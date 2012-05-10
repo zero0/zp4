@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ZP_BASE_TYPES_H
 #define ZP_BASE_TYPES_H
 
@@ -14,23 +15,12 @@ typedef signed __int64 zp_long;
 typedef float zp_float;
 typedef double zp_double;
 
+typedef bool zp_bool;
+
 #if ZP_USE_SIMD
 #include "zpBaseTypesSimd.inl"
 #else
 #include "zpBaseTypesFpu.inl"
 #endif
-
-class zpVector4;
-class zpReal;
-
-#include "zpVector4.h"
-#include "zpReal.h"
-
-#if ZP_USE_SIMD
-#include "zpRealSimd.inl"
-#else
-#include "zpRealFpu.inl"
-#endif
-
 
 #endif

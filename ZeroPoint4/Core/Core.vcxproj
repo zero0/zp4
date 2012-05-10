@@ -16,12 +16,12 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -41,6 +41,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_MBCS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>zpCore.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -62,6 +65,9 @@
   <ItemGroup>
     <ClInclude Include="zpBaseTypes.h" />
     <ClInclude Include="zpCore.h" />
+    <ClInclude Include="zpFlag.h" />
+    <ClInclude Include="zpGameObject.h" />
+    <ClInclude Include="zpMath.h" />
     <ClInclude Include="zpReal.h" />
     <ClInclude Include="zpVector4.h" />
   </ItemGroup>
@@ -70,6 +76,15 @@
     <None Include="zpRealFpu.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />
+    <None Include="zpVector4Fpu.inl" />
+    <None Include="zpVector4Simd.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="zpCore.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="zpGameObject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

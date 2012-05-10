@@ -33,6 +33,15 @@
     <ClInclude Include="zpCore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpFlag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpGameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -47,5 +56,22 @@
     <None Include="zpRealFpu.inl">
       <Filter>Source Files\Fpu</Filter>
     </None>
+    <None Include="zpVector4Fpu.inl">
+      <Filter>Source Files\Fpu</Filter>
+    </None>
+    <None Include="zpVector4Simd.inl">
+      <Filter>Source Files\Simd</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="zpGameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
