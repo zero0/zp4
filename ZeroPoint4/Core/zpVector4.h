@@ -18,20 +18,23 @@ public:
 
 	void set( zp_float x, zp_float y, zp_float z, zp_float w = 0 );
 	void set( const zpReal& x, const zpReal& y, const zpReal& z, const zpReal& w );
-
-	void mul( const zpVector4& vector );
-	void div( const zpVector4& vector );
-	void add( const zpVector4& vector );
-	void sub( const zpVector4& vector );
-
-	void mul( const zpReal& r );
-	void div( const zpReal& r );
-	void add( const zpReal& r );
-	void sub( const zpReal& r );
-
-	void zero();
-	zp_bool isZero() const;
 	*/
+	ZP_FORCE_INLINE void mul( const zpVector4& vector );
+	ZP_FORCE_INLINE void div( const zpVector4& vector );
+	ZP_FORCE_INLINE void add( const zpVector4& vector );
+	ZP_FORCE_INLINE void sub( const zpVector4& vector );
+	
+	ZP_FORCE_INLINE void mul( const zpReal& r );
+	ZP_FORCE_INLINE void div( const zpReal& r );
+	ZP_FORCE_INLINE void add( const zpReal& r );
+	ZP_FORCE_INLINE void sub( const zpReal& r );
+	
+	ZP_FORCE_INLINE void zero();
+	ZP_FORCE_INLINE zp_bool isZero() const;
+
+	ZP_FORCE_INLINE zp_float dot3( const zpVector4& vector ) const;
+	ZP_FORCE_INLINE zp_float dot4( const zpVector4& vector ) const;
+	
 private:
 	zp_vec4 m_xyzw;
 };

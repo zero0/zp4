@@ -5,6 +5,10 @@ zpReal::zpReal( const zpReal& real ) {}
 zpReal::zpReal( zpReal&& real ) {}
 zpReal::~zpReal() {}
 
+zpReal::operator zp_real() const {
+	return m_real;
+}
+
 void zpReal::operator=( const zpReal& real ) {}
 void zpReal::operator=( zpReal&& real ) {}
 

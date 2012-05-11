@@ -10,6 +10,8 @@ public:
 	zpReal( zpReal&& real );
 	~zpReal();
 
+	operator zp_real() const;
+
 	void operator=( const zpReal& real );
 	void operator=( zpReal&& real );
 
