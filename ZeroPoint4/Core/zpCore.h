@@ -10,9 +10,17 @@
 #include "zpBaseTypes.h"
 #include "zpMath.h"
 
+class zpTime;
 class zpGameObject;
+class zpGameObjectComponent;
 
+#include "zpTime.h"
+
+#include "zpLink.h"
 #include "zpFlag.h"
+
 #include "zpGameObject.h"
+#include "zpGameObjectComponent.h"
+
 
 #endif

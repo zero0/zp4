@@ -2,6 +2,12 @@
 #ifndef ZP_BASE_TYPES_H
 #define ZP_BASE_TYPES_H
 
+#if __cplusplus
+#define ZP_NULL	nullptr
+#else
+#define ZP_NULL	0
+#endif
+
 typedef unsigned __int8 zp_ubyte;
 typedef unsigned __int16 zp_ushort;
 typedef unsigned __int32 zp_uint;
