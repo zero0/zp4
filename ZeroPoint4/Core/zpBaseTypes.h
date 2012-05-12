@@ -23,6 +23,12 @@ typedef double zp_double;
 
 typedef bool zp_bool;
 
+#if UNICODE
+typedef wchar_t zp_char;
+#else
+typedef char zp_char;
+#endif
+
 #if ZP_USE_SIMD
 #include "zpBaseTypesSimd.inl"
 #else

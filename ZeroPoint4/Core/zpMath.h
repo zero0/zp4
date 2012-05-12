@@ -22,6 +22,7 @@ class zpReal;
 
 #include "zpVector4.h"
 #include "zpReal.h"
+#include "zpMatrix4.h"
 
 #if ZP_USE_SIMD
 #include "zpVector4Simd.inl"

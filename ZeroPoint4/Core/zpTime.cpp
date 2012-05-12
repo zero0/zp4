@@ -20,13 +20,23 @@ zpTime::zpTime() :
 zpTime::~zpTime() {}
 
 zpTime zpTime::s_instance;
-zpTime* zpTime::getInstance() { return &s_instance; }
+zpTime* zpTime::getInstance() {
+	return &s_instance;
+}
 
-zp_float zpTime::getDeltaTime() const { return m_deltaSeconds; }
-zp_float zpTime::getActualDeltaTime() const { return m_actualDeltaSeconds; }
+zp_float zpTime::getDeltaTime() const {
+	return m_deltaSeconds;
+}
+zp_float zpTime::getActualDeltaTime() const {
+	return m_actualDeltaSeconds;
+}
 
-void zpTime::setTimeScale( zp_float timeScale ) { m_timeScale = timeScale; }
-zp_float zpTime::getTimeScale() const { return m_timeScale; }
+void zpTime::setTimeScale( zp_float timeScale ) {
+	m_timeScale = timeScale;
+}
+zp_float zpTime::getTimeScale() const {
+	return m_timeScale;
+}
 
 void zpTime::tick() {
 	QueryPerformanceCounter( (LARGE_INTEGER*)&m_currentTime );

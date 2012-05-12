@@ -64,13 +64,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="zpBaseTypes.h" />
+    <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
     <ClInclude Include="zpFlag.h" />
     <ClInclude Include="zpGameObject.h" />
     <ClInclude Include="zpGameObjectComponent.h" />
     <ClInclude Include="zpIntrusiveList.h" />
     <ClInclude Include="zpMath.h" />
+    <ClInclude Include="zpMatrix4.h" />
     <ClInclude Include="zpReal.h" />
+    <ClInclude Include="zpString.h" />
     <ClInclude Include="zpTime.h" />
     <ClInclude Include="zpVector4.h" />
   </ItemGroup>

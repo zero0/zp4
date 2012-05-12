@@ -15,13 +15,13 @@ public:
 	void operator=( const zpFlag& flag ) { m_flag = flag; }
 	void operator=( zpFlag&& flag ) { m_flag = flag; }
 
-	void mark( zp_uint index ) { markAll( 1 << index ); }
+	void mark( zp_uint index ) { markAll( (F)( 1 << index ) ); }
 	void markAll( F mask ) { or( mask ); }
 
-	void unmark( zp_uint index ) { unmarkAll( 1 << index ); }
+	void unmark( zp_uint index ) { unmarkAll( (F)( 1 << index ) ); }
 	void unmarkAll( F mask ) { and( ~mask ); }
 
-	zp_bool isMarked( zp_uint index ) const { return isAllMarked( 1 << index ); }
+	zp_bool isMarked( zp_uint index ) const { return isAllMarked( (F)( 1 << index ) ); }
 	zp_bool isAnyMarked( F mask ) const { return ( m_flag & mask ) != 0; }
 	zp_bool isAllMarked( F mask ) const { return ( m_flag & mask ) == mask; }
 	

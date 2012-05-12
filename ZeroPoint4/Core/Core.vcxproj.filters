@@ -24,19 +24,7 @@
     <ClInclude Include="zpBaseTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpReal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpVector4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpCore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpFlag.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpGameObject.h">
@@ -48,7 +36,28 @@
     <ClInclude Include="zpTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpFlag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="zpIntrusiveList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpVector4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpMatrix4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpReal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
