@@ -50,26 +50,26 @@ int main() {
 	go4.addGameObjectComponent( new zpGameObjectComponent() );
 
 	go1.getComponents()->foreach([](zpGameObjectComponent* goc){
-		printf_s(" GOC: %p\n", goc);
+		zp_printfln(" GOC: %p", goc);
 	});
 	go1.getChildren()->foreach([](zpGameObject* go){
-		printf_s("GO: %p\n", go);
+		zp_printfln("GO: %p", go);
 		go->getComponents()->foreach([](zpGameObjectComponent* goc){
-			printf_s("  GOC: %p\n", goc);
+			zp_printfln("  GOC: %p", goc);
 		});
 
 
 		go->getChildren()->foreach([](zpGameObject* go){
-			printf_s("\tGO: %p\n", go);
+			zp_printfln("\tGO: %p", go);
 			go->getComponents()->foreach([](zpGameObjectComponent* goc){
-				printf_s("\t  GOC: %p\n", goc);
+				zp_printfln("\t  GOC: %p", goc);
 			});
 
 			go->update();
 			go->getChildren()->foreach([](zpGameObject* go){
-				printf_s("\t\tGO: %p\n", go);
+				zp_printfln("\t\tGO: %p", go);
 				go->getComponents()->foreach([](zpGameObjectComponent* goc){
-					printf_s("\t\t  GOC: %p\n", goc);
+					zp_printfln("\t\t  GOC: %p", goc);
 				});
 
 				go->update();

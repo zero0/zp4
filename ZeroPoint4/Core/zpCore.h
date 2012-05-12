@@ -7,10 +7,12 @@
 #endif
 
 #if ZP_DEBUG
-#define ZP_ON_DEBUG( msg, ... )		zp_printfln( msg, __VA_ARGS__ )
+#define ZP_ON_DEBUG( code )			do { code } while( 0 )
+#define ZP_ON_DEBUG_MSG( msg, ... )	zp_printfln( msg, __VA_ARGS__ )
 #define ZP_ASSERT( test, msg, ... )	do { if( !(test) ) { zp_printfcln( ZP_CC( CC_WHITE, CC_RED ), msg, __VA_ARGS__ ); } } while( 0 )
 #else
-#define ZP_ON_DEBUG( msg, ... )		(void)0
+#define ZP_ON_DEBUG( code )			(void)0
+#define ZP_ON_DEBUG_MSG( msg, ... )	(void)0
 #define ZP_ASSERT( test, msg, ... ) (void)0
 #endif
 
@@ -19,14 +21,9 @@
 #define ZP_INLINE		inline
 #define ZP_FORCE_INLINE	__forceinline
 
-#define ZP_SAFE_DELETE( p ) { if( (p) ) { delete (p); (p) = NULL; } }
-#define ZP_SAFE_DELETE_ARRAY( a ) { if( (a) ) { delete[] (a); (a) = NULL; } }
-#define ZP_SAFE_RELEASE( r ) { if( (r) ) { (r)->Release(); (r) = NULL; } }
-
-void ZP_INLINE zp_printf( const char* text, ... );
-//void ZP_INLINE zp_vprintf( const char* text, va_list args );
-void ZP_INLINE zp_printfln( const char* text, ... );
-//void ZP_INLINE zp_vprintfln( const char* text, va_list args );
+#define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }
+#define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
+#define ZP_SAFE_RELEASE( r )		{ if( (r) ) { (r)->Release(); (r) = ZP_NULL; } }
 
 #include "zpBaseTypes.h"
 #include "zpMath.h"
@@ -47,5 +44,7 @@ class zpGameObjectComponent;
 #include "zpGameObject.h"
 #include "zpGameObjectComponent.h"
 
+void zp_printf( const char* text, ... );
+void zp_printfln( const char* text, ... );
 
 #endif
