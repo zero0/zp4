@@ -16,7 +16,7 @@ class zpGameObjectComponent;
 
 #include "zpTime.h"
 
-#include "zpLink.h"
+#include "zpIntrusiveList.h"
 #include "zpFlag.h"
 
 #include "zpGameObject.h"

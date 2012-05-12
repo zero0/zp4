@@ -45,10 +45,10 @@
     <ClInclude Include="zpGameObjectComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpLink.h">
+    <ClInclude Include="zpTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpTime.h">
+    <ClInclude Include="zpIntrusiveList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -70,6 +70,9 @@
     </None>
     <None Include="zpVector4Simd.inl">
       <Filter>Source Files\Simd</Filter>
+    </None>
+    <None Include="zpIntrusiveList.inl">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

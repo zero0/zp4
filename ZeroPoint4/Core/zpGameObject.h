@@ -2,7 +2,7 @@
 #ifndef ZP_GAME_OBJECT_H
 #define ZP_GAME_OBJECT_H
 
-class zpGameObject : public zpLinkNode<zpGameObject> {
+class zpGameObject : public zpIntrusiveListNode<zpGameObject> {
 public:
 	zpGameObject();
 	~zpGameObject();
@@ -15,14 +15,14 @@ public:
 
 	void update();
 
-	const zpLink<zpGameObject>* getChildren() const { return &m_children; }
-	const zpLink<zpGameObjectComponent>* getComponents() const { return &m_components; }
+	const zpIntrusiveList<zpGameObject>* getChildren() const { return &m_children; }
+	const zpIntrusiveList<zpGameObjectComponent>* getComponents() const { return &m_components; }
 
 private:
 	zpGameObject* m_parent;
 
-	zpLink<zpGameObject> m_children;
-	zpLink<zpGameObjectComponent> m_components;
+	zpIntrusiveList<zpGameObject> m_children;
+	zpIntrusiveList<zpGameObjectComponent> m_components;
 
 	zpVector4 m_vector;
 };
