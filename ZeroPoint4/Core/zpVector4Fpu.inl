@@ -1,4 +1,13 @@
 
+#include <malloc.h>
+
+ZP_FORCE_INLINE void* zpVector4::operator new( zp_uint size ) {
+	return malloc( size );
+};
+ZP_FORCE_INLINE void zpVector4::operator delete( void* ptr ) {
+	free( ptr );
+}
+
 ZP_FORCE_INLINE zpVector4::zpVector4() {
 	m_xyzw.x = 0;
 	m_xyzw.y = 0;

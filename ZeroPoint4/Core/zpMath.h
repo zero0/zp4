@@ -19,17 +19,21 @@
 
 class zpVector4;
 class zpReal;
+class zpInteger;
 
 #include "zpVector4.h"
 #include "zpReal.h"
+#include "zpInteger.h"
 #include "zpMatrix4.h"
 
 #if ZP_USE_SIMD
 #include "zpVector4Simd.inl"
 #include "zpRealSimd.inl"
+#include "zpIntegerSimd.inl"
 #else
 #include "zpVector4Fpu.inl"
 #include "zpRealFpu.inl"
+#include "zpIntegerFpu.inl"
 #endif
 
 #endif

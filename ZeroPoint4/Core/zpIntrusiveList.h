@@ -3,7 +3,7 @@
 #define ZP_INTRUSIVE_LIST_H
 
 template<typename T>
-struct __declspec(novtable) zpIntrusiveListNode {
+struct ZP_NO_VTABLE zpIntrusiveListNode {
 	T* m_parent;
 	zpIntrusiveListNode* m_next;
 	zpIntrusiveListNode* m_prev;

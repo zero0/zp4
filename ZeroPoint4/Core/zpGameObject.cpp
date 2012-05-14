@@ -12,7 +12,7 @@ zpGameObject::~zpGameObject() {}
 void zpGameObject::addChildGameObject( zpGameObject* go ) {
 	m_children.prepend( go );
 }
-void zpGameObject::removeChildGameObject( zpGameObject go ) {
+void zpGameObject::removeChildGameObject( zpGameObject* go ) {
 	
 }
 

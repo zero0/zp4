@@ -4,6 +4,10 @@
 
 class zpVector4 {
 public:
+	ZP_FORCE_INLINE void* operator new( zp_uint size );
+	ZP_FORCE_INLINE void* operator new[]( zp_uint size );
+	ZP_FORCE_INLINE void operator delete( void* ptr );
+
 	ZP_FORCE_INLINE zpVector4();
 	ZP_FORCE_INLINE zpVector4( zp_float x, zp_float y, zp_float z, zp_float w = 0 );
 	ZP_FORCE_INLINE zpVector4( const zpVector4& vector );

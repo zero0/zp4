@@ -3,6 +3,9 @@
 
 int main() {
 	//zpGameObject go;
+	zpVector4 zz;
+	zpVector4* pp = new zpVector4();
+
 	zpVector4 vv( 4, 5, 6 );
 	//vv.add( zpVector4( 1, 0, 3, 0 ) );
 	//vv.mul( zpVector4( 2, 4, 6, 8 ) );
@@ -17,6 +20,7 @@ int main() {
 	zpGameObject* root2 = &go2;
 	zpGameObject* root3 = &go3;
 	zpGameObject* root4 = &go4;
+	zpGameObject* root5 = new zpGameObject();
 
 	go1.addChildGameObject( &go2 );
 	go2.addChildGameObject( &go3 );

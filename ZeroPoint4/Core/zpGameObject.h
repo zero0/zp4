@@ -8,7 +8,7 @@ public:
 	~zpGameObject();
 
 	void addChildGameObject( zpGameObject* go );
-	void removeChildGameObject( zpGameObject go );
+	void removeChildGameObject( zpGameObject* go );
 
 	void addGameObjectComponent( zpGameObjectComponent* goc );
 	void removeGameObjectComponent( zpGameObjectComponent* goc );

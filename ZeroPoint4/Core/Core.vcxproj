@@ -69,9 +69,11 @@
     <ClInclude Include="zpFlag.h" />
     <ClInclude Include="zpGameObject.h" />
     <ClInclude Include="zpGameObjectComponent.h" />
+    <ClInclude Include="zpInteger.h" />
     <ClInclude Include="zpIntrusiveList.h" />
     <ClInclude Include="zpMath.h" />
     <ClInclude Include="zpMatrix4.h" />
+    <ClInclude Include="zpMemorySystem.h" />
     <ClInclude Include="zpReal.h" />
     <ClInclude Include="zpString.h" />
     <ClInclude Include="zpTime.h" />
@@ -79,6 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl" />
+    <None Include="zpIntegerFpu.inl" />
+    <None Include="zpIntegerSimd.inl" />
     <None Include="zpIntrusiveList.inl" />
     <None Include="zpRealFpu.inl" />
     <None Include="zpRealSimd.inl" />
@@ -92,6 +96,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpGameObject.cpp" />
+    <ClCompile Include="zpMemorySystem.cpp" />
     <ClCompile Include="zpTime.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

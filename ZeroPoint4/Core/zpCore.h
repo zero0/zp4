@@ -16,10 +16,13 @@
 #define ZP_ASSERT( test, msg, ... ) (void)0
 #endif
 
-#define ZP_USE_SIMD		0
+#define ZP_USE_SIMD		1
 
 #define ZP_INLINE		inline
 #define ZP_FORCE_INLINE	__forceinline
+#define ZP_NO_VTABLE	__declspec( novtable )
+#define ZP_ALIGN(x)		__declspec( align( x ) )
+#define ZP_ALIGN16		ZP_ALIGN( 16 )
 
 #define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }
 #define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
@@ -32,6 +35,9 @@ class zpConsole;
 class zpTime;
 class zpGameObject;
 class zpGameObjectComponent;
+class zpMemorySystem;
+
+#include "zpMemorySystem.h"
 
 #include "zpString.h"
 
