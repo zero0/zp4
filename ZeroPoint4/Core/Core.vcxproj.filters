@@ -95,6 +95,9 @@
     <None Include="zpIntegerSimd.inl">
       <Filter>Source Files\Simd</Filter>
     </None>
+    <None Include="zpMatrix4Simd.inl">
+      <Filter>Source Files\Simd</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">

@@ -4,6 +4,11 @@
 
 class zpGameObject : public zpIntrusiveListNode<zpGameObject> {
 public:
+	/*
+	void* operator new( zp_uint size );
+	void* operator new[]( zp_uint size );
+	void operator delete( void* ptr );
+	*/
 	zpGameObject();
 	~zpGameObject();
 
@@ -24,7 +29,8 @@ private:
 	zpIntrusiveList<zpGameObject> m_children;
 	zpIntrusiveList<zpGameObjectComponent> m_components;
 
-	zpVector4 m_vector;
+	zpMatrix4 m_transform;
+	
 };
 
 #endif

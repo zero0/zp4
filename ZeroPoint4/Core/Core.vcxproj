@@ -84,6 +84,7 @@
     <None Include="zpIntegerFpu.inl" />
     <None Include="zpIntegerSimd.inl" />
     <None Include="zpIntrusiveList.inl" />
+    <None Include="zpMatrix4Simd.inl" />
     <None Include="zpRealFpu.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />

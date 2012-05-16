@@ -2,14 +2,6 @@
 #include <stdio.h>
 
 int main() {
-	//zpGameObject go;
-	zpVector4 zz;
-	zpVector4* pp = new zpVector4();
-
-	zpVector4 vv( 4, 5, 6 );
-	//vv.add( zpVector4( 1, 0, 3, 0 ) );
-	//vv.mul( zpVector4( 2, 4, 6, 8 ) );
-	zp_float dot = vv.dot3( zpVector4( 1, 2, 3 ) );
 
 	zpGameObject go1;
 	zpGameObject go2;

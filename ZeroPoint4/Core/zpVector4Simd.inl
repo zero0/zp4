@@ -1,4 +1,4 @@
-
+/*
 ZP_FORCE_INLINE void* zpVector4::operator new( zp_uint size ) {
 	return _aligned_malloc( size, 16 );
 };
@@ -8,7 +8,7 @@ ZP_FORCE_INLINE void* zpVector4::operator new[]( zp_uint size ) {
 ZP_FORCE_INLINE void zpVector4::operator delete( void* ptr ) {
 	_aligned_free( ptr );
 }
-
+*/
 ZP_FORCE_INLINE zpVector4::zpVector4() : m_xyzw( _mm_setzero_ps() ) {}
 ZP_FORCE_INLINE zpVector4::zpVector4( zp_float x, zp_float y, zp_float z, zp_float w ) : m_xyzw( _mm_set_ps( w, z, y, x ) ) {}
 ZP_FORCE_INLINE zpVector4::zpVector4( const zpVector4& vector ) : m_xyzw( vector.m_xyzw ) {}

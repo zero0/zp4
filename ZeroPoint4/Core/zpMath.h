@@ -20,6 +20,7 @@
 class zpVector4;
 class zpReal;
 class zpInteger;
+class zpMatrix4;
 
 #include "zpVector4.h"
 #include "zpReal.h"
@@ -30,6 +31,7 @@ class zpInteger;
 #include "zpVector4Simd.inl"
 #include "zpRealSimd.inl"
 #include "zpIntegerSimd.inl"
+#include "zpMatrix4Simd.inl"
 #else
 #include "zpVector4Fpu.inl"
 #include "zpRealFpu.inl"
