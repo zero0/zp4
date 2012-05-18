@@ -20,14 +20,13 @@ public:
 
 	static zpMemorySystem* getInstance();
 
-	void initialize( zpMemoryAllocator* allocator );
-	void initializeDefault();
-	void initializeDebug();
+	static void initialize( zpMemoryAllocator* allocator );
+	static void initializeDefault();
+	static void initializeDebug();
+	static zp_bool isInitialized();
+	static void destroy();
 
-	void setMemoryAllocator( zpMemoryAllocator* allocator );
 	zpMemoryAllocator* getMemoryAllocator() const;
-
-	zp_bool isInitialized() const;
 
 private:
 	zpMemorySystem();

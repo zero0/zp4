@@ -4,41 +4,41 @@
 
 class zpReal {
 public:
-	zpReal();
-	zpReal( zp_float real );
-	zpReal( const zpReal& real );
-	zpReal( zpReal&& real );
-	~zpReal();
+	ZP_FORCE_INLINE zpReal();
+	ZP_FORCE_INLINE zpReal( zp_float real );
+	ZP_FORCE_INLINE zpReal( const zpReal& real );
+	ZP_FORCE_INLINE zpReal( zpReal&& real );
+	ZP_FORCE_INLINE ~zpReal();
 
-	operator zp_real() const;
+	ZP_FORCE_INLINE operator zp_real() const;
 
-	void operator=( const zpReal& real );
-	void operator=( zpReal&& real );
+	ZP_FORCE_INLINE void operator=( const zpReal& real );
+	ZP_FORCE_INLINE void operator=( zpReal&& real );
 
-	zp_float getReal() const;
+	ZP_FORCE_INLINE zp_float getReal() const;
 
-	void abs();
-	void abs( const zp_real& real );
+	ZP_FORCE_INLINE void abs();
+	ZP_FORCE_INLINE void abs( const zp_real& real );
 
-	void mul( const zp_real& real );
-	void div( const zp_real& real );
-	void add( const zp_real& real );
-	void sub( const zp_real& real );
+	ZP_FORCE_INLINE void mul( const zp_real& real );
+	ZP_FORCE_INLINE void div( const zp_real& real );
+	ZP_FORCE_INLINE void add( const zp_real& real );
+	ZP_FORCE_INLINE void sub( const zp_real& real );
 
-	const zp_real operator-() const;
-	const zp_real operator*( const zp_real& real ) const;
-	const zp_real operator/( const zp_real& real ) const;
-	const zp_real operator+( const zp_real& real ) const;
-	const zp_real operator-( const zp_real& real ) const;
+	ZP_FORCE_INLINE const zp_real operator-() const;
+	ZP_FORCE_INLINE const zp_real operator*( const zp_real& real ) const;
+	ZP_FORCE_INLINE const zp_real operator/( const zp_real& real ) const;
+	ZP_FORCE_INLINE const zp_real operator+( const zp_real& real ) const;
+	ZP_FORCE_INLINE const zp_real operator-( const zp_real& real ) const;
 
-	void setMin( const zp_real& a, const zp_real& b );
-	void setMax( const zp_real& a, const zp_real& b );
+	ZP_FORCE_INLINE void setMin( const zp_real& a, const zp_real& b );
+	ZP_FORCE_INLINE void setMax( const zp_real& a, const zp_real& b );
 
-	const zp_real sqrt() const;
-	const zp_real invsqrt() const;
+	ZP_FORCE_INLINE const zp_real sqrt() const;
+	ZP_FORCE_INLINE const zp_real invsqrt() const;
 
-	void zero();
-	zp_bool isZero() const;
+	ZP_FORCE_INLINE void zero();
+	ZP_FORCE_INLINE zp_bool isZero() const;
 
 private:
 	zp_real m_real;

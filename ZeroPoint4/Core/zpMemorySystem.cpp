@@ -9,7 +9,7 @@ zpMemorySystem* zpMemorySystem::getInstance() {
 }
 
 void zpMemorySystem::initialize( zpMemoryAllocator* allocator ) {
-	m_allocator = allocator;
+	s_instance.m_allocator = allocator;
 }
 void zpMemorySystem::initializeDefault() {
 	struct zpDefaultMemoryAllocator : zpMemoryAllocator {
@@ -88,14 +88,13 @@ void zpMemorySystem::initializeDebug() {
 	initializeDefault();
 #endif
 }
-
-void zpMemorySystem::setMemoryAllocator( zpMemoryAllocator* allocator ) {
-	m_allocator = allocator;
+zp_bool zpMemorySystem::isInitialized() {
+	return s_instance.m_allocator != ZP_NULL;
 }
+void zpMemorySystem::destroy() {
+	s_instance.m_allocator = ZP_NULL;
+}
+
 zpMemoryAllocator* zpMemorySystem::getMemoryAllocator() const {
 	return m_allocator;
-}
-
-zp_bool zpMemorySystem::isInitialized() const {
-	return m_allocator != ZP_NULL;
 }

@@ -2,6 +2,11 @@
 #include <stdio.h>
 
 int main() {
+	zpMatrix4 mat;
+	zpVector4 vec;
+
+	//zpVector4* vv = new zpVector4();
+	//zpMatrix4* mm = new zpMatrix4();
 
 	zpGameObject go1;
 	zpGameObject go2;
@@ -12,7 +17,7 @@ int main() {
 	zpGameObject* root2 = &go2;
 	zpGameObject* root3 = &go3;
 	zpGameObject* root4 = &go4;
-	zpGameObject* root5 = new zpGameObject();
+	//zpGameObject* root5 = new zpGameObject();
 
 	go1.addChildGameObject( &go2 );
 	go2.addChildGameObject( &go3 );
@@ -46,26 +51,26 @@ int main() {
 	go4.addGameObjectComponent( new zpGameObjectComponent() );
 
 	go1.getComponents()->foreach([](zpGameObjectComponent* goc){
-		zp_printfln(" GOC: %p", goc);
+		zp_printfln(" GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 	});
 	go1.getChildren()->foreach([](zpGameObject* go){
-		zp_printfln("GO: %p", go);
+		zp_printfln("GO: %p Ref: %d", go, go->getReferenceCount() );
 		go->getComponents()->foreach([](zpGameObjectComponent* goc){
-			zp_printfln("  GOC: %p", goc);
+			zp_printfln("  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 		});
 
 
 		go->getChildren()->foreach([](zpGameObject* go){
-			zp_printfln("\tGO: %p", go);
+			zp_printfln("\tGO: %p Ref: %d", go, go->getReferenceCount());
 			go->getComponents()->foreach([](zpGameObjectComponent* goc){
-				zp_printfln("\t  GOC: %p", goc);
+				zp_printfln("\t  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 			});
 
 			go->update();
 			go->getChildren()->foreach([](zpGameObject* go){
-				zp_printfln("\t\tGO: %p", go);
+				zp_printfln("\t\tGO: %p Ref: %d", go, go->getReferenceCount() );
 				go->getComponents()->foreach([](zpGameObjectComponent* goc){
-					zp_printfln("\t\t  GOC: %p", goc);
+					zp_printfln("\t\t  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 				});
 
 				go->update();

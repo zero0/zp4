@@ -24,18 +24,18 @@ class zpMatrix4;
 
 #include "zpVector4.h"
 #include "zpReal.h"
-#include "zpInteger.h"
+//#include "zpInteger.h"
 #include "zpMatrix4.h"
 
 #if ZP_USE_SIMD
 #include "zpVector4Simd.inl"
 #include "zpRealSimd.inl"
-#include "zpIntegerSimd.inl"
+//#include "zpIntegerSimd.inl"
 #include "zpMatrix4Simd.inl"
 #else
 #include "zpVector4Fpu.inl"
 #include "zpRealFpu.inl"
-#include "zpIntegerFpu.inl"
+//#include "zpIntegerFpu.inl"
 #endif
 
 #endif
