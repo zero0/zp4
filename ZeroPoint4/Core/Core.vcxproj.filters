@@ -81,6 +81,9 @@
     <ClInclude Include="zpGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">

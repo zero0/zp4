@@ -61,6 +61,8 @@ class zpGameObjectComponent;
 #include "zpIntrusiveList.h"
 #include "zpFlag.h"
 
+#include "zpMessage.h"
+
 #include "zpGame.h"
 #include "zpWorld.h"
 #include "zpGameManager.h"

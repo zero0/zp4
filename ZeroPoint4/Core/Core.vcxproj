@@ -126,6 +126,7 @@
     <ClInclude Include="zpMath.h" />
     <ClInclude Include="zpMatrix4.h" />
     <ClInclude Include="zpMemorySystem.h" />
+    <ClInclude Include="zpMessage.h" />
     <ClInclude Include="zpReal.h" />
     <ClInclude Include="zpReferencedObject.h" />
     <ClInclude Include="zpReferencedPointer.h" />
