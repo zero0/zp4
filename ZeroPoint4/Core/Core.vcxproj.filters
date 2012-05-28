@@ -145,5 +145,8 @@
     <ClCompile Include="zpGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

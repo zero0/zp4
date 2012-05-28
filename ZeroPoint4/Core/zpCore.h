@@ -15,7 +15,7 @@
 #if ZP_DEBUG
 #define ZP_ON_DEBUG( code )			do { code } while( 0 )
 #define ZP_ON_DEBUG_MSG( msg, ... )	zp_printfln( msg, __VA_ARGS__ )
-#define ZP_ASSERT( test, msg, ... )	do { if( !(test) ) { zp_printfcln( ZP_CC( CC_WHITE, CC_RED ), msg, __VA_ARGS__ ); } } while( 0 )
+#define ZP_ASSERT( test, msg, ... )	do { if( !(test) ) { zp_printfln( msg, __VA_ARGS__ ); } } while( 0 )
 #else
 #define ZP_ON_DEBUG( code )			(void)0
 #define ZP_ON_DEBUG_MSG( msg, ... )	(void)0
@@ -36,6 +36,8 @@
 #include "zpBaseTypes.h"
 #include "zpMath.h"
 
+class zpString;
+
 class zpConsole;
 class zpTime;
 class zpMemorySystem;
@@ -47,14 +49,14 @@ class zpGameManager;
 class zpGameObject;
 class zpGameObjectComponent;
 
+#include "zpString.h"
+
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"
 #include "zpReferencedPointer.h"
 
-#include "zpString.h"
-
-#include "zpTime.h"
 #include "zpConsole.h"
+#include "zpTime.h"
 
 #include "zpIntrusiveList.h"
 #include "zpFlag.h"

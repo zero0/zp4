@@ -23,6 +23,15 @@ typedef double zp_double;
 
 typedef bool zp_bool;
 
+
+#if defined(_WIN32) 
+typedef zp_uint zp_ptr;
+typedef zp_ulong zp_lptr;
+#elif defined(_WIN64)
+typedef zp_ulong zp_ptr;
+typedef zp_ulong zp_lptr;
+#endif
+
 #if UNICODE
 typedef wchar_t zp_char;
 #else

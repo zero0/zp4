@@ -158,6 +158,7 @@
     <ClCompile Include="zpGameObjectComponent.cpp" />
     <ClCompile Include="zpMemorySystem.cpp" />
     <ClCompile Include="zpReferencedObject.cpp" />
+    <ClCompile Include="zpString.cpp" />
     <ClCompile Include="zpTime.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>

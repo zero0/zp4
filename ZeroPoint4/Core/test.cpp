@@ -2,6 +2,29 @@
 #include <stdio.h>
 
 int main() {
+
+	zpString empty;
+	zpString small( "orld" );
+	zpString* strprt = new zpString( "abcd" );
+	zpString str( "12345678" );
+	zpString cpy( str );
+	zpString ss( small, 2, 1 );
+	zpString ffss( "abcdefghijkl", 6, 3 );
+	zpString mv( zpString( "testing the move" ) );
+
+	//mv = ss;
+
+	zp_char a = strprt->charAt( 1 );
+
+	auto ind = str.endsWith( small );
+
+	small.setCharAt( 1, 'z' );
+
+	zpString sub = str.substring( 3, -1 );
+
+	zp_printfln( "String sub: %s", sub.getChars() );
+	zp_printfln( "String mv : %s", mv.getChars() );
+
 	zpMatrix4 mat;
 	zpVector4 vec;
 
@@ -37,7 +60,7 @@ int main() {
 
 	go4.addChildGameObject( new zpGameObject() );
 	go4.addChildGameObject( new zpGameObject() );
-
+	/*
 	go1.addGameObjectComponent( new zpGameObjectComponent() );
 	go1.addGameObjectComponent( new zpGameObjectComponent() );
 
@@ -49,7 +72,7 @@ int main() {
 	go3.addGameObjectComponent( new zpGameObjectComponent() );
 
 	go4.addGameObjectComponent( new zpGameObjectComponent() );
-
+	*/
 	go1.getComponents()->foreach([](zpGameObjectComponent* goc){
 		zp_printfln(" GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 	});
