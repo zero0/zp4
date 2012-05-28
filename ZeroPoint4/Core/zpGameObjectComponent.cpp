@@ -2,7 +2,8 @@
 
 zpGameObjectComponent::zpGameObjectComponent() :
 	m_parentGameObject( ZP_NULL ),
-	m_isEnabled( true )
+	m_isEnabled( true ),
+	m_name()
 {
 	m_parent = this;
 }
@@ -29,4 +30,11 @@ void zpGameObjectComponent::setEnabled( zp_bool enabled ) {
 }
 zp_bool zpGameObjectComponent::isEnabled() const {
 	return m_isEnabled;
+}
+
+const zpString& zpGameObjectComponent::getName() const {
+	return m_name;
+}
+void zpGameObjectComponent::setName( const zpString& name ) {
+	m_name = name;
 }

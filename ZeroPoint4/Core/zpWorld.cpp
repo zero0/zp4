@@ -40,3 +40,10 @@ void zpWorld::setEnabled( zp_bool enabled ) {
 zp_bool zpWorld::isEnabled() const {
 	return m_isEnabled;
 }
+
+const zpString& zpWorld::getName() const {
+	return m_name;
+}
+void zpWorld::setName( const zpString& name ) {
+	m_name = name;
+}

@@ -2,30 +2,36 @@
 #include <stdio.h>
 
 int main() {
+	zp_printfln( "Size: %d", sizeof( zpString ) );
 
 	zpString empty;
-	zpString small( "orld" );
+	zpString small( "WORLD wide Web Is the InterNETS" );
 	zpString* strprt = new zpString( "abcd" );
-	zpString str( "12345678" );
+	zpString str( "1234567890123456789012345678901234567890" );
 	zpString cpy( str );
 	zpString ss( small, 2, 1 );
 	zpString ffss( "abcdefghijkl", 6, 3 );
 	zpString mv( zpString( "testing the move" ) );
 
-	//mv = ss;
+	mv = "assigned";
 
 	zp_char a = strprt->charAt( 1 );
 
-	auto ind = str.endsWith( small );
+	auto ind = str.indexOf( small );
 
 	small.setCharAt( 1, 'z' );
 
 	zpString sub = str.substring( 3, -1 );
 
+	zpString up( mv.toUpper() );
+	zpString lower = small.toLower();
+
 	zp_printfln( "String sub: %s", sub.getChars() );
 	zp_printfln( "String mv : %s", mv.getChars() );
+	zp_printfln( "String small: %s", small.getChars() );
+	zp_printfln( "String lower: %s", lower.getChars() );
 
-	zpMatrix4 mat;
+	zpMatrix4 mat, ident;
 	zpVector4 vec;
 
 	//zpVector4* vv = new zpVector4();
@@ -100,6 +106,6 @@ int main() {
 			});
 		});
 	});
-
+	getchar();
 	return 0;
 }

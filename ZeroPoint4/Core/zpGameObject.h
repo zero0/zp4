@@ -35,6 +35,9 @@ public:
 	const zpIntrusiveList<zpGameObject>* getChildren() const { return &m_children; }
 	const zpIntrusiveList<zpGameObjectComponent>* getComponents() const { return &m_components; }
 
+	const zpString& getName() const;
+	void setName( const zpString& name );
+
 private:
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
@@ -46,7 +49,7 @@ private:
 	zpIntrusiveList<zpGameObjectComponent> m_components;
 
 	zpMatrix4 m_transform;
-	
+	zpString m_name;
 };
 
 #endif

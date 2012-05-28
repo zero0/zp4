@@ -36,6 +36,7 @@ class zpMatrix4;
 #include "zpVector4Fpu.inl"
 #include "zpRealFpu.inl"
 //#include "zpIntegerFpu.inl"
+#include "zpMatrix4Fpu.inl"
 #endif
 
 #endif

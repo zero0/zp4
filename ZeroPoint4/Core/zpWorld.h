@@ -18,11 +18,16 @@ public:
 	void setEnabled( zp_bool enabled );
 	zp_bool isEnabled() const;
 
+	const zpString& getName() const;
+	void setName( const zpString& name );
+
 private:
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
 
 	zpGameObject* m_root;
+
+	zpString m_name;
 };
 
 #endif

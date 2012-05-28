@@ -2,20 +2,21 @@
 #ifndef ZP_STRING_H
 #define ZP_STRING_H
 
-#define ZP_STRING_USE_LONG	0
+#define ZP_STRING_MAX_SMALL_SIZE	16
 
 class zpString {
 public:
-	static const zp_uint npos = -1;
+	static const zp_ushort npos = -1;
 
 	zpString();
-	explicit zpString( const zp_char* string );
+	zpString( const zp_char* string );
 	zpString( const zp_char* string, zp_uint length, zp_uint offset = 0 );
 	zpString( const zpString& string );
 	zpString( const zpString& string, zp_uint length, zp_uint offset = 0 );
 	zpString( zpString&& string );
 	~zpString();
 
+	zpString& operator=( const zp_char* string );
 	zpString& operator=( const zpString& string );
 	zpString& operator=( zpString&& string );
 
@@ -41,26 +42,24 @@ public:
 	zp_int compareTo( const zpString& string ) const;
 	zp_int compareToIgnoreCase( const zpString& string ) const;
 
+	zp_char& operator[]( zp_uint index );
 	void setCharAt( zp_uint index, zp_char ch );
 
 	zpString substring( zp_uint startIndex ) const;
 	zpString substring( zp_uint startIndex, zp_int endIndex ) const;
 
-private:
-	void initialize( const zp_char* string, zp_uint length, zp_uint offset );
+	zpString toLower() const;
+	zpString toUpper() const;
 
-#if ZP_STRING_USE_LONG
+	zp_int scan( const zp_char* format, ... ) const;
+
+private:
+	static zpString __format( zp_char* buff, zp_uint size, const zpString& format, ... );
+
 	union {
-		zp_lptr m_string;
-		zp_char* m_ptr;
-		zp_char m_chars[8];
-	};
-#else
-	union {
+		zp_char m_chars[ZP_STRING_MAX_SMALL_SIZE];
 		zp_char* m_string;
-		zp_char m_chars[4];
 	};
-#endif
 
 	zp_uint m_capacity;
 	zp_uint m_length;

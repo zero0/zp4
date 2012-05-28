@@ -113,6 +113,9 @@
     <None Include="zpMatrix4Simd.inl">
       <Filter>Source Files\Simd</Filter>
     </None>
+    <None Include="zpMatrix4Fpu.inl">
+      <Filter>Source Files\Fpu</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">

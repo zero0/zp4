@@ -16,7 +16,8 @@ zpGameObject::zpGameObject() :
 	m_parent( ZP_NULL ),
 	m_world( ZP_NULL ),
 	m_components( ZP_NULL ),
-	m_transform()
+	m_transform(),
+	m_name()
 {
 	m_children.setParent( this );
 }
@@ -124,4 +125,11 @@ void zpGameObject::destroy() {
 	m_children.foreach( []( zpGameObject* go ) {
 		go->destroy();
 	} );
+}
+
+const zpString& zpGameObject::getName() const {
+	return m_name;
+}
+void zpGameObject::setName( const zpString& name ) {
+	m_name = name;
 }
