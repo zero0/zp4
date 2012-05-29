@@ -113,6 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpArray.h" />
     <ClInclude Include="zpBaseTypes.h" />
     <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
