@@ -175,14 +175,14 @@ void zpWindow::windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) {
 		break;
 	case WM_KILLFOCUS:
 		{
-			m_focusListeners.foreach( [](  zpWindowFocusListener* listener ) {
+			m_focusListeners.foreach( []( zpWindowFocusListener* listener ) {
 				listener->onFocusLost();
 			});
 		}
 		break;
 	case WM_SETFOCUS:
 		{
-			m_focusListeners.foreach( [](  zpWindowFocusListener* listener ) {
+			m_focusListeners.foreach( []( zpWindowFocusListener* listener ) {
 				listener->onFocusGained();
 			});
 		}
@@ -219,7 +219,7 @@ void zpWindow::addFocusListener( zpWindowFocusListener* listener ) {
 	m_focusListeners.pushBack( listener );
 }
 void zpWindow::removeFocusListener( zpWindowFocusListener* listener ) {
-	m_focusListeners.remove( listener );
+	m_focusListeners.removeAll( listener );
 }
 void zpWindow::removeAllFocusListeners() {
 	m_focusListeners.clear();
@@ -229,7 +229,7 @@ void zpWindow::addProcListener( zpWindowProcListener* listener ) {
 	m_procListeners.pushBack( listener );
 }
 void zpWindow::removeProcListener( zpWindowProcListener* listener ) {
-	m_procListeners.remove( listener );
+	m_procListeners.removeAll( listener );
 }
 void zpWindow::removeAllProcListeners() {
 	m_procListeners.clear();

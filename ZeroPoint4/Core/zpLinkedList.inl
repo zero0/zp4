@@ -60,7 +60,7 @@ zp_bool zpLinkedList<T>::contains( const T& val ) const {
 }
 
 template<typename T>
-zp_bool zpLinkedList<T>::remove( const T& val ) {
+zp_bool zpLinkedList<T>::removeFirst( const T& val ) {
 	zpLinkedListNode<T>* ring = m_root.m_next;
 	const zpLinkedListNode<T>* head = &m_root;
 
@@ -70,6 +70,20 @@ zp_bool zpLinkedList<T>::remove( const T& val ) {
 			return true;
 		}
 		ring = ring->m_next;
+	}
+	return false;
+}
+template<typename T>
+zp_bool zpLinkedList<T>::removeLast( const T& val ) {
+	zpLinkedListNode<T>* ring = m_root.m_prev;
+	const zpLinkedListNode<T>* head = &m_root;
+
+	while( ring != head ) {
+		if( val == ring->m_value ) {
+			removeNode( ring );
+			return true;
+		}
+		ring = ring->m_prev;
 	}
 	return false;
 }
@@ -149,6 +163,7 @@ void zpLinkedList<T>::foreachIndexed( Func func ) const {
 		ring = ring->m_next;
 	}
 }
+
 template<typename T> template<typename Func>
 zp_uint zpLinkedList<T>::removeIf( Func func ) {
 	zpLinkedListNode<T>* ring = m_root.m_next;

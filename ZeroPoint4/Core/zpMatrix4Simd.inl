@@ -44,19 +44,19 @@ ZP_FORCE_INLINE zpMatrix4::zpMatrix4( zpMatrix4&& matrix ) :
 {}
 ZP_FORCE_INLINE zpMatrix4::~zpMatrix4() {}
 
-ZP_FORCE_INLINE zpMatrix4& zpMatrix4::operator=( const zpMatrix4& matrix ) {
+ZP_FORCE_INLINE void zpMatrix4::operator=( const zpMatrix4& matrix ) {
 	m_m1 = matrix.m_m1;
 	m_m2 = matrix.m_m2;
 	m_m3 = matrix.m_m3;
 	m_m4 = matrix.m_m4;
 }
-ZP_FORCE_INLINE zpMatrix4& zpMatrix4::operator=( zpMatrix4&& matrix ) {
+ZP_FORCE_INLINE void zpMatrix4::operator=( zpMatrix4&& matrix ) {
 	m_m1 = matrix.m_m1;
 	m_m2 = matrix.m_m2;
 	m_m3 = matrix.m_m3;
 	m_m4 = matrix.m_m4;
 }
-ZP_FORCE_INLINE zpMatrix4& zpMatrix4::operator=( const zp_float* matrix ) {
+ZP_FORCE_INLINE void zpMatrix4::operator=( const zp_float* matrix ) {
 	m_m1 = zp_vec4( MM( 0, 0 ), MM( 0, 1 ), MM( 0, 2 ), MM( 0, 3 ) );
 	m_m2 = zp_vec4( MM( 1, 0 ), MM( 1, 1 ), MM( 1, 2 ), MM( 1, 3 ) );
 	m_m3 = zp_vec4( MM( 2, 0 ), MM( 2, 1 ), MM( 2, 2 ), MM( 2, 3 ) );
@@ -104,6 +104,12 @@ ZP_FORCE_INLINE void zpMatrix4::operator*=( const zpMatrix4& matrix ) {
 	m_m2 = col2;
 	m_m3 = col3;
 	m_m4 = col4;
+}
+
+ZP_FORCE_INLINE zpMatrix4 zpMatrix4::operator*( const zpMatrix4& matrix ) const {
+	zpMatrix4 mat( (*this) );
+	mat *= matrix;
+	return mat;
 }
 
 #undef MM_

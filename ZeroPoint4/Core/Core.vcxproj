@@ -129,6 +129,7 @@
     <ClInclude Include="zpMatrix4.h" />
     <ClInclude Include="zpMemorySystem.h" />
     <ClInclude Include="zpMessage.h" />
+    <ClInclude Include="zpPair.h" />
     <ClInclude Include="zpReal.h" />
     <ClInclude Include="zpReferencedObject.h" />
     <ClInclude Include="zpReferencedPointer.h" />
@@ -147,6 +148,7 @@
     <None Include="zpLinkedList.inl" />
     <None Include="zpMatrix4Fpu.inl" />
     <None Include="zpMatrix4Simd.inl" />
+    <None Include="zpPair.inl" />
     <None Include="zpRealFpu.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />

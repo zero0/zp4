@@ -65,3 +65,61 @@ void zpIntrusiveList<T>::foreach( Func func ) const {
 		ring = ring->m_next;
 	}
 }
+
+template<typename T> template<typename Func>
+const T* zpIntrusiveList<T>::findFirstIf( Func func ) const {
+	const zpIntrusiveListNode<T>* ring = m_root.m_next;
+
+	while( ring != &m_root ) {
+		const T* val = (const T*)ring;
+		if( func( val ) ) {
+			return val;
+		};
+		ring = ring->m_next;
+	}
+
+	return ZP_NULL;
+}
+template<typename T> template<typename Func>
+T* zpIntrusiveList<T>::findFirstIf( Func func ) {
+	const zpIntrusiveListNode<T>* ring = m_root.m_next;
+
+	while( ring != &m_root ) {
+		T* val = (T*)ring;
+		if( func( val ) ) {
+			return val;
+		};
+		ring = ring->m_next;
+	}
+
+	return ZP_NULL;
+}
+
+template<typename T> template<typename Func>
+const T* zpIntrusiveList<T>::findLastIf( Func func ) const {
+	const zpIntrusiveListNode<T>* ring = m_root.m_prev;
+
+	while( ring != &m_root ) {
+		const T* val = ( const T*)ring;
+		if( func( val ) ) {
+			return val;
+		};
+		ring = ring->m_prev;
+	}
+
+	return ZP_NULL;
+}
+template<typename T> template<typename Func>
+T* zpIntrusiveList<T>::findLastIf( Func func ) {
+	const zpIntrusiveListNode<T>* ring = m_root.m_prev;
+
+	while( ring != &m_root ) {
+		T* val = (T*)ring;
+		if( func( val ) ) {
+			return val;
+		};
+		ring = ring->m_prev;
+	}
+
+	return ZP_NULL;
+}

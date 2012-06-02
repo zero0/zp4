@@ -28,7 +28,8 @@ public:
 
 	zp_bool contains( const T& val ) const;
 
-	zp_bool remove( const T& val );
+	zp_bool removeFirst( const T& val );
+	zp_bool removeLast( const T& val );
 	zp_uint removeAll( const T& val );
 
 	void clear();
@@ -46,6 +47,7 @@ public:
 	void foreach( Func func ) const;
 	template<typename Func>
 	void foreachIndexed( Func func ) const;
+
 	template<typename Func>
 	zp_uint removeIf( Func func );
 

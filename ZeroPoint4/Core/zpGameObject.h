@@ -2,6 +2,7 @@
 #ifndef ZP_GAME_OBJECT_H
 #define ZP_GAME_OBJECT_H
 
+
 class zpGameObject : public zpIntrusiveListNode<zpGameObject>, public zpReferencedObject {
 public:
 	/*
@@ -32,13 +33,30 @@ public:
 	void create();
 	void destroy();
 
-	const zpIntrusiveList<zpGameObject>* getChildren() const { return &m_children; }
-	const zpIntrusiveList<zpGameObjectComponent>* getComponents() const { return &m_components; }
+	const zpIntrusiveList<zpGameObject>* getChildGameObjects() const;
+	const zpIntrusiveList<zpGameObjectComponent>* getGameObjectComponents() const;
+
+	const zpGameObject* getChildGameObjectByName( const zpString& name ) const;
+	zpGameObject* getChildGameObjectByName( const zpString& name );
+
+	const zpGameObjectComponent* getGameObjectComponentByName( const zpString& name ) const;
+	zpGameObjectComponent* getGameObjectComponentByName( const zpString& name );
+
+	template<typename T>
+	const T* getGameObjectComponentByType() const { return (const T*)getGameObjectComponent_T( &typeid( T ) ); }
+	template<typename T>
+	T* getGameObjectComponentByType() { return (T*)getGameObjectComponent_T( &typeid( T ) ); }
 
 	const zpString& getName() const;
 	void setName( const zpString& name );
 
+	const zpMatrix4& getTransform() const;
+	zpMatrix4 getComputedTransform() const;
+	void setTransform( const zpMatrix4& transform );
+
 private:
+	zpGameObjectComponent* getGameObjectComponent_T( const void* type );
+
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
 

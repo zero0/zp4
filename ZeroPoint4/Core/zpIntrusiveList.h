@@ -29,6 +29,16 @@ public:
 	
 	template<typename Func>
 	void foreach( Func func ) const;
+
+	template<typename Func>
+	const T* findFirstIf( Func func ) const;
+	template<typename Func>
+	T* findFirstIf( Func func );
+
+	template<typename Func>
+	const T* findLastIf( Func func ) const;
+	template<typename Func>
+	T* findLastIf( Func func );
 	
 private:
 	zpIntrusiveListNode<T> m_root;

@@ -79,26 +79,26 @@ int main() {
 
 	go4.addGameObjectComponent( new zpGameObjectComponent() );
 	*/
-	go1.getComponents()->foreach([](zpGameObjectComponent* goc){
+	go1.getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
 		zp_printfln(" GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 	});
-	go1.getChildren()->foreach([](zpGameObject* go){
+	go1.getChildGameObjects()->foreach([](zpGameObject* go){
 		zp_printfln("GO: %p Ref: %d", go, go->getReferenceCount() );
-		go->getComponents()->foreach([](zpGameObjectComponent* goc){
+		go->getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
 			zp_printfln("  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 		});
 
 
-		go->getChildren()->foreach([](zpGameObject* go){
+		go->getChildGameObjects()->foreach([](zpGameObject* go){
 			zp_printfln("\tGO: %p Ref: %d", go, go->getReferenceCount());
-			go->getComponents()->foreach([](zpGameObjectComponent* goc){
+			go->getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
 				zp_printfln("\t  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 			});
 
 			go->update();
-			go->getChildren()->foreach([](zpGameObject* go){
+			go->getChildGameObjects()->foreach([](zpGameObject* go){
 				zp_printfln("\t\tGO: %p Ref: %d", go, go->getReferenceCount() );
-				go->getComponents()->foreach([](zpGameObjectComponent* goc){
+				go->getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
 					zp_printfln("\t\t  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 				});
 
@@ -106,6 +106,7 @@ int main() {
 			});
 		});
 	});
+	zpGameObjectComponent* gzz = go1.getGameObjectComponentByType<zpGameObjectComponent>();
 	
 	zpLinkedList<zp_int> intList;
 	intList.pushBack( 44 );

@@ -1,4 +1,6 @@
 #include "zpCore.h"
+#include <typeinfo>
+
 /*
 void* zpGameObject::operator new( zp_uint size ) {
 	return _aligned_malloc( size, 16 );
@@ -127,9 +129,36 @@ void zpGameObject::destroy() {
 	} );
 }
 
+const zpIntrusiveList<zpGameObject>* zpGameObject::getChildGameObjects() const {
+	return &m_children;
+}
+const zpIntrusiveList<zpGameObjectComponent>* zpGameObject::getGameObjectComponents() const {
+	return &m_components;
+}
+
 const zpString& zpGameObject::getName() const {
 	return m_name;
 }
 void zpGameObject::setName( const zpString& name ) {
 	m_name = name;
+}
+
+const zpMatrix4& zpGameObject::getTransform() const {
+	return m_transform;
+}
+zpMatrix4 zpGameObject::getComputedTransform() const {
+	return m_parent ? m_transform * m_parent->getComputedTransform() : m_transform;
+}
+void zpGameObject::setTransform( const zpMatrix4& transform ) {
+	m_transform = transform;
+}
+
+zpGameObjectComponent* zpGameObject::getGameObjectComponent_T( const void* type ) {
+	const std::type_info& info = *(const std::type_info*)type;
+	
+	zpGameObjectComponent* component = m_components.findFirstIf( [ &info ]( const zpGameObjectComponent* component ) {
+		return typeid( component ) == info;
+	});
+
+	return component;
 }

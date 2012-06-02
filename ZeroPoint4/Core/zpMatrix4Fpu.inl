@@ -44,25 +44,23 @@ ZP_FORCE_INLINE zpMatrix4::zpMatrix4( zpMatrix4&& matrix ) :
 {}
 ZP_FORCE_INLINE zpMatrix4::~zpMatrix4() {}
 
-ZP_FORCE_INLINE zpMatrix4& zpMatrix4::operator=( const zpMatrix4& matrix ) {
+ZP_FORCE_INLINE void zpMatrix4::operator=( const zpMatrix4& matrix ) {
 	m_m1 = matrix.m_m1;
 	m_m2 = matrix.m_m2;
 	m_m3 = matrix.m_m3;
 	m_m4 = matrix.m_m4;
 }
-ZP_FORCE_INLINE zpMatrix4& zpMatrix4::operator=( zpMatrix4&& matrix ) {
+ZP_FORCE_INLINE void zpMatrix4::operator=( zpMatrix4&& matrix ) {
 	m_m1 = matrix.m_m1;
 	m_m2 = matrix.m_m2;
 	m_m3 = matrix.m_m3;
 	m_m4 = matrix.m_m4;
 }
-ZP_FORCE_INLINE zpMatrix4& zpMatrix4::operator=( const zp_float* matrix ) {
+ZP_FORCE_INLINE void zpMatrix4::operator=( const zp_float* matrix ) {
 	m_m1 = zp_vec4( MM( 0, 0 ), MM( 0, 1 ), MM( 0, 2 ), MM( 0, 3 ) );
 	m_m2 = zp_vec4( MM( 1, 0 ), MM( 1, 1 ), MM( 1, 2 ), MM( 1, 3 ) );
 	m_m3 = zp_vec4( MM( 2, 0 ), MM( 2, 1 ), MM( 2, 2 ), MM( 2, 3 ) );
 	m_m4 = zp_vec4( MM( 3, 0 ), MM( 3, 1 ), MM( 3, 2 ), MM( 3, 3 ) );
-
-	return (*this);
 }
 
 ZP_FORCE_INLINE zp_float& zpMatrix4::operator()( zp_uint row, zp_uint col ) {
@@ -90,13 +88,19 @@ ZP_FORCE_INLINE void zpMatrix4::operator*=( const zpMatrix4& matrix ) {
 
 			for( j = 0; j < 4; ++j ) {
 				//sum += m_matrix[x][j] * matrix.m_matrix[j][y];
-				sum += m_data[ j + x * 4 ] * matrix.m_data[ y + j * 4 ];
+				sum += m_data[ MM_( j, x ) ] * matrix.m_data[ MM_( y, j ) ];
 			}
 
 			mat[x][y] = sum;
 		}
 	}
 	(*this) = &mat[0][0];
+}
+
+ZP_FORCE_INLINE zpMatrix4 zpMatrix4::operator*( const zpMatrix4& matrix ) const {
+	zpMatrix4 mat( (*this) );
+	mat *= matrix;
+	return mat;
 }
 
 #undef MM_

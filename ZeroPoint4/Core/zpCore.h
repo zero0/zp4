@@ -49,6 +49,7 @@ class zpString;
 #include "zpFlag.h"
 #include "zpLinkedList.h"
 #include "zpIntrusiveList.h"
+#include "zpPair.h"
 
 class zpConsole;
 class zpWindow;
