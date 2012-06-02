@@ -124,6 +124,7 @@
     <ClInclude Include="zpGameObjectComponent.h" />
     <ClInclude Include="zpInteger.h" />
     <ClInclude Include="zpIntrusiveList.h" />
+    <ClInclude Include="zpLinkedList.h" />
     <ClInclude Include="zpMath.h" />
     <ClInclude Include="zpMatrix4.h" />
     <ClInclude Include="zpMemorySystem.h" />
@@ -133,7 +134,9 @@
     <ClInclude Include="zpReferencedPointer.h" />
     <ClInclude Include="zpString.h" />
     <ClInclude Include="zpTime.h" />
+    <ClInclude Include="zpVector2.h" />
     <ClInclude Include="zpVector4.h" />
+    <ClInclude Include="zpWindow.h" />
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
@@ -141,11 +144,13 @@
     <None Include="zpIntegerFpu.inl" />
     <None Include="zpIntegerSimd.inl" />
     <None Include="zpIntrusiveList.inl" />
+    <None Include="zpLinkedList.inl" />
     <None Include="zpMatrix4Fpu.inl" />
     <None Include="zpMatrix4Simd.inl" />
     <None Include="zpRealFpu.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />
+    <None Include="zpVector2.inl" />
     <None Include="zpVector4Fpu.inl" />
     <None Include="zpVector4Simd.inl" />
   </ItemGroup>
@@ -163,6 +168,7 @@
     <ClCompile Include="zpReferencedObject.cpp" />
     <ClCompile Include="zpString.cpp" />
     <ClCompile Include="zpTime.cpp" />
+    <ClCompile Include="zpWindow.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

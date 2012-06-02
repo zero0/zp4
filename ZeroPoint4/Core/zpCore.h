@@ -6,6 +6,12 @@
 #define ZP_DEBUG	1
 #endif
 
+#if _WIN32
+#define ZP_WIN_32
+#elif _WIN64
+#define ZP_WIN_64
+#endif
+
 //#ifdef _WIN32
 //#define ZP_USE_SIMD		0
 //#elif defined(_WIN64)
@@ -22,6 +28,9 @@
 #define ZP_ASSERT( test, msg, ... ) (void)0
 #endif
 
+#define ZP_STDCALL		__stdcall
+#define ZP_FASTCALL		__fastcall
+
 #define ZP_INLINE		inline
 #define ZP_FORCE_INLINE	__forceinline
 #define ZP_NO_VTABLE	__declspec( novtable )
@@ -37,8 +46,13 @@
 #include "zpMath.h"
 
 class zpString;
+#include "zpFlag.h"
+#include "zpLinkedList.h"
+#include "zpIntrusiveList.h"
 
 class zpConsole;
+class zpWindow;
+
 class zpTime;
 class zpMemorySystem;
 class zpReferencedObject;
@@ -56,10 +70,9 @@ class zpGameObjectComponent;
 #include "zpReferencedPointer.h"
 
 #include "zpConsole.h"
-#include "zpTime.h"
+#include "zpWindow.h"
 
-#include "zpIntrusiveList.h"
-#include "zpFlag.h"
+#include "zpTime.h"
 
 #include "zpMessage.h"
 

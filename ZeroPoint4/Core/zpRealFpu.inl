@@ -1,3 +1,4 @@
+#include <math.h>
 
 ZP_FORCE_INLINE zpReal::zpReal() {}
 ZP_FORCE_INLINE zpReal::zpReal( zp_float real ) : m_real( real ) {}

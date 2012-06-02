@@ -56,8 +56,7 @@ template<typename T>
 T* zpIntrusiveList<T>::getParent() const {
 	return m_root.m_parent;}
 
-template<typename T>
-template<typename Func>
+template<typename T> template<typename Func>
 void zpIntrusiveList<T>::foreach( Func func ) const {
 	const zpIntrusiveListNode<T>* ring = m_root.m_next;
 

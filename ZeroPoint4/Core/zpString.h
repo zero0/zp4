@@ -22,6 +22,7 @@ public:
 
 	//operator const zp_char*() const;
 	const zp_char* getChars() const;
+	const char* c_str() const;
 
 	zp_char operator[]( zp_uint index ) const;
 	zp_char charAt( zp_uint index ) const;

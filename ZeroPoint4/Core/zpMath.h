@@ -2,8 +2,6 @@
 #ifndef ZP_MATH_H
 #define ZP_MATH_H
 
-#include <math.h>
-
 #define ZP_EPSILON	0.0001f
 #define ZP_PI		3.1415926f
 #define ZP_1OVERPI	( 1.0f / ZP_PI )
@@ -17,11 +15,18 @@
 #define ZP_MIN( a, b )	( ( (a) < (b) ) ? (a) : (b) )
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
 
+template<typename T>
+ZP_FORCE_INLINE T& zp_clamp01( T& val ) { return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val; }
+
+template<typename T>
+ZP_FORCE_INLINE T& zp_clamp( T& val, T& low, T& high ) { return val > high ? high : val < low ? low : val; }
+
 class zpVector4;
 class zpReal;
 class zpInteger;
 class zpMatrix4;
 
+#include "zpVector2.h"
 #include "zpVector4.h"
 #include "zpReal.h"
 //#include "zpInteger.h"

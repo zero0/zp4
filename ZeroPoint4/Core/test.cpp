@@ -30,7 +30,7 @@ int main() {
 	zp_printfln( "String mv : %s", mv.getChars() );
 	zp_printfln( "String small: %s", small.getChars() );
 	zp_printfln( "String lower: %s", lower.getChars() );
-
+	
 	zpMatrix4 mat, ident;
 	zpVector4 vec;
 
@@ -106,6 +106,20 @@ int main() {
 			});
 		});
 	});
+	
+	zpLinkedList<zp_int> intList;
+	intList.pushBack( 44 );
+	intList.pushFront( 12 );
+	intList.foreach( []( const zp_int& val ){ zp_printfln( "List: %d", val ); } );
+	//intList.popBack();
+	zp_bool cont = intList.contains( 43 );
+
+	zpWindow wnd;
+	wnd.setTitle( "ZeroPoint4 Window" );
+	wnd.setPosition( zpVector2i( 50, 50 ) );
+	wnd.create();
+	wnd.run();
+	
 	getchar();
 	return 0;
 }
