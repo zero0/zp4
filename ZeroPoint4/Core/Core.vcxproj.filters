@@ -102,6 +102,9 @@
     <ClInclude Include="zpMessageReceiver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpHashMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -144,6 +147,9 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpPair.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpArray.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

@@ -44,6 +44,7 @@
 #define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
 #define ZP_SAFE_RELEASE( r )		{ if( (r) ) { (r)->Release(); (r) = ZP_NULL; } }
 #define ZP_SAFE_REMOVE_REF( r )		{ if( (r) ) { (r)->removeReference(); (r) = ZP_NULL; } }
+#define ZP_SAFE_FREE( p )			{ if( (p) ) { free( (p) ); (p) = ZP_NULL; } }
 
 #include "zpBaseTypes.h"
 #include "zpMath.h"
@@ -53,6 +54,8 @@ class zpString;
 #include "zpLinkedList.h"
 #include "zpIntrusiveList.h"
 #include "zpPair.h"
+#include "zpArray.h"
+#include "zpHashMap.h"
 
 class zpConsole;
 class zpWindow;
