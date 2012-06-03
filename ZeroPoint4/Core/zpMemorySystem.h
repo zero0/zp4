@@ -2,7 +2,7 @@
 #ifndef ZP_MEMORY_SYSTEM_H
 #define ZP_MEMORY_SYSTEM_H
 
-struct ZP_NO_VTABLE zpMemoryAllocator {
+ZP_PURE_INTERFACE zpMemoryAllocator {
 	virtual void* allocate( zp_uint size ) = 0;
 	virtual void* allocateArray( zp_uint size, zp_uint count ) = 0;
 	virtual void* allocateAligned( zp_uint size, zp_uint align ) = 0;

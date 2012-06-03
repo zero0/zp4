@@ -2,7 +2,7 @@
 #ifndef ZP_GAME_MANAGER_H
 #define ZP_GAME_MANAGER_H
 
-class zpGameManager : public zpIntrusiveListNode<zpGameManager>, public zpReferencedObject {
+class zpGameManager : public zpIntrusiveListNode<zpGameManager>, public zpReferencedObject, public zpMessageReceiver {
 public:
 	zpGameManager();
 	virtual ~zpGameManager();

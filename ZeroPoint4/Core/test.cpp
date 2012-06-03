@@ -108,6 +108,12 @@ int main() {
 	});
 	zpGameObjectComponent* gzz = go1.getGameObjectComponentByType<zpGameObjectComponent>();
 	
+	zpMessage msg1( 22, 4444.424243f, ZP_NULL );
+	zpMessage msg2( 43, zpString( "Testing String" ), ZP_NULL );
+
+	float d1 = msg1.getMessageData<float>();
+	zpString d2 = msg2.getMessageData<zpString>();
+
 	zpLinkedList<zp_int> intList;
 	intList.pushBack( 44 );
 	intList.pushFront( 12 );

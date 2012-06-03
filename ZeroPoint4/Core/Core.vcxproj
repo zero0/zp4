@@ -129,6 +129,7 @@
     <ClInclude Include="zpMatrix4.h" />
     <ClInclude Include="zpMemorySystem.h" />
     <ClInclude Include="zpMessage.h" />
+    <ClInclude Include="zpMessageReceiver.h" />
     <ClInclude Include="zpPair.h" />
     <ClInclude Include="zpReal.h" />
     <ClInclude Include="zpReferencedObject.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="zpGameObject.cpp" />
     <ClCompile Include="zpGameObjectComponent.cpp" />
     <ClCompile Include="zpMemorySystem.cpp" />
+    <ClCompile Include="zpMessage.cpp" />
     <ClCompile Include="zpReferencedObject.cpp" />
     <ClCompile Include="zpString.cpp" />
     <ClCompile Include="zpTime.cpp" />

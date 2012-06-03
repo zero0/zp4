@@ -129,13 +129,13 @@ void zpWindow::create() {
 		NULL
 	);
 
-	SetWindowLongPtr( (HWND)m_hWnd, WINDOW_PTR_INDEX, (LONG)this );
-
 	if( !m_hWnd ) {
 		DWORD error = GetLastError();
 		ZP_ON_DEBUG_MSG( "Unable to create window. Error #%X", error );
 		return;
 	}
+
+	SetWindowLongPtr( (HWND)m_hWnd, WINDOW_PTR_INDEX, (LONG)this );
 
 	ShowWindow( (HWND)m_hWnd,  SW_SHOW );
 	UpdateWindow( (HWND)m_hWnd );
@@ -154,7 +154,7 @@ void zpWindow::run() {
 
 	MSG message;
 	while( true ) {
-		if( PeekMessage( &message, (HWND)m_hWnd, 0, 0, PM_REMOVE ) ) {
+		if( PeekMessage( &message, NULL, 0, 0, PM_REMOVE ) ) {
 			if( message.message == WM_QUIT ) {
 				break;
 			}

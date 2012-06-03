@@ -2,7 +2,7 @@
 #ifndef ZP_GAME_OBJECT_COMPONENT_H
 #define ZP_GAME_OBJECT_COMPONENT_H
 
-class zpGameObjectComponent : public zpIntrusiveListNode<zpGameObjectComponent>, public zpReferencedObject {
+ZP_ABSTRACT_CLASS zpGameObjectComponent : public zpIntrusiveListNode<zpGameObjectComponent>, public zpReferencedObject, public zpMessageReceiver {
 public:
 	zpGameObjectComponent();
 	virtual ~zpGameObjectComponent();
@@ -23,6 +23,9 @@ public:
 
 	const zpString& getName() const;
 	void setName( const zpString& name );
+
+	void sendMessageToGameObject( const zpMessage& message );
+	void sendMessageToSiblingGameObjectComponents( const zpMessage& message );
 
 private:
 	zp_bool m_isEnabled;

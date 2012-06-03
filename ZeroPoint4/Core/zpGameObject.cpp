@@ -15,37 +15,36 @@ void zpGameObject::operator delete( void* ptr ) {
 zpGameObject::zpGameObject() :
 	m_isEnabled( true ),
 	m_isCreated( false ),
-	m_parent( ZP_NULL ),
+	m_parentGameObject( ZP_NULL ),
 	m_world( ZP_NULL ),
 	m_components( ZP_NULL ),
 	m_transform(),
 	m_name()
 {
-	m_children.setParent( this );
 }
 zpGameObject::~zpGameObject() {}
 
 void zpGameObject::setParentGameObject( zpGameObject* go ) {
 	if( go == this ) return;
 	if( go ) go->addReference();
-	if( m_parent ) m_parent->removeReference();
-	m_parent = go;
+	if( m_parentGameObject ) m_parentGameObject->removeReference();
+	m_parentGameObject = go;
 	
-	setWorld( m_parent ? m_parent->getWorld() : ZP_NULL );
+	setWorld( m_parentGameObject ? m_parentGameObject->getWorld() : ZP_NULL );
 }
 zpGameObject* zpGameObject::getParentGameObject() const {
-	return m_parent;
+	return m_parentGameObject;
 }
 
 void zpGameObject::addChildGameObject( zpGameObject* go ) {
-	if( go ) {
+	if( go && go != this ) {
 		m_children.prepend( go );
 		go->setParentGameObject( this );
 		go->addReference();
 	}
 }
 void zpGameObject::removeChildGameObject( zpGameObject* go ) {
-	if( go ) {
+	if( go && go != this ) {
 		m_children.detatch( go );
 		go->setParentGameObject( ZP_NULL );
 		go->removeReference();
@@ -147,7 +146,7 @@ const zpMatrix4& zpGameObject::getTransform() const {
 	return m_transform;
 }
 zpMatrix4 zpGameObject::getComputedTransform() const {
-	return m_parent ? m_transform * m_parent->getComputedTransform() : m_transform;
+	return m_parent ? m_transform * m_parentGameObject->getComputedTransform() : m_transform;
 }
 void zpGameObject::setTransform( const zpMatrix4& transform ) {
 	m_transform = transform;
@@ -161,4 +160,22 @@ zpGameObjectComponent* zpGameObject::getGameObjectComponent_T( const void* type 
 	});
 
 	return component;
+}
+
+void zpGameObject::receiveMessage( const zpMessage& message ) {
+	sendMessageToGameObjectComponents( message );
+	sendMessageToChildGameObjects( message );
+}
+void zpGameObject::sendMessageToGameObjectComponents( const zpMessage& message ) {
+	m_components.foreach( [ &message ]( zpGameObjectComponent* goc ) {
+		goc->receiveMessage( message );
+	} );
+}
+void zpGameObject::sendMessageToChildGameObjects( const zpMessage& message ) {
+	m_children.foreach( [ &message ]( zpGameObject* go ) {
+		go->receiveMessage( message );
+	} );
+}
+void zpGameObject::sendMessageToParentGameObject( const zpMessage& message ) {
+	if( m_parentGameObject ) m_parentGameObject->receiveMessage( message );
 }

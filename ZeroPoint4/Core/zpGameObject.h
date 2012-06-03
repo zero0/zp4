@@ -3,7 +3,7 @@
 #define ZP_GAME_OBJECT_H
 
 
-class zpGameObject : public zpIntrusiveListNode<zpGameObject>, public zpReferencedObject {
+class zpGameObject : public zpIntrusiveListNode<zpGameObject>, public zpReferencedObject, public zpMessageReceiver {
 public:
 	/*
 	void* operator new( zp_uint size );
@@ -54,13 +54,18 @@ public:
 	zpMatrix4 getComputedTransform() const;
 	void setTransform( const zpMatrix4& transform );
 
+	void receiveMessage( const zpMessage& message );
+	void sendMessageToGameObjectComponents( const zpMessage& message );
+	void sendMessageToChildGameObjects( const zpMessage& message );
+	void sendMessageToParentGameObject( const zpMessage& message );
+
 private:
 	zpGameObjectComponent* getGameObjectComponent_T( const void* type );
 
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
 
-	zpGameObject* m_parent;
+	zpGameObject* m_parentGameObject;
 	zpWorld* m_world;
 
 	zpIntrusiveList<zpGameObject> m_children;

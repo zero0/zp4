@@ -21,7 +21,7 @@
 #if ZP_DEBUG
 #define ZP_ON_DEBUG( code )			do { code } while( 0 )
 #define ZP_ON_DEBUG_MSG( msg, ... )	zp_printfln( msg, __VA_ARGS__ )
-#define ZP_ASSERT( test, msg, ... )	do { if( !(test) ) { zp_printfln( msg, __VA_ARGS__ ); } } while( 0 )
+#define ZP_ASSERT( test, msg, ... )	do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); } } while( 0 )
 #else
 #define ZP_ON_DEBUG( code )			(void)0
 #define ZP_ON_DEBUG_MSG( msg, ... )	(void)0
@@ -36,6 +36,9 @@
 #define ZP_NO_VTABLE	__declspec( novtable )
 #define ZP_ALIGN(x)		__declspec( align( x ) )
 #define ZP_ALIGN16		ZP_ALIGN( 16 )
+
+#define ZP_PURE_INTERFACE	struct ZP_NO_VTABLE
+#define ZP_ABSTRACT_CLASS	class ZP_NO_VTABLE
 
 #define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }
 #define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
@@ -55,6 +58,10 @@ class zpConsole;
 class zpWindow;
 
 class zpTime;
+
+class zpMessage;
+ZP_PURE_INTERFACE zpMessageReceiver;
+
 class zpMemorySystem;
 class zpReferencedObject;
 
@@ -76,6 +83,7 @@ class zpGameObjectComponent;
 #include "zpTime.h"
 
 #include "zpMessage.h"
+#include "zpMessageReceiver.h"
 
 #include "zpGame.h"
 #include "zpWorld.h"

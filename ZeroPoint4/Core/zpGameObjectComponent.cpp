@@ -38,3 +38,13 @@ const zpString& zpGameObjectComponent::getName() const {
 void zpGameObjectComponent::setName( const zpString& name ) {
 	m_name = name;
 }
+
+void zpGameObjectComponent::sendMessageToGameObject( const zpMessage& message ) {
+	m_parentGameObject->receiveMessage( message );
+}
+void zpGameObjectComponent::sendMessageToSiblingGameObjectComponents( const zpMessage& message ) {
+	const zpGameObjectComponent* self = this;
+	m_parentGameObject->getGameObjectComponents()->foreach( [ &self, &message ]( zpGameObjectComponent* goc ){
+		if( goc != self ) goc->receiveMessage( message );
+	} );
+}
