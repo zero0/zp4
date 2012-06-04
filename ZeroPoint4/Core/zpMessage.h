@@ -28,7 +28,7 @@ public:
 	{}
 	template<typename MessageData>
 	const MessageData& getMessageData() const {
-		ZP_ASSERT( m_dataSize == sizeof( MessageData ), "Inconsistant zpMessage data size. size: %d request: %d.", m_dataSize, sizeof( MessageData ) );
+		ZP_ASSERT( m_dataSize == sizeof( MessageData ), "zpMessage: Inconsistant data size. Size: %d Given: %d", m_dataSize, sizeof( MessageData ) );
 		return zpMessageDataCache::getInstance()->getMessageData<MessageData>( m_data, m_dataSize );
 	}
 

@@ -121,6 +121,39 @@ int main() {
 	//intList.popBack();
 	zp_bool cont = intList.contains( 43 );
 
+	zp_printfln( "" );
+
+	zpArray<float> rrr( 3 );
+	rrr.pushBack( 1 );
+	rrr.pushBack( 2 );
+	rrr.pushBack( 3 );
+	rrr.pushBack( 4 );
+	float rerwrwe[3] = { 5, 6, 7 };
+	rrr.pushFront( rerwrwe );
+	rrr.foreachIndexed( [ &rrr ]( int i, const float& val ) {
+		zp_printfln( "%d %cArr: %f", i, ( i == rrr.size() ? '>' : ' ' ), val );
+	});
+	
+	zp_printfln( "" );
+
+	rrr.insert( 0, 9 );
+	//rrr.popFront();
+	//rrr.popBack( 3 );
+	rrr.foreachIndexed( [ &rrr ]( int i, const float& val ) {
+		zp_printfln( "%d %cArr: %f", i, ( i == rrr.size() ? '>' : ' ' ), val );
+	});
+
+	float fsfsfs;
+	rrr.remove( 5, &fsfsfs );
+	rrr[5] = 10;
+	
+	rrr.shrinkToFit(1);
+
+	zp_printfln( "" );
+	rrr.foreachIndexed( [ &rrr ]( int i, const float& val ) {
+		zp_printfln( "%d %cArr: %f", i, ( i == rrr.size() ? '>' : ' ' ), val );
+	});
+
 	zpWindow wnd;
 	wnd.setTitle( "ZeroPoint4 Window" );
 	wnd.setPosition( zpVector2i( 50, 50 ) );

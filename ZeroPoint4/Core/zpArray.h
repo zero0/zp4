@@ -28,20 +28,29 @@ public:
 	zp_bool isFull() const;
 
 	void pushBack( const T& val );
-	void pushBack( T* arr, zp_uint count );
+	void pushBack( const T* arr, zp_uint count );
+	template<zp_uint Count>
+	void pushBack( const T (&arr)[Count] );
 
 	void pushFront( const T& val );
-	void pushFront( T* arr, zp_uint count );
+	void pushFront( const T* arr, zp_uint count );
+	template<zp_uint Count>
+	void pushFront( const T (&arr)[Count] );
 
 	void popBack( zp_uint numToPop = 1 );
 	void popFront( zp_uint numToPop = 1 );
 
 	void insert( zp_uint index, const T& val );
 	
-	T remove( zp_uint index );
-	zp_bool removeFirst( const T& val );
-	zp_bool removeLast( const T& val );
+	void remove( zp_uint index, T* outVal = ZP_NULL );
+	zp_bool removeFirst( const T& val, T* outVal = ZP_NULL );
+	zp_bool removeLast( const T& val, T* outVal = ZP_NULL );
 	zp_uint removeAll( const T& val );
+
+	void erase( zp_uint index );
+	zp_bool eraseFirst( const T& val );
+	zp_bool eraseLast( const T& val );
+	zp_uint eraseAll( const T& val );
 
 	void clear();
 
@@ -49,7 +58,7 @@ public:
 	zp_uint lastIndexOf( const T& val ) const;
 
 	void ensureCapacity( zp_uint size );
-	void shrinkToFit();
+	void shrinkToFit( zp_uint padding = 0 );
 
 	T& front();
 	T& back();
@@ -62,6 +71,15 @@ public:
 
 	const T* begin() const;
 	const T* end() const;
+
+	template<typename Func>
+	void foreach( Func func ) const;
+	template<typename Func>
+	void foreachIndexed( Func func ) const;
+	template<typename Func>
+	void map( Func func ) const;
+
+	static const zp_uint npos;
 
 private:
 	T* m_array;

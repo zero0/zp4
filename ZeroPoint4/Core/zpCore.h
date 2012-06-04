@@ -19,13 +19,17 @@
 //#endif
 
 #if ZP_DEBUG
-#define ZP_ON_DEBUG( code )			do { code } while( 0 )
-#define ZP_ON_DEBUG_MSG( msg, ... )	zp_printfln( msg, __VA_ARGS__ )
-#define ZP_ASSERT( test, msg, ... )	do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); } } while( 0 )
+#define ZP_ON_DEBUG( code )							do { code ; } while( 0 )
+#define ZP_ON_DEBUG_MSG( msg, ... )					zp_printfln( msg, __VA_ARGS__ )
+#define ZP_ASSERT( test, msg, ... )					do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); } } while( 0 )
+#define ZP_ASSERT_RETURN( test, msg, ... )			do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); return; } } while( 0 ) 
+#define ZP_ASSERT_RETURN_( test, ret, msg, ... )	do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); return (ret); } } while( 0 ) 
 #else
-#define ZP_ON_DEBUG( code )			(void)0
-#define ZP_ON_DEBUG_MSG( msg, ... )	(void)0
-#define ZP_ASSERT( test, msg, ... ) (void)0
+#define ZP_ON_DEBUG( code )							(void)0
+#define ZP_ON_DEBUG_MSG( msg, ... )					(void)0
+#define ZP_ASSERT( test, msg, ... )					(void)0
+#define ZP_ASSERT_RETURN( test, msg, ... )			(void)0
+#define ZP_ASSERT_RETURN_( test, ret, msg, ... )	(void)0
 #endif
 
 #define ZP_STDCALL		__stdcall

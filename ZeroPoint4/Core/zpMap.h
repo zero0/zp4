@@ -1,17 +1,15 @@
 #pragma once
-#ifndef ZP_HASH_MAP_H
-#define ZP_HASH_MAP_H
+#ifndef ZP_MAP_H
+#define ZP_MAP_H
 
 template<typename Key, typename Value>
-class zpHashMap {
+class zpMap {
 public:
-	zpHashMap();
-	~zpHashMap();
+	zpMap();
+	~zphMap();
 
 private:
 	zpArray<zpPair<Key, Value>> m_map;
 };
-
-#include "zpHashMap.inl"
 
 #endif
