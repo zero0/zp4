@@ -54,12 +54,13 @@
 #include "zpMath.h"
 
 class zpString;
-#include "zpFlag.h"
-#include "zpLinkedList.h"
-#include "zpIntrusiveList.h"
-#include "zpPair.h"
-#include "zpArray.h"
-#include "zpHashMap.h"
+template<typename T> class zpFlag;
+template<typename T> class zpLinkedList;
+template<typename T> class zpIntrusiveList;
+template<typename F, typename S> class zpPair;
+template<typename T> class zpArray;
+template<typename K, typename V> class zpMap;
+template<typename F, typename S> class zpHashMap;
 
 class zpConsole;
 class zpWindow;
@@ -79,6 +80,14 @@ class zpGameObject;
 class zpGameObjectComponent;
 
 #include "zpString.h"
+
+#include "zpFlag.h"
+#include "zpLinkedList.h"
+#include "zpIntrusiveList.h"
+#include "zpPair.h"
+#include "zpArray.h"
+#include "zpHashMap.h"
+#include "zpMap.h"
 
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"

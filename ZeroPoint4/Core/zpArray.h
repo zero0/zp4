@@ -75,9 +75,16 @@ public:
 	template<typename Func>
 	void foreach( Func func ) const;
 	template<typename Func>
+	void foreachIf( Func func ) const;
+
+	template<typename Func>
 	void foreachIndexed( Func func ) const;
 	template<typename Func>
+	void foreachIndexedIf( Func func ) const;
+
+	template<typename Func>
 	void map( Func func ) const;
+	
 
 	static const zp_uint npos;
 

@@ -1,12 +1,22 @@
 #pragma once
 #ifndef ZP_PAIR_H
 #define ZP_PAIR_H
-
+#include <hash_map>
 template<typename First, typename Second>
 class zpPair {
+public:
 	zpPair();
 	zpPair( const First& first, const Second& second );
+	zpPair( First&& first, Second&& second );
+	zpPair( First&& first, const Second& second );
+	zpPair( const First& first, Second&& second );
+	zpPair( const zpPair& pair );
+	zpPair( zpPair&& pair );
 	~zpPair();
+
+	template<typename F, typename S>
+	void operator=( const zpPair<F, S>& pair );
+	void operator=( zpPair&& pair );
 
 	const First& first() const;
 	const Second& second() const;

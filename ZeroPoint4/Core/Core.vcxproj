@@ -151,6 +151,7 @@
     <None Include="zpIntegerSimd.inl" />
     <None Include="zpIntrusiveList.inl" />
     <None Include="zpLinkedList.inl" />
+    <None Include="zpMap.inl" />
     <None Include="zpMatrix4Fpu.inl" />
     <None Include="zpMatrix4Simd.inl" />
     <None Include="zpPair.inl" />

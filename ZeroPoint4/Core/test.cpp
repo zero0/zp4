@@ -154,6 +154,22 @@ int main() {
 		zp_printfln( "%d %cArr: %f", i, ( i == rrr.size() ? '>' : ' ' ), val );
 	});
 
+	zpMap<int, float> mmm;
+	mmm.put( 10, 10.2323f );
+	mmm.put( 5, 155.1f );
+	mmm.put( 59, 99.1f );
+	mmm.put( 10, 987654.f );
+	float ytryr = mmm[ 59 ];
+	ytryr = mmm[ 5 ];
+	mmm[ 23 ] = 12123414.f;
+	ytryr = mmm.get( 30 );
+
+	mmm.remove( 59, &ytryr );
+
+	mmm.foreach( []( int key, float val ) {
+		zp_printfln( "%d => %f", key, val );
+	});
+
 	zpWindow wnd;
 	wnd.setTitle( "ZeroPoint4 Window" );
 	wnd.setPosition( zpVector2i( 50, 50 ) );

@@ -158,6 +158,9 @@
     <None Include="zpHashMap.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpMap.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">

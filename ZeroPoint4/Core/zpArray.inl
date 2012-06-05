@@ -56,7 +56,7 @@ T& zpArray<T>::operator[]( zp_uint index ) {
 }
 template<typename T>
 const T& zpArray<T>::operator[]( zp_uint index ) const {
-	return m_array[ index ]
+	return m_array[ index ];
 }
 
 template<typename T>
@@ -188,7 +188,6 @@ zp_uint zpArray<T>::removeAll( const T& val ) {
 	return 0;
 }
 
-
 template<typename T>
 void zpArray<T>::erase( zp_uint index ) {
 	ZP_ASSERT_RETURN( index < m_size, "zpArray: Index out of bound of Array. Index: %d Size: %d", index, m_size );
@@ -270,12 +269,19 @@ void zpArray<T>::ensureCapacity( zp_uint size ) {
 	m_array = (T*)realloc( m_array, m_capacity * sizeof( T ) );
 }
 template<typename T>
-void zpArray<T>::shrinkToFit( zp_uint padding ) {
-	//zp_uint newCapacity = m_size + padding;
-
-	//m_array = (T*)realloc( m_array, newCapacity * sizeof( T ) );
-	//m_capacity = newCapacity;
-}
+void zpArray<T>::shrinkToFit( zp_uint padding ) {/*
+	zp_uint newCapacity = m_size + padding;
+	if( newCapacity > 0 && newCapacity < m_capacity ) {
+		zp_uint sizeInBytes = newCapacity * sizeof( T );
+		
+		T* newArray = (T*)malloc( sizeInBytes );
+		memcpy_s( newArray, sizeInBytes, m_array, sizeInBytes );
+		free( m_array );
+		
+		m_array = newArray;
+		m_capacity = newCapacity;
+	}
+*/}
 
 template<typename T>
 T& zpArray<T>::front() {
@@ -320,11 +326,25 @@ void zpArray<T>::foreach( Func func ) const {
 	}
 }
 template<typename T> template<typename Func>
+void zpArray<T>::foreachIf( Func func ) const {
+	for( zp_uint i = 0; i < m_size; ++i ) {
+		if( func( m_array[ i ] ) ) break;
+	}
+}
+
+template<typename T> template<typename Func>
 void zpArray<T>::foreachIndexed( Func func ) const {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		func( i, m_array[ i ] );
 	}
 }
+template<typename T> template<typename Func>
+void zpArray<T>::foreachIndexedIf( Func func ) const {
+	for( zp_uint i = 0; i < m_size; ++i ) {
+		if( func( i, m_array[ i ] ) ) break;
+	}
+}
+
 template<typename T> template<typename Func>
 void zpArray<T>::map( Func func ) const {
 	for( zp_uint i = 0; i < m_size; ++i ) {
