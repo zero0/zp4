@@ -44,7 +44,7 @@ public:
 	void foreach( Func func ) const;
 
 private:
-	zpArray<zpMapEntity> m_map;
+	zpArrayList<zpMapEntity> m_map;
 };
 
 #include "zpMap.inl"

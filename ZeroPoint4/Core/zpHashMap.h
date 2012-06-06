@@ -9,7 +9,7 @@ public:
 	~zpHashMap();
 
 private:
-	zpArray<zpPair<Key, Value>> m_map;
+	zpArrayList<zpPair<Key, Value>> m_map;
 };
 
 #include "zpHashMap.inl"

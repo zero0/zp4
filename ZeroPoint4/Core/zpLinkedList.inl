@@ -5,15 +5,37 @@ zpLinkedList<T>::zpLinkedList() : m_size( 0 ) {
 	m_root.m_prev = &m_root;
 }
 template<typename T>
-zpLinkedList<T>::~zpLinkedList() {}
+zpLinkedList<T>::zpLinkedList( const zpLinkedList& list ) : m_size( 0 ) {
+	m_root.m_next = &m_root;
+	m_root.m_prev = &m_root;
+	pushBackAll( list );
+}
+template<typename T>
+zpLinkedList<T>::zpLinkedList( zpLinkedList&& list ) : m_size( list.m_size ), m_root( list.m_root ) {
+	list.m_root.m_next = &list.m_root;
+	list.m_root.m_prev = &list.m_root;
+}
+template<typename T>
+zpLinkedList<T>::~zpLinkedList() {
+	clear();
+}
 
 template<typename T>
 void zpLinkedList<T>::pushBack( const T& val ) {
 	addNode( val, &m_root, m_root.m_prev );
 }
 template<typename T>
+void zpLinkedList<T>::pushBack( T&& val ) {
+	addNode( (T&&)val, &m_root, m_root.m_prev );
+}
+
+template<typename T>
 void zpLinkedList<T>::pushFront( const T& val ) {
 	addNode( val, m_root.m_next, &m_root );
+}
+template<typename T>
+void zpLinkedList<T>::pushFront( T&& val ) {
+	addNode( (T&&)val, m_root.m_next, &m_root );
 }
 
 template<typename T>
@@ -137,7 +159,7 @@ zp_bool zpLinkedList<T>::isEmpty() const {
 	return m_size == 0;
 }
 template<typename T>
-zp_uint zpLinkedList<T>::getSize() const {
+zp_uint zpLinkedList<T>::size() const {
 	return m_size;
 }
 
@@ -182,11 +204,16 @@ zp_uint zpLinkedList<T>::removeIf( Func func ) {
 
 template<typename T>
 void zpLinkedList<T>::addNode( const T& val, zpLinkedListNode<T>* next, zpLinkedListNode<T>* prev ) {
-	zpLinkedListNode<T>* node = new zpLinkedListNode<T>();
-	node->m_value = val;
-
-	node->m_next = next;
-	node->m_prev = prev;
+	zpLinkedListNode<T>* node = new zpLinkedListNode<T>( val, next, prev );
+	
+	node->m_next->m_prev = node;
+	node->m_prev->m_next = node;
+	++m_size;
+}
+template<typename T>
+void zpLinkedList<T>::addNode( T&& val, zpLinkedListNode<T>* next, zpLinkedListNode<T>* prev ) {
+	zpLinkedListNode<T>* node = new zpLinkedListNode<T>( (T&&)val, next, prev );
+	
 	node->m_next->m_prev = node;
 	node->m_prev->m_next = node;
 	++m_size;

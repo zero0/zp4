@@ -123,7 +123,7 @@ int main() {
 
 	zp_printfln( "" );
 
-	zpArray<float> rrr( 3 );
+	zpArrayList<float> rrr( 3 );
 	rrr.pushBack( 1 );
 	rrr.pushBack( 2 );
 	rrr.pushBack( 3 );

@@ -5,17 +5,17 @@
 #define ZP_ARRAY_DEFAULT_SIZE	10
 
 template<typename T>
-class zpArray {
+class zpArrayList {
 public:
-	zpArray();
-	zpArray( zp_uint size );
-	zpArray( T* arr, zp_uint size, zp_uint capacity );
-	zpArray( const zpArray& arr );
-	zpArray( zpArray&& arr );
-	~zpArray();
+	zpArrayList();
+	zpArrayList( zp_uint size );
+	zpArrayList( T* arr, zp_uint size, zp_uint capacity );
+	zpArrayList( const zpArrayList& arr );
+	zpArrayList( zpArrayList&& arr );
+	~zpArrayList();
 
-	void operator=( const zpArray& arr );
-	void operator=( zpArray&& arr );
+	void operator=( const zpArrayList& arr );
+	void operator=( zpArrayList&& arr );
 	
 	T& operator[]( zp_uint index );
 	const T& operator[]( zp_uint index ) const;
@@ -94,6 +94,6 @@ private:
 	zp_uint m_capacity;
 };
 
-#include "zpArray.inl"
+#include "zpArrayList.inl"
 
 #endif

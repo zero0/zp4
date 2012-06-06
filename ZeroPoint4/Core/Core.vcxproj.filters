@@ -81,9 +81,6 @@
     <ClInclude Include="zpGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpMessage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -106,6 +103,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpArrayList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -152,13 +152,13 @@
     <None Include="zpPair.inl">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="zpArray.inl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="zpHashMap.inl">
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpMap.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpArrayList.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

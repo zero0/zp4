@@ -113,7 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="zpArray.h" />
+    <ClInclude Include="zpArrayList.h" />
     <ClInclude Include="zpBaseTypes.h" />
     <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
@@ -144,7 +144,7 @@
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="zpArray.inl" />
+    <None Include="zpArrayList.inl" />
     <None Include="zpBaseTypesFpu.inl" />
     <None Include="zpHashMap.inl" />
     <None Include="zpIntegerFpu.inl" />
