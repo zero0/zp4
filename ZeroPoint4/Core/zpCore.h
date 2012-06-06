@@ -7,9 +7,9 @@
 #endif
 
 #if _WIN32
-#define ZP_WIN_32
+#define ZP_WIN_32			1
 #elif _WIN64
-#define ZP_WIN_64
+#define ZP_WIN_64			1
 #endif
 
 //#ifdef _WIN32
@@ -42,6 +42,7 @@
 #define ZP_ALIGN16		ZP_ALIGN( 16 )
 
 #define ZP_PURE_INTERFACE	struct ZP_NO_VTABLE
+#define ZP_CLASS_INTERFACE	class ZP_NO_VTABLE
 #define ZP_ABSTRACT_CLASS	class ZP_NO_VTABLE
 
 #define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }

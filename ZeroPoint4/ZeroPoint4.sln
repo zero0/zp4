@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{E1C56D07-B4D0-4EB3-B0F7-DCA0B0F13AB4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rendering", "Rendering\Rendering.vcxproj", "{6F74D63B-8FAE-4CC1-8E81-C1008B72FA76}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -23,6 +25,12 @@ Global
 		{E1C56D07-B4D0-4EB3-B0F7-DCA0B0F13AB4}.Release|Win32.Build.0 = Release|Win32
 		{E1C56D07-B4D0-4EB3-B0F7-DCA0B0F13AB4}.Release|x64.ActiveCfg = Release|x64
 		{E1C56D07-B4D0-4EB3-B0F7-DCA0B0F13AB4}.Release|x64.Build.0 = Release|x64
+		{6F74D63B-8FAE-4CC1-8E81-C1008B72FA76}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6F74D63B-8FAE-4CC1-8E81-C1008B72FA76}.Debug|Win32.Build.0 = Debug|Win32
+		{6F74D63B-8FAE-4CC1-8E81-C1008B72FA76}.Debug|x64.ActiveCfg = Debug|Win32
+		{6F74D63B-8FAE-4CC1-8E81-C1008B72FA76}.Release|Win32.ActiveCfg = Release|Win32
+		{6F74D63B-8FAE-4CC1-8E81-C1008B72FA76}.Release|Win32.Build.0 = Release|Win32
+		{6F74D63B-8FAE-4CC1-8E81-C1008B72FA76}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
