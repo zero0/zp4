@@ -108,6 +108,9 @@
     <ClInclude Include="zpArrayList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -161,12 +164,12 @@
     <None Include="zpArrayList.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpArray.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpCore.cpp">

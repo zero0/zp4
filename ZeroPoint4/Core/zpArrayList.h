@@ -1,6 +1,6 @@
 #pragma once
-#ifndef ZP_ARRAY_H
-#define ZP_ARRAY_H
+#ifndef ZP_ARRAY_LIST_H
+#define ZP_ARRAY_LIST_H
 
 #define ZP_ARRAY_DEFAULT_SIZE	10
 

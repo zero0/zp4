@@ -59,6 +59,7 @@ template<typename T> class zpFlag;
 template<typename T> class zpLinkedList;
 template<typename T> class zpIntrusiveList;
 template<typename F, typename S> class zpPair;
+template<typename T> class zpArray;
 template<typename T> class zpArrayList;
 template<typename K, typename V> class zpMap;
 template<typename F, typename S> class zpHashMap;
@@ -86,6 +87,7 @@ class zpGameObjectComponent;
 #include "zpLinkedList.h"
 #include "zpIntrusiveList.h"
 #include "zpPair.h"
+#include "zpArray.h"
 #include "zpArrayList.h"
 #include "zpHashMap.h"
 #include "zpMap.h"
@@ -110,5 +112,10 @@ class zpGameObjectComponent;
 
 void zp_printf( const char* text, ... );
 void zp_printfln( const char* text, ... );
+
+template<typename T>
+void zp_zero_memory( T* ptr ) {
+	memset( ptr, 0, sizeof( T ) );
+}
 
 #endif

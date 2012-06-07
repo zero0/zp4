@@ -86,6 +86,14 @@ void zpWindow::setStyle( zp_uint style ) {
 zp_uint zpWindow::getStyle() const {
 	return m_style;
 }
+
+zp_ptr zpWindow::getWindowHandle() const {
+	return m_hWnd;
+}
+zp_ptr zpWindow::getInstanceHandle() const {
+	return m_hInstance;
+}
+
 void zpWindow::create() {
 	if( m_hWnd ) return;
 	

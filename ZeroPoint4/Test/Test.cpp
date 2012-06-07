@@ -1,7 +1,7 @@
-#include "zpCore.h"
-#include <stdio.h>
+#include "Core\zpCore.h"
+#include "Rendering\zpRendering.h"
 
-int main() {
+void core_test_main() {
 	zp_printfln( "Size: %d", sizeof( zpString ) );
 
 	zpString empty;
@@ -162,7 +162,7 @@ int main() {
 	float ytryr = mmm[ 59 ];
 	ytryr = mmm[ 5 ];
 	mmm[ 23 ] = 12123414.f;
-	ytryr = mmm.get( 30 );
+	//ytryr = mmm.get( 30 );
 
 	mmm.remove( 59, &ytryr );
 
@@ -177,5 +177,43 @@ int main() {
 	wnd.run();
 	
 	getchar();
+}
+
+void rendering_test_main() {
+	zpWindow wnd;
+	wnd.setTitle( "ZeroPoint4 Window" );
+	wnd.setPosition( zpVector2i( 50, 50 ) );
+	wnd.setScreenSize( zpVector2i( 800, 600 ) );
+	wnd.create();
+
+	zpRenderingEngine* engine = zpRenderingFactory::createRenderingEngine<ZP_RENDERING_ENGINE_DX>();
+	/*
+	zpArrayList<zpRenderingDisplayMode> modes;
+	engine->enumerateDisplayModes( ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM, &modes );
+	modes.foreach( []( const zpRenderingDisplayMode& m ) {
+		zp_printfln( "Mode Width:%d Height:%d Refresh:%d", m.width, m.height, m.refreshRate );
+	});
+	*/
+	zpRenderingDisplayMode mm, omm;
+	zp_zero_memory( &mm );
+	
+	mm.displayFormat = ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM;
+	mm.width = 800;
+	mm.height = 600;
+
+	engine->findClosestDisplayMode( mm, &omm );
+
+	engine->setWindow( &wnd );
+	engine->setDisplayMode( omm );
+
+	engine->create();
+	engine->clear();
+	engine->present();
+
+	wnd.run();
+}
+
+int main() {
+	rendering_test_main();
 	return 0;
 }

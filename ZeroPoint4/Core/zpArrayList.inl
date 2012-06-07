@@ -234,7 +234,7 @@ void zpArrayList<T>::clear() {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		(&m_array[ i ])->~T();
 	}
-	ZP_ON_DEBUG( memset( m_array, 0, m_capacity * sizeof( T ) ) );
+	ZP_ON_DEBUG( memset( m_array, 0, m_size * sizeof( T ) ) );
 	m_size = 0;
 }
 
