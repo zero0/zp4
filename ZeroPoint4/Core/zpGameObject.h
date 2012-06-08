@@ -23,8 +23,8 @@ public:
 	void addChildGameObject( zpGameObject* go );
 	void removeChildGameObject( zpGameObject* go );
 
-	void addGameObjectComponent( zpGameObjectComponent* goc );
-	void removeGameObjectComponent( zpGameObjectComponent* goc );
+	void addComponent( zpComponent* goc );
+	void removeComponent( zpComponent* goc );
 
 	void setEnabled( zp_bool enabled );
 	zp_bool isEnabled() const;
@@ -38,18 +38,18 @@ public:
 	void destroy();
 
 	const zpIntrusiveList<zpGameObject>* getChildGameObjects() const;
-	const zpIntrusiveList<zpGameObjectComponent>* getGameObjectComponents() const;
+	const zpIntrusiveList<zpComponent>* getComponents() const;
 
 	const zpGameObject* getChildGameObjectByName( const zpString& name ) const;
 	zpGameObject* getChildGameObjectByName( const zpString& name );
 
-	const zpGameObjectComponent* getGameObjectComponentByName( const zpString& name ) const;
-	zpGameObjectComponent* getGameObjectComponentByName( const zpString& name );
+	const zpComponent* getComponentByName( const zpString& name ) const;
+	zpComponent* getComponentByName( const zpString& name );
 
 	template<typename T>
-	const T* getGameObjectComponentByType() const { return (const T*)getGameObjectComponent_T( &typeid( T ) ); }
+	const T* getComponentOfType() const { return (const T*)getComponent_T( &typeid( T ) ); }
 	template<typename T>
-	T* getGameObjectComponentByType() { return (T*)getGameObjectComponent_T( &typeid( T ) ); }
+	T* getComponentOfType() { return (T*)getComponent_T( &typeid( T ) ); }
 
 	const zpString& getName() const;
 	void setName( const zpString& name );
@@ -59,7 +59,7 @@ public:
 	void setTransform( const zpMatrix4& transform );
 
 	void receiveMessage( const zpMessage& message );
-	void sendMessageToGameObjectComponents( const zpMessage& message );
+	void sendMessageToComponents( const zpMessage& message );
 	void sendMessageToChildGameObjects( const zpMessage& message );
 	void sendMessageToParentGameObject( const zpMessage& message );
 
@@ -67,7 +67,7 @@ public:
 	void deserialize( zpSerializedInput* in );
 
 private:
-	zpGameObjectComponent* getGameObjectComponent_T( const void* type );
+	zpComponent* getComponent_T( const void* type );
 
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
@@ -76,7 +76,7 @@ private:
 	zpWorld* m_world;
 
 	zpIntrusiveList<zpGameObject> m_children;
-	zpIntrusiveList<zpGameObjectComponent> m_components;
+	zpIntrusiveList<zpComponent> m_components;
 
 	zpMatrix4 m_transform;
 	zpString m_name;

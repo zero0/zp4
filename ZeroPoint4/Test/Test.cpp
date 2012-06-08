@@ -67,38 +67,38 @@ void core_test_main() {
 	go4.addChildGameObject( new zpGameObject() );
 	go4.addChildGameObject( new zpGameObject() );
 	/*
-	go1.addGameObjectComponent( new zpGameObjectComponent() );
-	go1.addGameObjectComponent( new zpGameObjectComponent() );
+	go1.addComponent( new zpComponent() );
+	go1.addComponent( new zpComponent() );
 
-	go2.addGameObjectComponent( new zpGameObjectComponent() );
-	go2.addGameObjectComponent( new zpGameObjectComponent() );
-	go2.addGameObjectComponent( new zpGameObjectComponent() );
+	go2.addComponent( new zpComponent() );
+	go2.addComponent( new zpComponent() );
+	go2.addComponent( new zpComponent() );
 
-	go3.addGameObjectComponent( new zpGameObjectComponent() );
-	go3.addGameObjectComponent( new zpGameObjectComponent() );
+	go3.addComponent( new zpComponent() );
+	go3.addComponent( new zpComponent() );
 
-	go4.addGameObjectComponent( new zpGameObjectComponent() );
+	go4.addComponent( new zpComponent() );
 	*/
-	go1.getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
+	go1.getComponents()->foreach([](zpComponent* goc){
 		zp_printfln(" GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 	});
 	go1.getChildGameObjects()->foreach([](zpGameObject* go){
 		zp_printfln("GO: %p Ref: %d", go, go->getReferenceCount() );
-		go->getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
+		go->getComponents()->foreach([](zpComponent* goc){
 			zp_printfln("  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 		});
 
 
 		go->getChildGameObjects()->foreach([](zpGameObject* go){
 			zp_printfln("\tGO: %p Ref: %d", go, go->getReferenceCount());
-			go->getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
+			go->getComponents()->foreach([](zpComponent* goc){
 				zp_printfln("\t  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 			});
 
 			go->update();
 			go->getChildGameObjects()->foreach([](zpGameObject* go){
 				zp_printfln("\t\tGO: %p Ref: %d", go, go->getReferenceCount() );
-				go->getGameObjectComponents()->foreach([](zpGameObjectComponent* goc){
+				go->getComponents()->foreach([](zpComponent* goc){
 					zp_printfln("\t\t  GOC: %p Ref: %d", goc, goc->getReferenceCount() );
 				});
 
@@ -106,7 +106,7 @@ void core_test_main() {
 			});
 		});
 	});
-	zpGameObjectComponent* gzz = go1.getGameObjectComponentByType<zpGameObjectComponent>();
+	zpComponent* gzz = go1.getComponentOfType<zpComponent>();
 	
 	zpMessage msg1( 22, 4444.424243f, ZP_NULL );
 	zpMessage msg2( 43, zpString( "Testing String" ), ZP_NULL );

@@ -124,7 +124,7 @@
     <ClInclude Include="zpGame.h" />
     <ClInclude Include="zpGameManager.h" />
     <ClInclude Include="zpGameObject.h" />
-    <ClInclude Include="zpGameObjectComponent.h" />
+    <ClInclude Include="zpComponent.h" />
     <ClInclude Include="zpInteger.h" />
     <ClInclude Include="zpIntrusiveList.h" />
     <ClInclude Include="zpLinkedList.h" />
@@ -177,7 +177,7 @@
     <ClCompile Include="zpGame.cpp" />
     <ClCompile Include="zpGameManager.cpp" />
     <ClCompile Include="zpGameObject.cpp" />
-    <ClCompile Include="zpGameObjectComponent.cpp" />
+    <ClCompile Include="zpComponent.cpp" />
     <ClCompile Include="zpMemorySystem.cpp" />
     <ClCompile Include="zpMessage.cpp" />
     <ClCompile Include="zpReferencedObject.cpp" />

@@ -30,9 +30,6 @@
     <ClInclude Include="zpGameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpGameObjectComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -117,6 +114,9 @@
     <ClInclude Include="zpSerializable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -190,9 +190,6 @@
     <ClCompile Include="zpReferencedObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpGameObjectComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpWorld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -209,6 +206,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

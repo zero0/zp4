@@ -19,8 +19,8 @@ class zpDX11RenderingEngine : public zpRenderingEngine {
 public:
 	~zpDX11RenderingEngine();
 
-	zp_bool initialize();
 	zp_bool create();
+	void destroy();
 
 	zp_uint enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes );
 	zp_bool findClosestDisplayMode( const zpRenderingDisplayMode& displayMode, zpRenderingDisplayMode* outDisplayMode );
@@ -36,6 +36,10 @@ public:
 
 	void clear();
 	void present();
+
+protected:
+	zp_bool initialize();
+	void shutdown();
 
 private:
 	zpDX11RenderingEngine();

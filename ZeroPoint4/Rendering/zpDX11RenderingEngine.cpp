@@ -45,26 +45,13 @@ zpDX11RenderingEngine::zpDX11RenderingEngine() :
 	m_displayMode()
 {}
 zpDX11RenderingEngine::~zpDX11RenderingEngine() {
-	ZP_SAFE_RELEASE( m_d3dDevice );
-	ZP_SAFE_RELEASE( m_dxgiAdapter );
-	ZP_SAFE_RELEASE( m_dxgiFactory );
+	destroy();
+	shutdown();
 }
 
-zp_bool zpDX11RenderingEngine::initialize() {
-	if( m_dxgiAdapter ) return true;
-
-	HRESULT hr;
-
-	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)&m_dxgiFactory );
-	HR_MSG( hr, "Unable to Create DXGI Factory" );
-
-	hr = m_dxgiFactory->EnumAdapters( 0, &m_dxgiAdapter );
-	HR_MSG( hr, "Unable to Get Adapter 0" );
-		
-	return true;
-}
 zp_bool zpDX11RenderingEngine::create() {
-	
+	if( m_d3dDevice ) return true;
+
 	HRESULT hr;
 	zp_uint flags = 0;
 #if ZP_DEBUG
@@ -136,8 +123,18 @@ zp_bool zpDX11RenderingEngine::create() {
 	m_d3dDevice->CreateTexture2D( &depthStencilDesc, ZP_NULL, &m_depthBuffer );
 	m_d3dDevice->CreateDepthStencilView( m_depthBuffer, ZP_NULL, &m_depthBufferView );
 	
-
 	return true;
+}
+void zpDX11RenderingEngine::destroy() {
+	ZP_SAFE_RELEASE( m_depthBuffer );
+	ZP_SAFE_RELEASE( m_depthBufferView );
+
+	ZP_SAFE_RELEASE( m_backBuffer );
+	ZP_SAFE_RELEASE( m_backBufferView );
+
+	ZP_SAFE_RELEASE( m_immediateContext );
+	ZP_SAFE_RELEASE( m_swapChain );
+	ZP_SAFE_RELEASE( m_d3dDevice );
 }
 
 zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes ) {
@@ -240,4 +237,23 @@ void zpDX11RenderingEngine::clear() {
 }
 void zpDX11RenderingEngine::present() {
 	m_swapChain->Present( 0, 0 );
+}
+
+
+zp_bool zpDX11RenderingEngine::initialize() {
+	if( m_dxgiAdapter ) return true;
+
+	HRESULT hr;
+
+	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)&m_dxgiFactory );
+	HR_MSG( hr, "Unable to Create DXGI Factory" );
+
+	hr = m_dxgiFactory->EnumAdapters( 0, &m_dxgiAdapter );
+	HR_MSG( hr, "Unable to Get Adapter 0" );
+		
+	return true;
+}
+void zpDX11RenderingEngine::shutdown() {
+	ZP_SAFE_RELEASE( m_dxgiAdapter );
+	ZP_SAFE_RELEASE( m_dxgiFactory );
 }

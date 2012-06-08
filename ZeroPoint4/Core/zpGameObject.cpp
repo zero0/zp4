@@ -51,14 +51,14 @@ void zpGameObject::removeChildGameObject( zpGameObject* go ) {
 	}
 }
 
-void zpGameObject::addGameObjectComponent( zpGameObjectComponent* goc ) {
+void zpGameObject::addComponent( zpComponent* goc ) {
 	if( goc ) {
 		m_components.pushBack( goc );
 		goc->setParentGameObject( this );
 		goc->addReference();
 	}
 }
-void zpGameObject::removeGameObjectComponent( zpGameObjectComponent* goc ) {
+void zpGameObject::removeComponent( zpComponent* goc ) {
 	if( goc ) {
 		m_components.remove( goc );
 		goc->setParentGameObject( ZP_NULL );
@@ -70,7 +70,7 @@ void zpGameObject::setEnabled( zp_bool enabled ) {
 	if( m_isEnabled == enabled ) return;
 	m_isEnabled = enabled;
 
-	m_components.foreach( [ enabled ]( zpGameObjectComponent* goc ) {
+	m_components.foreach( [ enabled ]( zpComponent* goc ) {
 		goc->setEnabled( enabled );
 	} );
 
@@ -93,8 +93,8 @@ zpWorld* zpGameObject::getWorld() const {
 
 void zpGameObject::update() {
 	if( m_isEnabled && m_isCreated ) {
-		m_components.foreach( []( zpGameObjectComponent* goc ) {
-			goc->onUpdate();
+		m_components.foreach( []( zpComponent* goc ) {
+			goc->update();
 		} );
 
 		m_children.foreach( []( zpGameObject* go ) {
@@ -107,8 +107,8 @@ void zpGameObject::create() {
 	if( m_isCreated ) return;
 	m_isCreated = true;
 
-	m_components.foreach( []( zpGameObjectComponent* goc ) {
-		goc->onCreate();
+	m_components.foreach( []( zpComponent* goc ) {
+		goc->create();
 	} );
 	
 	m_children.foreach( []( zpGameObject* go ) {
@@ -119,8 +119,8 @@ void zpGameObject::destroy() {
 	if( !m_isCreated ) return;
 	m_isCreated = false;
 
-	m_components.foreach( []( zpGameObjectComponent* goc ) {
-		goc->onDestroy();
+	m_components.foreach( []( zpComponent* goc ) {
+		goc->destroy();
 	} );
 
 	m_children.foreach( []( zpGameObject* go ) {
@@ -131,7 +131,7 @@ void zpGameObject::destroy() {
 const zpIntrusiveList<zpGameObject>* zpGameObject::getChildGameObjects() const {
 	return &m_children;
 }
-const zpIntrusiveList<zpGameObjectComponent>* zpGameObject::getGameObjectComponents() const {
+const zpIntrusiveList<zpComponent>* zpGameObject::getComponents() const {
 	return &m_components;
 }
 
@@ -152,10 +152,10 @@ void zpGameObject::setTransform( const zpMatrix4& transform ) {
 	m_transform = transform;
 }
 
-zpGameObjectComponent* zpGameObject::getGameObjectComponent_T( const void* type ) {
+zpComponent* zpGameObject::getComponent_T( const void* type ) {
 	const std::type_info& info = *(const std::type_info*)type;
 	
-	zpGameObjectComponent* component = m_components.findFirstIf( [ &info ]( const zpGameObjectComponent* component ) {
+	zpComponent* component = m_components.findFirstIf( [ &info ]( const zpComponent* component ) {
 		return typeid( component ) == info;
 	});
 
@@ -163,11 +163,11 @@ zpGameObjectComponent* zpGameObject::getGameObjectComponent_T( const void* type 
 }
 
 void zpGameObject::receiveMessage( const zpMessage& message ) {
-	sendMessageToGameObjectComponents( message );
+	sendMessageToComponents( message );
 	sendMessageToChildGameObjects( message );
 }
-void zpGameObject::sendMessageToGameObjectComponents( const zpMessage& message ) {
-	m_components.foreach( [ &message ]( zpGameObjectComponent* goc ) {
+void zpGameObject::sendMessageToComponents( const zpMessage& message ) {
+	m_components.foreach( [ &message ]( zpComponent* goc ) {
 		goc->receiveMessage( message );
 	} );
 }
@@ -180,5 +180,27 @@ void zpGameObject::sendMessageToParentGameObject( const zpMessage& message ) {
 	if( m_parentGameObject ) m_parentGameObject->receiveMessage( message );
 }
 
-void zpGameObject::serialize( zpSerializedOutput* out ) {}
-void zpGameObject::deserialize( zpSerializedInput* in ) {}
+void zpGameObject::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeString( m_name, "@name" );
+
+	out->writeBlock( "Components" );
+	{
+		out->writeBlock( "Component" );
+		m_components.foreach( [ &out ]( zpComponent* comp ) {
+			//comp->serialize( out );
+		} );
+		out->endBlock();
+	}
+	out->endBlock();
+
+	out->endBlock();
+}
+void zpGameObject::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	setName( in->readString( "@name" ) );
+
+	in->endBlock();
+}

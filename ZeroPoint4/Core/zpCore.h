@@ -52,7 +52,8 @@
 #define ZP_SAFE_FREE( p )			{ if( (p) ) { free( (p) ); (p) = ZP_NULL; } }
 
 #include "zpBaseTypes.h"
-#include "zpMath.h"
+
+
 
 class zpString;
 template<typename T> class zpFlag;
@@ -84,9 +85,8 @@ class zpGame;
 class zpWorld;
 class zpGameManager;
 class zpGameObject;
-class zpGameObjectComponent;
-
-
+class zpComponent;
+#include "zpMath.h"
 #include "zpString.h"
 
 #include "zpFlag.h"
@@ -117,7 +117,7 @@ class zpGameObjectComponent;
 #include "zpWorld.h"
 #include "zpGameManager.h"
 #include "zpGameObject.h"
-#include "zpGameObjectComponent.h"
+#include "zpComponent.h"
 
 
 void zp_printf( const char* text, ... );

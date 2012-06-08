@@ -17,5 +17,6 @@ zpRenderingEngine* zpRenderingFactory::createRenderingEngine( zpRenderingEngineT
 }
 
 void zpRenderingFactory::destroyRenderingEngine( zpRenderingEngine* engine ) {
+	engine->shutdown();
 	delete engine;
 }

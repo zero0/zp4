@@ -2,6 +2,14 @@
 #ifndef ZP_SERIALIZABLE_H
 #define ZP_SERIALIZABLE_H
 
+template<typename T>
+const zp_char* zp_serialize_type( const T* type = ZP_NULL ) {
+	return type == ZP_NULL ? ( &typeid( T ).name()[6] ) : ( &typeid( (*type) ).name()[6] );
+};
+
+#define ZP_SERIALIZE_TYPE_THIS		( zp_serialize_type( this ) )
+#define ZP_SERIALIZE_TYPE( t )		( zp_serialize_type<t>() )
+
 ZP_PURE_INTERFACE zpSerializable;
 
 ZP_PURE_INTERFACE zpSerializedInput {
