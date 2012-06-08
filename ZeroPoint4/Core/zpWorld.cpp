@@ -34,6 +34,10 @@ void zpWorld::destroy() {
 	if( m_root ) m_root->destroy();
 }
 
+zp_bool zpWorld::isCreated() const {
+	return m_isCreated;
+}
+
 void zpWorld::setEnabled( zp_bool enabled ) {
 	m_isEnabled = enabled;
 }

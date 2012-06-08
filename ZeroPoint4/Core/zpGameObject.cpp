@@ -17,11 +17,11 @@ zpGameObject::zpGameObject() :
 	m_isCreated( false ),
 	m_parentGameObject( ZP_NULL ),
 	m_world( ZP_NULL ),
-	m_components( ZP_NULL ),
+	m_children(),
+	m_components(),
 	m_transform(),
 	m_name()
-{
-}
+{}
 zpGameObject::~zpGameObject() {}
 
 void zpGameObject::setParentGameObject( zpGameObject* go ) {
@@ -38,14 +38,14 @@ zpGameObject* zpGameObject::getParentGameObject() const {
 
 void zpGameObject::addChildGameObject( zpGameObject* go ) {
 	if( go && go != this ) {
-		m_children.prepend( go );
+		m_children.pushBack( go );
 		go->setParentGameObject( this );
 		go->addReference();
 	}
 }
 void zpGameObject::removeChildGameObject( zpGameObject* go ) {
 	if( go && go != this ) {
-		m_children.detatch( go );
+		m_children.remove( go );
 		go->setParentGameObject( ZP_NULL );
 		go->removeReference();
 	}
@@ -53,14 +53,14 @@ void zpGameObject::removeChildGameObject( zpGameObject* go ) {
 
 void zpGameObject::addGameObjectComponent( zpGameObjectComponent* goc ) {
 	if( goc ) {
-		m_components.prepend( goc );
+		m_components.pushBack( goc );
 		goc->setParentGameObject( this );
 		goc->addReference();
 	}
 }
 void zpGameObject::removeGameObjectComponent( zpGameObjectComponent* goc ) {
 	if( goc ) {
-		m_components.detatch( goc );
+		m_components.remove( goc );
 		goc->setParentGameObject( ZP_NULL );
 		goc->removeReference();
 	}
@@ -146,7 +146,7 @@ const zpMatrix4& zpGameObject::getTransform() const {
 	return m_transform;
 }
 zpMatrix4 zpGameObject::getComputedTransform() const {
-	return m_parent ? m_transform * m_parentGameObject->getComputedTransform() : m_transform;
+	return m_parentGameObject ? m_transform * m_parentGameObject->getComputedTransform() : m_transform;
 }
 void zpGameObject::setTransform( const zpMatrix4& transform ) {
 	m_transform = transform;
@@ -179,3 +179,6 @@ void zpGameObject::sendMessageToChildGameObjects( const zpMessage& message ) {
 void zpGameObject::sendMessageToParentGameObject( const zpMessage& message ) {
 	if( m_parentGameObject ) m_parentGameObject->receiveMessage( message );
 }
+
+void zpGameObject::serialize( zpSerializedOutput* out ) {}
+void zpGameObject::deserialize( zpSerializedInput* in ) {}

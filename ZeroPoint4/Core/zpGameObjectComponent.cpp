@@ -4,9 +4,7 @@ zpGameObjectComponent::zpGameObjectComponent() :
 	m_parentGameObject( ZP_NULL ),
 	m_isEnabled( true ),
 	m_name()
-{
-	m_parent = this;
-}
+{}
 zpGameObjectComponent::~zpGameObjectComponent() {}
 
 void zpGameObjectComponent::setParentGameObject( zpGameObject* parent ) {

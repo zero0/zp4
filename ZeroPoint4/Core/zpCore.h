@@ -72,6 +72,11 @@ class zpTime;
 class zpMessage;
 ZP_PURE_INTERFACE zpMessageReceiver;
 
+ZP_PURE_INTERFACE zpRenderable;
+ZP_PURE_INTERFACE zpSerializable;
+ZP_PURE_INTERFACE zpSerializedOutput;
+ZP_PURE_INTERFACE zpSerializedInput;
+
 class zpMemorySystem;
 class zpReferencedObject;
 
@@ -80,6 +85,7 @@ class zpWorld;
 class zpGameManager;
 class zpGameObject;
 class zpGameObjectComponent;
+
 
 #include "zpString.h"
 
@@ -104,11 +110,15 @@ class zpGameObjectComponent;
 #include "zpMessage.h"
 #include "zpMessageReceiver.h"
 
+#include "zpRenderable.h"
+#include "zpSerializable.h"
+
 #include "zpGame.h"
 #include "zpWorld.h"
 #include "zpGameManager.h"
 #include "zpGameObject.h"
 #include "zpGameObjectComponent.h"
+
 
 void zp_printf( const char* text, ... );
 void zp_printfln( const char* text, ... );

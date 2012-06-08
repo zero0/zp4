@@ -3,30 +3,34 @@
 #define ZP_INTRUSIVE_LIST_H
 
 template<typename T>
+class zpIntrusiveList;
+
+template<typename T>
 struct ZP_NO_VTABLE zpIntrusiveListNode {
-	T* m_parent;
+protected:
 	zpIntrusiveListNode* m_next;
 	zpIntrusiveListNode* m_prev;
+
+	friend class zpIntrusiveList<T>;
 };
 
 template<typename T>
 class zpIntrusiveList {
 public:
-	zpIntrusiveList( T* parent = ZP_NULL );
+	zpIntrusiveList();
 	~zpIntrusiveList();
 
-	void prepend( zpIntrusiveListNode<T>* node );
-	void append( zpIntrusiveListNode<T>* node );
-	void detatch( zpIntrusiveListNode<T>* node );
+	void pushBack( zpIntrusiveListNode<T>* node );
+	void pushFront( zpIntrusiveListNode<T>* node );
+	void remove( zpIntrusiveListNode<T>* node );
 
 	zp_bool isAttached() const;
-
-	void setParent( T* parent );
-
-	zpIntrusiveListNode<T>* getNext() const;
-	zpIntrusiveListNode<T>* getPrev() const;
-	T* getParent() const;
 	
+	const zpIntrusiveListNode<T>* front() const;
+	const zpIntrusiveListNode<T>* back() const;
+	
+	template<typename Func>
+	void foreach( Func func );
 	template<typename Func>
 	void foreach( Func func ) const;
 

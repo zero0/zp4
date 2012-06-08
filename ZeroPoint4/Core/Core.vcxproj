@@ -139,6 +139,8 @@
     <ClInclude Include="zpReal.h" />
     <ClInclude Include="zpReferencedObject.h" />
     <ClInclude Include="zpReferencedPointer.h" />
+    <ClInclude Include="zpRenderable.h" />
+    <ClInclude Include="zpSerializable.h" />
     <ClInclude Include="zpString.h" />
     <ClInclude Include="zpTime.h" />
     <ClInclude Include="zpVector2.h" />

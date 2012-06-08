@@ -214,6 +214,7 @@ void rendering_test_main() {
 }
 
 int main() {
+	//core_test_main();
 	rendering_test_main();
 	return 0;
 }

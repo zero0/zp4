@@ -2,8 +2,12 @@
 #ifndef ZP_GAME_OBJECT_H
 #define ZP_GAME_OBJECT_H
 
-
-class zpGameObject : public zpIntrusiveListNode<zpGameObject>, public zpReferencedObject, public zpMessageReceiver {
+class zpGameObject : 
+	public zpIntrusiveListNode<zpGameObject>, 
+	public zpReferencedObject, 
+	public zpMessageReceiver,
+	public zpSerializable
+{
 public:
 	/*
 	void* operator new( zp_uint size );
@@ -58,6 +62,9 @@ public:
 	void sendMessageToGameObjectComponents( const zpMessage& message );
 	void sendMessageToChildGameObjects( const zpMessage& message );
 	void sendMessageToParentGameObject( const zpMessage& message );
+
+	void serialize( zpSerializedOutput* out );
+	void deserialize( zpSerializedInput* in );
 
 private:
 	zpGameObjectComponent* getGameObjectComponent_T( const void* type );

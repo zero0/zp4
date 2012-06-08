@@ -111,6 +111,12 @@
     <ClInclude Include="zpArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpRenderable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpSerializable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">

@@ -14,14 +14,12 @@ enum zpWindowStyle : zp_uint {
 	ZP_WINDOW_STYLE_DEFAULT =		0,
 };
 
-class ZP_NO_VTABLE zpWindowFocusListener {
-public:
+ZP_PURE_INTERFACE zpWindowFocusListener {
 	virtual void onFocusGained() = 0;
 	virtual void onFocusLost() = 0;
 };
 
-class ZP_NO_VTABLE zpWindowProcListener {
-public:
+ZP_PURE_INTERFACE zpWindowProcListener {
 	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) = 0;
 };
 

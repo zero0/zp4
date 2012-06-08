@@ -1,15 +1,14 @@
 
 template<typename T>
-zpIntrusiveList<T>::zpIntrusiveList( T* parent = ZP_NULL ) {
+zpIntrusiveList<T>::zpIntrusiveList() {
 	m_root.m_next = &m_root;
 	m_root.m_prev = &m_root;
-	m_root.m_parent = parent;
 }
 template<typename T>
 zpIntrusiveList<T>::~zpIntrusiveList() {}
 
 template<typename T>
-void zpIntrusiveList<T>::prepend( zpIntrusiveListNode<T>* node ) {
+void zpIntrusiveList<T>::pushBack( zpIntrusiveListNode<T>* node ) {
 	if( !node || node->m_next == node ) return;
 
 	node->m_next = &m_root;
@@ -18,7 +17,7 @@ void zpIntrusiveList<T>::prepend( zpIntrusiveListNode<T>* node ) {
 	node->m_prev->m_next = node;
 }
 template<typename T>
-void zpIntrusiveList<T>::append( zpIntrusiveListNode<T>* node ) {
+void zpIntrusiveList<T>::pushFront( zpIntrusiveListNode<T>* node ) {
 	if( !node || node->m_next == node ) return;
 
 	node->m_next = m_root.m_next;
@@ -27,7 +26,7 @@ void zpIntrusiveList<T>::append( zpIntrusiveListNode<T>* node ) {
 	node->m_prev->m_next = node;
 }
 template<typename T>
-void zpIntrusiveList<T>::detatch( zpIntrusiveListNode<T>* node ) {
+void zpIntrusiveList<T>::remove( zpIntrusiveListNode<T>* node ) {
 	node->m_prev->m_next = node->m_next;
 	node->m_next->m_prev = node->m_prev;
 
@@ -40,22 +39,23 @@ zp_bool zpIntrusiveList<T>::isAttached() const {
 }
 
 template<typename T>
-void zpIntrusiveList<T>::setParent( T* parent ) {
-	m_root.m_parent = parent;
-}
-
-template<typename T>
-zpIntrusiveListNode<T>* zpIntrusiveList<T>::getNext() const {
+const zpIntrusiveListNode<T>* zpIntrusiveList<T>::front() const {
 	return m_root.m_next;
 }
 template<typename T>
-zpIntrusiveListNode<T>* zpIntrusiveList<T>::getPrev() const {
+const zpIntrusiveListNode<T>* zpIntrusiveList<T>::back() const {
 	return m_root.m_prev;
 }
-template<typename T>
-T* zpIntrusiveList<T>::getParent() const {
-	return m_root.m_parent;}
 
+template<typename T> template<typename Func>
+void zpIntrusiveList<T>::foreach( Func func ) {
+	const zpIntrusiveListNode<T>* ring = m_root.m_next;
+
+	while( ring != &m_root ) {
+		func( (T*)ring );
+		ring = ring->m_next;
+	}
+}
 template<typename T> template<typename Func>
 void zpIntrusiveList<T>::foreach( Func func ) const {
 	const zpIntrusiveListNode<T>* ring = m_root.m_next;
@@ -100,7 +100,7 @@ const T* zpIntrusiveList<T>::findLastIf( Func func ) const {
 	const zpIntrusiveListNode<T>* ring = m_root.m_prev;
 
 	while( ring != &m_root ) {
-		const T* val = ( const T*)ring;
+		const T* val = (const T*)ring;
 		if( func( val ) ) {
 			return val;
 		};
