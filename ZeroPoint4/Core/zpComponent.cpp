@@ -3,6 +3,7 @@
 zpComponent::zpComponent() :
 	m_parentGameObject( ZP_NULL ),
 	m_isEnabled( true ),
+	m_isCreated( false ),
 	m_name()
 {}
 zpComponent::~zpComponent() {
@@ -36,7 +37,7 @@ zp_bool zpComponent::isCreated() const {
 }
 
 void zpComponent::update() {
-	if( m_isCreated && m_isEnabled ) onUpdate();
+	if( m_isEnabled && m_isCreated ) onUpdate();
 }
 
 void zpComponent::create() {

@@ -35,7 +35,7 @@ public:
 	void foreach( Func func ) const;
 
 	template<typename Func>
-	const T* findFirstIf( Func func ) const;
+	T* findFirstIf( Func func ) const;
 	template<typename Func>
 	T* findFirstIf( Func func );
 

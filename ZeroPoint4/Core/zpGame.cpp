@@ -1,4 +1,5 @@
 #include "zpCore.h"
+#include <typeinfo>
 
 zpGame::zpGame() :
 	m_currentWorld( ZP_NULL ),
@@ -75,4 +76,20 @@ void zpGame::process() {
 		m_nextWorld = ZP_NULL;
 		m_asynchCreateNextWorld = false;
 	}
+}
+
+void zpGame::setWindow( zpWindow* window ) {
+	m_window = window;
+	if( m_window ) m_window->setGame( this );
+}
+zpWindow* zpGame::getWindow() const {
+	return m_window;
+}
+
+zpGameManager* zpGame::getGameManager_T( const void* type ) const {
+	const type_info& typeinfo = *(const type_info*)type;
+	zpGameManager* manager = m_managers.findFirstIf( [ &typeinfo ]( const zpGameManager* manager ) {
+		return typeinfo == typeid( *manager );
+	} );
+	return manager;
 }

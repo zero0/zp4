@@ -38,13 +38,14 @@ DWORD __zpStyleToWS( zp_uint style ) {
 }
 
 zpWindow::zpWindow() :
-	m_title( "" ),
 	m_position(),
 	m_screenSize( 640, 480 ),
 	m_windowSize(),
 	m_style( ZP_WINDOW_STYLE_DEFAULT ),
 	m_hWnd( 0 ),
-	m_hInstance( 0 )
+	m_hInstance( 0 ),
+	m_game( ZP_NULL ),
+	m_title( "" )
 {}
 zpWindow::~zpWindow() {}
 
@@ -170,6 +171,8 @@ void zpWindow::run() {
 			TranslateMessage( &message );
 			DispatchMessage( &message );
 		}
+
+		if( m_game ) m_game->process();
 	}
 }
 
@@ -252,4 +255,22 @@ void zpWindow::resizeWindow() {
 	RECT rc = { 0, 0, m_screenSize.getX(), m_screenSize.getY() };
 	AdjustWindowRectEx( &rc, __zpStyleToWS( m_style ), false, 0 );
 	m_windowSize.set( rc.right - rc.left, rc.bottom - rc.top );
+}
+
+void zpWindow::setGame( zpGame* game ) {
+	m_game = game;
+}
+zpGame* zpWindow::getGame() const {
+	return m_game;
+}
+
+void zpWindow::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->endBlock();
+}
+void zpWindow::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->endBlock();
 }

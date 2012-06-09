@@ -2,9 +2,11 @@
 #ifndef ZP_SERIALIZABLE_H
 #define ZP_SERIALIZABLE_H
 
+const zp_char* __zp_serialize_type( const void* type );
+
 template<typename T>
 const zp_char* zp_serialize_type( const T* type = ZP_NULL ) {
-	return type == ZP_NULL ? ( &typeid( T ).name()[6] ) : ( &typeid( (*type) ).name()[6] );
+	return __zp_serialize_type( &typeid( T ) );
 };
 
 #define ZP_SERIALIZE_TYPE_THIS		( zp_serialize_type( this ) )

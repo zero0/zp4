@@ -1,5 +1,6 @@
 #include "Core\zpCore.h"
 #include "Rendering\zpRendering.h"
+#include <stdio.h>
 
 void core_test_main() {
 	zp_printfln( "Size: %d", sizeof( zpString ) );

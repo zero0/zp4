@@ -1,7 +1,7 @@
 #pragma once
 #ifndef ZP_PAIR_H
 #define ZP_PAIR_H
-#include <hash_map>
+
 template<typename First, typename Second>
 class zpPair {
 public:

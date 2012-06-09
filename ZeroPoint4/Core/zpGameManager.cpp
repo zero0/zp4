@@ -1,6 +1,9 @@
 #include "zpCore.h"
 
-zpGameManager::zpGameManager() {}
+zpGameManager::zpGameManager() :
+	m_isEnabled( true ),
+	m_isCreated( false )
+{}
 zpGameManager::~zpGameManager() {}
 
 void zpGameManager::create() {

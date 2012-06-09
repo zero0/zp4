@@ -23,7 +23,7 @@ ZP_PURE_INTERFACE zpWindowProcListener {
 	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) = 0;
 };
 
-class zpWindow {
+class zpWindow : public zpSerializable {
 public:
 	zpWindow();
 	~zpWindow();
@@ -62,6 +62,12 @@ public:
 	void removeProcListener( zpWindowProcListener* listener );
 	void removeAllProcListeners();
 
+	void setGame( zpGame* game );
+	zpGame* getGame() const;
+
+	void serialize( zpSerializedOutput* out );
+	void deserialize( zpSerializedInput* in );
+
 private:
 	typedef zpLinkedList<zpWindowFocusListener*> zpWindowFocusListenerList;
 	typedef zpLinkedList<zpWindowProcListener*> zpWindowProcListenerList;
@@ -69,8 +75,7 @@ private:
 	void moveResize();
 	void resizeWindow();
 
-	zpString m_title;
-
+	
 	zpVector2i m_position;
 	zpVector2i m_screenSize;
 	zpVector2i m_windowSize;
@@ -79,6 +84,10 @@ private:
 
 	zp_ptr m_hWnd;
 	zp_ptr m_hInstance;
+
+	zpGame* m_game;
+
+	zpString m_title;
 
 	zpWindowFocusListenerList m_focusListeners;
 	zpWindowProcListenerList m_procListeners;

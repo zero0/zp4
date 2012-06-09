@@ -53,7 +53,10 @@
 
 #include "zpBaseTypes.h"
 
-
+ZP_PURE_INTERFACE zpRenderable;
+ZP_PURE_INTERFACE zpSerializable;
+ZP_PURE_INTERFACE zpSerializedOutput;
+ZP_PURE_INTERFACE zpSerializedInput;
 
 class zpString;
 template<typename T> class zpFlag;
@@ -73,11 +76,6 @@ class zpTime;
 class zpMessage;
 ZP_PURE_INTERFACE zpMessageReceiver;
 
-ZP_PURE_INTERFACE zpRenderable;
-ZP_PURE_INTERFACE zpSerializable;
-ZP_PURE_INTERFACE zpSerializedOutput;
-ZP_PURE_INTERFACE zpSerializedInput;
-
 class zpMemorySystem;
 class zpReferencedObject;
 
@@ -86,7 +84,12 @@ class zpWorld;
 class zpGameManager;
 class zpGameObject;
 class zpComponent;
+
 #include "zpMath.h"
+
+#include "zpRenderable.h"
+#include "zpSerializable.h"
+
 #include "zpString.h"
 
 #include "zpFlag.h"
@@ -110,8 +113,7 @@ class zpComponent;
 #include "zpMessage.h"
 #include "zpMessageReceiver.h"
 
-#include "zpRenderable.h"
-#include "zpSerializable.h"
+
 
 #include "zpGame.h"
 #include "zpWorld.h"
@@ -126,6 +128,10 @@ void zp_printfln( const char* text, ... );
 template<typename T>
 void zp_zero_memory( T* ptr ) {
 	memset( ptr, 0, sizeof( T ) );
+}
+template<typename T, zp_uint Size>
+void zp_zero_memory( T (&arr)[Size] ) {
+	memset( arr, 0, Size * sizeof( T ) );
 }
 
 #endif

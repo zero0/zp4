@@ -51,3 +51,7 @@ const zpString& zpWorld::getName() const {
 void zpWorld::setName( const zpString& name ) {
 	m_name = name;
 }
+
+void zpWorld::receiveMessage( const zpMessage& message ) {
+	if( m_root ) m_root->receiveMessage( message );
+}

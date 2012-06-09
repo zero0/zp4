@@ -67,13 +67,12 @@ void zpIntrusiveList<T>::foreach( Func func ) const {
 }
 
 template<typename T> template<typename Func>
-const T* zpIntrusiveList<T>::findFirstIf( Func func ) const {
+T* zpIntrusiveList<T>::findFirstIf( Func func ) const {
 	const zpIntrusiveListNode<T>* ring = m_root.m_next;
 
 	while( ring != &m_root ) {
-		const T* val = (const T*)ring;
-		if( func( val ) ) {
-			return val;
+		if( func( (const T*)ring ) ) {
+			return (T*)ring;
 		};
 		ring = ring->m_next;
 	}

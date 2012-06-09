@@ -22,7 +22,9 @@ zpGameObject::zpGameObject() :
 	m_transform(),
 	m_name()
 {}
-zpGameObject::~zpGameObject() {}
+zpGameObject::~zpGameObject() {
+	destroy();
+}
 
 void zpGameObject::setParentGameObject( zpGameObject* go ) {
 	if( go == this ) return;

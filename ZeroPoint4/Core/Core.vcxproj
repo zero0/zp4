@@ -181,6 +181,7 @@
     <ClCompile Include="zpMemorySystem.cpp" />
     <ClCompile Include="zpMessage.cpp" />
     <ClCompile Include="zpReferencedObject.cpp" />
+    <ClCompile Include="zpSerialize.cpp" />
     <ClCompile Include="zpString.cpp" />
     <ClCompile Include="zpTime.cpp" />
     <ClCompile Include="zpWindow.cpp" />
