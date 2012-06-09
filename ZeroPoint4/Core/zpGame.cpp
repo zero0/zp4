@@ -93,3 +93,6 @@ zpGameManager* zpGame::getGameManager_T( const void* type ) const {
 	} );
 	return manager;
 }
+
+void zpGame::serialize( zpSerializedOutput* out ) {}
+void zpGame::deserialize( zpSerializedInput* in ) {}

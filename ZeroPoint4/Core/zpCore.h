@@ -130,7 +130,7 @@ void zp_zero_memory( T* ptr ) {
 	memset( ptr, 0, sizeof( T ) );
 }
 template<typename T, zp_uint Size>
-void zp_zero_memory( T (&arr)[Size] ) {
+void zp_zero_memory_array( T (&arr)[Size] ) {
 	memset( arr, 0, Size * sizeof( T ) );
 }
 

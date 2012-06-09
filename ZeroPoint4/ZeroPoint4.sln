@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rendering", "Rendering\Rend
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{5D5CA349-B4D0-4CAF-8982-FE586497FF12}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Input", "Input\Input.vcxproj", "{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -39,6 +41,12 @@ Global
 		{5D5CA349-B4D0-4CAF-8982-FE586497FF12}.Release|Win32.ActiveCfg = Release|Win32
 		{5D5CA349-B4D0-4CAF-8982-FE586497FF12}.Release|Win32.Build.0 = Release|Win32
 		{5D5CA349-B4D0-4CAF-8982-FE586497FF12}.Release|x64.ActiveCfg = Release|Win32
+		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Debug|Win32.Build.0 = Debug|Win32
+		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Debug|x64.ActiveCfg = Debug|Win32
+		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Release|Win32.ActiveCfg = Release|Win32
+		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Release|Win32.Build.0 = Release|Win32
+		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

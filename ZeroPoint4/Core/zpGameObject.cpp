@@ -191,7 +191,17 @@ void zpGameObject::serialize( zpSerializedOutput* out ) {
 	{
 		out->writeBlock( "Component" );
 		m_components.foreach( [ &out ]( zpComponent* comp ) {
-			//comp->serialize( out );
+			comp->serialize( out );
+		} );
+		out->endBlock();
+	}
+	out->endBlock();
+
+	out->writeBlock( "Children" );
+	{
+		out->writeBlock( "Child" );
+		m_children.foreach( [ &out ]( zpGameObject* go ) {
+			go->serialize( out );
 		} );
 		out->endBlock();
 	}
@@ -203,6 +213,24 @@ void zpGameObject::deserialize( zpSerializedInput* in ) {
 	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
 
 	setName( in->readString( "@name" ) );
+
+	if( in->readBlock( "Components" ) )
+	{
+		in->readEach( "Component", [ this, &in ](){
+			zpComponent* comp = in->readSerializableType<zpComponent>();
+			if( comp ) addComponent( comp );
+		} );
+	}
+	in->endBlock();
+
+	if( in->readBlock( "Children" ) )
+	{
+		in->readEach( "Child", [ this, &in ](){
+			zpGameObject* go = in->readSerializableType<zpGameObject>();
+			if( go ) addChildGameObject( go );
+		} );
+	}
+	in->endBlock();
 
 	in->endBlock();
 }

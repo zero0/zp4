@@ -2,7 +2,12 @@
 #ifndef ZP_WORLD_H
 #define ZP_WORLD_H
 
-class zpWorld : public zpIntrusiveListNode<zpWorld>, public zpReferencedObject, public zpMessageReceiver {
+class zpWorld : 
+	public zpIntrusiveListNode<zpWorld>, 
+	public zpReferencedObject, 
+	public zpMessageReceiver,
+	public zpSerializable
+{
 public:
 	zpWorld();
 	virtual ~zpWorld();
@@ -24,6 +29,9 @@ public:
 	void setName( const zpString& name );
 
 	void receiveMessage( const zpMessage& message );
+
+	void serialize( zpSerializedOutput* out );
+	void deserialize( zpSerializedInput* in );
 
 private:
 	zp_bool m_isEnabled;

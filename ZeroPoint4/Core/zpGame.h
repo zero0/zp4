@@ -2,7 +2,7 @@
 #ifndef ZP_GAME_H
 #define ZP_GAME_H
 
-class zpGame {
+class zpGame : public zpSerializable{
 public:
 	zpGame();
 	~zpGame();
@@ -27,6 +27,9 @@ public:
 
 	void setWindow( zpWindow* window );
 	zpWindow* getWindow() const;
+
+	void serialize( zpSerializedOutput* out );
+	void deserialize( zpSerializedInput* in );
 
 private:
 	zpGameManager* getGameManager_T( const void* type ) const;

@@ -55,3 +55,6 @@ void zpWorld::setName( const zpString& name ) {
 void zpWorld::receiveMessage( const zpMessage& message ) {
 	if( m_root ) m_root->receiveMessage( message );
 }
+
+void zpWorld::serialize( zpSerializedOutput* out ) {}
+void zpWorld::deserialize( zpSerializedInput* in ) {}
