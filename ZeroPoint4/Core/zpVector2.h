@@ -59,6 +59,8 @@ public:
 
 	template<typename F>
 	zp_float dot( const zpVector2<F>& vector ) const;
+	template<typename F>
+	zp_float cross( const zpVector2<F>& vector ) const;
 
 	zp_float magnitudeSquared() const;
 	zp_float magnitude() const;
@@ -82,6 +84,12 @@ public:
 	zpVector2<T> lerp(  const zpVector2<F>& vector, zp_float alpha ) const;
 	template<typename F>
 	zpVector2<T> slerp(  const zpVector2<F>& vector, zp_float alpha ) const;
+
+	zpVector2<T> rotateLeft() const;
+	zpVector2<T> rotateRight() const;
+	zpVector2<T> rotate( zp_float radians ) const;
+	zpVector2<T> rotateDeg( zp_float degrees ) const;
+	zp_float angle() const;
 
 	template<typename F>
 	zp_bool operator==( const zpVector2<F>& vector ) const;

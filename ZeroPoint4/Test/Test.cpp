@@ -187,6 +187,17 @@ void rendering_test_main() {
 	wnd.setScreenSize( zpVector2i( 800, 600 ) );
 	wnd.create();
 
+	zpHashMap<zpString, float> mmmmm;
+	char buff[10];
+	for( int i = 0; i < 27; ++i ) {
+		sprintf_s( buff, "%d", i );
+		mmmmm[ buff ] = ( 1.f / (float)(i + 1) );
+	}
+
+	mmmmm.foreach( []( zpString& i, float f ) {
+		zp_printfln( "%s %f", i.c_str(), f );
+	});
+	
 	zpRenderingEngine* engine = zpRenderingFactory::createRenderingEngine<ZP_RENDERING_ENGINE_DX>();
 	/*
 	zpArrayList<zpRenderingDisplayMode> modes;

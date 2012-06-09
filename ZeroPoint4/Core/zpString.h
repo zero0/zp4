@@ -6,7 +6,7 @@
 
 class zpString {
 public:
-	static const zp_ushort npos = -1;
+	static const zp_uint npos = -1;
 
 	zpString();
 	zpString( const zp_char* string );
@@ -20,7 +20,7 @@ public:
 	zpString& operator=( const zpString& string );
 	zpString& operator=( zpString&& string );
 
-	//operator const zp_char*() const;
+	operator zp_hash() const;
 	const zp_char* getChars() const;
 	const char* c_str() const;
 

@@ -38,6 +38,12 @@ typedef wchar_t zp_char;
 typedef char zp_char;
 #endif
 
+typedef zp_ushort zp_word;
+typedef zp_uint zp_dword;
+typedef zp_ulong zp_qword;
+
+typedef zp_uint zp_hash;
+
 #if ZP_USE_SIMD
 #include "zpBaseTypesSimd.inl"
 #else

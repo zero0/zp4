@@ -5,7 +5,6 @@
 template<typename Key, typename Value>
 class zpMap {
 public:
-	typedef zpPair<Key, Value> zpMapEntity;
 
 	zpMap();
 	zpMap( zp_uint size );
@@ -44,6 +43,8 @@ public:
 	void foreach( Func func ) const;
 
 private:
+	typedef zpPair<Key, Value> zpMapEntity;
+
 	zpArrayList<zpMapEntity> m_map;
 };
 

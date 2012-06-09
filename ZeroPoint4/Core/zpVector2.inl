@@ -130,6 +130,10 @@ template<typename T> template<typename F>
 zp_float zpVector2<T>::dot( const zpVector2<F>& vector ) const {
 	return m_x * vector.m_x + m_y * vector.m_y;
 }
+template<typename T> template<typename F>
+zp_float zpVector2<T>::cross( const zpVector2<F>& vector ) const {
+	return m_x * vector.m_y - my * vector.m_x;
+}
 
 template<typename T>
 zp_float zpVector2<T>::magnitudeSquared() const {
@@ -141,7 +145,7 @@ zp_float zpVector2<T>::magnitude() const {
 }
 template<typename T>
 void zpVector2<T>::normalize() {
-	const zp_float mag = magnitude();
+	zp_float mag = magnitude();
 	if( !mag ) mag = 1.f;
 	const zp_float inv = 1.f / mag;
 	m_x *= inv;
@@ -189,11 +193,11 @@ zp_float zpVector2<T>::angleBetween( const zpVector2<F>& normal, zp_bool inRadia
 }
 
 template<typename T> template<typename F>
-zpVector2<T> zpVector2<T>::lerp(  const zpVector2<F>& vector, zp_float alpha ) const {
+zpVector2<T> zpVector2<T>::lerp( const zpVector2<F>& vector, zp_float alpha ) const {
 	return ( (*this) + ( vector - (*this) ) ) * zp_clamp01( alpha );
 }
 template<typename T> template<typename F>
-zpVector2<T> zpVector2<T>::slerp(  const zpVector2<F>& vector, zp_float alpha ) const {
+zpVector2<T> zpVector2<T>::slerp( const zpVector2<F>& vector, zp_float alpha ) const {
 	alpha = zp_clamp01( alpha );
 
 	const zp_float omega = dot( vector );
@@ -202,6 +206,29 @@ zpVector2<T> zpVector2<T>::slerp(  const zpVector2<F>& vector, zp_float alpha ) 
 	const zp_float so = sinf( omega );
 
 	return ( (*this) * ( somao / so ) ) + ( vector * ( sao / so ) );
+}
+
+template<typename T>
+zpVector2<T> zpVector2<T>::rotateLeft() const {
+	return zpVector2<T>( -m_y, m_x );
+}
+template<typename T>
+zpVector2<T> zpVector2<T>::rotateRight() const {
+	return zpVector2<T>( m_y, -m_x );
+}
+template<typename T>
+zpVector2<T> zpVector2<T>::rotate( zp_float radians ) const {
+	const zp_float c = cosf( radians );
+	const zp_float s = sinf( radians );
+	return zpVector2<T>( m_x * c - m_y * s, m_x * s + m_y * c );
+}
+template<typename T>
+zpVector2<T> zpVector2<T>::rotateDeg( zp_float degrees ) const {
+	return rotate( ZP_DEG_TO_RAD( degrees ) );
+}
+template<typename T>
+zp_float zpVector2<T>::angle() const {
+	return atan2f( m_y, m_x );
 }
 
 template<typename T> template<typename F>

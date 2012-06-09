@@ -134,4 +134,6 @@ void zp_zero_memory_array( T (&arr)[Size] ) {
 	memset( arr, 0, Size * sizeof( T ) );
 }
 
+zp_uint zp_near_pow2( zp_uint number );
+
 #endif

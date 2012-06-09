@@ -15,3 +15,9 @@ void zp_printfln( const char* text, ... ) {
 	va_end( vl );
 	printf_s( "\n" );
 }
+
+zp_uint zp_near_pow2( zp_uint number ) {
+	zp_uint i = 1;
+	while( i < number ) i <<= 1;
+	return i;
+}
