@@ -57,6 +57,7 @@ ZP_PURE_INTERFACE zpRenderable;
 ZP_PURE_INTERFACE zpSerializable;
 ZP_PURE_INTERFACE zpSerializedOutput;
 ZP_PURE_INTERFACE zpSerializedInput;
+class zpRegisterSerializable;
 
 class zpString;
 template<typename T> class zpFlag;
@@ -91,6 +92,7 @@ class zpComponent;
 
 #include "zpRenderable.h"
 #include "zpSerializable.h"
+#include "zpRegisterSerializable.h"
 
 #include "zpString.h"
 
