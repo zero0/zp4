@@ -19,6 +19,9 @@ ZP_PURE_INTERFACE zpRenderingEngine {
 	virtual void setWindow( zpWindow* window ) = 0;
 	virtual zpWindow* getWindow() const = 0;
 
+	virtual void setClearColor( const zpColor4f& color, zp_uint renderTargetIndex = 0 ) = 0;
+	virtual const zpColor4f& getClearColor( zp_uint renderTargetIndex = 0 ) const = 0;
+
 	virtual void clear() = 0;
 	virtual void present() = 0;
 

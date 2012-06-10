@@ -7,6 +7,9 @@ public:
 	zpGame();
 	~zpGame();
 
+	void create();
+	void destroy();
+
 	void addWorld( zpWorld* world, zp_bool andCreate = false );
 	void removeWorld( zpWorld* world );
 	zpWorld* getCurrentWorld() const;

@@ -13,6 +13,8 @@ public:
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
+	void receiveMessage( const zpMessage& message );
+
 protected:
 	void onCreate();
 	void onDestroy();

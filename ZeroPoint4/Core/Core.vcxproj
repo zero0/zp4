@@ -118,6 +118,7 @@
     <ClInclude Include="zpArray.h" />
     <ClInclude Include="zpArrayList.h" />
     <ClInclude Include="zpBaseTypes.h" />
+    <ClInclude Include="zpColor4f.h" />
     <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
     <ClInclude Include="zpFlag.h" />
@@ -169,6 +170,7 @@
     <None Include="zpVector4Simd.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpColor4f.cpp" />
     <ClCompile Include="zpCore.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

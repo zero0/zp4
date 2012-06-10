@@ -34,6 +34,9 @@ public:
 	void setWindow( zpWindow* window );
 	zpWindow* getWindow() const;
 
+	void setClearColor( const zpColor4f& color, zp_uint renderTargetIndex = 0 );
+	const zpColor4f& getClearColor( zp_uint renderTargetIndex = 0 ) const;
+
 	void clear();
 	void present();
 
@@ -60,6 +63,8 @@ private:
 
 	zpRenderingScreenMode m_screenMode;
 	zpRenderingDisplayMode m_displayMode;
+
+	zpColor4f m_clearColor;
 
 	friend class zpRenderingFactory;
 };

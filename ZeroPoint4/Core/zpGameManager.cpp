@@ -2,7 +2,8 @@
 
 zpGameManager::zpGameManager() :
 	m_isEnabled( true ),
-	m_isCreated( false )
+	m_isCreated( false ),
+	m_game( ZP_NULL )
 {}
 zpGameManager::~zpGameManager() {}
 
@@ -35,4 +36,11 @@ void zpGameManager::setEnabled( zp_bool enabled ) {
 }
 zp_bool zpGameManager::isEnabled() const {
 	return m_isEnabled;
+}
+
+void zpGameManager::setGame( zpGame* game ) {
+	m_game = game;
+}
+zpGame* zpGameManager::getGame() const {
+	return m_game;
 }

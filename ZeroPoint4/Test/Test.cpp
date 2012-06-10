@@ -198,29 +198,15 @@ void rendering_test_main() {
 		zp_printfln( "%s %f", i.c_str(), f );
 	});
 	
-	zpRenderingEngine* engine = zpRenderingFactory::createRenderingEngine<ZP_RENDERING_ENGINE_DX>();
-	/*
-	zpArrayList<zpRenderingDisplayMode> modes;
-	engine->enumerateDisplayModes( ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM, &modes );
-	modes.foreach( []( const zpRenderingDisplayMode& m ) {
-		zp_printfln( "Mode Width:%d Height:%d Refresh:%d", m.width, m.height, m.refreshRate );
-	});
-	*/
-	zpRenderingDisplayMode mm, omm;
-	zp_zero_memory( &mm );
+	zpGame game;
+	game.setWindow( &wnd );
+
+	zpRenderingManager rm;
+	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_DX );
 	
-	mm.displayFormat = ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM;
-	mm.width = 800;
-	mm.height = 600;
+	game.addGameManager( &rm );
 
-	engine->findClosestDisplayMode( mm, &omm );
-
-	engine->setWindow( &wnd );
-	engine->setDisplayMode( omm );
-
-	engine->create();
-	engine->clear();
-	engine->present();
+	game.create();
 
 	wnd.run();
 }

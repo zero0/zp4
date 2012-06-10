@@ -10,13 +10,12 @@ public:
 	static zpRenderingEngine* createRenderingEngine() {
 		return createRenderingEngine( type );
 	}
+	static zpRenderingEngine* createRenderingEngine( zpRenderingEngineType type );
 
 	static void destroyRenderingEngine( zpRenderingEngine* engine );
 
 private:
 	static zpRenderingEngine* s_renderingEngine;
-
-	static zpRenderingEngine* createRenderingEngine( zpRenderingEngineType type );
 
 	zpRenderingFactory();
 };

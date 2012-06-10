@@ -20,6 +20,9 @@ public:
 	void setEnabled( zp_bool enabled );
 	zp_bool isEnabled() const;
 
+	void setGame( zpGame* game );
+	zpGame* getGame() const;
+
 protected:
 	virtual void onCreate() = 0;
 	virtual void onDestroy() = 0;
@@ -32,6 +35,8 @@ protected:
 private:
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
+
+	zpGame* m_game;
 };
 
 #endif

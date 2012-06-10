@@ -9,6 +9,8 @@
 #endif
 
 enum zpRenderingEngineType {
+	ZP_RENDERING_ENGINE_NONE =			0,
+
 	ZP_RENDERING_ENGINE_OPENGL =		0x1000,
 	ZP_RENDERING_ENGINE_OPENGL_4,
 	ZP_RENDERING_ENGINE_OPENGL_3,
@@ -54,5 +56,6 @@ struct zpRenderingDisplayMode {
 #include "zpBuffer.h"
 
 #include "zpDX11RenderingEngine.h"
+#include "zpRenderingManager.h"
 
 #endif

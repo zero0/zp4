@@ -31,3 +31,5 @@ void zpInputManager::onDisabled() {}
 
 void zpInputManager::serialize( zpSerializedOutput* out ) {}
 void zpInputManager::deserialize( zpSerializedInput* in ) {}
+
+void zpInputManager::receiveMessage( const zpMessage& message ) {}

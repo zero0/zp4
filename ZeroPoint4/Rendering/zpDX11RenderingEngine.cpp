@@ -42,7 +42,8 @@ zpDX11RenderingEngine::zpDX11RenderingEngine() :
 	m_immediateContext( ZP_NULL ),
 	m_window( ZP_NULL ),
 	m_screenMode( ZP_RENDERING_SCREEN_MODE_WINDOWED ),
-	m_displayMode()
+	m_displayMode(),
+	m_clearColor()
 {}
 zpDX11RenderingEngine::~zpDX11RenderingEngine() {
 	destroy();
@@ -72,6 +73,17 @@ zp_bool zpDX11RenderingEngine::create() {
 				HR_MSG( hr, "Unable to create DirectX device." );
 			}
 		}
+	}
+
+	if( !m_displayMode.width || !m_displayMode.height ) {
+		m_displayMode.width = m_window->getScreenSize().getX();
+		m_displayMode.height = m_window->getScreenSize().getY();
+	}
+	if( m_displayMode.displayFormat == ZP_RENDERING_DISPLAY_FORMAT_UNKNOWN ) {
+		m_displayMode.displayFormat = ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM;
+	}
+	if( !m_displayMode.refreshRate ) {
+		findClosestDisplayMode( m_displayMode, &m_displayMode );
 	}
 
 	DXGI_FORMAT format = __zpDisplayFormatToDxgiFormat( m_displayMode.displayFormat );
@@ -230,9 +242,16 @@ zpWindow* zpDX11RenderingEngine::getWindow() const {
 	return m_window;
 }
 
+void zpDX11RenderingEngine::setClearColor( const zpColor4f& color, zp_uint renderTargetIndex ) {
+	m_clearColor = color;
+}
+const zpColor4f& zpDX11RenderingEngine::getClearColor( zp_uint renderTargetIndex ) const {
+	return m_clearColor;
+}
+
 void zpDX11RenderingEngine::clear() {
-	float color[] = { 1, 0, 0, 1 };
-	m_immediateContext->ClearRenderTargetView( m_backBufferView, color );
+	m_clearColor.clamp();
+	m_immediateContext->ClearRenderTargetView( m_backBufferView, m_clearColor );
 	m_immediateContext->OMSetRenderTargets( 1, &m_backBufferView, m_depthBufferView );
 }
 void zpDX11RenderingEngine::present() {
@@ -250,7 +269,9 @@ zp_bool zpDX11RenderingEngine::initialize() {
 
 	hr = m_dxgiFactory->EnumAdapters( 0, &m_dxgiAdapter );
 	HR_MSG( hr, "Unable to Get Adapter 0" );
-		
+	
+	zp_zero_memory( &m_displayMode );
+
 	return true;
 }
 void zpDX11RenderingEngine::shutdown() {

@@ -16,10 +16,10 @@
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
 
 template<typename T>
-ZP_FORCE_INLINE T& zp_clamp01( T& val ) { return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val; }
+ZP_FORCE_INLINE T zp_clamp01( T& val ) { return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val; }
 
 template<typename T>
-ZP_FORCE_INLINE T& zp_clamp( T& val, T& low, T& high ) { return val > high ? high : val < low ? low : val; }
+ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high ) { return val > high ? high : val < low ? low : val; }
 
 class zpVector4;
 class zpReal;

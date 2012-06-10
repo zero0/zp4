@@ -179,7 +179,7 @@ zpString& zpString::operator=( zpString&& string ) {
 zpString::operator zp_hash() const {
 	zp_hash h = 0;
 	const zp_char* chars = getChars();
-	for( int i = 0; i < m_length; ++i ) {
+	for( zp_uint i = 0; i < m_length; ++i ) {
 		h = 31 * h + chars[i];
 	}
 	return h;

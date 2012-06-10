@@ -36,6 +36,9 @@
     <ClInclude Include="zpRenderingFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpRenderingManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -45,6 +48,9 @@
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
     <ClCompile Include="zpRenderingFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpRenderingManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

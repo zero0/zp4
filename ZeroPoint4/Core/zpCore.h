@@ -68,6 +68,8 @@ template<typename T> class zpArrayList;
 template<typename K, typename V> class zpMap;
 template<typename F, typename S> class zpHashMap;
 
+class zpColor4f;
+
 class zpConsole;
 class zpWindow;
 
@@ -104,6 +106,8 @@ class zpComponent;
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"
 #include "zpReferencedPointer.h"
+
+#include "zpColor4f.h"
 
 #include "zpConsole.h"
 #include "zpWindow.h"

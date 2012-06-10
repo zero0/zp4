@@ -3,9 +3,23 @@
 
 zpGame::zpGame() :
 	m_currentWorld( ZP_NULL ),
-	m_nextWorld( ZP_NULL )
+	m_nextWorld( ZP_NULL ),
+	m_renderable( ZP_NULL ),
+	m_window( ZP_NULL ),
+	m_asynchCreateNextWorld( false )
 {}
 zpGame::~zpGame() {}
+
+void zpGame::create() {
+	m_managers.foreach( []( zpGameManager* manager ) {
+		manager->create();
+	} );
+}
+void zpGame::destroy() {
+	m_managers.foreach( []( zpGameManager* manager ) {
+		manager->destroy();
+	} );
+}
 
 void zpGame::addWorld( zpWorld* world, zp_bool andCreate ) {
 	if( world )	{
@@ -35,12 +49,14 @@ void zpGame::addGameManager( zpGameManager* manager ) {
 	if( manager ) {
 		m_managers.pushBack( manager );
 		manager->addReference();
+		manager->setGame( this );
 	}
 }
 void zpGame::removeGameManager( zpGameManager* manager ) {
 	if( manager ) {
 		m_managers.remove( manager );
 		manager->removeReference();
+		manager->setGame( ZP_NULL );
 	}
 }
 
