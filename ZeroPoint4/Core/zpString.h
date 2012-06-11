@@ -54,6 +54,31 @@ public:
 
 	zp_int scan( const zp_char* format, ... ) const;
 
+	zpString ltrim() const;
+	zpString rtrim() const;
+	zpString trim() const;
+
+	zpString& ltrim();
+	zpString& rtrim();
+	zpString& trim();
+
+	template<typename Func>
+	void foreach( Func func ) {
+		const zp_char* p = getChars();
+		while( *p ) {
+			func( *p );
+			++p;
+		}
+	}
+	template<typename Func>
+	void map( Func func ) {
+		zp_char* p = IS_STRING_PACKED( this ) ? m_chars : m_string;
+		while( *p ) {
+			*p = func( *p );
+			++p;
+		}
+	}
+
 private:
 	static zpString __format( zp_char* buff, zp_uint size, const zpString& format, ... );
 

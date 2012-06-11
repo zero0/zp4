@@ -19,7 +19,7 @@ zpHashMap<Key, Value>::zpHashMap( const zpHashMap& map ) :
 {}
 template<typename Key, typename Value>
 zpHashMap<Key, Value>::zpHashMap( zpHashMap&& map ) :
-	m_map( (zpMapEntity<Key, Value>&&)map.m_map ),
+	m_map( (zpArray<zpMapEntity*>&&)map.m_map ),
 	m_size( map.m_size ),
 	m_loadFactor( map.m_loadFactor )
 {}
@@ -38,35 +38,35 @@ void zpHashMap<Key, Value>::operator=( const zpHashMap& map ) {
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::operator=( zpHashMap&& map ) {
 	m_map.clear();
-	m_map = (zpMapEntity<Key, Value>&&)map.m_map;
+	m_map = (zpArray<zpMapEntity*>&&)map.m_map;
 	m_size = map.m_size;
 	m_loadFactor = map.m_loadFactor;
 }
 
 template<typename Key, typename Value>
 Value& zpHashMap<Key, Value>::operator[]( const Key& key ) {
-	zp_hash hash = (zp_hash)key;
-	zp_uint index = hash & m_map.size() - 1;
+	zp_hash h = (zp_hash)key;
+	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			return e->value;
 		}
 	}
 	zpMapEntity* entity;
-	addMapEntity( key, Value(), hash, index, &entity );
+	addMapEntity( key, Value(), h, index, &entity );
 	return entity->value;
 }
 template<typename Key, typename Value>
 Value& zpHashMap<Key, Value>::operator[]( Key&& key ) {
-	zp_hash hash = (zp_hash)key;
-	zp_uint index = hash & m_map.size() - 1;
+	zp_hash h = (zp_hash)key;
+	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			return e->value;
 		}
 	}
 	zpMapEntity* entity;
-	addMapEntity( (Key&&)key, Value(), hash, index, &entity );
+	addMapEntity( (Key&&)key, Value(), h, index, &entity );
 	return entity->value;
 }
 
@@ -81,10 +81,10 @@ zp_bool zpHashMap<Key, Value>::isEmpty() const {
 
 template<typename Key, typename Value>
 const Value& zpHashMap<Key, Value>::get( const Key& key ) const {
-	zp_hash hash = hash( (zp_hash)key );
-	zp_uint index = hash & m_map.size() - 1;
+	zp_hash h = hash( (zp_hash)key );
+	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			return e->value;
 		}
 	}
@@ -93,42 +93,42 @@ const Value& zpHashMap<Key, Value>::get( const Key& key ) const {
 
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( const Key& key, const Value& value ) {
-	zp_hash hash = hash( (zp_hash)key );
-	zp_uint index = hash & m_map.size() - 1;
+	zp_hash h = hash( (zp_hash)key );
+	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			(&e->value)->~Value();
 			e->value = value;
 			return;
 		}
 	}
-	addMapEntity( key, value, hash, index, ZP_NULL );
+	addMapEntity( key, value, h, index, ZP_NULL );
 }
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( Key&& key, const Value& value ) {
-	zp_hash hash = hash( (zp_hash)key );
-	zp_uint index = hash & m_map.size() - 1;
+	zp_hash h = hash( (zp_hash)key );
+	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			(&e->value)->~Value();
 			e->value = value;
 			return;
 		}
 	}
-	addMapEntity( (Key&&)key, value, hash, index, ZP_NULL );
+	addMapEntity( (Key&&)key, value, h, index, ZP_NULL );
 }
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( Key&& key, Value&& value ) {
-	zp_hash hash = hash( (zp_hash)key );
+	zp_hash h = hash( (zp_hash)key );
 	zp_uint index = hash & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			(&e->value)->~Value();
 			e->value = (Value&&)value;
 			return;
 		}
 	}
-	addMapEntity( (Key&&)key, (Value&&)value, hash, index, ZP_NULL );
+	addMapEntity( (Key&&)key, (Value&&)value, h, index, ZP_NULL );
 }
 
 template<typename Key, typename Value>
@@ -140,10 +140,10 @@ void zpHashMap<Key, Value>::putAll( const zpHashMap& map ) {
 
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::containsKey( const Key& key ) const {
-	zp_hash hash = (zp_hash)key;
-	zp_uint index = hash & m_map.size() - 1;
+	zp_hash h = (zp_hash)key;
+	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			return true;
 		}
 	}
@@ -163,11 +163,11 @@ zp_bool zpHashMap<Key, Value>::containsValue( const Value& value ) const {
 
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::remove( const Key& key, Value* outValue = ZP_NULL ) {
-	zp_hash hash = (zp_hash)key;
+	zp_hash h = (zp_hash)key;
 	zp_uint index = hash & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next ) {
 		next = e->next;
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			--m_size;
 			if( prev == e ) {
 				m_map[ index ] = next;
@@ -183,11 +183,11 @@ zp_bool zpHashMap<Key, Value>::remove( const Key& key, Value* outValue = ZP_NULL
 }
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::erase( const Key& key ) {
-	zp_hash hash = (zp_hash)key;
+	zp_hash h = (zp_hash)key;
 	zp_uint index = hash & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next ) {
 		next = e->next;
-		if( e->hash == hash && e->key == key ) {
+		if( e->hash == h && e->key == key ) {
 			--m_size;
 			if( prev == e ) {
 				m_map[ index ] = next;
@@ -224,9 +224,9 @@ void zpHashMap<Key, Value>::foreach( Func func ) const {
 }
 
 template<typename Key, typename Value> 
-zp_hash zpHashMap<Key, Value>::hash( zp_hash hash ) const {
-	hash ^= ( hash >>> 20 ) ^ ( hash >>> 12 );
-	return hash ^ ( hash >>> 7 ) ^ ( hash >>> 4 );
+zp_hash zpHashMap<Key, Value>::hash( zp_hash h ) const {
+	h ^= ( h >> 20 ) ^ ( h >> 12 );
+	return h ^ ( h >> 7 ) ^ ( h >> 4 );
 }
 
 template<typename Key, typename Value> 
@@ -254,9 +254,9 @@ void zpHashMap<Key, Value>::resize( zp_uint newSize ) {
 }
 
 template<typename Key, typename Value> 
-void zpHashMap<Key, Value>::addMapEntity( const Key& key, const Value& value, zp_hash hash, zp_uint index, zpMapEntity** entity ) {
+void zpHashMap<Key, Value>::addMapEntity( const Key& key, const Value& value, zp_hash h, zp_uint index, zpMapEntity** entity ) {
 	zpMapEntity* e = m_map[ index ];
-	m_map[ index ] = new zpMapEntity( key, value, hash, e );
+	m_map[ index ] = new zpMapEntity( key, value, h, e );
 	if( *entity ) *entity = m_map[ index ];
 	++m_size;
 	if( (zp_float)m_size >= ( (zp_float)m_map.size() * m_loadFactor ) ) {
@@ -264,9 +264,9 @@ void zpHashMap<Key, Value>::addMapEntity( const Key& key, const Value& value, zp
 	}
 }
 template<typename Key, typename Value> 
-void zpHashMap<Key, Value>::addMapEntity( Key&& key, const Value& value, zp_hash hash, zp_uint index, zpMapEntity** entity ) {
+void zpHashMap<Key, Value>::addMapEntity( Key&& key, const Value& value, zp_hash h, zp_uint index, zpMapEntity** entity ) {
 	zpMapEntity* e = m_map[ index ];
-	m_map[ index ] = new zpMapEntity( (Key&&)key, value, hash, e );
+	m_map[ index ] = new zpMapEntity( (Key&&)key, value, h, e );
 	if( *entity ) *entity = m_map[ index ];
 	++m_size;
 	if( (zp_float)m_size >= ( (zp_float)m_map.size() * m_loadFactor ) ) {
@@ -274,9 +274,9 @@ void zpHashMap<Key, Value>::addMapEntity( Key&& key, const Value& value, zp_hash
 	}
 }
 template<typename Key, typename Value> 
-void zpHashMap<Key, Value>::addMapEntity( Key&& key, Value&& value, zp_hash hash, zp_uint index, zpMapEntity** entity ) {
+void zpHashMap<Key, Value>::addMapEntity( Key&& key, Value&& value, zp_hash h, zp_uint index, zpMapEntity** entity ) {
 	zpMapEntity* e = m_map[ index ];
-	m_map[ index ] = new zpMapEntity( (Key&&)key, (Value&&)value, hash, e );
+	m_map[ index ] = new zpMapEntity( (Key&&)key, (Value&&)value, h, e );
 	if( *entity ) *entity = m_map[ index ];
 	++m_size;
 	if( (zp_float)m_size >= ( (zp_float)m_map.size() * m_loadFactor ) ) {

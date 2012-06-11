@@ -13,6 +13,19 @@ ZP_FORCE_INLINE zp_char __to_lower( zp_char ch ) {
 ZP_FORCE_INLINE zp_char __to_upper( zp_char ch ) {
 	return ( 'a' <= ch && ch <= 'z' ) ? ch -= 'a' - 'A' : ch;
 }
+zp_bool __is_whitespace( zp_char ch ) {
+	switch( ch ) {
+		case 0x09:
+		case 0x0A:
+		case 0x0B:
+		case 0x0C:
+		case 0x0D:
+		case 0x20:
+			return true;
+		default:
+			return false;
+	}
+}
 
 zpString::zpString() : 
 	m_length( 0 ),
@@ -387,6 +400,60 @@ zp_int zpString::scan( const zp_char* format, ... ) const {
 
 	return ret;
 }
+
+zpString zpString::ltrim() const {
+	const zp_char* p = IS_STRING_PACKED( this ) ? m_chars : m_string;
+	
+	while( *p && __is_whitespace( *p++ ) );
+
+	return zpString( p );
+}
+zpString zpString::rtrim() const {
+	const zp_char* p = IS_STRING_PACKED( this ) ? m_chars : m_string;
+	const zp_char* s = p + m_length;
+
+	while( *s && __is_whitespace( *s-- ) );
+	s++;
+
+	return zpString( p, m_length - ( s - p ) );
+}
+zpString zpString::trim() const {
+	zpString str( (*this) );
+	str.ltrim();
+	str.rtrim();
+	return str;
+}
+
+zpString& zpString::ltrim() {
+	zp_char* p = IS_STRING_PACKED( this ) ? m_chars : m_string;
+	zp_char* s = p;
+
+	while( *s && __is_whitespace( *s ) ) { ++s; }
+	zp_uint diff = s - p;
+
+	memmove_s( p, m_capacity, s, m_capacity - diff );
+	m_length -= diff;
+	
+	return (*this);
+}
+zpString& zpString::rtrim() {
+	zp_char* p = IS_STRING_PACKED( this ) ? m_chars : m_string;
+	zp_char* s = p + m_length - 1;
+
+	while( *s && __is_whitespace( *s ) ) { --s; }
+	s++;
+	zp_uint diff = s - p;
+
+	*s = '\0';
+	m_length -= m_length - diff;
+
+	return (*this);
+}
+zpString& zpString::trim() {
+	ltrim();
+	rtrim();
+	return (*this);
+}
 /*
 zpString zpString::format( const zpString& format, ... ) {
 	zp_char buff[ 256 ];
@@ -408,6 +475,7 @@ zpString zpString::__format( zp_char* buff, zp_uint size, const zpString& format
 
 	return zpString( buff );
 }
+
 zp_bool operator==( const zpString& string1, const zpString& string2 ) {
 	return string1.equals( string2 );
 }

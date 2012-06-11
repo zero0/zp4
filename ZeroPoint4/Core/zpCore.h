@@ -79,6 +79,7 @@ class zpTime;
 class zpMessage;
 ZP_PURE_INTERFACE zpMessageReceiver;
 
+class zpProperties;
 class zpMemorySystem;
 class zpReferencedObject;
 
@@ -105,6 +106,7 @@ class zpComponent;
 #include "zpHashMap.h"
 #include "zpMap.h"
 
+#include "zpProperties.h"
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"
 #include "zpReferencedPointer.h"
@@ -138,6 +140,11 @@ void zp_zero_memory( T* ptr ) {
 template<typename T, zp_uint Size>
 void zp_zero_memory_array( T (&arr)[Size] ) {
 	memset( arr, 0, Size * sizeof( T ) );
+}
+
+template<typename T>
+T zp_abs( T& value ) {
+	return value > (T)0 ? value : -value;
 }
 
 zp_uint zp_near_pow2( zp_uint number );

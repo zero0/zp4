@@ -25,6 +25,11 @@ public:
 
 	static void registerSerializable( const zpString& name, CreateSerializableFunction createFunc );
 
+	template<typename T>
+	static T* createSerializable( const zpString& name ) {
+		return (T*)createSerializable( name );
+	};
+
 	static zpSerializable* createSerializable( const zpString& name );
 
 private:

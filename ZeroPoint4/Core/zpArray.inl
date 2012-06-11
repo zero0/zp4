@@ -8,7 +8,7 @@ zpArray<T>::zpArray() : m_array( ZP_NULL ), m_size( 0 ) {}
 template<typename T>
 zpArray<T>::zpArray( zp_uint size ) : m_array( size == 0 ? ZP_NULL : (T*)calloc( size, sizeof( T ) ) ), m_size( size ) {}
 template<typename T>
-zpArray<T>::zpArray( const zpArray& arr ) : m_array( (T*)calloc( size, sizeof( T ) ) ), m_size( arr.m_size ) {
+zpArray<T>::zpArray( const zpArray& arr ) : m_array( (T*)calloc( arr.m_size, sizeof( T ) ) ), m_size( arr.m_size ) {
 	memcpy_s( m_array, m_size * sizeof( T ), arr.m_array, m_size * sizeof( T ) );
 }
 template<typename T>
