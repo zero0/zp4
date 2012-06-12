@@ -145,6 +145,7 @@
     <ClInclude Include="zpRenderable.h" />
     <ClInclude Include="zpSerializable.h" />
     <ClInclude Include="zpString.h" />
+    <ClInclude Include="zpStringBuffer.h" />
     <ClInclude Include="zpTime.h" />
     <ClInclude Include="zpVector2.h" />
     <ClInclude Include="zpVector4.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="zpRegisterSerializable.cpp" />
     <ClCompile Include="zpSerialize.cpp" />
     <ClCompile Include="zpString.cpp" />
+    <ClCompile Include="zpStringBuffer.cpp" />
     <ClCompile Include="zpTime.cpp" />
     <ClCompile Include="zpWindow.cpp" />
     <ClCompile Include="zpWorld.cpp" />

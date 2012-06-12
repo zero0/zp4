@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Input", "Input\Input.vcxproj", "{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scripting", "Scripting\Scripting.vcxproj", "{23B9D3DD-536D-4AFB-BACD-736612E095C5}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -47,6 +49,12 @@ Global
 		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Release|Win32.ActiveCfg = Release|Win32
 		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Release|Win32.Build.0 = Release|Win32
 		{EED15947-2655-4C7A-AD5F-83F51AE8F6CE}.Release|x64.ActiveCfg = Release|Win32
+		{23B9D3DD-536D-4AFB-BACD-736612E095C5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{23B9D3DD-536D-4AFB-BACD-736612E095C5}.Debug|Win32.Build.0 = Debug|Win32
+		{23B9D3DD-536D-4AFB-BACD-736612E095C5}.Debug|x64.ActiveCfg = Debug|Win32
+		{23B9D3DD-536D-4AFB-BACD-736612E095C5}.Release|Win32.ActiveCfg = Release|Win32
+		{23B9D3DD-536D-4AFB-BACD-736612E095C5}.Release|Win32.Build.0 = Release|Win32
+		{23B9D3DD-536D-4AFB-BACD-736612E095C5}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

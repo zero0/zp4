@@ -60,6 +60,7 @@ ZP_PURE_INTERFACE zpSerializedInput;
 class zpRegisterSerializable;
 
 class zpString;
+class zpStringBuffer;
 template<typename T> class zpFlag;
 template<typename T> class zpLinkedList;
 template<typename T> class zpIntrusiveList;
@@ -96,6 +97,7 @@ class zpComponent;
 #include "zpRegisterSerializable.h"
 
 #include "zpString.h"
+#include "zpStringBuffer.h"
 
 #include "zpFlag.h"
 #include "zpLinkedList.h"

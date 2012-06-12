@@ -286,6 +286,9 @@ zp_uint zpString::length() const {
 zp_uint zpString::capacity() const {
 	return m_capacity;
 }
+zp_uint zpString::size() const {
+	return m_length;
+}
 
 zp_bool zpString::equals( const zpString& string ) const {
 	if( m_length != string.m_length ) return false;

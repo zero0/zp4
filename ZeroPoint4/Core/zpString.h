@@ -36,6 +36,7 @@ public:
 	zp_bool isEmpty() const;
 	zp_uint length() const;
 	zp_uint capacity() const;
+	zp_uint size() const;
 
 	zp_bool equals( const zpString& string ) const;
 	zp_bool equalsIgnoreCase( const zpString& string ) const;
