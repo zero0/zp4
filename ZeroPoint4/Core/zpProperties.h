@@ -40,6 +40,11 @@ public:
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
+	template<typename Func>
+	void foreach( Func func ) const {
+		m_properties.foreach( func );
+	};
+
 private:
 	zpHashMap<zpString, zpString> m_properties;
 };

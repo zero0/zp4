@@ -181,23 +181,26 @@ void core_test_main() {
 }
 
 void rendering_test_main() {
+	zp_printfln( "Size: %d", sizeof( zpString ) );
 	zpWindow wnd;
 	wnd.setTitle( "ZeroPoint4 Window" );
 	wnd.setPosition( zpVector2i( 50, 50 ) );
 	wnd.setScreenSize( zpVector2i( 800, 600 ) );
 	wnd.create();
-
-	zpHashMap<zpString, float> mmmmm;
-	char buff[10];
-	for( int i = 0; i < 27; ++i ) {
-		sprintf_s( buff, "%d", i );
-		mmmmm[ buff ] = ( 1.f / (float)(i + 1) );
-	}
-
-	mmmmm.foreach( []( zpString& i, float f ) {
-		zp_printfln( "%s %f", i.c_str(), f );
-	});
 	
+	zpProperties prop;
+	prop[ "a" ] = "b";
+	prop.setInt( "one", 1 );
+	prop.setFloat( "two.point.three", 2.3f );
+
+	prop.save( "test.properties" );
+
+
+	zpProperties prop2;
+	prop2.load( "test.properties" );
+	prop2.foreach( []( const zpString& key, const zpString& value ) {
+		zp_printfln( "%s = %s", key.c_str(), value.c_str() );
+	} );
 	zpGame game;
 	game.setWindow( &wnd );
 

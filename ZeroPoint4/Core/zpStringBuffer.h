@@ -20,6 +20,7 @@ public:
 
 	zpStringBuffer& operator<<( zp_char value );
 	zpStringBuffer& operator<<( const zp_char* value );
+	zpStringBuffer& operator<<( const zpString& value );
 	
 	zpStringBuffer& operator<<( zp_byte value );
 	zpStringBuffer& operator<<( zp_short value );
@@ -41,6 +42,7 @@ public:
 
 	void append( zp_char value );
 	void append( const zp_char* value, zp_uint length = npos );
+	void append( const zpString& value );
 
 	void append( zp_byte value );
 	void append( zp_short value );
@@ -72,6 +74,7 @@ public:
 	void prepend( zp_double value );
 
 	void erase( zp_uint start, zp_uint end = npos );
+	void clear();
 
 	zp_uint indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
 	zp_uint indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;

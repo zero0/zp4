@@ -41,54 +41,58 @@ zp_char zpStringBuffer::operator[]( zp_uint index ) const {
 }
 
 zpStringBuffer& zpStringBuffer::operator<<( zp_char value ) {
-	append( value );
+	append( (zp_char)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( const zp_char* value ) {
+	append( (const zp_char*)value );
+	return (*this);
+}
+zpStringBuffer& zpStringBuffer::operator<<( const zpString& value ) {
 	append( value );
 	return (*this);
 }
-	
+
 zpStringBuffer& zpStringBuffer::operator<<( zp_byte value ) {
-	append( value );
+	append( (zp_byte)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_short value ) {
-	append( value );
+	append( (zp_short)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_int value ) {
-	append( value );
+	append( (zp_int)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_long value ) {
-	append( value );
+	append( (zp_long)value );
 	return (*this);
 }
 
 zpStringBuffer& zpStringBuffer::operator<<( zp_ubyte value ) {
-	append( value );
+	append( (zp_ubyte)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_ushort value ) {
-	append( value );
+	append( (zp_ushort)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_uint value ) {
-	append( value );
+	append( (zp_uint)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_ulong value ) {
-	append( value );
+	append( (zp_ulong)value );
 	return (*this);
 }
 
 zpStringBuffer& zpStringBuffer::operator<<( zp_float value ) {
-	append( value );
+	append( (zp_float)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_double value ) {
-	append( value );
+	append( (zp_double)value );
 	return (*this);
 }
 	
@@ -117,14 +121,24 @@ void zpStringBuffer::append( const zp_char* value, zp_uint length ) {
 	if( length == npos ) {
 		length = strlen( value );
 	}
-	if( length == 1 ) {
-		append( value[0] );
-		return;
-	}
 	if( length == 0 ) {
 		return;
-	}
+	} else if( length == 1 ) {
+		append( value[0] );
+		return;
+	} else if( length < 8 ) {
+		ensureCapacity( m_length + length + 1 );
 
+		zp_char* c = m_buffer + m_length;
+		for( zp_uint i = 0; i < length; ++i, ++c ) {
+			*c = value[ i ];
+		}
+		
+		m_length += length;
+		m_buffer[ m_length ] = '\0';
+		return;
+	}
+	
 	zp_uint newLength = m_length + length;
 	ensureCapacity( newLength + 1 );
 
@@ -132,6 +146,9 @@ void zpStringBuffer::append( const zp_char* value, zp_uint length ) {
 	
 	m_length = newLength;
 	m_buffer[ m_length ] = '\0';
+}
+void zpStringBuffer::append( const zpString& value ) {
+	append( (const zp_char*)value.getChars(), value.length() );
 }
 
 void zpStringBuffer::append( zp_byte value ) {
@@ -204,6 +221,10 @@ void zpStringBuffer::prepend( zp_float value ) {}
 void zpStringBuffer::prepend( zp_double value ) {}
 
 void zpStringBuffer::erase( zp_uint start, zp_uint end ) {}
+void zpStringBuffer::clear() {
+	m_length = 0;
+	m_buffer[ 0 ] = '\0';
+}
 
 zp_uint zpStringBuffer::indexOf( zp_char ch, zp_uint fromIndex ) const {
 	if( fromIndex > m_length ) return npos;

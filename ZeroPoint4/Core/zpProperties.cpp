@@ -66,6 +66,10 @@ void zpProperties::load( const zpString& file ) {
 		zpString str;
 		zp_uint pos;
 		while( fgets( buff, 256, f ) ) {
+			zp_uint len = strlen( buff );
+			if( len == 0 ) continue;
+			buff[ len - 1 ] = '\0';
+
 			str = buff;
 			str.trim();
 
@@ -81,7 +85,25 @@ void zpProperties::load( const zpProperties& properties ) {
 }
 
 void zpProperties::save( const zpString& file ) const {
+	if( m_properties.isEmpty() ) return;
 	
+	FILE* f = ZP_NULL;
+	if( fopen_s( &f, file.c_str(), "w" ) == 0 ) {
+		char buff[ 64 ];
+		setbuf( f, buff );
+
+		zpStringBuffer buffer( 256 );
+		m_properties.foreach( [ &buffer, f ]( const zpString& key, const zpString& value ) {
+			buffer << key << " = " << value << '\n';
+			
+			fputs( buffer.getChars(), f );
+			fflush( f );
+
+			buffer.clear();
+		} );
+		
+		fclose( f );
+	}
 }
 
 void zpProperties::clear() {

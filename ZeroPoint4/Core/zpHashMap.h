@@ -36,6 +36,8 @@ public:
 	zp_bool remove( const Key& key, Value* outValue = ZP_NULL );
 	zp_bool erase( const Key& key );
 
+	zp_bool find( const Key& key, Value* outValue ) const;
+
 	void clear();
 
 	template<typename Func>

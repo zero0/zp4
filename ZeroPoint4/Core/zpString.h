@@ -33,6 +33,9 @@ public:
 	zp_uint indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
 	zp_uint indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
 
+	zp_uint lastIndexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
+	zp_uint lastIndexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
+
 	zp_bool isEmpty() const;
 	zp_uint length() const;
 	zp_uint capacity() const;
@@ -53,6 +56,9 @@ public:
 	zpString toLower() const;
 	zpString toUpper() const;
 
+	zpString& toLower();
+	zpString& toUpper();
+
 	zp_int scan( const zp_char* format, ... ) const;
 
 	zpString ltrim() const;
@@ -62,7 +68,7 @@ public:
 	zpString& ltrim();
 	zpString& rtrim();
 	zpString& trim();
-
+	
 	template<typename Func>
 	void foreach( Func func ) {
 		const zp_char* p = getChars();
@@ -73,7 +79,7 @@ public:
 	}
 	template<typename Func>
 	void map( Func func ) {
-		zp_char* p = IS_STRING_PACKED( this ) ? m_chars : m_string;
+		zp_char* p = m_length < ZP_STRING_MAX_SMALL_SIZE ? m_chars : m_string;
 		while( *p ) {
 			*p = func( *p );
 			++p;
@@ -81,18 +87,28 @@ public:
 	}
 
 private:
+	void ensureCapacity( zp_uint size );
+
 	static zpString __format( zp_char* buff, zp_uint size, const zpString& format, ... );
 
 	union {
 		zp_char m_chars[ZP_STRING_MAX_SMALL_SIZE];
-		zp_char* m_string;
+		struct {
+			zp_char* m_string;
+			zp_uint m_capacity;
+		};
 	};
 
-	zp_uint m_capacity;
 	zp_uint m_length;
 };
 
 zp_bool operator==( const zpString& string1, const zpString& string2 );
 
 zp_bool operator!=( const zpString& string1, const zpString& string2 );
+
+zp_char zp_to_lower( zp_char ch );
+zp_char zp_to_upper( zp_char ch );
+
+zp_bool zp_is_whitespace( zp_char ch );
+
 #endif
