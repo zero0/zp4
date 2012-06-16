@@ -3,7 +3,8 @@
 zpWorld::zpWorld() :
 	m_isEnabled( false ),
 	m_isCreated( false ),
-	m_root( ZP_NULL )
+	m_root( ZP_NULL ),
+	m_game( ZP_NULL )
 {}
 zpWorld::~zpWorld() {}
 
@@ -52,9 +53,17 @@ void zpWorld::setName( const zpString& name ) {
 	m_name = name;
 }
 
+void zpWorld::setGame( zpGame* game ) {
+	m_game = game;
+}
+zpGame* zpWorld::getGame() const {
+	return m_game;
+}
+
 void zpWorld::receiveMessage( const zpMessage& message ) {
 	if( m_root ) m_root->receiveMessage( message );
 }
 
 void zpWorld::serialize( zpSerializedOutput* out ) {}
 void zpWorld::deserialize( zpSerializedInput* in ) {}
+

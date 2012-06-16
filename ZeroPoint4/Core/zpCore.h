@@ -149,6 +149,52 @@ T zp_abs( T& value ) {
 	return value > (T)0 ? value : -value;
 }
 
+template<typename T>
+void zp_move_swap( T& a, T& b ) {
+	T temp = (T&&)a;
+	a = (T&&)b;
+	b = (T&&)temp;
+}
+
+template<typename T>
+void zp_qsort( T* arr, zp_uint l, zp_uint r ) {
+	if( r <= l ) return;
+	zp_uint i = l - 1, j = r;
+	zp_uint p - l - 1, q = r;
+	zp_uint k;
+
+	while( true ) {
+		while( arr[ ++i ] < a[ r ] );
+		while( arr[ r ] < arr[ --j ] ) if( j == l ) break;
+		if( i >= j ) break;
+
+		zp_move_swap( arr[ i ], arr[ j ] );
+
+		if( a[ i ] == a[ r ] ) zp_move_swap( a[ ++p ], a[ i ] );
+		if( a[ j ] == a[ r ] ) zp_move_swap( a[ --q ], a[ j ] );
+	}
+
+	zp_move_swap( a[ i ], a[ r ] );
+	j = i - 1;
+	i = i + 1;
+	
+	for( k = l; k <= p; k++ ) zp_move_swap( a[ k ], a[ j-- ] );
+	for( k = r - 1; k >= q; k-- ) zp_move_swap( a[ k ], a[ i++ ] );
+
+	zp_qsort( a, l, j );
+	zp_qsort( a, i, r );
+}
+
+template<typename T, zp_uint Size>
+void zp_qsort( T (&arr)[Size] ) {
+	zp_qsort( arr, 0, Size - 1 );
+}
+
+template<typename T>
+void zp_qsort( T* arr, zp_uint count ) {
+	zp_qsort( arr, 0, count - 1 );
+}
+
 zp_uint zp_near_pow2( zp_uint number );
 
 #endif

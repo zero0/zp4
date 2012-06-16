@@ -28,6 +28,9 @@ public:
 	const zpString& getName() const;
 	void setName( const zpString& name );
 
+	void setGame( zpGame* game );
+	zpGame* getGame() const;
+
 	void receiveMessage( const zpMessage& message );
 
 	void serialize( zpSerializedOutput* out );
@@ -38,6 +41,7 @@ private:
 	zp_bool m_isCreated;
 
 	zpGameObject* m_root;
+	zpGame* m_game;
 
 	zpString m_name;
 };

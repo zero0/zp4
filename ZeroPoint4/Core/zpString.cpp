@@ -546,8 +546,6 @@ zpString zpString::__format( zp_char* buff, zp_uint size, const zpString& format
 	return zpString( buff );
 }
 
-
-
 zp_bool operator==( const zpString& string1, const zpString& string2 ) {
 	return string1.equals( string2 );
 }

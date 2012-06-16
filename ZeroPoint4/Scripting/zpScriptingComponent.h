@@ -22,7 +22,9 @@ protected:
 	void onDisabled();
 
 private:
-	zpString m_scriptName;
+	zpString m_scriptAlias;
+	zpScriptingInstance* m_scriptInstance;
+	void* m_scriptObject;
 };
 
 #endif

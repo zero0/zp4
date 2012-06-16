@@ -90,7 +90,7 @@ void zpProperties::save( const zpString& file ) const {
 	FILE* f = ZP_NULL;
 	if( fopen_s( &f, file.c_str(), "w" ) == 0 ) {
 		char buff[ 64 ];
-		setbuf( f, buff );
+		setvbuf( f, buff, _IOFBF, 64 );
 
 		zpStringBuffer buffer( 256 );
 		m_properties.foreach( [ &buffer, f ]( const zpString& key, const zpString& value ) {

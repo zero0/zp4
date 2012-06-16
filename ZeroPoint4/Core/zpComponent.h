@@ -2,6 +2,9 @@
 #ifndef ZP_COMPONENT_H
 #define ZP_COMPONENT_H
 
+class zpWorld;
+class zpGame;
+
 ZP_ABSTRACT_CLASS zpComponent : 
 	public zpIntrusiveListNode<zpComponent>,
 	public zpReferencedObject, 
@@ -29,6 +32,15 @@ public:
 
 	void sendMessageToParentGameObject( const zpMessage& message );
 	void sendMessageToSiblingComponents( const zpMessage& message );
+
+	zpWorld* getWorld() const;
+	zpGame* getGame() const;
+
+	template<typename T>
+	T* getGameManagerOfType() const {
+		return getGame()->getGameManagerOfType<T>();
+	}
+
 
 protected:
 	virtual void onCreate() = 0;

@@ -85,7 +85,6 @@ public:
 	template<typename Func>
 	void map( Func func ) const;
 	
-
 	static const zp_uint npos;
 
 private:

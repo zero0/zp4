@@ -67,3 +67,11 @@ void zpComponent::sendMessageToSiblingComponents( const zpMessage& message ) {
 		if( goc != self ) goc->receiveMessage( message );
 	} );
 }
+
+zpWorld* zpComponent::getWorld() const {
+	return m_parentGameObject->getWorld();
+}
+zpGame* zpComponent::getGame() const {
+	return m_parentGameObject->getWorld()->getGame();
+}
+

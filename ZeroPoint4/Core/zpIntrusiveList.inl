@@ -9,7 +9,7 @@ zpIntrusiveList<T>::~zpIntrusiveList() {}
 
 template<typename T>
 void zpIntrusiveList<T>::pushBack( zpIntrusiveListNode<T>* node ) {
-	if( !node || node->m_next == node ) return;
+	if( !node || node->m_next != node ) return;
 
 	node->m_next = &m_root;
 	node->m_prev = m_root.m_prev;
@@ -18,7 +18,7 @@ void zpIntrusiveList<T>::pushBack( zpIntrusiveListNode<T>* node ) {
 }
 template<typename T>
 void zpIntrusiveList<T>::pushFront( zpIntrusiveListNode<T>* node ) {
-	if( !node || node->m_next == node ) return;
+	if( !node || node->m_next != node ) return;
 
 	node->m_next = m_root.m_next;
 	node->m_prev = &m_root;

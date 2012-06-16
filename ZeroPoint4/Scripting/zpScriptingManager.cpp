@@ -1,5 +1,7 @@
 #include "zpScripting.h"
-#include "sqrat.h"
+#include "angelscript.h"
+
+
 
 zpScriptingManager::zpScriptingManager() {}
 zpScriptingManager::~zpScriptingManager() {}
@@ -10,11 +12,10 @@ void zpScriptingManager::serialize( zpSerializedOutput* out ) {}
 void zpScriptingManager::deserialize( zpSerializedInput* in ) {}
 
 void zpScriptingManager::onCreate() {
-	m_vm = (zp_ptr)sq_open( 512 );
-	Sqrat::DefaultVM().Set( (HSQUIRRELVM)m_vm );
+	zpAngelScript::createInstance();
 }
 void zpScriptingManager::onDestroy() {
-	sq_close( (HSQUIRRELVM)m_vm );
+	zpAngelScript::destroyInstance();
 }
 
 void zpScriptingManager::onUpdate() {}

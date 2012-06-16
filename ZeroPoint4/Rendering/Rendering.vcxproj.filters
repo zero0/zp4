@@ -39,6 +39,9 @@
     <ClInclude Include="zpRenderingManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">

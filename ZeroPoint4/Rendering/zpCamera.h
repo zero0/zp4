@@ -1,18 +1,14 @@
 #pragma once
-#ifndef ZP_SCRIPTING_MANAGER_H
-#define ZP_SCRIPTING_MANAGER_H
+#ifndef ZP_CAMERA_H
+#define ZP_CAMERA_H
 
-#if ZP_DEBUG
-#pragma comment( lib, "angelscriptd.lib" )
-#else
-#pragma comment( lib, "angelscript.lib" )
-#endif
-
-class zpScriptingManager : public zpGameManager {
+class zpCamera : public zpComponent, public zpRenderable {
 public:
-	zpScriptingManager();
-	virtual ~zpScriptingManager();
-	
+	zpCamera();
+	~zpCamera();
+
+	void render();
+
 	void receiveMessage( const zpMessage& message );
 
 	void serialize( zpSerializedOutput* out );
@@ -28,6 +24,7 @@ protected:
 	void onDisabled();
 
 private:
+
 };
 
 #endif

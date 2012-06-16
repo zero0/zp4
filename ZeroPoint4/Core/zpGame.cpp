@@ -25,6 +25,7 @@ void zpGame::addWorld( zpWorld* world, zp_bool andCreate ) {
 	if( world )	{
 		m_worlds.pushBack( world );
 		world->addReference();
+		world->setGame( this );
 		if( andCreate ) world->create();
 	}
 	if( !m_currentWorld ) m_nextWorld = world;
@@ -39,6 +40,7 @@ void zpGame::removeWorld( zpWorld* world ) {
 		}
 		
 		world->removeReference();
+		world->setGame( ZP_NULL );
 	}
 }
 zpWorld* zpGame::getCurrentWorld() const {

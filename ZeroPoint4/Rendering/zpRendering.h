@@ -54,6 +54,7 @@ struct zpRenderingDisplayMode {
 #include "zpRenderingFactory.h"
 
 #include "zpBuffer.h"
+#include "zpCamera.h"
 
 #include "zpDX11RenderingEngine.h"
 #include "zpRenderingManager.h"

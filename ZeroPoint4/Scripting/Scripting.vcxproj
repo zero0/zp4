@@ -72,40 +72,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\sqrat.h" />
-    <ClInclude Include="include\sqrat\sqratAllocator.h" />
-    <ClInclude Include="include\sqrat\sqratArray.h" />
-    <ClInclude Include="include\sqrat\sqratClass.h" />
-    <ClInclude Include="include\sqrat\sqratClassType.h" />
-    <ClInclude Include="include\sqrat\sqratConst.h" />
-    <ClInclude Include="include\sqrat\sqratFunction.h" />
-    <ClInclude Include="include\sqrat\sqratGlobalMethods.h" />
-    <ClInclude Include="include\sqrat\sqratMemberMethods.h" />
-    <ClInclude Include="include\sqrat\sqratObject.h" />
-    <ClInclude Include="include\sqrat\sqratOverloadMethods.h" />
-    <ClInclude Include="include\sqrat\sqratScript.h" />
-    <ClInclude Include="include\sqrat\sqratTable.h" />
-    <ClInclude Include="include\sqrat\sqratTypes.h" />
-    <ClInclude Include="include\sqrat\sqratUtil.h" />
-    <ClInclude Include="include\sqrat\sqratVM.h" />
-    <ClInclude Include="include\sqstdaux.h" />
-    <ClInclude Include="include\sqstdblob.h" />
-    <ClInclude Include="include\sqstdio.h" />
-    <ClInclude Include="include\sqstdmath.h" />
-    <ClInclude Include="include\sqstdstring.h" />
-    <ClInclude Include="include\sqstdsystem.h" />
-    <ClInclude Include="include\squirrel.h" />
+    <ClInclude Include="zpAngelScript.h" />
     <ClInclude Include="zpScripting.h" />
     <ClInclude Include="zpScriptingComponent.h" />
+    <ClInclude Include="zpScriptingInstance.h" />
     <ClInclude Include="zpScriptingManager.h" />
+    <ClInclude Include="zpScriptingResource.h" />
+    <ClInclude Include="zpScriptingResourceCreator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpAngelScript.cpp" />
     <ClCompile Include="zpScripting.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpScriptingComponent.cpp" />
+    <ClCompile Include="zpScriptingInstance.cpp" />
     <ClCompile Include="zpScriptingManager.cpp" />
+    <ClCompile Include="zpScriptingResource.cpp" />
+    <ClCompile Include="zpScriptingResourceCreator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Content\Content.vcxproj">
+      <Project>{8f28bfad-31ec-42d1-9d92-c2a2bcb5db5f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.vcxproj">
+      <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
