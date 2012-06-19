@@ -22,12 +22,12 @@ public:
 	zpStringBuffer& operator<<( const zp_char* value );
 	zpStringBuffer& operator<<( const zpString& value );
 	
-	zpStringBuffer& operator<<( zp_byte value );
+	zpStringBuffer& operator<<( zp_sbyte value );
 	zpStringBuffer& operator<<( zp_short value );
 	zpStringBuffer& operator<<( zp_int value );
 	zpStringBuffer& operator<<( zp_long value );
 
-	zpStringBuffer& operator<<( zp_ubyte value );
+	zpStringBuffer& operator<<( zp_byte value );
 	zpStringBuffer& operator<<( zp_ushort value );
 	zpStringBuffer& operator<<( zp_uint value );
 	zpStringBuffer& operator<<( zp_ulong value );
@@ -44,12 +44,12 @@ public:
 	void append( const zp_char* value, zp_uint length = npos );
 	void append( const zpString& value );
 
-	void append( zp_byte value );
+	void append( zp_sbyte value );
 	void append( zp_short value );
 	void append( zp_int value );
 	void append( zp_long value );
 
-	void append( zp_ubyte value );
+	void append( zp_byte value );
 	void append( zp_ushort value );
 	void append( zp_uint value );
 	void append( zp_ulong value );
@@ -60,12 +60,12 @@ public:
 	void prepend( zp_char value );
 	void prepend( const zp_char* value );
 
-	void prepend( zp_byte value );
+	void prepend( zp_sbyte value );
 	void prepend( zp_short value );
 	void prepend( zp_int value );
 	void prepend( zp_long value );
 
-	void prepend( zp_ubyte value );
+	void prepend( zp_byte value );
 	void prepend( zp_ushort value );
 	void prepend( zp_uint value );
 	void prepend( zp_ulong value );

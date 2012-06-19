@@ -121,6 +121,7 @@
     <ClInclude Include="zpColor4f.h" />
     <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
+    <ClInclude Include="zpFile.h" />
     <ClInclude Include="zpFlag.h" />
     <ClInclude Include="zpGame.h" />
     <ClInclude Include="zpGameManager.h" />
@@ -179,6 +180,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zpFile.cpp" />
     <ClCompile Include="zpGame.cpp" />
     <ClCompile Include="zpGameManager.cpp" />
     <ClCompile Include="zpGameObject.cpp" />

@@ -53,8 +53,8 @@ zpStringBuffer& zpStringBuffer::operator<<( const zpString& value ) {
 	return (*this);
 }
 
-zpStringBuffer& zpStringBuffer::operator<<( zp_byte value ) {
-	append( (zp_byte)value );
+zpStringBuffer& zpStringBuffer::operator<<( zp_sbyte value ) {
+	append( (zp_sbyte)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_short value ) {
@@ -70,8 +70,8 @@ zpStringBuffer& zpStringBuffer::operator<<( zp_long value ) {
 	return (*this);
 }
 
-zpStringBuffer& zpStringBuffer::operator<<( zp_ubyte value ) {
-	append( (zp_ubyte)value );
+zpStringBuffer& zpStringBuffer::operator<<( zp_byte value ) {
+	append( (zp_byte)value );
 	return (*this);
 }
 zpStringBuffer& zpStringBuffer::operator<<( zp_ushort value ) {
@@ -151,7 +151,7 @@ void zpStringBuffer::append( const zpString& value ) {
 	append( (const zp_char*)value.getChars(), value.length() );
 }
 
-void zpStringBuffer::append( zp_byte value ) {
+void zpStringBuffer::append( zp_sbyte value ) {
 	zp_char buff[8];
 	sprintf_s( buff, "%d", value );
 	append( buff );
@@ -172,7 +172,7 @@ void zpStringBuffer::append( zp_long value ) {
 	append( buff );
 }
 
-void zpStringBuffer::append( zp_ubyte value ) {
+void zpStringBuffer::append( zp_byte value ) {
 	zp_char buff[8];
 	sprintf_s( buff, "%u", value );
 	append( buff );
@@ -207,12 +207,12 @@ void zpStringBuffer::append( zp_double value ) {
 void zpStringBuffer::prepend( zp_char value ) {}
 void zpStringBuffer::prepend( const zp_char* value ) {}
 
-void zpStringBuffer::prepend( zp_byte value ) {}
+void zpStringBuffer::prepend( zp_sbyte value ) {}
 void zpStringBuffer::prepend( zp_short value ) {}
 void zpStringBuffer::prepend( zp_int value ) {}
 void zpStringBuffer::prepend( zp_long value ) {}
 
-void zpStringBuffer::prepend( zp_ubyte value ) {}
+void zpStringBuffer::prepend( zp_byte value ) {}
 void zpStringBuffer::prepend( zp_ushort value ) {}
 void zpStringBuffer::prepend( zp_uint value ) {}
 void zpStringBuffer::prepend( zp_ulong value ) {}

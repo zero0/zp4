@@ -8,12 +8,11 @@
 #define ZP_NULL	0
 #endif
 
-typedef unsigned __int8 zp_ubyte;
 typedef unsigned __int16 zp_ushort;
 typedef unsigned __int32 zp_uint;
 typedef unsigned __int64 zp_ulong;
 
-typedef signed __int8 zp_byte;
+typedef signed __int8 zp_sbyte;
 typedef signed __int16 zp_short;
 typedef signed __int32 zp_int;
 typedef signed __int64 zp_long;
@@ -38,6 +37,7 @@ typedef wchar_t zp_char;
 typedef char zp_char;
 #endif
 
+typedef unsigned __int8 zp_byte;
 typedef zp_ushort zp_word;
 typedef zp_uint zp_dword;
 typedef zp_ulong zp_qword;

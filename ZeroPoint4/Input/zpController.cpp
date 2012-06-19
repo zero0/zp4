@@ -114,8 +114,8 @@ void zpController::poll() {
 		m_buttons = currentButtons;
 
 		// Trigger Pulls
-		zp_ubyte t;
-		zp_ubyte pt;
+		zp_byte t;
+		zp_byte pt;
 		// Left Trigger
 		t = state.Gamepad.bLeftTrigger;
 		pt = m_leftTrigger;
@@ -215,20 +215,20 @@ zp_bool zpController::isConnected() const {
 	return m_isConnected;
 }
 
-void zpController::setTriggerThreshold( zp_ubyte threshold ) {
+void zpController::setTriggerThreshold( zp_byte threshold ) {
 	m_leftTriggerThreshold = threshold;
 	m_rightTriggerThreshold = threshold;
 }
-void zpController::setLeftTriggerThreshold( zp_ubyte threshold ) {
+void zpController::setLeftTriggerThreshold( zp_byte threshold ) {
 	m_leftTriggerThreshold = threshold;
 }
-void zpController::setRightTriggerThreshold( zp_ubyte threshold ) {
+void zpController::setRightTriggerThreshold( zp_byte threshold ) {
 	m_rightTriggerThreshold = threshold;
 }
-zp_ubyte zpController::getLeftTriggerThreshold() const {
+zp_byte zpController::getLeftTriggerThreshold() const {
 	return m_leftTriggerThreshold;
 }
-zp_ubyte zpController::getRightTriggerThreshold() const {
+zp_byte zpController::getRightTriggerThreshold() const {
 	return m_rightTriggerThreshold;
 }
 
@@ -315,10 +315,10 @@ zp_bool zpController::isRightTriggerPressed() const {
 	return m_rightTrigger != 0;
 }
 
-zp_ubyte zpController::getLeftTrigger() const {
+zp_byte zpController::getLeftTrigger() const {
 	return m_leftTrigger;
 }
-zp_ubyte zpController::getRightTrigger() const {
+zp_byte zpController::getRightTrigger() const {
 	return m_rightTrigger;
 }
 

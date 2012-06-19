@@ -39,7 +39,7 @@ private:
 	F m_flag;
 };
 
-typedef zpFlag<zp_ubyte> zpFlag8;
+typedef zpFlag<zp_byte> zpFlag8;
 typedef zpFlag<zp_ushort> zpFlag16;
 typedef zpFlag<zp_uint> zpFlag32;
 typedef zpFlag<zp_ulong> zpFlag64;

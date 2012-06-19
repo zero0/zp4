@@ -69,6 +69,7 @@ template<typename T> class zpArray;
 template<typename T> class zpArrayList;
 template<typename K, typename V> class zpMap;
 template<typename F, typename S> class zpHashMap;
+class zpFile;
 
 class zpColor4f;
 
@@ -107,6 +108,7 @@ class zpComponent;
 #include "zpArrayList.h"
 #include "zpHashMap.h"
 #include "zpMap.h"
+#include "zpFile.h"
 
 #include "zpProperties.h"
 #include "zpMemorySystem.h"

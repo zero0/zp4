@@ -10,13 +10,13 @@ enum zpControllerNumber : zp_ushort {
 	ZP_CONTROLLER_3,
 	ZP_CONTROLLER_4
 };
-enum zpControllerBatterLevel : zp_ubyte {
+enum zpControllerBatterLevel : zp_byte {
 	ZP_CONTROLLER_BATTERY_LEVEL_EMPTY =		0,
 	ZP_CONTROLLER_BATTERY_LEVEL_LOW,
 	ZP_CONTROLLER_BATTERY_LEVEL_MEDIUM,
 	ZP_CONTROLLER_BATTERY_LEVEL_FULL,
 };
-enum zpControllerBatterType : zp_ubyte {
+enum zpControllerBatterType : zp_byte {
 	ZP_CONTROLLER_BATTERY_TYPE_DISCONNECTED =		0,
 	ZP_CONTROLLER_BATTERY_TYPE_WIRED,
 	ZP_CONTROLLER_BATTERY_TYPE_ALKALINE,
@@ -74,11 +74,11 @@ public:
 
 	zp_bool isConnected() const;
 
-	void setTriggerThreshold( zp_ubyte threshold );
-	void setLeftTriggerThreshold( zp_ubyte threshold );
-	void setRightTriggerThreshold( zp_ubyte threshold );
-	zp_ubyte getLeftTriggerThreshold() const;
-	zp_ubyte getRightTriggerThreshold() const;
+	void setTriggerThreshold( zp_byte threshold );
+	void setLeftTriggerThreshold( zp_byte threshold );
+	void setRightTriggerThreshold( zp_byte threshold );
+	zp_byte getLeftTriggerThreshold() const;
+	zp_byte getRightTriggerThreshold() const;
 
 	void setLeftThumbDeadZone( zp_short deadzone );
 	zp_short getLeftThumbDeadZone() const;
@@ -114,8 +114,8 @@ public:
 	zp_bool isLeftTriggerPressed() const;
 	zp_bool isRightTriggerPressed() const;
 
-	zp_ubyte getLeftTrigger() const;
-	zp_ubyte getRightTrigger() const;
+	zp_byte getLeftTrigger() const;
+	zp_byte getRightTrigger() const;
 
 	const zpVector2i& getLeftThumb() const;
 	const zpVector2i& getRightThumb() const;
@@ -151,11 +151,11 @@ private:
 	zp_bool m_isConnected;
 	zp_ushort m_buttons;
 
-	zp_ubyte m_leftTrigger;
-	zp_ubyte m_rightTrigger;
+	zp_byte m_leftTrigger;
+	zp_byte m_rightTrigger;
 
-	zp_ubyte m_leftTriggerThreshold;
-	zp_ubyte m_rightTriggerThreshold;
+	zp_byte m_leftTriggerThreshold;
+	zp_byte m_rightTriggerThreshold;
 
 	zp_bool m_isRumbleEnabled;
 	zp_float m_rightRumbleTime;
