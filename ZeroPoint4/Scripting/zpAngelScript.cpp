@@ -18,6 +18,7 @@ void __onMessageCallback( const asSMessageInfo& info ) {
 zpAngelScript::zpAngelScript() {}
 zpAngelScript::~zpAngelScript() {}
 
+zpMemoryAllocator* zpAngelScript::s_allocator = ZP_NULL;
 asIScriptEngine* zpAngelScript::s_engine = ZP_NULL;
 zp_bool zpAngelScript::createInstance( zpMemoryAllocator* memoryAllocator ) {
 	if( s_engine ) return false;
@@ -30,7 +31,8 @@ zp_bool zpAngelScript::createInstance( zpMemoryAllocator* memoryAllocator ) {
 	s_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
 	if( !s_engine ) return false;
 	
-	s_engine->SetMessageCallback( asFUNCTION( __onMessageCallback ), ZP_NULL, asCALL_STDCALL );
+	//s_engine->SetEngineProperty( asEP_COPY_SCRIPT_SECTIONS, true );
+	//s_engine->SetMessageCallback( asFUNCTION( __onMessageCallback ), ZP_NULL, asCALL_STDCALL );
 	return true;
 }
 void zpAngelScript::destroyInstance() {

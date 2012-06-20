@@ -7,14 +7,18 @@ public:
 	zpScriptingInstance( zpScriptingResource* resource );
 	~zpScriptingInstance();
 
-	void callFunction( const zpString& functionName );
+	void* getMethod( const zpString& methodName );
+	void* getScriptObject() const;
 
 private:
 	zpScriptingInstance();
 	
+	void createObject();
+	void destroyObject();
+
 	zpScriptingResource* m_resource;
 
-	void* m_object;
+	void* m_scriptObject;
 };
 
 #endif

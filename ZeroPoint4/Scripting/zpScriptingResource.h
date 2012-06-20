@@ -10,8 +10,13 @@ public:
 	zp_bool load();
 	void unload();
 
+	void* getScriptObjectType() const;
+	void* getMethod( const zpString& functionName );
+
 private:
-	void* m_script;
+	void* m_scriptObjectType;
+
+	zpHashMap<zpString, void*> m_cachedMethods;
 };
 
 #endif

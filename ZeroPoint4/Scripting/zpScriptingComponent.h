@@ -12,6 +12,11 @@ public:
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
+	void callFunction( const zpString& functionName );
+
+	void setScriptAlias( const zpString& alias );
+	const zpString& getScriptAlias() const;
+
 protected:
 	void onCreate();
 	void onDestroy();
@@ -22,9 +27,9 @@ protected:
 	void onDisabled();
 
 private:
-	zpString m_scriptAlias;
 	zpScriptingInstance* m_scriptInstance;
-	void* m_scriptObject;
+	
+	zpString m_scriptAlias;
 };
 
 #endif

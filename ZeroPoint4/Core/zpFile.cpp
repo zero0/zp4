@@ -35,9 +35,7 @@ zpFile::zpFile( const zpString& filename, zpFileMode mode ) :
 	m_mode( mode ), 
 	m_size( -1 ), 
 	m_filename( filename )
-{
-	open();	
-}
+{}
 zpFile::zpFile( const zpFile& file ) : 
 	m_file( ZP_NULL ), 
 	m_mode( ZP_FILE_MODE_NONE ), 
@@ -121,7 +119,7 @@ zp_int zpFile::readFile( zpStringBuffer* buffer ) {
 		FILE* f = (FILE*)m_file;
 
 		zp_uint s;
-		while( ( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), 64, f ) ) >= 0 && feof( f ) == 0 ) {
+		while( feof( f ) == 0 && ( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), 64, f ) ) >= 0 ) {
 			buffer->append( buff, s );
 		}
 	}

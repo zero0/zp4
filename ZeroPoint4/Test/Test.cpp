@@ -1,5 +1,8 @@
 #include "Core\zpCore.h"
 #include "Rendering\zpRendering.h"
+#include "Content\zpContent.h"
+#include "Scripting\zpScripting.h"
+
 #include <stdio.h>
 
 void core_test_main() {
@@ -214,8 +217,30 @@ void rendering_test_main() {
 	wnd.run();
 }
 
+void scripting_test_main() {
+	zpScriptingManager sm;
+	sm.create();
+
+	zpScriptingResourceCreator src;
+	src.setRootDirectory( "scripts/" );
+
+	zpContentManager content;
+	content.create();
+
+	content.setRootDirectory( "Assets/" );
+	content.registerFileExtension( "as", &src );
+
+	content.loadResource( "TestScript.as", "TestScript" );
+	
+	zpScriptingComponent sc;
+	sc.setScriptAlias( "TestScript" );
+	sc.create();
+}
+
 int main() {
 	//core_test_main();
-	rendering_test_main();
+	//rendering_test_main();
+	scripting_test_main();
+
 	return 0;
 }

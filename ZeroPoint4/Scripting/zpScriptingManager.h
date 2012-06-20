@@ -8,6 +8,8 @@
 #pragma comment( lib, "angelscript.lib" )
 #endif
 
+struct asSMessageInfo;
+
 class zpScriptingManager : public zpGameManager {
 public:
 	zpScriptingManager();
@@ -28,6 +30,7 @@ protected:
 	void onDisabled();
 
 private:
+	void messageCallback( const asSMessageInfo& msg );
 };
 
 #endif

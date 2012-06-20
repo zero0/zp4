@@ -33,13 +33,13 @@ zpString::zpString() :
 	m_chars[ 0 ] = '\0';
 }
 zpString::zpString( const zp_char* string ) : 
-	m_length( string ? strlen( string ) : 0 )
+	m_length( string ? strlen( string ) : 0 ),
+	m_capacity( ZP_STRING_MAX_SMALL_SIZE )
 {
 	if( m_length > 0 ) {
 		if( IS_STRING_PACKED( this ) ) {
 			strcpy_s( m_chars, string );
 		} else {
-			m_capacity = ZP_STRING_MAX_SMALL_SIZE;
 			while( m_capacity <= m_length ) m_capacity *= 2;
 
 			m_string = new zp_char[ m_capacity ];
@@ -49,13 +49,15 @@ zpString::zpString( const zp_char* string ) :
 	
 }
 zpString::zpString( const zp_char* string, zp_uint length, zp_uint offset ) : 
-	m_length( length )
+	m_length( length ),
+	m_capacity( ZP_STRING_MAX_SMALL_SIZE )
 {
 	if( m_length > 0 ) {
 		if( IS_STRING_PACKED( this ) ) {
-			strcpy_s( m_chars, string + offset );
+			//strcpy_s( m_chars, string + offset );
+			memcpy_s( m_chars, sizeof( zp_char ) * ZP_STRING_MAX_SMALL_SIZE, string + offset, length );
+			m_chars[ length ] = '\0';
 		} else {
-			m_capacity = ZP_STRING_MAX_SMALL_SIZE;
 			while( m_capacity <= m_length ) m_capacity *= 2;
 
 			m_string = new zp_char[ m_capacity ];
@@ -66,19 +68,21 @@ zpString::zpString( const zp_char* string, zp_uint length, zp_uint offset ) :
 	}
 }
 zpString::zpString( const zpString& string ) : 
-	m_length( string.m_length )
+	m_length( string.m_length ),
+	m_capacity( string.m_capacity )
 {
 	if( m_length > 0 ) {
 		if( IS_STRING_PACKED( this ) ) {
 			strcpy_s( m_chars, string.m_chars );
 		} else {
-			m_string = new zp_char[ string.m_capacity ];
+			m_string = new zp_char[ m_capacity ];
 			strcpy_s( m_string, m_capacity * sizeof( zp_char ), string.m_string );
 		}
 	}
 }
 zpString::zpString( const zpString& string, zp_uint length, zp_uint offset ) :
-	m_length( length )
+	m_length( length ),
+	m_capacity( ZP_STRING_MAX_SMALL_SIZE )
 {
 	if( string.m_length > 0 ) {
 		if( IS_STRING_PACKED( &string ) ) {
@@ -109,7 +113,8 @@ zpString::zpString( const zpString& string, zp_uint length, zp_uint offset ) :
 	}
 }
 zpString::zpString( zpString&& string ) : 
-	m_length( string.m_length )
+	m_length( string.m_length ),
+	m_capacity( ZP_STRING_MAX_SMALL_SIZE )
 {
 	if( IS_STRING_PACKED( this ) ) {
 		strcpy_s( m_chars, string.m_chars );

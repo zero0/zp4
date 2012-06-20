@@ -4,7 +4,9 @@
 zpContentManager::zpContentManager() {}
 zpContentManager::~zpContentManager() {}
 	
-void zpContentManager::registerFileExtension( const zpString& extension, zpResourceCreator* creator ) {}
+void zpContentManager::registerFileExtension( const zpString& extension, zpResourceCreator* creator ) {
+	m_creators.put( extension, creator );
+}
 	
 zp_bool zpContentManager::loadResource( const zpString& filename, const zpString& alias ) {
 	zpString extension = filename.substring( filename.lastIndexOf( '.' ) + 1 );
@@ -20,6 +22,7 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 		zpResource* resource = creator->createResource( fullFilePath );
 		ZP_ASSERT_RETURN_( resource, false, "Unable to create resource %s => %s", alias.c_str(), filename.c_str() );
 		resource->setContentManager( this );
+		resource->setFilename( fullFilePath );
 
 		m_resources[ alias ] = resource;
 		m_fileToAlias[ filename ] = alias;
@@ -95,6 +98,16 @@ void zpContentManager::receiveMessage( const zpMessage& message ) {}
 
 void zpContentManager::serialize( zpSerializedOutput* out ) {}
 void zpContentManager::deserialize( zpSerializedInput* in ) {}
+
+void zpContentManager::setRootDirectory( const zpString& rootDirectory ) {
+	m_rootDirectory = rootDirectory;
+	m_rootDirectory.map( []( zp_char ch ) {
+		return ch == '/' || ch == '\\' ? zpFile::sep : ch;
+	} );
+}
+const zpString& zpContentManager::getRootDirectory() const {
+	return m_rootDirectory;
+}
 
 void zpContentManager::onCreate() {}
 void zpContentManager::onDestroy() {}

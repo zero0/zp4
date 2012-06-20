@@ -37,7 +37,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(SolutionDir)Scripting\lib\x86\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(LibraryPath)</LibraryPath>
@@ -67,11 +67,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Content\Content.vcxproj">
+      <Project>{8f28bfad-31ec-42d1-9d92-c2a2bcb5db5f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Input\Input.vcxproj">
+      <Project>{eed15947-2655-4c7a-ad5f-83f51ae8f6ce}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Rendering\Rendering.vcxproj">
       <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Scripting\Scripting.vcxproj">
+      <Project>{23b9d3dd-536d-4afb-bacd-736612e095c5}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

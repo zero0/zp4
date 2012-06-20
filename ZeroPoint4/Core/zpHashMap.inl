@@ -102,7 +102,8 @@ void zpHashMap<Key, Value>::put( const Key& key, const Value& value ) {
 			return;
 		}
 	}
-	addMapEntity( key, value, h, index, ZP_NULL );
+	zpMapEntity* entity = ZP_NULL;
+	addMapEntity( key, value, h, index, &entity );
 }
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( Key&& key, const Value& value ) {
@@ -115,7 +116,8 @@ void zpHashMap<Key, Value>::put( Key&& key, const Value& value ) {
 			return;
 		}
 	}
-	addMapEntity( (Key&&)key, value, h, index, ZP_NULL );
+	zpMapEntity* entity = ZP_NULL;
+	addMapEntity( (Key&&)key, value, h, index, &entity );
 }
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( Key&& key, Value&& value ) {
@@ -128,7 +130,8 @@ void zpHashMap<Key, Value>::put( Key&& key, Value&& value ) {
 			return;
 		}
 	}
-	addMapEntity( (Key&&)key, (Value&&)value, h, index, ZP_NULL );
+	zpMapEntity* entity = ZP_NULL;
+	addMapEntity( (Key&&)key, (Value&&)value, h, index, &entity );
 }
 
 template<typename Key, typename Value>
@@ -140,7 +143,7 @@ void zpHashMap<Key, Value>::putAll( const zpHashMap& map ) {
 
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::containsKey( const Key& key ) const {
-	zp_hash h = (zp_hash)key;
+	zp_hash h = hash( (zp_hash)key );
 	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
 		if( e->hash == h && e->key == key ) {
@@ -163,7 +166,7 @@ zp_bool zpHashMap<Key, Value>::containsValue( const Value& value ) const {
 
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::remove( const Key& key, Value* outValue = ZP_NULL ) {
-	zp_hash h = (zp_hash)key;
+	zp_hash h = hash( (zp_hash)key );
 	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next ) {
 		next = e->next;
@@ -183,7 +186,7 @@ zp_bool zpHashMap<Key, Value>::remove( const Key& key, Value* outValue = ZP_NULL
 }
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::erase( const Key& key ) {
-	zp_hash h = (zp_hash)key;
+	zp_hash h = hash( (zp_hash)key );
 	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next ) {
 		next = e->next;
@@ -203,7 +206,7 @@ zp_bool zpHashMap<Key, Value>::erase( const Key& key ) {
 
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::find( const Key& key, Value* outValue ) const {
-	zp_hash h = (zp_hash)key;
+	zp_hash h = hash( (zp_hash)key );
 	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next ) {
 		next = e->next;

@@ -33,10 +33,18 @@ public:
 #endif
 	}
 
+	template<typename I, typename R>
+	I* createInstanceOfResource( const zpString& alias ) const {
+		return new I( getResourceOfType<R>( alias ) );
+	}
+
 	void receiveMessage( const zpMessage& message );
 
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
+
+	void setRootDirectory( const zpString& rootDirectory );
+	const zpString& getRootDirectory() const;
 
 protected:
 	void onCreate();
