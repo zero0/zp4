@@ -14,7 +14,7 @@ zp_bool zpScriptingResource::load() {
 	asIScriptEngine* engine = zpAngelScript::getInstance();
 	zp_int r;
 
-	asIScriptModule* module = engine->GetModule( getFilename().c_str(), asGM_CREATE_IF_NOT_EXISTS );
+	asIScriptModule* module = engine->GetModule( getFilename().c_str(), asGM_ALWAYS_CREATE );
 	if( module == ZP_NULL ) return false;
 
 	// strip extension and directories off to get section name
@@ -41,15 +41,14 @@ zp_bool zpScriptingResource::load() {
 	zp_uint end = getFilename().lastIndexOf( '.' );
 	zpString className = getFilename().substring( begin, end );
 	
+	asIObjectType* type = ZP_NULL;
 	for( zp_uint i = module->GetObjectTypeCount(); i --> 0; ) {
-		zp_printfln( "%d %s", i, module->GetObjectTypeByIndex( i )->GetName() );
-
-		//r = engine->RegisterObjectType( module->GetObjectTypeByIndex( i )->GetName(), 0, asOBJ_REF );
-		//AS_ASSERT( r );
+		asIObjectType* objType = module->GetObjectTypeByIndex( i );
+		if( className == objType->GetName() ) {
+			type = objType;
+			break;
+		}
 	}
-	
-	// get the object type for the class
-	asIObjectType* type = engine->GetObjectTypeByName( className.c_str() );
 	if( type == ZP_NULL ) return false;
 	
 	type->AddRef();
@@ -65,7 +64,7 @@ zp_bool zpScriptingResource::load() {
 		m_cachedMethods.put( func->GetName(), func );
 	}
 
-	return false;
+	return true;
 }
 void zpScriptingResource::unload() {
 	if( m_scriptObjectType ) {

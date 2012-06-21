@@ -45,7 +45,7 @@ void zpHashMap<Key, Value>::operator=( zpHashMap&& map ) {
 
 template<typename Key, typename Value>
 Value& zpHashMap<Key, Value>::operator[]( const Key& key ) {
-	zp_hash h = (zp_hash)key;
+	zp_hash h = hash( (zp_hash)key );
 	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
 		if( e->hash == h && e->key == key ) {
@@ -58,7 +58,7 @@ Value& zpHashMap<Key, Value>::operator[]( const Key& key ) {
 }
 template<typename Key, typename Value>
 Value& zpHashMap<Key, Value>::operator[]( Key&& key ) {
-	zp_hash h = (zp_hash)key;
+	zp_hash h = hash( (zp_hash)key );
 	zp_uint index = h & m_map.size() - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next ) {
 		if( e->hash == h && e->key == key ) {

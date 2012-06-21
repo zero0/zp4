@@ -9,6 +9,7 @@
 #endif
 
 struct asSMessageInfo;
+class asIScriptContext;
 
 class zpScriptingManager : public zpGameManager {
 public:
@@ -31,6 +32,9 @@ protected:
 
 private:
 	void messageCallback( const asSMessageInfo& msg );
+	
+	zp_uint m_numContexts;
+	zpArrayList<asIScriptContext*> m_contexts;
 };
 
 #endif

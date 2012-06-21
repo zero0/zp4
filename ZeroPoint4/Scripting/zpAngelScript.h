@@ -3,6 +3,7 @@
 #define ZP_ANGELSCRIPT_H
 
 class asIScriptEngine;
+typedef void (*zpAngelScriptRegisterFunction)( asIScriptEngine* engine );
 
 class zpAngelScript {
 public:
@@ -19,6 +20,9 @@ private:
 	static void* allocate( zp_uint size );
 	static void deallocate( void* ptr );
 
+	static void registerStringType();
+	static void registerArrayType();
+	
 	static asIScriptEngine* s_engine;
 	static zpMemoryAllocator* s_allocator;
 };

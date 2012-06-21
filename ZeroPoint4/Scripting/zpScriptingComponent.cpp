@@ -31,8 +31,8 @@ void zpScriptingComponent::onCreate() {
 
 	asIScriptContext* cxt = zpAngelScript::getInstance()->CreateContext();
 
-	cxt->SetObject( m_scriptInstance->getScriptObject() );
 	cxt->Prepare( (asIScriptFunction*)m_scriptInstance->getMethod( "onCreate" ) );
+	cxt->SetObject( m_scriptInstance->getScriptObject() );
 	cxt->Execute();
 	cxt->Release();
 }

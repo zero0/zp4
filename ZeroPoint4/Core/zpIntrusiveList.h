@@ -7,10 +7,15 @@ class zpIntrusiveList;
 
 template<typename T>
 struct ZP_NO_VTABLE zpIntrusiveListNode {
+public:
+	zpIntrusiveListNode() : m_next( ZP_NULL ), m_prev( ZP_NULL ) { init(); };
+
 protected:
 	zpIntrusiveListNode* m_next;
 	zpIntrusiveListNode* m_prev;
 
+private:
+	void init() { m_next = m_prev = this; };
 	friend class zpIntrusiveList<T>;
 };
 

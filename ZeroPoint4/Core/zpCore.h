@@ -152,6 +152,11 @@ T zp_abs( T& value ) {
 }
 
 template<typename T>
+ZP_FORCE_INLINE T&& zp_move( T& v ) {
+	return (T&&)v;
+}
+
+template<typename T>
 void zp_move_swap( T& a, T& b ) {
 	T temp = (T&&)a;
 	a = (T&&)b;

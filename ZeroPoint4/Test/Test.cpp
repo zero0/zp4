@@ -218,23 +218,35 @@ void rendering_test_main() {
 }
 
 void scripting_test_main() {
+	zpGame game;
+	zpWorld w;
+	zpGameObject root;
+
 	zpScriptingManager sm;
-	sm.create();
 
 	zpScriptingResourceCreator src;
 	src.setRootDirectory( "scripts/" );
 
 	zpContentManager content;
-	content.create();
-
 	content.setRootDirectory( "Assets/" );
 	content.registerFileExtension( "as", &src );
-
-	content.loadResource( "TestScript.as", "TestScript" );
 	
 	zpScriptingComponent sc;
 	sc.setScriptAlias( "TestScript" );
-	sc.create();
+
+	root.addComponent( &sc );
+
+	w.setRootGameObject( &root );
+
+	game.addGameManager( &content );
+	game.addGameManager( &sm );
+
+	game.create();
+	zp_bool isLoaded = content.loadResource( "TestScript.as", "TestScript" );
+
+	game.addWorld( &w, true );
+	
+	
 }
 
 int main() {
