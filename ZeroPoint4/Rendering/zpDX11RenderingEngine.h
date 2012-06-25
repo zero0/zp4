@@ -40,6 +40,9 @@ public:
 	void clear();
 	void present();
 
+	zpRenderingContext* createRenderingContext();
+	void setCurrentRenderingContext( zpRenderingContext* context );
+
 protected:
 	zp_bool initialize();
 	void shutdown();

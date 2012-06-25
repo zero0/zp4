@@ -15,6 +15,7 @@ const zp_char* zp_serialize_type( const T* type = ZP_NULL ) {
 ZP_PURE_INTERFACE zpSerializable;
 
 ZP_PURE_INTERFACE zpSerializedInput {
+public:
 	virtual zp_bool readBoolean( const zp_char* name = 0 ) = 0;
 
 	virtual zp_byte readByte( const zp_char* name = 0 ) = 0;
@@ -51,6 +52,7 @@ ZP_PURE_INTERFACE zpSerializedInput {
 };
 
 ZP_PURE_INTERFACE zpSerializedOutput {
+public:
 	virtual void writeBoolean( bool value, const char* name = 0 ) = 0;
 
 	virtual void writeByte( zp_byte value, const zp_char* name = 0 ) = 0;
@@ -71,6 +73,7 @@ ZP_PURE_INTERFACE zpSerializedOutput {
 };
 
 ZP_PURE_INTERFACE zpSerializable {
+public:
 	virtual void serialize( zpSerializedOutput* out ) = 0;
 	virtual void deserialize( zpSerializedInput* in ) = 0;
 };

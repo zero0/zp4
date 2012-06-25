@@ -41,8 +41,7 @@
 #define ZP_ALIGN(x)		__declspec( align( x ) )
 #define ZP_ALIGN16		ZP_ALIGN( 16 )
 
-#define ZP_PURE_INTERFACE	struct ZP_NO_VTABLE
-#define ZP_CLASS_INTERFACE	class ZP_NO_VTABLE
+#define ZP_PURE_INTERFACE	class ZP_NO_VTABLE
 #define ZP_ABSTRACT_CLASS	class ZP_NO_VTABLE
 
 #define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }
@@ -83,13 +82,13 @@ ZP_PURE_INTERFACE zpMessageReceiver;
 
 class zpProperties;
 class zpMemorySystem;
-class zpReferencedObject;
+ZP_PURE_INTERFACE zpReferencedObject;
 
 class zpGame;
 class zpWorld;
 class zpGameManager;
 class zpGameObject;
-class zpComponent;
+ZP_ABSTRACT_CLASS zpComponent;
 
 #include "zpMath.h"
 

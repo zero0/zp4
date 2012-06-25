@@ -36,12 +36,25 @@ public:
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
+	void addReference() const;
+	zp_bool removeReference() const;
+
+	zp_uint getReferenceCount() const;
+
+	void markForAutoDelete( zp_bool marked ) const;
+	zp_bool isMarkedForAutoDelete() const;
+
 private:
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
 
 	zpGameObject* m_root;
 	zpGame* m_game;
+
+	struct {
+		mutable zp_uint m_referenceCount : 31;
+		mutable zp_bool m_isMarkedForAutoDelete : 1;
+	};
 
 	zpString m_name;
 };

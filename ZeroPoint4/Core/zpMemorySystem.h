@@ -3,6 +3,7 @@
 #define ZP_MEMORY_SYSTEM_H
 
 ZP_PURE_INTERFACE zpMemoryAllocator {
+public:
 	virtual void* allocate( zp_uint size ) = 0;
 	virtual void* allocateArray( zp_uint size, zp_uint count ) = 0;
 	virtual void* allocateAligned( zp_uint size, zp_uint align ) = 0;

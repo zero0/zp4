@@ -184,7 +184,11 @@ void core_test_main() {
 }
 
 void rendering_test_main() {
-	zp_printfln( "Size: %d", sizeof( zp_bool ) );
+
+	zpGameObject ro;
+
+	zp_printfln( "Size: %d", sizeof( zpGameObject ) );
+
 	zpWindow wnd;
 	wnd.setTitle( "ZeroPoint4 Window" );
 	wnd.setPosition( zpVector2i( 50, 50 ) );

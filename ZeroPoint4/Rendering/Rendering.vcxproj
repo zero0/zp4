@@ -80,13 +80,16 @@
   <ItemGroup>
     <ClInclude Include="zpBuffer.h" />
     <ClInclude Include="zpCamera.h" />
+    <ClInclude Include="zpDX11RenderingContext.h" />
     <ClInclude Include="zpDX11RenderingEngine.h" />
     <ClInclude Include="zpRendering.h" />
+    <ClInclude Include="zpRenderingContext.h" />
     <ClInclude Include="zpRenderingEngine.h" />
     <ClInclude Include="zpRenderingFactory.h" />
     <ClInclude Include="zpRenderingManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpDX11RenderingContext.cpp" />
     <ClCompile Include="zpDX11RenderingEngine.cpp" />
     <ClCompile Include="zpRendering.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

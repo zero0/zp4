@@ -1,4 +1,5 @@
 #include "zpRendering.h"
+#include "zpDX11RenderingEngine.h"
 #include <D3D11.h>
 
 #define HR( r )						if( FAILED( (r) ) ) { return false; }
@@ -277,4 +278,10 @@ zp_bool zpDX11RenderingEngine::initialize() {
 void zpDX11RenderingEngine::shutdown() {
 	ZP_SAFE_RELEASE( m_dxgiAdapter );
 	ZP_SAFE_RELEASE( m_dxgiFactory );
+}
+
+zpRenderingContext* zpDX11RenderingEngine::createRenderingContext() {
+	return ZP_NULL;
+}
+void zpDX11RenderingEngine::setCurrentRenderingContext( zpRenderingContext* context ) {
 }

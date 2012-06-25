@@ -41,6 +41,14 @@ public:
 		return getGame()->getGameManagerOfType<T>();
 	}
 
+	void addReference() const;
+	zp_bool removeReference() const;
+
+	zp_uint getReferenceCount() const;
+
+	void markForAutoDelete( zp_bool marked ) const;
+	zp_bool isMarkedForAutoDelete() const;
+
 
 protected:
 	virtual void onCreate() = 0;
@@ -54,6 +62,11 @@ protected:
 private:
 	zp_bool m_isEnabled;
 	zp_bool m_isCreated;
+
+	struct {
+		mutable zp_uint m_referenceCount : 31;
+		mutable zp_bool m_isMarkedForAutoDelete : 1;
+	};
 
 	zpGameObject* m_parentGameObject;
 

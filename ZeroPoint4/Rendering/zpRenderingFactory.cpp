@@ -1,5 +1,7 @@
 #include "zpRendering.h"
 
+#include "zpDX11RenderingEngine.h"
+
 zpRenderingFactory::zpRenderingFactory() {}
 zpRenderingFactory::~zpRenderingFactory() {}
 

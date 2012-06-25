@@ -6,7 +6,7 @@ template<typename T>
 class zpIntrusiveList;
 
 template<typename T>
-struct ZP_NO_VTABLE zpIntrusiveListNode {
+struct zpIntrusiveListNode {
 public:
 	zpIntrusiveListNode() : m_next( ZP_NULL ), m_prev( ZP_NULL ) { init(); };
 

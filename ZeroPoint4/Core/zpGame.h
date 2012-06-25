@@ -2,7 +2,7 @@
 #ifndef ZP_GAME_H
 #define ZP_GAME_H
 
-class zpGame : public zpSerializable{
+class zpGame : public zpSerializable {
 public:
 	zpGame();
 	~zpGame();

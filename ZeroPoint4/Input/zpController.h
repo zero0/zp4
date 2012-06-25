@@ -41,6 +41,7 @@ enum zpControllerButton : zp_ushort {
 };
 
 ZP_PURE_INTERFACE zpControllerListener {
+public:
 	virtual void onButtonDown( zpControllerButton button ) {};
 	virtual void onButtonRepeat( zpControllerButton button ) {};
 	virtual void onButtonUp( zpControllerButton button ) {};

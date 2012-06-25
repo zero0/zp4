@@ -3,6 +3,7 @@
 #define ZP_RENDERABLE_H
 
 ZP_PURE_INTERFACE zpRenderable {
+public:
 	virtual void render() = 0;
 };
 

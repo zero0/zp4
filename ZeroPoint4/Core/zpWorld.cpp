@@ -3,6 +3,8 @@
 zpWorld::zpWorld() :
 	m_isEnabled( false ),
 	m_isCreated( false ),
+	m_referenceCount( 1 ),
+	m_isMarkedForAutoDelete( false ),
 	m_root( ZP_NULL ),
 	m_game( ZP_NULL )
 {}
@@ -67,3 +69,25 @@ void zpWorld::receiveMessage( const zpMessage& message ) {
 void zpWorld::serialize( zpSerializedOutput* out ) {}
 void zpWorld::deserialize( zpSerializedInput* in ) {}
 
+void zpWorld::addReference() const {
+	++m_referenceCount;
+}
+zp_bool zpWorld::removeReference() const {
+	--m_referenceCount;
+	if( m_referenceCount == 0 ) {
+		if( m_isMarkedForAutoDelete ) delete this;
+		return true;
+	}
+	return false;
+}
+
+zp_uint zpWorld::getReferenceCount() const {
+	return m_referenceCount;
+}
+
+void zpWorld::markForAutoDelete( zp_bool marked ) const {
+	m_isMarkedForAutoDelete = marked;
+}
+zp_bool zpWorld::isMarkedForAutoDelete() const {
+	return m_isMarkedForAutoDelete;
+}

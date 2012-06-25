@@ -4,6 +4,8 @@ zpComponent::zpComponent() :
 	m_parentGameObject( ZP_NULL ),
 	m_isEnabled( true ),
 	m_isCreated( false ),
+	m_referenceCount( 1 ),
+	m_isMarkedForAutoDelete( false ),
 	m_name()
 {}
 zpComponent::~zpComponent() {
@@ -75,3 +77,25 @@ zpGame* zpComponent::getGame() const {
 	return m_parentGameObject->getWorld()->getGame();
 }
 
+void zpComponent::addReference() const {
+	++m_referenceCount;
+}
+zp_bool zpComponent::removeReference() const {
+	--m_referenceCount;
+	if( m_referenceCount == 0 ) {
+		if( m_isMarkedForAutoDelete ) delete this;
+		return true;
+	}
+	return false;
+}
+
+zp_uint zpComponent::getReferenceCount() const {
+	return m_referenceCount;
+}
+
+void zpComponent::markForAutoDelete( zp_bool marked ) const {
+	m_isMarkedForAutoDelete = marked;
+}
+zp_bool zpComponent::isMarkedForAutoDelete() const {
+	return m_isMarkedForAutoDelete;
+}

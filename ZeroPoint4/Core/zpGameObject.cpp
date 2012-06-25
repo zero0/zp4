@@ -15,6 +15,8 @@ void zpGameObject::operator delete( void* ptr ) {
 zpGameObject::zpGameObject() :
 	m_isEnabled( true ),
 	m_isCreated( false ),
+	m_referenceCount( 1 ),
+	m_isMarkedForAutoDelete( false ),
 	m_parentGameObject( ZP_NULL ),
 	m_world( ZP_NULL ),
 	m_children(),
@@ -233,4 +235,27 @@ void zpGameObject::deserialize( zpSerializedInput* in ) {
 	in->endBlock();
 
 	in->endBlock();
+}
+
+void zpGameObject::addReference() const {
+	++m_referenceCount;
+}
+zp_bool zpGameObject::removeReference() const {
+	--m_referenceCount;
+	if( m_referenceCount == 0 ) {
+		if( m_isMarkedForAutoDelete ) delete this;
+		return true;
+	}
+	return false;
+}
+
+zp_uint zpGameObject::getReferenceCount() const {
+	return m_referenceCount;
+}
+
+void zpGameObject::markForAutoDelete( zp_bool marked ) const {
+	m_isMarkedForAutoDelete = marked;
+}
+zp_bool zpGameObject::isMarkedForAutoDelete() const {
+	return m_isMarkedForAutoDelete;
 }

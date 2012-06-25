@@ -2,8 +2,10 @@
 #ifndef ZP_RENDERING_ENGINE_H
 #define ZP_RENDERING_ENGINE_H
 
+ZP_PURE_INTERFACE zpRenderingContext;
+
 ZP_PURE_INTERFACE zpRenderingEngine {
-	
+public:
 	virtual zp_bool create() = 0;
 	virtual void destroy() = 0;
 
@@ -24,6 +26,9 @@ ZP_PURE_INTERFACE zpRenderingEngine {
 
 	virtual void clear() = 0;
 	virtual void present() = 0;
+
+	virtual zpRenderingContext* createRenderingContext() = 0;
+	virtual void setCurrentRenderingContext( zpRenderingContext* context ) = 0;
 
 protected:
 	virtual zp_bool initialize() = 0;

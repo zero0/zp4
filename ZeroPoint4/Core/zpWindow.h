@@ -15,11 +15,13 @@ enum zpWindowStyle : zp_uint {
 };
 
 ZP_PURE_INTERFACE zpWindowFocusListener {
+public:
 	virtual void onFocusGained() = 0;
 	virtual void onFocusLost() = 0;
 };
 
 ZP_PURE_INTERFACE zpWindowProcListener {
+public:
 	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) = 0;
 };
 

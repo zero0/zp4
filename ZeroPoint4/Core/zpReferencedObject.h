@@ -2,18 +2,15 @@
 #ifndef ZP_REFERENCED_OBJECT_H
 #define ZP_REFERENCED_OBJECT_H
 
-class ZP_NO_VTABLE zpReferencedObject {
+ZP_PURE_INTERFACE zpReferencedObject {
 public:
-	zpReferencedObject();
-	virtual ~zpReferencedObject();
+	virtual void addReference() const = 0;
+	virtual zp_bool removeReference() const = 0;
 
-	void addReference() const;
-	void removeReference() const;
+	virtual zp_uint getReferenceCount() const = 0;
 
-	zp_uint getReferenceCount() const;
-
-private:
-	mutable zp_uint m_referenceCount;
+	virtual void markForAutoDelete( zp_bool marked ) const = 0;
+	virtual zp_bool isMarkedForAutoDelete() const = 0;
 };
 
 #endif

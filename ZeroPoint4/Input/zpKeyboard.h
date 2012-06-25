@@ -15,6 +15,7 @@ enum zpKeyCode : zp_ushort {
 #define ZP_STRIP_KEY_CODE_MOD( code )			( 0x0FFF & (code) )
 
 ZP_PURE_INTERFACE zpKeyboardListener {
+public:
 	virtual void onKeyDown( zpKeyCode key ) = 0;
 	virtual void onKeyRepeat( zpKeyCode key ) = 0;
 	virtual void onKeyUp( zpKeyCode key ) = 0;
