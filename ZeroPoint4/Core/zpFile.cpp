@@ -119,8 +119,9 @@ zp_int zpFile::readFile( zpStringBuffer* buffer ) {
 		FILE* f = (FILE*)m_file;
 
 		zp_uint s;
-		while( feof( f ) == 0 && ( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), 64, f ) ) >= 0 ) {
+		while( feof( f ) == 0 && ( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), sizeof( buff ), f ) ) >= 0 ) {
 			buffer->append( buff, s );
+			count += s;
 		}
 	}
 	return count;
@@ -130,12 +131,14 @@ zp_int zpFile::readLine( zpStringBuffer* buffer ) {
 	if( m_file && buffer && !isBinaryFile() ) {
 		zp_char buff[64];
 		FILE* f = (FILE*)m_file;
-
-		zp_uint s;
+		
 		zp_bool newLineFound = false;
-		while( !newLineFound && ( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), 64, f ) ) >= 0 && feof( f ) == 0 ) {
-			buffer->append( buff, s );
-			newLineFound = buff[ s - 1 ] == '\n';
+		zp_uint len = 0;
+		while( !newLineFound && fgets( buff, sizeof( buff ), f ) != ZP_NULL ) {
+			buffer->append( buff );
+			len = strlen( buff );
+			newLineFound = buff[ len ] == '\0';
+			count += len;
 		}
 	}
 	return count;
@@ -148,8 +151,9 @@ zp_int zpFile::readFileBinary( zpArrayList<zp_byte>* buffer ) {
 		FILE* f = (FILE*)m_file;
 
 		zp_uint s;
-		while( ( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), 64, f ) ) >= 0 && feof( f ) == 0 ) {
+		while( ( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), sizeof( buff ), f ) ) >= 0 && feof( f ) == 0 ) {
 			buffer->pushBack( (zp_byte*)buff, s );
+			count += s;
 		}
 	}
 	return count;

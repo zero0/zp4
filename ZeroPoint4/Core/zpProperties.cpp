@@ -60,24 +60,26 @@ zp_bool zpProperties::hasProperty( const zpString& key ) const {
 }
 
 void zpProperties::load( const zpString& file ) {
-	FILE* f = ZP_NULL;
-	if( fopen_s( &f, file.c_str(), "r" ) == 0 ) {
-		zp_char buff[265];
-		zpString str;
+	zpFile f( file, ZP_FILE_MODE_READ );
+	if( f.open() ) {
 		zp_uint pos;
-		while( fgets( buff, 256, f ) ) {
-			zp_uint len = strlen( buff );
-			if( len == 0 ) continue;
-			buff[ len - 1 ] = '\0';
 
-			str = buff;
+		zpStringBuffer buff( 128 );
+		zpString str;
+
+		while( f.readLine( &buff ) > 0 ) {
+			str = buff.toString();
+			buff.clear();
+
+			if( str.isEmpty() ) continue;
+
 			str.trim();
 
 			if( str.isEmpty() || str.charAt( 0 ) == '#' || ( pos = str.indexOf( '=' ) ) == zpString::npos ) continue;
 
 			m_properties[ str.substring( 0, pos ).trim() ] = str.substring( pos + 1 ).trim();
 		}
-		fclose( f );
+		f.close();
 	}
 }
 void zpProperties::load( const zpProperties& properties ) {
@@ -87,22 +89,20 @@ void zpProperties::load( const zpProperties& properties ) {
 void zpProperties::save( const zpString& file ) const {
 	if( m_properties.isEmpty() ) return;
 	
-	FILE* f = ZP_NULL;
-	if( fopen_s( &f, file.c_str(), "w" ) == 0 ) {
-		char buff[ 64 ];
-		setvbuf( f, buff, _IOFBF, 64 );
-
-		zpStringBuffer buffer( 256 );
-		m_properties.foreach( [ &buffer, f ]( const zpString& key, const zpString& value ) {
+	zpFile f( file, ZP_FILE_MODE_TRUNCATE_WRITE );
+	if( f.open() ) {
+		
+		zpStringBuffer buffer( 128 );
+		m_properties.foreach( [ &buffer, &f ]( const zpString& key, const zpString& value ) {
 			buffer << key << " = " << value << '\n';
-			
-			fputs( buffer.getChars(), f );
-			fflush( f );
+
+			f.writeFormat( "%s", buffer.getChars() );
+			f.flush();
 
 			buffer.clear();
 		} );
 		
-		fclose( f );
+		f.close();
 	}
 }
 

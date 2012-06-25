@@ -184,7 +184,7 @@ void core_test_main() {
 }
 
 void rendering_test_main() {
-	zp_printfln( "Size: %d", sizeof( zpString ) );
+	zp_printfln( "Size: %d", sizeof( zp_bool ) );
 	zpWindow wnd;
 	wnd.setTitle( "ZeroPoint4 Window" );
 	wnd.setPosition( zpVector2i( 50, 50 ) );
@@ -202,7 +202,7 @@ void rendering_test_main() {
 	zpProperties prop2;
 	prop2.load( "test.properties" );
 	prop2.foreach( []( const zpString& key, const zpString& value ) {
-		zp_printfln( "%s = %s", key.c_str(), value.c_str() );
+		zp_printfln( "%s : %s", key.c_str(), value.c_str() );
 	} );
 	zpGame game;
 	game.setWindow( &wnd );
@@ -251,8 +251,8 @@ void scripting_test_main() {
 
 int main() {
 	//core_test_main();
-	//rendering_test_main();
-	scripting_test_main();
+	rendering_test_main();
+	//scripting_test_main();
 
 	return 0;
 }
