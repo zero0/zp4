@@ -33,8 +33,13 @@ public:
 	zp_uint indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
 	zp_uint indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
 
+	zp_uint indexOfIgnoreCase( zp_char ch, zp_uint fromIndex = 0 ) const;
+	zp_uint indexOfIgnoreCase( const zpString& string, zp_uint fromIndex = 0 ) const;
+
 	zp_uint lastIndexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
 	zp_uint lastIndexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
+
+	zp_uint findFirstOf( const zpString& string, zp_uint fromIndex = 0 ) const;
 
 	zp_bool isEmpty() const;
 	zp_uint length() const;

@@ -2,6 +2,7 @@
 #include "Rendering\zpRendering.h"
 #include "Content\zpContent.h"
 #include "Scripting\zpScripting.h"
+#include "Audio\zpAudio.h"
 
 #include <stdio.h>
 
@@ -16,7 +17,7 @@ void core_test_main() {
 	zpString ss( small, 2, 1 );
 	zpString ffss( "abcdefghijkl", 6, 3 );
 	zpString mv( zpString( "testing the move" ) );
-
+	
 	mv = "assigned";
 
 	zp_char a = strprt->charAt( 1 );
@@ -173,12 +174,6 @@ void core_test_main() {
 	mmm.foreach( []( int key, float val ) {
 		zp_printfln( "%d => %f", key, val );
 	});
-
-	zpWindow wnd;
-	wnd.setTitle( "ZeroPoint4 Window" );
-	wnd.setPosition( zpVector2i( 50, 50 ) );
-	wnd.create();
-	wnd.run();
 	
 	getchar();
 }
@@ -190,7 +185,7 @@ void rendering_test_main() {
 	zp_printfln( "Size: %d", sizeof( zpGameObject ) );
 
 	zpWindow wnd;
-	wnd.setTitle( "ZeroPoint4 Window" );
+	wnd.setTitle( "ZP4 Window" );
 	wnd.setPosition( zpVector2i( 50, 50 ) );
 	wnd.setScreenSize( zpVector2i( 800, 600 ) );
 	wnd.create();
@@ -218,7 +213,9 @@ void rendering_test_main() {
 
 	game.create();
 
-	wnd.run();
+	while( wnd.processMessages() ) {
+		game.process();
+	}
 }
 
 void scripting_test_main() {

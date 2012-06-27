@@ -52,7 +52,7 @@ public:
 
 	zp_bool isCreated() const;
 
-	void run();
+	zp_bool processMessages();
 
 	void windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam );
 
@@ -64,9 +64,6 @@ public:
 	void removeProcListener( zpWindowProcListener* listener );
 	void removeAllProcListeners();
 
-	void setGame( zpGame* game );
-	zpGame* getGame() const;
-
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
@@ -76,7 +73,6 @@ private:
 
 	void moveResize();
 	void resizeWindow();
-
 	
 	zpVector2i m_position;
 	zpVector2i m_screenSize;
@@ -86,8 +82,6 @@ private:
 
 	zp_ptr m_hWnd;
 	zp_ptr m_hInstance;
-
-	zpGame* m_game;
 
 	zpString m_title;
 

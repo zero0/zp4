@@ -98,7 +98,6 @@ void zpGame::process() {
 
 void zpGame::setWindow( zpWindow* window ) {
 	m_window = window;
-	if( m_window ) m_window->setGame( this );
 }
 zpWindow* zpGame::getWindow() const {
 	return m_window;

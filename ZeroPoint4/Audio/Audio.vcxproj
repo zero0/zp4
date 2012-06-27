@@ -11,17 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5D5CA349-B4D0-4CAF-8982-FE586497FF12}</ProjectGuid>
-    <RootNamespace>Test</RootNamespace>
+    <ProjectGuid>{D1AF3EE6-A733-4511-978F-EBB52E43CDC5}</ProjectGuid>
+    <RootNamespace>Audio</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -36,21 +36,22 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(SolutionDir)Scripting\lib\x86\;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);include;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>zpAudio.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>lib\$(ProcessorArchiecture)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -58,36 +59,47 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>zpAudio.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir);include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>lib\$(ProcessorArchiecture)\;</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Audio\Audio.vcxproj">
-      <Project>{d1af3ee6-a733-4511-978f-ebb52e43cdc5}</Project>
-    </ProjectReference>
+    <ClInclude Include="zpAudio.h" />
+    <ClInclude Include="zpAudioEmitterComponent.h" />
+    <ClInclude Include="zpAudioInstance.h" />
+    <ClInclude Include="zpAudioManager.h" />
+    <ClInclude Include="zpAudioResource.h" />
+    <ClInclude Include="zpAudioResourceCreator.h" />
+    <ClInclude Include="zpFMOD.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="zpAudio.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="zpAudioEmitterComponent.cpp" />
+    <ClCompile Include="zpAudioInstance.cpp" />
+    <ClCompile Include="zpAudioManager.cpp" />
+    <ClCompile Include="zpAudioResource.cpp" />
+    <ClCompile Include="zpAudioResourceCreator.cpp" />
+    <ClCompile Include="zpFMOD.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Content\Content.vcxproj">
       <Project>{8f28bfad-31ec-42d1-9d92-c2a2bcb5db5f}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Input\Input.vcxproj">
-      <Project>{eed15947-2655-4c7a-ad5f-83f51ae8f6ce}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Rendering\Rendering.vcxproj">
-      <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Scripting\Scripting.vcxproj">
-      <Project>{23b9d3dd-536d-4afb-bacd-736612e095c5}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

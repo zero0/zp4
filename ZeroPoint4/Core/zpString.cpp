@@ -253,15 +253,13 @@ zp_bool zpString::endsWith( const zpString& string ) const {
 zp_uint zpString::indexOf( zp_char ch, zp_uint fromIndex ) const {
 	if( fromIndex > m_length ) return npos;
 
-	zp_uint pos = npos;
 	for( zp_uint i = fromIndex; i < m_length; ++i ) {
 		if( charAt( i ) == ch ) {
-			pos = i;
-			break;
+			return i;
 		}
 	}
 
-	return pos;
+	return npos;
 }
 zp_uint zpString::indexOf( const zpString& string, zp_uint fromIndex ) const {
 	if( string.m_length > m_length ) return npos;
@@ -294,24 +292,80 @@ zp_uint zpString::indexOf( const zpString& string, zp_uint fromIndex ) const {
 	return npos;
 }
 
+zp_uint zpString::indexOfIgnoreCase( zp_char ch, zp_uint fromIndex ) const {
+	if( fromIndex > m_length ) return npos;
+
+	for( zp_uint i = fromIndex; i < m_length; ++i ) {
+		if( zp_to_lower( charAt( i ) ) == zp_to_lower( ch ) ) {
+			return i;
+		}
+	}
+
+	return npos;
+}
+zp_uint zpString::indexOfIgnoreCase( const zpString& string, zp_uint fromIndex ) const {
+	if( string.m_length > m_length ) return npos;
+
+	zp_char first = zp_to_lower( string[ 0 ] );
+	zp_uint count = m_length - string.m_length;
+	zp_uint j;
+	zp_uint end;
+	zp_uint k;
+
+	for( zp_uint i = fromIndex; i <= count; ++i ) {
+		// find the first character
+		if( charAt( i ) != first ) {
+			while( ++i <= count && zp_to_lower( charAt( i ) ) != first );
+		}
+
+		// look for the rest of the characters
+		if( i <= count ) {
+			j = i + 1;
+			end = j + string.m_length - 1;
+			for( k = 1; j < end && zp_to_lower( charAt( j ) ) == zp_to_lower( string[ k ] ); ++j, ++k );
+
+			// if whole string found, return index
+			if( j == end ) {
+				return i;
+			}
+		}
+	}
+
+	return npos;
+}
+
 zp_uint zpString::lastIndexOf( zp_char ch, zp_uint fromIndex ) const {
 	if( fromIndex > m_length ) return npos;
 	if( fromIndex <= 0 ) fromIndex = m_length + fromIndex;
 
-	zp_uint pos = npos;
 	for( zp_uint i = fromIndex; i-- > 0; ) {
 		if( charAt( i ) == ch ) {
-			pos = i;
-			break;
+			return i;
 		}
 	}
 
-	return pos;
+	return npos;
 }
 zp_uint zpString::lastIndexOf( const zpString& string, zp_uint fromIndex ) const {
 	if( fromIndex > m_length ) return npos;
 	if( fromIndex < 0 ) fromIndex = m_length + fromIndex;
 
+
+	return npos;
+}
+
+zp_uint zpString::findFirstOf( const zpString& string, zp_uint fromIndex ) const {
+	if( fromIndex > m_length ) return npos;
+
+	zp_char ch;
+	for( zp_uint i = fromIndex; i < m_length; ++i ) {
+		ch = charAt( i );
+		for( zp_uint j = string.length(); j --> 0; ) {
+			if( ch == string.charAt( j ) ) {
+				return i;
+			}
+		}
+	}
 
 	return npos;
 }

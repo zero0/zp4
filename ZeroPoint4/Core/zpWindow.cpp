@@ -44,7 +44,6 @@ zpWindow::zpWindow() :
 	m_style( ZP_WINDOW_STYLE_DEFAULT ),
 	m_hWnd( 0 ),
 	m_hInstance( 0 ),
-	m_game( ZP_NULL ),
 	m_title( "" )
 {}
 zpWindow::~zpWindow() {}
@@ -155,25 +154,17 @@ zp_bool zpWindow::isCreated() const {
 	return m_hWnd != 0;
 }
 
-void zpWindow::run() {
-	if( !isCreated() ) {
-		ZP_ON_DEBUG_MSG( "Window not created before running." );
-		return;
-	}
-
+zp_bool zpWindow::processMessages() {
 	MSG message;
-	while( true ) {
-		if( PeekMessage( &message, NULL, 0, 0, PM_REMOVE ) ) {
-			if( message.message == WM_QUIT ) {
-				break;
-			}
-
-			TranslateMessage( &message );
-			DispatchMessage( &message );
+	if( PeekMessage( &message, NULL, 0, 0, PM_REMOVE ) ) {
+		if( message.message == WM_QUIT ) {
+			return false;
 		}
 
-		if( m_game ) m_game->process();
+		TranslateMessage( &message );
+		DispatchMessage( &message );
 	}
+	return true;
 }
 
 void zpWindow::windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) {
@@ -255,13 +246,6 @@ void zpWindow::resizeWindow() {
 	RECT rc = { 0, 0, m_screenSize.getX(), m_screenSize.getY() };
 	AdjustWindowRectEx( &rc, __zpStyleToWS( m_style ), false, 0 );
 	m_windowSize.set( rc.right - rc.left, rc.bottom - rc.top );
-}
-
-void zpWindow::setGame( zpGame* game ) {
-	m_game = game;
-}
-zpGame* zpWindow::getGame() const {
-	return m_game;
 }
 
 void zpWindow::serialize( zpSerializedOutput* out ) {
