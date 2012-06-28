@@ -67,6 +67,10 @@ zp_uint zpAudioResource::getLoopTo() const {
 	return m_loopTo;
 }
 
+void* zpAudioResource::getSound() const {
+	return m_sound;
+}
+
 void zpAudioResource::setIsStreaming( zp_bool isStreaming ) {
 	m_isStreaming = isStreaming;
 }

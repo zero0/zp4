@@ -7,6 +7,10 @@ public:
 	zpAudioEmitterComponent();
 	virtual ~zpAudioEmitterComponent();
 
+	void playSound( const zpString& soundAlias );
+	void stopSound( const zpString& soundAlias );
+	void stopAllSounds();
+
 	void receiveMessage( const zpMessage& message );
 
 	void serialize( zpSerializedOutput* out );
@@ -22,7 +26,12 @@ protected:
 	void onDisabled();
 
 private:
+	zp_bool m_isMoving;
+	zp_bool m_isPlaying;
 
+	zpAudioManager* m_manager;
+
+	zpHashMap<zpString, zpAudioInstance*> m_audioInstances;
 };
 
 #endif

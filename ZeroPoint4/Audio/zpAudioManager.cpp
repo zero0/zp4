@@ -66,6 +66,39 @@ zp_uint zpAudioManager::getNumListeners() const {
 	return m_numListeners;
 }
 
+void zpAudioManager::play( zpAudioInstance* soundInstance ) {
+	if( !soundInstance ) return;
+	FMOD_RESULT r;
+
+	zpAudioResource* resource = soundInstance->getAudioResource();
+
+	FMOD::ChannelGroup* group = (FMOD::ChannelGroup*)m_channelGroups[ resource->getChannelGroup() ];
+	
+	zp_bool paused;
+	group->getPaused( &paused );
+	if( paused ) return;
+	
+	FMOD::Sound* sound = (FMOD::Sound*)resource->getSound();
+
+	FMOD::Channel* channel;
+	r = zpFMOD::getInstance()->playSound( FMOD_CHANNEL_FREE, sound, true, &channel );
+
+	soundInstance->setChannel( channel );
+	r = channel->setChannelGroup( group );
+
+	zp_bool muted;
+	r = group->getMute( &muted );
+	r = channel->setMute( muted );
+
+	zp_float volume;
+	r = group->getVolume( &volume );
+	r = channel->setVolume( volume );
+
+	soundInstance->update();
+
+	r = channel->setPaused( false );
+}
+
 void zpAudioManager::serialize( zpSerializedOutput* out ) {}
 void zpAudioManager::deserialize( zpSerializedInput* in ) {}
 

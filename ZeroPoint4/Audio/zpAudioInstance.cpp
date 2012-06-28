@@ -28,6 +28,10 @@ zpAudioInstance::~zpAudioInstance() {
 	m_resource = ZP_NULL;
 }
 
+zpAudioResource* zpAudioInstance::getAudioResource() const {
+	return m_resource;
+}
+
 zp_bool zpAudioInstance::isPlaying() const {
 	if( m_channel ) {
 		zp_bool playing = false;

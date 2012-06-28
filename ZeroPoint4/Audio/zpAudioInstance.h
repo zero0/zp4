@@ -7,6 +7,8 @@ public:
 	zpAudioInstance( zpAudioResource* resource );
 	~zpAudioInstance();
 
+	zpAudioResource* getAudioResource() const;
+
 	zp_bool isPlaying() const;
 
 	void setPosition( const zpVector4& position );

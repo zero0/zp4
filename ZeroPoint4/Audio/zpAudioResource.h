@@ -20,6 +20,8 @@ public:
 	zp_uint getLoopTo() const;
 
 private:
+	void* getSound() const;
+
 	void setIsStreaming( zp_bool isStreaming );
 	void setIsLooping( zp_bool isLooping );
 	void setIs3DSound( zp_bool is3DSound );
@@ -37,6 +39,7 @@ private:
 	zp_uint m_loopTo;
 
 	friend class zpAudioResourceCreator;
+	friend class zpAudioManager;
 };
 
 #endif

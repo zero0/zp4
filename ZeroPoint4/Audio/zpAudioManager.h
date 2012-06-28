@@ -29,7 +29,7 @@ public:
 	//void set3DListener( int listener, const Point3f& position, const Vector3f& velocity, const Vector3f& forward, const Vector3f& up );
 
 	//void stop( zpAudioChannelGroup channel );
-	//void play( SoundInstance* sound );
+	void play( zpAudioInstance* sound );
 
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
