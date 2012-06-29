@@ -41,24 +41,24 @@ zp_bool zpAudioInstance::isPlaying() const {
 	return false;
 }
 
-void zpAudioInstance::setPosition( const zpVector4& position ) {
+void zpAudioInstance::setPosition( const zpVector4f& position ) {
 	m_position = position;
 }
-const zpVector4& zpAudioInstance::getPosition() const {
+const zpVector4f& zpAudioInstance::getPosition() const {
 	return m_position;
 }
 
-void zpAudioInstance::setVelocity( const zpVector4& velocity ) {
+void zpAudioInstance::setVelocity( const zpVector4f& velocity ) {
 	m_velocity = velocity;
 }
-const zpVector4& zpAudioInstance::getVelocity() const {
+const zpVector4f& zpAudioInstance::getVelocity() const {
 	return m_velocity;
 }
 
-void zpAudioInstance::setConeOrientation( const zpVector4& orientation ) {
+void zpAudioInstance::setConeOrientation( const zpVector4f& orientation ) {
 	m_coneOrientation = orientation;
 }
-const zpVector4& zpAudioInstance::getConeOrientation() const {
+const zpVector4f& zpAudioInstance::getConeOrientation() const {
 	return m_coneOrientation;
 }
 
@@ -85,7 +85,13 @@ zp_float zpAudioInstance::getMaxDistance() const {
 void zpAudioInstance::update() {
 	if( m_channel && m_resource && m_resource->is3DSound() ) {
 		FMOD::Channel* channel = (FMOD::Channel*)m_channel;
-		//channel->set3DAttributes( m_position, m_velocity );
+
+		zp_float pos[ 3 ];
+		zp_float vel[ 3 ];
+		m_position.storef3( pos );
+		m_velocity.storef3( vel );
+
+		channel->set3DAttributes( (const FMOD_VECTOR*)pos, (const FMOD_VECTOR*)vel );
 		channel->set3DMinMaxDistance( m_minDistance, m_maxDistance );
 	}
 }

@@ -146,13 +146,13 @@ void zpGameObject::setName( const zpString& name ) {
 	m_name = name;
 }
 
-const zpMatrix4& zpGameObject::getTransform() const {
+const zpMatrix4f& zpGameObject::getTransform() const {
 	return m_transform;
 }
-zpMatrix4 zpGameObject::getComputedTransform() const {
+zpMatrix4f zpGameObject::getComputedTransform() const {
 	return m_parentGameObject ? m_transform * m_parentGameObject->getComputedTransform() : m_transform;
 }
-void zpGameObject::setTransform( const zpMatrix4& transform ) {
+void zpGameObject::setTransform( const zpMatrix4f& transform ) {
 	m_transform = transform;
 }
 

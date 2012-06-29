@@ -18,27 +18,44 @@ public:
 	ZP_FORCE_INLINE zp_float getReal() const;
 
 	ZP_FORCE_INLINE void abs();
-	ZP_FORCE_INLINE void abs( const zp_real& real );
+	ZP_FORCE_INLINE void abs( const zpReal& real );
 
-	ZP_FORCE_INLINE void mul( const zp_real& real );
-	ZP_FORCE_INLINE void div( const zp_real& real );
-	ZP_FORCE_INLINE void add( const zp_real& real );
-	ZP_FORCE_INLINE void sub( const zp_real& real );
+	ZP_FORCE_INLINE void mul( const zpReal& real );
+	ZP_FORCE_INLINE void div( const zpReal& real );
+	ZP_FORCE_INLINE void add( const zpReal& real );
+	ZP_FORCE_INLINE void sub( const zpReal& real );
 
-	ZP_FORCE_INLINE const zp_real operator-() const;
-	ZP_FORCE_INLINE const zp_real operator*( const zp_real& real ) const;
-	ZP_FORCE_INLINE const zp_real operator/( const zp_real& real ) const;
-	ZP_FORCE_INLINE const zp_real operator+( const zp_real& real ) const;
-	ZP_FORCE_INLINE const zp_real operator-( const zp_real& real ) const;
+	ZP_FORCE_INLINE const zpReal operator-() const;
+	ZP_FORCE_INLINE const zpReal operator*( const zpReal& real ) const;
+	ZP_FORCE_INLINE const zpReal operator/( const zpReal& real ) const;
+	ZP_FORCE_INLINE const zpReal operator+( const zpReal& real ) const;
+	ZP_FORCE_INLINE const zpReal operator-( const zpReal& real ) const;
 
-	ZP_FORCE_INLINE void setMin( const zp_real& a, const zp_real& b );
-	ZP_FORCE_INLINE void setMax( const zp_real& a, const zp_real& b );
+	ZP_FORCE_INLINE void setMin( const zpReal& a, const zpReal& b );
+	ZP_FORCE_INLINE void setMax( const zpReal& a, const zpReal& b );
 
-	ZP_FORCE_INLINE const zp_real sqrt() const;
-	ZP_FORCE_INLINE const zp_real invsqrt() const;
+	ZP_FORCE_INLINE const zpReal sqrt() const;
+	ZP_FORCE_INLINE void sqrt( const zpReal& real );
+	ZP_FORCE_INLINE const zpReal invsqrt() const;
+	ZP_FORCE_INLINE void invsqrt( const zpReal& real );
 
 	ZP_FORCE_INLINE void zero();
 	ZP_FORCE_INLINE zp_bool isZero() const;
+
+	ZP_FORCE_INLINE void clamp01();
+	ZP_FORCE_INLINE void clamp01( const zpReal& real );
+
+	ZP_FORCE_INLINE void clamp( const zpReal& low, const zpReal& high );
+	ZP_FORCE_INLINE void clamp( const zpReal& real, const zpReal& low, const zpReal& high );
+
+	ZP_FORCE_INLINE void sin();
+	ZP_FORCE_INLINE void sin( const zpReal& real );
+
+	ZP_FORCE_INLINE void cos();
+	ZP_FORCE_INLINE void cos( const zpReal& real );
+
+	ZP_FORCE_INLINE void tan();
+	ZP_FORCE_INLINE void tan( const zpReal& real );
 
 private:
 	zp_real m_real;

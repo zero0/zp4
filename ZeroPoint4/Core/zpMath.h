@@ -21,10 +21,10 @@ ZP_FORCE_INLINE T zp_clamp01( T& val ) { return val > (T)1 ? (T)1 : val < (T)0 ?
 template<typename T>
 ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high ) { return val > high ? high : val < low ? low : val; }
 
-class zpVector4;
+class zpVector4f;
 class zpReal;
 class zpInteger;
-class zpMatrix4;
+class zpMatrix4f;
 
 #include "zpVector2.h"
 #include "zpVector4.h"

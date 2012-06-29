@@ -36,11 +36,11 @@ void core_test_main() {
 	zp_printfln( "String small: %s", small.getChars() );
 	zp_printfln( "String lower: %s", lower.getChars() );
 	
-	zpMatrix4 mat, ident;
-	zpVector4 vec;
+	zpMatrix4f mat, ident;
+	zpVector4f vec;
 
-	//zpVector4* vv = new zpVector4();
-	//zpMatrix4* mm = new zpMatrix4();
+	//zpVector4f* vv = new zpVector4f();
+	//zpMatrix4f* mm = new zpMatrix4f();
 
 	zpGameObject go1;
 	zpGameObject go2;

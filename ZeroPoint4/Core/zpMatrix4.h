@@ -1,23 +1,23 @@
 #pragma once
-#ifndef ZP_MATRIX4_H
-#define ZP_MATRIX4_H
+#ifndef ZP_MATRIX4F_H
+#define ZP_MATRIX4F_H
 
-ZP_ALIGN16 class zpMatrix4 {
+ZP_ALIGN16 class zpMatrix4f {
 public:
 	/*
 	ZP_FORCE_INLINE void* operator new( zp_uint size );
 	ZP_FORCE_INLINE void* operator new[]( zp_uint size );
 	ZP_FORCE_INLINE void operator delete( void* ptr );
 	*/
-	ZP_FORCE_INLINE zpMatrix4();
-	ZP_FORCE_INLINE zpMatrix4( const zp_float* matrix );
-	ZP_FORCE_INLINE zpMatrix4( const zp_vec4* matrix );
-	ZP_FORCE_INLINE zpMatrix4( const zpMatrix4& matrix );
-	ZP_FORCE_INLINE zpMatrix4( zpMatrix4&& matrix );
-	ZP_FORCE_INLINE ~zpMatrix4();
+	ZP_FORCE_INLINE zpMatrix4f();
+	ZP_FORCE_INLINE zpMatrix4f( const zp_float* matrix );
+	ZP_FORCE_INLINE zpMatrix4f( const zp_vec4* matrix );
+	ZP_FORCE_INLINE zpMatrix4f( const zpMatrix4f& matrix );
+	ZP_FORCE_INLINE zpMatrix4f( zpMatrix4f&& matrix );
+	ZP_FORCE_INLINE ~zpMatrix4f();
 
-	ZP_FORCE_INLINE void operator=( const zpMatrix4& matrix );
-	ZP_FORCE_INLINE void operator=( zpMatrix4&& matrix );
+	ZP_FORCE_INLINE void operator=( const zpMatrix4f& matrix );
+	ZP_FORCE_INLINE void operator=( zpMatrix4f&& matrix );
 	ZP_FORCE_INLINE void operator=( const zp_float* matrix );
 
 	ZP_FORCE_INLINE zp_float& operator()( zp_uint row, zp_uint col );
@@ -26,9 +26,9 @@ public:
 	ZP_FORCE_INLINE operator zp_float*();
 	ZP_FORCE_INLINE operator const zp_float*() const;
 
-	ZP_FORCE_INLINE void operator*=( const zpMatrix4& matrix );
+	ZP_FORCE_INLINE void operator*=( const zpMatrix4f& matrix );
 
-	ZP_FORCE_INLINE zpMatrix4 operator*( const zpMatrix4& matrix ) const;
+	ZP_FORCE_INLINE zpMatrix4f operator*( const zpMatrix4f& matrix ) const;
 
 private:
 	union {
