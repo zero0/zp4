@@ -90,7 +90,7 @@ void zpAudioInstance::update() {
 		zp_float vel[ 3 ];
 		m_position.storef3( pos );
 		m_velocity.storef3( vel );
-
+		
 		channel->set3DAttributes( (const FMOD_VECTOR*)pos, (const FMOD_VECTOR*)vel );
 		channel->set3DMinMaxDistance( m_minDistance, m_maxDistance );
 	}
