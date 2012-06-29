@@ -99,7 +99,7 @@ public:
 
 #define SWIZZEL4( x, y, z, w )	ZP_FORCE_INLINE zpVector4f x##y##z##w() const	{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, m_xyzw.##w ); }
 #define SWIZZEL3( x, y, z )		ZP_FORCE_INLINE zpVector4f x##y##z() const		{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, m_xyzw.##z ); }
-#define SWIZZEL2( x, y )		ZP_FORCE_INLINE zpVector4f x##y##() const		{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##y, m_xyzw.##y ); }
+#define SWIZZEL2( x, y )		ZP_FORCE_INLINE zpVector4f x##y() const			{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##y, m_xyzw.##y ); }
 #define SWIZZEL1( x )			ZP_FORCE_INLINE zpVector4f x##() const			{ return zpVector4f( m_xyzw.##x, m_xyzw.##x, m_xyzw.##x, m_xyzw.##x ); }
 	// swizzel 4 ( abcd )
 	//====
