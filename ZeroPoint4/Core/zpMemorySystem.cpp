@@ -1,4 +1,5 @@
 #include "zpCore.h"
+#include <malloc.h>
 
 zpMemorySystem::zpMemorySystem() : m_allocator( ZP_NULL ) {}
 zpMemorySystem::~zpMemorySystem() {}

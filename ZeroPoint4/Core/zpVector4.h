@@ -10,8 +10,10 @@ public:
 	ZP_FORCE_INLINE void operator delete( void* ptr );
 	*/
 	ZP_FORCE_INLINE zpVector4f();
-	ZP_FORCE_INLINE zpVector4f( zp_float x, zp_float y, zp_float z, zp_float w = 0 );
-	ZP_FORCE_INLINE zpVector4f( const zpReal& x, const zpReal& y, const zpReal& z, const zpReal& w );
+#if ZP_USE_SIMD
+	ZP_FORCE_INLINE zpVector4f( zp_float x, zp_float y, zp_float z, zp_float w = 0.f );
+#endif
+	ZP_FORCE_INLINE zpVector4f( const zp_real& x, const zp_real& y, const zp_real& z, const zp_real& w = zp_real_zero() );
 	ZP_FORCE_INLINE zpVector4f( const zpVector4f& vector );
 	ZP_FORCE_INLINE zpVector4f( zpVector4f&& vector );
 	ZP_FORCE_INLINE explicit zpVector4f( const zp_vec4& vector );
@@ -22,25 +24,26 @@ public:
 
 	ZP_FORCE_INLINE zpVector4f operator-() const;
 	
-	ZP_FORCE_INLINE void set3( const zpReal& x, const zpReal& y, const zpReal& z );
-	ZP_FORCE_INLINE void set4( const zpReal& x, const zpReal& y, const zpReal& z, const zpReal& w );
+	ZP_FORCE_INLINE void set3( const zp_real& x, const zp_real& y, const zp_real& z );
+	ZP_FORCE_INLINE void set4( const zp_real& x, const zp_real& y, const zp_real& z, const zp_real& w );
 	ZP_FORCE_INLINE void set3( const zpVector4f& vector );
 	ZP_FORCE_INLINE void set4( const zpVector4f& vector );
 
-	ZP_FORCE_INLINE zpReal getX() const;
-	ZP_FORCE_INLINE zpReal getY() const;
-	ZP_FORCE_INLINE zpReal getZ() const;
-	ZP_FORCE_INLINE zpReal getW() const;
+	ZP_FORCE_INLINE zp_real getX() const;
+	ZP_FORCE_INLINE zp_real getY() const;
+	ZP_FORCE_INLINE zp_real getZ() const;
+	ZP_FORCE_INLINE zp_real getW() const;
 
-	ZP_FORCE_INLINE void store3( zpReal* xyz ) const;
-	ZP_FORCE_INLINE void store4( zpReal* xyzw ) const;
-	ZP_FORCE_INLINE void storef3( zp_float* xyz ) const;
-	ZP_FORCE_INLINE void storef4( zp_float* xyzw ) const;
+	ZP_FORCE_INLINE void setX( const zp_real& x );
+	ZP_FORCE_INLINE void setY( const zp_real& y );
+	ZP_FORCE_INLINE void setZ( const zp_real& z );
+	ZP_FORCE_INLINE void setW( const zp_real& w );
 
-	ZP_FORCE_INLINE void load3( const zpReal* xyz );
-	ZP_FORCE_INLINE void load4( const zpReal* xyzw );
-	ZP_FORCE_INLINE void loadf3( zp_float* xyz );
-	ZP_FORCE_INLINE void loadf4( zp_float* xyzw );
+	ZP_FORCE_INLINE void store3( zp_float* xyz ) const;
+	ZP_FORCE_INLINE void store4( zp_float* xyzw ) const;
+
+	ZP_FORCE_INLINE void load3( const zp_float* xyz );
+	ZP_FORCE_INLINE void load4( const zp_float* xyzw );
 
 	ZP_FORCE_INLINE void mul3( const zpVector4f& vector );
 	ZP_FORCE_INLINE void mul4( const zpVector4f& vector );
@@ -51,30 +54,30 @@ public:
 	ZP_FORCE_INLINE void sub3( const zpVector4f& vector );
 	ZP_FORCE_INLINE void sub4( const zpVector4f& vector );
 	
-	ZP_FORCE_INLINE void mul3( const zpReal& r );
-	ZP_FORCE_INLINE void mul4( const zpReal& r );
-	ZP_FORCE_INLINE void div3( const zpReal& r );
-	ZP_FORCE_INLINE void div4( const zpReal& r );
-	ZP_FORCE_INLINE void add3( const zpReal& r );
-	ZP_FORCE_INLINE void add4( const zpReal& r );
-	ZP_FORCE_INLINE void sub3( const zpReal& r );
-	ZP_FORCE_INLINE void sub4( const zpReal& r );
+	ZP_FORCE_INLINE void mul3( const zp_real& r );
+	ZP_FORCE_INLINE void mul4( const zp_real& r );
+	ZP_FORCE_INLINE void div3( const zp_real& r );
+	ZP_FORCE_INLINE void div4( const zp_real& r );
+	ZP_FORCE_INLINE void add3( const zp_real& r );
+	ZP_FORCE_INLINE void add4( const zp_real& r );
+	ZP_FORCE_INLINE void sub3( const zp_real& r );
+	ZP_FORCE_INLINE void sub4( const zp_real& r );
 	
 	ZP_FORCE_INLINE void zero3();
 	ZP_FORCE_INLINE void zero4();
 	ZP_FORCE_INLINE zp_bool isZero3() const;
 	ZP_FORCE_INLINE zp_bool isZero4() const;
 
-	ZP_FORCE_INLINE zpReal dot3( const zpVector4f& vector ) const;
-	ZP_FORCE_INLINE zpReal dot4( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zp_real dot3( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zp_real dot4( const zpVector4f& vector ) const;
 
 	ZP_FORCE_INLINE zpVector4f cross3( const zpVector4f& vector ) const;
 	ZP_FORCE_INLINE zpVector4f cross4( const zpVector4f& vector ) const;
 
-	ZP_FORCE_INLINE zpReal magnitude3() const;
-	ZP_FORCE_INLINE zpReal magnitude4() const;
-	ZP_FORCE_INLINE zpReal magnitudeSquared3() const;
-	ZP_FORCE_INLINE zpReal magnitudeSquared4() const;
+	ZP_FORCE_INLINE zp_real magnitude3() const;
+	ZP_FORCE_INLINE zp_real magnitude4() const;
+	ZP_FORCE_INLINE zp_real magnitudeSquared3() const;
+	ZP_FORCE_INLINE zp_real magnitudeSquared4() const;
 
 	ZP_FORCE_INLINE zpVector4f normalize3() const;
 	ZP_FORCE_INLINE void normalize3();
@@ -84,23 +87,48 @@ public:
 	ZP_FORCE_INLINE zpVector4f homogenize4() const;
 	ZP_FORCE_INLINE void homogenize4();
 
-	ZP_FORCE_INLINE zpVector4f lerp3( const zpVector4f& vector, zpReal alpha ) const;
-	ZP_FORCE_INLINE void lerp3( const zpVector4f& vector, zpReal alpha );
-	ZP_FORCE_INLINE zpVector4f lerp4( const zpVector4f& vector, zpReal alpha ) const;
-	ZP_FORCE_INLINE void lerp4( const zpVector4f& vector, zpReal alpha );
+	ZP_FORCE_INLINE zp_real angleBetween3( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zp_real angleBetween4( const zpVector4f& vector ) const;
 
-	ZP_FORCE_INLINE zpVector4f slerp3( const zpVector4f& vector, zpReal alpha ) const;
-	ZP_FORCE_INLINE void slerp3( const zpVector4f& vector, zpReal alpha );
-	ZP_FORCE_INLINE zpVector4f slerp4( const zpVector4f& vector, zpReal alpha ) const;
-	ZP_FORCE_INLINE void slerp4( const zpVector4f& vector, zpReal alpha );
+	ZP_FORCE_INLINE zpVector4f lerp3( const zpVector4f& vector, zp_real alpha ) const;
+	ZP_FORCE_INLINE void lerp3( const zpVector4f& vector, zp_real alpha );
+	ZP_FORCE_INLINE zpVector4f lerp4( const zpVector4f& vector, zp_real alpha ) const;
+	ZP_FORCE_INLINE void lerp4( const zpVector4f& vector, zp_real alpha );
+
+	ZP_FORCE_INLINE zpVector4f slerp3( const zpVector4f& vector, zp_real alpha ) const;
+	ZP_FORCE_INLINE void slerp3( const zpVector4f& vector, zp_real alpha );
+	ZP_FORCE_INLINE zpVector4f slerp4( const zpVector4f& vector, zp_real alpha ) const;
+	ZP_FORCE_INLINE void slerp4( const zpVector4f& vector, zp_real alpha );
+
+	ZP_FORCE_INLINE zp_bool equals3( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zp_bool equals4( const zpVector4f& vector ) const;
 
 	ZP_FORCE_INLINE zp_bool operator==( const zpVector4f& vector ) const;
 	ZP_FORCE_INLINE zp_bool operator!=( const zpVector4f& vector ) const;
+
+#if ZP_USE_SIMD
+private:
+	enum ComponentToIndex {
+		cti_x = 0,
+		cti_y = 1,
+		cti_z = 2,
+		cti_w = 3,
+	};
+public:
+
+#define SWIZZEL4( x, y, z, w )	ZP_FORCE_INLINE zpVector4f x##y##z##w() const	{ return zpVector4f( _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##y, cti_##z, cti_##w ) ) ); }
+#define SWIZZEL3( x, y, z )		ZP_FORCE_INLINE zpVector4f x##y##z() const		{ return zpVector4f( _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##y, cti_##z, cti_##z ) ) ); }
+#define SWIZZEL2( x, y )		ZP_FORCE_INLINE zpVector4f x##y() const			{ return zpVector4f( _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##y, cti_##y, cti_##y ) ) ); }
+#define SWIZZEL1( x )			ZP_FORCE_INLINE zpVector4f x##() const			{ return zpVector4f( _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##x, cti_##x, cti_##x ) ) ); }
+
+#else
 
 #define SWIZZEL4( x, y, z, w )	ZP_FORCE_INLINE zpVector4f x##y##z##w() const	{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, m_xyzw.##w ); }
 #define SWIZZEL3( x, y, z )		ZP_FORCE_INLINE zpVector4f x##y##z() const		{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, m_xyzw.##z ); }
 #define SWIZZEL2( x, y )		ZP_FORCE_INLINE zpVector4f x##y() const			{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##y, m_xyzw.##y ); }
 #define SWIZZEL1( x )			ZP_FORCE_INLINE zpVector4f x##() const			{ return zpVector4f( m_xyzw.##x, m_xyzw.##x, m_xyzw.##x, m_xyzw.##x ); }
+
+#endif
 	// swizzel 4 ( abcd )
 	//====
 	SWIZZEL4( x, x, x, x );
@@ -545,6 +573,10 @@ public:
 	SWIZZEL1( y );
 	SWIZZEL1( z );
 	SWIZZEL1( w );
+
+#if ZP_USE_SIMD
+#undef ComponentToIndex
+#endif
 
 #undef SWIZZEL4
 #undef SWIZZEL3

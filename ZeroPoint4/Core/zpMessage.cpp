@@ -1,4 +1,5 @@
 #include "zpCore.h"
+#include <malloc.h>
 #include <memory.h>
 
 zpMessage::zpMessage() : m_type( ZP_MESSAGE_TYPE_NULL ), m_sender( ZP_NULL ), m_data( 0 ), m_dataSize( 0 ) {}

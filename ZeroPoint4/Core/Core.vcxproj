@@ -170,6 +170,7 @@
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />
     <None Include="zpVector2.inl" />
+    <None Include="zpVector4.inl" />
     <None Include="zpVector4Fpu.inl" />
     <None Include="zpVector4Simd.inl" />
   </ItemGroup>

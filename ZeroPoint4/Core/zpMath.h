@@ -26,20 +26,23 @@ class zpReal;
 class zpInteger;
 class zpMatrix4f;
 
+#include "zpReal.h"
 #include "zpVector2.h"
 #include "zpVector4.h"
-#include "zpReal.h"
+
 //#include "zpInteger.h"
 #include "zpMatrix4.h"
 
+#include "zpVector4.inl"
+
 #if ZP_USE_SIMD
-#include "zpVector4Simd.inl"
 #include "zpRealSimd.inl"
+#include "zpVector4Simd.inl"
 //#include "zpIntegerSimd.inl"
 #include "zpMatrix4Simd.inl"
 #else
-#include "zpVector4Fpu.inl"
 #include "zpRealFpu.inl"
+#include "zpVector4Fpu.inl"
 //#include "zpIntegerFpu.inl"
 #include "zpMatrix4Fpu.inl"
 #endif

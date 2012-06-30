@@ -85,11 +85,11 @@ zp_float zpAudioInstance::getMaxDistance() const {
 void zpAudioInstance::update() {
 	if( m_channel && m_resource && m_resource->is3DSound() ) {
 		FMOD::Channel* channel = (FMOD::Channel*)m_channel;
-
+		
 		zp_float pos[ 3 ];
 		zp_float vel[ 3 ];
-		m_position.storef3( pos );
-		m_velocity.storef3( vel );
+		m_position.store3( pos );
+		m_velocity.store3( vel );
 		
 		channel->set3DAttributes( (const FMOD_VECTOR*)pos, (const FMOD_VECTOR*)vel );
 		channel->set3DMinMaxDistance( m_minDistance, m_maxDistance );

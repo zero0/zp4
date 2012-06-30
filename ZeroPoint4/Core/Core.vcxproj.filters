@@ -188,6 +188,9 @@
     <None Include="zpArray.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpVector4.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">
