@@ -50,6 +50,8 @@
 #define ZP_SAFE_REMOVE_REF( r )		{ if( (r) ) { (r)->removeReference(); (r) = ZP_NULL; } }
 #define ZP_SAFE_FREE( p )			{ if( (p) ) { free( (p) ); (p) = ZP_NULL; } }
 
+#define ZP_USE_COLOR_CONSOLE	1
+
 #include "zpBaseTypes.h"
 
 ZP_PURE_INTERFACE zpRenderable;

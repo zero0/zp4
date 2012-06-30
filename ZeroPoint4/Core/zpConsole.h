@@ -27,7 +27,8 @@ enum zpConsoleColor {
 };
 #define ZP_CC( f, b ) (zpConsoleColorType)( ( (b) << 4 ) | (f) )
 
-#define ZP_DEFAULT_CONSOLE_BUFFER_SIZE	1024
+#define ZP_CONSOLE_DEFAULT_BUFFER_SIZE	1024
+#define ZP_CONSOLE_DEFAULT_COLOR		ZP_CC( ZP_CC_WHITE, ZP_CC_BLACK )
 
 class zpConsole {
 public:
@@ -38,10 +39,10 @@ public:
 	const zpString& getTitle() const;
 	void setTitle( const zpString& title );
 
-	void create( zp_ushort bufferSize = ZP_DEFAULT_CONSOLE_BUFFER_SIZE );
+	void create( zp_ushort bufferSize = ZP_CONSOLE_DEFAULT_BUFFER_SIZE );
 	void destroy();
 
-	bool isCreated() const;
+	zp_bool isCreated() const;
 
 	void setColor( zpConsoleColorType color );
 	void setDefaultColor( zpConsoleColorType color );
@@ -51,7 +52,7 @@ public:
 
 	void resetColor();
 
-	//static HANDLE getConsoleHandle();
+	void* getConsoleHandle();
 
 	//void serialize( ISerializedOutput* const out );
 	//void deserialize( ISerializedInput* const in );
@@ -59,17 +60,22 @@ public:
 private:
 	zpConsole();
 	
-	zpString m_title;
-	zp_ushort m_bufferSize;
 	zp_bool m_isCreated;
-
+	zp_ushort m_bufferSize;
+	
 	//HANDLE m_hStdOut;
 	//HANDLE m_hStdErr;
 	//HANDLE m_hStdIn;
 
+	zpConsoleColorType m_currentColor;
 	zpConsoleColorType m_defaultColor;
 
-	//static HANDLE s_hConsole;
+	void* m_hConsole;
+	
+	zpString m_title;
 };
+
+void zp_printfc( zpConsoleColorType color, const char* text, ... );
+void zp_printfcln( zpConsoleColorType color, const char* text, ... );
 
 #endif

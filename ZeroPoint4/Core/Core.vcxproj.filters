@@ -247,5 +247,8 @@
     <ClCompile Include="zpFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpConsole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

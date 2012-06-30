@@ -179,10 +179,11 @@ void core_test_main() {
 }
 
 void rendering_test_main() {
+	zpConsole::getInstance()->create();
 
 	zpGameObject ro;
 
-	zp_printfln( "Size: %d", sizeof( zpGameObject ) );
+	zp_printfcln( ZP_CC( ZP_CC_RED, ZP_CC_LIGHT_BLUE ), "Size: %d", sizeof( zpGameObject ) );
 
 	zpWindow wnd;
 	wnd.setTitle( "ZP4 Window" );
