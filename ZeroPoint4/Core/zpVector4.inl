@@ -27,6 +27,13 @@ ZP_FORCE_INLINE void zpVector4f::operator=( const zpVector4f& vector ) {
 ZP_FORCE_INLINE void zpVector4f::operator=( zpVector4f&& vector ) {
 	m_xyzw = vector.m_xyzw;
 }
+ZP_FORCE_INLINE void zpVector4f::operator=( const zp_vec4& vector ) {
+	m_xyzw = vector;
+}
+
+ZP_FORCE_INLINE zpVector4f::operator zp_vec4() const {
+	return m_xyzw;
+}
 
 ZP_FORCE_INLINE zp_real zpVector4f::getX() const {
 	return m_xyzw.getX();

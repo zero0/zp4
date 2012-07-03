@@ -163,6 +163,7 @@
     <None Include="zpIntrusiveList.inl" />
     <None Include="zpLinkedList.inl" />
     <None Include="zpMap.inl" />
+    <None Include="zpMatrix4f.inl" />
     <None Include="zpMatrix4Fpu.inl" />
     <None Include="zpMatrix4Simd.inl" />
     <None Include="zpPair.inl" />
@@ -187,6 +188,7 @@
     <ClCompile Include="zpGameManager.cpp" />
     <ClCompile Include="zpGameObject.cpp" />
     <ClCompile Include="zpComponent.cpp" />
+    <ClCompile Include="zpMatrix4f.cpp" />
     <ClCompile Include="zpMemorySystem.cpp" />
     <ClCompile Include="zpMessage.cpp" />
     <ClCompile Include="zpProperties.cpp" />

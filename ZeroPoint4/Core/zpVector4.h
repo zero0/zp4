@@ -16,14 +16,16 @@ public:
 	ZP_FORCE_INLINE zpVector4f( const zp_real& x, const zp_real& y, const zp_real& z, const zp_real& w = zp_real_zero() );
 	ZP_FORCE_INLINE zpVector4f( const zpVector4f& vector );
 	ZP_FORCE_INLINE zpVector4f( zpVector4f&& vector );
-	ZP_FORCE_INLINE explicit zpVector4f( const zp_vec4& vector );
+	ZP_FORCE_INLINE zpVector4f( const zp_vec4& vector );
 	ZP_FORCE_INLINE ~zpVector4f();
 
 	ZP_FORCE_INLINE void operator=( const zpVector4f& vector );
 	ZP_FORCE_INLINE void operator=( zpVector4f&& vector );
+	ZP_FORCE_INLINE void operator=( const zp_vec4& vector );
 
 	ZP_FORCE_INLINE zpVector4f operator-() const;
-	
+	ZP_FORCE_INLINE operator zp_vec4() const;
+
 	ZP_FORCE_INLINE void set3( const zp_real& x, const zp_real& y, const zp_real& z );
 	ZP_FORCE_INLINE void set4( const zp_real& x, const zp_real& y, const zp_real& z, const zp_real& w );
 	ZP_FORCE_INLINE void set3( const zpVector4f& vector );

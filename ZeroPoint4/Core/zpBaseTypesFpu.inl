@@ -16,21 +16,23 @@ struct zp_vec4 {
 		return v[I];
 	}
 	ZP_FORCE_INLINE zp_real getX() const {
-		return get<0>();
+		return x;
 	}
 	ZP_FORCE_INLINE zp_real getY() const {
-		return get<1>();
+		return y;
 	}
 	ZP_FORCE_INLINE zp_real getZ() const {
-		return get<2>();
+		return z;
 	}
 	ZP_FORCE_INLINE zp_real getW() const {
-		return get<3>();
+		return w;
 	}
 
 	ZP_FORCE_INLINE operator const zp_float*() const { return &v[0]; };
 	
 	ZP_FORCE_INLINE void operator=( const zp_float* m ) { v[0] = m[0]; v[1] = m[1]; v[2] = m[2]; v[3] = m[3];};
+
+	ZP_FORCE_INLINE void operator=( const zp_vec4& m ) { x = m.x; y = m.y; z = m.z; w = m.w; };
 
 	union {
 		zp_float v[4];

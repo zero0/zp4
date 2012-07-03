@@ -34,6 +34,7 @@ class zpMatrix4f;
 #include "zpMatrix4.h"
 
 #include "zpVector4.inl"
+#include "zpMatrix4f.inl"
 
 #if ZP_USE_SIMD
 #include "zpRealSimd.inl"
