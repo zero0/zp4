@@ -50,13 +50,45 @@ struct zpRenderingDisplayMode {
 	zpRenderingDisplayFormat displayFormat;
 };
 
-#include "zpRenderingEngine.h"
-#include "zpRenderingFactory.h"
-#include "zpRenderingContext.h"
+enum zpBufferType {
+	ZP_BUFFER_TYPE_VERTEX,
+	ZP_BUFFER_TYPE_INDEX,
+	ZP_BUFFER_TYPE_CONSTANT,
+	ZP_BUFFER_TYPE_SHADER_RESOURCE,
+	ZP_BUFFER_TYPE_STREAM_OUT,
+	ZP_BUFFER_TYPE_RENDER_TARGET,
+	ZP_BUFFER_TYPE_DEPTH_STENCIL,
+	ZP_BUFFER_TYPE_UNORDERED_ACCESS,
+};
+
+enum zpBufferBind {
+	ZP_BUFFER_BIND_DEFAULT,
+	ZP_BUFFER_BIND_DYNAMIC,
+	ZP_BUFFER_BIND_IMMUTABLE,
+};
+
+enum zpRenderingMapType {
+	ZP_RENDERING_MAP_TYPE_READ,
+	ZP_RENDERING_MAP_TYPE_WRITE,
+	ZP_RENDERING_MAP_TYPE_READ_WRITE,
+	ZP_RENDERING_MAP_TYPE_WRITE_DISCARD,
+
+};
 
 #include "zpBuffer.h"
-#include "zpCamera.h"
+#include "zpRenderingContext.h"
+#include "zpRenderingEngine.h"
+#include "zpRenderingFactory.h"
 
+#include "zpCamera.h"
 #include "zpRenderingManager.h"
+
+ZP_PURE_INTERFACE zpBuffer;
+ZP_PURE_INTERFACE zpRenderingContext;
+ZP_PURE_INTERFACE zpRenderingEngine;
+class zpRenderingFactory;
+
+class zpCamera;
+class zpRenderingManager;
 
 #endif

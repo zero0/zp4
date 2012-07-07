@@ -42,6 +42,9 @@ public:
 
 	zpRenderingContext* createRenderingContext();
 	void setCurrentRenderingContext( zpRenderingContext* context );
+	zpRenderingContext* getCurrentRenderingContext() const;
+
+	zpBuffer* createBuffer();
 
 protected:
 	zp_bool initialize();
@@ -49,6 +52,8 @@ protected:
 
 private:
 	zpDX11RenderingEngine();
+
+	ID3D11Device* getDevice() const;
 
 	IDXGIFactory* m_dxgiFactory;
 	IDXGIAdapter* m_dxgiAdapter;
@@ -70,6 +75,7 @@ private:
 	zpColor4f m_clearColor;
 
 	friend class zpRenderingFactory;
+	friend class zpDX11Buffer;
 };
 
 #endif

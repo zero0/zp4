@@ -1,5 +1,5 @@
 #include "zpRendering.h"
-#include "zpDX11RenderingEngine.h"
+#include "zpDX11.h"
 #include <D3D11.h>
 
 #define HR( r )						if( FAILED( (r) ) ) { return false; }
@@ -272,7 +272,7 @@ zp_bool zpDX11RenderingEngine::initialize() {
 	HR_MSG( hr, "Unable to Get Adapter 0" );
 	
 	zp_zero_memory( &m_displayMode );
-
+	
 	return true;
 }
 void zpDX11RenderingEngine::shutdown() {
@@ -281,7 +281,20 @@ void zpDX11RenderingEngine::shutdown() {
 }
 
 zpRenderingContext* zpDX11RenderingEngine::createRenderingContext() {
-	return ZP_NULL;
+	ID3D11DeviceContext* context;
+	m_d3dDevice->CreateDeferredContext( 0, &context );
+	return new zpDX11RenderingContext( context );
 }
 void zpDX11RenderingEngine::setCurrentRenderingContext( zpRenderingContext* context ) {
+}
+zpRenderingContext* zpDX11RenderingEngine::getCurrentRenderingContext() const {
+	return ZP_NULL;
+}
+
+zpBuffer* zpDX11RenderingEngine::createBuffer() {
+	return new zpDX11Buffer( this );
+}
+
+ID3D11Device* zpDX11RenderingEngine::getDevice() const {
+	return m_d3dDevice;
 }

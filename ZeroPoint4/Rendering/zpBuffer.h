@@ -1,0 +1,38 @@
+#pragma once
+#ifndef ZP_BUFFER_H
+#define ZP_BUFFER_H
+
+ZP_PURE_INTERFACE zpBuffer {
+public:
+
+	template<typename S, zp_uint I>
+	void create( zpBufferType type, zpBufferBind bind, const S (&data)[I] ) {
+		create( type, bind, I, sizeof( S ), data );
+	}
+
+	template<typename S, zp_uint I>
+	void update( const S (&data)[I] ) {
+		update( I, data );
+	}
+
+	template<typename S>
+	void map( S** data ) {
+		map( (void**)data );
+	}	
+
+	virtual void create( zpBufferType type, zpBufferBind bind, zp_uint count, zp_uint stride, void* data = 0 );
+	virtual void release() = 0;
+
+	virtual void map( void** data, zpRenderingMapType mapType = ZP_RENDERING_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 ) = 0;
+	virtual void unmap( zp_uint subResource = 0 ) = 0;
+
+	virtual void update( zp_uint count, void* data = 0 ) = 0;
+
+	virtual void bind() = 0;
+	virtual void unbind() = 0;
+
+	virtual zp_uint getCount() const = 0;
+	virtual zp_uint getStride() const = 0;
+};
+
+#endif

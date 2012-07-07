@@ -138,6 +138,10 @@ ZP_ABSTRACT_CLASS zpComponent;
 void zp_printf( const char* text, ... );
 void zp_printfln( const char* text, ... );
 
+template<typename T, typename A>
+ZP_FORCE_INLINE T& zp_as( A& a ) {
+	return (T)a;
+}
 template<typename T>
 void zp_zero_memory( T* ptr ) {
 	memset( ptr, 0, sizeof( T ) );

@@ -48,6 +48,12 @@
     <ClInclude Include="zpDX11RenderingContext.h">
       <Filter>Header Files\DirectX 11</Filter>
     </ClInclude>
+    <ClInclude Include="zpDX11Buffer.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -63,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpDX11RenderingContext.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11Buffer.cpp">
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
   </ItemGroup>
