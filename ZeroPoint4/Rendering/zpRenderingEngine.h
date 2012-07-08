@@ -7,6 +7,8 @@ public:
 	virtual zp_bool create() = 0;
 	virtual void destroy() = 0;
 
+	virtual zpRenderingEngineType getEngineType() const = 0;
+
 	virtual zp_uint enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes ) = 0;
 	virtual zp_bool findClosestDisplayMode( const zpRenderingDisplayMode& displayMode, zpRenderingDisplayMode* outDisplayMode ) = 0;
 	
@@ -30,6 +32,8 @@ public:
 	virtual zpRenderingContext* getCurrentRenderingContext() const = 0;
 
 	virtual zpBuffer* createBuffer() = 0;
+
+	virtual zpTextureResource* createTextureResource() = 0;
 
 protected:
 	virtual zp_bool initialize() = 0;

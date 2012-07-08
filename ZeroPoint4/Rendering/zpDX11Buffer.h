@@ -2,13 +2,11 @@
 #ifndef ZP_DX11_BUFFER_H
 #define ZP_DX11_BUFFER_H
 
-class zpDX11RenderingEngine;
 struct ID3D11Buffer;
 
 class zpDX11Buffer : public zpBuffer {
 public:
 	zpDX11Buffer();
-	zpDX11Buffer( zpDX11RenderingEngine* engine );
 	virtual ~zpDX11Buffer();
 
 	void create( zpBufferType type, zpBufferBind bind, zp_uint count, zp_uint stride, void* data = 0 );
@@ -34,7 +32,6 @@ private:
 	zpBufferBind m_bind;
 
 	ID3D11Buffer* m_buffer;
-	zpDX11RenderingEngine* m_engine;
 
 	friend class zpDX11RenderingEngine;
 	friend class zpDX11RenderingContext;

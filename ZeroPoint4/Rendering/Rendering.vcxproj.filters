@@ -54,6 +54,21 @@
     <ClInclude Include="zpDX11.h">
       <Filter>Header Files\DirectX 11</Filter>
     </ClInclude>
+    <ClInclude Include="zpRenderingResourceCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpTextureResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11TextureResource.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
+    <ClInclude Include="zpShaderResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11ShaderResource.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -72,6 +87,15 @@
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
     <ClCompile Include="zpDX11Buffer.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpRenderingResourceCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11TextureResource.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11ShaderResource.cpp">
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
   </ItemGroup>

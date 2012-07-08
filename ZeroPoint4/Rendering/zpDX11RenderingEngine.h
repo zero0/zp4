@@ -2,10 +2,6 @@
 #ifndef ZP_DX11_RENDERING_ENGINE_H
 #define ZP_DX11_RENDERING_ENGINE_H
 
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "dxguid.lib")
-
 struct IDXGIFactory;
 struct IDXGIAdapter;
 struct IDXGISwapChain;
@@ -21,6 +17,8 @@ public:
 
 	zp_bool create();
 	void destroy();
+
+	zpRenderingEngineType getEngineType() const;
 
 	zp_uint enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes );
 	zp_bool findClosestDisplayMode( const zpRenderingDisplayMode& displayMode, zpRenderingDisplayMode* outDisplayMode );
@@ -45,6 +43,8 @@ public:
 	zpRenderingContext* getCurrentRenderingContext() const;
 
 	zpBuffer* createBuffer();
+
+	zpTextureResource* createTextureResource();
 
 protected:
 	zp_bool initialize();
@@ -71,11 +71,14 @@ private:
 
 	zpRenderingScreenMode m_screenMode;
 	zpRenderingDisplayMode m_displayMode;
+	zpRenderingEngineType m_engineType;
 
 	zpColor4f m_clearColor;
 
 	friend class zpRenderingFactory;
 	friend class zpDX11Buffer;
+	friend class zpDX11TextureResource;
+	friend class zpDX11ShaderResource;
 };
 
 #endif

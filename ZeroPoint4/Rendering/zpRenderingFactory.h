@@ -12,7 +12,9 @@ public:
 	}
 	static zpRenderingEngine* createRenderingEngine( zpRenderingEngineType type );
 
-	static void destroyRenderingEngine( zpRenderingEngine* engine );
+	static zpRenderingEngine* getRenderingEngine();
+
+	static void destroyRenderingEngine();
 
 private:
 	static zpRenderingEngine* s_renderingEngine;

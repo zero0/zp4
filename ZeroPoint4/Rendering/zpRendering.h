@@ -3,6 +3,7 @@
 #define ZP_RENDERING_H
 
 #include "Core\zpCore.h"
+#include "Content\zpContent.h"
 
 #if ZP_WIN_32 || ZP_WIN_64
 #define ZP_DIRECTX_SUPPORT		1
@@ -75,14 +76,9 @@ enum zpRenderingMapType {
 
 };
 
-#include "zpBuffer.h"
-#include "zpRenderingContext.h"
-#include "zpRenderingEngine.h"
-#include "zpRenderingFactory.h"
-
-#include "zpCamera.h"
-#include "zpRenderingManager.h"
-
+ZP_PURE_INTERFACE zpShaderResource;
+ZP_PURE_INTERFACE zpTextureResource;
+class zpRenderingResourceCreator;
 ZP_PURE_INTERFACE zpBuffer;
 ZP_PURE_INTERFACE zpRenderingContext;
 ZP_PURE_INTERFACE zpRenderingEngine;
@@ -90,5 +86,16 @@ class zpRenderingFactory;
 
 class zpCamera;
 class zpRenderingManager;
+
+#include "zpShaderResource.h"
+#include "zpTextureResource.h"
+#include "zpRenderingResourceCreator.h"
+#include "zpBuffer.h"
+#include "zpRenderingContext.h"
+#include "zpRenderingEngine.h"
+#include "zpRenderingFactory.h"
+
+#include "zpCamera.h"
+#include "zpRenderingManager.h"
 
 #endif

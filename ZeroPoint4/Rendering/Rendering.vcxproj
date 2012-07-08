@@ -84,22 +84,30 @@
     <ClInclude Include="zpDX11Buffer.h" />
     <ClInclude Include="zpDX11RenderingContext.h" />
     <ClInclude Include="zpDX11RenderingEngine.h" />
+    <ClInclude Include="zpDX11ShaderResource.h" />
+    <ClInclude Include="zpDX11TextureResource.h" />
     <ClInclude Include="zpRendering.h" />
     <ClInclude Include="zpRenderingContext.h" />
     <ClInclude Include="zpRenderingEngine.h" />
     <ClInclude Include="zpRenderingFactory.h" />
     <ClInclude Include="zpRenderingManager.h" />
+    <ClInclude Include="zpRenderingResourceCreator.h" />
+    <ClInclude Include="zpShaderResource.h" />
+    <ClInclude Include="zpTextureResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpDX11Buffer.cpp" />
     <ClCompile Include="zpDX11RenderingContext.cpp" />
     <ClCompile Include="zpDX11RenderingEngine.cpp" />
+    <ClCompile Include="zpDX11ShaderResource.cpp" />
+    <ClCompile Include="zpDX11TextureResource.cpp" />
     <ClCompile Include="zpRendering.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpRenderingFactory.cpp" />
     <ClCompile Include="zpRenderingManager.cpp" />
+    <ClCompile Include="zpRenderingResourceCreator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

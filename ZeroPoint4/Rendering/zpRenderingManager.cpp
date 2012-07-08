@@ -27,7 +27,7 @@ void zpRenderingManager::onCreate() {
 }
 void zpRenderingManager::onDestroy() {
 	m_engine->destroy();
-	zpRenderingFactory::destroyRenderingEngine( m_engine );
+	zpRenderingFactory::destroyRenderingEngine();
 }
 
 void zpRenderingManager::onUpdate() {

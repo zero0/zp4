@@ -18,7 +18,16 @@ zpRenderingEngine* zpRenderingFactory::createRenderingEngine( zpRenderingEngineT
 	return s_renderingEngine;
 }
 
-void zpRenderingFactory::destroyRenderingEngine( zpRenderingEngine* engine ) {
-	engine->shutdown();
-	delete engine;
+zpRenderingEngine* zpRenderingFactory::getRenderingEngine() {
+	ZP_ASSERT_RETURN_( s_renderingEngine, ZP_NULL, "Rendering Engine not created!" );
+	return s_renderingEngine;
+}
+
+void zpRenderingFactory::destroyRenderingEngine() {
+	if( s_renderingEngine ) {
+		s_renderingEngine->shutdown();
+		delete s_renderingEngine;
+		s_renderingEngine = ZP_NULL;
+	}
+	
 }

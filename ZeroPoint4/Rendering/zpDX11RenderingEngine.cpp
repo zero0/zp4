@@ -76,13 +76,23 @@ zp_bool zpDX11RenderingEngine::create() {
 		}
 	}
 
+	// get the feature level of the rendering engine
+	switch( m_d3dDevice->GetFeatureLevel() ) {
+		case D3D_FEATURE_LEVEL_11_0: m_engineType = ZP_RENDERING_ENGINE_DX11; break;
+		case D3D_FEATURE_LEVEL_10_1: m_engineType = ZP_RENDERING_ENGINE_DX10_1; break;
+		case D3D_FEATURE_LEVEL_10_0: m_engineType = ZP_RENDERING_ENGINE_DX10; break;
+	}
+
+	// if neither of the display mode's dimensions are set, set to the window screen size
 	if( !m_displayMode.width || !m_displayMode.height ) {
 		m_displayMode.width = m_window->getScreenSize().getX();
 		m_displayMode.height = m_window->getScreenSize().getY();
 	}
+	// if the display mode is set to unknow, default to RGBA unorm
 	if( m_displayMode.displayFormat == ZP_RENDERING_DISPLAY_FORMAT_UNKNOWN ) {
 		m_displayMode.displayFormat = ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM;
 	}
+	// if the refresh rate is not set, find the closest display mode that matches
 	if( !m_displayMode.refreshRate ) {
 		findClosestDisplayMode( m_displayMode, &m_displayMode );
 	}
@@ -148,6 +158,10 @@ void zpDX11RenderingEngine::destroy() {
 	ZP_SAFE_RELEASE( m_immediateContext );
 	ZP_SAFE_RELEASE( m_swapChain );
 	ZP_SAFE_RELEASE( m_d3dDevice );
+}
+
+zpRenderingEngineType zpDX11RenderingEngine::getEngineType() const {
+	return m_engineType;
 }
 
 zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes ) {
@@ -292,7 +306,10 @@ zpRenderingContext* zpDX11RenderingEngine::getCurrentRenderingContext() const {
 }
 
 zpBuffer* zpDX11RenderingEngine::createBuffer() {
-	return new zpDX11Buffer( this );
+	return new zpDX11Buffer();
+}
+zpTextureResource* zpDX11RenderingEngine::createTextureResource() {
+	return new zpDX11TextureResource();
 }
 
 ID3D11Device* zpDX11RenderingEngine::getDevice() const {
