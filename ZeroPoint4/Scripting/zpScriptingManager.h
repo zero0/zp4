@@ -2,12 +2,6 @@
 #ifndef ZP_SCRIPTING_MANAGER_H
 #define ZP_SCRIPTING_MANAGER_H
 
-#if ZP_DEBUG
-#pragma comment( lib, "angelscriptd.lib" )
-#else
-#pragma comment( lib, "angelscript.lib" )
-#endif
-
 struct asSMessageInfo;
 class asIScriptContext;
 

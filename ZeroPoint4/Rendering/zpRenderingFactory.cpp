@@ -1,6 +1,7 @@
 #include "zpRendering.h"
 
 #include "zpDX11RenderingEngine.h"
+#include "zpOpenGLRenderingEngine.h"
 
 zpRenderingFactory::zpRenderingFactory() {}
 zpRenderingFactory::~zpRenderingFactory() {}
@@ -11,6 +12,9 @@ zpRenderingEngine* zpRenderingFactory::createRenderingEngine( zpRenderingEngineT
 		switch( type ) {
 		case ZP_RENDERING_ENGINE_DX:
 			s_renderingEngine = new zpDX11RenderingEngine;
+			break;
+		case ZP_RENDERING_ENGINE_OPENGL:
+			s_renderingEngine = new zpOpenGLRenderingEngine;
 			break;
 		}
 		if( s_renderingEngine ) s_renderingEngine->initialize();

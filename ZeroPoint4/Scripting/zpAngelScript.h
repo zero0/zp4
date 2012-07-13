@@ -2,7 +2,14 @@
 #ifndef ZP_ANGELSCRIPT_H
 #define ZP_ANGELSCRIPT_H
 
-class asIScriptEngine;
+#include <angelscript.h>
+
+#if ZP_DEBUG
+#pragma comment( lib, "angelscriptd.lib" )
+#else
+#pragma comment( lib, "angelscript.lib" )
+#endif
+
 typedef void (*zpAngelScriptRegisterFunction)( asIScriptEngine* engine );
 
 class zpAngelScript {

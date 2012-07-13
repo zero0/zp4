@@ -1,5 +1,5 @@
 #include "zpScripting.h"
-#include "angelscript.h"
+#include "zpAngelScript.h"
 
 void __print( const zpString& str ) {
 	zp_printf( "%s", str.c_str() );

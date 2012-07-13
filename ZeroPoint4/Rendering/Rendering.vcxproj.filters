@@ -19,6 +19,12 @@
     <Filter Include="Source Files\DirectX 11">
       <UniqueIdentifier>{584ed23e-4404-41a2-8af1-763506f366fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\OpenGL">
+      <UniqueIdentifier>{fb435fd5-218b-4b88-99f7-644b8cd25406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OpenGL">
+      <UniqueIdentifier>{c2993514-4629-434e-a0e2-7c19fb577c04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpRendering.h">
@@ -69,6 +75,12 @@
     <ClInclude Include="zpDX11ShaderResource.h">
       <Filter>Header Files\DirectX 11</Filter>
     </ClInclude>
+    <ClInclude Include="zpOpenGL.h">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="zpOpenGLRenderingEngine.h">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -97,6 +109,12 @@
     </ClCompile>
     <ClCompile Include="zpDX11ShaderResource.cpp">
       <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpOpenGL.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="zpOpenGLRenderingEngine.cpp">
+      <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

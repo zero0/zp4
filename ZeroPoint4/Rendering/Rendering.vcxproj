@@ -37,10 +37,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(ProjectDir)lib\x86\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;$(ProjectDir)lib\x86\</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -55,7 +57,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,7 +77,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -86,6 +90,8 @@
     <ClInclude Include="zpDX11RenderingEngine.h" />
     <ClInclude Include="zpDX11ShaderResource.h" />
     <ClInclude Include="zpDX11TextureResource.h" />
+    <ClInclude Include="zpOpenGL.h" />
+    <ClInclude Include="zpOpenGLRenderingEngine.h" />
     <ClInclude Include="zpRendering.h" />
     <ClInclude Include="zpRenderingContext.h" />
     <ClInclude Include="zpRenderingEngine.h" />
@@ -101,6 +107,8 @@
     <ClCompile Include="zpDX11RenderingEngine.cpp" />
     <ClCompile Include="zpDX11ShaderResource.cpp" />
     <ClCompile Include="zpDX11TextureResource.cpp" />
+    <ClCompile Include="zpOpenGL.cpp" />
+    <ClCompile Include="zpOpenGLRenderingEngine.cpp" />
     <ClCompile Include="zpRendering.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

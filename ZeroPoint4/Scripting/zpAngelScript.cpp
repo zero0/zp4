@@ -1,5 +1,5 @@
 #include "zpScripting.h"
-#include "angelscript.h"
+#include "zpAngelScript.h"
 
 #define AS_ASSERT( r )	if( (r) < 0 ) { zp_printfln( "Assert Failed (%d) %s:%d", (r), __FILE__, __LINE__ ); }
 

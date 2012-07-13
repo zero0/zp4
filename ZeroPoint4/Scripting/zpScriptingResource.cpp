@@ -1,5 +1,5 @@
 #include "zpScripting.h"
-#include "angelscript.h"
+#include "zpAngelScript.h"
 
 #define AS_ASSERT( r )	if( (r) < asSUCCESS ) { return false; }
 
