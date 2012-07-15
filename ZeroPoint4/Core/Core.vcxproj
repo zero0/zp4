@@ -158,6 +158,7 @@
     <None Include="zpArray.inl" />
     <None Include="zpArrayList.inl" />
     <None Include="zpBaseTypesFpu.inl" />
+    <None Include="zpDelegate.inl" />
     <None Include="zpHashMap.inl" />
     <None Include="zpIntegerFpu.inl" />
     <None Include="zpIntegerSimd.inl" />

@@ -197,6 +197,9 @@
     <None Include="zpMatrix4f.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpDelegate.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">

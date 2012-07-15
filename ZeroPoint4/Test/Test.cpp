@@ -251,33 +251,34 @@ void scripting_test_main() {
 	
 }
 
-int fffff() { return 1010; };
+int fffff(int) { return 1010; };
 
 int main() {
-	zpDelegate<int ()> dd = zpCreateFunctionDelegate( fffff );
-
-	int ab = dd();
+	//zpDelegate<int ()> dd = zpCreateFunctionDelegate( fffff );
+	
+	//int ab = dd();
 
 	zpVector2f vec2;
 	vec2.set( 10, 12 );
 
-	zpDelegate<void ()> aa = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
+	//zpDelegate<void ()> aa = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
 
-	aa();
-
+	//aa();
+	zpCreateFunctionDelegate( fffff );
+	zpCreateMemberDelegate( &zpVector2f::set, &vec2 );
 
 	zpString str( "This string" );
 
-	zpDelegate<zp_uint ()> ss = zpCreateMemberDelegate( &zpString::size, &str );
+	//zpDelegate<zp_uint ()> ss = zpCreateMemberDelegate( &zpString::size, &str );
 
 
-	zp_uint size = ss();
+	//zp_uint size = ss();
 
-	zpArray<zpDelegate<void ()>> dels( 4 );
-	dels[0] = zpDelegateFunctionFactory<void>::Bind<core_test_main>();
-	dels[1] = zpDelegateFunctionFactory<void>::Bind<scripting_test_main>();
-	dels[2] = aa;
-	dels[3] = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
+	//zpArray<zpDelegate<void ()>> dels( 4 );
+	//dels[0] = zpDelegateFunctionFactory<void>::Bind<core_test_main>();
+	//dels[1] = zpDelegateFunctionFactory<void>::Bind<scripting_test_main>();
+	//dels[2] = aa;
+	//dels[3] = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
 
 	//core_test_main();
 	rendering_test_main();

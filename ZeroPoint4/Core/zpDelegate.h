@@ -2,6 +2,7 @@
 #ifndef ZP_DELEGATE_H
 #define ZP_DELEGATE_H
 
+#if 0
 template<typename R> class zpDelegate;
 
 template<typename R> class zpDelegateFunctionFactory;
@@ -104,19 +105,76 @@ public:
 };
 
 template<typename R>
-zpDelegateFunctionFactory<R> zpDelegateGetFactory( R (*)() ) {
+ZP_FORCE_INLINE zpDelegateFunctionFactory<R> zpDelegateGetFactory( R (*)() ) {
 	return zpDelegateFunctionFactory<R>();
 }
 
 template<typename R, typename T>
-zpDelegateMemberFactory<R, T> zpDelegateGetFactory( R (T::*)() ) {
+ZP_FORCE_INLINE zpDelegateMemberFactory<R, T> zpDelegateGetFactory( R (T::*)() ) {
 	return zpDelegateMemberFactory<R, T>();
 }
 
 template<typename R, typename T>
-zpDelegateConstMemberFactory<R, T> zpDelegateGetFactory( R (T::*)() const ) {
+ZP_FORCE_INLINE zpDelegateConstMemberFactory<R, T> zpDelegateGetFactory( R (T::*)() const ) {
 	return zpDelegateConstMemberFactory<R, T>();
 }
+#endif
+
+template<typename R> class zpDelegate;
+
+// 0 parameters
+
+#define DELEGATE_ARG_COUNT					0
+#define DELEGATE_COMMA
+#define DELEGATE_TEMPLATE_PARAMS
+#define DELEGATE_CLASS_TEMPLATE_ARGS
+#define DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS
+#define DELEGATE_OPERATOR_ARGS
+#define DELEGATE_OPERATOR_PARAMS
+#include "zpDelegate.inl"
+#undef DELEGATE_ARG_COUNT
+#undef DELEGATE_COMMA
+#undef DELEGATE_TEMPLATE_PARAMS
+#undef DELEGATE_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_OPERATOR_ARGS
+#undef DELEGATE_OPERATOR_PARAMS
+
+
+// 1 parameter
+#define DELEGATE_ARG_COUNT					1
+#define DELEGATE_COMMA						,
+#define DELEGATE_TEMPLATE_PARAMS			typename P1
+#define DELEGATE_CLASS_TEMPLATE_ARGS		P1
+#define DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS	typename FP1
+#define DELEGATE_OPERATOR_ARGS				P1 a1
+#define DELEGATE_OPERATOR_PARAMS			a1
+#include "zpDelegate.inl"
+#undef DELEGATE_ARG_COUNT
+#undef DELEGATE_COMMA
+#undef DELEGATE_TEMPLATE_PARAMS
+#undef DELEGATE_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_OPERATOR_ARGS
+#undef DELEGATE_OPERATOR_PARAMS
+
+// 2 parameters
+#define DELEGATE_ARG_COUNT					2
+#define DELEGATE_COMMA						,
+#define DELEGATE_TEMPLATE_PARAMS			typename P1, typename P2
+#define DELEGATE_CLASS_TEMPLATE_ARGS		P1, P2
+#define DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS	typename FP1, typename FP2
+#define DELEGATE_OPERATOR_ARGS				P1 a1, P2 a2
+#define DELEGATE_OPERATOR_PARAMS			a1, a2
+#include "zpDelegate.inl"
+#undef DELEGATE_ARG_COUNT
+#undef DELEGATE_COMMA
+#undef DELEGATE_TEMPLATE_PARAMS
+#undef DELEGATE_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_OPERATOR_ARGS
+#undef DELEGATE_OPERATOR_PARAMS
+
 
 #define zpCreateFunctionDelegate( func )			( zpDelegateGetFactory( func ).Bind<func>() )
 #define zpCreateMemberDelegate( memFunc, objPtr	)	( zpDelegateGetFactory( memFunc ).Bind<memFunc>( objPtr ) )
