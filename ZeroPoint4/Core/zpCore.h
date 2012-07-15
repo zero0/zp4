@@ -54,6 +54,8 @@
 
 #include "zpBaseTypes.h"
 
+template<typename R> class zpDelegate;
+
 ZP_PURE_INTERFACE zpRenderable;
 ZP_PURE_INTERFACE zpSerializable;
 ZP_PURE_INTERFACE zpSerializedOutput;
@@ -93,6 +95,8 @@ class zpGameObject;
 ZP_ABSTRACT_CLASS zpComponent;
 
 #include "zpMath.h"
+
+#include "zpDelegate.h"
 
 #include "zpRenderable.h"
 #include "zpSerializable.h"

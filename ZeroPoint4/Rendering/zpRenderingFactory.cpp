@@ -14,7 +14,7 @@ zpRenderingEngine* zpRenderingFactory::createRenderingEngine( zpRenderingEngineT
 			s_renderingEngine = new zpDX11RenderingEngine;
 			break;
 		case ZP_RENDERING_ENGINE_OPENGL:
-			s_renderingEngine = new zpOpenGLRenderingEngine;
+			//s_renderingEngine = new zpOpenGLRenderingEngine;
 			break;
 		}
 		if( s_renderingEngine ) s_renderingEngine->initialize();

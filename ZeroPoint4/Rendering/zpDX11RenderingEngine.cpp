@@ -181,7 +181,7 @@ zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat d
 	HR_MSG_V( hr, 0, "Unable to list display modes." );
 
 	zpArray<DXGI_MODE_DESC> modes( numModes );
-	hr = adapterOutput->GetDisplayModeList( format, DXGI_ENUM_MODES_INTERLACED, &numModes, modes );
+	hr = adapterOutput->GetDisplayModeList( format, DXGI_ENUM_MODES_INTERLACED, &numModes, modes.data() );
 	HR_MSG_V( hr, 0, "Unable to list display modes." );
 
 	zp_uint count = 0;

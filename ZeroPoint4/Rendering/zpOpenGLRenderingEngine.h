@@ -2,6 +2,7 @@
 #ifndef ZP_OPENGL_RENDERING_ENGINE_H
 #define ZP_OPENGL_RENDERING_ENGINE_H
 
+#if 0
 class zpOpenGLRenderingEngine : public zpRenderingEngine {
 public:
 	~zpOpenGLRenderingEngine();
@@ -54,5 +55,6 @@ private:
 
 	friend class zpRenderingFactory;
 };
+#endif
 
 #endif

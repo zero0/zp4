@@ -132,6 +132,9 @@
     <ClInclude Include="zpFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpDelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">

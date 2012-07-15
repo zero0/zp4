@@ -121,6 +121,7 @@
     <ClInclude Include="zpColor4f.h" />
     <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
+    <ClInclude Include="zpDelegate.h" />
     <ClInclude Include="zpFile.h" />
     <ClInclude Include="zpFlag.h" />
     <ClInclude Include="zpGame.h" />

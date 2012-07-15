@@ -51,11 +51,11 @@ const T& zpArray<T>::operator[]( zp_uint index ) const {
 }
 
 template<typename T>
-zpArray<T>::operator T*() {
+T* zpArray<T>::data() {
 	return m_array;
 }
 template<typename T>
-zpArray<T>::operator const T*() const {
+const T* zpArray<T>::data() const {
 	return m_array;
 }
 

@@ -17,8 +17,8 @@ public:
 	T& operator[]( zp_uint index );
 	const T& operator[]( zp_uint index ) const;
 
-	operator T*();
-	operator const T*() const;
+	T* data();
+	const T* data() const;
 
 	const T& at( zp_uint index ) const;
 

@@ -1,9 +1,12 @@
 #include "zpRendering.h"
+
+#if 0
 #include "zpOpenGL.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#define GLEW_STATIC
 #include <GL\glew.h>
 #include <GL\wglew.h>
 
@@ -30,6 +33,8 @@ zp_bool zpOpenGLRenderingEngine::create() {
 
 	zp_bool formatSet = SetPixelFormat( hdc, pixelFormatIndex, &pfd ) == 1;
 	if( !formatSet ) return false;
+
+	if( glewInit() != GLEW_OK ) return false;
 
 	return true;
 }
@@ -71,3 +76,5 @@ zp_bool zpOpenGLRenderingEngine::initialize() {
 	return true;
 }
 void zpOpenGLRenderingEngine::shutdown() {}
+
+#endif
