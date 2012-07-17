@@ -175,6 +175,22 @@ template<typename R> class zpDelegate;
 #undef DELEGATE_OPERATOR_ARGS
 #undef DELEGATE_OPERATOR_PARAMS
 
+// 3 parameters
+#define DELEGATE_ARG_COUNT					3
+#define DELEGATE_COMMA						,
+#define DELEGATE_TEMPLATE_PARAMS			typename P1, typename P2, typename P3
+#define DELEGATE_CLASS_TEMPLATE_ARGS		P1, P2, P3
+#define DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS	typename FP1, typename FP2, typename FP3
+#define DELEGATE_OPERATOR_ARGS				P1 a1, P2 a2, P3 a3
+#define DELEGATE_OPERATOR_PARAMS			a1, a2, a3
+#include "zpDelegate.inl"
+#undef DELEGATE_ARG_COUNT
+#undef DELEGATE_COMMA
+#undef DELEGATE_TEMPLATE_PARAMS
+#undef DELEGATE_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_OPERATOR_ARGS
+#undef DELEGATE_OPERATOR_PARAMS
 
 #define zpCreateFunctionDelegate( func )			( zpDelegateGetFactory( func ).Bind<func>() )
 #define zpCreateMemberDelegate( memFunc, objPtr	)	( zpDelegateGetFactory( memFunc ).Bind<memFunc>( objPtr ) )
