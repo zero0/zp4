@@ -48,6 +48,9 @@ public:
 	operator zp_bool() const { return m_function == ZP_NULL ? false : m_object != ZP_NULL; }
 	zp_bool operator!() const { return !( operator zp_bool() ); }
 
+	zp_bool operator==( const zpDelegate& other ) { return m_function == ZP_NULL && m_object == ZP_NULL; }
+	zp_bool operator!=( const zpDelegate& other ) { return !( operator==( other ) ); }
+
 private:
 	typedef R (*FuncType)( void* DELEGATE_COMMA DELEGATE_CLASS_TEMPLATE_ARGS );
 

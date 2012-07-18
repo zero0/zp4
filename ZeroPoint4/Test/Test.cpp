@@ -259,6 +259,7 @@ int main() {
 	//int ab = dd();
 
 	zpVector2f vec2;
+	zpVector4f vec4;
 	vec2.set( 10, 12 );
 
 	//zpDelegate<void ()> aa = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
@@ -266,6 +267,7 @@ int main() {
 	//aa();
 	zpCreateFunctionDelegate( fffff );
 	zpCreateMemberDelegate( &zpVector2f::set, &vec2 );
+	zpCreateMemberDelegate( &zpVector4f::setX, &vec4 );
 
 	zpString str( "This string" );
 
