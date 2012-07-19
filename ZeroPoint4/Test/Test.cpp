@@ -251,7 +251,7 @@ void scripting_test_main() {
 	
 }
 
-int fffff(int) { return 1010; };
+int fffff(int, float, void*, int) { return 1010; };
 
 int main() {
 	//zpDelegate<int ()> dd = zpCreateFunctionDelegate( fffff );

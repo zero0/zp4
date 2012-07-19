@@ -2,8 +2,9 @@
 #ifndef ZP_DELEGATE_H
 #define ZP_DELEGATE_H
 
-template<typename R> class zpDelegate;
 #if 0
+template<typename R> class zpDelegate;
+
 template<typename R> class zpDelegateFunctionFactory;
 template<typename R, typename T> class zpDelegateMemberFactory;
 template<typename R, typename T> class zpDelegateConstMemberFactory;
