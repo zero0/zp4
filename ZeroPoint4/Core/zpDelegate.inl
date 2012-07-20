@@ -70,6 +70,32 @@ private:
 	friend class CONST_FACTORY_CLASS;
 };
 
+// Argument specific zpDelegateEvent
+template<typename R DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS>
+class zpDelegateEvent<R ( DELEGATE_CLASS_TEMPLATE_ARGS )> {
+public:
+	zpDelegateEvent() {}
+	~zpDelegateEvent() { clear(); }
+
+	void operator+=( const zpDelegate& del ) { m_delegates.pushBack( del ); }
+	void operator-=( const zpDelegate& del ) { m_delegates.removeAll( del ); }
+
+	void add( const zpDelegate& del ) { m_delegates.pushBack( del ); }
+	void remove( const zpDelegate& del ) { m_delegates.removeAll( del ); }
+	void clear() { m_delegates.clear(); }
+
+	zp_uint size() const { return m_delegates.size(); }
+
+	void operator()( DELEGATE_OPERATOR_ARGS ) {
+		m_delegates.foreach( [ DELEGATE_OPERATOR_REF_PARAMS ]( const zpDelegate& del ) {
+			del( DELEGATE_OPERATOR_PARAMS );
+		} );
+	}
+
+private:
+	zpArrayList<zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>> m_delegates;
+};
+
 // Function Factory Class
 template<typename R DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS>
 class FUNC_FACTORY_CLASS {
