@@ -207,6 +207,40 @@ template<typename T> class zpDelegate;
 #undef DELEGATE_OPERATOR_ARGS
 #undef DELEGATE_OPERATOR_PARAMS
 
+// 5 parameters
+#define DELEGATE_ARG_COUNT					5
+#define DELEGATE_COMMA						,
+#define DELEGATE_TEMPLATE_PARAMS			typename P1, typename P2, typename P3, typename P4, typename P5
+#define DELEGATE_CLASS_TEMPLATE_ARGS		P1, P2, P3, P4, P5
+#define DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS	typename FP1, typename FP2, typename FP3, typename FP4, typename FP5
+#define DELEGATE_OPERATOR_ARGS				P1 a1, P2 a2, P3 a3, P4 a4, P5 a5
+#define DELEGATE_OPERATOR_PARAMS			a1, a2, a3, a4, a5
+#include "zpDelegate.inl"
+#undef DELEGATE_ARG_COUNT
+#undef DELEGATE_COMMA
+#undef DELEGATE_TEMPLATE_PARAMS
+#undef DELEGATE_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_OPERATOR_ARGS
+#undef DELEGATE_OPERATOR_PARAMS
+
+// 6 parameters
+#define DELEGATE_ARG_COUNT					6
+#define DELEGATE_COMMA						,
+#define DELEGATE_TEMPLATE_PARAMS			typename P1, typename P2, typename P3, typename P4, typename P5, typename P6
+#define DELEGATE_CLASS_TEMPLATE_ARGS		P1, P2, P3, P4, P5, P6
+#define DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS	typename FP1, typename FP2, typename FP3, typename FP4, typename FP5, typename FP6
+#define DELEGATE_OPERATOR_ARGS				P1 a1, P2 a2, P3 a3, P4 a4, P5 a5, P6 a6
+#define DELEGATE_OPERATOR_PARAMS			a1, a2, a3, a4, a5, a6
+#include "zpDelegate.inl"
+#undef DELEGATE_ARG_COUNT
+#undef DELEGATE_COMMA
+#undef DELEGATE_TEMPLATE_PARAMS
+#undef DELEGATE_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_FRIEND_CLASS_TEMPLATE_ARGS
+#undef DELEGATE_OPERATOR_ARGS
+#undef DELEGATE_OPERATOR_PARAMS
+
 #define zpCreateFunctionDelegate( func )			( zpDelegateGetFactory( func ).Bind<func>() )
 #define zpCreateMemberDelegate( memFunc, objPtr	)	( zpDelegateGetFactory( memFunc ).Bind<memFunc>( objPtr ) )
 
