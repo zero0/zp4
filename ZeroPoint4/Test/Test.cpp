@@ -265,16 +265,20 @@ int main() {
 	//zpDelegate<void ()> aa = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
 
 	//aa();
-	zpCreateFunctionDelegate( fffff );
-	zpCreateMemberDelegate( &zpVector2f::set, &vec2 );
+	zpDelegate<int( int, float, void*, int )> vi = zpCreateFunctionDelegate( fffff );
+	zpDelegate<void(  )> ss = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
 	zpCreateMemberDelegate( &zpVector4f::setX, &vec4 );
+
+	//zpDelegateFunctionFactory4<int, int, float, void*, int>::Bind<fffff>();
 
 	zpString str( "This string" );
 
-	//zpDelegate<zp_uint ()> ss = zpCreateMemberDelegate( &zpString::size, &str );
+	zpDelegate<zp_uint ()> ssss = zpCreateMemberDelegate( &zpString::size, &str );
 
 
-	//zp_uint size = ss();
+	int vv = vi( 1, 2.f, 0, 0 );
+	ss();
+	zp_uint strSize = ssss();
 
 	//zpArray<zpDelegate<void ()>> dels( 4 );
 	//dels[0] = zpDelegateFunctionFactory<void>::Bind<core_test_main>();

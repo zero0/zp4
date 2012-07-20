@@ -18,6 +18,7 @@ template<typename R DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS> class FUNC_FACTORY_
 template<typename R, typename T DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS> class MEMB_FACTORY_CLASS;
 template<typename R, typename T DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS> class CONST_FACTORY_CLASS;
 
+// Argument specific zpDelegate
 template<typename R DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS>
 class zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )> {
 public:
@@ -69,6 +70,7 @@ private:
 	friend class CONST_FACTORY_CLASS;
 };
 
+// Function Factory Class
 template<typename R DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS>
 class FUNC_FACTORY_CLASS {
 private:
@@ -80,10 +82,11 @@ private:
 public:
 	template<R (*Func)( DELEGATE_CLASS_TEMPLATE_ARGS )>
 	ZP_INLINE static zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )> Bind() {
-		return zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>( &FUNC_FACTORY_CLASS::Wrapper<Func DELEGATE_COMMA DELEGATE_CLASS_TEMPLATE_ARGS>, ZP_NULL );
+		return zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>( &FUNC_FACTORY_CLASS::Wrapper<Func>, ZP_NULL );
 	}
 };
 
+// Member Function Factory Class
 template<typename R, typename T DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS>
 class MEMB_FACTORY_CLASS {
 private:
@@ -96,10 +99,11 @@ private:
 public:
 	template<R (T::*Func)( DELEGATE_CLASS_TEMPLATE_ARGS )>
 	ZP_INLINE static zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )> Bind( T* obj ) {
-		return zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>( &MEMB_FACTORY_CLASS::Wrapper<Func DELEGATE_COMMA DELEGATE_CLASS_TEMPLATE_ARGS>, static_cast<void*>( obj ) );
+		return zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>( &MEMB_FACTORY_CLASS::Wrapper<Func>, static_cast<void*>( obj ) );
 	}
 };
 
+// Const Member Function Factory Class
 template<typename R, typename T DELEGATE_COMMA DELEGATE_TEMPLATE_PARAMS>
 class CONST_FACTORY_CLASS {
 private:
@@ -112,7 +116,7 @@ private:
 public:
 	template<R (T::*Func)( DELEGATE_CLASS_TEMPLATE_ARGS ) const>
 	ZP_INLINE static zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )> Bind( T* obj ) {
-		return zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS ) const>( &CONST_FACTORY_CLASS::Wrapper<Func DELEGATE_COMMA DELEGATE_CLASS_TEMPLATE_ARGS>, static_cast<void*>( obj ) );
+		return zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>( &CONST_FACTORY_CLASS::Wrapper<Func>, static_cast<void*>( obj ) );
 	}
 };
 

@@ -120,7 +120,7 @@ ZP_FORCE_INLINE zpDelegateConstMemberFactory<R, T> zpDelegateGetFactory( R (T::*
 }
 #endif
 
-template<typename R> class zpDelegate;
+template<typename T> class zpDelegate;
 
 // 0 parameters
 #define DELEGATE_ARG_COUNT					0

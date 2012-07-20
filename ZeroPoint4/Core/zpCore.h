@@ -54,8 +54,6 @@
 
 #include "zpBaseTypes.h"
 
-template<typename R> class zpDelegate;
-
 ZP_PURE_INTERFACE zpRenderable;
 ZP_PURE_INTERFACE zpSerializable;
 ZP_PURE_INTERFACE zpSerializedOutput;
