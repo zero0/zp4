@@ -252,6 +252,9 @@ void scripting_test_main() {
 }
 
 int fffff(int, float, void*, int) { return 1010; };
+void asdf( int a ) { zp_printfln( "asdf: %d", a ); }
+void qwerty( int a ) { zp_printfln( "asdf: %d", a * 2 ); }
+void zxcvb( int a ) { zp_printfln( "asdf: %d", a + 1 ); }
 
 int main() {
 	//zpDelegate<int ()> dd = zpCreateFunctionDelegate( fffff );
@@ -260,6 +263,7 @@ int main() {
 
 	zpVector2f vec2;
 	zpVector4f vec4;
+	zpVector2i vec2i;
 	vec2.set( 10, 12 );
 
 	//zpDelegate<void ()> aa = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
@@ -275,6 +279,13 @@ int main() {
 
 	zpDelegate<zp_uint ()> ssss = zpCreateMemberDelegate( &zpString::size, &str );
 
+	zpDelegateEvent<void( int )> de;
+	de += zpCreateFunctionDelegate( asdf );
+	de += zpCreateFunctionDelegate( qwerty );
+	de += zpCreateFunctionDelegate( zxcvb );
+	de += zpCreateMemberDelegate( &zpVector2i::setX, &vec2i );
+
+	de( 10 );
 
 	int vv = vi( 1, 2.f, 0, 0 );
 	ss();

@@ -77,17 +77,17 @@ public:
 	zpDelegateEvent() {}
 	~zpDelegateEvent() { clear(); }
 
-	void operator+=( const zpDelegate& del ) { m_delegates.pushBack( del ); }
-	void operator-=( const zpDelegate& del ) { m_delegates.removeAll( del ); }
+	void operator+=( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.pushBack( del ); }
+	void operator-=( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.removeAll( del ); }
 
-	void add( const zpDelegate& del ) { m_delegates.pushBack( del ); }
-	void remove( const zpDelegate& del ) { m_delegates.removeAll( del ); }
+	void add( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.pushBack( del ); }
+	void remove( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.removeAll( del ); }
 	void clear() { m_delegates.clear(); }
 
 	zp_uint size() const { return m_delegates.size(); }
 
 	void operator()( DELEGATE_OPERATOR_ARGS ) {
-		m_delegates.foreach( [ DELEGATE_OPERATOR_REF_PARAMS ]( const zpDelegate& del ) {
+		m_delegates.foreach( [ DELEGATE_OPERATOR_REF_PARAMS ]( zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) {
 			del( DELEGATE_OPERATOR_PARAMS );
 		} );
 	}
