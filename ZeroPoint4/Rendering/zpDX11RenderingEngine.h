@@ -44,6 +44,7 @@ public:
 	zpBuffer* createBuffer();
 
 	zpTextureResource* createTextureResource();
+	zpShaderResource* createShaderResource();
 
 	zpRenderTarget* createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height );
 	zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpRenderingDisplayFormat* formats, zp_uint width, zp_uint height );

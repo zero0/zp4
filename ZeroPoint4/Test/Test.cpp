@@ -198,7 +198,6 @@ void rendering_test_main() {
 
 	prop.save( "test.properties" );
 
-
 	zpProperties prop2;
 	prop2.load( "test.properties" );
 	prop2.foreach( []( const zpString& key, const zpString& value ) {

@@ -319,6 +319,9 @@ zpBuffer* zpDX11RenderingEngine::createBuffer() {
 zpTextureResource* zpDX11RenderingEngine::createTextureResource() {
 	return new zpDX11TextureResource();
 }
+zpShaderResource* zpDX11RenderingEngine::createShaderResource() {
+	return new zpDX11ShaderResource();
+}
 
 zpRenderTarget* zpDX11RenderingEngine::createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) {
 	HRESULT hr;

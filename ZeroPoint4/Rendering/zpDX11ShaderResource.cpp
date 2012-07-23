@@ -112,6 +112,7 @@ zp_bool zpDX11ShaderResource::load() {
 	if( shaderProperties.hasProperty( "shader.vs" ) ) {
 		zpString function = shaderProperties[ "shader.vs" ];
 		zpString layout = shaderProperties[ "shader.vs.layout" ];
+		// @TODO: implement vertex shader layout
 	}
 
 	// if the geometry shader function is defined for this shader, compile and create it
@@ -133,7 +134,7 @@ zp_bool zpDX11ShaderResource::load() {
 					zp_printfln( "Failed to create Geometry Shader %s", shaderFile.c_str() );
 				}
 			} else {
-
+				// @TODO: implement stream-out for geometry shader
 			}
 		}
 	}
@@ -166,4 +167,17 @@ void zpDX11ShaderResource::unload() {
 	ZP_SAFE_RELEASE( m_pixelShader );
 	ZP_SAFE_RELEASE( m_geometryShader );
 	ZP_SAFE_RELEASE( m_computeShader );
+}
+
+ID3D11VertexShader* zpDX11ShaderResource::getVertexShader() {
+	return m_vertexShader;
+}
+ID3D11PixelShader* zpDX11ShaderResource::getPixelShader() {
+	return m_pixelShader;
+}
+ID3D11GeometryShader* zpDX11ShaderResource::getGeometryShader() {
+	return m_geometryShader;
+}
+ID3D11ComputeShader* zpDX11ShaderResource::getComputeShader() {
+	return m_computeShader;
 }

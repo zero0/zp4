@@ -33,6 +33,7 @@ public:
 	virtual zpBuffer* createBuffer() = 0;
 
 	virtual zpTextureResource* createTextureResource() = 0;
+	virtual zpShaderResource* createShaderResource() = 0;
 
 	virtual zpRenderTarget* createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) = 0;
 	virtual zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpRenderingDisplayFormat* formats, zp_uint width, zp_uint height ) = 0;

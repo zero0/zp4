@@ -16,10 +16,17 @@ public:
 	void unload();
 
 private:
+	ID3D11VertexShader* getVertexShader();
+	ID3D11PixelShader* getPixelShader();
+	ID3D11GeometryShader* getGeometryShader();
+	ID3D11ComputeShader* getComputeShader();
+
 	ID3D11VertexShader* m_vertexShader;
 	ID3D11PixelShader* m_pixelShader;
 	ID3D11GeometryShader* m_geometryShader;
 	ID3D11ComputeShader* m_computeShader;
+
+	friend class zpDX11RenderingContext;
 };
 
 #endif
