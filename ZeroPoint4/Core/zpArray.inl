@@ -106,6 +106,17 @@ zp_uint zpArray<T>::lastIndexOf( const T& val ) const {
 	return npos;
 }
 
+template<typename T>
+void zpArray<T>::fill( const T* vals, zp_uint size, zp_uint startIndex ) {
+	if( startIndex > m_size ) return;
+	zp_uint count = m_size - startIndex;
+	count = ZP_MIN( count, size );
+
+	for( zp_uint i = startIndex, j = 0; i < count; ++i, ++j ) {
+		m_array[ i ] = vals[ j ];
+	}
+}
+
 template<typename T> template<typename Func>
 void zpArray<T>::foreach( Func func ) const {
 	for( zp_uint i = 0; i < m_size; ++i ) {

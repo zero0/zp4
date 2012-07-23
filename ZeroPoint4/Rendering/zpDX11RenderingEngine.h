@@ -32,19 +32,22 @@ public:
 	void setWindow( zpWindow* window );
 	zpWindow* getWindow() const;
 
-	void setClearColor( const zpColor4f& color, zp_uint renderTargetIndex = 0 );
-	const zpColor4f& getClearColor( zp_uint renderTargetIndex = 0 ) const;
-
-	void clear();
 	void present();
 
-	zpRenderingContext* createRenderingContext();
-	void setCurrentRenderingContext( zpRenderingContext* context );
-	zpRenderingContext* getCurrentRenderingContext() const;
+	zpRenderingContext* createRenderingContext( const zpString& name );
+	zp_bool removeRenderingContext( const zpString& name );
+	zpRenderingContext* getRenderingContextByIndex( zp_uint index ) const;
+	zpRenderingContext* getRenderingContext( const zpString& name ) const;
+	zp_uint getRenderingContextCount() const;
+	zpRenderingContext* getImmediateRenderingContext() const;
 
 	zpBuffer* createBuffer();
 
 	zpTextureResource* createTextureResource();
+
+	zpRenderTarget* createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height );
+	zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpRenderingDisplayFormat* formats, zp_uint width, zp_uint height );
+	zpDepthStencilBuffer* createDepthBuffer( zpRenderingDisplayFormat format, zp_uint width, zp_uint height );
 
 protected:
 	zp_bool initialize();
@@ -59,21 +62,20 @@ private:
 	IDXGIAdapter* m_dxgiAdapter;
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_d3dDevice;
-	ID3D11DeviceContext* m_immediateContext;
-
-	ID3D11Texture2D* m_backBuffer;
-	ID3D11RenderTargetView* m_backBufferView;
-
-	ID3D11Texture2D* m_depthBuffer;
-	ID3D11DepthStencilView* m_depthBufferView;
 
 	zpWindow* m_window;
+
+	zpRenderingContext* m_immediateContext;
+	zpRenderTarget* m_immediateRenderTarget;
+	zpDepthStencilBuffer* m_immediateDepthStencilBuffer;
 
 	zpRenderingScreenMode m_screenMode;
 	zpRenderingDisplayMode m_displayMode;
 	zpRenderingEngineType m_engineType;
 
 	zpColor4f m_clearColor;
+
+	zpArrayList<zpRenderingContext*> m_contexts;
 
 	friend class zpRenderingFactory;
 	friend class zpDX11Buffer;

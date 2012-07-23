@@ -81,6 +81,18 @@
     <ClInclude Include="zpOpenGLRenderingEngine.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="zpRenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDepthStencilBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11RenderTarget.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11DepthStencilBuffer.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -115,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="zpOpenGLRenderingEngine.cpp">
       <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11RenderTarget.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11DepthStencilBuffer.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -31,7 +31,9 @@ void zpRenderingManager::onDestroy() {
 }
 
 void zpRenderingManager::onUpdate() {
-	m_engine->clear();
+	//m_engine->clear();
+	zpColor4f c(.23f, .15f, .88f, 1.f );
+	m_engine->getImmediateRenderingContext()->clearRenderTarget( &c );
 
 	m_engine->present();
 }

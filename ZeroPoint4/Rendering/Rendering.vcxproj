@@ -82,12 +82,15 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpDepthStencilBuffer.h" />
     <ClInclude Include="zpBuffer.h" />
     <ClInclude Include="zpCamera.h" />
     <ClInclude Include="zpDX11.h" />
     <ClInclude Include="zpDX11Buffer.h" />
+    <ClInclude Include="zpDX11DepthStencilBuffer.h" />
     <ClInclude Include="zpDX11RenderingContext.h" />
     <ClInclude Include="zpDX11RenderingEngine.h" />
+    <ClInclude Include="zpDX11RenderTarget.h" />
     <ClInclude Include="zpDX11ShaderResource.h" />
     <ClInclude Include="zpDX11TextureResource.h" />
     <ClInclude Include="zpOpenGL.h" />
@@ -98,13 +101,16 @@
     <ClInclude Include="zpRenderingFactory.h" />
     <ClInclude Include="zpRenderingManager.h" />
     <ClInclude Include="zpRenderingResourceCreator.h" />
+    <ClInclude Include="zpRenderTarget.h" />
     <ClInclude Include="zpShaderResource.h" />
     <ClInclude Include="zpTextureResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpDX11Buffer.cpp" />
+    <ClCompile Include="zpDX11DepthStencilBuffer.cpp" />
     <ClCompile Include="zpDX11RenderingContext.cpp" />
     <ClCompile Include="zpDX11RenderingEngine.cpp" />
+    <ClCompile Include="zpDX11RenderTarget.cpp" />
     <ClCompile Include="zpDX11ShaderResource.cpp" />
     <ClCompile Include="zpDX11TextureResource.cpp" />
     <ClCompile Include="zpOpenGL.cpp" />

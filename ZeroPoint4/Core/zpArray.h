@@ -32,6 +32,8 @@ public:
 	zp_uint indexOf( const T& val ) const;
 	zp_uint lastIndexOf( const T& val ) const;
 
+	void fill( const T* vals, zp_uint size, zp_uint startIndex = 0 );
+
 	template<typename Func>
 	void foreach( Func func ) const;
 	template<typename Func>

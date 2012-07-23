@@ -21,19 +21,22 @@ public:
 	virtual void setWindow( zpWindow* window ) = 0;
 	virtual zpWindow* getWindow() const = 0;
 
-	virtual void setClearColor( const zpColor4f& color, zp_uint renderTargetIndex = 0 ) = 0;
-	virtual const zpColor4f& getClearColor( zp_uint renderTargetIndex = 0 ) const = 0;
-
-	virtual void clear() = 0;
 	virtual void present() = 0;
 
-	virtual zpRenderingContext* createRenderingContext() = 0;
-	virtual void setCurrentRenderingContext( zpRenderingContext* context ) = 0;
-	virtual zpRenderingContext* getCurrentRenderingContext() const = 0;
+	virtual zpRenderingContext* createRenderingContext( const zpString& name ) = 0;
+	virtual zp_bool removeRenderingContext( const zpString& name ) = 0;
+	virtual zpRenderingContext* getRenderingContextByIndex( zp_uint index ) const = 0;
+	virtual zpRenderingContext* getRenderingContext( const zpString& name ) const = 0;
+	virtual zp_uint getRenderingContextCount() const = 0;
+	virtual zpRenderingContext* getImmediateRenderingContext() const = 0;
 
 	virtual zpBuffer* createBuffer() = 0;
 
 	virtual zpTextureResource* createTextureResource() = 0;
+
+	virtual zpRenderTarget* createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) = 0;
+	virtual zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpRenderingDisplayFormat* formats, zp_uint width, zp_uint height ) = 0;
+	virtual zpDepthStencilBuffer* createDepthBuffer( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) = 0;
 
 protected:
 	virtual zp_bool initialize() = 0;

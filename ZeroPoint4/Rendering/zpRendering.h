@@ -9,6 +9,8 @@
 #define ZP_DIRECTX_SUPPORT		1
 #endif
 
+#define ZP_RENDER_TARGET_MAX_COUNT		8
+
 enum zpRenderingEngineType {
 	ZP_RENDERING_ENGINE_NONE =			0,
 
@@ -36,6 +38,8 @@ enum zpRenderingDisplayFormat {
 	ZP_RENDERING_DISPLAY_FORMAT_R32_UINT,
 	ZP_RENDERING_DISPLAY_FORMAT_R32_SINT,
 	ZP_RENDERING_DISPLAY_FORMAT_R32_FLOAT,
+
+	ZP_RENDERING_DISPLAY_FORMAT_R24G8,
 };
 
 enum zpRenderingScreenMode {
@@ -79,7 +83,11 @@ enum zpRenderingMapType {
 ZP_PURE_INTERFACE zpShaderResource;
 ZP_PURE_INTERFACE zpTextureResource;
 class zpRenderingResourceCreator;
+
 ZP_PURE_INTERFACE zpBuffer;
+ZP_PURE_INTERFACE zpRenderTarget;
+ZP_PURE_INTERFACE zpDepthStencilBuffer;
+
 ZP_PURE_INTERFACE zpRenderingContext;
 ZP_PURE_INTERFACE zpRenderingEngine;
 class zpRenderingFactory;
@@ -90,7 +98,11 @@ class zpRenderingManager;
 #include "zpShaderResource.h"
 #include "zpTextureResource.h"
 #include "zpRenderingResourceCreator.h"
+
 #include "zpBuffer.h"
+#include "zpRenderTarget.h"
+#include "zpDepthStencilBuffer.h"
+
 #include "zpRenderingContext.h"
 #include "zpRenderingEngine.h"
 #include "zpRenderingFactory.h"

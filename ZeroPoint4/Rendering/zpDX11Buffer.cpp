@@ -60,15 +60,15 @@ void zpDX11Buffer::release() {
 }
 
 void zpDX11Buffer::map( void** data, zpRenderingMapType mapType, zp_uint subResource ) {
-	zpRenderingFactory::getRenderingEngine()->getCurrentRenderingContext()->map( this, mapType, 0, data );
+	zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext()->map( this, mapType, 0, data );
 }
 void zpDX11Buffer::unmap( zp_uint subResource ) {
-	zpRenderingFactory::getRenderingEngine()->getCurrentRenderingContext()->unmap( this, subResource );
+	zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext()->unmap( this, subResource );
 }
 
 void zpDX11Buffer::update( zp_uint count, void* data ) {
 	void* d;
-	zpRenderingContext* context = zpRenderingFactory::getRenderingEngine()->getCurrentRenderingContext();
+	zpRenderingContext* context = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 	count = ZP_MIN( m_count, count );
 	
 	context->map( this, ZP_RENDERING_MAP_TYPE_WRITE_DISCARD, 0, &d );
