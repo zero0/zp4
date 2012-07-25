@@ -20,14 +20,14 @@ public:
 
 	zpRenderingEngineType getEngineType() const;
 
-	zp_uint enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes );
-	zp_bool findClosestDisplayMode( const zpRenderingDisplayMode& displayMode, zpRenderingDisplayMode* outDisplayMode );
+	zp_uint enumerateDisplayModes( zpDisplayFormat displayFormat, zpArrayList<zpDisplayMode>* outDisplayModes );
+	zp_bool findClosestDisplayMode( const zpDisplayMode& displayMode, zpDisplayMode* outDisplayMode );
 
-	void setDisplayMode( const zpRenderingDisplayMode& mode );
-	const zpRenderingDisplayMode& getDisplayMode() const;
+	void setDisplayMode( const zpDisplayMode& mode );
+	const zpDisplayMode& getDisplayMode() const;
 
-	void setScreenMode( zpRenderingScreenMode mode );
-	zpRenderingScreenMode getScreenMode() const;
+	void setScreenMode( zpScreenMode mode );
+	zpScreenMode getScreenMode() const;
 
 	void setWindow( zpWindow* window );
 	zpWindow* getWindow() const;
@@ -46,9 +46,11 @@ public:
 	zpTextureResource* createTextureResource();
 	zpShaderResource* createShaderResource();
 
-	zpRenderTarget* createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height );
-	zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpRenderingDisplayFormat* formats, zp_uint width, zp_uint height );
-	zpDepthStencilBuffer* createDepthBuffer( zpRenderingDisplayFormat format, zp_uint width, zp_uint height );
+	zpRenderTarget* createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height );
+	zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height );
+	zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height );
+
+	zpVertexLayout* createVertexLayout();
 
 protected:
 	zp_bool initialize();
@@ -70,8 +72,8 @@ private:
 	zpRenderTarget* m_immediateRenderTarget;
 	zpDepthStencilBuffer* m_immediateDepthStencilBuffer;
 
-	zpRenderingScreenMode m_screenMode;
-	zpRenderingDisplayMode m_displayMode;
+	zpScreenMode m_screenMode;
+	zpDisplayMode m_displayMode;
 	zpRenderingEngineType m_engineType;
 
 	zpColor4f m_clearColor;

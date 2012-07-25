@@ -9,14 +9,14 @@ public:
 
 	virtual zpRenderingEngineType getEngineType() const = 0;
 
-	virtual zp_uint enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes ) = 0;
-	virtual zp_bool findClosestDisplayMode( const zpRenderingDisplayMode& displayMode, zpRenderingDisplayMode* outDisplayMode ) = 0;
+	virtual zp_uint enumerateDisplayModes( zpDisplayFormat displayFormat, zpArrayList<zpDisplayMode>* outDisplayModes ) = 0;
+	virtual zp_bool findClosestDisplayMode( const zpDisplayMode& displayMode, zpDisplayMode* outDisplayMode ) = 0;
 	
-	virtual void setDisplayMode( const zpRenderingDisplayMode& mode ) = 0;
-	virtual const zpRenderingDisplayMode& getDisplayMode() const = 0;
+	virtual void setDisplayMode( const zpDisplayMode& mode ) = 0;
+	virtual const zpDisplayMode& getDisplayMode() const = 0;
 
-	virtual void setScreenMode( zpRenderingScreenMode mode ) = 0;
-	virtual zpRenderingScreenMode getScreenMode() const = 0;
+	virtual void setScreenMode( zpScreenMode mode ) = 0;
+	virtual zpScreenMode getScreenMode() const = 0;
 
 	virtual void setWindow( zpWindow* window ) = 0;
 	virtual zpWindow* getWindow() const = 0;
@@ -35,9 +35,11 @@ public:
 	virtual zpTextureResource* createTextureResource() = 0;
 	virtual zpShaderResource* createShaderResource() = 0;
 
-	virtual zpRenderTarget* createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) = 0;
-	virtual zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpRenderingDisplayFormat* formats, zp_uint width, zp_uint height ) = 0;
-	virtual zpDepthStencilBuffer* createDepthBuffer( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) = 0;
+	virtual zpRenderTarget* createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height ) = 0;
+	virtual zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height ) = 0;
+	virtual zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) = 0;
+
+	virtual zpVertexLayout* createVertexLayout() = 0;
 
 protected:
 	virtual zp_bool initialize() = 0;

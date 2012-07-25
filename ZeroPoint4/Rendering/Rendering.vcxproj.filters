@@ -93,6 +93,15 @@
     <ClInclude Include="zpDX11DepthStencilBuffer.h">
       <Filter>Header Files\DirectX 11</Filter>
     </ClInclude>
+    <ClInclude Include="zpDX11Util.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
+    <ClInclude Include="zpVertexLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11VertexLayout.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -132,6 +141,9 @@
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
     <ClCompile Include="zpDX11DepthStencilBuffer.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11VertexLayout.cpp">
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
   </ItemGroup>

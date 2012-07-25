@@ -49,7 +49,7 @@ void zpOpenGLRenderingEngine::setDisplayMode( const zpRenderingDisplayMode& mode
 const zpRenderingDisplayMode& zpOpenGLRenderingEngine::getDisplayMode() const { return zpRenderingDisplayMode(); }
 
 void zpOpenGLRenderingEngine::setScreenMode( zpRenderingScreenMode mode ) {}
-zpRenderingScreenMode zpOpenGLRenderingEngine::getScreenMode() const { return ZP_RENDERING_SCREEN_MODE_WINDOWED; }
+zpRenderingScreenMode zpOpenGLRenderingEngine::getScreenMode() const { return ZP_SCREEN_MODE_WINDOWED; }
 
 void zpOpenGLRenderingEngine::setWindow( zpWindow* window ) {
 	m_window = window;

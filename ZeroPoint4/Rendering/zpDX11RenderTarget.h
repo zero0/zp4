@@ -12,7 +12,7 @@ public:
 	zp_uint getWidth() const;
 	zp_uint getHeight() const;
 
-	zp_uint getDisplayFormat( zpRenderingDisplayFormat* formats ) const;
+	zp_uint getDisplayFormat( zpDisplayFormat* formats ) const;
 
 	zp_uint getNumberOfTargets() const;
 

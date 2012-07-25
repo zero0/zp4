@@ -7,7 +7,7 @@ public:
 	virtual zp_uint getWidth() const = 0;
 	virtual zp_uint getHeight() const = 0;
 
-	virtual zp_uint getDisplayFormat( zpRenderingDisplayFormat* formats ) const = 0;
+	virtual zp_uint getDisplayFormat( zpDisplayFormat* formats ) const = 0;
 
 	virtual zp_uint getNumberOfTargets() const = 0;
 };

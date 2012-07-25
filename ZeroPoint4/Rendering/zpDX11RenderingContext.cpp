@@ -1,16 +1,9 @@
 #include "zpRendering.h"
 #include "zpDX11.h"
 #include <D3D11.h>
+#include "zpDX11Util.h"
 
-ZP_FORCE_INLINE D3D11_MAP __zpMapTypeToD3DMap( zpRenderingMapType type ) {
-	switch( type ) {
-		case ZP_RENDERING_MAP_TYPE_READ: return D3D11_MAP_READ;
-		case ZP_RENDERING_MAP_TYPE_WRITE: return D3D11_MAP_WRITE;
-		case ZP_RENDERING_MAP_TYPE_READ_WRITE: return D3D11_MAP_READ_WRITE;
-		case ZP_RENDERING_MAP_TYPE_WRITE_DISCARD: return D3D11_MAP_WRITE_DISCARD;
-		default: return D3D11_MAP_WRITE_DISCARD;
-	}
-}
+#define MAX_SET_BUFFER_VERTEX_COUNT	8
 
 zpDX11RenderingContext::zpDX11RenderingContext() :
 	m_context( ZP_NULL ),
@@ -67,19 +60,69 @@ void zpDX11RenderingContext::clearRenderTarget( const zpColor4f* colors, zp_uint
 	}
 }
 void zpDX11RenderingContext::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil ) {
+	m_context->ClearDepthStencilView( ( (zpDX11DepthStencilBuffer*)m_depthStencilBuffer )->getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, (zp_byte)clearStencil );
+}
+
+void zpDX11RenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {
+	zp_uint offset = 0;
+	ID3D11Buffer* b = ( (zpDX11Buffer*)buffer )->getBuffer();
+	zp_uint stride = buffer->getStride();
+
+	switch( buffer->getBufferType() ) {
+	case ZP_BUFFER_TYPE_VERTEX:
+		m_context->IASetVertexBuffers( slot, 1, &b, &stride, &offset );
+		break;
+	case ZP_BUFFER_TYPE_INDEX:
+		m_context->IASetIndexBuffer( b, __zpToDX( buffer->getFormat() ), offset );
+		break;
+	}
+}
+void zpDX11RenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
+	switch( buffer->getBufferBindType() ) {
+	case ZP_BUFFER_TYPE_VERTEX:
+		m_context->IASetVertexBuffers( slot, 0, ZP_NULL, ZP_NULL, ZP_NULL );
+		break;
+	case ZP_BUFFER_TYPE_INDEX:
+		m_context->IASetIndexBuffer( ZP_NULL, DXGI_FORMAT_UNKNOWN, 0 );
+		break;
+	}
+}
+
+void zpDX11RenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {
+	switch( buffers[ 0 ]->getBufferBindType() ) {
+	case ZP_BUFFER_TYPE_INDEX:
+		m_context->IASetIndexBuffer( ( (zpDX11Buffer*)buffers[ 0 ] )->getBuffer(), DXGI_FORMAT_R16_UINT, 0 );
+		return;
+	case ZP_BUFFER_TYPE_VERTEX:
+		{
+			count = ZP_MIN( count, MAX_SET_BUFFER_VERTEX_COUNT );
+			ID3D11Buffer* buffs[ MAX_SET_BUFFER_VERTEX_COUNT ];
+			zp_uint strides[ MAX_SET_BUFFER_VERTEX_COUNT ];
+			for( zp_uint i = 0; i < count; ++i ) {
+				buffs[ i ] = ( (zpDX11Buffer*)buffers[ i ] )->getBuffer();
+				strides[ i ] = buffers[ i ]->getStride();
+			}
+
+			m_context->IASetVertexBuffers( slot, count, buffs, strides, 0 );
+		}
+		break;
+	}
+}
+void zpDX11RenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {
 
 }
 
-void zpDX11RenderingContext::map( zpBuffer* buffer, zpRenderingMapType mapType, zp_uint subResource, void** data ) {
-	zpDX11Buffer* buff = (zpDX11Buffer*)buffer;
-	
+void zpDX11RenderingContext::setVertexLayout( zpVertexLayout* layout ) {
+	m_context->IASetInputLayout( layout ? ( (zpDX11VertexLayout*)layout )->getInputLayout() : ZP_NULL );
+}
+
+void zpDX11RenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {
 	D3D11_MAPPED_SUBRESOURCE r;
-	m_context->Map( buff->getBuffer(), subResource, __zpMapTypeToD3DMap( mapType ), 0, &r );
+	m_context->Map( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource, __zpToDX( mapType ), 0, &r );
 	data = &r.pData;
 }
 void zpDX11RenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
-	zpDX11Buffer* buff = (zpDX11Buffer*)buffer;
-	m_context->Unmap( buff->getBuffer(), subResource );
+	m_context->Unmap( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource );
 }
 
 void zpDX11RenderingContext::addReference() const {

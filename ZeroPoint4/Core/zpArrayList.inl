@@ -321,6 +321,17 @@ const T* zpArrayList<T>::end() const {
 }
 
 template<typename T> template<typename Func>
+zp_bool zpArrayList<T>::findIf( Func func, T* found ) const {
+	for( zp_uint i = 0; i < m_size; ++i ) {
+		if( func( m_array[ i ] ) ) {
+			if( found ) *found = m_array[ i ];
+			return true;
+		}
+	}
+	return false;
+}
+
+template<typename T> template<typename Func>
 void zpArrayList<T>::foreach( Func func ) const {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		func( m_array[ i ] );
@@ -343,6 +354,33 @@ template<typename T> template<typename Func>
 void zpArrayList<T>::foreachIndexedIf( Func func ) const {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		if( func( i, m_array[ i ] ) ) break;
+	}
+}
+
+template<typename T> template<typename Func>
+void zpArrayList<T>::removeFirstIf( Func func, T* outVal ) {
+	for( zp_uint i = 0; i < m_size; ++i ) {
+		if( func( m_array[ i ] ) ) {
+			remove( i, outVal );
+			return;
+		}
+	}
+}
+template<typename T> template<typename Func>
+void zpArrayList<T>::removeLastIf( Func func, T* outVal ) {
+	for( zp_uint i = m_size; i --> 0; ) {
+		if( func( m_array[ i ] ) ) {
+			remove( i, outVal );
+			return;
+		}
+	}
+}
+template<typename T> template<typename Func>
+void zpArrayList<T>::removeAllIf( Func func, T* outVal ) {
+	for( zp_uint i = 0; i < m_size; ++i ) {
+		if( func( m_array[ i ] ) ) {
+			remove( i, outVal );
+		}
 	}
 }
 

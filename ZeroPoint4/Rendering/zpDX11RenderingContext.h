@@ -19,7 +19,15 @@ public:
 	void clearRenderTarget( const zpColor4f* colors, zp_uint count = 1 );
 	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
 
-	void map( zpBuffer* buffer, zpRenderingMapType mapType, zp_uint subResource, void** data );
+	void bindBuffer( zpBuffer* buffer, zp_uint slot );
+	void unbindBuffer( zpBuffer* buffer, zp_uint slot );
+
+	void bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
+	void unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
+
+	void setVertexLayout( zpVertexLayout* layout );
+
+	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );
 	void unmap( zpBuffer* buffer, zp_uint subResource );
 
 	void addReference() const;

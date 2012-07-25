@@ -73,6 +73,9 @@ public:
 	const T* end() const;
 
 	template<typename Func>
+	zp_bool findIf( Func func, T* found = ZP_NULL ) const;
+
+	template<typename Func>
 	void foreach( Func func ) const;
 	template<typename Func>
 	void foreachIf( Func func ) const;
@@ -81,6 +84,13 @@ public:
 	void foreachIndexed( Func func ) const;
 	template<typename Func>
 	void foreachIndexedIf( Func func ) const;
+
+	template<typename Func>
+	void removeFirstIf( Func func, T* outVal = ZP_NULL );
+	template<typename Func>
+	void removeLastIf( Func func, T* outVal = ZP_NULL );
+	template<typename Func>
+	void removeAllIf( Func func, T* outVal = ZP_NULL );
 
 	template<typename Func>
 	void map( Func func ) const;

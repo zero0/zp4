@@ -12,7 +12,7 @@ public:
 	zp_uint getWidth() const;
 	zp_uint getHeight() const;
 
-	zpRenderingDisplayFormat getDisplayFormat() const;
+	zpDisplayFormat getDisplayFormat() const;
 
 	void addReference() const;
 	zp_bool removeReference() const;
@@ -24,7 +24,7 @@ public:
 
 private:
 	zpDX11DepthStencilBuffer();
-	zpDX11DepthStencilBuffer( ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height );
+	zpDX11DepthStencilBuffer( zpDisplayFormat format, ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height );
 
 	ID3D11DepthStencilView* getDepthStencilView();
 	ID3D11Texture2D* getDepthTexture();
@@ -32,6 +32,7 @@ private:
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11Texture2D* m_depthTexture;
 
+	zpDisplayFormat m_format;
 	mutable zp_uint m_referenceCount;
 	zp_uint m_width;
 	zp_uint m_height;

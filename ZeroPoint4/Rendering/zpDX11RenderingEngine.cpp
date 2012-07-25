@@ -1,6 +1,7 @@
 #include "zpRendering.h"
 #include "zpDX11.h"
 #include <D3D11.h>
+#include "zpDX11Util.h"
 
 #define HR( r )						if( FAILED( (r) ) ) { return false; }
 #define HR_( r )					if( FAILED( (r) ) ) { return; }
@@ -10,35 +11,6 @@
 #define HR_MSG_( r, msg, ... )		if( FAILED( (r) ) ) { zp_printfln( (msg), __VA_ARGS__ ); return; }
 #define HR_MSG_V( r, v, msg, ... )	if( FAILED( (r) ) ) { zp_printfln( (msg), __VA_ARGS__ ); return (v); }
 
-DXGI_FORMAT __zpDisplayFormatToDxgiFormat( zpRenderingDisplayFormat format ) {
-	switch( format ) {
-		case ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM:		return DXGI_FORMAT_R8G8B8A8_UNORM;
-		case ZP_RENDERING_DISPLAY_FORMAT_RGBA8_SNORM:		return DXGI_FORMAT_R8G8B8A8_SNORM;
-
-		case ZP_RENDERING_DISPLAY_FORMAT_R32_UINT:			return DXGI_FORMAT_R32_UINT;
-		case ZP_RENDERING_DISPLAY_FORMAT_R32_SINT:			return DXGI_FORMAT_R32_SINT;
-		case ZP_RENDERING_DISPLAY_FORMAT_R32_FLOAT:			return DXGI_FORMAT_R32_FLOAT;
-
-		case ZP_RENDERING_DISPLAY_FORMAT_R24G8:				return DXGI_FORMAT_R24G8_TYPELESS;
-
-		default:											return DXGI_FORMAT_UNKNOWN;
-	}
-}
-zpRenderingDisplayFormat __dxgiFormatToZpDisplayFormat(DXGI_FORMAT format ) {
-	switch( format ) {
-		case DXGI_FORMAT_R8G8B8A8_UNORM:	return ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM;
-		case DXGI_FORMAT_R8G8B8A8_SNORM:	return ZP_RENDERING_DISPLAY_FORMAT_RGBA8_SNORM;
-
-		case DXGI_FORMAT_R32_UINT:			return ZP_RENDERING_DISPLAY_FORMAT_R32_UINT;
-		case DXGI_FORMAT_R32_SINT:			return ZP_RENDERING_DISPLAY_FORMAT_R32_SINT;
-		case DXGI_FORMAT_R32_FLOAT:			return ZP_RENDERING_DISPLAY_FORMAT_R32_FLOAT;
-
-		case DXGI_FORMAT_R24G8_TYPELESS:	return ZP_RENDERING_DISPLAY_FORMAT_R24G8;
-
-		default:							return ZP_RENDERING_DISPLAY_FORMAT_UNKNOWN;
-	}
-}
-
 zpDX11RenderingEngine::zpDX11RenderingEngine() : 
 	m_dxgiFactory( ZP_NULL ),
 	m_dxgiAdapter( ZP_NULL ),
@@ -46,7 +18,7 @@ zpDX11RenderingEngine::zpDX11RenderingEngine() :
 	m_d3dDevice( ZP_NULL ),
 	m_immediateContext( ZP_NULL ),
 	m_window( ZP_NULL ),
-	m_screenMode( ZP_RENDERING_SCREEN_MODE_WINDOWED ),
+	m_screenMode( ZP_SCREEN_MODE_WINDOWED ),
 	m_displayMode(),
 	m_clearColor()
 {}
@@ -84,7 +56,7 @@ zp_bool zpDX11RenderingEngine::create() {
 	// create the immidiate context wrapper
 	m_immediateContext = new zpDX11RenderingContext( immidiate, "immidiate" );
 
-	// get the feature level of the rendering engine
+	// get the actual feature level of the rendering engine
 	switch( m_d3dDevice->GetFeatureLevel() ) {
 		case D3D_FEATURE_LEVEL_11_0: m_engineType = ZP_RENDERING_ENGINE_DX11; break;
 		case D3D_FEATURE_LEVEL_10_1: m_engineType = ZP_RENDERING_ENGINE_DX10_1; break;
@@ -97,15 +69,15 @@ zp_bool zpDX11RenderingEngine::create() {
 		m_displayMode.height = m_window->getScreenSize().getY();
 	}
 	// if the display mode is set to unknown, default to RGBA8_UNORM
-	if( m_displayMode.displayFormat == ZP_RENDERING_DISPLAY_FORMAT_UNKNOWN ) {
-		m_displayMode.displayFormat = ZP_RENDERING_DISPLAY_FORMAT_RGBA8_UNORM;
+	if( m_displayMode.displayFormat == ZP_DISPLAY_FORMAT_UNKNOWN ) {
+		m_displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
 	}
 	// if the refresh rate is not set, find the closest display mode that matches
 	if( !m_displayMode.refreshRate ) {
 		findClosestDisplayMode( m_displayMode, &m_displayMode );
 	}
 
-	DXGI_FORMAT format = __zpDisplayFormatToDxgiFormat( m_displayMode.displayFormat );
+	DXGI_FORMAT format = __zpToDX( m_displayMode.displayFormat );
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	zp_zero_memory( &swapChainDesc );
@@ -121,7 +93,7 @@ zp_bool zpDX11RenderingEngine::create() {
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.OutputWindow = (HWND)m_window->getWindowHandle();
-	swapChainDesc.Windowed = m_screenMode == ZP_RENDERING_SCREEN_MODE_WINDOWED;
+	swapChainDesc.Windowed = m_screenMode == ZP_SCREEN_MODE_WINDOWED;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swapChainDesc.Flags = 0;//DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	
@@ -141,7 +113,7 @@ zp_bool zpDX11RenderingEngine::create() {
 
 	// create the render target and depth buffer for the immediate context
 	m_immediateRenderTarget = new zpDX11RenderTarget( &backBuffer, &backBufferView, 1, m_displayMode.width, m_displayMode.height );
-	m_immediateDepthStencilBuffer = createDepthBuffer( ZP_RENDERING_DISPLAY_FORMAT_R24G8, m_displayMode.width, m_displayMode.height );
+	m_immediateDepthStencilBuffer = createDepthBuffer( ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT, m_displayMode.width, m_displayMode.height );
 
 	// set render target and depth buffer for the immediate context automatically
 	m_immediateContext->setRenderTarget( m_immediateRenderTarget );
@@ -165,7 +137,7 @@ zpRenderingEngineType zpDX11RenderingEngine::getEngineType() const {
 	return m_engineType;
 }
 
-zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes ) {
+zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpDisplayFormat displayFormat, zpArrayList<zpDisplayMode>* outDisplayModes ) {
 	if( !m_dxgiAdapter ) return 0;
 
 	ZP_ASSERT_RETURN_( outDisplayModes, 0, "Out parameter not set." );
@@ -177,7 +149,7 @@ zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat d
 	HR_MSG_V( hr, 0, "Unable to get display modes." );
 
 	zp_uint numModes;
-	DXGI_FORMAT format = __zpDisplayFormatToDxgiFormat( displayFormat );
+	DXGI_FORMAT format = __zpToDX( displayFormat );
 	hr = adapterOutput->GetDisplayModeList( format, DXGI_ENUM_MODES_INTERLACED, &numModes, ZP_NULL );
 	HR_MSG_V( hr, 0, "Unable to list display modes." );
 
@@ -189,7 +161,7 @@ zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat d
 	outDisplayModes->clear();
 	modes.foreach( [ &outDisplayModes, &count ]( const DXGI_MODE_DESC& mode ) {
 		if( mode.RefreshRate.Denominator == 1 ) {
-			zpRenderingDisplayMode m = { mode.Width, mode.Height, mode.RefreshRate.Numerator, __dxgiFormatToZpDisplayFormat( mode.Format ) };
+			zpDisplayMode m = { mode.Width, mode.Height, mode.RefreshRate.Numerator, __dxToZP( mode.Format ) };
 			outDisplayModes->pushBack( m );
 			++count;
 		}
@@ -199,12 +171,12 @@ zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat d
 
 	return count;
 }
-zp_bool zpDX11RenderingEngine::findClosestDisplayMode( const zpRenderingDisplayMode& displayMode, zpRenderingDisplayMode* outDisplayMode ) {
+zp_bool zpDX11RenderingEngine::findClosestDisplayMode( const zpDisplayMode& displayMode, zpDisplayMode* outDisplayMode ) {
 	if( !m_dxgiAdapter ) return false;
 
 	ZP_ASSERT_RETURN_( outDisplayMode, false, "Out parameter not set." );
 
-	DXGI_FORMAT format = __zpDisplayFormatToDxgiFormat( displayMode.displayFormat );
+	DXGI_FORMAT format = __zpToDX( displayMode.displayFormat );
 	ZP_ASSERT_RETURN_( format != DXGI_FORMAT_UNKNOWN, false, "Display mode format must be set." );
 
 	IDXGIOutput* adapterOutput;
@@ -214,7 +186,7 @@ zp_bool zpDX11RenderingEngine::findClosestDisplayMode( const zpRenderingDisplayM
 	HR_MSG( hr, "Unable to get display modes." );
 
 	DXGI_MODE_DESC inMode, outMode;
-	ZeroMemory( &inMode, sizeof( DXGI_MODE_DESC ) );
+	zp_zero_memory( &inMode );
 
 	zp_bool widthHeightSet = displayMode.width && displayMode.height;
 
@@ -230,24 +202,24 @@ zp_bool zpDX11RenderingEngine::findClosestDisplayMode( const zpRenderingDisplayM
 	ZP_SAFE_RELEASE( adapterOutput );
 	
 	if( outDisplayMode ) {
-		zpRenderingDisplayMode mode = { outMode.Width, outMode.Height, outMode.RefreshRate.Numerator, __dxgiFormatToZpDisplayFormat( outMode.Format ) };
+		zpDisplayMode mode = { outMode.Width, outMode.Height, outMode.RefreshRate.Numerator, __dxToZP( outMode.Format ) };
 		*outDisplayMode = mode;
 	}
 
 	return true;
 }
 
-void zpDX11RenderingEngine::setDisplayMode( const zpRenderingDisplayMode& mode ) {
+void zpDX11RenderingEngine::setDisplayMode( const zpDisplayMode& mode ) {
 	m_displayMode = mode;
 }
-const zpRenderingDisplayMode& zpDX11RenderingEngine::getDisplayMode() const {
+const zpDisplayMode& zpDX11RenderingEngine::getDisplayMode() const {
 	return m_displayMode;
 }
 
-void zpDX11RenderingEngine::setScreenMode( zpRenderingScreenMode mode ) {
+void zpDX11RenderingEngine::setScreenMode( zpScreenMode mode ) {
 	m_screenMode = mode;
 }
-zpRenderingScreenMode zpDX11RenderingEngine::getScreenMode() const {
+zpScreenMode zpDX11RenderingEngine::getScreenMode() const {
 	return m_screenMode;
 }
 
@@ -274,16 +246,11 @@ zpRenderingContext* zpDX11RenderingEngine::createRenderingContext( const zpStrin
 zp_bool zpDX11RenderingEngine::removeRenderingContext( const zpString& name ) {
 	zpRenderingContext* ctx = ZP_NULL;
 
-	m_contexts.foreachIf( [ &ctx, &name ]( zpRenderingContext* c ) -> zp_bool {
-		if( c->getName() == name ) {
-			ctx = c;
-			return true;
-		}
-		return false;
-	} );
+	m_contexts.removeFirstIf( [ &name ]( zpRenderingContext* c ) -> zp_bool {
+		return c->getName() == name;
+	}, &ctx );
 
-	if( ctx != ZP_NULL ) {
-		m_contexts.removeFirst( ctx );
+	if( ctx ) {
 		ctx->removeReference();
 		return true;
 	}
@@ -294,14 +261,10 @@ zpRenderingContext* zpDX11RenderingEngine::getRenderingContextByIndex( zp_uint i
 }
 zpRenderingContext* zpDX11RenderingEngine::getRenderingContext( const zpString& name ) const {
 	zpRenderingContext* ctx = ZP_NULL;
-
-	m_contexts.foreachIf( [ &ctx, &name ]( zpRenderingContext* c ) -> zp_bool {
-		if( c->getName() == name ) {
-			ctx = c;
-			return true;
-		}
-		return false;
-	} );
+	
+	m_contexts.findIf( [ &name ]( zpRenderingContext* c ) -> zp_bool {
+		return c->getName() == name;
+	}, &ctx );
 
 	return ctx;
 }
@@ -313,7 +276,7 @@ zpRenderingContext* zpDX11RenderingEngine::getImmediateRenderingContext() const 
 }
 
 zpBuffer* zpDX11RenderingEngine::createBuffer() {
-	return new zpDX11Buffer();
+	return new zpDX11Buffer( this );
 }
 
 zpTextureResource* zpDX11RenderingEngine::createTextureResource() {
@@ -323,7 +286,7 @@ zpShaderResource* zpDX11RenderingEngine::createShaderResource() {
 	return new zpDX11ShaderResource();
 }
 
-zpRenderTarget* zpDX11RenderingEngine::createRenderTarget( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) {
+zpRenderTarget* zpDX11RenderingEngine::createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height ) {
 	HRESULT hr;
 	ID3D11Texture2D* texture;
 	ID3D11RenderTargetView* rtv;
@@ -333,7 +296,7 @@ zpRenderTarget* zpDX11RenderingEngine::createRenderTarget( zpRenderingDisplayFor
 	texDesc.ArraySize = 1;
 	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
-	texDesc.Format = __zpDisplayFormatToDxgiFormat( format );
+	texDesc.Format = __zpToDX( format );
 	texDesc.Height = height;
 	texDesc.MipLevels = 1;
 	texDesc.MiscFlags = 0;
@@ -358,7 +321,7 @@ zpRenderTarget* zpDX11RenderingEngine::createRenderTarget( zpRenderingDisplayFor
 
 	return new zpDX11RenderTarget( &texture, &rtv, 1, width, height );
 }
-zpRenderTarget* zpDX11RenderingEngine::createMultiRenderTarget( zp_uint targetCount, zpRenderingDisplayFormat* formats, zp_uint width, zp_uint height ) {
+zpRenderTarget* zpDX11RenderingEngine::createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height ) {
 	if( targetCount == 1 ) return createRenderTarget( formats[ 0 ], width, height );
 
 	HRESULT hr;
@@ -376,7 +339,7 @@ zpRenderTarget* zpDX11RenderingEngine::createMultiRenderTarget( zp_uint targetCo
 		texDesc.ArraySize = 1;
 		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		texDesc.CPUAccessFlags = 0;
-		texDesc.Format = __zpDisplayFormatToDxgiFormat( formats[ i ] );
+		texDesc.Format = __zpToDX( formats[ i ] );
 		texDesc.Height = height;
 		texDesc.MipLevels = 1;
 		texDesc.MiscFlags = 0;
@@ -404,7 +367,7 @@ zpRenderTarget* zpDX11RenderingEngine::createMultiRenderTarget( zp_uint targetCo
 
 	return new zpDX11RenderTarget( textures.begin(), targets.begin(), targets.size(), width, height );
 }
-zpDepthStencilBuffer* zpDX11RenderingEngine::createDepthBuffer( zpRenderingDisplayFormat format, zp_uint width, zp_uint height ) {
+zpDepthStencilBuffer* zpDX11RenderingEngine::createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) {
 	HRESULT hr;
 	ID3D11Texture2D* texture;
 	ID3D11DepthStencilView* view;
@@ -415,7 +378,7 @@ zpDepthStencilBuffer* zpDX11RenderingEngine::createDepthBuffer( zpRenderingDispl
 	depthStencilDesc.Height = height;
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format = __zpDisplayFormatToDxgiFormat( format );
+	depthStencilDesc.Format = __zpToDX( format );
 	depthStencilDesc.SampleDesc.Count = 1;
 	depthStencilDesc.SampleDesc.Quality = 0;
 	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -438,9 +401,12 @@ zpDepthStencilBuffer* zpDX11RenderingEngine::createDepthBuffer( zpRenderingDispl
 	// remove reference to texture so view now owns pointer
 	texture->Release();
 	
-	return new zpDX11DepthStencilBuffer( texture, view, width, height );
+	return new zpDX11DepthStencilBuffer( format, texture, view, width, height );
 }
 
+zpVertexLayout* zpDX11RenderingEngine::createVertexLayout() {
+	return new zpDX11VertexLayout();
+}
 
 zp_bool zpDX11RenderingEngine::initialize() {
 	if( m_dxgiAdapter ) return true;

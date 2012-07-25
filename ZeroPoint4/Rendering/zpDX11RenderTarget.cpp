@@ -1,6 +1,7 @@
 #include "zpRendering.h"
 #include "zpDX11.h"
 #include <D3DX11.h>
+#include "zpDX11Util.h"
 
 zpDX11RenderTarget::zpDX11RenderTarget() :
 	m_referenceCount( 1 ),
@@ -45,11 +46,11 @@ zp_uint zpDX11RenderTarget::getHeight() const {
 	return m_height;
 }
 
-zp_uint zpDX11RenderTarget::getDisplayFormat( zpRenderingDisplayFormat* formats ) const {
+zp_uint zpDX11RenderTarget::getDisplayFormat( zpDisplayFormat* formats ) const {
 	D3D11_TEXTURE2D_DESC desc;
 	m_textures.foreachIndexed( [ &formats, &desc ]( zp_uint index, ID3D11Texture2D* tex ) {
 		tex->GetDesc( &desc );
-		// @TODO: implement zpDX11Util::"fromDX11FormatToZPFormat"()
+		formats[ index ] = __dxToZP( desc.Format );
 	} );
 	return m_renderTargets.size();
 }

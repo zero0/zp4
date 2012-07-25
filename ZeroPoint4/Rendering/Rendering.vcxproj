@@ -93,6 +93,8 @@
     <ClInclude Include="zpDX11RenderTarget.h" />
     <ClInclude Include="zpDX11ShaderResource.h" />
     <ClInclude Include="zpDX11TextureResource.h" />
+    <ClInclude Include="zpDX11Util.h" />
+    <ClInclude Include="zpDX11VertexLayout.h" />
     <ClInclude Include="zpOpenGL.h" />
     <ClInclude Include="zpOpenGLRenderingEngine.h" />
     <ClInclude Include="zpRendering.h" />
@@ -104,6 +106,7 @@
     <ClInclude Include="zpRenderTarget.h" />
     <ClInclude Include="zpShaderResource.h" />
     <ClInclude Include="zpTextureResource.h" />
+    <ClInclude Include="zpVertexLayout.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpDX11Buffer.cpp" />
@@ -113,6 +116,7 @@
     <ClCompile Include="zpDX11RenderTarget.cpp" />
     <ClCompile Include="zpDX11ShaderResource.cpp" />
     <ClCompile Include="zpDX11TextureResource.cpp" />
+    <ClCompile Include="zpDX11VertexLayout.cpp" />
     <ClCompile Include="zpOpenGL.cpp" />
     <ClCompile Include="zpOpenGLRenderingEngine.cpp" />
     <ClCompile Include="zpRendering.cpp">

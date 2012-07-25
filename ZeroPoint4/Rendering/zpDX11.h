@@ -18,10 +18,10 @@ class zpDX11TextureResource;
 class zpDX11Buffer;
 class zpDX11RenderTarget;
 class zpDX11DepthStencilBuffer;
+class zpDX11VertexLayout;
 
 class zpDX11RenderingContext;
 class zpDX11RenderingEngine;
-
 
 #include "zpDX11ShaderResource.h"
 #include "zpDX11TextureResource.h"
@@ -29,6 +29,7 @@ class zpDX11RenderingEngine;
 #include "zpDX11Buffer.h"
 #include "zpDX11RenderTarget.h"
 #include "zpDX11DepthStencilBuffer.h"
+#include "zpDX11VertexLayout.h"
 
 #include "zpDX11RenderingContext.h"
 #include "zpDX11RenderingEngine.h"

@@ -5,13 +5,15 @@
 zpDX11DepthStencilBuffer::zpDX11DepthStencilBuffer() :
 	m_depthStencilView( ZP_NULL ),
 	m_depthTexture( ZP_NULL ),
+	m_format( ZP_DISPLAY_FORMAT_UNKNOWN ),
 	m_referenceCount( 1 ),
 	m_width( 0 ),
 	m_height( 0 )
 {}
-zpDX11DepthStencilBuffer::zpDX11DepthStencilBuffer( ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height ) :
+zpDX11DepthStencilBuffer::zpDX11DepthStencilBuffer( zpDisplayFormat format, ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height ) :
 	m_depthStencilView( view ),
 	m_depthTexture( texture ),
+	m_format( format ),
 	m_referenceCount( 1 ),
 	m_width( width ),
 	m_height( height )
@@ -28,8 +30,8 @@ zp_uint zpDX11DepthStencilBuffer::getHeight() const {
 	return m_height;
 }
 
-zpRenderingDisplayFormat zpDX11DepthStencilBuffer::getDisplayFormat() const {
-	return ZP_RENDERING_DISPLAY_FORMAT_UNKNOWN;
+zpDisplayFormat zpDX11DepthStencilBuffer::getDisplayFormat() const {
+	return m_format;
 }
 
 void zpDX11DepthStencilBuffer::addReference() const {
