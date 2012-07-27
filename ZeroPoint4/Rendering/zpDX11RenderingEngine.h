@@ -50,7 +50,7 @@ public:
 	zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height );
 	zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height );
 
-	zpVertexLayout* createVertexLayout();
+	zpVertexLayout* createVertexLayout( const zpString& desc );
 
 protected:
 	zp_bool initialize();

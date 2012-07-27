@@ -80,7 +80,7 @@ void zpDX11RenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {
 void zpDX11RenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
 	switch( buffer->getBufferBindType() ) {
 	case ZP_BUFFER_TYPE_VERTEX:
-		m_context->IASetVertexBuffers( slot, 0, ZP_NULL, ZP_NULL, ZP_NULL );
+		m_context->IASetVertexBuffers( slot, 1, ZP_NULL, ZP_NULL, ZP_NULL );
 		break;
 	case ZP_BUFFER_TYPE_INDEX:
 		m_context->IASetIndexBuffer( ZP_NULL, DXGI_FORMAT_UNKNOWN, 0 );
@@ -90,9 +90,6 @@ void zpDX11RenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
 
 void zpDX11RenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {
 	switch( buffers[ 0 ]->getBufferBindType() ) {
-	case ZP_BUFFER_TYPE_INDEX:
-		m_context->IASetIndexBuffer( ( (zpDX11Buffer*)buffers[ 0 ] )->getBuffer(), DXGI_FORMAT_R16_UINT, 0 );
-		return;
 	case ZP_BUFFER_TYPE_VERTEX:
 		{
 			count = ZP_MIN( count, MAX_SET_BUFFER_VERTEX_COUNT );
@@ -106,10 +103,20 @@ void zpDX11RenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_
 			m_context->IASetVertexBuffers( slot, count, buffs, strides, 0 );
 		}
 		break;
+	case ZP_BUFFER_TYPE_INDEX:
+		m_context->IASetIndexBuffer( ( (zpDX11Buffer*)buffers[ 0 ] )->getBuffer(), DXGI_FORMAT_R16_UINT, 0 );
+		break;
 	}
 }
 void zpDX11RenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {
-
+	switch( buffers[ 0 ]->getBufferBindType() ) {
+	case ZP_BUFFER_TYPE_VERTEX:
+		m_context->IASetVertexBuffers( slot, count, ZP_NULL, ZP_NULL, ZP_NULL );
+		break;
+	case ZP_BUFFER_TYPE_INDEX:
+		m_context->IASetIndexBuffer( ZP_NULL, DXGI_FORMAT_UNKNOWN, 0 );
+		break;
+	}
 }
 
 void zpDX11RenderingContext::setVertexLayout( zpVertexLayout* layout ) {

@@ -404,7 +404,7 @@ zpDepthStencilBuffer* zpDX11RenderingEngine::createDepthBuffer( zpDisplayFormat 
 	return new zpDX11DepthStencilBuffer( format, texture, view, width, height );
 }
 
-zpVertexLayout* zpDX11RenderingEngine::createVertexLayout() {
+zpVertexLayout* zpDX11RenderingEngine::createVertexLayout( const zpString& desc ) {
 	return new zpDX11VertexLayout();
 }
 

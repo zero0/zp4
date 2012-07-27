@@ -106,6 +106,7 @@
     <ClInclude Include="zpRenderTarget.h" />
     <ClInclude Include="zpShaderResource.h" />
     <ClInclude Include="zpTextureResource.h" />
+    <ClInclude Include="zpVertex.h" />
     <ClInclude Include="zpVertexLayout.h" />
   </ItemGroup>
   <ItemGroup>

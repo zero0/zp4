@@ -39,7 +39,7 @@ public:
 	virtual zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height ) = 0;
 	virtual zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) = 0;
 
-	virtual zpVertexLayout* createVertexLayout() = 0;
+	virtual zpVertexLayout* createVertexLayout( const zpString& desc ) = 0;
 
 protected:
 	virtual zp_bool initialize() = 0;
