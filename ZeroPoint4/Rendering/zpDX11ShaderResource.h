@@ -15,6 +15,8 @@ public:
 	zp_bool load();
 	void unload();
 
+	zpVertexLayout* getVertexLayout();
+
 private:
 	ID3D11VertexShader* getVertexShader();
 	ID3D11PixelShader* getPixelShader();
@@ -25,6 +27,8 @@ private:
 	ID3D11PixelShader* m_pixelShader;
 	ID3D11GeometryShader* m_geometryShader;
 	ID3D11ComputeShader* m_computeShader;
+
+	zpVertexLayout* m_vertexLayout;
 
 	friend class zpDX11RenderingContext;
 };

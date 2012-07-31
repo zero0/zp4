@@ -30,6 +30,8 @@ public:
 	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );
 	void unmap( zpBuffer* buffer, zp_uint subResource );
 
+	void bindShader( zpShaderResource* shader );
+
 	void addReference() const;
 	zp_bool removeReference() const;
 

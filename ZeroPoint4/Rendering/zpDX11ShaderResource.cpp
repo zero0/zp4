@@ -113,6 +113,28 @@ zp_bool zpDX11ShaderResource::load() {
 		zpString function = shaderProperties[ "shader.vs" ];
 		zpString layout = shaderProperties[ "shader.vs.layout" ];
 		// @TODO: implement vertex shader layout
+
+		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), vs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
+		if( errors ) {
+			zp_printfcln( ZP_CC( ZP_CC_BLACK, ZP_CC_LIGHT_YELLOW ), "Error compiling shader [%s]: %s", shaderFile.c_str(), (zp_char*)errors->GetBufferPointer() );
+		}
+		ZP_SAFE_RELEASE( errors );
+
+		if( SUCCEEDED( hr ) ) {
+			hr = engine->getDevice()->CreateVertexShader( blob->GetBufferPointer(), blob->GetBufferSize(), ZP_NULL, &m_vertexShader );
+			if( FAILED( hr ) ) {
+				zp_printfln( "Failed to create Vertex Shader %s", shaderFile.c_str() );
+			}
+
+			// get the vertex layout from the shader file
+			m_vertexLayout = zpDX11VertexLayout::getLayoutFromDesc( layout, blob->GetBufferPointer(), blob->GetBufferSize() );
+			if( m_vertexLayout == ZP_NULL ) {
+				zp_printfln( "Failed to get Vertex Layout" );
+			}
+		} else {
+			zp_printfln( "Failed to compile Vertex Shader %s", shaderFile.c_str() );
+		}
+		ZP_SAFE_RELEASE( blob );
 	}
 
 	// if the geometry shader function is defined for this shader, compile and create it

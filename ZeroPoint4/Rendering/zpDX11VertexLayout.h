@@ -8,11 +8,11 @@ class zpDX11VertexLayout : public zpVertexLayout {
 public:
 	virtual ~zpDX11VertexLayout();
 
-	static zpDX11VertexLayout* getLayoutFromDesc( const zpString& desc );
-
 private:
 	zpDX11VertexLayout();
 	
+	static zpDX11VertexLayout* getLayoutFromDesc( const zpString& inputDesc, void* vertexShaderBlob, zp_uint vertexShaderBlobSize );
+
 	ID3D11InputLayout* getInputLayout() const;
 
 	ID3D11InputLayout* m_layout;
@@ -21,6 +21,8 @@ private:
 
 	friend class zpDX11RenderingContext;
 	friend class zpDX11RenderingEngine;
+
+	friend class zpDX11ShaderResource;
 };
  
 #endif

@@ -84,6 +84,7 @@ private:
 	friend class zpDX11Buffer;
 	friend class zpDX11TextureResource;
 	friend class zpDX11ShaderResource;
+	friend class zpDX11VertexLayout;
 };
 
 #endif

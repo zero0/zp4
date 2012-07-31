@@ -29,6 +29,8 @@ public:
 
 	virtual void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) = 0;
 	virtual void unmap( zpBuffer* buffer, zp_uint subResource ) = 0;
+
+	virtual void bindShader( zpShaderResource* shader ) = 0;
 };
 
 #endif

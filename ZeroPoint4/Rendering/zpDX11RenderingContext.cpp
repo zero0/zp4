@@ -120,7 +120,8 @@ void zpDX11RenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, z
 }
 
 void zpDX11RenderingContext::setVertexLayout( zpVertexLayout* layout ) {
-	m_context->IASetInputLayout( layout ? ( (zpDX11VertexLayout*)layout )->getInputLayout() : ZP_NULL );
+	zpDX11VertexLayout* i = (zpDX11VertexLayout*)layout;
+	if( i->getInputLayout() ) m_context->IASetInputLayout( i->getInputLayout() );
 }
 
 void zpDX11RenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {
@@ -130,6 +131,17 @@ void zpDX11RenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint s
 }
 void zpDX11RenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
 	m_context->Unmap( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource );
+}
+
+void zpDX11RenderingContext::bindShader( zpShaderResource* shader ) {
+	zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader;
+	if( s->getPixelShader() ) m_context->PSSetShader( s->getPixelShader(), ZP_NULL, 0 );
+	if( s->getVertexShader() ) {
+		setVertexLayout( s->getVertexLayout() );
+		m_context->VSSetShader( s->getVertexShader(), ZP_NULL, 0 );
+	}
+	if( s->getGeometryShader() ) m_context->GSSetShader( s->getGeometryShader(), ZP_NULL, 0 );
+	if( s->getComputeShader() ) m_context->CSSetShader( s->getComputeShader(), ZP_NULL, 0 );
 }
 
 void zpDX11RenderingContext::addReference() const {
