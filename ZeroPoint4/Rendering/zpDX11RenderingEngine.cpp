@@ -12,6 +12,7 @@
 #define HR_MSG_V( r, v, msg, ... )	if( FAILED( (r) ) ) { zp_printfln( (msg), __VA_ARGS__ ); return (v); }
 
 zpDX11RenderingEngine::zpDX11RenderingEngine() : 
+	m_vsyncEnabled( false ),
 	m_dxgiFactory( ZP_NULL ),
 	m_dxgiAdapter( ZP_NULL ),
 	m_swapChain( ZP_NULL ),
@@ -39,22 +40,22 @@ zp_bool zpDX11RenderingEngine::create() {
 	D3D_FEATURE_LEVEL actualFeatureLevel;
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 	zp_uint featureLevelCount = sizeof( featureLevels ) / sizeof( featureLevels[0] );
-	ID3D11DeviceContext* immidiate = ZP_NULL;
+	ID3D11DeviceContext* immediate = ZP_NULL;
 
-	hr = D3D11CreateDevice( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immidiate );
+	hr = D3D11CreateDevice( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
 	if( FAILED( hr ) ) {
-		hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immidiate );
+		hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
 		if( FAILED( hr ) ) {
-			hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immidiate );
+			hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
 			if( FAILED( hr ) ) {
-				hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immidiate );
+				hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
 				HR_MSG( hr, "Unable to create DirectX device." );
 			}
 		}
 	}
 
-	// create the immidiate context wrapper
-	m_immediateContext = new zpDX11RenderingContext( immidiate, "immidiate" );
+	// create the immediate context wrapper
+	m_immediateContext = new zpDX11RenderingContext( immediate, "immediate" );
 
 	// get the actual feature level of the rendering engine
 	switch( m_d3dDevice->GetFeatureLevel() ) {
@@ -232,8 +233,12 @@ zpWindow* zpDX11RenderingEngine::getWindow() const {
 	return m_window;
 }
 
+void zpDX11RenderingEngine::setVSyncEnabled( zp_bool enabled ) {
+	m_vsyncEnabled = enabled;
+}
+
 void zpDX11RenderingEngine::present() {
-	m_swapChain->Present( 0, 0 );
+	m_swapChain->Present( m_vsyncEnabled ? 1 : 0, 0 );
 }
 
 zpRenderingContext* zpDX11RenderingEngine::createRenderingContext( const zpString& name ) {

@@ -1,14 +1,5 @@
 #include "zpRendering.h"
-
-#if 0
 #include "zpOpenGL.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-
-#define GLEW_STATIC
-#include <GL\glew.h>
-#include <GL\wglew.h>
 
 zpOpenGLRenderingEngine::zpOpenGLRenderingEngine() {}
 zpOpenGLRenderingEngine::~zpOpenGLRenderingEngine() {}
@@ -28,28 +19,71 @@ zp_bool zpOpenGLRenderingEngine::create() {
 	pfd.cDepthBits = 32;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 
+	// choose a pixel format
 	zp_int pixelFormatIndex = ChoosePixelFormat( hdc, &pfd );
 	if( pixelFormatIndex == 0 ) return false;
 
+	// set the pixel format
 	zp_bool formatSet = SetPixelFormat( hdc, pixelFormatIndex, &pfd ) == 1;
 	if( !formatSet ) return false;
 
-	if( glewInit() != GLEW_OK ) return false;
+	// create an OpenGL context
+	HGLRC context = wglCreateContext( hdc );
+	wglMakeCurrent( hdc, context );
+
+	// initialize GLEW
+	GLenum gle = glewInit();
+	if( gle != GLEW_OK ) {
+		zp_printfln( "Unable to initialize GLEW" );
+		return false;
+	}
+
+	if( WGLEW_ARB_create_context ) {
+		zp_int attr[] = {
+			WGL_CONTEXT_MAJOR_VERSION_ARB,	3,
+			WGL_CONTEXT_MINOR_VERSION_ARB,	1,
+#if ZP_DEBUG
+			WGL_CONTEXT_FLAGS_ARB,			WGL_CONTEXT_DEBUG_BIT_ARB,
+#else
+			WGL_CONTEXT_FLAGS_ARB,			0,
+#endif
+			0
+		};
+		
+		HGLRC rc = wglCreateContextAttribsARB( hdc, 0, attr );
+		wglMakeCurrent( ZP_NULL, ZP_NULL );
+		wglDeleteContext( context );
+		wglMakeCurrent( hdc, rc );
+		context = rc;
+	}
+	const zp_byte* vv = glGetString( GL_VERSION );
+
+	m_immediateContext = new zpOpenGLRenderingContext( context, "immediate" );
 
 	return true;
 }
 void zpOpenGLRenderingEngine::destroy() {}
 
-zpRenderingEngineType zpOpenGLRenderingEngine::getEngineType() const { return ZP_RENDERING_ENGINE_OPENGL; }
+zpRenderingEngineType zpOpenGLRenderingEngine::getEngineType() const {
+	return m_engineType;
+}
 
-zp_uint zpOpenGLRenderingEngine::enumerateDisplayModes( zpRenderingDisplayFormat displayFormat, zpArrayList<zpRenderingDisplayMode>* outDisplayModes ) { return 0; }
-zp_bool zpOpenGLRenderingEngine::findClosestDisplayMode( const zpRenderingDisplayMode& displayMode, zpRenderingDisplayMode* outDisplayMode ) { return false; }
+zp_uint zpOpenGLRenderingEngine::enumerateDisplayModes( zpDisplayFormat displayFormat, zpArrayList<zpDisplayMode>* outDisplayModes ) { return 0; }
+zp_bool zpOpenGLRenderingEngine::findClosestDisplayMode( const zpDisplayMode& displayMode, zpDisplayMode* outDisplayMode ) { return false; }
 
-void zpOpenGLRenderingEngine::setDisplayMode( const zpRenderingDisplayMode& mode ) {}
-const zpRenderingDisplayMode& zpOpenGLRenderingEngine::getDisplayMode() const { return zpRenderingDisplayMode(); }
+void zpOpenGLRenderingEngine::setDisplayMode( const zpDisplayMode& mode ) {
+	m_displayMode = mode;
+}
+const zpDisplayMode& zpOpenGLRenderingEngine::getDisplayMode() const {
+	return m_displayMode;
+}
 
-void zpOpenGLRenderingEngine::setScreenMode( zpRenderingScreenMode mode ) {}
-zpRenderingScreenMode zpOpenGLRenderingEngine::getScreenMode() const { return ZP_SCREEN_MODE_WINDOWED; }
+void zpOpenGLRenderingEngine::setScreenMode( zpScreenMode mode ) {
+	m_screenMode = mode;
+}
+zpScreenMode zpOpenGLRenderingEngine::getScreenMode() const { 
+	return m_screenMode;
+}
 
 void zpOpenGLRenderingEngine::setWindow( zpWindow* window ) {
 	m_window = window;
@@ -58,23 +92,33 @@ zpWindow* zpOpenGLRenderingEngine::getWindow() const {
 	return m_window;
 }
 
-void zpOpenGLRenderingEngine::setClearColor( const zpColor4f& color, zp_uint renderTargetIndex ) {}
-const zpColor4f& zpOpenGLRenderingEngine::getClearColor( zp_uint renderTargetIndex ) const { return m_clearColor; }
+void zpOpenGLRenderingEngine::setVSyncEnabled( zp_bool enabled ) {
+	m_vsyncEnabled = enabled;
+}
 
-void zpOpenGLRenderingEngine::clear() {}
 void zpOpenGLRenderingEngine::present() {}
 
-zpRenderingContext* zpOpenGLRenderingEngine::createRenderingContext() { return ZP_NULL; }
-void zpOpenGLRenderingEngine::setCurrentRenderingContext( zpRenderingContext* context ) {}
-zpRenderingContext* zpOpenGLRenderingEngine::getCurrentRenderingContext() const { return ZP_NULL; }
+zpRenderingContext* zpOpenGLRenderingEngine::createRenderingContext( const zpString& name ) { return ZP_NULL; }
+zp_bool zpOpenGLRenderingEngine::removeRenderingContext( const zpString& name ) { return false; }
+zpRenderingContext* zpOpenGLRenderingEngine::getRenderingContextByIndex( zp_uint index ) const { return ZP_NULL; }
+zpRenderingContext* zpOpenGLRenderingEngine::getRenderingContext( const zpString& name ) const { return ZP_NULL; }
+zp_uint zpOpenGLRenderingEngine::getRenderingContextCount() const { return 0; }
+zpRenderingContext* zpOpenGLRenderingEngine::getImmediateRenderingContext() const {
+	return m_immediateContext;
+}
 
 zpBuffer* zpOpenGLRenderingEngine::createBuffer() { return ZP_NULL; }
 
 zpTextureResource* zpOpenGLRenderingEngine::createTextureResource() { return ZP_NULL; }
+zpShaderResource* zpOpenGLRenderingEngine::createShaderResource() { return ZP_NULL; }
+
+zpRenderTarget* zpOpenGLRenderingEngine::createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height ) { return ZP_NULL; }
+zpRenderTarget* zpOpenGLRenderingEngine::createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height ) { return ZP_NULL; }
+zpDepthStencilBuffer* zpOpenGLRenderingEngine::createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) { return ZP_NULL; }
+
+zpVertexLayout* zpOpenGLRenderingEngine::createVertexLayout( const zpString& desc ) { return ZP_NULL; }
 
 zp_bool zpOpenGLRenderingEngine::initialize() {
 	return true;
 }
 void zpOpenGLRenderingEngine::shutdown() {}
-
-#endif

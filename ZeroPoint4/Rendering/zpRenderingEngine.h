@@ -21,6 +21,8 @@ public:
 	virtual void setWindow( zpWindow* window ) = 0;
 	virtual zpWindow* getWindow() const = 0;
 
+	virtual void setVSyncEnabled( zp_bool enabled ) = 0;
+
 	virtual void present() = 0;
 
 	virtual zpRenderingContext* createRenderingContext( const zpString& name ) = 0;

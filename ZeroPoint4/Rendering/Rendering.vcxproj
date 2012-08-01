@@ -96,6 +96,7 @@
     <ClInclude Include="zpDX11Util.h" />
     <ClInclude Include="zpDX11VertexLayout.h" />
     <ClInclude Include="zpOpenGL.h" />
+    <ClInclude Include="zpOpenGLRenderingContext.h" />
     <ClInclude Include="zpOpenGLRenderingEngine.h" />
     <ClInclude Include="zpRendering.h" />
     <ClInclude Include="zpRenderingContext.h" />
@@ -119,7 +120,7 @@
     <ClCompile Include="zpDX11ShaderResource.cpp" />
     <ClCompile Include="zpDX11TextureResource.cpp" />
     <ClCompile Include="zpDX11VertexLayout.cpp" />
-    <ClCompile Include="zpOpenGL.cpp" />
+    <ClCompile Include="zpOpenGLRenderingContext.cpp" />
     <ClCompile Include="zpOpenGLRenderingEngine.cpp" />
     <ClCompile Include="zpRendering.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

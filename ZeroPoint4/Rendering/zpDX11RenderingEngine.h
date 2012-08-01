@@ -32,6 +32,8 @@ public:
 	void setWindow( zpWindow* window );
 	zpWindow* getWindow() const;
 
+	void setVSyncEnabled( zp_bool enabled );
+
 	void present();
 
 	zpRenderingContext* createRenderingContext( const zpString& name );
@@ -60,6 +62,8 @@ private:
 	zpDX11RenderingEngine();
 
 	ID3D11Device* getDevice() const;
+
+	zp_bool m_vsyncEnabled;
 
 	IDXGIFactory* m_dxgiFactory;
 	IDXGIAdapter* m_dxgiAdapter;

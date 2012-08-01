@@ -186,7 +186,7 @@ void rendering_test_main() {
 	zp_printfcln( ZP_CC( ZP_CC_RED, ZP_CC_LIGHT_BLUE ), "Size: %d", sizeof( zpGameObject ) );
 
 	zpWindow wnd;
-	wnd.setTitle( "ZP4 Window" );
+	wnd.setTitle( "ZeroPoint4 Window" );
 	wnd.setPosition( zpVector2i( 50, 50 ) );
 	wnd.setScreenSize( zpVector2i( 800, 600 ) );
 	wnd.create();
@@ -216,7 +216,7 @@ void rendering_test_main() {
 	cm.registerFileExtension( "shader", &rrcShader );
 
 	zpRenderingManager rm;
-	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_DX );
+	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_OPENGL );
 	
 	game.addGameManager( &rm );
 	game.addGameManager( &cm );
@@ -233,13 +233,14 @@ void rendering_test_main() {
 		zp_uint frames;
 		void start( zpContentManager* cm ) {
 			engine = zpRenderingFactory::getRenderingEngine();
-
+			/*
 			buff = engine->createBuffer();
 
 			zpSimpleVertex sv[] = {
 				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
 				{ zpVector4f( 0, .5f, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
-				{ zpVector4f( .5f, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) }
+				{ zpVector4f( .5f, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+				{ zpVector4f( .5f, .5, 0, 1 ), zpColor4f( 1, 0, 1, 1 ) },
 			};
 			buff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, sv );
 
@@ -249,20 +250,24 @@ void rendering_test_main() {
 			time = 0;
 
 			engine->getImmediateRenderingContext()->setViewport( zpViewport( 800, 600 ) );
+			engine->setVSyncEnabled( true );
+			*/
 		}
 		void render() {
+			/*
 			zpRenderingContext* i = engine->getImmediateRenderingContext();
 
 			zpColor4f c(.23f, .15f, .88f, 1.f );
 			i->clearRenderTarget( &c );
 			i->clearDepthStencilBuffer( 1.0f, 0 );
 
-			i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
+			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 			i->bindBuffer( buff );
 			i->bindShader( sr );
-			i->draw( 3 );
+			i->draw( 4 );
 
 			engine->present();
+
 			++frames;
 			time += zpTime::getInstance()->getDeltaTime();
 			if( time > 1.f ) {
@@ -270,6 +275,7 @@ void rendering_test_main() {
 				time = 0;
 				frames = 0;
 			}
+			*/
 		}
 	};
 	TestRenderable* tr = new TestRenderable;
