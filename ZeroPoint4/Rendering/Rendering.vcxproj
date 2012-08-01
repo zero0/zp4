@@ -108,6 +108,7 @@
     <ClInclude Include="zpTextureResource.h" />
     <ClInclude Include="zpVertex.h" />
     <ClInclude Include="zpVertexLayout.h" />
+    <ClInclude Include="zpViewport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpDX11Buffer.cpp" />
@@ -127,6 +128,7 @@
     <ClCompile Include="zpRenderingFactory.cpp" />
     <ClCompile Include="zpRenderingManager.cpp" />
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
+    <ClCompile Include="zpViewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

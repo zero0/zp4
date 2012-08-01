@@ -64,7 +64,7 @@ void zpProperties::load( const zpString& file ) {
 	if( f.open() ) {
 		zp_uint pos;
 
-		zpStringBuffer buff( 128 );
+		zpStringBuffer buff;
 		zpString str;
 
 		while( f.readLine( &buff ) > 0 ) {
@@ -92,7 +92,7 @@ void zpProperties::save( const zpString& file ) const {
 	zpFile f( file, ZP_FILE_MODE_TRUNCATE_WRITE );
 	if( f.open() ) {
 		
-		zpStringBuffer buffer( 128 );
+		zpStringBuffer buffer;
 		m_properties.foreach( [ &buffer, &f ]( const zpString& key, const zpString& value ) {
 			buffer << key << " = " << value << '\n';
 

@@ -120,8 +120,8 @@ void zpContentManager::onDisabled() {}
 zpResource* zpContentManager::getResource_T( const void* type, const zpString& alias ) const {
 	const std::type_info& info = *(const std::type_info*)type;
 	zpResource* resource = m_resources.get( alias );
-	
-	ZP_ASSERT_RETURN_( ( resource && info == typeid( *resource ) ), ZP_NULL, "Resource '%s' is not type %s", alias.c_str(), info.name() );
+
+	ZP_ASSERT_RETURN_( ( resource && info == typeid( *resource ) ), ZP_NULL, "Resource '%s' is not type %s but type %s", alias.c_str(), info.name(), typeid(*resource).name() );
 	
 	return resource;
 }

@@ -117,8 +117,21 @@ enum zpMapType {
 	ZP_MAP_TYPE_WRITE,
 	ZP_MAP_TYPE_READ_WRITE,
 	ZP_MAP_TYPE_WRITE_DISCARD,
-
 };
+
+enum zpTopology {
+	ZP_TOPOLOGY_UNKNOWN,
+
+	ZP_TOPOLOGY_POINT_LIST,
+
+	ZP_TOPOLOGY_LINE_LIST,
+	ZP_TOPOLOGY_LINE_STRIP,
+
+	ZP_TOPOLOGY_TRIANGLE_LIST,
+	ZP_TOPOLOGY_TRIANGLE_STRIP,
+};
+
+class zpViewport;
 
 ZP_PURE_INTERFACE zpShaderResource;
 ZP_PURE_INTERFACE zpTextureResource;
@@ -135,6 +148,9 @@ class zpRenderingFactory;
 
 class zpCamera;
 class zpRenderingManager;
+
+#include "zpVertex.h"
+#include "zpViewport.h"
 
 #include "zpShaderResource.h"
 #include "zpTextureResource.h"

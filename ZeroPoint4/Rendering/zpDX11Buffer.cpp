@@ -7,17 +7,9 @@ zpDX11Buffer::zpDX11Buffer() :
 	m_count( 0 ),
 	m_stride( 0 ),
 	m_type( ZP_BUFFER_TYPE_VERTEX ),
+	m_format( ZP_DISPLAY_FORMAT_UNKNOWN ),
 	m_bind( ZP_BUFFER_BIND_DEFAULT ),
-	m_buffer( ZP_NULL ),
-	m_engine( ZP_NULL )
-{}
-zpDX11Buffer::zpDX11Buffer( zpDX11RenderingEngine* engine ) :
-	m_count( 0 ),
-	m_stride( 0 ),
-	m_type( ZP_BUFFER_TYPE_VERTEX ),
-	m_bind( ZP_BUFFER_BIND_DEFAULT ),
-	m_buffer( ZP_NULL ),
-	m_engine( engine )
+	m_buffer( ZP_NULL )
 {}
 zpDX11Buffer::~zpDX11Buffer() {
 	release();
@@ -36,6 +28,8 @@ void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint cou
 		}
 	}
 
+	HRESULT hr;
+
 	D3D11_BUFFER_DESC desc;
 	zp_zero_memory( &desc );
 	desc.Usage = __zpToDX( bind );
@@ -44,30 +38,34 @@ void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint cou
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 
+	ID3D11Device* device = ( (zpDX11RenderingEngine*)zpRenderingFactory::getRenderingEngine() )->getDevice();
 	if( data ) {
 		D3D11_SUBRESOURCE_DATA sub;
 		zp_zero_memory( &sub );
 		sub.pSysMem = data;
 
-		m_engine->getDevice()->CreateBuffer( &desc, &sub, &m_buffer );
+		
+		hr = device->CreateBuffer( &desc, &sub, &m_buffer );
 	} else {
-		m_engine->getDevice()->CreateBuffer( &desc, ZP_NULL, &m_buffer );
+		hr = device->CreateBuffer( &desc, ZP_NULL, &m_buffer );
 	}
+
+	if( FAILED( hr ) ) zp_printfln( "Failed to create zpBuffer" );
 }
 void zpDX11Buffer::release() {
 	ZP_SAFE_RELEASE( m_buffer );
 }
 
 void zpDX11Buffer::map( void** data, zpMapType mapType, zp_uint subResource ) {
-	m_engine->getImmediateRenderingContext()->map( this, mapType, 0, data );
+	zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext()->map( this, mapType, 0, data );
 }
 void zpDX11Buffer::unmap( zp_uint subResource ) {
-	m_engine->getImmediateRenderingContext()->unmap( this, subResource );
+	zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext()->unmap( this, subResource );
 }
 
 void zpDX11Buffer::update( zp_uint count, void* data ) {
 	void* d;
-	zpRenderingContext* context = m_engine->getImmediateRenderingContext();
+	zpRenderingContext* context = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 	m_count = count;
 
 	context->map( this, ZP_MAP_TYPE_WRITE_DISCARD, 0, &d );

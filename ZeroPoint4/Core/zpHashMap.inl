@@ -1,7 +1,7 @@
 
 template<typename Key, typename Value>
 zpHashMap<Key, Value>::zpHashMap() : 
-	m_map( 16 ),
+	m_map( ZP_HASH_MAP_DEFAULT_SIZE ),
 	m_size( 0 ),
 	m_loadFactor( ZP_HASH_MAP_DEFAULT_LOAD_FACTOR )
 {}
@@ -220,15 +220,17 @@ zp_bool zpHashMap<Key, Value>::find( const Key& key, Value* outValue ) const {
 
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::clear() {
-	for( zp_uint i = 0; i < m_map.size(); ++i ) {
-		for( zpMapEntity* e = m_map[ i ], *next = e; next != ZP_NULL;  ) {
-			next = e->next;
-			ZP_SAFE_DELETE( e );
-			e = next;
+	if( m_size > 0 ) {
+		for( zp_uint i = 0; i < m_map.size(); ++i ) {
+			for( zpMapEntity* e = m_map[ i ], *next = e; next != ZP_NULL;  ) {
+				next = e->next;
+				ZP_SAFE_DELETE( e );
+				e = next;
+			}
 		}
+		m_map.clear();
+		m_size = 0;
 	}
-	m_map.clear();
-	m_size = 0;
 }
 
 template<typename Key, typename Value> template<typename Func>

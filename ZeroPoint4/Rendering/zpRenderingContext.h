@@ -31,6 +31,13 @@ public:
 	virtual void unmap( zpBuffer* buffer, zp_uint subResource ) = 0;
 
 	virtual void bindShader( zpShaderResource* shader ) = 0;
+	virtual void unbindShader( zpShaderResource* shader ) = 0;
+
+	virtual void setTopology( zpTopology topology ) = 0;
+
+	virtual void draw( zp_uint vertexCount, zp_uint startIndex = 0 ) = 0;
+
+	virtual void setViewport( const zpViewport& viewport ) = 0;
 };
 
 #endif

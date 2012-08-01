@@ -3,6 +3,7 @@
 #define ZP_HASH_MAP_H
 
 #define ZP_HASH_MAP_DEFAULT_LOAD_FACTOR	0.75f
+#define ZP_HASH_MAP_DEFAULT_SIZE		8
 
 template<typename Key, typename Value>
 class zpHashMap {

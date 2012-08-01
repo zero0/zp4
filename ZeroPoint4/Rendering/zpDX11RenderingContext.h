@@ -31,6 +31,14 @@ public:
 	void unmap( zpBuffer* buffer, zp_uint subResource );
 
 	void bindShader( zpShaderResource* shader );
+	void unbindShader( zpShaderResource* shader );
+
+	void setTopology( zpTopology topology );
+
+	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
+
+	void setViewport( const zpViewport& viewport );
+
 
 	void addReference() const;
 	zp_bool removeReference() const;

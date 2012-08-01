@@ -12,7 +12,7 @@ public:
 
 	template<typename S, zp_uint I>
 	void create( zpBufferType type, zpBufferBindType bind, const S (&data)[I] ) {
-		create( type, bind, I, sizeof( S ), data );
+		create( type, bind, I, sizeof( S ), (void*)data );
 	}
 
 	template<typename S, zp_uint I>

@@ -24,7 +24,6 @@ public:
 
 private:
 	zpDX11Buffer();
-	zpDX11Buffer( zpDX11RenderingEngine* engine );
 
 	ID3D11Buffer* getBuffer() const;
 
@@ -35,7 +34,6 @@ private:
 	zpBufferBindType m_bind;
 
 	ID3D11Buffer* m_buffer;
-	zpDX11RenderingEngine* m_engine;
 
 	friend class zpDX11RenderingEngine;
 	friend class zpDX11RenderingContext;

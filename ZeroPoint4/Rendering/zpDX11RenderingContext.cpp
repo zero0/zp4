@@ -31,13 +31,20 @@ void zpDX11RenderingContext::setRenderTarget( zpRenderTarget* target ) {
 	if( target ) target->addReference();
 
 	m_renderTarget = target;
+
+	m_context->OMSetRenderTargets( m_renderTarget ? m_renderTarget->getNumberOfTargets() : 0, m_renderTarget ? ( (zpDX11RenderTarget*)m_renderTarget )->getRenderTargets() : ZP_NULL, m_depthStencilBuffer ? ( (zpDX11DepthStencilBuffer*)m_depthStencilBuffer )->getDepthStencilView() : ZP_NULL );
 }
 zpRenderTarget* zpDX11RenderingContext::getRenderTarget() const {
 	return m_renderTarget;
 }
 
 void zpDX11RenderingContext::setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer ) {
+	if( m_depthStencilBuffer ) m_depthStencilBuffer->removeReference();
+	if( depthBuffer ) depthBuffer->addReference();
+
 	m_depthStencilBuffer = depthBuffer;
+
+	m_context->OMSetRenderTargets( m_renderTarget ? m_renderTarget->getNumberOfTargets() : 0, m_renderTarget ? ( (zpDX11RenderTarget*)m_renderTarget )->getRenderTargets() : ZP_NULL, m_depthStencilBuffer ? ( (zpDX11DepthStencilBuffer*)m_depthStencilBuffer )->getDepthStencilView() : ZP_NULL );
 }
 zpDepthStencilBuffer* zpDX11RenderingContext::getDepthStencilBuffer() const {
 	return m_depthStencilBuffer;
@@ -121,7 +128,11 @@ void zpDX11RenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, z
 
 void zpDX11RenderingContext::setVertexLayout( zpVertexLayout* layout ) {
 	zpDX11VertexLayout* i = (zpDX11VertexLayout*)layout;
-	if( i->getInputLayout() ) m_context->IASetInputLayout( i->getInputLayout() );
+	if( !i ) {
+		m_context->IASetInputLayout( ZP_NULL );
+	} else if( i->getInputLayout() ) {
+		m_context->IASetInputLayout( i->getInputLayout() );
+	}
 }
 
 void zpDX11RenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {
@@ -135,22 +146,57 @@ void zpDX11RenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
 
 void zpDX11RenderingContext::bindShader( zpShaderResource* shader ) {
 	zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader;
-	if( s->getPixelShader() ) m_context->PSSetShader( s->getPixelShader(), ZP_NULL, 0 );
 	if( s->getVertexShader() ) {
 		setVertexLayout( s->getVertexLayout() );
 		m_context->VSSetShader( s->getVertexShader(), ZP_NULL, 0 );
 	}
+	if( s->getPixelShader() ) m_context->PSSetShader( s->getPixelShader(), ZP_NULL, 0 );
 	if( s->getGeometryShader() ) m_context->GSSetShader( s->getGeometryShader(), ZP_NULL, 0 );
 	if( s->getComputeShader() ) m_context->CSSetShader( s->getComputeShader(), ZP_NULL, 0 );
 }
+void zpDX11RenderingContext::unbindShader( zpShaderResource* shader ) {
+	zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader;
+	if( !s || s->getVertexShader() ) {
+		setVertexLayout( ZP_NULL );
+		m_context->VSSetShader( ZP_NULL, ZP_NULL, 0 );
+	}
+	if( !s || s->getPixelShader() ) m_context->PSSetShader( ZP_NULL, ZP_NULL, 0 );
+	if( !s || s->getGeometryShader() ) m_context->GSSetShader( ZP_NULL, ZP_NULL, 0 );
+	if( !s || s->getComputeShader() ) m_context->CSSetShader( ZP_NULL, ZP_NULL, 0 );
+}
+
+void zpDX11RenderingContext::setTopology( zpTopology topology ) {
+	m_context->IASetPrimitiveTopology( __zpToDX( topology ) );
+}
+
+void zpDX11RenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
+	m_context->Draw( vertexCount, startIndex );
+}
+
+void zpDX11RenderingContext::setViewport( const zpViewport& viewport ) {
+	D3D11_VIEWPORT v;
+	v.Width = viewport.getWidth();
+	v.Height = viewport.getHeight();
+	v.MinDepth = viewport.getMinDepth();
+	v.MaxDepth = viewport.getMaxDepth();
+	v.TopLeftX = viewport.getTopX();
+	v.TopLeftY = viewport.getTepY();
+
+	m_context->RSSetViewports( 1, &v );
+}
+
 
 void zpDX11RenderingContext::addReference() const {
 	++m_referenceCount;
 	m_context->AddRef();
+	m_renderTarget->addReference();
+	m_depthStencilBuffer->addReference();
 }
 zp_bool zpDX11RenderingContext::removeReference() const {
 	--m_referenceCount;
 	m_context->Release();
+	m_renderTarget->removeReference();
+	m_depthStencilBuffer->removeReference();
 	return m_referenceCount == 0;
 }
 

@@ -8,6 +8,8 @@ class zpDX11VertexLayout : public zpVertexLayout {
 public:
 	virtual ~zpDX11VertexLayout();
 
+	zp_uint getStride() const;
+
 private:
 	zpDX11VertexLayout();
 	
@@ -16,6 +18,7 @@ private:
 	ID3D11InputLayout* getInputLayout() const;
 
 	ID3D11InputLayout* m_layout;
+	zp_uint m_stride;
 
 	static zpHashMap<zpString, zpDX11VertexLayout*> s_layouts;
 

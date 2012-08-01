@@ -26,11 +26,11 @@ public:
 
 	template<typename T>
 	T* getResourceOfType( const zpString& alias ) const {
-#if ZP_DEBUG
-		return (T*)getResource_T( (const void*)&typeid( T ), alias );
-#else
+//#if ZP_DEBUG
+//		return (T*)getResource_T( (const void*)&typeid( T ), alias );
+//#else
 		return (T*)getResource( alias );
-#endif
+//#endif
 	}
 
 	template<typename I, typename R>

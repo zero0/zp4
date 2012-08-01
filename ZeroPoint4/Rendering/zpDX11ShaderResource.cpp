@@ -191,6 +191,10 @@ void zpDX11ShaderResource::unload() {
 	ZP_SAFE_RELEASE( m_computeShader );
 }
 
+zpVertexLayout* zpDX11ShaderResource::getVertexLayout() {
+	return m_vertexLayout;
+}
+
 ID3D11VertexShader* zpDX11ShaderResource::getVertexShader() {
 	return m_vertexShader;
 }

@@ -72,6 +72,13 @@ void zpGame::setNextWorld( const zpString& worldName, zp_bool asynchCreateNextWo
 	}
 }
 
+void zpGame::setRenderable( zpRenderable* renderable ) {
+	m_renderable = renderable;
+}
+zpRenderable* zpGame::getRenderable() const {
+	return m_renderable;
+}
+
 void zpGame::process() {
 	zpTime::getInstance()->tick();
 

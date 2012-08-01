@@ -203,16 +203,80 @@ void rendering_test_main() {
 	prop2.foreach( []( const zpString& key, const zpString& value ) {
 		zp_printfln( "%s : %s", key.c_str(), value.c_str() );
 	} );
+
+
 	zpGame game;
 	game.setWindow( &wnd );
+
+	zpRenderingResourceCreator rrcShader;
+	rrcShader.setRootDirectory( "rendering/" );
+
+	zpContentManager cm;
+	cm.setRootDirectory( "Assets/" );
+	cm.registerFileExtension( "shader", &rrcShader );
 
 	zpRenderingManager rm;
 	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_DX );
 	
 	game.addGameManager( &rm );
+	game.addGameManager( &cm );
 
 	game.create();
 
+	cm.loadResource( "simple.shader", "simple_shader" );
+
+	struct TestRenderable : public zpRenderable {
+		zpBuffer* buff;
+		zpShaderResource* sr;
+		zpRenderingEngine* engine;
+		zp_float time;
+		zp_uint frames;
+		void start( zpContentManager* cm ) {
+			engine = zpRenderingFactory::getRenderingEngine();
+
+			buff = engine->createBuffer();
+
+			zpSimpleVertex sv[] = {
+				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
+				{ zpVector4f( 0, .5f, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+				{ zpVector4f( .5f, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) }
+			};
+			buff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, sv );
+
+			sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
+
+			frames = 0;
+			time = 0;
+
+			engine->getImmediateRenderingContext()->setViewport( zpViewport( 800, 600 ) );
+		}
+		void render() {
+			zpRenderingContext* i = engine->getImmediateRenderingContext();
+
+			zpColor4f c(.23f, .15f, .88f, 1.f );
+			i->clearRenderTarget( &c );
+			i->clearDepthStencilBuffer( 1.0f, 0 );
+
+			i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
+			i->bindBuffer( buff );
+			i->bindShader( sr );
+			i->draw( 3 );
+
+			engine->present();
+			++frames;
+			time += zpTime::getInstance()->getDeltaTime();
+			if( time > 1.f ) {
+				zp_printfcln( ZP_CC( ZP_CC_GREEN, ZP_CC_WHITE ), "FPS: %d", frames );
+				time = 0;
+				frames = 0;
+			}
+		}
+	};
+	TestRenderable* tr = new TestRenderable;
+	tr->start( &cm );
+
+	game.setRenderable( tr );
+	
 	while( wnd.processMessages() ) {
 		game.process();
 	}

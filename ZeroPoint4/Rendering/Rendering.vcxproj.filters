@@ -105,6 +105,9 @@
     <ClInclude Include="zpVertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpViewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -148,6 +151,9 @@
     </ClCompile>
     <ClCompile Include="zpDX11VertexLayout.cpp">
       <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpViewport.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

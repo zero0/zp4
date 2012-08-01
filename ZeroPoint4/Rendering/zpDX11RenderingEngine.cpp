@@ -131,6 +131,8 @@ void zpDX11RenderingEngine::destroy() {
 	//ZP_SAFE_RELEASE( m_immediateContext );
 	ZP_SAFE_RELEASE( m_swapChain );
 	ZP_SAFE_RELEASE( m_d3dDevice );
+
+	ZP_SAFE_REMOVE_REF( m_immediateContext );
 }
 
 zpRenderingEngineType zpDX11RenderingEngine::getEngineType() const {
@@ -276,7 +278,7 @@ zpRenderingContext* zpDX11RenderingEngine::getImmediateRenderingContext() const 
 }
 
 zpBuffer* zpDX11RenderingEngine::createBuffer() {
-	return new zpDX11Buffer( this );
+	return new zpDX11Buffer();
 }
 
 zpTextureResource* zpDX11RenderingEngine::createTextureResource() {

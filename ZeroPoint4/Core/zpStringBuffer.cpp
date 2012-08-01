@@ -3,8 +3,13 @@
 #include <string.h>
 #include <stdio.h>
 
-zpStringBuffer::zpStringBuffer() : m_buffer( (zp_char*)calloc( 16, sizeof( zp_char ) ) ), m_length( 0 ), m_capacity( 16 ) {}
-zpStringBuffer::zpStringBuffer( zp_uint size )  : m_buffer( (zp_char*)calloc( size, sizeof( zp_char ) ) ), m_length( 0 ), m_capacity( size ) {}
+#define ZP_STRING_BUFFER_DEFAULT_SIZE	16
+
+zpStringBuffer::zpStringBuffer() : m_buffer( (zp_char*)calloc( ZP_STRING_BUFFER_DEFAULT_SIZE, sizeof( zp_char ) ) ), m_length( 0 ), m_capacity( ZP_STRING_BUFFER_DEFAULT_SIZE ) {}
+zpStringBuffer::zpStringBuffer( const zpString& str ) : m_buffer( ZP_NULL ), m_length( str.length() ), m_capacity( 1 ) {
+	ensureCapacity( str.capacity() + 1 );
+	memcpy_s( m_buffer, m_capacity * sizeof( zp_char ), str.getChars(), str.capacity() * sizeof( zp_char ) );
+}
 zpStringBuffer::zpStringBuffer( const zpStringBuffer& buff ) : m_buffer( (zp_char*)calloc( buff.m_capacity, sizeof( zp_char ) ) ), m_length( buff.m_length ), m_capacity( buff.m_capacity ) {
 	memcpy_s( m_buffer, m_capacity * sizeof( zp_char ), buff.m_buffer, buff.m_capacity * sizeof( zp_char ) );
 }

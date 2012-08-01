@@ -7,7 +7,7 @@ public:
 	static const zp_uint npos = -1;
 
 	zpStringBuffer();
-	zpStringBuffer( zp_uint size );
+	zpStringBuffer( const zpString& str );
 	zpStringBuffer( const zpStringBuffer& buff );
 	zpStringBuffer( zpStringBuffer&& buff );
 	~zpStringBuffer();
