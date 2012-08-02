@@ -111,6 +111,12 @@
     <ClInclude Include="zpOpenGLRenderingContext.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="zpTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11Texture.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -157,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="zpOpenGLRenderingContext.cpp">
       <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11Texture.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

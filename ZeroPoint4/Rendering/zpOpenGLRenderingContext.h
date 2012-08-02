@@ -26,6 +26,9 @@ public:
 	void bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
 	void unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
 
+	void bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture );
+	void unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture );
+
 	void setVertexLayout( zpVertexLayout* layout );
 
 	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );

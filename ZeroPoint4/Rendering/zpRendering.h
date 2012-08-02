@@ -131,7 +131,15 @@ enum zpTopology {
 	ZP_TOPOLOGY_TRIANGLE_STRIP,
 };
 
+enum zpResourceBindType {
+	ZP_RESOURCE_BIND_TYPE_VERTEX_SHADER,
+	ZP_RESOURCE_BIND_TYPE_GEOMETRY_SHADER,
+	ZP_RESOURCE_BIND_TYPE_COMPUTE_SHADER,
+	ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER,
+};
+
 class zpViewport;
+ZP_PURE_INTERFACE zpTexture;
 
 ZP_PURE_INTERFACE zpShaderResource;
 ZP_PURE_INTERFACE zpTextureResource;
@@ -151,6 +159,7 @@ class zpRenderingManager;
 
 #include "zpVertex.h"
 #include "zpViewport.h"
+#include "zpTexture.h"
 
 #include "zpShaderResource.h"
 #include "zpTextureResource.h"

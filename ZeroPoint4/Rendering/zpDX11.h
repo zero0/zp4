@@ -12,6 +12,8 @@
 #pragma comment( lib, "d3dx11.lib" )
 #endif
 
+class zpDX11Texture;
+
 class zpDX11ShaderResource;
 class zpDX11TextureResource;
 
@@ -22,6 +24,8 @@ class zpDX11VertexLayout;
 
 class zpDX11RenderingContext;
 class zpDX11RenderingEngine;
+
+#include "zpDX11Texture.h"
 
 #include "zpDX11ShaderResource.h"
 #include "zpDX11TextureResource.h"

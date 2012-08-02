@@ -57,6 +57,9 @@ void zpOpenGLRenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {}
 void zpOpenGLRenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {}
 void zpOpenGLRenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {}
 
+void zpOpenGLRenderingContext::bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {}
+void zpOpenGLRenderingContext::unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {}
+
 void zpOpenGLRenderingContext::setVertexLayout( zpVertexLayout* layout ) {}
 
 void zpOpenGLRenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {}

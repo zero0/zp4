@@ -36,6 +36,9 @@ public:
 	virtual void bindShader( zpShaderResource* shader ) = 0;
 	virtual void unbindShader( zpShaderResource* shader ) = 0;
 
+	virtual void bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) = 0;
+	virtual void unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) = 0;
+
 	virtual void setTopology( zpTopology topology ) = 0;
 
 	virtual void draw( zp_uint vertexCount, zp_uint startIndex = 0 ) = 0;

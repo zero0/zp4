@@ -130,6 +130,28 @@ void zpDX11RenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, z
 	}
 }
 
+void zpDX11RenderingContext::bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {
+	ID3D11ShaderResourceView* view = ( (zpDX11Texture*)texture )->getResourceView();
+	switch( bindType ) {
+	case ZP_RESOURCE_BIND_TYPE_VERTEX_SHADER:
+		m_context->VSSetShaderResources( slot, 1, &view );
+		break;
+	case ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER:
+		m_context->PSSetShaderResources( slot, 1, &view );
+		break;
+	}
+}
+void zpDX11RenderingContext::unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {
+	switch( bindType ) {
+	case ZP_RESOURCE_BIND_TYPE_VERTEX_SHADER:
+		m_context->VSSetShaderResources( slot, 1, ZP_NULL );
+		break;
+	case ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER:
+		m_context->PSSetShaderResources( slot, 1, ZP_NULL );
+		break;
+	}
+}
+
 void zpDX11RenderingContext::setVertexLayout( zpVertexLayout* layout ) {
 	zpDX11VertexLayout* i = (zpDX11VertexLayout*)layout;
 	if( !i ) {
