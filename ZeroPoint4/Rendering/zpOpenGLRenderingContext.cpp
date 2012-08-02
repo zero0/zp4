@@ -3,13 +3,15 @@
 
 zpOpenGLRenderingContext::zpOpenGLRenderingContext() :
 	m_context( ZP_NULL ),
+	m_hdc( ZP_NULL ),
 	m_renderTarget( ZP_NULL ),
 	m_depthStencilBuffer( ZP_NULL ),
 	m_referenceCount( 1 ),
 	m_name()
 {}
-zpOpenGLRenderingContext::zpOpenGLRenderingContext( void* context, const zpString& name ) :
+zpOpenGLRenderingContext::zpOpenGLRenderingContext( void* context, void* hdc, const zpString& name ) :
 	m_context( context ),
+	m_hdc( hdc ),
 	m_renderTarget( ZP_NULL ),
 	m_depthStencilBuffer( ZP_NULL ),
 	m_referenceCount( 1 ),
@@ -21,15 +23,30 @@ const zpString& zpOpenGLRenderingContext::getName() const {
 	return m_name;
 }
 
-void zpOpenGLRenderingContext::setRenderTarget( zpRenderTarget* target ) {}
+void zpOpenGLRenderingContext::setRenderTarget( zpRenderTarget* target ) {
+	if( m_renderTarget ) m_renderTarget->removeReference();
+	if( target ) target->addReference();
+
+	m_renderTarget = target;
+
+	wglMakeCurrent( (HDC)m_hdc, (HGLRC)m_context );
+}
 zpRenderTarget* zpOpenGLRenderingContext::getRenderTarget() const {
 	return m_renderTarget;
 }
 
-void zpOpenGLRenderingContext::setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer ) {}
+void zpOpenGLRenderingContext::setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer ) {
+	if( m_depthStencilBuffer ) m_depthStencilBuffer->removeReference();
+	if( depthBuffer ) depthBuffer->addReference();
+
+	m_depthStencilBuffer = depthBuffer;
+}
 zpDepthStencilBuffer* zpOpenGLRenderingContext::getDepthStencilBuffer() const {
 	return m_depthStencilBuffer;
 }
+
+void zpOpenGLRenderingContext::bindRenderTargetAndDepthBuffer() {}
+void zpOpenGLRenderingContext::unbindRenderTargetAndDepthBuffer() {}
 
 void zpOpenGLRenderingContext::clearRenderTarget( const zpColor4f* colors, zp_uint count ) {}
 void zpOpenGLRenderingContext::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil ) {}
@@ -60,6 +77,7 @@ void zpOpenGLRenderingContext::addReference() const {
 }
 zp_bool zpOpenGLRenderingContext::removeReference() const {
 	if( m_referenceCount == 0 ) return true;
+
 	--m_referenceCount;
 	return m_referenceCount > 0;
 }

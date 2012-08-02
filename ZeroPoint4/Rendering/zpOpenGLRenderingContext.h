@@ -14,6 +14,9 @@ public:
 	void setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer );
 	zpDepthStencilBuffer* getDepthStencilBuffer() const;
 
+	void bindRenderTargetAndDepthBuffer();
+	void unbindRenderTargetAndDepthBuffer();
+
 	void clearRenderTarget( const zpColor4f* colors, zp_uint count = 1 );
 	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
 
@@ -48,9 +51,10 @@ public:
 
 private:
 	zpOpenGLRenderingContext();
-	zpOpenGLRenderingContext( void* context, const zpString& name );
+	zpOpenGLRenderingContext( void* context, void* hdc, const zpString& name );
 
 	void* m_context;
+	void* m_hdc;
 
 	zpRenderTarget* m_renderTarget;
 	zpDepthStencilBuffer* m_depthStencilBuffer;

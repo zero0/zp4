@@ -31,8 +31,6 @@ void zpDX11RenderingContext::setRenderTarget( zpRenderTarget* target ) {
 	if( target ) target->addReference();
 
 	m_renderTarget = target;
-
-	m_context->OMSetRenderTargets( m_renderTarget ? m_renderTarget->getNumberOfTargets() : 0, m_renderTarget ? ( (zpDX11RenderTarget*)m_renderTarget )->getRenderTargets() : ZP_NULL, m_depthStencilBuffer ? ( (zpDX11DepthStencilBuffer*)m_depthStencilBuffer )->getDepthStencilView() : ZP_NULL );
 }
 zpRenderTarget* zpDX11RenderingContext::getRenderTarget() const {
 	return m_renderTarget;
@@ -43,11 +41,17 @@ void zpDX11RenderingContext::setDepthStencilBuffer( zpDepthStencilBuffer* depthB
 	if( depthBuffer ) depthBuffer->addReference();
 
 	m_depthStencilBuffer = depthBuffer;
-
-	m_context->OMSetRenderTargets( m_renderTarget ? m_renderTarget->getNumberOfTargets() : 0, m_renderTarget ? ( (zpDX11RenderTarget*)m_renderTarget )->getRenderTargets() : ZP_NULL, m_depthStencilBuffer ? ( (zpDX11DepthStencilBuffer*)m_depthStencilBuffer )->getDepthStencilView() : ZP_NULL );
 }
 zpDepthStencilBuffer* zpDX11RenderingContext::getDepthStencilBuffer() const {
 	return m_depthStencilBuffer;
+}
+
+void zpDX11RenderingContext::bindRenderTargetAndDepthBuffer() {
+	m_context->OMSetRenderTargets( m_renderTarget ? m_renderTarget->getNumberOfTargets() : 0, m_renderTarget ? ( (zpDX11RenderTarget*)m_renderTarget )->getRenderTargets() : ZP_NULL, m_depthStencilBuffer ? ( (zpDX11DepthStencilBuffer*)m_depthStencilBuffer )->getDepthStencilView() : ZP_NULL );
+}
+void zpDX11RenderingContext::unbindRenderTargetAndDepthBuffer() {
+	m_context->OMSetRenderTargets( 0, ZP_NULL, ZP_NULL );
+
 }
 
 void zpDX11RenderingContext::clearRenderTarget( const zpColor4f* colors, zp_uint count ) {
@@ -193,6 +197,8 @@ void zpDX11RenderingContext::addReference() const {
 	m_depthStencilBuffer->addReference();
 }
 zp_bool zpDX11RenderingContext::removeReference() const {
+	if( m_referenceCount == 0 ) return true;
+
 	--m_referenceCount;
 	m_context->Release();
 	m_renderTarget->removeReference();

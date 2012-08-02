@@ -12,6 +12,9 @@ public:
 	virtual void setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer ) = 0;
 	virtual zpDepthStencilBuffer* getDepthStencilBuffer() const = 0;
 
+	virtual void bindRenderTargetAndDepthBuffer() = 0;
+	virtual void unbindRenderTargetAndDepthBuffer() = 0;
+
 	template<zp_uint I>
 	void clearRenderTarget( const zpColor4f (&colors)[I] ) {
 		clearRenderTarget( colors, I );

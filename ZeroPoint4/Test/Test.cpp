@@ -6,6 +6,11 @@
 
 #include <stdio.h>
 
+#define TEST_NONE		0
+#define TEST_DX			1
+#define TEST_OPENGL		2
+#define TEST_RENDERING	TEST_DX
+
 void core_test_main() {
 	zp_printfln( "Size: %d", sizeof( zpString ) );
 
@@ -216,8 +221,12 @@ void rendering_test_main() {
 	cm.registerFileExtension( "shader", &rrcShader );
 
 	zpRenderingManager rm;
+#if TEST_RENDERING == TEST_DX
+	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_DX );
+#elif TEST_RENDERING == TEST_OPENGL
 	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_OPENGL );
-	
+#endif
+
 	game.addGameManager( &rm );
 	game.addGameManager( &cm );
 
@@ -233,7 +242,7 @@ void rendering_test_main() {
 		zp_uint frames;
 		void start( zpContentManager* cm ) {
 			engine = zpRenderingFactory::getRenderingEngine();
-			/*
+#if TEST_RENDERING
 			buff = engine->createBuffer();
 
 			zpSimpleVertex sv[] = {
@@ -250,11 +259,12 @@ void rendering_test_main() {
 			time = 0;
 
 			engine->getImmediateRenderingContext()->setViewport( zpViewport( 800, 600 ) );
+			engine->getImmediateRenderingContext()->bindRenderTargetAndDepthBuffer();
 			engine->setVSyncEnabled( true );
-			*/
+#endif
 		}
 		void render() {
-			/*
+#if TEST_RENDERING
 			zpRenderingContext* i = engine->getImmediateRenderingContext();
 
 			zpColor4f c(.23f, .15f, .88f, 1.f );
@@ -275,7 +285,7 @@ void rendering_test_main() {
 				time = 0;
 				frames = 0;
 			}
-			*/
+#endif
 		}
 	};
 	TestRenderable* tr = new TestRenderable;

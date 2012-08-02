@@ -58,7 +58,7 @@ zp_bool zpOpenGLRenderingEngine::create() {
 	}
 	const zp_byte* vv = glGetString( GL_VERSION );
 
-	m_immediateContext = new zpOpenGLRenderingContext( context, "immediate" );
+	m_immediateContext = new zpOpenGLRenderingContext( context, hdc, "immediate" );
 
 	return true;
 }
