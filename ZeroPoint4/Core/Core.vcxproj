@@ -132,6 +132,7 @@
     <ClInclude Include="zpIntrusiveList.h" />
     <ClInclude Include="zpLinkedList.h" />
     <ClInclude Include="zpHashMap.h" />
+    <ClInclude Include="zpLog.h" />
     <ClInclude Include="zpMap.h" />
     <ClInclude Include="zpMath.h" />
     <ClInclude Include="zpMatrix4.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="zpRegisterSerializable.h" />
     <ClInclude Include="zpRenderable.h" />
     <ClInclude Include="zpSerializable.h" />
+    <ClInclude Include="zpSingleton.h" />
     <ClInclude Include="zpString.h" />
     <ClInclude Include="zpStringBuffer.h" />
     <ClInclude Include="zpTime.h" />
@@ -190,6 +192,7 @@
     <ClCompile Include="zpGameManager.cpp" />
     <ClCompile Include="zpGameObject.cpp" />
     <ClCompile Include="zpComponent.cpp" />
+    <ClCompile Include="zpLog.cpp" />
     <ClCompile Include="zpMatrix4f.cpp" />
     <ClCompile Include="zpMemorySystem.cpp" />
     <ClCompile Include="zpMessage.cpp" />

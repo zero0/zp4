@@ -47,18 +47,18 @@ zp_bool zpDX11TextureResource::load() {
 	return true;
 }
 void zpDX11TextureResource::unload() {
-	// release texture and resource view
+	// release texture so it can be recreated (if need be)
 	m_texture.removeReference();
 }
 
 zpTextureType zpDX11TextureResource::getTextureType() const {
-	return ZP_TEXTURE_TYPE_2D;
+	return m_texture.getTextureType();
 }
 zp_uint zpDX11TextureResource::getWidth() const {
-	return 0;
+	return m_texture.getWidth();
 }
 zp_uint zpDX11TextureResource::getHeight() const {
-	return 0;
+	return m_texture.getHeight();
 }
 
 zpTexture* zpDX11TextureResource::getTexture() const {

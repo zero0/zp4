@@ -28,7 +28,7 @@ enum zpConsoleColor {
 #define ZP_CC( f, b ) (zpConsoleColorType)( ( (b) << 4 ) | (f) )
 
 #define ZP_CONSOLE_DEFAULT_BUFFER_SIZE	1024
-#define ZP_CONSOLE_DEFAULT_COLOR		ZP_CC( ZP_CC_WHITE, ZP_CC_BLACK )
+#define ZP_CONSOLE_DEFAULT_COLOR		ZP_CC( ZP_CC_GRAY, ZP_CC_BLACK )
 
 class zpConsole {
 public:

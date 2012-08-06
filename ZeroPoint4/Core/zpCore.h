@@ -18,6 +18,8 @@
 #define ZP_USE_SIMD			0
 //#endif
 
+#define ZP_LOG_ENABLED		1
+
 #if ZP_DEBUG
 #define ZP_ON_DEBUG( code )							do { code ; } while( 0 )
 #define ZP_ON_DEBUG_MSG( msg, ... )					zp_printfln( msg, __VA_ARGS__ )
@@ -56,6 +58,9 @@
 
 #include "zpBaseTypes.h"
 
+class zpLog;
+class zpLogOutput;
+
 ZP_PURE_INTERFACE zpRenderable;
 ZP_PURE_INTERFACE zpSerializable;
 ZP_PURE_INTERFACE zpSerializedOutput;
@@ -93,6 +98,8 @@ class zpWorld;
 class zpGameManager;
 class zpGameObject;
 ZP_ABSTRACT_CLASS zpComponent;
+
+#include "zpLog.h"
 
 #include "zpMath.h"
 

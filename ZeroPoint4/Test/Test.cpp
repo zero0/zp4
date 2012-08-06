@@ -216,6 +216,8 @@ void rendering_test_main() {
 	zpRenderingResourceCreator rrcShader;
 	rrcShader.setRootDirectory( "rendering/" );
 
+	zpLog::debug() << "Hello Debug" << zpLog::endl;
+
 	zpContentManager cm;
 	cm.setRootDirectory( "Assets/" );
 	cm.registerFileExtension( "shader", &rrcShader );
@@ -233,6 +235,9 @@ void rendering_test_main() {
 	game.create();
 
 	cm.loadResource( "simple.shader", "simple_shader" );
+	//zpLog::getInstance()->disableLogLevel( ZP_LOG_LEVEL_DEBUG );
+	//zpLogOutput& d = zpLog::debug();
+	//zpLog::debug() << "hello" << zpLogOptions::endl << zpLogOptions::red << "debug log" << zpLogOptions::reset << " Log";
 
 	struct TestRenderable : public zpRenderable {
 		zpBuffer* buff;
