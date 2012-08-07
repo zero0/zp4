@@ -213,14 +213,15 @@ void rendering_test_main() {
 	zpGame game;
 	game.setWindow( &wnd );
 
-	zpRenderingResourceCreator rrcShader;
-	rrcShader.setRootDirectory( "rendering/" );
+	zpRenderingResourceCreator rrc;
+	rrc.setRootDirectory( "rendering/" );
 
 	zpLog::debug() << "Hello Debug" << zpLog::endl;
 
 	zpContentManager cm;
 	cm.setRootDirectory( "Assets/" );
-	cm.registerFileExtension( "shader", &rrcShader );
+	cm.registerFileExtension( "shader", &rrc );
+	cm.registerFileExtension( "png", &rrc );
 
 	zpRenderingManager rm;
 #if TEST_RENDERING == TEST_DX
@@ -235,30 +236,48 @@ void rendering_test_main() {
 	game.create();
 
 	cm.loadResource( "simple.shader", "simple_shader" );
+	cm.loadResource( "tex_norm.shader", "tex_norm_shader" );
+	cm.loadResource( "test.png", "tex" );
+
 	//zpLog::getInstance()->disableLogLevel( ZP_LOG_LEVEL_DEBUG );
 	//zpLogOutput& d = zpLog::debug();
 	//zpLog::debug() << "hello" << zpLogOptions::endl << zpLogOptions::red << "debug log" << zpLogOptions::reset << " Log";
 
 	struct TestRenderable : public zpRenderable {
 		zpBuffer* buff;
+		zpBuffer* buff2;
 		zpShaderResource* sr;
+		zpShaderResource* srtex;
 		zpRenderingEngine* engine;
+		zpTextureResource* tex;
 		zp_float time;
 		zp_uint frames;
 		void start( zpContentManager* cm ) {
 			engine = zpRenderingFactory::getRenderingEngine();
 #if TEST_RENDERING
 			buff = engine->createBuffer();
+			buff2 = engine->createBuffer();
 
-			zpSimpleVertex sv[] = {
+			const zp_float f = .7f;
+			zpVertexPositionColor sv[] = {
 				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
-				{ zpVector4f( 0, .5f, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
-				{ zpVector4f( .5f, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) },
-				{ zpVector4f( .5f, .5, 0, 1 ), zpColor4f( 1, 0, 1, 1 ) },
+				{ zpVector4f( 0, f, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+				{ zpVector4f( f, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+				{ zpVector4f( f, f, 0, 1 ), zpColor4f( 1, 0, 1, 1 ) },
 			};
 			buff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, sv );
 
+			zpVertexPositionNormalTexture pnt[] = {
+				{ zpVector4f( -f, 0, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 )  },
+				{ zpVector4f( -f, f, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 0 )  },
+				{ zpVector4f( 0, 0, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 1, 1 )  },
+				{ zpVector4f( 0, f, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 1, 0 )  }
+			};
+			buff2->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, pnt );
+
 			sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
+			srtex = cm->getResourceOfType<zpShaderResource>( "tex_norm_shader" );
+			tex = cm->getResourceOfType<zpTextureResource>( "tex" );
 
 			frames = 0;
 			time = 0;
@@ -279,6 +298,11 @@ void rendering_test_main() {
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 			i->bindBuffer( buff );
 			i->bindShader( sr );
+			i->draw( 4 );
+
+			i->bindBuffer( buff2 );
+			i->bindShader( srtex );
+			i->bindTexture( ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER, 0, tex->getTexture() );
 			i->draw( 4 );
 
 			engine->present();

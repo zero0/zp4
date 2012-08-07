@@ -15,9 +15,19 @@
 #include <GL\wglew.h>
 #include <GL\GL.h>
 
+class zpOpenGLBuffer;
+class zpOpenGLDepthStencilBuffer;
+
+class zpOpenGLRenderTarget;
 class zpOpenGLRenderingEngine;
 class zpOpenGLRenderingContext;
 
+#include "zpOpenGLUtil.h"
+
+#include "zpOpenGLBuffer.h"
+#include "zpOpenGLDepthStencilBuffer.h"
+
+#include "zpOpenGLRenderTarget.h"
 #include "zpOpenGLRenderingEngine.h"
 #include "zpOpenGLRenderingContext.h"
 

@@ -51,7 +51,6 @@ void zpDX11RenderingContext::bindRenderTargetAndDepthBuffer() {
 }
 void zpDX11RenderingContext::unbindRenderTargetAndDepthBuffer() {
 	m_context->OMSetRenderTargets( 0, ZP_NULL, ZP_NULL );
-
 }
 
 void zpDX11RenderingContext::clearRenderTarget( const zpColor4f* colors, zp_uint count ) {
@@ -206,7 +205,7 @@ void zpDX11RenderingContext::setViewport( const zpViewport& viewport ) {
 	v.MinDepth = viewport.getMinDepth();
 	v.MaxDepth = viewport.getMaxDepth();
 	v.TopLeftX = viewport.getTopX();
-	v.TopLeftY = viewport.getTepY();
+	v.TopLeftY = viewport.getTopY();
 
 	m_context->RSSetViewports( 1, &v );
 }

@@ -45,16 +45,37 @@ zpDepthStencilBuffer* zpOpenGLRenderingContext::getDepthStencilBuffer() const {
 	return m_depthStencilBuffer;
 }
 
-void zpOpenGLRenderingContext::bindRenderTargetAndDepthBuffer() {}
-void zpOpenGLRenderingContext::unbindRenderTargetAndDepthBuffer() {}
+void zpOpenGLRenderingContext::bindRenderTargetAndDepthBuffer() {
+	( (zpOpenGLRenderTarget*)m_renderTarget )->getFramebuffers().foreachIndexed( []( zp_uint index, zp_uint framebuffer ) {
+		glBindFramebuffer( GL_COLOR_ATTACHMENT0 + index, framebuffer );
+	} );
+	glBindFramebuffer( GL_DEPTH_STENCIL_ATTACHMENT, ( (zpOpenGLDepthStencilBuffer*)m_depthStencilBuffer )->getFramebuffer() );
+}
+void zpOpenGLRenderingContext::unbindRenderTargetAndDepthBuffer() {
+	glBindFramebuffer( GL_COLOR_ATTACHMENT0, 0 );
+	glBindFramebuffer( GL_DEPTH_STENCIL_ATTACHMENT, 0 );
+}
 
-void zpOpenGLRenderingContext::clearRenderTarget( const zpColor4f* colors, zp_uint count ) {}
-void zpOpenGLRenderingContext::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil ) {}
+void zpOpenGLRenderingContext::clearRenderTarget( const zpColor4f* colors, zp_uint count ) {
+	for( zp_uint i = 0; i < count; ++i ) {
+		glClearBufferfv( GL_COLOR, GL_DRAW_BUFFER0 + i, colors[i] );
+	}
+}
+void zpOpenGLRenderingContext::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil ) {
+	glClearBufferfi( GL_DEPTH_STENCIL, 0, clearDepth, clearStencil );
+}
 
-void zpOpenGLRenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {}
-void zpOpenGLRenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {}
+void zpOpenGLRenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {
+	zpOpenGLBuffer* buff = (zpOpenGLBuffer*)buffer;
+	glBindBuffer( buff->getTarget(), buff->getBuffer() );
+}
+void zpOpenGLRenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
+	zpOpenGLBuffer* buff = (zpOpenGLBuffer*)buffer;
+	glBindBuffer( buff->getTarget(), 0 );
+}
 
-void zpOpenGLRenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {}
+void zpOpenGLRenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {
+}
 void zpOpenGLRenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {}
 
 void zpOpenGLRenderingContext::bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {}
@@ -62,18 +83,27 @@ void zpOpenGLRenderingContext::unbindTexture( zpResourceBindType bindType, zp_ui
 
 void zpOpenGLRenderingContext::setVertexLayout( zpVertexLayout* layout ) {}
 
-void zpOpenGLRenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {}
-void zpOpenGLRenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {}
+void zpOpenGLRenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {
+	buffer->map( data, mapType, subResource );
+}
+void zpOpenGLRenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
+	buffer->unmap( subResource );
+}
 
 void zpOpenGLRenderingContext::bindShader( zpShaderResource* shader ) {}
 void zpOpenGLRenderingContext::unbindShader( zpShaderResource* shader ) {}
 
-void zpOpenGLRenderingContext::setTopology( zpTopology topology ) {}
+void zpOpenGLRenderingContext::setTopology( zpTopology topology ) {
+	m_topology = __zpToGL( topology );
+}
 
-void zpOpenGLRenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {}
+void zpOpenGLRenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
+	glDrawArrays( m_topology, startIndex, vertexCount );
+}
 
-void zpOpenGLRenderingContext::setViewport( const zpViewport& viewport ) {}
-
+void zpOpenGLRenderingContext::setViewport( const zpViewport& viewport ) {
+	glViewport( (zp_int)viewport.getTopX(), (zp_int)viewport.getTopY(), (zp_uint)viewport.getWidth(), (zp_uint)viewport.getHeight() );
+}
 
 void zpOpenGLRenderingContext::addReference() const {
 	++m_referenceCount;

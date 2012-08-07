@@ -62,6 +62,7 @@ private:
 	zpRenderTarget* m_renderTarget;
 	zpDepthStencilBuffer* m_depthStencilBuffer;
 
+	zp_uint m_topology;
 	mutable zp_uint m_referenceCount;
 
 	zpString m_name;

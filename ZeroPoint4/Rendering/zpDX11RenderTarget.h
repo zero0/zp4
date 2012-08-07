@@ -36,7 +36,7 @@ private:
 	zp_uint m_height;
 
 	zpArray<ID3D11RenderTargetView*> m_renderTargets;
-	zpArray<ID3D11Texture2D*> m_textures;;
+	zpArray<ID3D11Texture2D*> m_textures;
 
 	friend class zpDX11RenderingContext;
 	friend class zpDX11RenderingEngine;

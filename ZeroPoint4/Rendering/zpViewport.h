@@ -11,7 +11,7 @@ public:
 	zp_float getMinDepth() const;
 	zp_float getMaxDepth() const;
 	zp_float getTopX() const;
-	zp_float getTepY() const;
+	zp_float getTopY() const;
 
 private:
 	zpViewport();

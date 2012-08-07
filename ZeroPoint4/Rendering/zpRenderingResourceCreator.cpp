@@ -11,6 +11,8 @@ zpResource* zpRenderingResourceCreator::createResource( const zpString& filename
 		resource = engine->createTextureResource();
 	} else if( filename.endsWith( ".shader" ) ) {
 		resource = engine->createShaderResource();
+	} else {
+		zpLog::warning() << "Unknown file extension for file: " << filename << zpLog::endl;
 	}
 
 	return resource;

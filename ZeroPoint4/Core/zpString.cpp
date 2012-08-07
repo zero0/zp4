@@ -61,8 +61,8 @@ zpString::zpString( const zp_char* string, zp_uint length, zp_uint offset ) :
 			while( m_capacity <= m_length ) m_capacity *= 2;
 
 			m_string = new zp_char[ m_capacity ];
-			strcpy_s( m_string, m_capacity * sizeof( zp_char ), string + offset );
-			//memcpy_s( m_string, m_capacity * sizeof( zp_char ), string + offset, m_length );
+			//strcpy_s( m_string, m_capacity * sizeof( zp_char ), string + offset );
+			memcpy_s( m_string, m_capacity * sizeof( zp_char ), string + offset, m_length );
 			m_string[ m_length ] = '\0';
 		}
 	}

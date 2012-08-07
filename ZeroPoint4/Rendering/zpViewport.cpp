@@ -22,4 +22,4 @@ zp_float zpViewport::getHeight() const { return m_height; }
 zp_float zpViewport::getMinDepth() const { return m_minDepth; }
 zp_float zpViewport::getMaxDepth() const { return m_maxDepth; }
 zp_float zpViewport::getTopX() const { return m_topX; }
-zp_float zpViewport::getTepY() const { return m_topY; }
+zp_float zpViewport::getTopY() const { return m_topY; }

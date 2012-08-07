@@ -107,16 +107,74 @@ zpRenderingContext* zpOpenGLRenderingEngine::getImmediateRenderingContext() cons
 	return m_immediateContext;
 }
 
-zpBuffer* zpOpenGLRenderingEngine::createBuffer() { return ZP_NULL; }
+zpBuffer* zpOpenGLRenderingEngine::createBuffer() {
+	return new zpOpenGLBuffer;
+}
 
 zpTextureResource* zpOpenGLRenderingEngine::createTextureResource() { return ZP_NULL; }
 zpShaderResource* zpOpenGLRenderingEngine::createShaderResource() { return ZP_NULL; }
 
-zpRenderTarget* zpOpenGLRenderingEngine::createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height ) { return ZP_NULL; }
-zpRenderTarget* zpOpenGLRenderingEngine::createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height ) { return ZP_NULL; }
-zpDepthStencilBuffer* zpOpenGLRenderingEngine::createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) { return ZP_NULL; }
+zpRenderTarget* zpOpenGLRenderingEngine::createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height ) {
+	zp_uint framebuffer = 0;
+	zp_uint texture = 0;
+	glGenFramebuffers( 1, &framebuffer );
+	glGenTextures( 1, &texture );
 
-zpVertexLayout* zpOpenGLRenderingEngine::createVertexLayout( const zpString& desc ) { return ZP_NULL; }
+	glBindTexture( GL_TEXTURE_2D, texture );
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGBA8,
+		width,
+		height,
+		0,
+		GL_RGBA,
+		GL_UNSIGNED_INT_8_8_8_8,
+		ZP_NULL
+	);
+
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, framebuffer );
+	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0 );
+	
+	glBindTexture( GL_TEXTURE_2D, 0 );
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+
+	return new zpOpenGLRenderTarget( &framebuffer, &texture, 1, width, height );
+}
+zpRenderTarget* zpOpenGLRenderingEngine::createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height ) {
+	return ZP_NULL;
+}
+zpDepthStencilBuffer* zpOpenGLRenderingEngine::createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) {
+	zp_uint framebuffer = 0;
+	zp_uint texture = 0;
+	glGenFramebuffers( 1, &framebuffer );
+	glGenTextures( 1, &texture );
+
+	glBindTexture( GL_TEXTURE_2D, texture );
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_DEPTH24_STENCIL8,
+		width,
+		height,
+		0,
+		GL_DEPTH_STENCIL,
+		GL_DEPTH24_STENCIL8,
+		ZP_NULL
+	);
+
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, framebuffer );
+	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0 );
+
+	glBindTexture( GL_TEXTURE_2D, 0 );
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+
+	return new zpOpenGLDepthStencilBuffer( format, framebuffer, texture, width, height );
+}
+
+zpVertexLayout* zpOpenGLRenderingEngine::createVertexLayout( const zpString& desc ) {
+	return ZP_NULL;
+}
 
 zp_bool zpOpenGLRenderingEngine::initialize() {
 	return true;
