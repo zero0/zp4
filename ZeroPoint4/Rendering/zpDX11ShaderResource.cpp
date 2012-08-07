@@ -93,8 +93,7 @@ zp_bool zpDX11ShaderResource::load() {
 		
 		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), ps_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
-			//zp_printfcln( ZP_CC( ZP_CC_BLACK, ZP_CC_LIGHT_YELLOW ), "Error compiling shader [%s]: %s", shaderFile.c_str(), (zp_char*)errors->GetBufferPointer() );
-			zpLog::error() << (zp_char*)errors->GetBufferPointer() << zpLog::endl;
+			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( errors );
 
@@ -103,7 +102,7 @@ zp_bool zpDX11ShaderResource::load() {
 			if( FAILED( hr ) ) {
 				zpLog::error() << "Failed to create Pixel Shader " << shaderFile << zpLog::endl;
 			} else {
-				zpLog::message() << "Pixel Shader Compiled Successfully " << shaderFile << zpLog::endl;
+				zpLog::message() << "Pixel Shader created " << shaderFile << zpLog::endl;
 			}
 		} else {
 			zpLog::error() << "Failed to compile Pixel Shader " << shaderFile << zpLog::endl;
@@ -118,23 +117,25 @@ zp_bool zpDX11ShaderResource::load() {
 
 		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), vs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
-			zp_printfcln( ZP_CC( ZP_CC_BLACK, ZP_CC_LIGHT_YELLOW ), "Error compiling shader [%s]: %s", shaderFile.c_str(), (zp_char*)errors->GetBufferPointer() );
+			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( errors );
 
 		if( SUCCEEDED( hr ) ) {
 			hr = engine->getDevice()->CreateVertexShader( blob->GetBufferPointer(), blob->GetBufferSize(), ZP_NULL, &m_vertexShader );
 			if( FAILED( hr ) ) {
-				zp_printfln( "Failed to create Vertex Shader %s", shaderFile.c_str() );
+				zpLog::error() << "Failed to create Vertex Shader " << shaderFile << zpLog::endl;
+			} else {
+				zpLog::message() << "Vertex Shader created " << shaderFile << zpLog::endl;
 			}
 
 			// get the vertex layout from the shader file
 			m_vertexLayout = zpDX11VertexLayout::getLayoutFromDesc( layout, blob->GetBufferPointer(), blob->GetBufferSize() );
 			if( m_vertexLayout == ZP_NULL ) {
-				zp_printfln( "Failed to get Vertex Layout" );
+				zpLog::error() << "Failed to get Vertex Layout " << layout << zpLog::endl;
 			}
 		} else {
-			zp_printfln( "Failed to compile Vertex Shader %s", shaderFile.c_str() );
+			zpLog::error() << "Failed to compile Vertex Shader " << shaderFile << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( blob );
 	}
@@ -145,22 +146,54 @@ zp_bool zpDX11ShaderResource::load() {
 
 		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), gs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
-			zp_printfcln( ZP_CC( ZP_CC_BLACK, ZP_CC_LIGHT_YELLOW ), "Error compiling shader [%s]: %s", shaderFile.c_str(), (zp_char*)errors->GetBufferPointer() );
+			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( errors );
 
 		if( SUCCEEDED( hr ) ) {
 			zpProperties streamProperties = shaderProperties.getSubProperties( "shader.gsso.decl" );
 
-			if( streamProperties.isEmpty() ) {
+			if( streamProperties.isEmpty() ) 
+			// create non-stream out geometry shader
+			{
 				hr = engine->getDevice()->CreateGeometryShader( blob->GetBufferPointer(), blob->GetBufferSize(), ZP_NULL, &m_geometryShader );
 				if( FAILED( hr ) ) {
-					zp_printfln( "Failed to create Geometry Shader %s", shaderFile.c_str() );
+					zpLog::error() << "Failed to create Geometry Shader " << shaderFile << zpLog::endl;
+				} else {
+					zpLog::message() << "Geometry Shader created " << shaderFile << zpLog::endl;
 				}
-			} else {
-				// @TODO: implement stream-out for geometry shader
 			}
+			else
+			// create stream out geometry shader
+			{
+				zpArrayList<D3D11_SO_DECLARATION_ENTRY> entries( streamProperties.size() );
+
+				streamProperties.foreach( [ &entries ]( const zpString& key, const zpString& val ) {
+					D3D11_SO_DECLARATION_ENTRY entry;
+					zp_uint index;
+
+					// grab the values from the string using a scan
+					val.scan( "%d,%d,%d,%d,%d,%d", &index, &entry.Stream, &entry.SemanticIndex, &entry.StartComponent, &entry.ComponentCount, &entry.OutputSlot );
+					entry.SemanticName = key.c_str();
+
+					entries[ index ] = entry;
+				} );
+
+				zp_uint strides[1];
+				strides[0] = shaderProperties.getInt( "shader.gsso.strides" );
+
+				// compile the geometry shader with stream output
+				hr = engine->getDevice()->CreateGeometryShaderWithStreamOutput( blob->GetBufferPointer(), blob->GetBufferSize(), entries.begin(), entries.size(), strides, 1, D3D11_SO_NO_RASTERIZED_STREAM, NULL, &m_geometryShader );
+				if( FAILED( hr ) ) {
+					zpLog::error() << "Failed to create Geometry Stream Out Shader " << shaderFile << zpLog::endl;
+				} else {
+					zpLog::message() << "Geometry Shader Stream Out created " << shaderFile << zpLog::endl;
+				}
+			}
+		} else {
+			zpLog::error() << "Failed to compile Geometry Shader " << shaderFile << zpLog::endl;
 		}
+		ZP_SAFE_RELEASE( blob );
 	}
 
 	// if the compute shader function is defined for this shader, compile and create it
@@ -169,17 +202,19 @@ zp_bool zpDX11ShaderResource::load() {
 
 		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), cs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
-			zp_printfcln( ZP_CC( ZP_CC_BLACK, ZP_CC_LIGHT_YELLOW ), "Error compiling shader [%s]: %s", shaderFile.c_str(), (zp_char*)errors->GetBufferPointer() );
+			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( errors );
 
 		if( SUCCEEDED( hr ) ) {
 			hr = engine->getDevice()->CreateComputeShader( blob->GetBufferPointer(), blob->GetBufferSize(), ZP_NULL, &m_computeShader );
 			if( FAILED( hr ) ) {
-				zp_printfln( "Failed to create Compute Shader %s", shaderFile.c_str() );
+				zpLog::error() << "Failed to create Compute Shader " << shaderFile << zpLog::endl;
+			} else {
+				zpLog::message() << "Compute Shader created " << shaderFile << zpLog::endl;
 			}
 		} else {
-			zp_printfln( "Failed to compile Compute Shader %s", shaderFile.c_str() );
+			zpLog::error() << "Failed to compile Compute Shader " << shaderFile << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( blob );
 	}

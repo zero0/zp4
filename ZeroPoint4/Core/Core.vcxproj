@@ -151,6 +151,7 @@
     <ClInclude Include="zpString.h" />
     <ClInclude Include="zpStringBuffer.h" />
     <ClInclude Include="zpTime.h" />
+    <ClInclude Include="zpTween.h" />
     <ClInclude Include="zpVector2.h" />
     <ClInclude Include="zpVector4.h" />
     <ClInclude Include="zpWindow.h" />

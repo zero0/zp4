@@ -9,7 +9,7 @@
 #define TEST_NONE		0
 #define TEST_DX			1
 #define TEST_OPENGL		2
-#define TEST_RENDERING	TEST_OPENGL
+#define TEST_RENDERING	TEST_DX
 
 void core_test_main() {
 	zp_printfln( "Size: %d", sizeof( zpString ) );
@@ -235,9 +235,9 @@ void rendering_test_main() {
 
 	game.create();
 
-	//cm.loadResource( "simple.shader", "simple_shader" );
-	//cm.loadResource( "tex_norm.shader", "tex_norm_shader" );
-	//cm.loadResource( "test.png", "tex" );
+	cm.loadResource( "simple.shader", "simple_shader" );
+	cm.loadResource( "tex_norm.shader", "tex_norm_shader" );
+	cm.loadResource( "test.png", "tex" );
 
 	//zpLog::getInstance()->disableLogLevel( ZP_LOG_LEVEL_DEBUG );
 	//zpLogOutput& d = zpLog::debug();
@@ -275,9 +275,9 @@ void rendering_test_main() {
 			};
 			buff2->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, pnt );
 
-			//sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
-			//srtex = cm->getResourceOfType<zpShaderResource>( "tex_norm_shader" );
-			//tex = cm->getResourceOfType<zpTextureResource>( "tex" );
+			sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
+			srtex = cm->getResourceOfType<zpShaderResource>( "tex_norm_shader" );
+			tex = cm->getResourceOfType<zpTextureResource>( "tex" );
 
 			frames = 0;
 			time = 0;
@@ -298,14 +298,14 @@ void rendering_test_main() {
 			
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 			i->bindBuffer( buff );
-			//i->bindShader( sr );
+			i->bindShader( sr );
 			i->draw( 4 );
-			/*
+			
 			i->bindBuffer( buff2 );
 			i->bindShader( srtex );
 			i->bindTexture( ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER, 0, tex->getTexture() );
 			i->draw( 4 );
-			*/
+			
 			engine->present();
 
 			++frames;

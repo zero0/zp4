@@ -50,7 +50,7 @@ void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint cou
 		hr = device->CreateBuffer( &desc, ZP_NULL, &m_buffer );
 	}
 
-	if( FAILED( hr ) ) zp_printfln( "Failed to create zpBuffer" );
+	if( FAILED( hr ) ) zpLog::error() << "Failed to create buffer" << zpLog::endl;
 }
 void zpDX11Buffer::release() {
 	ZP_SAFE_RELEASE( m_buffer );
