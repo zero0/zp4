@@ -6,18 +6,17 @@ zpOpenGLRenderTarget::zpOpenGLRenderTarget() :
 	m_referenceCount( 1 ),
 	m_width( 0 ),
 	m_height( 0 ),
-	m_framebuffers( 0 ),
-	m_textures( 0 )
+	m_frameBuffer( 0 ),
+	m_renderBuffers( 0 )
 {}
-zpOpenGLRenderTarget::zpOpenGLRenderTarget( zp_uint* framebuffers, zp_uint* textures, zp_uint count, zp_uint width, zp_uint height ) :
+zpOpenGLRenderTarget::zpOpenGLRenderTarget( zp_uint frameBuffer, zp_uint* renderBuffers, zp_uint count, zp_uint width, zp_uint height ) :
 	m_referenceCount( 1 ),
 	m_width( width ),
 	m_height( height ),
-	m_framebuffers( count ),
-	m_textures( count )
+	m_frameBuffer( frameBuffer ),
+	m_renderBuffers( count )
 {
-	m_framebuffers.fill( framebuffers, count );
-	m_textures.fill( textures, count );
+	m_renderBuffers.fill( renderBuffers, count );
 }
 zpOpenGLRenderTarget::~zpOpenGLRenderTarget() {}
 
@@ -33,7 +32,7 @@ zp_uint zpOpenGLRenderTarget::getDisplayFormat( zpDisplayFormat* formats ) const
 }
 
 zp_uint zpOpenGLRenderTarget::getNumberOfTargets() const {
-	return m_framebuffers.size();
+	return m_renderBuffers.size();
 }
 
 void zpOpenGLRenderTarget::addReference() const {
@@ -55,9 +54,9 @@ zp_bool zpOpenGLRenderTarget::isMarkedForAutoDelete() const {
 	return false;
 }
 
-zpArray<zp_uint>& zpOpenGLRenderTarget::getFramebuffers() {
-	return m_framebuffers;
+zp_uint zpOpenGLRenderTarget::getFrameBuffer() {
+	return m_frameBuffer;
 }
-zpArray<zp_uint>& zpOpenGLRenderTarget::getTextures() {
-	return m_textures;
+zpArray<zp_uint>& zpOpenGLRenderTarget::getRenderBuffers() {
+	return m_renderBuffers;
 }

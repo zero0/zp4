@@ -93,17 +93,20 @@ zp_bool zpDX11ShaderResource::load() {
 		
 		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), ps_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
-			zp_printfcln( ZP_CC( ZP_CC_BLACK, ZP_CC_LIGHT_YELLOW ), "Error compiling shader [%s]: %s", shaderFile.c_str(), (zp_char*)errors->GetBufferPointer() );
+			//zp_printfcln( ZP_CC( ZP_CC_BLACK, ZP_CC_LIGHT_YELLOW ), "Error compiling shader [%s]: %s", shaderFile.c_str(), (zp_char*)errors->GetBufferPointer() );
+			zpLog::error() << (zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( errors );
 
 		if( SUCCEEDED( hr ) ) {
 			hr = engine->getDevice()->CreatePixelShader( blob->GetBufferPointer(), blob->GetBufferSize(), ZP_NULL, &m_pixelShader );
 			if( FAILED( hr ) ) {
-				zp_printfln( "Failed to create Pixel Shader %s", shaderFile.c_str() );
+				zpLog::error() << "Failed to create Pixel Shader " << shaderFile << zpLog::endl;
+			} else {
+				zpLog::message() << "Pixel Shader Compiled Successfully " << shaderFile << zpLog::endl;
 			}
 		} else {
-			zp_printfln( "Failed to compile Pixel Shader %s", shaderFile.c_str() );
+			zpLog::error() << "Failed to compile Pixel Shader " << shaderFile << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( blob );
 	}
@@ -112,7 +115,6 @@ zp_bool zpDX11ShaderResource::load() {
 	if( shaderProperties.hasProperty( "shader.vs" ) ) {
 		zpString function = shaderProperties[ "shader.vs" ];
 		zpString layout = shaderProperties[ "shader.vs.layout" ];
-		// @TODO: implement vertex shader layout
 
 		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), vs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {

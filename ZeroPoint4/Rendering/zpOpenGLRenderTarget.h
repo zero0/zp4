@@ -23,17 +23,17 @@ public:
 
 private:
 	zpOpenGLRenderTarget();
-	zpOpenGLRenderTarget( zp_uint* framebuffers, zp_uint* textures, zp_uint count, zp_uint width, zp_uint height );
+	zpOpenGLRenderTarget( zp_uint frameBuffer, zp_uint* renderBuffers, zp_uint count, zp_uint width, zp_uint height );
 
-	zpArray<zp_uint>& getFramebuffers();
-	zpArray<zp_uint>& getTextures();
+	zp_uint getFrameBuffer();
+	zpArray<zp_uint>& getRenderBuffers();
 
 	mutable zp_uint m_referenceCount;
 	zp_uint m_width;
 	zp_uint m_height;
 
-	zpArray<zp_uint> m_framebuffers;
-	zpArray<zp_uint> m_textures;
+	zp_uint m_frameBuffer;
+	zpArray<zp_uint> m_renderBuffers;
 
 	friend class zpOpenGLRenderingEngine;
 	friend class zpOpenGLRenderingContext;

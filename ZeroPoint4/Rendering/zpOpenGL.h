@@ -17,6 +17,7 @@
 
 class zpOpenGLBuffer;
 class zpOpenGLDepthStencilBuffer;
+class zpOpenGLShaderResource;
 
 class zpOpenGLRenderTarget;
 class zpOpenGLRenderingEngine;
@@ -26,6 +27,7 @@ class zpOpenGLRenderingContext;
 
 #include "zpOpenGLBuffer.h"
 #include "zpOpenGLDepthStencilBuffer.h"
+#include "zpOpenGLShaderResource.h"
 
 #include "zpOpenGLRenderTarget.h"
 #include "zpOpenGLRenderingEngine.h"

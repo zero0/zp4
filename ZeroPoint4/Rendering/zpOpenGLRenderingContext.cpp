@@ -46,28 +46,45 @@ zpDepthStencilBuffer* zpOpenGLRenderingContext::getDepthStencilBuffer() const {
 }
 
 void zpOpenGLRenderingContext::bindRenderTargetAndDepthBuffer() {
-	( (zpOpenGLRenderTarget*)m_renderTarget )->getFramebuffers().foreachIndexed( []( zp_uint index, zp_uint framebuffer ) {
-		glBindFramebuffer( GL_COLOR_ATTACHMENT0 + index, framebuffer );
-	} );
-	glBindFramebuffer( GL_DEPTH_STENCIL_ATTACHMENT, ( (zpOpenGLDepthStencilBuffer*)m_depthStencilBuffer )->getFramebuffer() );
+	wglMakeCurrent( (HDC)m_hdc, (HGLRC)m_context );
+
+	//( (zpOpenGLRenderTarget*)m_renderTarget )->getFramebuffers().foreachIndexed( []( zp_uint index, zp_uint framebuffer ) {
+	//	glBindFramebuffer( GL_COLOR_ATTACHMENT0 + index, framebuffer );
+	//} );
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, ( (zpOpenGLRenderTarget*)m_renderTarget )->getFrameBuffer() );
+	//glBindFramebuffer( GL_DRAW_FRAMEBUFFER, ( (zpOpenGLDepthStencilBuffer*)m_depthStencilBuffer )->getFramebuffer() );
+	glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ( (zpOpenGLRenderTarget*)m_renderTarget )->getRenderBuffers()[0] );
+	glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, ( (zpOpenGLDepthStencilBuffer*)m_depthStencilBuffer )->getTexture() );
+	
+	checkError();
 }
 void zpOpenGLRenderingContext::unbindRenderTargetAndDepthBuffer() {
-	glBindFramebuffer( GL_COLOR_ATTACHMENT0, 0 );
-	glBindFramebuffer( GL_DEPTH_STENCIL_ATTACHMENT, 0 );
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 }
 
 void zpOpenGLRenderingContext::clearRenderTarget( const zpColor4f* colors, zp_uint count ) {
-	for( zp_uint i = 0; i < count; ++i ) {
-		glClearBufferfv( GL_COLOR, GL_DRAW_BUFFER0 + i, colors[i] );
-	}
+	//for( zp_uint i = 0; i < count; ++i ) {
+	//	glClearBufferfv( GL_COLOR, GL_DRAW_BUFFER0, colors[0] );
+	//}
+	glClearColor( colors[0].getRed(), colors[0].getGreen(), colors[0].getBlue(), colors[0].getAlpha() );
+	glClear( GL_COLOR_BUFFER_BIT );
+
+	checkError();
 }
 void zpOpenGLRenderingContext::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil ) {
-	glClearBufferfi( GL_DEPTH_STENCIL, 0, clearDepth, clearStencil );
+	//glClearBufferfi( GL_DEPTH_STENCIL, 0, clearDepth, clearStencil );
+	glClearDepth( clearDepth );
+	glClearStencil( clearStencil );
+	glClear( GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+
+	checkError();
 }
 
 void zpOpenGLRenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {
 	zpOpenGLBuffer* buff = (zpOpenGLBuffer*)buffer;
 	glBindBuffer( buff->getTarget(), buff->getBuffer() );
+
+	checkError();
 }
 void zpOpenGLRenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
 	zpOpenGLBuffer* buff = (zpOpenGLBuffer*)buffer;
@@ -90,8 +107,12 @@ void zpOpenGLRenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
 	buffer->unmap( subResource );
 }
 
-void zpOpenGLRenderingContext::bindShader( zpShaderResource* shader ) {}
-void zpOpenGLRenderingContext::unbindShader( zpShaderResource* shader ) {}
+void zpOpenGLRenderingContext::bindShader( zpShaderResource* shader ) {
+	glUseProgram( ( (zpOpenGLShaderResource*)shader )->getShaderProgram() );
+}
+void zpOpenGLRenderingContext::unbindShader( zpShaderResource* shader ) {
+	glUseProgram( 0 );
+}
 
 void zpOpenGLRenderingContext::setTopology( zpTopology topology ) {
 	m_topology = __zpToGL( topology );
@@ -99,6 +120,8 @@ void zpOpenGLRenderingContext::setTopology( zpTopology topology ) {
 
 void zpOpenGLRenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
 	glDrawArrays( m_topology, startIndex, vertexCount );
+
+	checkError();
 }
 
 void zpOpenGLRenderingContext::setViewport( const zpViewport& viewport ) {

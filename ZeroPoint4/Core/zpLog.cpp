@@ -48,6 +48,18 @@ zpLogOutput& zpLogOutput::operator<<( zp_char c ) {
 #endif
 	return (*this);
 }
+zpLogOutput& zpLogOutput::operator<<( zp_int c ) {
+#if ZP_LOG_ENABLED
+	zp_printf( m_base == 10 ? "%d" : m_base == 8 ? "%o" : "%x", c );
+#endif
+	return (*this);
+}
+zpLogOutput& zpLogOutput::operator<<( zp_long c ) {
+#if ZP_LOG_ENABLED
+	zp_printf( m_base == 10 ? "%ld" : m_base == 8 ? "%lo" : "%lx", c );
+#endif
+	return (*this);
+}
 zpLogOutput& zpLogOutput::operator<<( const zp_char* c ) {
 #if ZP_LOG_ENABLED
 	zp_printf( "%s", c );
@@ -65,6 +77,7 @@ zpLogOutput& zpLogOutput::operator<<( zpLog::Options c ) {
 	switch( c ) {
 	case zpLog::endl:
 		zpConsole::getInstance()->resetColor();
+		m_base = 10;
 	case zpLog::tab:
 		zp_printf( "%c", c );
 		break;

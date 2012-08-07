@@ -34,12 +34,22 @@ zp_bool zpOpenGLRenderingEngine::create() {
 	// initialize GLEW
 	GLenum gle = glewInit();
 	if( gle != GLEW_OK ) {
-		zp_printfln( "Unable to initialize GLEW" );
+		zpLog::critical() << "Unable to initialize GLEW" << zpLog::endl;
 		return false;
 	}
 
-	if( WGLEW_ARB_create_context ) {
-		zp_int attr[] = {
+	if( WGLEW_ARB_create_context && WGLEW_ARB_pixel_format ) {
+		const zp_int pixelAttr[] = {
+			WGL_DRAW_TO_WINDOW_ARB,	GL_TRUE,
+			WGL_SUPPORT_OPENGL_ARB,	GL_TRUE,
+			WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
+			WGL_PIXEL_TYPE_ARB,		WGL_TYPE_RGBA_ARB,
+			WGL_COLOR_BITS_ARB,		32,
+			WGL_DEPTH_BITS_ARB,		24,
+			WGL_STENCIL_BITS_ARB,	8,
+			0
+		};
+		const zp_int contextAttr[] = {
 			WGL_CONTEXT_MAJOR_VERSION_ARB,	3,
 			WGL_CONTEXT_MINOR_VERSION_ARB,	1,
 #if ZP_DEBUG
@@ -49,8 +59,13 @@ zp_bool zpOpenGLRenderingEngine::create() {
 #endif
 			0
 		};
-		
-		HGLRC rc = wglCreateContextAttribsARB( hdc, 0, attr );
+
+		zp_int pixelFormat;
+		zp_uint numFormats;
+		wglChoosePixelFormatARB( hdc, pixelAttr, ZP_NULL, 1, &pixelFormat, &numFormats );
+		SetPixelFormat( hdc, pixelFormat, &pfd );
+
+		HGLRC rc = wglCreateContextAttribsARB( hdc, 0, contextAttr );
 		wglMakeCurrent( ZP_NULL, ZP_NULL );
 		wglDeleteContext( context );
 		wglMakeCurrent( hdc, rc );
@@ -58,7 +73,20 @@ zp_bool zpOpenGLRenderingEngine::create() {
 	}
 	const zp_byte* vv = glGetString( GL_VERSION );
 
+	// create the immediate context directly
 	m_immediateContext = new zpOpenGLRenderingContext( context, hdc, "immediate" );
+
+	// create the render target and depth/stencil buffer
+	m_immediateRenderTarget = createRenderTarget( ZP_DISPLAY_FORMAT_RGBA8_UNORM, m_window->getScreenSize().getX(), m_window->getScreenSize().getY() );
+	m_immediateDepthStencilBuffer = createDepthBuffer( ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT, m_window->getScreenSize().getX(), m_window->getScreenSize().getY() );
+
+	// set the render target and depth/stencil buffer to the immediate context
+	m_immediateContext->setRenderTarget( m_immediateRenderTarget );
+	m_immediateContext->setDepthStencilBuffer( m_immediateDepthStencilBuffer );
+
+	// remove reference so immediate context has reference
+	m_immediateRenderTarget->removeReference();
+	m_immediateDepthStencilBuffer->removeReference();
 
 	return true;
 }
@@ -96,9 +124,27 @@ void zpOpenGLRenderingEngine::setVSyncEnabled( zp_bool enabled ) {
 	m_vsyncEnabled = enabled;
 }
 
-void zpOpenGLRenderingEngine::present() {}
+void zpOpenGLRenderingEngine::present() {
+	zpOpenGLRenderingContext* ctx = (zpOpenGLRenderingContext*)m_immediateContext;
 
-zpRenderingContext* zpOpenGLRenderingEngine::createRenderingContext( const zpString& name ) { return ZP_NULL; }
+	wglMakeCurrent( (HDC)ctx->m_hdc, (HGLRC)ctx->m_context );
+
+	glDrawBuffer( GL_FRAMEBUFFER );
+
+	glFlush(); 
+	
+	SwapBuffers( (HDC)ctx->m_hdc );
+}
+
+zpRenderingContext* zpOpenGLRenderingEngine::createRenderingContext( const zpString& name ) {
+	HWND hwnd = (HWND)m_window->getWindowHandle();
+	HDC hdc = GetDC( hwnd );
+
+	// @TODO: make function to return better GL context
+	HGLRC context = wglCreateContext( hdc );
+	
+	return new zpOpenGLRenderingContext( context, hdc, name );
+}
 zp_bool zpOpenGLRenderingEngine::removeRenderingContext( const zpString& name ) { return false; }
 zpRenderingContext* zpOpenGLRenderingEngine::getRenderingContextByIndex( zp_uint index ) const { return ZP_NULL; }
 zpRenderingContext* zpOpenGLRenderingEngine::getRenderingContext( const zpString& name ) const { return ZP_NULL; }
@@ -112,64 +158,64 @@ zpBuffer* zpOpenGLRenderingEngine::createBuffer() {
 }
 
 zpTextureResource* zpOpenGLRenderingEngine::createTextureResource() { return ZP_NULL; }
-zpShaderResource* zpOpenGLRenderingEngine::createShaderResource() { return ZP_NULL; }
+zpShaderResource* zpOpenGLRenderingEngine::createShaderResource() {
+	return new zpOpenGLShaderResource;
+}
 
 zpRenderTarget* zpOpenGLRenderingEngine::createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height ) {
 	zp_uint framebuffer = 0;
-	zp_uint texture = 0;
-	glGenFramebuffers( 1, &framebuffer );
-	glGenTextures( 1, &texture );
+	zp_uint renderbuffer = 0;
 
-	glBindTexture( GL_TEXTURE_2D, texture );
-	glTexImage2D(
-		GL_TEXTURE_2D,
-		0,
-		GL_RGBA8,
-		width,
-		height,
-		0,
-		GL_RGBA,
-		GL_UNSIGNED_INT_8_8_8_8,
-		ZP_NULL
-	);
+	glGenFramebuffers( 1, &framebuffer );
+	glGenRenderbuffers( 1, &renderbuffer );
+
+	checkError();
+
+	glBindRenderbuffer( GL_RENDERBUFFER, renderbuffer );
+	glRenderbufferStorage( GL_RENDERBUFFER, GL_RGBA8, width, height );
+
+	checkError();
 
 	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, framebuffer );
-	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0 );
-	
-	glBindTexture( GL_TEXTURE_2D, 0 );
+	glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, renderbuffer );
+
+	checkError();
+
+	glBindRenderbuffer( GL_RENDERBUFFER, 0 );
 	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
 
-	return new zpOpenGLRenderTarget( &framebuffer, &texture, 1, width, height );
+	checkError();
+
+	return new zpOpenGLRenderTarget( framebuffer, &renderbuffer, 1, width, height );
 }
 zpRenderTarget* zpOpenGLRenderingEngine::createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height ) {
 	return ZP_NULL;
 }
 zpDepthStencilBuffer* zpOpenGLRenderingEngine::createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) {
 	zp_uint framebuffer = 0;
-	zp_uint texture = 0;
-	glGenFramebuffers( 1, &framebuffer );
-	glGenTextures( 1, &texture );
+	zp_uint renderbuffer = 0;
 
-	glBindTexture( GL_TEXTURE_2D, texture );
-	glTexImage2D(
-		GL_TEXTURE_2D,
-		0,
-		GL_DEPTH24_STENCIL8,
-		width,
-		height,
-		0,
-		GL_DEPTH_STENCIL,
-		GL_DEPTH24_STENCIL8,
-		ZP_NULL
-	);
+	//glGenFramebuffers( 1, &framebuffer );
+	glGenRenderbuffers( 1, &renderbuffer );
 
-	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, framebuffer );
-	glFramebufferTexture2D( GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture, 0 );
+	checkError();
 
-	glBindTexture( GL_TEXTURE_2D, 0 );
-	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+	glBindRenderbuffer( GL_RENDERBUFFER, renderbuffer );
+	glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height );
 
-	return new zpOpenGLDepthStencilBuffer( format, framebuffer, texture, width, height );
+	checkError();
+
+	//glBindFramebuffer( GL_DRAW_FRAMEBUFFER, framebuffer );
+	//glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderbuffer );
+
+	//checkError();
+
+	glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+	//glBindFramebuffer( GL_DRAW_FRAMEBUFFER, 0 );
+
+	checkError();
+
+	return new zpOpenGLDepthStencilBuffer( format, framebuffer, renderbuffer, width, height );
 }
 
 zpVertexLayout* zpOpenGLRenderingEngine::createVertexLayout( const zpString& desc ) {

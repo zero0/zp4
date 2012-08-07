@@ -43,4 +43,16 @@ ZP_FORCE_INLINE zp_uint __zpToGL( zpTopology t ) {
 	}
 }
 
+#if ZP_DEBUG
+#define checkError()	checkOpenGLError( __FUNCTION__, __LINE__ )
+ZP_FORCE_INLINE void checkOpenGLError( const zp_char* func, zp_int line ) {
+	GLenum err = glGetError();
+	if( err != GL_NO_ERROR ) {
+		zpLog::warning() << "0x" << zpLog::hex << (zp_int)err << zpLog::dec << " " << func << "@" << line << zpLog::endl;
+	}
+}
+#else
+#define checkError()	(void)0
+#endif
+
 #endif
