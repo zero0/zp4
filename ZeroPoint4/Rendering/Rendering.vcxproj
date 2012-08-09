@@ -119,6 +119,7 @@
     <ClInclude Include="zpViewport.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpCamera.cpp" />
     <ClCompile Include="zpDX11.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>

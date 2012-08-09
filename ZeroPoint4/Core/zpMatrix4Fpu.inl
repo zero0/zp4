@@ -83,7 +83,28 @@ ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {
 
 ZP_FORCE_INLINE void zpMatrix4f::mul( const zpVector4f& vector, zpVector4f* outVector ) const {}
 
-ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f& point, const zpVector4f& up ) {}
+ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f& point, const zpVector4f& up ) {
+	if( eye == point ) {
+		(*this) = identity;
+		return;
+	}
+
+	zpVector4f z( point );
+	z.sub3( eye );
+	z.normalize3();
+
+	zpVector4f x( up );
+	x.cross3( z );
+	x.normalize3();
+
+	zpVector4f y( z );
+	y.cross3( x );
+
+	m_11 = x.getX();	m_12 = y.getX();	m_13 = z.getX();	m_14 = 0;
+	m_21 = x.getY();	m_22 = y.getY();	m_23 = z.getY();	m_24 = 0;
+	m_31 = x.getZ();	m_32 = y.getZ();	m_33 = z.getZ();	m_34 = 0;
+	m_41 = -( x.dot3( eye ) );	m_42 = -( y.dot3( eye ) );	m_43 = -( z.dot3( eye ) );	m_44 = 1;
+}
 ZP_FORCE_INLINE void zpMatrix4f::perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance ) {}
 ZP_FORCE_INLINE void zpMatrix4f::ortho( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}
 ZP_FORCE_INLINE void zpMatrix4f::orthoOffset( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}

@@ -34,8 +34,12 @@ private:
 	zp_bool m_isViewDirty;
 	zp_bool m_isProjectionDirty;
 	
+	zp_float m_near;
+	zp_float m_far;
+	zp_float m_fovy;
+	zp_float m_aspectRatio;
+
 	zpVector4f m_up;
-	zpVector4f m_left;
 	zpVector4f m_lookAt;
 	zpVector4f m_position;
 
