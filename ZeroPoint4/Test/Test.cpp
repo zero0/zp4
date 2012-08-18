@@ -400,6 +400,12 @@ int main() {
 	ss();
 	zp_uint strSize = ssss();
 
+	zpTween<zpVector4f> anim;
+	anim.queue( 2.f, zpVector4f(), ZP_TWEEN_EASING_SIN_IN );
+	anim.update( .1f );
+	anim.getCurrentValue();
+	anim.isComplete();
+
 	//zpArray<zpDelegate<void ()>> dels( 4 );
 	//dels[0] = zpDelegateFunctionFactory<void>::Bind<core_test_main>();
 	//dels[1] = zpDelegateFunctionFactory<void>::Bind<scripting_test_main>();

@@ -25,6 +25,8 @@ class zpVector4f;
 class zpReal;
 class zpInteger;
 class zpMatrix4f;
+class zpPlane;
+class zpFrustum;
 
 #include "zpReal.h"
 #include "zpVector2.h"
@@ -35,6 +37,8 @@ class zpMatrix4f;
 
 #include "zpVector4.inl"
 #include "zpMatrix4f.inl"
+#include "zpPlane.h"
+#include "zpFrustum.h"
 
 #if ZP_USE_SIMD
 #include "zpRealSimd.inl"
@@ -47,5 +51,13 @@ class zpMatrix4f;
 //#include "zpIntegerFpu.inl"
 #include "zpMatrix4Fpu.inl"
 #endif
+
+zp_float zp_cos( zp_float v );
+zp_float zp_sin( zp_float v );
+zp_float zp_tan( zp_float v );
+
+zp_float zp_pow( zp_float b, zp_float p );
+
+zp_float zp_sqrt( zp_float v );
 
 #endif

@@ -9,6 +9,7 @@ zpCamera::zpCamera() :
 	m_up( 0, 1, 0 ),
 	m_lookAt( 0, 0, -1 ),
 	m_position( 0, 0, 0 ),
+	m_frustum(),
 	m_view(),
 	m_projection(),
 	m_viewProjection(),
@@ -16,17 +17,7 @@ zpCamera::zpCamera() :
 {}
 zpCamera::~zpCamera() {}
 
-void zpCamera::render() {}
-
-void zpCamera::receiveMessage( const zpMessage& message ) {}
-
-void zpCamera::serialize( zpSerializedOutput* out ) {}
-void zpCamera::deserialize( zpSerializedInput* in ) {}
-
-void zpCamera::onCreate() {}
-void zpCamera::onDestroy() {}
-
-void zpCamera::onUpdate() {
+void zpCamera::update() {
 	zp_bool isViewProjectionDirty = false;
 
 	if( m_isProjectionDirty ) {
@@ -51,9 +42,63 @@ void zpCamera::onUpdate() {
 	}
 
 	if( isViewProjectionDirty ) {
+		m_frustum.set( m_position, m_lookAt, m_up, m_aspectRatio, m_fovy, m_near, m_far );
+
 		m_viewProjection = m_view * m_projection;
 	}
 }
 
-void zpCamera::onEnabled() {}
-void zpCamera::onDisabled() {}
+void zpCamera::setProjectionType( zpCameraProjection type ) {
+	m_projectionType = type;
+	m_isProjectionDirty = true;
+}
+
+void zpCamera::setNearFar( zp_float nearDist, zp_float farDist ) {
+	m_near = nearDist;
+	m_far = farDist;
+	m_isProjectionDirty = true;
+}
+void zpCamera::setFovy( zp_float fovy ) {
+	m_fovy = fovy;
+	m_isProjectionDirty = true;
+}
+void zpCamera::setAspectRatio( zp_float aspectRatio ) {
+	m_aspectRatio = aspectRatio;
+	m_isProjectionDirty = true;
+}
+
+void zpCamera::setPosition( const zpVector4f& position ) {
+	m_position = position;
+	m_isViewDirty = true;
+}
+void zpCamera::setLookAt( const zpVector4f& lookAt ) {
+	m_lookAt = lookAt;
+	m_isViewDirty = true;
+}
+void zpCamera::setUp( const zpVector4f& up ) {
+	m_up;
+	m_isViewDirty = true;
+}
+void zpCamera::set( const zpVector4f& position, const zpVector4f& lookAt, const zpVector4f& up ) {
+	m_position = position;
+	m_lookAt = lookAt;
+	m_up = up;
+	m_isViewDirty = true;
+}
+
+const zpFrustum& zpCamera::getFrustum() const {
+	return m_frustum;
+}
+
+const zpMatrix4f& zpCamera::getView() const {
+	return m_view;
+}
+const zpMatrix4f& zpCamera::getProjection() const {
+	return m_projection;
+}
+const zpMatrix4f& zpCamera::getViewProjection() const {
+	return m_viewProjection;
+}
+const zpMatrix4f& zpCamera::getInvViewProjection() const {
+	return m_invViewProjection;
+}

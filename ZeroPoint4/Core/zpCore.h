@@ -3,7 +3,7 @@
 #define ZP_CORE_H
 
 #if defined(DEBUG) || defined(_DEBUG)
-#define ZP_DEBUG	1
+#define ZP_DEBUG			1
 #endif
 
 #if _WIN32
@@ -15,7 +15,7 @@
 //#ifdef _WIN32
 //#define ZP_USE_SIMD		0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD			0
+#define ZP_USE_SIMD			1
 //#endif
 
 #define ZP_LOG_ENABLED		1
@@ -55,11 +55,14 @@
 #define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
 
 #define ZP_USE_COLOR_CONSOLE	1
+#define ZP_USE_FAST_MATH		0
 
 #include "zpBaseTypes.h"
 
 class zpLog;
 class zpLogOutput;
+
+template<typename T> class zpTween;
 
 ZP_PURE_INTERFACE zpRenderable;
 ZP_PURE_INTERFACE zpSerializable;
@@ -100,8 +103,8 @@ class zpGameObject;
 ZP_ABSTRACT_CLASS zpComponent;
 
 #include "zpLog.h"
-
 #include "zpMath.h"
+#include "zpTween.h"
 
 #include "zpDelegate.h"
 

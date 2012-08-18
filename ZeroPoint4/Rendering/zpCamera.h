@@ -7,26 +7,30 @@ enum zpCameraProjection {
 	ZP_CAMERA_PROJECTION_PERSPECTIVE
 };
 
-class zpCamera : public zpComponent, public zpRenderable {
+class zpCamera {
 public:
 	zpCamera();
 	~zpCamera();
 
-	void render();
+	void update();
 
-	void receiveMessage( const zpMessage& message );
+	void setProjectionType( zpCameraProjection type );
 
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
+	void setNearFar( zp_float nearDist, zp_float farDist );
+	void setFovy( zp_float fovy );
+	void setAspectRatio( zp_float aspectRatio );
 
-protected:
-	void onCreate();
-	void onDestroy();
+	void setPosition( const zpVector4f& position );
+	void setLookAt( const zpVector4f& lookAt );
+	void setUp( const zpVector4f& up );
+	void set( const zpVector4f& position, const zpVector4f& lookAt, const zpVector4f& up );
 
-	void onUpdate();
+	const zpFrustum& getFrustum() const;
 
-	void onEnabled();
-	void onDisabled();
+	const zpMatrix4f& getView() const;
+	const zpMatrix4f& getProjection() const;
+	const zpMatrix4f& getViewProjection() const;
+	const zpMatrix4f& getInvViewProjection() const;
 
 private:
 	zpCameraProjection m_projectionType;
@@ -42,6 +46,8 @@ private:
 	zpVector4f m_up;
 	zpVector4f m_lookAt;
 	zpVector4f m_position;
+
+	zpFrustum m_frustum;
 
 	zpMatrix4f m_view;
 	zpMatrix4f m_projection;

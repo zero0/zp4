@@ -79,7 +79,7 @@ ZP_FORCE_INLINE void zpMatrix4f::getPosition( zpVector4f* position ) const {
 }
 
 ZP_FORCE_INLINE void zpMatrix4f::setPosition( const zpVector4f& position ) {
-	m_m4 = position;
+	m_m4 = position.toVec4();
 }
 
 ZP_FORCE_INLINE zp_bool zpMatrix4f::isIdentity() const {

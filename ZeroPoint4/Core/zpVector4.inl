@@ -31,7 +31,7 @@ ZP_FORCE_INLINE void zpVector4f::operator=( const zp_vec4& vector ) {
 	m_xyzw = vector;
 }
 
-ZP_FORCE_INLINE zpVector4f::operator zp_vec4() const {
+ZP_FORCE_INLINE zp_vec4 zpVector4f::toVec4() const {
 	return m_xyzw;
 }
 
@@ -172,4 +172,47 @@ ZP_FORCE_INLINE void zpVector4f::slerp4( const zpVector4f& vector, zp_real alpha
 	v.mul4( sao / so );
 
 	add4( v );
+}
+
+ZP_FORCE_INLINE zpVector4f operator+( const zpVector4f& v1, const zpVector4f& v2 ) {
+	zpVector4f v( v1 );
+	v.add4( v2 );
+	return v;
+}
+ZP_FORCE_INLINE zpVector4f operator-( const zpVector4f& v1, const zpVector4f& v2 ) {
+	zpVector4f v( v1 );
+	v.sub4( v2 );
+	return v;
+}
+ZP_FORCE_INLINE zpVector4f operator*( const zpVector4f& v1, const zpVector4f& v2 ) {
+	zpVector4f v( v1 );
+	v.mul4( v2 );
+	return v;
+}
+ZP_FORCE_INLINE zpVector4f operator/( const zpVector4f& v1, const zpVector4f& v2 ) {
+	zpVector4f v( v1 );
+	v.div4( v2 );
+	return v;
+}
+
+ZP_FORCE_INLINE zpVector4f operator*( const zpVector4f& v1, const zp_float& v2 ) {
+	zpVector4f v( v1 );
+	v.mul4( zp_real_from_float( v2 ) );
+	return v;
+}
+ZP_FORCE_INLINE zpVector4f operator*( const zp_float& v1, const zpVector4f& v2 ) {
+	zpVector4f v( v2 );
+	v.mul4( zp_real_from_float( v1 ) );
+	return v;
+}
+
+ZP_FORCE_INLINE zpVector4f operator/( const zpVector4f& v1, const zp_float& v2 ) {
+	zpVector4f v( v1 );
+	v.div4( zp_real_from_float( v2 ) );
+	return v;
+}
+ZP_FORCE_INLINE zpVector4f operator/( const zp_float& v1, const zpVector4f& v2 ) {
+	zpVector4f v( v2 );
+	v.mul4( zp_real_rcp( zp_real_from_float( v1 ) ) );
+	return v;
 }

@@ -144,6 +144,12 @@
     <ClInclude Include="zpTween.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpPlane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpFrustum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -209,6 +215,9 @@
     <None Include="zpDelegate.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpTween.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">
@@ -272,6 +281,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpPlane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpFrustum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
