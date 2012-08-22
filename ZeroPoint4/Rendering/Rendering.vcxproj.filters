@@ -132,6 +132,15 @@
     <ClInclude Include="zpOpenGLShaderResource.h">
       <Filter>Header Files\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="zpStaticMeshResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpOBJStaticMeshResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpCameraComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -198,6 +207,15 @@
       <Filter>Source Files\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="zpCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpStaticMeshResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpOBJStaticMeshResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpCameraComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

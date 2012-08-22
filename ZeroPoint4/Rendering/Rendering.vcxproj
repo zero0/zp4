@@ -82,6 +82,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpCameraComponent.h" />
     <ClInclude Include="zpDepthStencilBuffer.h" />
     <ClInclude Include="zpBuffer.h" />
     <ClInclude Include="zpCamera.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="zpDX11TextureResource.h" />
     <ClInclude Include="zpDX11Util.h" />
     <ClInclude Include="zpDX11VertexLayout.h" />
+    <ClInclude Include="zpOBJStaticMeshResource.h" />
     <ClInclude Include="zpOpenGL.h" />
     <ClInclude Include="zpOpenGLBuffer.h" />
     <ClInclude Include="zpOpenGLDepthStencilBuffer.h" />
@@ -112,6 +114,7 @@
     <ClInclude Include="zpRenderingResourceCreator.h" />
     <ClInclude Include="zpRenderTarget.h" />
     <ClInclude Include="zpShaderResource.h" />
+    <ClInclude Include="zpStaticMeshResource.h" />
     <ClInclude Include="zpTexture.h" />
     <ClInclude Include="zpTextureResource.h" />
     <ClInclude Include="zpVertex.h" />
@@ -120,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCamera.cpp" />
+    <ClCompile Include="zpCameraComponent.cpp" />
     <ClCompile Include="zpDX11.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
@@ -150,6 +154,7 @@
     <ClCompile Include="zpDX11VertexLayout.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zpOBJStaticMeshResource.cpp" />
     <ClCompile Include="zpOpenGLBuffer.cpp" />
     <ClCompile Include="zpOpenGLDepthStencilBuffer.cpp" />
     <ClCompile Include="zpOpenGLRenderingContext.cpp" />
@@ -163,6 +168,7 @@
     <ClCompile Include="zpRenderingFactory.cpp" />
     <ClCompile Include="zpRenderingManager.cpp" />
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
+    <ClCompile Include="zpStaticMeshResource.cpp" />
     <ClCompile Include="zpViewport.cpp" />
   </ItemGroup>
   <ItemGroup>

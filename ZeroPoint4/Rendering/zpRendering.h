@@ -138,6 +138,14 @@ enum zpResourceBindType {
 	ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER,
 };
 
+enum zpMeshTextureBindSlot {
+	ZP_MESH_TEXTURE_BIND_SLOT_DIFFUSE =		0,
+	ZP_MESH_TEXTURE_BIND_SLOT_NORMAL,
+	ZP_MESH_TEXTURE_BIND_SLOT_SPECULAR,
+	ZP_MESH_TEXTURE_BIND_SLOT_OPACITY,
+	ZP_MESH_TEXTURE_BIND_SLOT_OTHER,
+};
+
 class zpViewport;
 ZP_PURE_INTERFACE zpTexture;
 
@@ -150,12 +158,17 @@ ZP_PURE_INTERFACE zpRenderTarget;
 ZP_PURE_INTERFACE zpDepthStencilBuffer;
 ZP_PURE_INTERFACE zpVertexLayout;
 
+ZP_ABSTRACT_CLASS zpStaticMeshResource;
+class zpOBJStaticMeshResource;
+
 ZP_PURE_INTERFACE zpRenderingContext;
 ZP_PURE_INTERFACE zpRenderingEngine;
 class zpRenderingFactory;
 
 class zpCamera;
 class zpRenderingManager;
+
+class zpCameraComponent;
 
 #include "zpVertex.h"
 #include "zpViewport.h"
@@ -170,11 +183,16 @@ class zpRenderingManager;
 #include "zpDepthStencilBuffer.h"
 #include "zpVertexLayout.h"
 
+#include "zpStaticMeshResource.h"
+#include "zpOBJStaticMeshResource.h"
+
 #include "zpRenderingContext.h"
 #include "zpRenderingEngine.h"
 #include "zpRenderingFactory.h"
 
 #include "zpCamera.h"
 #include "zpRenderingManager.h"
+
+#include "zpCameraComponent.h"
 
 #endif

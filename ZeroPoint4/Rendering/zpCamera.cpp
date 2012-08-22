@@ -86,6 +86,23 @@ void zpCamera::set( const zpVector4f& position, const zpVector4f& lookAt, const 
 	m_isViewDirty = true;
 }
 
+zp_float zpCamera::getAspectRation() const {
+	return m_aspectRatio;
+}
+zp_float zpCamera::getFovy() const {
+	return m_fovy;
+}
+
+const zpVector4f& zpCamera::getPosition() const {
+	return m_position;
+}
+const zpVector4f& zpCamera::getLookAt() const {
+	return m_lookAt;
+}
+const zpVector4f& zpCamera::getUp() const {
+	return m_up;
+}
+
 const zpFrustum& zpCamera::getFrustum() const {
 	return m_frustum;
 }

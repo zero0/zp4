@@ -25,6 +25,13 @@ public:
 	void setUp( const zpVector4f& up );
 	void set( const zpVector4f& position, const zpVector4f& lookAt, const zpVector4f& up );
 
+	zp_float getAspectRation() const;
+	zp_float getFovy() const;
+
+	const zpVector4f& getPosition() const;
+	const zpVector4f& getLookAt() const;
+	const zpVector4f& getUp() const;
+
 	const zpFrustum& getFrustum() const;
 
 	const zpMatrix4f& getView() const;
