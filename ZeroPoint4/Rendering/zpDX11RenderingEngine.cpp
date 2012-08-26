@@ -37,18 +37,55 @@ zp_bool zpDX11RenderingEngine::create() {
 	flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
+	// if neither of the display mode's dimensions are set, set to the window screen size
+	if( !m_displayMode.width || !m_displayMode.height ) {
+		m_displayMode.width = m_window->getScreenSize().getX();
+		m_displayMode.height = m_window->getScreenSize().getY();
+	}
+	// if the display mode is set to unknown, default to RGBA8_UNORM
+	if( m_displayMode.displayFormat == ZP_DISPLAY_FORMAT_UNKNOWN ) {
+		m_displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
+	}
+	// if the refresh rate is not set, find the closest display mode that matches
+	if( !m_displayMode.refreshRate ) {
+		findClosestDisplayMode( m_displayMode, &m_displayMode );
+	}
+	
+	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+	zp_zero_memory( &swapChainDesc );
+	swapChainDesc.BufferDesc.Width = m_displayMode.width;
+	swapChainDesc.BufferDesc.Height = m_displayMode.height;
+	swapChainDesc.BufferDesc.RefreshRate.Numerator = m_displayMode.refreshRate;
+	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	swapChainDesc.BufferDesc.Format = __zpToDX( m_displayMode.displayFormat );
+	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = 2;
+	swapChainDesc.OutputWindow = (HWND)m_window->getWindowHandle();
+	swapChainDesc.Windowed = m_screenMode == ZP_SCREEN_MODE_WINDOWED;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.Flags = 0;//DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
 	D3D_FEATURE_LEVEL actualFeatureLevel;
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 	zp_uint featureLevelCount = sizeof( featureLevels ) / sizeof( featureLevels[0] );
 	ID3D11DeviceContext* immediate = ZP_NULL;
 
-	hr = D3D11CreateDevice( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+	//hr = D3D11CreateDevice( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+	hr = D3D11CreateDeviceAndSwapChain( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
 	if( FAILED( hr ) ) {
-		hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+		//hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+		hr = D3D11CreateDeviceAndSwapChain( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
 		if( FAILED( hr ) ) {
-			hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+			//hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+			hr = D3D11CreateDeviceAndSwapChain( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
 			if( FAILED( hr ) ) {
-				hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+				//hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+				hr = D3D11CreateDeviceAndSwapChain( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
+
 				HR_MSG( hr, "Unable to create DirectX device." );
 			}
 		}
@@ -64,43 +101,10 @@ zp_bool zpDX11RenderingEngine::create() {
 		case D3D_FEATURE_LEVEL_10_0: m_engineType = ZP_RENDERING_ENGINE_DX10; break;
 	}
 
-	// if neither of the display mode's dimensions are set, set to the window screen size
-	if( !m_displayMode.width || !m_displayMode.height ) {
-		m_displayMode.width = m_window->getScreenSize().getX();
-		m_displayMode.height = m_window->getScreenSize().getY();
-	}
-	// if the display mode is set to unknown, default to RGBA8_UNORM
-	if( m_displayMode.displayFormat == ZP_DISPLAY_FORMAT_UNKNOWN ) {
-		m_displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
-	}
-	// if the refresh rate is not set, find the closest display mode that matches
-	if( !m_displayMode.refreshRate ) {
-		findClosestDisplayMode( m_displayMode, &m_displayMode );
-	}
-
-	DXGI_FORMAT format = __zpToDX( m_displayMode.displayFormat );
-
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	zp_zero_memory( &swapChainDesc );
-	swapChainDesc.BufferDesc.Width = m_displayMode.width;
-	swapChainDesc.BufferDesc.Height = m_displayMode.height;
-	swapChainDesc.BufferDesc.RefreshRate.Numerator = m_displayMode.refreshRate;
-	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-	swapChainDesc.BufferDesc.Format = format;
-	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	swapChainDesc.SampleDesc.Count = 1;
-	swapChainDesc.SampleDesc.Quality = 0;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.BufferCount = 2;
-	swapChainDesc.OutputWindow = (HWND)m_window->getWindowHandle();
-	swapChainDesc.Windowed = m_screenMode == ZP_SCREEN_MODE_WINDOWED;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	swapChainDesc.Flags = 0;//DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	
 	// create the swap chain
-	hr = m_dxgiFactory->CreateSwapChain( m_d3dDevice, &swapChainDesc, &m_swapChain );
-	HR_MSG( hr, "Unable to create swap chain." );
+	//hr = m_dxgiFactory->CreateSwapChain( m_d3dDevice, &swapChainDesc, &m_swapChain );
+	//HR_MSG( hr, "Unable to create swap chain." );
 
 	// get the back buffer
 	ID3D11Texture2D* backBuffer;

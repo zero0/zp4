@@ -38,6 +38,8 @@ public:
 
 	static const zp_char sep;
 	static zpFile createTempFile();
+	static const zpString& getCurrentDirectory();
+	static void convertToFilePath( zpString& filepath );
 
 	zpFileMode getFileMode() const;
 	zp_long getFileSize();
@@ -77,7 +79,7 @@ public:
 
 	const zpString& getFilename() const;
 	zpString getFileExtension() const;
-	zpString getFileDirectory() const;
+	zpString getFileDirectory() const;	
 
 private:
 	zpFile( const zpFile& file );
@@ -88,6 +90,8 @@ private:
 	zp_long m_size;
 
 	zpString m_filename;
+
+	static zpString s_currentDirectory;
 };
 
 #endif

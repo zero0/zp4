@@ -14,8 +14,7 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 
 	zpResourceCreator* creator;
 	if( m_creators.find( extension, &creator ) ) {
-		zpStringBuffer filepath; //( m_rootDirectory.length() + m_assetsFolder.length() + creator->getRootDirectory().length() + filename.length() + 5 );
-
+		zpStringBuffer filepath;
 		filepath << m_rootDirectory << m_assetsFolder << creator->getRootDirectory() << filename;
 		zpString fullFilePath = filepath.toString();
 
@@ -100,8 +99,8 @@ void zpContentManager::serialize( zpSerializedOutput* out ) {}
 void zpContentManager::deserialize( zpSerializedInput* in ) {}
 
 void zpContentManager::setRootDirectory( const zpString& rootDirectory ) {
-	m_rootDirectory = rootDirectory;
-	m_rootDirectory.map( []( zp_char ch ) {
+	m_assetsFolder = rootDirectory;
+	m_assetsFolder.map( []( zp_char ch ) {
 		return ch == '/' || ch == '\\' ? zpFile::sep : ch;
 	} );
 }
@@ -109,7 +108,9 @@ const zpString& zpContentManager::getRootDirectory() const {
 	return m_rootDirectory;
 }
 
-void zpContentManager::onCreate() {}
+void zpContentManager::onCreate() {
+	m_rootDirectory = zpFile::getCurrentDirectory();
+}
 void zpContentManager::onDestroy() {}
 
 void zpContentManager::onUpdate() {}

@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#if ZP_WIN_32 || ZP_WIN_64
+#include <Windows.h>
+#endif
+
+#define ZP_FILE_BUFFER_SIZE		64
+
 const zp_char* __zpFileModeToString( zpFileMode mode ) {
 	switch( mode ) {
 		case ZP_FILE_MODE_READ: return "r";
@@ -35,19 +41,24 @@ zpFile::zpFile( const zpString& filename, zpFileMode mode ) :
 	m_mode( mode ), 
 	m_size( -1 ), 
 	m_filename( filename )
-{}
+{
+	convertToFilePath( m_filename );
+}
 zpFile::zpFile( const zpFile& file ) : 
-	m_file( ZP_NULL ), 
-	m_mode( ZP_FILE_MODE_NONE ), 
-	m_size( -1 ), 
-	m_filename()
-{}
+	m_file( file.m_file ), 
+	m_mode( file.m_mode ), 
+	m_size( file.m_size ), 
+	m_filename( file.m_filename )
+{
+	convertToFilePath( m_filename );
+}
 zpFile::zpFile( zpFile&& file ) : 
 	m_file( file.m_file ), 
 	m_mode( file.m_mode ), 
 	m_size( file.m_size ), 
 	m_filename( (zpString&&)file.m_filename )
 {
+	convertToFilePath( m_filename );
 	file.m_file = ZP_NULL;
 }
 zpFile::~zpFile() {
@@ -73,6 +84,28 @@ zpFile zpFile::createTempFile() {
 
 	return tmp;
 }
+
+zpString zpFile::s_currentDirectory;
+const zpString& zpFile::getCurrentDirectory() {
+	if( s_currentDirectory.isEmpty() ) {
+#if ZP_WIN_32 || ZP_WIN_64
+		zp_dword size = GetCurrentDirectory( 0, ZP_NULL );
+		zp_char* buff = new zp_char[ size + 1 ];
+		GetCurrentDirectory( size, buff );
+		buff[ size - 1 ] = zpFile::sep;
+		buff[ size ] = 0;
+		s_currentDirectory = buff;
+		delete[] buff;
+#endif
+	}
+	return s_currentDirectory;
+}
+void zpFile::convertToFilePath( zpString& filepath ) {
+	filepath.map( []( zp_char ch ) -> zp_char {
+		return ch == '/' || ch == '\\' ? zpFile::sep : ch;
+	} );
+}
+
 
 zpFileMode zpFile::getFileMode() const {
 	return m_mode;
@@ -102,7 +135,8 @@ zp_bool zpFile::open( zpFileMode mode ) {
 	if( m_mode == ZP_FILE_MODE_NONE ) return false;
 	if( m_filename.isEmpty() ) return false;
 
-	return 0 == fopen_s( (FILE**)&m_file, m_filename.c_str(), __zpFileModeToString( m_mode ) );
+	zp_uint err = fopen_s( (FILE**)&m_file, m_filename.c_str(), __zpFileModeToString( m_mode ) );
+	return 0 == err;
 }
 void zpFile::close() {
 	if( m_file ) {
@@ -115,7 +149,7 @@ void zpFile::close() {
 zp_int zpFile::readFile( zpStringBuffer* buffer ) {
 	zp_int count = 0;
 	if( m_file && buffer && !isBinaryFile() ) {
-		zp_char buff[64];
+		zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 		FILE* f = (FILE*)m_file;
 
 		zp_uint s;
@@ -129,7 +163,7 @@ zp_int zpFile::readFile( zpStringBuffer* buffer ) {
 zp_int zpFile::readLine( zpStringBuffer* buffer ) {
 	zp_int count = 0;
 	if( m_file && buffer && !isBinaryFile() ) {
-		zp_char buff[64];
+		zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 		FILE* f = (FILE*)m_file;
 		
 		zp_bool newLineFound = false;
@@ -147,7 +181,7 @@ zp_int zpFile::readLine( zpStringBuffer* buffer ) {
 zp_int zpFile::readFileBinary( zpArrayList<zp_byte>* buffer ) {
 	zp_int count = 0;
 	if( m_file && buffer && isBinaryFile() ) {
-		zp_char buff[64];
+		zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 		FILE* f = (FILE*)m_file;
 
 		zp_uint s;
