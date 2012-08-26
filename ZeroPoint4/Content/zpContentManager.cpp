@@ -100,16 +100,15 @@ void zpContentManager::deserialize( zpSerializedInput* in ) {}
 
 void zpContentManager::setRootDirectory( const zpString& rootDirectory ) {
 	m_assetsFolder = rootDirectory;
-	m_assetsFolder.map( []( zp_char ch ) {
-		return ch == '/' || ch == '\\' ? zpFile::sep : ch;
-	} );
+	zpFile::convertToFilePath( m_assetsFolder );
 }
 const zpString& zpContentManager::getRootDirectory() const {
 	return m_rootDirectory;
 }
 
 void zpContentManager::onCreate() {
-	m_rootDirectory = zpFile::getCurrentDirectory();
+	//m_rootDirectory = zpFile::getCurrentDirectory();
+	m_rootDirectory = "./";
 }
 void zpContentManager::onDestroy() {}
 

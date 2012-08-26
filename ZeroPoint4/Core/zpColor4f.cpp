@@ -89,6 +89,18 @@ void zpColor4f::clamp() {
 	m_alpha = zp_clamp01( m_alpha );
 }
 
+void zpColor4f::store3( zp_float* rgb ) const {
+	rgb[0] = m_red;
+	rgb[1] = m_green;
+	rgb[2] = m_blue;
+}
+void zpColor4f::store4( zp_float* rgba ) const {
+	rgba[0] = m_red;
+	rgba[1] = m_green;
+	rgba[2] = m_blue;
+	rgba[3] = m_alpha;
+}
+
 zp_bool zpColor4f::operator==( const zpColor4f& color ) const {
 	return m_red == color.m_red && m_green == color.m_green && m_blue == color.m_blue && m_alpha == color.m_alpha;
 }

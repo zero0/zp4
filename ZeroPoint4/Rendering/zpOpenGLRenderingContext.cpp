@@ -95,8 +95,8 @@ void zpOpenGLRenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, z
 }
 void zpOpenGLRenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {}
 
-void zpOpenGLRenderingContext::bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {}
-void zpOpenGLRenderingContext::unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {}
+void zpOpenGLRenderingContext::bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture ) {}
+void zpOpenGLRenderingContext::unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture ) {}
 
 void zpOpenGLRenderingContext::setVertexLayout( zpVertexLayout* layout ) {}
 
@@ -126,6 +126,9 @@ void zpOpenGLRenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
 
 void zpOpenGLRenderingContext::setViewport( const zpViewport& viewport ) {
 	glViewport( (zp_int)viewport.getTopX(), (zp_int)viewport.getTopY(), (zp_uint)viewport.getWidth(), (zp_uint)viewport.getHeight() );
+}
+
+void zpOpenGLRenderingContext::setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state ) {
 }
 
 void zpOpenGLRenderingContext::addReference() const {

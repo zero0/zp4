@@ -92,6 +92,7 @@
     <ClInclude Include="zpDX11RenderingContext.h" />
     <ClInclude Include="zpDX11RenderingEngine.h" />
     <ClInclude Include="zpDX11RenderTarget.h" />
+    <ClInclude Include="zpDX11SamplerState.h" />
     <ClInclude Include="zpDX11ShaderResource.h" />
     <ClInclude Include="zpDX11Texture.h" />
     <ClInclude Include="zpDX11TextureResource.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="zpRenderingManager.h" />
     <ClInclude Include="zpRenderingResourceCreator.h" />
     <ClInclude Include="zpRenderTarget.h" />
+    <ClInclude Include="zpSamplerState.h" />
     <ClInclude Include="zpShaderResource.h" />
     <ClInclude Include="zpStaticMeshResource.h" />
     <ClInclude Include="zpTexture.h" />
@@ -142,6 +144,7 @@
     <ClCompile Include="zpDX11RenderTarget.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zpDX11SamplerState.cpp" />
     <ClCompile Include="zpDX11ShaderResource.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>

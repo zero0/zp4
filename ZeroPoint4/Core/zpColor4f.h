@@ -37,6 +37,9 @@ public:
 	zpColor4f lerp( const zpColor4f& color, zp_float alpha ) const;
 	void clamp();
 
+	void store3( zp_float* rgb ) const;
+	void store4( zp_float* rgba ) const;
+
 	zp_bool operator==( const zpColor4f& color ) const;
 	zp_bool operator!=( const zpColor4f& color ) const;
 

@@ -26,8 +26,8 @@ public:
 	void bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
 	void unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
 
-	void bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture );
-	void unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture );
+	void bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture );
+	void unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture );
 
 	void setVertexLayout( zpVertexLayout* layout );
 
@@ -42,6 +42,8 @@ public:
 	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
 
 	void setViewport( const zpViewport& viewport );
+
+	void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state );
 
 
 	void addReference() const;

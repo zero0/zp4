@@ -129,23 +129,23 @@ void zpDX11RenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, z
 	}
 }
 
-void zpDX11RenderingContext::bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {
+void zpDX11RenderingContext::bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture ) {
 	ID3D11ShaderResourceView* view = ( (zpDX11Texture*)texture )->getResourceView();
 	switch( bindType ) {
-	case ZP_RESOURCE_BIND_TYPE_VERTEX_SHADER:
+	case ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER:
 		m_context->VSSetShaderResources( slot, 1, &view );
 		break;
-	case ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER:
+	case ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER:
 		m_context->PSSetShaderResources( slot, 1, &view );
 		break;
 	}
 }
-void zpDX11RenderingContext::unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture ) {
+void zpDX11RenderingContext::unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture ) {
 	switch( bindType ) {
-	case ZP_RESOURCE_BIND_TYPE_VERTEX_SHADER:
+	case ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER:
 		m_context->VSSetShaderResources( slot, 1, ZP_NULL );
 		break;
-	case ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER:
+	case ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER:
 		m_context->PSSetShaderResources( slot, 1, ZP_NULL );
 		break;
 	}
@@ -208,6 +208,25 @@ void zpDX11RenderingContext::setViewport( const zpViewport& viewport ) {
 	v.TopLeftY = viewport.getTopY();
 
 	m_context->RSSetViewports( 1, &v );
+}
+
+void zpDX11RenderingContext::setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state ) {
+	zpDX11SamplerState* s = (zpDX11SamplerState*)state;
+
+	switch( bindSlot ) {
+	case ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER:
+		m_context->VSSetSamplers( slot, 1, state ? &s->m_sampler : ZP_NULL );
+		break;
+	case ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER:
+		m_context->GSSetSamplers( slot, 1, state ? &s->m_sampler : ZP_NULL );
+		break;
+	case ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER:
+		m_context->CSSetSamplers( slot, 1, state ? &s->m_sampler : ZP_NULL );
+		break;
+	case ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER:
+		m_context->PSSetSamplers( slot, 1, state ? &s->m_sampler : ZP_NULL );
+		break;
+	}
 }
 
 

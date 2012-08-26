@@ -36,14 +36,16 @@ public:
 	void bindShader( zpShaderResource* shader );
 	void unbindShader( zpShaderResource* shader );
 
-	void bindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture );
-	void unbindTexture( zpResourceBindType bindType, zp_uint slot, zpTexture* texture );
+	void bindTexture( zpResourceBindSlot bindSlot, zp_uint slot, zpTexture* texture );
+	void unbindTexture( zpResourceBindSlot bindSlot, zp_uint slot, zpTexture* texture );
 
 	void setTopology( zpTopology topology );
 
 	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
 
 	void setViewport( const zpViewport& viewport );
+
+	void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state );
 
 
 	void addReference() const;

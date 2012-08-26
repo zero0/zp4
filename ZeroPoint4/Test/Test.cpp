@@ -250,6 +250,7 @@ void rendering_test_main() {
 		zpShaderResource* srtex;
 		zpRenderingEngine* engine;
 		zpTextureResource* tex;
+		zpSamplerState* state;
 		zp_float time;
 		zp_uint frames;
 		void start( zpContentManager* cm ) {
@@ -268,10 +269,10 @@ void rendering_test_main() {
 			buff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, sv );
 
 			zpVertexPositionNormalTexture pnt[] = {
-				{ zpVector4f( -f, 0, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 )  },
+				{ zpVector4f( -f, 0, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 2 )  },
 				{ zpVector4f( -f, f, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 0 )  },
-				{ zpVector4f( 0, 0, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 1, 1 )  },
-				{ zpVector4f( 0, f, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 1, 0 )  }
+				{ zpVector4f( 0, 0, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 2 )  },
+				{ zpVector4f( 0, f, 0, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 0 )  }
 			};
 			buff2->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, pnt );
 
@@ -284,7 +285,10 @@ void rendering_test_main() {
 
 			engine->getImmediateRenderingContext()->setViewport( zpViewport( 800, 600 ) );
 			engine->getImmediateRenderingContext()->bindRenderTargetAndDepthBuffer();
-			engine->setVSyncEnabled( true );
+			engine->setVSyncEnabled( false );
+
+			zpSamplerStateDesc samplerDesc;
+			state = engine->createSamplerState( samplerDesc );
 #endif
 		}
 		void render() {
@@ -295,7 +299,8 @@ void rendering_test_main() {
 			i->bindRenderTargetAndDepthBuffer();
 			i->clearRenderTarget( &c );
 			i->clearDepthStencilBuffer( 1.0f, 0 );
-			
+			i->setSamplerState( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, state );
+
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 			i->bindBuffer( buff );
 			i->bindShader( sr );
@@ -303,7 +308,7 @@ void rendering_test_main() {
 			
 			i->bindBuffer( buff2 );
 			i->bindShader( srtex );
-			i->bindTexture( ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER, 0, tex->getTexture() );
+			i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
 			i->draw( 4 );
 			
 			engine->present();

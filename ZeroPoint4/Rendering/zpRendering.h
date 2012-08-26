@@ -131,11 +131,11 @@ enum zpTopology {
 	ZP_TOPOLOGY_TRIANGLE_STRIP,
 };
 
-enum zpResourceBindType {
-	ZP_RESOURCE_BIND_TYPE_VERTEX_SHADER,
-	ZP_RESOURCE_BIND_TYPE_GEOMETRY_SHADER,
-	ZP_RESOURCE_BIND_TYPE_COMPUTE_SHADER,
-	ZP_RESOURCE_BIND_TYPE_PIXEL_SHADER,
+enum zpResourceBindSlot {
+	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER,
+	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER,
+	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER,
+	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER,
 };
 
 enum zpMeshTextureBindSlot {
@@ -145,6 +145,59 @@ enum zpMeshTextureBindSlot {
 	ZP_MESH_TEXTURE_BIND_SLOT_OPACITY,
 	ZP_MESH_TEXTURE_BIND_SLOT_OTHER,
 };
+
+enum zpTextureWrap {
+	ZP_TEXTURE_WRAP_REPEAT =		1,
+	ZP_TEXTURE_WRAP_MIRROR,
+	ZP_TEXTURE_WRAP_CLAMP,
+	ZP_TEXTURE_WRAP_BORDER,
+};
+
+enum zpTextureFilter {
+	ZP_TEXTURE_FILTER_POINT =					0x01,
+	ZP_TEXTURE_FILTER_LINEAR =					0x02,
+	ZP_TEXTURE_FILTER_ANISOTROPIC =				0x04,
+
+	ZP_TEXTURE_FILTER_COMPARISON_POINT =		0x11,
+	ZP_TEXTURE_FILTER_COMPARISON_LINEAR =		0x12,
+	ZP_TEXTURE_FILTER_COMPARISON_ANISOTROPIC =	0x14,
+};
+
+enum zpComparisonFunc {
+	ZP_COMPARISON_FUNC_NONE =		1,
+	ZP_COMPARISON_FUNC_LESS,
+	ZP_COMPARISON_FUNC_LESS_EQUAL,
+	ZP_COMPARISON_FUNC_EQUAL,
+	ZP_COMPARISON_FUNC_NOT_EQUAL,
+	ZP_COMPARISON_FUNC_GREATER_EQUAL,
+	ZP_COMPARISON_FUNC_GREATER,
+	ZP_COMPARISON_FUNC_ALWAYS,
+};
+
+struct zpSamplerStateDesc {
+	struct {
+		zpComparisonFunc cmpFunc : 8;
+		zpTextureFilter minFilter : 8;
+		zpTextureFilter magFilter : 8;
+		zpTextureFilter mipFilter : 8;
+	};
+
+	struct {
+		zpTextureWrap texWrapU : 8;
+		zpTextureWrap texWrapV : 8;
+		zpTextureWrap texWrapW : 8;
+		zp_byte maxAnisotrpy : 8;
+	};
+
+	zp_float lodMin;
+	zp_float lodMax;
+	zp_float lodBias;
+
+	zpColor4f borderColor;
+
+	zpSamplerStateDesc();
+};
+
 
 class zpViewport;
 ZP_PURE_INTERFACE zpTexture;
@@ -157,6 +210,7 @@ ZP_PURE_INTERFACE zpBuffer;
 ZP_PURE_INTERFACE zpRenderTarget;
 ZP_PURE_INTERFACE zpDepthStencilBuffer;
 ZP_PURE_INTERFACE zpVertexLayout;
+ZP_PURE_INTERFACE zpSamplerState;
 
 ZP_ABSTRACT_CLASS zpStaticMeshResource;
 class zpOBJStaticMeshResource;
@@ -182,6 +236,7 @@ class zpCameraComponent;
 #include "zpRenderTarget.h"
 #include "zpDepthStencilBuffer.h"
 #include "zpVertexLayout.h"
+#include "zpSamplerState.h"
 
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"

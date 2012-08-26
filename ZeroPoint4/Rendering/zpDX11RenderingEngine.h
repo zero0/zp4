@@ -54,6 +54,8 @@ public:
 
 	zpVertexLayout* createVertexLayout( const zpString& desc );
 
+	zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc );
+
 protected:
 	zp_bool initialize();
 	void shutdown();

@@ -141,6 +141,12 @@
     <ClInclude Include="zpCameraComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpSamplerState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11SamplerState.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -217,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="zpCameraComponent.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11SamplerState.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

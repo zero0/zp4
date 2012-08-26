@@ -222,6 +222,10 @@ zpVertexLayout* zpOpenGLRenderingEngine::createVertexLayout( const zpString& des
 	return ZP_NULL;
 }
 
+zpSamplerState* zpOpenGLRenderingEngine::createSamplerState( const zpSamplerStateDesc& desc ) {
+	return ZP_NULL;
+}
+
 zp_bool zpOpenGLRenderingEngine::initialize() {
 	return true;
 }

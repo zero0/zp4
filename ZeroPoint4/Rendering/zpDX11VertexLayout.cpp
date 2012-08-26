@@ -43,9 +43,10 @@ zpDX11VertexLayout* zpDX11VertexLayout::getLayoutFromDesc( const zpString& input
 				{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32,	D3D11_INPUT_PER_VERTEX_DATA, 0 }
 			};
 			ID3D11InputLayout* layout = ZP_NULL;
+			zp_uint length = ZP_ARRAY_LENGTH( desc );
 			HRESULT hr;
 
-			hr = ( (zpDX11RenderingEngine*)zpRenderingFactory::getRenderingEngine() )->getDevice()->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), vertexShaderBlob, vertexShaderBlobSize, &layout );
+			hr = ( (zpDX11RenderingEngine*)zpRenderingFactory::getRenderingEngine() )->getDevice()->CreateInputLayout( desc, length, vertexShaderBlob, vertexShaderBlobSize, &layout );
 
 			vertexLayout = new zpDX11VertexLayout;
 			vertexLayout->m_layout = layout;

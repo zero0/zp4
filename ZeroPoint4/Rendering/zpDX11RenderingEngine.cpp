@@ -419,6 +419,27 @@ zpVertexLayout* zpDX11RenderingEngine::createVertexLayout( const zpString& desc 
 	return new zpDX11VertexLayout();
 }
 
+zpSamplerState* zpDX11RenderingEngine::createSamplerState( const zpSamplerStateDesc& desc ) {
+	HRESULT hr;
+	D3D11_SAMPLER_DESC samplerDesc;
+	zp_zero_memory( &samplerDesc );
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;	// @TODO: implement mapping
+	samplerDesc.AddressU = __zpToDX( desc.texWrapU );
+	samplerDesc.AddressV = __zpToDX( desc.texWrapV );
+	samplerDesc.AddressW = __zpToDX( desc.texWrapW );
+	samplerDesc.MipLODBias = desc.lodBias;
+	samplerDesc.MaxAnisotropy = desc.maxAnisotrpy;
+	samplerDesc.ComparisonFunc = __zpToDX( desc.cmpFunc );
+	desc.borderColor.store4( samplerDesc.BorderColor );
+	samplerDesc.MinLOD = desc.lodMin;
+	samplerDesc.MaxLOD = desc.lodMax;
+
+	ID3D11SamplerState* state;
+	hr = m_d3dDevice->CreateSamplerState( &samplerDesc, &state );
+
+	return new zpDX11SamplerState( state );
+}
+
 zp_bool zpDX11RenderingEngine::initialize() {
 	if( m_dxgiAdapter ) return true;
 
