@@ -85,6 +85,9 @@ void zpDX11RenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {
 	case ZP_BUFFER_TYPE_INDEX:
 		m_context->IASetIndexBuffer( b, __zpToDX( buffer->getFormat() ), offset );
 		break;
+	case ZP_BUFFER_TYPE_CONSTANT:
+		m_context->VSSetConstantBuffers( slot, 1, &b );
+		break;
 	}
 }
 void zpDX11RenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
@@ -94,6 +97,9 @@ void zpDX11RenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
 		break;
 	case ZP_BUFFER_TYPE_INDEX:
 		m_context->IASetIndexBuffer( ZP_NULL, DXGI_FORMAT_UNKNOWN, 0 );
+		break;
+	case ZP_BUFFER_TYPE_CONSTANT:
+		m_context->VSSetConstantBuffers( slot, 1, ZP_NULL );
 		break;
 	}
 }

@@ -23,10 +23,10 @@ void zpCamera::update() {
 	if( m_isProjectionDirty ) {
 		switch( m_projectionType ) {
 		case ZP_CAMERA_PROJECTION_ORTHO:
-			m_projection.ortho( 0, 0, 0, 0, m_near, m_far );
+			m_projection.ortho( 0, 800, 600, 0, m_near, m_far );
 			break;
 		case ZP_CAMERA_PROJECTION_PERSPECTIVE:
-			m_projection.perspective( m_fovy, m_aspectRatio, m_near, m_far );
+			m_projection.perspective( ( m_fovy ), m_aspectRatio, m_near, m_far );
 			break;
 		}
 

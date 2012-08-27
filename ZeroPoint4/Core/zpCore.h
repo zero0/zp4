@@ -15,7 +15,7 @@
 //#ifdef _WIN32
 //#define ZP_USE_SIMD		0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD			1
+#define ZP_USE_SIMD			0
 //#endif
 
 #define ZP_LOG_ENABLED		1

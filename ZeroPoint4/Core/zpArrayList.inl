@@ -304,7 +304,7 @@ const T& zpArrayList<T>::back() const {
 
 template<typename T>
 T* zpArrayList<T>::begin() {
-	return &m_array[ 0 ];
+	return m_array;
 }
 template<typename T>
 T* zpArrayList<T>::end() {
@@ -313,7 +313,7 @@ T* zpArrayList<T>::end() {
 
 template<typename T>
 const T* zpArrayList<T>::begin() const {
-	return &m_array[ 0 ];
+	return m_array;
 }
 template<typename T>
 const T* zpArrayList<T>::end() const {

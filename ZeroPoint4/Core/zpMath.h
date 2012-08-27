@@ -21,6 +21,14 @@ ZP_FORCE_INLINE T zp_clamp01( T& val ) { return val > (T)1 ? (T)1 : val < (T)0 ?
 template<typename T>
 ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high ) { return val > high ? high : val < low ? low : val; }
 
+zp_float zp_cos( zp_float v );
+zp_float zp_sin( zp_float v );
+zp_float zp_tan( zp_float v );
+
+zp_float zp_pow( zp_float b, zp_float p );
+
+zp_float zp_sqrt( zp_float v );
+
 class zpVector4f;
 class zpReal;
 class zpInteger;
@@ -52,12 +60,5 @@ class zpFrustum;
 #include "zpMatrix4Fpu.inl"
 #endif
 
-zp_float zp_cos( zp_float v );
-zp_float zp_sin( zp_float v );
-zp_float zp_tan( zp_float v );
-
-zp_float zp_pow( zp_float b, zp_float p );
-
-zp_float zp_sqrt( zp_float v );
 
 #endif

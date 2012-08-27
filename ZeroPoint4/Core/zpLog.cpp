@@ -60,6 +60,12 @@ zpLogOutput& zpLogOutput::operator<<( zp_long c ) {
 #endif
 	return (*this);
 }
+zpLogOutput& zpLogOutput::operator<<( zp_float c ) {
+#if ZP_LOG_ENABLED
+	zp_printf( "%f", c );
+#endif
+	return (*this);
+}
 zpLogOutput& zpLogOutput::operator<<( const zp_char* c ) {
 #if ZP_LOG_ENABLED
 	zp_printf( "%s", c );

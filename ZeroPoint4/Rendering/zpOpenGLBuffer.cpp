@@ -10,7 +10,7 @@ zpOpenGLBuffer::zpOpenGLBuffer() :
 	m_buffer( 0 )
 {}
 zpOpenGLBuffer::~zpOpenGLBuffer() {
-	release();
+	destroy();
 }
 
 void zpOpenGLBuffer::create( zpBufferType type, zpBufferBindType bind, zp_uint count, zp_uint stride, void* data ) {
@@ -26,7 +26,7 @@ void zpOpenGLBuffer::create( zpBufferType type, zpBufferBindType bind, zp_uint c
 	glBufferData( m_target, count * stride, data, __zpToGL( bind ) );
 	glBindBuffer( m_target, 0 );
 }
-void zpOpenGLBuffer::release() {
+void zpOpenGLBuffer::destroy() {
 	glDeleteBuffers( 1, &m_buffer );
 }
 

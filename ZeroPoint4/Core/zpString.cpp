@@ -474,12 +474,12 @@ zpString& zpString::toUpper() {
 }
 
 zp_int zpString::scan( const zp_char* format, ... ) const {
-	va_list args;
+	//va_list args;
 	zp_int ret = 0;
 
-	va_start( args, format );
-	ret = sscanf_s( getChars(), format, args );
-	va_end( args );
+	//va_start( args, format );
+	//ret = sscanf_s( getChars(), format, args );
+	//va_end( args );
 
 	return ret;
 }

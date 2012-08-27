@@ -20,8 +20,8 @@ ZP_FORCE_INLINE void zpMatrix4f::operator*=( const zpMatrix4f& matrix ) {
 			sum = 0;
 
 			for( j = 0; j < 4; ++j ) {
-				//sum += m_matrix[x][j] * matrix.m_matrix[j][y];
-				sum += m_matrix[j][x] * matrix.m_matrix[y][j];
+				sum += m_matrix[x][j] * matrix.m_matrix[j][y];
+				//sum += m_matrix[j][x] * matrix.m_matrix[y][j];
 			}
 
 			mat[x][y] = sum;
@@ -31,7 +31,7 @@ ZP_FORCE_INLINE void zpMatrix4f::operator*=( const zpMatrix4f& matrix ) {
 }
 
 ZP_FORCE_INLINE void zpMatrix4f::translate( const zpVector4f& position ) {
-	zp_vec4 v = position;
+	zp_vec4 v = position.toVec4();
 	m_41 = m_11 * v.x + m_21 * v.y + m_31 * v.z + m_41;
 	m_42 = m_12 * v.x + m_22 * v.y + m_32 * v.z + m_42;
 	m_43 = m_13 * v.x + m_23 * v.y + m_33 * v.z + m_43;
@@ -71,7 +71,14 @@ ZP_FORCE_INLINE void zpMatrix4f::rotateZ( zp_real angle ) {
 
 	(*this) = rotZ * (*this);
 }
-ZP_FORCE_INLINE void zpMatrix4f::scale( zp_float uniformScale ) {}
+ZP_FORCE_INLINE void zpMatrix4f::scale( zp_float uniformScale ) {
+	zpMatrix4f m;
+	m( 0, 0 ) = uniformScale;
+	m( 1, 1 ) = uniformScale;
+	m( 2, 2 ) = uniformScale;
+
+	(*this) = m * (*this);
+}
 ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {
 	zpMatrix4f m;
 	m( 0, 0 ) = scale.getX();
@@ -89,8 +96,7 @@ ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f
 		return;
 	}
 
-	zpVector4f z( point );
-	z.sub3( eye );
+	zpVector4f z( eye - point );
 	z.normalize3();
 
 	zpVector4f x( up );
@@ -105,8 +111,29 @@ ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f
 	m_31 = x.getZ();	m_32 = y.getZ();	m_33 = z.getZ();	m_34 = 0;
 	m_41 = -( x.dot3( eye ) );	m_42 = -( y.dot3( eye ) );	m_43 = -( z.dot3( eye ) );	m_44 = 1;
 }
-ZP_FORCE_INLINE void zpMatrix4f::perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance ) {}
-ZP_FORCE_INLINE void zpMatrix4f::ortho( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}
+ZP_FORCE_INLINE void zpMatrix4f::perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance ) {
+	zp_float e = 1.f / zp_tan( fovy * .5f );
+	zp_float fpn = farDistance + nearDistance;
+	zp_float fnn = farDistance - nearDistance;
+	zp_float fmn = farDistance * nearDistance;
+
+	m_11 = e;	m_12 = 0;			m_13 = 0;	m_14 = 0;
+	m_21 = 0;	m_22 = e / aspect;	m_23 = 0;	m_24 = 0;
+	m_31 = 0;	m_32 = 0;			m_33 = -( fpn / fnn );	m_34 = -( ( 2 * fmn ) / fnn );
+	m_41 = 0;	m_42 = 0;			m_43 = -1;	m_44 = 0;
+}
+ZP_FORCE_INLINE void zpMatrix4f::ortho( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {
+	zp_float fn = farDistance - nearDistance;
+	zp_float pfn = farDistance + nearDistance;
+	zp_float nf = nearDistance - farDistance;
+	zp_float width = right - left;
+	zp_float height = top - bottom;
+
+	m_11 = 2.f / width;	m_12 = 0;			m_13 = 0;			m_14 = 0;
+	m_21 = 0;			m_22 = 2.f / height;m_23 = 0;			m_24 = 0;
+	m_31 = 0;			m_32 = 0;			m_33 = -2.f / fn;	m_34 = 0;
+	m_41 = 0;			m_42 = 0;			m_43 = nearDistance / fn;	m_44 = 1;
+}
 ZP_FORCE_INLINE void zpMatrix4f::orthoOffset( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}
 ZP_FORCE_INLINE void zpMatrix4f::frustum( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}
 

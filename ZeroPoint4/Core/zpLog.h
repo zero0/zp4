@@ -108,6 +108,7 @@ public:
 	zpLogOutput& operator<<( zp_char c );
 	zpLogOutput& operator<<( zp_int c );
 	zpLogOutput& operator<<( zp_long c );
+	zpLogOutput& operator<<( zp_float c );
 	zpLogOutput& operator<<( const zp_char* c );
 	zpLogOutput& operator<<( const zpString& c );
 	zpLogOutput& operator<<( zpLog::Options c );

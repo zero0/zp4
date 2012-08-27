@@ -10,9 +10,13 @@ public:
 	zpBuffer* getVertexBuffer() const;
 	zpBuffer* getIndexBuffer() const;
 
+	zp_uint getNumVertices() const;
+
 	void unload();
 
 protected:
+	zp_uint m_numVertices;
+
 	zpBuffer* m_vertexBuffer;
 	zpBuffer* m_indexBuffer;
 };

@@ -171,7 +171,7 @@ zp_int zpFile::readLine( zpStringBuffer* buffer ) {
 		while( !newLineFound && fgets( buff, sizeof( buff ), f ) != ZP_NULL ) {
 			buffer->append( buff );
 			len = strlen( buff );
-			newLineFound = buff[ len ] == '\0';
+			newLineFound = buff[ len - 1 ] == '\n';
 			count += len;
 		}
 	}

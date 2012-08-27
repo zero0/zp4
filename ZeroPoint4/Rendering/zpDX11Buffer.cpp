@@ -12,7 +12,7 @@ zpDX11Buffer::zpDX11Buffer() :
 	m_buffer( ZP_NULL )
 {}
 zpDX11Buffer::~zpDX11Buffer() {
-	release();
+	destroy();
 }
 
 void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint count, zp_uint stride, void* data ) {
@@ -43,7 +43,6 @@ void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint cou
 		D3D11_SUBRESOURCE_DATA sub;
 		zp_zero_memory( &sub );
 		sub.pSysMem = data;
-
 		
 		hr = device->CreateBuffer( &desc, &sub, &m_buffer );
 	} else {
@@ -52,7 +51,7 @@ void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint cou
 
 	if( FAILED( hr ) ) zpLog::error() << "Failed to create buffer" << zpLog::endl;
 }
-void zpDX11Buffer::release() {
+void zpDX11Buffer::destroy() {
 	ZP_SAFE_RELEASE( m_buffer );
 }
 

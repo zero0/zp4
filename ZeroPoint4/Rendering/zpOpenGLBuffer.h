@@ -8,7 +8,7 @@ public:
 	virtual ~zpOpenGLBuffer();
 
 	void create( zpBufferType type, zpBufferBindType bind, zp_uint count, zp_uint stride, void* data = 0 );
-	void release();
+	void destroy();
 
 	void map( void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
 	void unmap( zp_uint subResource = 0 );

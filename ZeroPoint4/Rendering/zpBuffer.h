@@ -26,7 +26,7 @@ public:
 	}	
 
 	virtual void create( zpBufferType type, zpBufferBindType bind, zp_uint count, zp_uint stride, void* data = 0 );
-	virtual void release() = 0;
+	virtual void destroy() = 0;
 
 	virtual void map( void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 ) = 0;
 	virtual void unmap( zp_uint subResource = 0 ) = 0;
