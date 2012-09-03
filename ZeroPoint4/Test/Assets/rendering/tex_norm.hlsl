@@ -1,3 +1,5 @@
+//#pragma pack_matrix( row_major )
+
 struct VS_Input {
 	float4 position : POSITION;
 	float4 normal : NORMAL;
@@ -10,17 +12,22 @@ struct PS_Input {
 	float2 texCoord0 : TEXCOORD0;
 };
 
+cbuffer Camera : register( b0 ) {
+	float4x4 view;
+	float4x4 projection;
+	float4x4 viewProjection;
+	float4x4 world;
+};
+
 Texture2D diffuseMap : register( t0 );
-SamplerState linearSampler {
-	Filter = MIN_MAG_MIP_LINEAR;
-};
-SamplerState pointSampler {
-	Filter = MIN_MAG_MIP_POINT;
-};
+SamplerState linearSampler : register( s0 );
 
 PS_Input main_vs( VS_Input input ) {
 	PS_Input output = (PS_Input)0;
-	output.position = input.position;
+	output.position = mul( input.position, world );
+	output.position = mul( output.position, view );
+	output.position = mul( output.position, projection );
+	
 	output.normal = input.normal;
 	output.texCoord0 = input.texCoord0;
 	
