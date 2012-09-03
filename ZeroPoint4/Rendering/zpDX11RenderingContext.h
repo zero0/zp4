@@ -46,6 +46,7 @@ public:
 	void setViewport( const zpViewport& viewport );
 
 	void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state );
+	void setRasterState( zpRasterState* raster );
 
 
 	void addReference() const;

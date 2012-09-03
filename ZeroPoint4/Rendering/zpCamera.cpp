@@ -7,8 +7,8 @@ zpCamera::zpCamera() :
 	m_near( 1.f ),
 	m_far( 1000.f ),
 	m_up( 0, 1, 0 ),
-	m_lookAt( 0, 0, -1 ),
-	m_position( 0, 0, 0 ),
+	m_lookAt( 0, 0, 0 ),
+	m_position( 0, 0, 1 ),
 	m_frustum(),
 	m_view(),
 	m_projection(),
@@ -23,10 +23,11 @@ void zpCamera::update() {
 	if( m_isProjectionDirty ) {
 		switch( m_projectionType ) {
 		case ZP_CAMERA_PROJECTION_ORTHO:
-			m_projection.ortho( 0, 800, 600, 0, m_near, m_far );
+			m_projection.ortho( 800, 600, m_near, m_far );
+			//m_projection.orthoOffset( -20, 80, 60, -2, m_near, m_far );
 			break;
 		case ZP_CAMERA_PROJECTION_PERSPECTIVE:
-			m_projection.perspective( ( m_fovy ), m_aspectRatio, m_near, m_far );
+			m_projection.perspective( m_fovy, m_aspectRatio, m_near, m_far );
 			break;
 		}
 
@@ -44,7 +45,8 @@ void zpCamera::update() {
 	if( isViewProjectionDirty ) {
 		m_frustum.set( m_position, m_lookAt, m_up, m_aspectRatio, m_fovy, m_near, m_far );
 
-		m_viewProjection = m_view * m_projection;
+		m_viewProjection = m_view;
+		m_viewProjection *= m_projection;
 	}
 }
 

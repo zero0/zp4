@@ -80,8 +80,21 @@ ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f
 	zpVector4f y( z );
 	y.cross3( x );
 
-	// @TODO: implement
+	zp_real px = zp_real_neg( x.dot3( eye ) );
+	zp_real py = zp_real_neg( y.dot3( eye ) );
+	zp_real pz = zp_real_neg( z.dot3( eye ) );
 
+	x.setW( px );
+	y.setW( py );
+	z.setW( pz );
+
+	m_m1 = x.toVec4();
+	m_m2 = y.toVec4();
+	m_m3 = z.toVec4();
+	m_m4 = zpVector4f( 0, 0, 0, 1 ).toVec4();
+
+	transpose();
+	// @TODO: implement
 	/*
 	m_11 = x.getX();	m_12 = y.getX();	m_13 = z.getX();	m_14 = 0;
 	m_21 = x.getY();	m_22 = y.getY();	m_23 = z.getY();	m_24 = 0;
@@ -89,10 +102,51 @@ ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f
 	m_41 = -( x.dot3( eye ) );	m_42 = -( y.dot3( eye ) );	m_43 = -( z.dot3( eye ) );	m_44 = 1;
 	*/
 }
-ZP_FORCE_INLINE void zpMatrix4f::perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance ) {}
-ZP_FORCE_INLINE void zpMatrix4f::ortho( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}
-ZP_FORCE_INLINE void zpMatrix4f::orthoOffset( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}
+ZP_FORCE_INLINE void zpMatrix4f::perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance ) {
+	
+	zp_float f = 1.f / zp_tan( ZP_DEG_TO_RAD( fovy ) * .5f );
+
+	m_m1 = zp_vec4( f / aspect, 0, 0, 0 );
+	m_m2 = zp_vec4( 0, f, 0, 0 );
+	m_m3 = zp_vec4( 0, 0, ( farDistance + nearDistance ) / ( farDistance - nearDistance ), ( -2.f * farDistance * nearDistance ) / ( farDistance - nearDistance ) );
+	m_m4 = zp_vec4( 0, 0, -1, 0 );
+	//zp_float f = 1.f / zp_tan( ZP_DEG_TO_RAD( fovy ) * .5f );
+
+	//m_11 = f/ aspect;	m_12 = 0;	m_13 = 0;	m_14 = 0;
+	//m_21 = 0;	m_22 = f;	m_23 = 0;	m_24 = 0;
+	//m_31 = 0;	m_32 = 0;	m_33 = ( farDistance + nearDistance ) / ( farDistance - nearDistance );	m_34 = ( -2.f * farDistance * nearDistance ) / ( farDistance - nearDistance );
+	//m_41 = 0;	m_42 = 0;	m_43 = -1;	m_44 = 0;
+}
+ZP_FORCE_INLINE void zpMatrix4f::ortho( zp_float width, zp_float height, zp_float nearDistance, zp_float farDistance ) {
+	zp_float fn = farDistance - nearDistance;
+	zp_float pfn = farDistance + nearDistance;
+	zp_float nf = nearDistance - farDistance;
+
+	m_m1 = zp_vec4( 2.0f / width, 0, 0, 0 );
+	m_m2 = zp_vec4( 0, 2.0f / height, 0, 0 );
+	m_m3 = zp_vec4( 0, 0, 1.0f / fn, 0 );
+	m_m4 = zp_vec4( 0, 0, -nearDistance / fn, 1 );
+	//m_11 = 2.f / width;	m_12 = 0;			m_13 = 0;			m_14 = 0;
+	//m_21 = 0;			m_22 = 2.f / height;m_23 = 0;			m_24 = 0;
+	//m_31 = 0;			m_32 = 0;			m_33 = 1.f / fn;	m_34 = 0;
+	//m_41 = 0;			m_42 = 0;			m_43 = -nearDistance / fn;	m_44 = 1;
+}
+ZP_FORCE_INLINE void zpMatrix4f::orthoOffset( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {
+	m_m1 = zp_vec4( 2.0f / ( right - left ), 0, 0, 0 );
+	m_m2 = zp_vec4( 0,  2.0f / ( top - bottom ), 0, 0 );
+	m_m3 = zp_vec4( 0, 0,  1.0f / ( farDistance - nearDistance ), 0 );
+	m_m4 = zp_vec4( ( left + right ) / ( left - right ), ( top + bottom ) / ( bottom - top ), nearDistance / ( nearDistance - farDistance ), 1 );
+	//m_11 = 2.f / ( right - left );	m_12 = 0;			m_13 = 0;			m_14 = 0;
+	//m_21 = 0;			m_22 = 2.f / ( top - bottom );m_23 = 0;			m_24 = 0;
+	//m_31 = 0;			m_32 = 0;			m_33 = 1.f / ( farDistance - nearDistance );	m_34 = 0;
+	//m_41 = ( left + right ) / ( left - right );			m_42 = ( top + bottom ) / ( bottom - top );			m_43 = nearDistance / ( nearDistance - farDistance );	m_44 = 1;
+
+}
 ZP_FORCE_INLINE void zpMatrix4f::frustum( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance ) {}
+
+ZP_FORCE_INLINE void zpMatrix4f::transpose() {
+	_MM_TRANSPOSE4_PS( m_m1, m_m2, m_m3, m_m4 );
+}
 
 ZP_FORCE_INLINE zp_bool zpMatrix4f::operator==( const zpMatrix4f& matrix ) const {
 	for( zp_uint i = 16; i --> 0; ) if( m_data[i] != matrix.m_data[i] ) return false;

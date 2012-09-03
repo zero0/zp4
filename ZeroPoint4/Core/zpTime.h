@@ -8,14 +8,17 @@ public:
 
 	static zpTime* getInstance();
 
-	zp_float getDeltaTime() const;
-	zp_float getActualDeltaTime() const;
+	zp_float getDeltaSeconds() const;
+	zp_float getActualDeltaSeconds() const;
 
 	void setTimeScale( zp_float timeScale );
 	zp_float getTimeScale() const;
 
 	void tick();
 	void resetTimer();
+
+	zp_long getTime() const;
+	zp_long getDeltaTime() const;
 
 private:
 	zpTime();

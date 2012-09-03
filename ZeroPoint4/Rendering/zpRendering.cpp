@@ -14,3 +14,16 @@ zpSamplerStateDesc::zpSamplerStateDesc() :
 	lodBias( 0.f ),
 	borderColor( 0.f, 0.f, 0.f, 0.f )
 {}
+
+zpRasterStateDesc::zpRasterStateDesc() :
+	fillMode( ZP_FILL_MODE_SOLID ),
+	cullMode( ZP_CULL_MODE_BACK ),
+	frontFace( ZP_FRONT_FACE_CW ),
+	depthBias( 0 ),
+	depthBiasClamp( 0.f ),
+	slopeScaledDepthBias( 0.f ),
+	depthClipEnable( true ),
+	scissorEnable( false ),
+	multisampleEnable( false ),
+	antialiasedLineEnable( false )
+{}

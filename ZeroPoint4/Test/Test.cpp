@@ -248,6 +248,7 @@ void rendering_test_main() {
 	struct TestRenderable : public zpRenderable {
 		zpBuffer* buff;
 		zpBuffer* buff2;
+		zpBuffer* origBuff;
 		zpBuffer* cameraBuffer;
 
 		zpCamera camera;
@@ -257,6 +258,7 @@ void rendering_test_main() {
 		zpRenderingEngine* engine;
 		zpTextureResource* tex;
 		zpSamplerState* state;
+		zpRasterState* raster;
 		zpStaticMeshResource* mesh;
 		zp_float time;
 		zp_uint frames;
@@ -265,24 +267,39 @@ void rendering_test_main() {
 #if TEST_RENDERING
 			buff = engine->createBuffer();
 			buff2 = engine->createBuffer();
+			origBuff = engine->createBuffer();
 
-			const zp_float f = .7f;
-			const zp_float z = 0.5f;
+			const zp_float f = .5f;
+			const zp_float z = 2.f;
+			const zp_float o = 5.f;
+
 			zpVertexPositionColor sv[] = {
-				{ zpVector4f( 0, 0, z, 1 ), zpColor4f( 1, 0, 0, 1 ) },
-				{ zpVector4f( 0, f, z, 1 ), zpColor4f( 0, 1, 0, 1 ) },
-				{ zpVector4f( f, 0, z, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+				{ zpVector4f(-f,-f, z, 1 ), zpColor4f( 1, 0, 0, 1 ) },
+				{ zpVector4f(-f, f, z, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+				{ zpVector4f( f,-f, z, 1 ), zpColor4f( 0, 0, 1, 1 ) },
 				{ zpVector4f( f, f, z, 1 ), zpColor4f( 1, 0, 1, 1 ) },
 			};
 			buff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, sv );
 
 			zpVertexPositionNormalTexture pnt[] = {
-				{ zpVector4f( -f, 0, z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 2 )  },
-				{ zpVector4f( -f, f, z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 0 )  },
-				{ zpVector4f( 0, 0, z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 2 )  },
-				{ zpVector4f( 0, f, z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 0 )  }
+				{ zpVector4f(-o,-o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 2 )  },
+				{ zpVector4f(-o, o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 0 )  },
+				{ zpVector4f( o,-o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 2 )  },
+				{ zpVector4f( o, o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 0 )  }
 			};
 			buff2->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, pnt );
+
+			zpVertexPositionColor orig[] = {
+				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
+				{ zpVector4f( o, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
+
+				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+				{ zpVector4f( 0, o, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+
+				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+				{ zpVector4f( 0, 0, o, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+			};
+			origBuff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, orig );
 
 			sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
 			srtex = cm->getResourceOfType<zpShaderResource>( "tex_norm_shader" );
@@ -292,37 +309,56 @@ void rendering_test_main() {
 			frames = 0;
 			time = 0;
 
-			engine->getImmediateRenderingContext()->setViewport( zpViewport( 800, 600 ) );
 			engine->getImmediateRenderingContext()->bindRenderTargetAndDepthBuffer();
 			engine->setVSyncEnabled( true );
 
 			zpSamplerStateDesc samplerDesc;
 			state = engine->createSamplerState( samplerDesc );
 
+			zpRasterStateDesc rasterDesc;
+			//rasterDesc.fillMode = ZP_FILL_MODE_WIREFRAME;
+			//rasterDesc.cullMode = ZP_CULL_MODE_NONE;
+			raster = engine->createRasterState( rasterDesc );
+
 			camera.setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
-			camera.set( zpVector4f( 10, 10, 10 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
+			camera.setNearFar( 1, 1000 );
+			camera.set( zpVector4f( 0, 0, 0 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
 			camera.setAspectRatio( 800.f / 600.f );
 			camera.setFovy( 45.f );
 			camera.update();
 
 			cameraBuffer = engine->createBuffer();
-			zpMatrix4f m;
-			for( zp_uint i = 0; i < 16; ++i ) m[i] = (zp_float)i;
 
-			cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
+			struct cb {
+				zpMatrix4f v, p, vp, w;
+			};
+			cb cambuf[1];
+			cambuf[0].v.lookAt( zpVector4f( -5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
+			//cambuf[0].p.ortho( 80, 60, -100, 100 );// = camera.getProjection();
+			cambuf[0].p.perspective( 45.f, 4.f / 3.f, 1, 1000 );
+			//cambuf[0].vp = camera.getViewProjection();
+			cambuf[0].w.scale( 1 );
+
+			cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
+			//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
 			
 #endif
 		}
 		void render() {
 #if TEST_RENDERING
+			zp_long start = zpTime::getInstance()->getTime();
+
 			zpRenderingContext* i = engine->getImmediateRenderingContext();
 
 			zpColor4f c(.23f, .15f, .88f, 1.f );
+			i->setViewport( zpViewport( 800, 600 ) );
 			i->bindRenderTargetAndDepthBuffer();
 			i->clearRenderTarget( &c );
 			i->clearDepthStencilBuffer( 1.0f, 0 );
 
 			i->setSamplerState( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, state );
+			i->setRasterState( raster );
+
 			i->bindBuffer( cameraBuffer, 0 );
 
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
@@ -330,21 +366,31 @@ void rendering_test_main() {
 			i->bindBuffer( buff );
 			i->bindShader( sr );
 			i->draw( 4 );
-			
+
+			i->setTopology( ZP_TOPOLOGY_LINE_LIST );
+			i->bindBuffer( origBuff );
+			i->draw( 6 );
+
+			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
+
 			i->bindBuffer( buff2 );
 			i->bindShader( srtex );
 			i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
 			i->draw( 4 );
 			
+			i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
+
 			i->bindBuffer( mesh->getVertexBuffer() );
 			i->draw( mesh->getNumVertices() );
-
+			
 			engine->present();
+			zp_long end = zpTime::getInstance()->getTime();
 
 			++frames;
-			time += zpTime::getInstance()->getDeltaTime();
+			time += zpTime::getInstance()->getDeltaSeconds();
 			if( time > 1.f ) {
-				zp_printfcln( ZP_CC( ZP_CC_GREEN, ZP_CC_WHITE ), "FPS: %d", frames );
+				end -= start;
+				zp_printfcln( ZP_CC( ZP_CC_GREEN, ZP_CC_WHITE ), "FPS: %d\tFT(ms): %.1f", frames, ( end / 1000.f ) );
 				time = 0;
 				frames = 0;
 			}

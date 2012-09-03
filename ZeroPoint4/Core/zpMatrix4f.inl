@@ -1,6 +1,8 @@
 
 #define MM( r, c )		matrix[( (r) + (c) * 4 )]
 #define MM_( r, c )		( (r) + (c) * 4 )
+//#define MM( r, c )		matrix[( (r) * 4 + (c) )]
+//#define MM_( r, c )		( (r) * 4 + (c) )
 
 ZP_FORCE_INLINE zpMatrix4f::zpMatrix4f() :
 	m_m1( 1, 0, 0, 0 ),

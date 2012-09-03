@@ -81,57 +81,75 @@ ZP_FORCE_INLINE void zpVector4f::load4( const zp_float* xyzw ) {
 }
 
 ZP_FORCE_INLINE void zpVector4f::mul3( const zpVector4f& vector ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_mul_ps( m_xyzw, vector.m_xyzw );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::mul4( const zpVector4f& vector ) {
 	m_xyzw = _mm_mul_ps( m_xyzw, vector.m_xyzw );
 }
 ZP_FORCE_INLINE void zpVector4f::div3( const zpVector4f& vector ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_div_ps( m_xyzw, vector.m_xyzw );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::div4( const zpVector4f& vector ) {
 	m_xyzw = _mm_div_ps( m_xyzw, vector.m_xyzw );
 }
 ZP_FORCE_INLINE void zpVector4f::add3( const zpVector4f& vector ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_add_ps( m_xyzw, vector.m_xyzw );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::add4( const zpVector4f& vector ) {
 	m_xyzw = _mm_add_ps( m_xyzw, vector.m_xyzw );
 }
 ZP_FORCE_INLINE void zpVector4f::sub3( const zpVector4f& vector ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_sub_ps( m_xyzw, vector.m_xyzw );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::sub4( const zpVector4f& vector ) {
 	m_xyzw = _mm_sub_ps( m_xyzw, vector.m_xyzw );
 }
 
 ZP_FORCE_INLINE void zpVector4f::mul3( const zp_real& r ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_mul_ps( m_xyzw, r );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::mul4( const zp_real& r ) {
 	m_xyzw = _mm_mul_ps( m_xyzw, r );
 }
 ZP_FORCE_INLINE void zpVector4f::div3( const zp_real& r ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_div_ps( m_xyzw, r );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::div4( const zp_real& r ) {
 	m_xyzw = _mm_div_ps( m_xyzw, r );
 }
 ZP_FORCE_INLINE void zpVector4f::add3( const zp_real& r ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_add_ps( m_xyzw, r );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::add4( const zp_real& r ) {
 	m_xyzw = _mm_add_ps( m_xyzw, r );
 }
 ZP_FORCE_INLINE void zpVector4f::sub3( const zp_real& r ) {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_sub_ps( m_xyzw, r );
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::sub4( const zp_real& r ) {
 	m_xyzw = _mm_sub_ps( m_xyzw, r );
 }
 
 ZP_FORCE_INLINE void zpVector4f::zero3() {
+	zp_float w = m_xyzw.v.m128_f32[3];
 	m_xyzw = _mm_setzero_ps();
+	m_xyzw.v.m128_f32[3] = w;
 }
 ZP_FORCE_INLINE void zpVector4f::zero4() {
 	m_xyzw = _mm_setzero_ps();

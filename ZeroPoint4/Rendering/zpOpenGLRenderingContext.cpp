@@ -130,6 +130,8 @@ void zpOpenGLRenderingContext::setViewport( const zpViewport& viewport ) {
 
 void zpOpenGLRenderingContext::setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state ) {
 }
+void zpOpenGLRenderingContext::setRasterState( zpRasterState* raster ) {
+}
 
 void zpOpenGLRenderingContext::addReference() const {
 	++m_referenceCount;

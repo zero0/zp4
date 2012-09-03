@@ -46,6 +46,7 @@ public:
 	zpVertexLayout* createVertexLayout( const zpString& desc );
 
 	zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc );
+	zpRasterState* createRasterState( const zpRasterStateDesc& desc );
 
 protected:
 	zp_bool initialize();

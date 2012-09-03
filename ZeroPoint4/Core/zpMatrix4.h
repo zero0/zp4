@@ -48,11 +48,14 @@ public:
 
 	ZP_FORCE_INLINE void mul( const zpVector4f& vector, zpVector4f* outVector ) const;
 
-	ZP_FORCE_INLINE void lookAt( const zpVector4f& eye, const zpVector4f& point, const zpVector4f& up );
+	ZP_FORCE_INLINE void lookAt( const zpVector4f& eye, const zpVector4f& at, const zpVector4f& up );
+	ZP_FORCE_INLINE void lookTo( const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up );
 	ZP_FORCE_INLINE void perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance );
-	ZP_FORCE_INLINE void ortho( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance );
+	ZP_FORCE_INLINE void ortho( zp_float width, zp_float height, zp_float nearDistance, zp_float farDistance );
 	ZP_FORCE_INLINE void orthoOffset( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance );
 	ZP_FORCE_INLINE void frustum( zp_float left, zp_float right, zp_float bottom, zp_float top, zp_float nearDistance, zp_float farDistance );
+
+	ZP_FORCE_INLINE void transpose();
 
 	ZP_FORCE_INLINE zp_bool operator==( const zpMatrix4f& matrix ) const;
 	ZP_FORCE_INLINE zp_bool operator!=( const zpMatrix4f& matrix ) const;

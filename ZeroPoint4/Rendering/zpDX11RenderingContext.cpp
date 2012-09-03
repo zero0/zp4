@@ -234,6 +234,9 @@ void zpDX11RenderingContext::setSamplerState( zpResourceBindSlot bindSlot, zp_ui
 		break;
 	}
 }
+void zpDX11RenderingContext::setRasterState( zpRasterState* raster ) {
+	m_context->RSSetState( raster ? ( (zpDX11RasterState*)raster )->m_raster : ZP_NULL );
+}
 
 
 void zpDX11RenderingContext::addReference() const {

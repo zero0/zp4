@@ -225,6 +225,9 @@ zpVertexLayout* zpOpenGLRenderingEngine::createVertexLayout( const zpString& des
 zpSamplerState* zpOpenGLRenderingEngine::createSamplerState( const zpSamplerStateDesc& desc ) {
 	return ZP_NULL;
 }
+zpRasterState* zpOpenGLRenderingEngine::createRasterState( const zpRasterStateDesc& desc ) {
+	return ZP_NULL;
+}
 
 zp_bool zpOpenGLRenderingEngine::initialize() {
 	return true;

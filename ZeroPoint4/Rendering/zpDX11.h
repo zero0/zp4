@@ -22,6 +22,7 @@ class zpDX11RenderTarget;
 class zpDX11DepthStencilBuffer;
 class zpDX11VertexLayout;
 class zpDX11SamplerState;
+class zpDX11RasterState;
 
 class zpDX11RenderingContext;
 class zpDX11RenderingEngine;
@@ -36,6 +37,7 @@ class zpDX11RenderingEngine;
 #include "zpDX11DepthStencilBuffer.h"
 #include "zpDX11VertexLayout.h"
 #include "zpDX11SamplerState.h"
+#include "zpDX11RasterState.h"
 
 #include "zpDX11RenderingContext.h"
 #include "zpDX11RenderingEngine.h"

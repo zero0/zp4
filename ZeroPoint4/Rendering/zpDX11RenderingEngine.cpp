@@ -440,6 +440,27 @@ zpSamplerState* zpDX11RenderingEngine::createSamplerState( const zpSamplerStateD
 	return new zpDX11SamplerState( state );
 }
 
+zpRasterState* zpDX11RenderingEngine::createRasterState( const zpRasterStateDesc& desc ) {
+	HRESULT hr;
+	D3D11_RASTERIZER_DESC rasterDesc;
+	zp_zero_memory( &rasterDesc );
+	rasterDesc.FillMode = __zpToDX( desc.fillMode );
+	rasterDesc.CullMode = __zpToDX( desc.cullMode );
+	rasterDesc.FrontCounterClockwise = desc.frontFace == ZP_FRONT_FACE_CCW;
+	rasterDesc.DepthBias = desc.depthBias;
+	rasterDesc.DepthBiasClamp = desc.depthBiasClamp;
+	rasterDesc.SlopeScaledDepthBias = desc.slopeScaledDepthBias;
+	rasterDesc.DepthClipEnable = desc.depthClipEnable;
+	rasterDesc.ScissorEnable = desc.scissorEnable;
+	rasterDesc.MultisampleEnable = desc.multisampleEnable;
+	rasterDesc.AntialiasedLineEnable = desc.antialiasedLineEnable;
+
+	ID3D11RasterizerState* state;
+	hr = m_d3dDevice->CreateRasterizerState( &rasterDesc, &state );
+
+	return new zpDX11RasterState( state );
+}
+
 zp_bool zpDX11RenderingEngine::initialize() {
 	if( m_dxgiAdapter ) return true;
 

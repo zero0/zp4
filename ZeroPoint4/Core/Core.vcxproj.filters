@@ -150,6 +150,12 @@
     <ClInclude Include="zpFrustum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpBoundingAABB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpBoundingSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -290,6 +296,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpFrustum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpBoundingAABB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpBoundingSphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

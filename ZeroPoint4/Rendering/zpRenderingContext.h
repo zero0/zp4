@@ -46,6 +46,7 @@ public:
 	virtual void setViewport( const zpViewport& viewport ) = 0;
 
 	virtual void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state ) = 0;
+	virtual void setRasterState( zpRasterState* raster ) = 0;
 };
 
 #endif

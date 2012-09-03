@@ -70,6 +70,9 @@ ZP_PURE_INTERFACE zpSerializedOutput;
 ZP_PURE_INTERFACE zpSerializedInput;
 class zpRegisterSerializable;
 
+class zpBoundingAABB;
+class zpBoundingSphere;
+
 class zpString;
 class zpStringBuffer;
 template<typename T> class zpFlag;
@@ -111,6 +114,9 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpRenderable.h"
 #include "zpSerializable.h"
 #include "zpRegisterSerializable.h"
+
+#include "zpBoundingAABB.h"
+#include "zpBoundingSphere.h"
 
 #include "zpString.h"
 #include "zpStringBuffer.h"

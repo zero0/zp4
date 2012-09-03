@@ -118,6 +118,8 @@
     <ClInclude Include="zpArray.h" />
     <ClInclude Include="zpArrayList.h" />
     <ClInclude Include="zpBaseTypes.h" />
+    <ClInclude Include="zpBoundingAABB.h" />
+    <ClInclude Include="zpBoundingSphere.h" />
     <ClInclude Include="zpColor4f.h" />
     <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
@@ -184,6 +186,8 @@
     <None Include="zpVector4Simd.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpBoundingAABB.cpp" />
+    <ClCompile Include="zpBoundingSphere.cpp" />
     <ClCompile Include="zpColor4f.cpp" />
     <ClCompile Include="zpConsole.cpp" />
     <ClCompile Include="zpCore.cpp">

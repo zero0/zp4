@@ -10,7 +10,7 @@
 #define ZP_PIOVER4	( 0.25f* ZP_PI ) 
 
 #define ZP_RAD_TO_DEG( r )	( ( (r) * 180.f ) * ZP_1OVERPI )
-#define ZP_DEG_TO_RAD( d )	( ( (d) * ZP_PI ) * ( 1.0f / 180.0f ) )
+#define ZP_DEG_TO_RAD( d )	( ( (d) * ZP_PI ) / 180.0f )
 
 #define ZP_MIN( a, b )	( ( (a) < (b) ) ? (a) : (b) )
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )

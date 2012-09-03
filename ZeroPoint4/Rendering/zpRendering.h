@@ -174,6 +174,22 @@ enum zpComparisonFunc {
 	ZP_COMPARISON_FUNC_ALWAYS,
 };
 
+enum zpCullMode {
+	ZP_CULL_MODE_NONE =		1,
+	ZP_CULL_MODE_FRONT,
+	ZP_CULL_MODE_BACK,
+};
+
+enum zpFillMode {
+	ZP_FILL_MODE_SOLID =	1,
+	ZP_FILL_MODE_WIREFRAME,
+};
+
+enum zpFrontFace {
+	ZP_FRONT_FACE_CW =		1,
+	ZP_FRONT_FACE_CCW,
+};
+
 struct zpSamplerStateDesc {
 	struct {
 		zpComparisonFunc cmpFunc : 8;
@@ -198,6 +214,21 @@ struct zpSamplerStateDesc {
 	zpSamplerStateDesc();
 };
 
+struct zpRasterStateDesc {
+	zpFillMode fillMode;
+	zpCullMode cullMode;
+	zpFrontFace frontFace;
+	zp_int depthBias;
+	zp_float depthBiasClamp;
+	zp_float slopeScaledDepthBias;
+	zp_bool depthClipEnable;
+	zp_bool scissorEnable;
+	zp_bool multisampleEnable;
+	zp_bool antialiasedLineEnable;
+
+	zpRasterStateDesc();
+};
+
 
 class zpViewport;
 ZP_PURE_INTERFACE zpTexture;
@@ -211,6 +242,7 @@ ZP_PURE_INTERFACE zpRenderTarget;
 ZP_PURE_INTERFACE zpDepthStencilBuffer;
 ZP_PURE_INTERFACE zpVertexLayout;
 ZP_PURE_INTERFACE zpSamplerState;
+ZP_PURE_INTERFACE zpRasterState;
 
 ZP_ABSTRACT_CLASS zpStaticMeshResource;
 class zpOBJStaticMeshResource;
@@ -237,6 +269,7 @@ class zpCameraComponent;
 #include "zpDepthStencilBuffer.h"
 #include "zpVertexLayout.h"
 #include "zpSamplerState.h"
+#include "zpRasterState.h"
 
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"

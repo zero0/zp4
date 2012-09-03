@@ -35,23 +35,23 @@ zp_bool zpOBJStaticMeshResource::load() {
 					zp_float x, y, z;
 					sscanf_s( line.c_str(),"vn %f %f %f", &x, &y, &z  );
 
-					zpLog::debug() << "vn " << x << ' ' << y << ' ' << z << zpLog::endl;
+					//zpLog::debug() << "vn " << x << ' ' << y << ' ' << z << zpLog::endl;
 					
-					normals.pushBack( zpVector4f( x, y, z ) );
+					normals.pushBack( zpVector4f( x, y, z, 1 ) );
 				} else if( line[1] == 't' ) {
 					zp_float x, y;
 					sscanf_s( line.c_str(),"vt %f %f", &x, &y  );
 
-					zpLog::debug() << "vt " << x << ' ' << y << ' ' << zpLog::endl;
+					//zpLog::debug() << "vt " << x << ' ' << y << ' ' << zpLog::endl;
 
 					texCoords.pushBack( zpVector2f( x, y ) );
 				} else {
 					zp_float x, y, z;
 					sscanf_s( line.c_str(),"v %f %f %f", &x, &y, &z  );
 
-					zpLog::debug() << "v  " << x << ' ' << y << ' ' << z << zpLog::endl;
+					//zpLog::debug() << "v  " << x << ' ' << y << ' ' << z << zpLog::endl;
 
-					verticies.pushBack( zpVector4f( x, y, z ) );
+					verticies.pushBack( zpVector4f( x, y, z, 1 ) );
 				}
 			} else if( line[0] == 'f' ) {
 				zp_uint pos = line.indexOf( ' ' );

@@ -230,4 +230,20 @@ ZP_FORCE_INLINE D3D11_TEXTURE_ADDRESS_MODE __zpToDX( zpTextureWrap t ) {
 	}
 }
 
+ZP_FORCE_INLINE D3D11_CULL_MODE __zpToDX( zpCullMode t ) {
+	switch( t ) {
+	case ZP_CULL_MODE_NONE:		return D3D11_CULL_NONE;
+	case ZP_CULL_MODE_FRONT:	return D3D11_CULL_FRONT;
+	case ZP_CULL_MODE_BACK:		return D3D11_CULL_BACK;
+	default: return D3D11_CULL_FRONT;
+	}
+}
+
+ZP_FORCE_INLINE D3D11_FILL_MODE __zpToDX( zpFillMode t ) {
+	switch( t ) {
+	case ZP_FILL_MODE_SOLID:		return D3D11_FILL_SOLID;
+	case ZP_FILL_MODE_WIREFRAME:	return D3D11_FILL_WIREFRAME;
+	default: return D3D11_FILL_SOLID;
+	}
+}
 #endif

@@ -24,10 +24,10 @@ zpTime* zpTime::getInstance() {
 	return &s_instance;
 }
 
-zp_float zpTime::getDeltaTime() const {
+zp_float zpTime::getDeltaSeconds() const {
 	return m_deltaSeconds;
 }
-zp_float zpTime::getActualDeltaTime() const {
+zp_float zpTime::getActualDeltaSeconds() const {
 	return m_actualDeltaSeconds;
 }
 
@@ -54,4 +54,13 @@ void zpTime::resetTimer() {
 	zp_long time;
 	QueryPerformanceCounter( (LARGE_INTEGER*)&time );
 	m_baseTime = m_previousTime = time;
+}
+
+zp_long zpTime::getTime() const {
+	zp_long time;
+	QueryPerformanceCounter( (LARGE_INTEGER*)&time );
+	return time;
+}
+zp_long zpTime::getDeltaTime() const {
+	return m_deltaTime;
 }

@@ -147,6 +147,12 @@
     <ClInclude Include="zpDX11SamplerState.h">
       <Filter>Header Files\DirectX 11</Filter>
     </ClInclude>
+    <ClInclude Include="zpRasterState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11RasterState.h">
+      <Filter>Header Files\DirectX 11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -225,6 +231,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpDX11SamplerState.cpp">
+      <Filter>Source Files\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="zpDX11RasterState.cpp">
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
   </ItemGroup>
