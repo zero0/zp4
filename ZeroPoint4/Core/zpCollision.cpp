@@ -53,8 +53,12 @@ zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpRay
 
 	return ZP_COLLISION_TYPE_NONE;
 }
-zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBoundingAABB& b ) {}
-zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBoundingSphere& b ) {}
+zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBoundingAABB& b ) {
+	return ZP_COLLISION_TYPE_NONE;
+}
+zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBoundingSphere& b ) {
+	return ZP_COLLISION_TYPE_NONE;
+}
 
 zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpVector4f& b ) {
 	zpVector4f dist( b );
@@ -86,7 +90,9 @@ zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpR
 
 	return zp_real_lt( t, zp_real_zero() ) ? ZP_COLLISION_TYPE_NONE : ZP_COLLISION_TYPE_INTERSECT;
 }
-zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpBoundingAABB& b ) {}
+zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpBoundingAABB& b ) {
+	return ZP_COLLISION_TYPE_NONE;
+}
 zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpBoundingSphere& b ) {
 	zpVector4f dist( b.getCenter() );
 	dist.sub3( a.getCenter() );
