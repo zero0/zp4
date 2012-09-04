@@ -36,6 +36,11 @@ class zpMatrix4f;
 class zpPlane;
 class zpFrustum;
 
+class zpRay;
+class zpBoundingAABB;
+class zpBoundingSphere;
+class zpCollision;
+
 #include "zpReal.h"
 #include "zpVector2.h"
 #include "zpVector4.h"
@@ -48,6 +53,11 @@ class zpFrustum;
 #include "zpPlane.h"
 #include "zpFrustum.h"
 
+#include "zpRay.h"
+#include "zpBoundingAABB.h"
+#include "zpBoundingSphere.h"
+#include "zpCollision.h"
+
 #if ZP_USE_SIMD
 #include "zpRealSimd.inl"
 #include "zpVector4Simd.inl"
@@ -59,6 +69,5 @@ class zpFrustum;
 //#include "zpIntegerFpu.inl"
 #include "zpMatrix4Fpu.inl"
 #endif
-
 
 #endif

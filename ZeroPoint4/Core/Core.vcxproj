@@ -120,6 +120,7 @@
     <ClInclude Include="zpBaseTypes.h" />
     <ClInclude Include="zpBoundingAABB.h" />
     <ClInclude Include="zpBoundingSphere.h" />
+    <ClInclude Include="zpCollision.h" />
     <ClInclude Include="zpColor4f.h" />
     <ClInclude Include="zpConsole.h" />
     <ClInclude Include="zpCore.h" />
@@ -145,6 +146,7 @@
     <ClInclude Include="zpPair.h" />
     <ClInclude Include="zpPlane.h" />
     <ClInclude Include="zpProperties.h" />
+    <ClInclude Include="zpRay.h" />
     <ClInclude Include="zpReal.h" />
     <ClInclude Include="zpReferencedObject.h" />
     <ClInclude Include="zpReferencedPointer.h" />
@@ -188,6 +190,7 @@
   <ItemGroup>
     <ClCompile Include="zpBoundingAABB.cpp" />
     <ClCompile Include="zpBoundingSphere.cpp" />
+    <ClCompile Include="zpCollision.cpp" />
     <ClCompile Include="zpColor4f.cpp" />
     <ClCompile Include="zpConsole.cpp" />
     <ClCompile Include="zpCore.cpp">
@@ -208,6 +211,7 @@
     <ClCompile Include="zpMessage.cpp" />
     <ClCompile Include="zpPlane.cpp" />
     <ClCompile Include="zpProperties.cpp" />
+    <ClCompile Include="zpRay.cpp" />
     <ClCompile Include="zpReferencedObject.cpp" />
     <ClCompile Include="zpRegisterSerializable.cpp" />
     <ClCompile Include="zpSerialize.cpp" />

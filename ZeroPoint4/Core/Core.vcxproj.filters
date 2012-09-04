@@ -156,6 +156,12 @@
     <ClInclude Include="zpBoundingSphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpRay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpCollision.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -302,6 +308,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpBoundingSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpRay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpCollision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
