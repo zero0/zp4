@@ -98,7 +98,7 @@ ZP_PURE_INTERFACE zpReferencedObject;
 
 class zpGame;
 class zpWorld;
-class zpGameManager;
+ZP_ABSTRACT_CLASS zpGameManager;
 class zpGameObject;
 ZP_ABSTRACT_CLASS zpComponent;
 

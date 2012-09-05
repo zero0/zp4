@@ -69,6 +69,7 @@
   <ItemGroup>
     <ClInclude Include="zpContent.h" />
     <ClInclude Include="zpContentManager.h" />
+    <ClInclude Include="zpPrefabs.h" />
     <ClInclude Include="zpResource.h" />
     <ClInclude Include="zpResourceCreator.h" />
   </ItemGroup>

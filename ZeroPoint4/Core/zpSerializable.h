@@ -16,38 +16,36 @@ ZP_PURE_INTERFACE zpSerializable;
 
 ZP_PURE_INTERFACE zpSerializedInput {
 public:
-	virtual zp_bool readBoolean( const zp_char* name = 0 ) = 0;
+	virtual zp_bool readBoolean( zp_bool* value, const zp_char* name = 0 ) = 0;
 
-	virtual zp_byte readByte( const zp_char* name = 0 ) = 0;
-	virtual zp_char readChar( const zp_char* name = 0 ) = 0;
-	virtual zp_short readShort( const zp_char* name = 0 ) = 0;
-	virtual zp_int readInt( const zp_char* name = 0 ) = 0;
-	virtual zp_long readLong( const zp_char* name = 0 ) = 0;
+	virtual zp_bool readByte( zp_byte* value, const zp_char* name = 0 ) = 0;
+	virtual zp_bool readChar( zp_char* value, const zp_char* name = 0 ) = 0;
+	virtual zp_bool readShort( zp_short* value, const zp_char* name = 0 ) = 0;
+	virtual zp_bool readInt( zp_int* value, const zp_char* name = 0 ) = 0;
+	virtual zp_bool readLong( zp_long* value, const zp_char* name = 0 ) = 0;
 
-	virtual zp_float readFloat( const zp_char* name = 0 ) = 0;
-	virtual zp_double readDouble( const zp_char* name = 0 ) = 0;
+	virtual zp_bool readFloat( zp_float* value, const zp_char* name = 0 ) = 0;
+	virtual zp_bool readDouble(  zp_double* value, const zp_char* name = 0 ) = 0;
 
-	virtual const zpString readString( const zp_char* name = 0 ) = 0;
+	virtual zp_bool readString( zpString* value, const zp_char* name = 0 ) = 0;
 
-	virtual zpSerializable* readSerializable( const zp_char* name = 0 ) = 0;
+	virtual zp_bool readSerializable( zpSerializable** value, const zp_char* name = 0 ) = 0;
 
 	virtual zp_bool readBlock( const zp_char* name = 0 ) = 0;
 	virtual zp_bool endBlock() = 0;
 
 	template<typename Func>
-	void readEach( const zp_char* name, Func func ) {
-		bool hasMore = true;
-		while( hasMore ) {
+	void readEachBlock( const zp_char* name, Func func ) {
+		do {
 			if( readBlock( name ) ) {
 				func();
 			}
-			hasMore = endBlock();
-		}
+		} while( endBlock() );
 	}
 
 	template<typename T>
-	T* readSerializableType( const zp_char* name = 0 ) {
-		return (T*)readSerializable( name );
+	zp_bool readSerializableOfType( T** value, const zp_char* name = 0 ) {
+		return readSerializable( (zpSerializable**)value, name );
 	}
 };
 

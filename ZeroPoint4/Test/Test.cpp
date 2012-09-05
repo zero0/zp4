@@ -333,9 +333,9 @@ void rendering_test_main() {
 				zpMatrix4f v, p, vp, w;
 			};
 			cb cambuf[1];
-			cambuf[0].v.lookAt( zpVector4f( -5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
-			cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
-			//cambuf[0].p.perspective( 45.f, 4.f / 3.f, 1, 1000 );
+			cambuf[0].v.lookAt( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
+			//cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
+			cambuf[0].p.perspective( 45.f, 4.f / 3.f, 1, 1000 );
 			//cambuf[0].vp = camera.getViewProjection();
 			cambuf[0].w.scale( 1 );
 

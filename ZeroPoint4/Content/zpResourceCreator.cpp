@@ -20,7 +20,7 @@ void zpResourceCreator::serialize( zpSerializedOutput* out ) {
 void zpResourceCreator::deserialize( zpSerializedInput* in ) {
 	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
 
-	m_rootDirectory = in->readString( "@root" );
+	in->readString( &m_rootDirectory, "@root" );
 
 	in->endBlock();
 }

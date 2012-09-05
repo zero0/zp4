@@ -214,12 +214,13 @@ void zpGameObject::serialize( zpSerializedOutput* out ) {
 void zpGameObject::deserialize( zpSerializedInput* in ) {
 	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
 
-	setName( in->readString( "@name" ) );
+	in->readString( &m_name, "@name" );
 
 	if( in->readBlock( "Components" ) )
 	{
-		in->readEach( "Component", [ this, &in ](){
-			zpComponent* comp = in->readSerializableType<zpComponent>();
+		in->readEachBlock( "Component", [ this, &in ]() {
+			zpComponent* comp = ZP_NULL;
+			in->readSerializableOfType<zpComponent>( &comp );
 			if( comp ) addComponent( comp );
 		} );
 	}
@@ -227,8 +228,9 @@ void zpGameObject::deserialize( zpSerializedInput* in ) {
 
 	if( in->readBlock( "Children" ) )
 	{
-		in->readEach( "Child", [ this, &in ](){
-			zpGameObject* go = in->readSerializableType<zpGameObject>();
+		in->readEachBlock( "Child", [ this, &in ]() {
+			zpGameObject* go = ZP_NULL;
+			in->readSerializableOfType<zpGameObject>( &go );
 			if( go ) addChildGameObject( go );
 		} );
 	}
