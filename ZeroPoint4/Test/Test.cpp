@@ -320,9 +320,9 @@ void rendering_test_main() {
 			//rasterDesc.cullMode = ZP_CULL_MODE_NONE;
 			raster = engine->createRasterState( rasterDesc );
 
-			camera.setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
+			camera.setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
 			camera.setNearFar( 1, 1000 );
-			camera.set( zpVector4f( 0, 0, 0 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
+			camera.set( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
 			camera.setAspectRatio( 800.f / 600.f );
 			camera.setFovy( 45.f );
 			camera.update();
@@ -333,10 +333,10 @@ void rendering_test_main() {
 				zpMatrix4f v, p, vp, w;
 			};
 			cb cambuf[1];
-			cambuf[0].v.lookAt( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
+			cambuf[0].v = camera.getView();//.lookAt( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
 			//cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
-			cambuf[0].p.perspective( 45.f, 4.f / 3.f, 1, 1000 );
-			//cambuf[0].vp = camera.getViewProjection();
+			cambuf[0].p = camera.getProjection();//.perspective( 45.f, 4.f / 3.f, 1, 1000 );
+			cambuf[0].vp = camera.getViewProjection();
 			cambuf[0].w.scale( 1 );
 
 			cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );

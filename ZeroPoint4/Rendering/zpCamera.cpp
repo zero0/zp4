@@ -43,7 +43,7 @@ void zpCamera::update() {
 	}
 
 	if( isViewProjectionDirty ) {
-		m_frustum.set( m_position, m_lookAt, m_up, m_aspectRatio, m_fovy, m_near, m_far );
+		m_frustum.setLookAt( m_position, m_lookAt, m_up, m_aspectRatio, m_fovy, m_near, m_far );
 
 		m_viewProjection = m_view;
 		m_viewProjection *= m_projection;

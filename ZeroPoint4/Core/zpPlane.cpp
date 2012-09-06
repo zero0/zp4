@@ -28,12 +28,12 @@ void zpPlane::operator=( zpPlane&& plane ) {
 	m_plane = zp_move( plane.m_plane );
 }
 
-zp_int zpPlane::getSideOfPlane( const zpVector4f& point ) const {
+zpPlaneSide zpPlane::getSideOfPlane( const zpVector4f& point ) const {
 	zp_real z = zp_real_zero();
 	zp_real d = point.dot3( m_plane );
 	d = zp_real_add( d, m_plane.getW() );
 	
-	return zp_real_gt( d, z ) ? 1 : zp_real_lt( d, z ) ? -1 : 0;;
+	return zp_real_gt( d, z ) ? ZP_PLANE_SIDE_POSITIVE : zp_real_lt( d, z ) ? ZP_PLANE_SIDE_NEGATIVE : ZP_PLANE_SIDE_ON_PLANE;
 }
 zp_float zpPlane::getDistanceToPoint( const zpVector4f& point ) const {
 	zp_real d = point.dot3( m_plane );
@@ -52,4 +52,8 @@ void zpPlane::set( const zpVector4f& p0, const zpVector4f& p1, const zpVector4f&
 	zp_real l = m_plane.magnitude3();
 	m_plane.div3( l );
 	m_plane.setW( zp_real_neg( m_plane.dot3( m_plane ) ) / l );
+}
+
+const zpVector4f& zpPlane::getVector() const {
+	return m_plane;
 }

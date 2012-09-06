@@ -2,6 +2,12 @@
 #ifndef ZP_PLANE_H
 #define ZP_PLANE_H
 
+enum zpPlaneSide {
+	ZP_PLANE_SIDE_NEGATIVE = -1,
+	ZP_PLANE_SIDE_ON_PLANE = 0,
+	ZP_PLANE_SIDE_POSITIVE = 1,
+};
+
 class zpPlane {
 public:
 	zpPlane();
@@ -14,11 +20,13 @@ public:
 	void operator=( const zpPlane& plane );
 	void operator=( zpPlane&& plane );
 
-	zp_int getSideOfPlane( const zpVector4f& point ) const;
+	zpPlaneSide getSideOfPlane( const zpVector4f& point ) const;
 	zp_float getDistanceToPoint( const zpVector4f& point ) const;
 
 	void set( zp_float a, zp_float b, zp_float c, zp_float d );
 	void set( const zpVector4f& p0, const zpVector4f& p1, const zpVector4f& p2 );
+
+	const zpVector4f& getVector() const;
 
 private:
 	zpVector4f m_plane;

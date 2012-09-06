@@ -213,6 +213,24 @@ ZP_FORCE_INLINE zpVector4f zpVector4f::cross4( const zpVector4f& vector ) const 
 	);
 }
 
+ZP_FORCE_INLINE void zpVector4f::abs3() {
+	m_xyzw.x = zp_abs( m_xyzw.x );
+	m_xyzw.y = zp_abs( m_xyzw.y );
+	m_xyzw.z = zp_abs( m_xyzw.z );
+}
+ZP_FORCE_INLINE void zpVector4f::abs4() {
+	m_xyzw.x = zp_abs( m_xyzw.x );
+	m_xyzw.y = zp_abs( m_xyzw.y );
+	m_xyzw.z = zp_abs( m_xyzw.z );
+	m_xyzw.w = zp_abs( m_xyzw.w );
+}
+ZP_FORCE_INLINE zpVector4f zpVector4f::abs3() const {
+	return zpVector4f( zp_abs( m_xyzw.x ), zp_abs( m_xyzw.y ), zp_abs( m_xyzw.z ), m_xyzw.w );
+}
+ZP_FORCE_INLINE zpVector4f zpVector4f::abs4() const {
+	return zpVector4f( zp_abs( m_xyzw.x ), zp_abs( m_xyzw.y ), zp_abs( m_xyzw.z ), zp_abs( m_xyzw.w ) );
+}
+
 ZP_FORCE_INLINE zp_bool zpVector4f::equals3( const zpVector4f& vector ) const {
 	return m_xyzw.x == vector.m_xyzw.x && m_xyzw.y == vector.m_xyzw.y && m_xyzw.z == vector.m_xyzw.z;
 }

@@ -105,3 +105,43 @@ zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpB
 
 	return zp_real_eq( d, r ) ? ZP_COLLISION_TYPE_INTERSECT : zp_real_lt( d, r ) ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
 }
+
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpVector4f& b ) {
+	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
+	for( zp_uint i = 6; i --> 0; ) {
+		zpPlaneSide side = a.getPlane( (zpFrustumPlane)i ).getSideOfPlane( b );
+		switch( side ) {
+		case ZP_PLANE_SIDE_NEGATIVE: return ZP_COLLISION_TYPE_NONE;
+		case ZP_PLANE_SIDE_ON_PLANE: type = ZP_COLLISION_TYPE_INTERSECT;
+		}
+	}
+	return type;
+}
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpRay& b ) {
+	return ZP_COLLISION_TYPE_NONE;
+}
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingAABB& b ) {
+	zpVector4f center( b.getCenter() );
+	zpVector4f extence( b.getMax() - center );
+	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
+
+	for( zp_uint i = 6; i --> 0; ) {
+		zpVector4f p( a.getPlane( (zpFrustumPlane)i ).getVector() );
+		zpVector4f absP( p );
+		absP.abs3();
+
+		zp_real d = center.dot3( p );
+		zp_real r = extence.dot3( absP );
+
+		zp_real n = zp_real_neg( p.getW() );
+		if( zp_real_lt( zp_real_add( d, r ), n ) ) {
+			return ZP_COLLISION_TYPE_NONE;
+		} else if( zp_real_lt( zp_real_sub( d, r ), n ) ) {
+			type = ZP_COLLISION_TYPE_INTERSECT;
+		}
+	}
+	return type;
+}
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingSphere& b ) {
+	return ZP_COLLISION_TYPE_NONE;
+}

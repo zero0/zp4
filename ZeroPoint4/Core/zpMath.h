@@ -29,6 +29,11 @@ zp_float zp_pow( zp_float b, zp_float p );
 
 zp_float zp_sqrt( zp_float v );
 
+template<typename T>
+T zp_abs( T& value ) {
+	return value > (T)0 ? value : -value;
+}
+
 class zpVector4f;
 class zpReal;
 class zpInteger;

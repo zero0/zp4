@@ -166,11 +166,6 @@ void zp_zero_memory_array( T (&arr)[Size] ) {
 }
 
 template<typename T>
-T zp_abs( T& value ) {
-	return value > (T)0 ? value : -value;
-}
-
-template<typename T>
 ZP_FORCE_INLINE T&& zp_move( T& v ) {
 	return (T&&)v;
 }

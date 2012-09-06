@@ -24,6 +24,11 @@ public:
 	static zpCollisionType testCollision( const zpBoundingSphere& a, const zpBoundingAABB& b );
 	static zpCollisionType testCollision( const zpBoundingSphere& a, const zpBoundingSphere& b );
 
+	static zpCollisionType testCollision( const zpFrustum& a, const zpVector4f& b );
+	static zpCollisionType testCollision( const zpFrustum& a, const zpRay& b );
+	static zpCollisionType testCollision( const zpFrustum& a, const zpBoundingAABB& b );
+	static zpCollisionType testCollision( const zpFrustum& a, const zpBoundingSphere& b );
+
 private:
 	zpCollision();
 };

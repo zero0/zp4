@@ -89,6 +89,11 @@ public:
 	ZP_FORCE_INLINE zpVector4f homogenize4() const;
 	ZP_FORCE_INLINE void homogenize4();
 
+	ZP_FORCE_INLINE void abs3();
+	ZP_FORCE_INLINE void abs4();
+	ZP_FORCE_INLINE zpVector4f abs3() const;
+	ZP_FORCE_INLINE zpVector4f abs4() const;
+	
 	ZP_FORCE_INLINE zp_real angleBetween3( const zpVector4f& vector ) const;
 	ZP_FORCE_INLINE zp_real angleBetween4( const zpVector4f& vector ) const;
 
