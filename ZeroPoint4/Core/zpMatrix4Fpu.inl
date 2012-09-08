@@ -20,8 +20,8 @@ ZP_FORCE_INLINE void zpMatrix4f::operator*=( const zpMatrix4f& matrix ) {
 			sum = 0;
 
 			for( j = 0; j < 4; ++j ) {
-				sum += m_matrix[x][j] * matrix.m_matrix[j][y];
-				//sum += m_matrix[j][x] * matrix.m_matrix[y][j];
+				//sum += m_matrix[x][j] * matrix.m_matrix[j][y];
+				sum += m_matrix[j][x] * matrix.m_matrix[y][j];
 			}
 
 			mat[x][y] = sum;

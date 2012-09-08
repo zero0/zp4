@@ -1,7 +1,7 @@
 #include "zpCore.h"
 
 zpWorld::zpWorld() :
-	m_isEnabled( false ),
+	m_isEnabled( true ),
 	m_isCreated( false ),
 	m_referenceCount( 1 ),
 	m_isMarkedForAutoDelete( false ),
