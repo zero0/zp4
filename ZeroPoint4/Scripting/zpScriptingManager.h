@@ -15,8 +15,6 @@ public:
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
-	
-
 protected:
 	void onCreate();
 	void onDestroy();
@@ -43,10 +41,15 @@ private:
 		zp_long sleepUntil;
 		zp_uint currentCoRoutine;
 		zpArrayList<asIScriptContext*> coRoutines;
+
+		zpScriptingThreadContext() : sleepUntil( 0 ), currentCoRoutine( 0 ), coRoutines() {}
+		void operator=( const zpScriptingThreadContext& stc );
+		void operator=( zpScriptingThreadContext&& stc );
 	};
 
 	zp_uint m_currentThread;
-	zpArrayList<zpScriptingThreadContext> m_threads;
+	zpArrayList<zpScriptingThreadContext*> m_threads;
+	zpArrayList<zpScriptingThreadContext*> m_freeThreads;
 
 	friend class zpScriptingComponent;
 };

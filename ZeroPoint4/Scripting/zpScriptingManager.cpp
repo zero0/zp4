@@ -48,21 +48,32 @@ void zpScriptingManager::onCreate() {
 	r = engine->RegisterGlobalFunction( "void printc( uint, string &in )", asFUNCTION( as_printc ), asCALL_CDECL );
 
 	// register threading/co-routine functions
-	r = engine->RegisterGlobalFunction( "void sleep( uint )", asFUNCTION( as_sleep ), asCALL_CDECL );
-	r = engine->RegisterGlobalFunction( "void yield()", asFUNCTION( as_yield ), asCALL_CDECL );
-	r = engine->RegisterGlobalFunction( "void createCoRoutine( const string &in )", asFUNCTION( as_createCoRoutine ), asCALL_CDECL );
+	r = engine->RegisterGlobalFunction( "void sleep( uint )", asFUNCTIONPR( zpScriptingManager::as_sleep, ( zp_uint ), void ), asCALL_CDECL );
+	r = engine->RegisterGlobalFunction( "void yield()", asFUNCTION( zpScriptingManager::as_yield ), asCALL_CDECL );
+	r = engine->RegisterGlobalFunction( "void createCoRoutine( const string &in )", asFUNCTIONPR( zpScriptingManager::as_createCoRoutine, ( const zpString& ), void ), asCALL_CDECL );
 }
 void zpScriptingManager::onDestroy() {
-	m_threads.foreach( []( zpScriptingThreadContext& thread ) {
-		thread.coRoutines.foreach( []( asIScriptContext* context ) {
+	m_threads.foreach( []( zpScriptingThreadContext* thread ) {
+		thread->coRoutines.foreach( []( asIScriptContext* context ) {
 			if( context ) {
 				context->Abort();
 				context->Release();
 			}
 		} );
-		thread.coRoutines.clear();
+		thread->coRoutines.clear();
 	} );
 	m_threads.clear();
+
+	m_freeThreads.foreach( []( zpScriptingThreadContext* thread ) {
+		thread->coRoutines.foreach( []( asIScriptContext* context ) {
+			if( context ) {
+				context->Abort();
+				context->Release();
+			}
+		} );
+		thread->coRoutines.clear();
+	} );
+	m_freeThreads.clear();
 
 	zpAngelScript::destroyInstance();
 }
@@ -75,11 +86,11 @@ void zpScriptingManager::onUpdate() {
 	zp_int r;
 
 	for( m_currentThread = 0; m_currentThread < m_threads.size(); ++m_currentThread ) {
-		zpScriptingThreadContext& thread = m_threads[ m_currentThread ];
-		if( thread.sleepUntil < time ) {
+		zpScriptingThreadContext* thread = m_threads[ m_currentThread ];
+		if( thread->sleepUntil < time ) {
 			engine->GetGCStatistics( &gc1 );
 
-			asIScriptContext* context = thread.coRoutines[ thread.currentCoRoutine ];
+			asIScriptContext* context = thread->coRoutines[ thread->currentCoRoutine ];
 			r = context->Execute();
 
 			engine->GetGCStatistics( &gc2 );
@@ -87,9 +98,15 @@ void zpScriptingManager::onUpdate() {
 			if( r != asEXECUTION_SUSPENDED ) {
 				context->Release();
 
-				thread.coRoutines.erase( thread.currentCoRoutine );
-				if( thread.coRoutines.isEmpty() ) {
-					m_threads.erase( m_currentThread );
+				thread->coRoutines.remove( thread->currentCoRoutine );
+
+				if( thread->currentCoRoutine >= thread->coRoutines.size() ) {
+					thread->currentCoRoutine = 0;
+				}
+
+				if( thread->coRoutines.isEmpty() ) {
+					m_freeThreads.pushBack( thread );
+					m_threads.remove( m_currentThread );
 					--m_currentThread;
 				}
 			}
@@ -114,28 +131,37 @@ void zpScriptingManager::callObjectFunction( void* object, void* function ) {
 	context->Prepare( (asIScriptFunction*)function );
 	context->SetObject( object );
 
-	zpScriptingThreadContext stc;
-	stc.sleepUntil = 0;
-	stc.currentCoRoutine = 0;
-	stc.coRoutines.pushBack( context );
+	zpScriptingThreadContext* stc;
+	if( !m_freeThreads.isEmpty() ) {
+		stc = m_freeThreads.back();
+		m_freeThreads.popBack();
+	} else {
+		stc = new zpScriptingThreadContext;
+	}
+	stc->sleepUntil = 0;
+	stc->currentCoRoutine = 0;
+	stc->coRoutines.pushBack( context );
+	context->SetUserData( stc );
 
 	m_threads.pushBack( stc );
-	context->SetUserData( &m_threads.back() );
+	
 }
 
 void zpScriptingManager::scriptSleep( zp_uint milliseconds ) {
 	asIScriptContext* context = asGetActiveContext();
 	if( context ) {
 		context->Suspend();
+		zpScriptingThreadContext* thread = (zpScriptingThreadContext*)context->GetUserData();
 
-		( (zpScriptingThreadContext*)context->GetUserData() )->sleepUntil = zpTime::getInstance()->getTime() + milliseconds;
+		thread->sleepUntil = zpTime::getInstance()->getTime() + milliseconds * 1000;
+		thread->currentCoRoutine = ( thread->currentCoRoutine + 1 ) % thread->coRoutines.size();
 	}
 }
 void zpScriptingManager::scriptYield() {
 	asIScriptContext* context = asGetActiveContext();
 	if( context ) {
-		zpScriptingThreadContext& thread = m_threads[ m_currentThread ];
-		thread.currentCoRoutine = ( thread.currentCoRoutine + 1 ) % thread.coRoutines.size();
+		zpScriptingThreadContext* thread = m_threads[ m_currentThread ];
+		thread->currentCoRoutine = ( thread->currentCoRoutine + 1 ) % thread->coRoutines.size();
 		
 		context->Suspend();
 	}
@@ -166,21 +192,20 @@ void zpScriptingManager::scriptCreateCoRoutine( const zpString& functionName ) {
 		}
 
 		zpScriptingThreadContext* thread = (zpScriptingThreadContext*)context->GetUserData();
-		if( thread ) {
-			thread->coRoutines.pushBack( newContext );
-			newContext->SetUserData( thread );
-		} else {
-			zpScriptingThreadContext stc;
-			stc.sleepUntil = 0;
-			stc.currentCoRoutine = 0;
-			stc.coRoutines.pushBack( newContext );
-			stc.coRoutines.pushBack( context );
-
-			m_threads.pushBack( stc );
-			newContext->SetUserData( &m_threads.back() );
-			context->SetUserData( &m_threads.back() );
-		}
+		thread->coRoutines.pushBack( newContext );
+		newContext->SetUserData( thread );
 	}
+}
+
+void zpScriptingManager::zpScriptingThreadContext::operator=( const zpScriptingThreadContext& stc ) {
+	sleepUntil = stc.sleepUntil;
+	currentCoRoutine = stc.currentCoRoutine;
+	coRoutines = stc.coRoutines;
+}
+void zpScriptingManager::zpScriptingThreadContext::operator=( zpScriptingThreadContext&& stc ) {
+	sleepUntil = stc.sleepUntil;
+	currentCoRoutine = stc.currentCoRoutine;
+	coRoutines = stc.coRoutines;
 }
 
 void zpScriptingManager::messageCallback( const asSMessageInfo& msg ) {
