@@ -98,7 +98,7 @@ void __zpArrayRegister( asIScriptEngine* engine ) {
 	zp_int r;
 
 	r = engine->RegisterObjectType( "array<class T>", 0, asOBJ_REF | asOBJ_GC | asOBJ_TEMPLATE ); AS_ASSERT( r );
-	
+
 }
 #pragma endregion
 

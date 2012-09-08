@@ -15,6 +15,8 @@ public:
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
+	
+
 protected:
 	void onCreate();
 	void onDestroy();
@@ -25,10 +27,28 @@ protected:
 	void onDisabled();
 
 private:
+	void callObjectFunction( void* object, void* function );
+
+	void scriptSleep( zp_uint sleep );
+	void scriptYield();
+	void scriptCreateCoRoutine( const zpString& functionName );
+
 	void messageCallback( const asSMessageInfo& msg );
 	
-	zp_uint m_numContexts;
-	zpArrayList<asIScriptContext*> m_contexts;
+	static void as_sleep( zp_uint milliseconds );
+	static void as_yield();
+	static void as_createCoRoutine( const zpString& functionName );
+
+	struct zpScriptingThreadContext {
+		zp_long sleepUntil;
+		zp_uint currentCoRoutine;
+		zpArrayList<asIScriptContext*> coRoutines;
+	};
+
+	zp_uint m_currentThread;
+	zpArrayList<zpScriptingThreadContext> m_threads;
+
+	friend class zpScriptingComponent;
 };
 
 #endif

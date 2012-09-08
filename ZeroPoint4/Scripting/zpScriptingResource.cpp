@@ -14,18 +14,21 @@ zp_bool zpScriptingResource::load() {
 	asIScriptEngine* engine = zpAngelScript::getInstance();
 	zp_int r;
 
-	asIScriptModule* module = engine->GetModule( getFilename().c_str(), asGM_ALWAYS_CREATE );
-	if( module == ZP_NULL ) return false;
+	asIScriptModule* module = engine->GetModule( getFilename().c_str(), asGM_CREATE_IF_NOT_EXISTS );
+	if( !module ) return false;
 
 	// strip extension and directories off to get section name
 	zpStringBuffer code;
 
 	zpFile codeFile( getFilename(), ZP_FILE_MODE_READ );
-	codeFile.open();
-	codeFile.readFile( &code );
-	codeFile.close();
+	if( codeFile.open() ) {
+		codeFile.readFile( &code );
+		codeFile.close();
+	} else {
+		return false;
+	}
 
-	zpString codeString = code.toString();
+	zpString codeString( code.toString() );
 
 	// process code
 	r = module->AddScriptSection( getFilename().c_str(), codeString.c_str(), codeString.length() );
@@ -68,12 +71,12 @@ zp_bool zpScriptingResource::load() {
 }
 void zpScriptingResource::unload() {
 	if( m_scriptObjectType ) {
-		((asIObjectType*)m_scriptObjectType)->Release();
+		( (asIObjectType*)m_scriptObjectType )->Release();
 		m_scriptObjectType = ZP_NULL;
 	}
 
 	m_cachedMethods.foreach( []( const zpString& key, void* value ) {
-		((asIScriptFunction*)value)->Release();
+		( (asIScriptFunction*)value )->Release();
 	} );
 	m_cachedMethods.clear();
 
@@ -84,13 +87,14 @@ void* zpScriptingResource::getScriptObjectType() const {
 	return m_scriptObjectType;
 }
 void* zpScriptingResource::getMethod( const zpString& functionName ) {
-	void* method;
+	void* method = ZP_NULL;
 	if( !m_cachedMethods.find( functionName, &method ) ) {
-		asIScriptFunction* func = ((asIObjectType*)m_scriptObjectType)->GetMethodByName( functionName.c_str() );
-		func->AddRef();
-
+		asIScriptFunction* func = ( (asIObjectType*)m_scriptObjectType )->GetMethodByName( functionName.c_str() );
+		if( func ) {
+			func->AddRef();
+			method = func;
+		}
 		m_cachedMethods.put( functionName, func );
-		method = func;
 	}
 	return method;
 }

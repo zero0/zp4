@@ -28,7 +28,8 @@ protected:
 
 private:
 	zpScriptingInstance* m_scriptInstance;
-	
+	zpScriptingManager* m_manager;
+
 	zpString m_scriptAlias;
 };
 
