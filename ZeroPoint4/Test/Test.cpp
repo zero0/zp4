@@ -408,9 +408,16 @@ void rendering_test_main() {
 }
 
 void scripting_test_main() {
+	zpWindow wnd;
+	wnd.setTitle( "ZeroPoint4 Window" );
+	wnd.setPosition( zpVector2i( 50, 50 ) );
+	wnd.setScreenSize( zpVector2i( 800, 600 ) );
+	wnd.create();
+
 	zpGame game;
-	zpWorld w;
+	zpWorld world;
 	zpGameObject root;
+	zpGameObject obj;
 
 	zpScriptingManager sm;
 
@@ -424,9 +431,17 @@ void scripting_test_main() {
 	zpScriptingComponent sc;
 	sc.setScriptAlias( "TestScript" );
 
-	root.addComponent( &sc );
+	zpScriptingComponent sc2;
+	sc2.setScriptAlias( "TestScript" );
 
-	w.setRootGameObject( &root );
+	root.addComponent( &sc );
+	obj.addComponent( &sc2 );
+
+	
+	world.setRootGameObject( &root );
+	world.setName( "world" );
+
+	root.addChildGameObject( &obj );
 
 	game.addGameManager( &content );
 	game.addGameManager( &sm );
@@ -434,9 +449,9 @@ void scripting_test_main() {
 	game.create();
 	zp_bool isLoaded = content.loadResource( "TestScript.as", "TestScript" );
 
-	game.addWorld( &w, true );
-	
-	
+	game.addWorld( &world, true );
+
+	while( wnd.processMessages() ) game.process();
 }
 
 int fffff(int, float, void*, int) { return 1010; };
@@ -444,7 +459,25 @@ void asdf( int a ) { zp_printfln( "asdf: %d", a ); }
 void qwerty( int a ) { zp_printfln( "asdf: %d", a * 2 ); }
 void zxcvb( int a ) { zp_printfln( "asdf: %d", a + 1 ); }
 
+void printNode( const zpXmlNode* node, zp_int tab ) {
+	for( zp_int t = tab; t --> 0; ) printf( "-" );
+
+	printf( "%s '%s' \n", node->name.c_str(), node->value.c_str() );
+
+	node->children.foreach( [ &tab ]( const zpXmlNode* n ) {
+		printNode( n, tab + 1 );
+	} );
+}
+
 int main() {
+	scripting_test_main();
+
+	//zpXmlNode* node = zpXmlParser::parseFile( "Assets/test.xml" );
+
+	//printNode( node, 0 );
+
+	return 0;
+
 	//zpDelegate<int ()> dd = zpCreateFunctionDelegate( fffff );
 	
 	//int ab = dd();

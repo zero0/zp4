@@ -58,6 +58,9 @@ void zpProperties::setString( const zpString& key, const zpString& value ) {
 zp_bool zpProperties::hasProperty( const zpString& key ) const {
 	return m_properties.containsKey( key );
 }
+zp_bool zpProperties::find( const zpString& key, zpString* outValue ) const {
+	return m_properties.find( key, outValue );
+}
 
 void zpProperties::load( const zpString& file ) {
 	zpFile f( file, ZP_FILE_MODE_READ );

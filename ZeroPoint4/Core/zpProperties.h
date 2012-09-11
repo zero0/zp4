@@ -25,6 +25,7 @@ public:
 	void setString( const zpString& key, const zpString& value );
 
 	zp_bool hasProperty( const zpString& key ) const;
+	zp_bool find( const zpString& key, zpString* outValue ) const;
 
 	void load( const zpString& file );
 	void load( const zpProperties& properties );

@@ -108,8 +108,12 @@ private:
 };
 
 zp_bool operator==( const zpString& string1, const zpString& string2 );
+zp_bool operator==( const zpString& string1, const zp_char* string2 );
+zp_bool operator==( const zp_char* string1, const zpString& string2 );
 
 zp_bool operator!=( const zpString& string1, const zpString& string2 );
+zp_bool operator!=( const zpString& string1, const zp_char* string2 );
+zp_bool operator!=( const zp_char* string1, const zpString& string2 );
 
 zp_char zp_to_lower( zp_char ch );
 zp_char zp_to_upper( zp_char ch );

@@ -11,31 +11,22 @@ public:
 	void setPrefabRoot( const zpString& root );
 	const zpString& getPrefabRoot() const;
 
-	zpSerializable* loadPrefab( const zpString& prefabName, zpSerializedInput* in = ZP_NULL );
-	zpSerializable* loadPrefabWithOverrides( const zpString& prefabName, const zpProperties& overrides, zpSerializedInput* in = ZP_NULL );
+	zpSerializable* loadPrefab( const zpString& prefabName );
+	zpSerializable* loadPrefabWithOverrides( const zpString& prefabName, const zpProperties& overrides );
 
 	template<typename T>
-	T* loadPrefabOfType( const zpString& prefabName, zpSerializedInput* in = ZP_NULL ) {
-		return (T*)loadPrefab( prefabName, in );
+	T* loadPrefabOfType( const zpString& prefabName ) {
+		return (T*)loadPrefab( prefabName );
 	}
 	template<typename T>
-	T* loadPrefabWithOverridesOfType( const zpString& prefabName, const zpProperties& overrides, zpSerializedInput* in = ZP_NULL ) {
-		return (T*)loadPrefabWithOverrides( prefabName, overrides, in );
+	T* loadPrefabWithOverridesOfType( const zpString& prefabName, const zpProperties& overrides ) {
+		return (T*)loadPrefabWithOverrides( prefabName, overrides );
 	}
 
-	zp_bool saveAsPrefab( const zpString& prefabName, zpSerializable* obj, zpSerializedOutput* out = ZP_NULL );
-
-	void setDefaultSerializedInput( zpSerializedInput* in );
-	zpSerializedInput* getDefaultSerializedInput() const;
-
-	void setDefaultSerializedOutput( zpSerializedOutput* out );
-	zpSerializedOutput* getDefaultSerializedOutput() const;
+	zp_bool saveAsPrefab( const zpString& prefabName, zpSerializable* obj );
 
 private:
 	zpPrefabs();
-
-	zpSerializedInput* m_defaultIn;
-	zpSerializedOutput* m_defaultOut;
 
 	zpString m_prefabRoot;
 };

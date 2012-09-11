@@ -24,19 +24,23 @@ void* zpScriptingInstance::getScriptObject() const {
 
 void zpScriptingInstance::createObject() {
 	if( m_scriptObject ) return;
-
+	
 	asIScriptEngine* engine = zpAngelScript::getInstance();
 	asIObjectType* type = (asIObjectType*)m_resource->getScriptObjectType();
-
-	m_scriptObject = engine->CreateScriptObject( type->GetTypeId() );
-	engine->AddRefScriptObject( m_scriptObject, type );
+	if( type ) {
+		m_scriptObject = engine->CreateScriptObject( type->GetTypeId() );
+		engine->AddRefScriptObject( m_scriptObject, type );
+	} else {
+		zpLog::error() << "Failed to create script object." << zpLog::endl;
+	}
 }
 void zpScriptingInstance::destroyObject() {
 	if( !m_scriptObject ) return;
 
 	asIScriptEngine* engine = zpAngelScript::getInstance();
 	asIObjectType* type = (asIObjectType*)m_resource->getScriptObjectType();
-
-	engine->ReleaseScriptObject( m_scriptObject, type );
-	m_scriptObject = ZP_NULL;
+	if( type ) {
+		engine->ReleaseScriptObject( m_scriptObject, type );
+		m_scriptObject = ZP_NULL;
+	}
 }

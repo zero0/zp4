@@ -608,7 +608,19 @@ zpString zpString::__format( zp_char* buff, zp_uint size, const zpString& format
 zp_bool operator==( const zpString& string1, const zpString& string2 ) {
 	return string1.equals( string2 );
 }
+zp_bool operator==( const zpString& string1, const zp_char* string2 ) {
+	return strcmp( string1.c_str(), string2 ) == 0;
+}
+zp_bool operator==( const zp_char* string1, const zpString& string2 ) {
+	return strcmp( string1, string2.c_str() ) == 0;
+}
 
 zp_bool operator!=( const zpString& string1, const zpString& string2 ) {
-	return !string1.equals( string2 );
+	return !( string1 == string2 );
+}
+zp_bool operator!=( const zpString& string1, const zp_char* string2 ) {
+	return !( string1 == string2 );
+}
+zp_bool operator!=( const zp_char* string1, const zpString& string2 ) {
+	return !( string1 == string2 );
 }

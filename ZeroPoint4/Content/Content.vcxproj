@@ -72,6 +72,9 @@
     <ClInclude Include="zpPrefabs.h" />
     <ClInclude Include="zpResource.h" />
     <ClInclude Include="zpResourceCreator.h" />
+    <ClInclude Include="zpSerializedFactory.h" />
+    <ClInclude Include="zpXmlParser.h" />
+    <ClInclude Include="zpXmlSerializedInput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
@@ -79,8 +82,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpContentManager.cpp" />
+    <ClCompile Include="zpPrefabs.cpp" />
     <ClCompile Include="zpResource.cpp" />
     <ClCompile Include="zpResourceCreator.cpp" />
+    <ClCompile Include="zpXmlParser.cpp" />
+    <ClCompile Include="zpXmlSerializedInput.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
