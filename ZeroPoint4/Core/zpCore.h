@@ -15,7 +15,7 @@
 //#ifdef _WIN32
 //#define ZP_USE_SIMD		0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD			0
+#define ZP_USE_SIMD			1
 //#endif
 
 #define ZP_LOG_ENABLED		1
@@ -38,7 +38,7 @@
 #define ZP_FASTCALL		__fastcall
 
 #define ZP_INLINE		inline
-#define ZP_FORCE_INLINE	__forceinline
+#define ZP_FORCE_INLINE	inline
 #define ZP_NO_VTABLE	__declspec( novtable )
 #define ZP_ALIGN(x)		__declspec( align( x ) )
 #define ZP_ALIGN16		ZP_ALIGN( 16 )
@@ -56,6 +56,9 @@
 
 #define ZP_USE_COLOR_CONSOLE	1
 #define ZP_USE_FAST_MATH		0
+
+void zp_printf( const char* text, ... );
+void zp_printfln( const char* text, ... );
 
 #include "zpBaseTypes.h"
 
@@ -148,9 +151,6 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpGameObject.h"
 #include "zpComponent.h"
 
-
-void zp_printf( const char* text, ... );
-void zp_printfln( const char* text, ... );
 
 template<typename T, typename A>
 ZP_FORCE_INLINE T& zp_as( A& a ) {

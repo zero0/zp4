@@ -70,14 +70,8 @@ ZP_FORCE_INLINE zpMatrix4f::operator const zp_float*() const {
 	return m_data;
 }
 
-ZP_FORCE_INLINE zpMatrix4f zpMatrix4f::operator*( const zpMatrix4f& matrix ) const {
-	zpMatrix4f mat( (*this) );
-	mat *= matrix;
-	return mat;
-}
-
-ZP_FORCE_INLINE void zpMatrix4f::getPosition( zpVector4f* position ) const {
-	*position = m_m4;
+ZP_FORCE_INLINE void zpMatrix4f::getPosition( zpVector4f& position ) const {
+	position = m_m4;
 }
 
 ZP_FORCE_INLINE void zpMatrix4f::setPosition( const zpVector4f& position ) {

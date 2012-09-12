@@ -322,7 +322,7 @@ void rendering_test_main() {
 
 			camera.setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
 			camera.setNearFar( 1, 1000 );
-			camera.set( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
+			camera.set( zpVector4f( 5, 6, 7 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
 			camera.setAspectRatio( 800.f / 600.f );
 			camera.setFovy( 45.f );
 			camera.update();
@@ -337,7 +337,7 @@ void rendering_test_main() {
 			//cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
 			cambuf[0].p = camera.getProjection();//.perspective( 45.f, 4.f / 3.f, 1, 1000 );
 			cambuf[0].vp = camera.getViewProjection();
-			cambuf[0].w.scale( 1 );
+			cambuf[0].w.scale( zp_real_from_float( .5f ) );
 
 			cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
 			//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
@@ -470,7 +470,8 @@ void printNode( const zpXmlNode* node, zp_int tab ) {
 }
 
 int main() {
-	scripting_test_main();
+	rendering_test_main();
+	//scripting_test_main();
 
 	//zpXmlNode* node = zpXmlParser::parseFile( "Assets/test.xml" );
 
@@ -486,7 +487,7 @@ int main() {
 	zpVector4f vec4;
 	zpVector2i vec2i;
 	vec2.set( 10, 12 );
-
+	
 	//zpDelegate<void ()> aa = zpCreateMemberDelegate( &zpVector2f::zero, &vec2 );
 
 	//aa();

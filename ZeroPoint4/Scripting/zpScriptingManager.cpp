@@ -36,7 +36,9 @@ void zpScriptingManager::deserialize( zpSerializedInput* in ) {}
 void zpScriptingManager::onCreate() {
 	m_threads.ensureCapacity( ZP_SCRIPTING_MANAGER_DEFAULT_NUM_THREADS );
 
-	zpAngelScript::createInstance();
+	zpMemorySystem::getInstance()->initializeDefault();
+
+	zpAngelScript::createInstance( zpMemorySystem::getInstance()->getMemoryAllocator() );
 	asIScriptEngine* engine = zpAngelScript::getInstance();
 	zp_int r;
 

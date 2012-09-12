@@ -48,5 +48,5 @@ zp_bool zpRay::isPointOnRay( const zpVector4f& point ) const {
 	zpVector4f r( point );
 	r.sub3( m_origin );
 	r.normalize3();
-	return r.dot3( m_direction ) == 1.f;
+	return zp_real_eq( r.dot3( m_direction ), zp_real_from_float( 1.f ) );
 }

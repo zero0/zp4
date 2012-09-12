@@ -10,26 +10,6 @@ ZP_FORCE_INLINE void zpMatrix4f::operator delete( void* ptr ) {
 }
 */
 
-ZP_FORCE_INLINE void zpMatrix4f::operator*=( const zpMatrix4f& matrix ) {
-	zp_float sum;
-	zp_int x, y, j;
-	zp_float mat[4][4];
-
-	for( x = 0; x < 4; ++x ) {
-		for( y = 0; y < 4; ++y ) {
-			sum = 0;
-
-			for( j = 0; j < 4; ++j ) {
-				//sum += m_matrix[x][j] * matrix.m_matrix[j][y];
-				sum += m_matrix[j][x] * matrix.m_matrix[y][j];
-			}
-
-			mat[x][y] = sum;
-		}
-	}
-	(*this) = &mat[0][0];
-}
-
 ZP_FORCE_INLINE void zpMatrix4f::translate( const zpVector4f& position ) {
 	zp_vec4 v = position.toVec4();
 	m_41 = m_11 * v.x + m_21 * v.y + m_31 * v.z + m_41;
@@ -47,7 +27,7 @@ ZP_FORCE_INLINE void zpMatrix4f::rotateX( zp_real angle ) {
 	rotX.m_22 = c; rotX.m_23 = -s;
 	rotX.m_32 = s; rotX.m_33 = c;
 
-	(*this) = rotX * (*this);
+	rotX.mul( (*this), (*this) );
 }
 ZP_FORCE_INLINE void zpMatrix4f::rotateY( zp_real angle ) {
 	//left handed
@@ -58,7 +38,7 @@ ZP_FORCE_INLINE void zpMatrix4f::rotateY( zp_real angle ) {
 	rotY.m_11 = c; rotY.m_13 = s;
 	rotY.m_31 = -s; rotY.m_33 = c;
 
-	(*this) = rotY * (*this);
+	rotY.mul( (*this), (*this) );
 }
 ZP_FORCE_INLINE void zpMatrix4f::rotateZ( zp_real angle ) {
 	//left handed
@@ -69,15 +49,15 @@ ZP_FORCE_INLINE void zpMatrix4f::rotateZ( zp_real angle ) {
 	rotZ.m_11 = c; rotZ.m_12 = -s;
 	rotZ.m_21 = s; rotZ.m_22 = c;
 
-	(*this) = rotZ * (*this);
+	rotZ.mul( (*this), (*this) );
 }
-ZP_FORCE_INLINE void zpMatrix4f::scale( zp_float uniformScale ) {
+ZP_FORCE_INLINE void zpMatrix4f::scale( zp_real uniformScale ) {
 	zpMatrix4f m;
 	m( 0, 0 ) = uniformScale;
 	m( 1, 1 ) = uniformScale;
 	m( 2, 2 ) = uniformScale;
 
-	(*this) = m * (*this);
+	m.mul( (*this), (*this) );
 }
 ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {
 	zpMatrix4f m;
@@ -85,10 +65,27 @@ ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {
 	m( 1, 1 ) = scale.getY();
 	m( 2, 2 ) = scale.getZ();
 
-	(*this) = m * (*this);
+	m.mul( (*this), (*this) );
 }
 
-ZP_FORCE_INLINE void zpMatrix4f::mul( const zpVector4f& vector, zpVector4f* outVector ) const {}
+ZP_FORCE_INLINE void zpMatrix4f::mul( const zpVector4f& vector, zpVector4f& outVector ) const {}
+ZP_FORCE_INLINE void zpMatrix4f::mul( const zpMatrix4f& matrix, zpMatrix4f& outMatrix ) const {
+	zp_float sum;
+	zp_int x, y, j;
+
+	for( x = 0; x < 4; ++x ) {
+		for( y = 0; y < 4; ++y ) {
+			sum = 0;
+
+			for( j = 0; j < 4; ++j ) {
+				//sum += m_matrix[x][j] * matrix.m_matrix[j][y];
+				sum += m_matrix[j][x] * matrix.m_matrix[y][j];
+			}
+
+			outMatrix.m_matrix[x][y] = sum;
+		}
+	}
+}
 
 ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f& at, const zpVector4f& up ) {
 	if( eye == at ) {
@@ -102,12 +99,10 @@ ZP_FORCE_INLINE void zpMatrix4f::lookTo( const zpVector4f& eye, const zpVector4f
 	zpVector4f z( direction );
 	z.normalize3();
 
-	zpVector4f x( up );
-	x = x.cross3( z );
+	zpVector4f x = up.cross3( z );
 	x.normalize3();
 
-	zpVector4f y( z );
-	y = y.cross3( x );
+	zpVector4f y = z.cross3( x );
 
 	zpVector4f e( -eye );
 

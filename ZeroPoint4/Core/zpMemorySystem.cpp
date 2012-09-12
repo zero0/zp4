@@ -10,9 +10,13 @@ zpMemorySystem* zpMemorySystem::getInstance() {
 }
 
 void zpMemorySystem::initialize( zpMemoryAllocator* allocator ) {
+	if( isInitialized() ) return;
+
 	s_instance.m_allocator = allocator;
 }
 void zpMemorySystem::initializeDefault() {
+	if( isInitialized() ) return;
+
 	struct zpDefaultMemoryAllocator : zpMemoryAllocator {
 		void* allocate( zp_uint size ) {
 			return malloc( size );
@@ -43,6 +47,8 @@ void zpMemorySystem::initializeDefault() {
 }
 void zpMemorySystem::initializeDebug() {
 #if ZP_DEBUG
+	if( isInitialized() ) return;
+
 	struct zpDebugMemoryAllocator : zpMemoryAllocator {
 		void* allocate( zp_uint size ) {
 			void* mem = malloc( size );

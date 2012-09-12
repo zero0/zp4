@@ -189,6 +189,7 @@ ZP_FORCE_INLINE zpVector4f zpVector4f::cross3( const zpVector4f& vector ) const 
 }
 ZP_FORCE_INLINE zpVector4f zpVector4f::cross4( const zpVector4f& vector ) const {
 	// hmmm...
+	return zpVector4f();
 }
 
 ZP_FORCE_INLINE zp_bool zpVector4f::equals3( const zpVector4f& vector ) const {

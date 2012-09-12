@@ -55,7 +55,7 @@ public:
 	void setName( const zpString& name );
 
 	const zpMatrix4f& getTransform() const;
-	zpMatrix4f getComputedTransform() const;
+	void getComputedTransform( zpMatrix4f& outTransform ) const;
 	void setTransform( const zpMatrix4f& transform );
 
 	void receiveMessage( const zpMessage& message );

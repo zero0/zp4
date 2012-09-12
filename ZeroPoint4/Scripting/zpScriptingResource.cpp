@@ -53,7 +53,7 @@ zp_bool zpScriptingResource::load() {
 		}
 	}
 	if( type == ZP_NULL ) return false;
-	
+
 	type->AddRef();
 	m_scriptObjectType = type;
 

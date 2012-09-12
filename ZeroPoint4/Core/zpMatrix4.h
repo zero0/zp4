@@ -26,11 +26,7 @@ public:
 	ZP_FORCE_INLINE operator zp_float*();
 	ZP_FORCE_INLINE operator const zp_float*() const;
 
-	ZP_FORCE_INLINE void operator*=( const zpMatrix4f& matrix );
-
-	ZP_FORCE_INLINE zpMatrix4f operator*( const zpMatrix4f& matrix ) const;
-
-	ZP_FORCE_INLINE void getPosition( zpVector4f* position ) const;
+	ZP_FORCE_INLINE void getPosition( zpVector4f& position ) const;
 	//ZP_FORCE_INLINE void getRotation( zpVector4f* rotation ) const;
 	//ZP_FORCE_INLINE void getScale( zpVector4f* rotation ) const;
 
@@ -41,12 +37,13 @@ public:
 	ZP_FORCE_INLINE void rotateX( zp_real angle );
 	ZP_FORCE_INLINE void rotateY( zp_real angle );
 	ZP_FORCE_INLINE void rotateZ( zp_real angle );
-	ZP_FORCE_INLINE void scale( zp_float uniformScale );
+	ZP_FORCE_INLINE void scale( zp_real uniformScale );
 	ZP_FORCE_INLINE void scale( const zpVector4f& scale );
 
 	ZP_FORCE_INLINE zp_bool isIdentity() const;
 
-	ZP_FORCE_INLINE void mul( const zpVector4f& vector, zpVector4f* outVector ) const;
+	ZP_FORCE_INLINE void mul( const zpVector4f& vector, zpVector4f& outVector ) const;
+	ZP_FORCE_INLINE void mul( const zpMatrix4f& matrix, zpMatrix4f& outMatrix ) const;
 
 	ZP_FORCE_INLINE void lookAt( const zpVector4f& eye, const zpVector4f& at, const zpVector4f& up );
 	ZP_FORCE_INLINE void lookTo( const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up );
