@@ -71,15 +71,15 @@ ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {
 ZP_FORCE_INLINE void zpMatrix4f::mul( const zpVector4f& vector, zpVector4f& outVector ) const {}
 ZP_FORCE_INLINE void zpMatrix4f::mul( const zpMatrix4f& matrix, zpMatrix4f& outMatrix ) const {
 	zp_float sum;
-	zp_int x, y, j;
+	zp_uint y, x, j;
 
-	for( x = 0; x < 4; ++x ) {
-		for( y = 0; y < 4; ++y ) {
+	for( y = 0; y < 4; ++y ) {
+		for( x = 0; x < 4; ++x ) {
 			sum = 0;
 
 			for( j = 0; j < 4; ++j ) {
 				//sum += m_matrix[x][j] * matrix.m_matrix[j][y];
-				sum += m_matrix[j][x] * matrix.m_matrix[y][j];
+				sum += m_matrix[j][y] * matrix.m_matrix[x][j];
 			}
 
 			outMatrix.m_matrix[x][y] = sum;
@@ -99,10 +99,16 @@ ZP_FORCE_INLINE void zpMatrix4f::lookTo( const zpVector4f& eye, const zpVector4f
 	zpVector4f z( direction );
 	z.normalize3();
 
-	zpVector4f x = up.cross3( z );
+	zpVector4f x( up.cross3( z ) );
+	zp_printfln( "x: %f %f %f %f", 
+		zp_real_to_float( x.getX() ), 
+		zp_real_to_float( x.getY() ), 
+		zp_real_to_float( x.getZ() ), 
+		zp_real_to_float( x.getW() ) 
+		);
 	x.normalize3();
 
-	zpVector4f y = z.cross3( x );
+	zpVector4f y( z.cross3( x ) );
 
 	zpVector4f e( -eye );
 

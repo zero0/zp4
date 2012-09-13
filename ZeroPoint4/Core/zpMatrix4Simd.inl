@@ -73,10 +73,10 @@ ZP_FORCE_INLINE void zpMatrix4f::lookAt( const zpVector4f& eye, const zpVector4f
 ZP_FORCE_INLINE void zpMatrix4f::lookTo( const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up ) {
 	zpVector4f z( direction );
 	z.normalize3();
-	zp_uint i = 0;
-	zpVector4f x( up.cross3( z ) );
+
+	zpVector4f x( up.cross3( z ) ); 
 	x.normalize3();
-	i++;
+
 	zpVector4f y( z.cross3( x ) );
 	
 	zpVector4f e( -eye );

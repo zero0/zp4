@@ -337,7 +337,7 @@ void rendering_test_main() {
 			//cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
 			cambuf[0].p = camera.getProjection();//.perspective( 45.f, 4.f / 3.f, 1, 1000 );
 			cambuf[0].vp = camera.getViewProjection();
-			cambuf[0].w.scale( zp_real_from_float( .5f ) );
+			//cambuf[0].w.scale( zp_real_from_float( .5f ) );
 
 			cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
 			//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );

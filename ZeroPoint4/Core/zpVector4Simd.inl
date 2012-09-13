@@ -181,11 +181,15 @@ ZP_FORCE_INLINE zp_real zpVector4f::dot4( const zpVector4f& vector ) const {
 }
 
 ZP_FORCE_INLINE zpVector4f zpVector4f::cross3( const zpVector4f& vector ) const {
-	zp_real t0 = _mm_shuffle_ps( vector.m_xyzw, vector.m_xyzw, _MM_SHUFFLE( 1, 2, 0, 3 ) );	//yzxw
-	zp_real t1 = _mm_mul_ps( m_xyzw, t0 );
-	zp_real t2 = _mm_shuffle_ps( vector.m_xyzw, vector.m_xyzw, _MM_SHUFFLE( 2, 0, 1, 3 ) );	//zxyw
-	zp_real t3 = _mm_mul_ps( m_xyzw, t2 );
-	return zpVector4f( _mm_sub_ps( t1, t3 ) );
+	zp_real s0 = _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( 3, 0, 2, 1 ) );
+	zp_real s1 = _mm_shuffle_ps( vector.m_xyzw, vector.m_xyzw, _MM_SHUFFLE( 3, 1, 0, 2 ) );
+	zp_real s2 = _mm_mul_ps( s0, s1 );
+
+	zp_real s3 = _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( 3, 1, 0, 2 ) );
+	zp_real s4 = _mm_shuffle_ps( vector.m_xyzw, vector.m_xyzw, _MM_SHUFFLE( 3, 0, 2, 1 ) );
+	zp_real s5 = _mm_mul_ps( s3, s4 );
+
+	return zpVector4f( _mm_sub_ps( s2, s5 ) );
 }
 ZP_FORCE_INLINE zpVector4f zpVector4f::cross4( const zpVector4f& vector ) const {
 	// hmmm...
