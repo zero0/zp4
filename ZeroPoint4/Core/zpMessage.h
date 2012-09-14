@@ -8,6 +8,21 @@ typedef zp_ptr zpMessageDataHandle;
 
 class zpMessageDataCache;
 
+#undef MT_DEF
+#undef MT_SYS
+
+#define MT_DEF( m )	m,
+#define MT_SYS( m ) SYS_##m,
+
+struct zpMessageTypes {
+	enum Types {
+#include "zpMessageTypes.inl"
+	};
+};
+
+#undef MT_DEF
+#undef MT_SYS
+
 class zpMessage {
 public:
 	zpMessage();
@@ -70,4 +85,25 @@ private:
 	
 	void* getMessageData( zpMessageDataHandle& handle, zp_uint size );
 };
+
+class zpMessageTypeSystem {
+public:
+	~zpMessageTypeSystem();
+
+	static zpMessageTypeSystem* getInstance();
+
+	zpMessageType getMessageType( const zpString& msg ) const;
+	const zpString& getMessageName( zpMessageType msg ) const;
+
+private:
+	zpMessageTypeSystem();
+
+	void createMessages();
+
+	static zpMessageTypeSystem s_instance;
+
+	zpArrayList<zpString> m_names;
+	zpArrayList<zpMessageType> m_types;
+};
+
 #endif

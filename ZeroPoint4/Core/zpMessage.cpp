@@ -55,3 +55,38 @@ void* zpMessageDataCache::getMessageData( zpMessageDataHandle& handle, zp_uint s
 		return (void*)handle;
 	}
 }
+
+zpMessageTypeSystem::zpMessageTypeSystem() {
+	createMessages();
+}
+zpMessageTypeSystem::~zpMessageTypeSystem() {
+	m_names.clear();
+	m_types.clear();
+}
+
+zpMessageTypeSystem zpMessageTypeSystem::s_instance;
+zpMessageTypeSystem* zpMessageTypeSystem::getInstance() {
+	return &s_instance;
+}
+
+zpMessageType zpMessageTypeSystem::getMessageType( const zpString& msg ) const {
+	zp_uint index = m_names.indexOf( msg );
+	return m_types[ index ];
+}
+const zpString& zpMessageTypeSystem::getMessageName( zpMessageType msg ) const {
+	zp_uint index = m_types.indexOf( msg );
+	return m_names[ index ];
+}
+
+void zpMessageTypeSystem::createMessages() {
+#undef MT_DEF
+#undef MT_SYS
+
+#define MT_DEF( m )	{ m_names.pushBack( zpString( #m ).toCamelCase() ); m_types.pushBack( zpMessageTypes::m ); }
+#define MT_SYS( m )	(void)0;
+
+#include "zpMessageTypes.inl"
+
+#undef MT_DEF
+#undef MT_SYS
+}

@@ -57,10 +57,14 @@
 #define ZP_USE_COLOR_CONSOLE	1
 #define ZP_USE_FAST_MATH		0
 
-void zp_printf( const char* text, ... );
-void zp_printfln( const char* text, ... );
-
 #include "zpBaseTypes.h"
+
+void zp_printf( const zp_char* text, ... );
+void zp_printfln( const zp_char* text, ... );
+
+zp_char zp_to_lower( zp_char ch );
+zp_char zp_to_upper( zp_char ch );
+zp_bool zp_is_whitespace( zp_char ch );
 
 class zpLog;
 class zpLogOutput;

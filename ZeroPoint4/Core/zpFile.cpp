@@ -95,6 +95,7 @@ const zpString& zpFile::getCurrentDirectory() {
 		buff[ size - 1 ] = zpFile::sep;
 		buff[ size ] = 0;
 		s_currentDirectory = buff;
+		convertToFilePath( s_currentDirectory );
 		delete[] buff;
 #endif
 	}

@@ -6,27 +6,6 @@
 #define IS_STRING_PACKED( s )	( (s)->m_length < ZP_STRING_MAX_SMALL_SIZE )
 #define NOT_STRING_PACKED( s )	( !IS_STRING_PACKED( s ) )
 
-zp_char zp_to_lower( zp_char ch ) {
-	return ( 'A' <= ch && ch <= 'Z' ) ? ch -= 'A' - 'a' : ch;
-}
-
-zp_char zp_to_upper( zp_char ch ) {
-	return ( 'a' <= ch && ch <= 'z' ) ? ch -= 'a' - 'A' : ch;
-}
-zp_bool zp_is_whitespace( zp_char ch ) {
-	switch( ch ) {
-		case 0x09:
-		case 0x0A:
-		case 0x0B:
-		case 0x0C:
-		case 0x0D:
-		case 0x20:
-			return true;
-		default:
-			return false;
-	}
-}
-
 zpString::zpString() : 
 	m_length( 0 )
 {
@@ -470,6 +449,33 @@ zpString& zpString::toLower() {
 }
 zpString& zpString::toUpper() {
 	map( zp_to_upper );
+	return (*this);
+}
+
+zpString zpString::toCamelCase( zp_bool capitalFirstLetter ) const {
+	zpStringBuffer camel;
+	
+	if( m_length > 0 ) {
+		const zp_char* s = c_str();
+		zp_char c, n;
+		camel.append( capitalFirstLetter ? zp_to_upper( s[ 0 ] ) : s[ 0 ] );
+		for( zp_uint i = 1; i < m_length - 1; ++i ) {
+			c = s[ i ];
+			n = s[ i + 1 ];
+			if( n == '_' || n == ' ' ) {
+				c = zp_to_upper( c );
+				i++;
+			}
+			camel.append( c );
+		}
+	}
+
+	return camel.toString();
+}
+zpString& zpString::toCamelCase( zp_bool capitalFirstLetter ) {
+	zpString camel( *this );
+	camel.toCamelCase( capitalFirstLetter );
+	(*this) = camel;
 	return (*this);
 }
 

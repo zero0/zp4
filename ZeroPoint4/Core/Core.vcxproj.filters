@@ -230,6 +230,9 @@
     <None Include="zpTween.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpMessageTypes.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">

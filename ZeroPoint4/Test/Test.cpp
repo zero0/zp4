@@ -183,6 +183,160 @@ void core_test_main() {
 	getchar();
 }
 
+
+struct TestRenderable : public zpRenderable {
+	zpBuffer* buff;
+	zpBuffer* buff2;
+	zpBuffer* origBuff;
+	zpBuffer* cameraBuffer;
+
+	zpCamera camera; 
+
+	zpShaderResource* sr;
+	zpShaderResource* srtex;
+	zpRenderingEngine* engine;
+	zpTextureResource* tex;
+	zpSamplerState* state;
+	zpRasterState* raster;
+	zpStaticMeshResource* mesh;
+	zp_float time;
+	zp_uint frames;
+	void start( zpContentManager* cm ) {
+		engine = zpRenderingFactory::getRenderingEngine();
+#if TEST_RENDERING
+		buff = engine->createBuffer();
+		buff2 = engine->createBuffer();
+		origBuff = engine->createBuffer();
+
+		const zp_float f = .5f;
+		const zp_float z = 2.f;
+		const zp_float o = 5.f;
+
+		zpVertexPositionColor sv[] = {
+			{ zpVector4f(-f,-f, z, 1 ), zpColor4f( 1, 0, 0, 1 ) },
+			{ zpVector4f(-f, f, z, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+			{ zpVector4f( f,-f, z, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+			{ zpVector4f( f, f, z, 1 ), zpColor4f( 1, 0, 1, 1 ) },
+		};
+		buff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, sv );
+
+		zpVertexPositionNormalTexture pnt[] = {
+			{ zpVector4f(-o,-o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 2 )  },
+			{ zpVector4f(-o, o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 0 )  },
+			{ zpVector4f( o,-o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 2 )  },
+			{ zpVector4f( o, o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 0 )  }
+		};
+		buff2->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, pnt );
+
+		zpVertexPositionColor orig[] = {
+			{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
+			{ zpVector4f( o, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
+
+			{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+			{ zpVector4f( 0, o, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
+
+			{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+			{ zpVector4f( 0, 0, o, 1 ), zpColor4f( 0, 0, 1, 1 ) },
+		};
+		origBuff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, orig );
+
+		sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
+		srtex = cm->getResourceOfType<zpShaderResource>( "tex_norm_shader" );
+		tex = cm->getResourceOfType<zpTextureResource>( "tex" );
+		mesh = cm->getResourceOfType<zpStaticMeshResource>( "cube" );
+
+		frames = 0;
+		time = 0;
+
+		engine->getImmediateRenderingContext()->bindRenderTargetAndDepthBuffer();
+		engine->setVSyncEnabled( false );
+
+		zpSamplerStateDesc samplerDesc;
+		state = engine->createSamplerState( samplerDesc );
+
+		zpRasterStateDesc rasterDesc;
+		//rasterDesc.fillMode = ZP_FILL_MODE_WIREFRAME;
+		//rasterDesc.cullMode = ZP_CULL_MODE_NONE;
+		raster = engine->createRasterState( rasterDesc );
+
+		camera.setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
+		camera.setNearFar( 1, 1000 );
+		camera.set( zpVector4f( 5, 6, 7 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
+		camera.setAspectRatio( 800.f / 600.f );
+		camera.setFovy( 45.f );
+		camera.update();
+
+		cameraBuffer = engine->createBuffer();
+
+		struct cb {
+			zpMatrix4f v, p, vp, w;
+		};
+		cb cambuf[1];
+		cambuf[0].v = camera.getView();//.lookAt( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
+		//cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
+		cambuf[0].p = camera.getProjection();//.perspective( 45.f, 4.f / 3.f, 1, 1000 );
+		cambuf[0].vp = camera.getViewProjection();
+		//cambuf[0].w.scale( zp_real_from_float( .5f ) );
+
+		cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
+		//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
+
+#endif
+	}
+	void render() {
+#if TEST_RENDERING
+		zp_long start = zpTime::getInstance()->getTime();
+
+		zpRenderingContext* i = engine->getImmediateRenderingContext();
+
+		zpColor4f c(.23f, .15f, .88f, 1.f );
+		i->setViewport( zpViewport( 800, 600 ) );
+		i->bindRenderTargetAndDepthBuffer();
+		i->clearRenderTarget( &c );
+		i->clearDepthStencilBuffer( 1.0f, 0 );
+
+		i->setSamplerState( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, state );
+		i->setRasterState( raster );
+
+		i->bindBuffer( cameraBuffer, 0 );
+
+		i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
+		
+		i->bindBuffer( buff );
+		i->bindShader( sr );
+		i->draw( 4 );
+		
+		i->setTopology( ZP_TOPOLOGY_LINE_LIST );
+		i->bindBuffer( origBuff );
+		i->draw( 6 );
+
+		i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
+
+		i->bindBuffer( buff2 );
+		i->bindShader( srtex );
+		i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
+		i->draw( 4 );
+
+		i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
+		
+		i->bindBuffer( mesh->getVertexBuffer() );
+		i->draw( mesh->getNumVertices() );
+		
+		engine->present();
+		zp_long end = zpTime::getInstance()->getTime();
+
+		++frames;
+		time += zpTime::getInstance()->getDeltaSeconds();
+		if( time > 1.f ) {
+			end -= start;
+			zp_printfcln( ZP_CC( ZP_CC_GREEN, ZP_CC_WHITE ), "FPS: %d\tFT(ms): %.3f", frames, ( end / 1000.f ) );
+			time = 0;
+			frames = 0;
+		}
+#endif
+	}
+};
+
 void rendering_test_main() {
 	zpConsole::getInstance()->create();
 
@@ -236,171 +390,20 @@ void rendering_test_main() {
 
 	game.create();
 
-	cm.loadResource( "simple.shader", "simple_shader" );
-	cm.loadResource( "tex_norm.shader", "tex_norm_shader" );
-	cm.loadResource( "test.png", "tex" );
-	cm.loadResource( "cube.obj", "cube" );
+	zp_bool loaded = false;
+	loaded = cm.loadResource( "simple.shader", "simple_shader" );
+	loaded = cm.loadResource( "tex_norm.shader", "tex_norm_shader" );
+	loaded = cm.loadResource( "test.png", "tex" );
+	loaded = cm.loadResource( "cube.obj", "cube" );
 
 	//zpLog::getInstance()->disableLogLevel( ZP_LOG_LEVEL_DEBUG );
 	//zpLogOutput& d = zpLog::debug();
 	//zpLog::debug() << "hello" << zpLogOptions::endl << zpLogOptions::red << "debug log" << zpLogOptions::reset << " Log";
 
-	struct TestRenderable : public zpRenderable {
-		zpBuffer* buff;
-		zpBuffer* buff2;
-		zpBuffer* origBuff;
-		zpBuffer* cameraBuffer;
+	TestRenderable tr;
+	tr.start( &cm );
 
-		zpCamera camera;
-
-		zpShaderResource* sr;
-		zpShaderResource* srtex;
-		zpRenderingEngine* engine;
-		zpTextureResource* tex;
-		zpSamplerState* state;
-		zpRasterState* raster;
-		zpStaticMeshResource* mesh;
-		zp_float time;
-		zp_uint frames;
-		void start( zpContentManager* cm ) {
-			engine = zpRenderingFactory::getRenderingEngine();
-#if TEST_RENDERING
-			buff = engine->createBuffer();
-			buff2 = engine->createBuffer();
-			origBuff = engine->createBuffer();
-
-			const zp_float f = .5f;
-			const zp_float z = 2.f;
-			const zp_float o = 5.f;
-
-			zpVertexPositionColor sv[] = {
-				{ zpVector4f(-f,-f, z, 1 ), zpColor4f( 1, 0, 0, 1 ) },
-				{ zpVector4f(-f, f, z, 1 ), zpColor4f( 0, 1, 0, 1 ) },
-				{ zpVector4f( f,-f, z, 1 ), zpColor4f( 0, 0, 1, 1 ) },
-				{ zpVector4f( f, f, z, 1 ), zpColor4f( 1, 0, 1, 1 ) },
-			};
-			buff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, sv );
-
-			zpVertexPositionNormalTexture pnt[] = {
-				{ zpVector4f(-o,-o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 2 )  },
-				{ zpVector4f(-o, o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 0 )  },
-				{ zpVector4f( o,-o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 2 )  },
-				{ zpVector4f( o, o, -z, 1 ), zpVector4f( 0, 0, 0, 1 ), zpVector2f( 2, 0 )  }
-			};
-			buff2->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, pnt );
-
-			zpVertexPositionColor orig[] = {
-				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
-				{ zpVector4f( o, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) },
-
-				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
-				{ zpVector4f( 0, o, 0, 1 ), zpColor4f( 0, 1, 0, 1 ) },
-
-				{ zpVector4f( 0, 0, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) },
-				{ zpVector4f( 0, 0, o, 1 ), zpColor4f( 0, 0, 1, 1 ) },
-			};
-			origBuff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, orig );
-
-			sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
-			srtex = cm->getResourceOfType<zpShaderResource>( "tex_norm_shader" );
-			tex = cm->getResourceOfType<zpTextureResource>( "tex" );
-			mesh = cm->getResourceOfType<zpStaticMeshResource>( "cube" );
-
-			frames = 0;
-			time = 0;
-
-			engine->getImmediateRenderingContext()->bindRenderTargetAndDepthBuffer();
-			engine->setVSyncEnabled( true );
-
-			zpSamplerStateDesc samplerDesc;
-			state = engine->createSamplerState( samplerDesc );
-
-			zpRasterStateDesc rasterDesc;
-			//rasterDesc.fillMode = ZP_FILL_MODE_WIREFRAME;
-			//rasterDesc.cullMode = ZP_CULL_MODE_NONE;
-			raster = engine->createRasterState( rasterDesc );
-
-			camera.setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
-			camera.setNearFar( 1, 1000 );
-			camera.set( zpVector4f( 5, 6, 7 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
-			camera.setAspectRatio( 800.f / 600.f );
-			camera.setFovy( 45.f );
-			camera.update();
-
-			cameraBuffer = engine->createBuffer();
-
-			struct cb {
-				zpMatrix4f v, p, vp, w;
-			};
-			cb cambuf[1];
-			cambuf[0].v = camera.getView();//.lookAt( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
-			//cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
-			cambuf[0].p = camera.getProjection();//.perspective( 45.f, 4.f / 3.f, 1, 1000 );
-			cambuf[0].vp = camera.getViewProjection();
-			//cambuf[0].w.scale( zp_real_from_float( .5f ) );
-
-			cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
-			//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
-			
-#endif
-		}
-		void render() {
-#if TEST_RENDERING
-			zp_long start = zpTime::getInstance()->getTime();
-
-			zpRenderingContext* i = engine->getImmediateRenderingContext();
-
-			zpColor4f c(.23f, .15f, .88f, 1.f );
-			i->setViewport( zpViewport( 800, 600 ) );
-			i->bindRenderTargetAndDepthBuffer();
-			i->clearRenderTarget( &c );
-			i->clearDepthStencilBuffer( 1.0f, 0 );
-
-			i->setSamplerState( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, state );
-			i->setRasterState( raster );
-
-			i->bindBuffer( cameraBuffer, 0 );
-
-			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
-			
-			i->bindBuffer( buff );
-			i->bindShader( sr );
-			i->draw( 4 );
-
-			i->setTopology( ZP_TOPOLOGY_LINE_LIST );
-			i->bindBuffer( origBuff );
-			i->draw( 6 );
-
-			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
-
-			i->bindBuffer( buff2 );
-			i->bindShader( srtex );
-			i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
-			i->draw( 4 );
-			
-			i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
-
-			i->bindBuffer( mesh->getVertexBuffer() );
-			i->draw( mesh->getNumVertices() );
-			
-			engine->present();
-			zp_long end = zpTime::getInstance()->getTime();
-
-			++frames;
-			time += zpTime::getInstance()->getDeltaSeconds();
-			if( time > 1.f ) {
-				end -= start;
-				zp_printfcln( ZP_CC( ZP_CC_GREEN, ZP_CC_WHITE ), "FPS: %d\tFT(ms): %.1f", frames, ( end / 1000.f ) );
-				time = 0;
-				frames = 0;
-			}
-#endif
-		}
-	};
-	TestRenderable* tr = new TestRenderable;
-	tr->start( &cm );
-
-	game.setRenderable( tr );
+	game.setRenderable( &tr );
 	
 	while( wnd.processMessages() ) {
 		game.process();

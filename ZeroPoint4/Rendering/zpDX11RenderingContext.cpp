@@ -139,10 +139,10 @@ void zpDX11RenderingContext::bindTexture( zpResourceBindSlot bindType, zp_uint s
 	ID3D11ShaderResourceView* view = ( (zpDX11Texture*)texture )->getResourceView();
 	switch( bindType ) {
 	case ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER:
-		m_context->VSSetShaderResources( slot, 1, &view );
+		m_context->VSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
 		break;
 	case ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER:
-		m_context->PSSetShaderResources( slot, 1, &view );
+		m_context->PSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
 		break;
 	}
 }

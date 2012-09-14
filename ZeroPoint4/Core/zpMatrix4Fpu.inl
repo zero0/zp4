@@ -100,12 +100,6 @@ ZP_FORCE_INLINE void zpMatrix4f::lookTo( const zpVector4f& eye, const zpVector4f
 	z.normalize3();
 
 	zpVector4f x( up.cross3( z ) );
-	zp_printfln( "x: %f %f %f %f", 
-		zp_real_to_float( x.getX() ), 
-		zp_real_to_float( x.getY() ), 
-		zp_real_to_float( x.getZ() ), 
-		zp_real_to_float( x.getW() ) 
-		);
 	x.normalize3();
 
 	zpVector4f y( z.cross3( x ) );

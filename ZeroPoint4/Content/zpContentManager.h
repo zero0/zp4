@@ -61,6 +61,7 @@ private:
 	zpString m_assetsFolder;
 	zpString m_rootDirectory;
 
+	zpArrayList<zpResource*> m_resourcesToLoad;
 	zpHashMap<zpString, zpResourceCreator*> m_creators;
 	zpHashMap<zpString, zpResource*> m_resources;
 	zpHashMap<zpString, zpString> m_fileToAlias;

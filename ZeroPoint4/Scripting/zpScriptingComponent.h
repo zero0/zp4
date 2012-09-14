@@ -31,6 +31,7 @@ private:
 	zpScriptingManager* m_manager;
 
 	zpString m_scriptAlias;
+	zpHashMap<zpMessageType, zpString> m_messageFunctions;
 };
 
 #endif

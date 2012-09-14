@@ -27,6 +27,8 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 		m_fileToAlias[ filename ] = alias;
 
 		return resource->load();
+		m_resourcesToLoad.pushBack( resource );
+		return true;
 	}
 
 	ZP_ON_DEBUG_MSG( "No resource creator registered for file extension '%s'", extension.c_str() );
@@ -112,7 +114,12 @@ void zpContentManager::onCreate() {
 }
 void zpContentManager::onDestroy() {}
 
-void zpContentManager::onUpdate() {}
+void zpContentManager::onUpdate() {
+	if( !m_resourcesToLoad.isEmpty() ) {
+		m_resourcesToLoad.back()->load();
+		m_resourcesToLoad.popBack();
+	}
+}
 
 void zpContentManager::onEnabled() {}
 void zpContentManager::onDisabled() {}
