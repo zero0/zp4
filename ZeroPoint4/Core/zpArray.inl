@@ -1,7 +1,4 @@
 
-#include <malloc.h>
-#include <string.h>
-
 template<typename T>
 const zp_uint zpArray<T>::npos = (zp_uint)-1;
 
@@ -11,7 +8,7 @@ template<typename T>
 zpArray<T>::zpArray( zp_uint size ) : m_array( size == 0 ? ZP_NULL : (T*)calloc( size, sizeof( T ) ) ), m_size( size ) {}
 template<typename T>
 zpArray<T>::zpArray( const zpArray& arr ) : m_array( (T*)calloc( arr.m_size, sizeof( T ) ) ), m_size( arr.m_size ) {
-	memcpy_s( m_array, m_size * sizeof( T ), arr.m_array, m_size * sizeof( T ) );
+	zp_memcpy( m_array, m_size * sizeof( T ), arr.m_array, m_size * sizeof( T ) );
 }
 template<typename T>
 zpArray<T>::zpArray( zpArray&& arr ) : m_array( arr.m_array ), m_size( arr.m_size ) {
@@ -29,7 +26,7 @@ void zpArray<T>::operator=( const zpArray& arr ) {
 	ZP_SAFE_FREE( m_array );
 	m_size = arr.m_size;
 	m_array = (T*)calloc( m_size, sizeof( T ) );
-	memcpy_s( m_array, m_size * sizeof( T ), arr.m_array, m_size * sizeof( T ) );
+	zp_memcpy( m_array, m_size * sizeof( T ), arr.m_array, m_size * sizeof( T ) );
 }
 template<typename T>
 void zpArray<T>::operator=( zpArray&& arr ) {
@@ -72,14 +69,14 @@ zp_uint zpArray<T>::size() const {
 template<typename T>
 void zpArray<T>::remove( zp_uint index, T* outVal = ZP_NULL ) {
 	if( outVal ) *outVal = (T&&)m_array[ index ];
-	memset( &m_array[ index ], 0, sizeof( T ) );
+	zp_memset( &m_array[ index ], 0, sizeof( T ) );
 }
 template<typename T>
 void zpArray<T>::erase( zp_uint index ) {
 	if( &m_array[ index ] ) {
 		(&m_array[ index ])->~T();
 		//m_array[ index ] = T();
-		memset( &m_array[ index ], 0, sizeof( T ) );
+		zp_memset( &m_array[ index ], 0, sizeof( T ) );
 	}
 }
 

@@ -37,6 +37,8 @@ public:
 private:
 	zpGameManager* getGameManager_T( const void* type ) const;
 
+	zpTime* m_timer;
+
 	zpWorld* m_currentWorld;
 	zpWorld* m_nextWorld;
 	zpRenderable* m_renderable;

@@ -9,10 +9,6 @@ public:
 	zp_bool load();
 	void unload();
 
-	zpTextureType getTextureType() const;
-	zp_uint getWidth() const;
-	zp_uint getHeight() const;
-
 	zpTexture* getTexture() const;
 
 private:

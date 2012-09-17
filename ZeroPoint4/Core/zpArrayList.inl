@@ -1,32 +1,28 @@
 
-#include <malloc.h>
-#include <memory.h>
-#include <string.h>
-
 template<typename T>
 const zp_uint zpArrayList<T>::npos = (zp_uint)-1;
 
 template<typename T>
 zpArrayList<T>::zpArrayList() : m_array( ZP_NULL ), m_size( 0 ), m_capacity( 0 ) {
 	ensureCapacity( ZP_ARRAY_DEFAULT_SIZE );
-	ZP_ON_DEBUG( memset( m_array, 0, m_capacity * sizeof( T ) ) );
+	ZP_ON_DEBUG( zp_memset( m_array, 0, m_capacity * sizeof( T ) ) );
 }
 template<typename T>
 zpArrayList<T>::zpArrayList( zp_uint size ) : m_array( ZP_NULL ), m_size( 0 ), m_capacity( 0 ) {
 	ensureCapacity( size );
-	ZP_ON_DEBUG( memset( m_array, 0, m_capacity * sizeof( T ) ) );
+	ZP_ON_DEBUG( zp_memset( m_array, 0, m_capacity * sizeof( T ) ) );
 }
 template<typename T>
 zpArrayList<T>::zpArrayList( T* arr, zp_uint size, zp_uint capacity ) : m_array( ZP_NULL ), m_size( 0 ), m_capacity ( 0 ) {
 	ensureCapacity( ZP_MAX( size, capacity ) );
 	pushBack( arr, size );
-	ZP_ON_DEBUG( memset( m_array + m_size, 0, ( m_capacity - m_size ) * sizeof( T ) ) );
+	ZP_ON_DEBUG( zp_memset( m_array + m_size, 0, ( m_capacity - m_size ) * sizeof( T ) ) );
 }
 template<typename T>
 zpArrayList<T>::zpArrayList( const zpArrayList& arr ) : m_array( ZP_NULL ), m_size( 0 ), m_capacity ( 0 ) {
 	ensureCapacity( arr.m_capacity );
 	pushBack( arr.m_array, arr.m_size );
-	ZP_ON_DEBUG( memset( m_array + m_size, 0, ( m_capacity - m_size ) * sizeof( T ) ) );
+	ZP_ON_DEBUG( zp_memset( m_array + m_size, 0, ( m_capacity - m_size ) * sizeof( T ) ) );
 }
 template<typename T>
 zpArrayList<T>::zpArrayList( zpArrayList&& arr ) : m_array( arr.m_array ), m_size( arr.m_size ), m_capacity( arr.m_capacity ) {
@@ -93,7 +89,7 @@ void zpArrayList<T>::pushBack( const T* arr, zp_uint count ) {
 	zp_uint newSize = m_size + count;
 	ensureCapacity( newSize );
 
-	memcpy_s( m_array + m_size, ( m_capacity - m_size ) * sizeof( T ), arr, count * sizeof( T ) );
+	zp_memcpy( m_array + m_size, ( m_capacity - m_size ) * sizeof( T ), arr, count * sizeof( T ) );
 
 	m_size = newSize;
 }
@@ -106,7 +102,7 @@ template<typename T>
 void zpArrayList<T>::pushFront( const T& val ) {
 	ensureCapacity( m_size + 1 );
 
-	memmove_s( m_array + 1, ( m_capacity - 1 ) * sizeof( T ), m_array, ( m_capacity - 1 ) * sizeof( T ) );
+	zp_memmove( m_array + 1, ( m_capacity - 1 ) * sizeof( T ), m_array, ( m_capacity - 1 ) * sizeof( T ) );
 	m_array[ 0 ] = val;
 
 	++m_size;
@@ -116,8 +112,8 @@ void zpArrayList<T>::pushFront( const T* arr, zp_uint count ) {
 	zp_uint newSize = m_size + count;
 	ensureCapacity( newSize );
 
-	memmove_s( m_array + count, ( m_capacity - count ) * sizeof( T ), m_array, ( m_capacity - count ) * sizeof( T ) );
-	memcpy_s( m_array, m_capacity * sizeof( T ), arr, count * sizeof( T ) );
+	zp_memmove( m_array + count, ( m_capacity - count ) * sizeof( T ), m_array, ( m_capacity - count ) * sizeof( T ) );
+	zp_memcpy( m_array, m_capacity * sizeof( T ), arr, count * sizeof( T ) );
 
 	m_size = newSize;
 }
@@ -139,7 +135,7 @@ void zpArrayList<T>::popFront( zp_uint numToPop = 1 ) {
 	for( zp_uint s = 0; s < numToPop; ++s ) {
 		(&m_array[ s ])->~T();
 	}
-	memmove_s( m_array, m_capacity * sizeof( T ), m_array + numToPop, ( m_capacity - numToPop ) * sizeof( T ) );
+	zp_memmove( m_array, m_capacity * sizeof( T ), m_array + numToPop, ( m_capacity - numToPop ) * sizeof( T ) );
 	m_size = m_size - numToPop;
 }
 
@@ -151,7 +147,7 @@ void zpArrayList<T>::insert( zp_uint index, const T& val ) {
 	}
 	ensureCapacity( m_size + 1 );
 
-	memmove_s( m_array + index + 1, ( m_capacity - 1 ) * sizeof( T ), m_array + index, ( m_capacity - 1 ) * sizeof( T ) );
+	zp_memmove( m_array + index + 1, ( m_capacity - 1 ) * sizeof( T ), m_array + index, ( m_capacity - 1 ) * sizeof( T ) );
 	m_array[ index ] = val;
 	++m_size;
 }
@@ -161,7 +157,7 @@ void zpArrayList<T>::remove( zp_uint index, T* outVal ) {
 	ZP_ASSERT_RETURN( index < m_size, "zpArrayList: Index out of bound of Array. Index: %d Size: %d", index, m_size );
 	
 	if( outVal ) *outVal = m_array[ index ];
-	memmove_s( m_array + index, ( m_capacity - 1 ) * sizeof( T ), m_array + index + 1, ( m_capacity - 1 ) * sizeof( T ) );
+	zp_memmove( m_array + index, ( m_capacity - 1 ) * sizeof( T ), m_array + index + 1, ( m_capacity - 1 ) * sizeof( T ) );
 	--m_size;
 }
 template<typename T>
@@ -194,7 +190,7 @@ void zpArrayList<T>::erase( zp_uint index ) {
 	ZP_ASSERT_RETURN( index < m_size, "zpArrayList: Index out of bound of Array. Index: %d Size: %d", index, m_size );
 
 	(&m_array[ index ])->~T();
-	memmove_s( m_array + index, ( m_capacity - 1 ) * sizeof( T ), m_array + index + 1, ( m_capacity - 1 ) * sizeof( T ) );
+	zp_memmove( m_array + index, ( m_capacity - 1 ) * sizeof( T ), m_array + index + 1, ( m_capacity - 1 ) * sizeof( T ) );
 	--m_size;
 }
 template<typename T>
@@ -235,7 +231,7 @@ void zpArrayList<T>::clear() {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		(&m_array[ i ])->~T();
 	}
-	ZP_ON_DEBUG( memset( m_array, 0, m_size * sizeof( T ) ) );
+	ZP_ON_DEBUG( zp_memset( m_array, 0, m_size * sizeof( T ) ) );
 	m_size = 0;
 }
 
@@ -276,7 +272,7 @@ void zpArrayList<T>::shrinkToFit( zp_uint padding ) {/*
 		zp_uint sizeInBytes = newCapacity * sizeof( T );
 		
 		T* newArray = (T*)malloc( sizeInBytes );
-		memcpy_s( newArray, sizeInBytes, m_array, sizeInBytes );
+		zp_memcpy( newArray, sizeInBytes, m_array, sizeInBytes );
 		free( m_array );
 		
 		m_array = newArray;

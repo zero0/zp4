@@ -9,6 +9,7 @@ public:
 
 	zpKeyboard* getKeyboard();
 	zpController* getController( zpControllerNumber controller );
+	zpMouse* getMouse();
 
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
@@ -26,6 +27,7 @@ protected:
 
 private:
 	zpKeyboard* m_keyboard;
+	zpMouse* m_mouse;
 	zpController* m_controllers[4];
 };
 

@@ -212,9 +212,6 @@
     <None Include="zpMap.inl">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="zpArrayList.inl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="zpArray.inl">
       <Filter>Source Files</Filter>
     </None>
@@ -230,7 +227,10 @@
     <None Include="zpTween.inl">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="zpMessageTypes.inl">
+    <None Include="zpArrayList.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpMessageTypes.inc">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

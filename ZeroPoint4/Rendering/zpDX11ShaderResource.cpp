@@ -108,6 +108,8 @@ zp_bool zpDX11ShaderResource::load() {
 			zpLog::error() << "Failed to compile Pixel Shader " << shaderFile << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( blob );
+
+		m_type.mark( ZP_SHADER_TYPE_PIXEL );
 	}
 
 	// if the vertex shader function is defined for this shader, compile and create it
@@ -138,6 +140,8 @@ zp_bool zpDX11ShaderResource::load() {
 			zpLog::error() << "Failed to compile Vertex Shader " << shaderFile << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( blob );
+
+		m_type.mark( ZP_SHADER_TYPE_VERTEX );
 	}
 
 	// if the geometry shader function is defined for this shader, compile and create it
@@ -194,6 +198,8 @@ zp_bool zpDX11ShaderResource::load() {
 			zpLog::error() << "Failed to compile Geometry Shader " << shaderFile << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( blob );
+
+		m_type.mark( ZP_SHADER_TYPE_GEOMETRY );
 	}
 
 	// if the compute shader function is defined for this shader, compile and create it
@@ -217,6 +223,8 @@ zp_bool zpDX11ShaderResource::load() {
 			zpLog::error() << "Failed to compile Compute Shader " << shaderFile << zpLog::endl;
 		}
 		ZP_SAFE_RELEASE( blob );
+
+		m_type.mark( ZP_SHADER_TYPE_COMPUTE );
 	}
 
 	return m_pixelShader || m_vertexShader || m_geometryShader || m_computeShader;
@@ -226,6 +234,7 @@ void zpDX11ShaderResource::unload() {
 	ZP_SAFE_RELEASE( m_pixelShader );
 	ZP_SAFE_RELEASE( m_geometryShader );
 	ZP_SAFE_RELEASE( m_computeShader );
+	m_type.clear();
 }
 
 zpVertexLayout* zpDX11ShaderResource::getVertexLayout() {

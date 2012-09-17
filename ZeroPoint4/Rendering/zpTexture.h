@@ -3,6 +3,7 @@
 #define ZP_TEXTURE_H
 
 enum zpTextureType {
+	ZP_TEXTURE_TYPE_UNKNOWN,
 	ZP_TEXTURE_TYPE_1D,
 	ZP_TEXTURE_TYPE_2D,
 	ZP_TEXTURE_TYPE_3D,
@@ -13,7 +14,7 @@ enum zpTextureType {
 	//ZP_TEXTURE_TYPE_3D_ARRAY,
 };
 
-ZP_PURE_INTERFACE zpTexture : public zpReferencedObject {
+ZP_PURE_INTERFACE zpTexture {
 public:
 	virtual zpTextureType getTextureType() const = 0;
 

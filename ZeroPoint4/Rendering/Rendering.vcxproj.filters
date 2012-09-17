@@ -236,5 +236,8 @@
     <ClCompile Include="zpDX11RasterState.cpp">
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
+    <ClCompile Include="zpShaderResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

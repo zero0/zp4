@@ -65,7 +65,6 @@ public:
 	zpString& toUpper();
 
 	zpString toCamelCase( zp_bool capitalFirstLetter = true ) const;
-	zpString& toCamelCase( zp_bool capitalFirstLetter = true );
 
 	zp_int scan( const zp_char* format, ... ) const;
 
@@ -96,8 +95,6 @@ public:
 
 private:
 	void ensureCapacity( zp_uint size );
-
-	static zpString __format( zp_char* buff, zp_uint size, const zpString& format, ... );
 
 	union {
 		zp_char m_chars[ ZP_STRING_MAX_SMALL_SIZE ];

@@ -14,21 +14,12 @@ public:
 	zp_uint getWidth() const;
 	zp_uint getHeight() const;
 
-	void addReference() const;
-	zp_bool removeReference() const;
-
-	zp_uint getReferenceCount() const;
-
-	void markForAutoDelete( zp_bool marked ) const;
-	zp_bool isMarkedForAutoDelete() const;
-
 private:
 	zpDX11Texture();
 
 	ID3D11Resource* getTexture() const;
 	ID3D11ShaderResourceView* getResourceView() const;
 
-	mutable zp_uint m_referenceCount;
 	zp_uint m_width;
 	zp_uint m_height;
 	zpTextureType m_type;

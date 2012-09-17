@@ -138,7 +138,7 @@ void zpAudioManager::onCreate() {
 		zp_char driverName[256];
 		r = system->getDriverInfo( 0, driverName, 256, 0 );
 
-		if( strstr( driverName, "SigmaTel" ) ) {
+		if( zp_strstr( driverName, "SigmaTel" ) ) {
 			r = system->setSoftwareFormat( 48000, FMOD_SOUND_FORMAT_PCMFLOAT, 0, 0, FMOD_DSP_RESAMPLER_LINEAR );
 		}
 	}

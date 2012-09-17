@@ -9,8 +9,16 @@ enum zpShaderType {
 	ZP_SHADER_TYPE_COMPUTE =	0x08,
 };
 
-ZP_PURE_INTERFACE zpShaderResource : public zpResource {
+ZP_ABSTRACT_CLASS zpShaderResource : public zpResource {
+public:
+	virtual ~zpShaderResource();
 
+	zp_bool isShaderType( zpShaderType type ) const;
+
+protected:
+	zpShaderResource();
+
+	zpFlag8 m_type;
 };
 
 #endif

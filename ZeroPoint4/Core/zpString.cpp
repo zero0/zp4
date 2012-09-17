@@ -1,7 +1,4 @@
 #include "zpCore.h"
-#include <string.h>
-#include <stdarg.h>
-#include <stdio.h>
 
 #define IS_STRING_PACKED( s )	( (s)->m_length < ZP_STRING_MAX_SMALL_SIZE )
 #define NOT_STRING_PACKED( s )	( !IS_STRING_PACKED( s ) )
@@ -12,17 +9,17 @@ zpString::zpString() :
 	m_chars[ 0 ] = '\0';
 }
 zpString::zpString( const zp_char* string ) : 
-	m_length( string ? strlen( string ) : 0 ),
+	m_length( string ? zp_strlen( string ) : 0 ),
 	m_capacity( ZP_STRING_MAX_SMALL_SIZE )
 {
 	if( m_length > 0 ) {
 		if( IS_STRING_PACKED( this ) ) {
-			strcpy_s( m_chars, string );
+			zp_strcpy( m_chars, string );
 		} else {
 			while( m_capacity <= m_length ) m_capacity *= 2;
 
 			m_string = new zp_char[ m_capacity ];
-			strcpy_s( m_string, m_capacity * sizeof( zp_char ), string );
+			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string );
 		}
 	}
 	
@@ -33,15 +30,15 @@ zpString::zpString( const zp_char* string, zp_uint length, zp_uint offset ) :
 {
 	if( m_length > 0 ) {
 		if( IS_STRING_PACKED( this ) ) {
-			//strcpy_s( m_chars, string + offset );
-			memcpy_s( m_chars, sizeof( zp_char ) * ZP_STRING_MAX_SMALL_SIZE, string + offset, length );
+			//zp_strcpy( m_chars, string + offset );
+			zp_memcpy( m_chars, sizeof( zp_char ) * ZP_STRING_MAX_SMALL_SIZE, string + offset, length );
 			m_chars[ length ] = '\0';
 		} else {
 			while( m_capacity <= m_length ) m_capacity *= 2;
 
 			m_string = new zp_char[ m_capacity ];
-			//strcpy_s( m_string, m_capacity * sizeof( zp_char ), string + offset );
-			memcpy_s( m_string, m_capacity * sizeof( zp_char ), string + offset, m_length );
+			//zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string + offset );
+			zp_memcpy( m_string, m_capacity * sizeof( zp_char ), string + offset, m_length );
 			m_string[ m_length ] = '\0';
 		}
 	}
@@ -52,10 +49,10 @@ zpString::zpString( const zpString& string ) :
 {
 	if( m_length > 0 ) {
 		if( IS_STRING_PACKED( this ) ) {
-			strcpy_s( m_chars, string.m_chars );
+			zp_strcpy( m_chars, string.m_chars );
 		} else {
 			m_string = new zp_char[ m_capacity ];
-			strcpy_s( m_string, m_capacity * sizeof( zp_char ), string.m_string );
+			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.m_string );
 		}
 	}
 }
@@ -65,7 +62,7 @@ zpString::zpString( const zpString& string, zp_uint length, zp_uint offset ) :
 {
 	if( string.m_length > 0 ) {
 		if( IS_STRING_PACKED( &string ) ) {
-			strcpy_s( m_chars, string.m_chars + offset );
+			zp_strcpy( m_chars, string.m_chars + offset );
 			/*
 			if( IS_STRING_PACKED( this ) ) {
 				
@@ -74,19 +71,19 @@ zpString::zpString( const zpString& string, zp_uint length, zp_uint offset ) :
 				while( m_capacity < m_length ) m_capacity * 2;
 
 				m_string = new zp_char[ m_capacity ];
-				memcpy_s( m_string, m_capacity, string.m_chars + offset, m_length );
+				zp_memcpy( m_string, m_capacity, string.m_chars + offset, m_length );
 				m_string[ m_length ] = '\0';
 			}
 			*/
 		} else {
 			if( IS_STRING_PACKED( this ) ) {
-				strcpy_s( m_chars, string.m_string + offset );
+				zp_strcpy( m_chars, string.m_string + offset );
 			} else {
 				m_capacity = ZP_STRING_MAX_SMALL_SIZE;
-				while( m_capacity <= m_length ) m_capacity *= 2;
+				while( m_capacity < m_length ) m_capacity *= 2;
 
 				m_string = new zp_char[ m_capacity ];
-				strcpy_s( m_string, m_capacity * sizeof( zp_char ), string.m_string + offset );
+				zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.m_string + offset );
 			}
 		}
 	}
@@ -96,7 +93,7 @@ zpString::zpString( zpString&& string ) :
 	m_capacity( ZP_STRING_MAX_SMALL_SIZE )
 {
 	if( IS_STRING_PACKED( this ) ) {
-		strcpy_s( m_chars, string.m_chars );
+		zp_strcpy( m_chars, string.m_chars );
 	} else {
 		m_string = string.m_string;
 		m_capacity = string.m_capacity;
@@ -105,7 +102,7 @@ zpString::zpString( zpString&& string ) :
 }
 zpString::~zpString() {
 	if( IS_STRING_PACKED( this ) ) {
-		memset( m_chars, 0, ZP_STRING_MAX_SMALL_SIZE * sizeof( zp_char ) );
+		zp_memset( m_chars, 0, ZP_STRING_MAX_SMALL_SIZE * sizeof( zp_char ) );
 	} else {
 		ZP_SAFE_DELETE_ARRAY( m_string );
 	}
@@ -121,17 +118,17 @@ zpString& zpString::operator=( const zp_char* string ) {
 			ZP_SAFE_DELETE_ARRAY( m_string );
 		}
 
-		m_length = string ? strlen( string ) : 0;
+		m_length = string ? zp_strlen( string ) : 0;
 
 		if( m_length > 0 ) {
 			if( IS_STRING_PACKED( this ) ) {
-				strcpy_s( m_chars, string );
+				zp_strcpy( m_chars, string );
 			} else {
 				m_capacity = ZP_STRING_MAX_SMALL_SIZE;
 				while( m_capacity <= m_length ) m_capacity *= 2;
 
 				m_string = new zp_char[ m_capacity ];
-				strcpy_s( m_string, m_capacity, string );
+				zp_strcpy( m_string, m_capacity, string );
 			}
 		}
 	}
@@ -141,7 +138,7 @@ zpString& zpString::operator=( const zpString& string ) {
 	if( this != &string ) {
 		// delete old buffers
 		if( IS_STRING_PACKED( this ) ) {
-			memset( m_chars, 0, sizeof( zp_char ) * ZP_STRING_MAX_SMALL_SIZE );
+			zp_memset( m_chars, 0, sizeof( zp_char ) * ZP_STRING_MAX_SMALL_SIZE );
 		} else {
 			ZP_SAFE_DELETE_ARRAY( m_string );
 		}
@@ -150,11 +147,11 @@ zpString& zpString::operator=( const zpString& string ) {
 
 		if( m_length > 0 ) {
 			if( IS_STRING_PACKED( this ) ) {
-				strcpy_s( m_chars, string.m_chars );
+				zp_strcpy( m_chars, string.m_chars );
 			} else {
 				m_capacity = string.m_capacity;
 				m_string = new zp_char[ m_capacity ];
-				strcpy_s( m_string, m_capacity, string.m_string );
+				zp_strcpy( m_string, m_capacity, string.m_string );
 			}
 		}
 	}
@@ -164,7 +161,7 @@ zpString& zpString::operator=( zpString&& string ) {
 	if( this != &string ) {
 		// delete old buffers
 		if( IS_STRING_PACKED( this ) ) {
-			memset( m_chars, 0, sizeof( zp_char ) * ZP_STRING_MAX_SMALL_SIZE );
+			zp_memset( m_chars, 0, sizeof( zp_char ) * ZP_STRING_MAX_SMALL_SIZE );
 		} else {
 			ZP_SAFE_DELETE_ARRAY( m_string );
 		}
@@ -174,7 +171,7 @@ zpString& zpString::operator=( zpString&& string ) {
 
 		if( m_length > 0 ) {
 			if( IS_STRING_PACKED( this ) ) {
-				strcpy_s( m_chars, string.m_chars );
+				zp_strcpy( m_chars, string.m_chars );
 			} else {
 				m_string = string.m_string;
 				m_capacity = string.m_capacity;
@@ -454,29 +451,26 @@ zpString& zpString::toUpper() {
 
 zpString zpString::toCamelCase( zp_bool capitalFirstLetter ) const {
 	zpStringBuffer camel;
-	
+
 	if( m_length > 0 ) {
 		const zp_char* s = c_str();
-		zp_char c, n;
-		camel.append( capitalFirstLetter ? zp_to_upper( s[ 0 ] ) : s[ 0 ] );
-		for( zp_uint i = 1; i < m_length - 1; ++i ) {
+		zp_char c;
+		zp_bool shouldCapital = capitalFirstLetter;
+		
+		for( zp_uint i = 0; i < m_length; ++i ) {
 			c = s[ i ];
-			n = s[ i + 1 ];
-			if( n == '_' || n == ' ' ) {
-				c = zp_to_upper( c );
-				i++;
+			if( c == '_' || c == ' ' ) {
+				shouldCapital = true;
+				continue;
 			}
-			camel.append( c );
+
+			camel.append( shouldCapital ? zp_to_upper( c ) : zp_to_lower( c ) );
+			shouldCapital = false;
 		}
 	}
+	camel.append( '\0' );
 
 	return camel.toString();
-}
-zpString& zpString::toCamelCase( zp_bool capitalFirstLetter ) {
-	zpString camel( *this );
-	camel.toCamelCase( capitalFirstLetter );
-	(*this) = camel;
-	return (*this);
 }
 
 zp_int zpString::scan( const zp_char* format, ... ) const {
@@ -523,12 +517,12 @@ zpString& zpString::ltrim() {
 	if( diff != 0 ) {
 		zp_bool wasPacked = IS_STRING_PACKED( this );
 		zp_uint size = wasPacked ? ZP_STRING_MAX_SMALL_SIZE : m_capacity;
-		memmove_s( p, size, s, size - diff );
+		zp_memmove( p, size, s, size - diff );
 		
 		m_length -= diff;
 
 		if( !wasPacked && IS_STRING_PACKED( this ) ) {
-			strcpy_s( m_chars, p );
+			zp_strcpy( m_chars, p );
 			ZP_SAFE_DELETE_ARRAY( p );
 		}
 	}
@@ -549,7 +543,7 @@ zpString& zpString::rtrim() {
 		m_length -= m_length - diff;
 
 		if( !wasPacked && IS_STRING_PACKED( this ) ) {
-			strcpy_s( m_chars, p );
+			zp_strcpy( m_chars, p );
 			ZP_SAFE_DELETE_ARRAY( p );
 		}
 	}
@@ -572,7 +566,7 @@ void zpString::ensureCapacity( zp_uint size ) {
 		while( cap <= size ) cap *= 2;
 
 		zp_char* buff = new zp_char[ cap ];
-		memcpy_s( buff, size * sizeof( zp_char ), m_chars, m_length * sizeof( zp_char ) );
+		zp_memcpy( buff, size * sizeof( zp_char ), m_chars, m_length * sizeof( zp_char ) );
 		zp_zero_memory_array( m_chars );
 
 		m_string = buff;
@@ -582,43 +576,22 @@ void zpString::ensureCapacity( zp_uint size ) {
 
 		while( m_capacity <= size ) m_capacity *= 2;
 
-		zp_char* buff = new zp_char[ size ];
-		memcpy_s( buff, size * sizeof( zp_char ), m_string, m_length * sizeof( zp_char ) );
+		zp_char* buff = new zp_char[ m_capacity ];
+		zp_memcpy( buff, size * sizeof( zp_char ), m_string, m_length * sizeof( zp_char ) );
 		ZP_SAFE_DELETE_ARRAY( m_string );
 
 		m_string = buff;
 	}
-}
-/*
-zpString zpString::format( const zpString& format, ... ) {
-	zp_char buff[ 256 ];
-	va_list args;
-
-	va_start( args, format );
-	sprintf_s( buff, format.getChars(), args );
-	va_end( args );
-
-	return zpString( buff );
-}
-*/
-zpString zpString::__format( zp_char* buff, zp_uint size, const zpString& format, ... ) {
-	va_list args;
-
-	va_start( args, format );
-	sprintf_s( buff, size, format.getChars(), args );
-	va_end( args );
-
-	return zpString( buff );
 }
 
 zp_bool operator==( const zpString& string1, const zpString& string2 ) {
 	return string1.equals( string2 );
 }
 zp_bool operator==( const zpString& string1, const zp_char* string2 ) {
-	return strcmp( string1.c_str(), string2 ) == 0;
+	return zp_strcmp( string1.c_str(), string2 ) == 0;
 }
 zp_bool operator==( const zp_char* string1, const zpString& string2 ) {
-	return strcmp( string1, string2.c_str() ) == 0;
+	return zp_strcmp( string1, string2.c_str() ) == 0;
 }
 
 zp_bool operator!=( const zpString& string1, const zpString& string2 ) {

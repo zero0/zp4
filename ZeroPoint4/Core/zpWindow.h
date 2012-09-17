@@ -68,8 +68,8 @@ public:
 	void deserialize( zpSerializedInput* in );
 
 private:
-	typedef zpLinkedList<zpWindowFocusListener*> zpWindowFocusListenerList;
-	typedef zpLinkedList<zpWindowProcListener*> zpWindowProcListenerList;
+	typedef zpArrayList<zpWindowFocusListener*> zpWindowFocusListenerList;
+	typedef zpArrayList<zpWindowProcListener*> zpWindowProcListenerList;
 
 	void moveResize();
 	void resizeWindow();

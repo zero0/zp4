@@ -1,12 +1,13 @@
 #include "zpCore.h"
 #include <typeinfo>
 
-zpGame::zpGame() :
-	m_currentWorld( ZP_NULL ),
-	m_nextWorld( ZP_NULL ),
-	m_renderable( ZP_NULL ),
-	m_window( ZP_NULL ),
-	m_asynchCreateNextWorld( false )
+zpGame::zpGame()
+	: m_timer( zpTime::getInstance() )
+	,m_currentWorld( ZP_NULL )
+	, m_nextWorld( ZP_NULL )
+	, m_renderable( ZP_NULL )
+	, m_window( ZP_NULL )
+	, m_asynchCreateNextWorld( false )
 {}
 zpGame::~zpGame() {}
 
@@ -80,7 +81,7 @@ zpRenderable* zpGame::getRenderable() const {
 }
 
 void zpGame::process() {
-	zpTime::getInstance()->tick();
+	m_timer->tick();
 
 	m_managers.foreach( []( zpGameManager* manager ) {
 		manager->update();
@@ -91,12 +92,12 @@ void zpGame::process() {
 	if( m_renderable ) m_renderable->render();
 	
 	if( m_nextWorld ) {
-		if( m_currentWorld ) m_currentWorld->receiveMessage( 0/* leave */ );
-		if( m_nextWorld ) m_nextWorld->receiveMessage( 0/* enter */ );
+		if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::LEAVE_WORLD );
+		if( m_nextWorld ) m_nextWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
 
 		m_currentWorld = m_nextWorld;
 
-		if( m_currentWorld ) m_currentWorld->receiveMessage( 0/* enter */ );
+		if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
 
 		m_nextWorld = ZP_NULL;
 		m_asynchCreateNextWorld = false;

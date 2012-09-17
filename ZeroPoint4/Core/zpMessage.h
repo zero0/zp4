@@ -16,7 +16,7 @@ class zpMessageDataCache;
 
 struct zpMessageTypes {
 	enum Types {
-#include "zpMessageTypes.inl"
+#include "zpMessageTypes.inc"
 	};
 };
 

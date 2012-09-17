@@ -3,6 +3,7 @@
 #include "Content\zpContent.h"
 #include "Scripting\zpScripting.h"
 #include "Audio\zpAudio.h"
+#include "Input\zpInput.h"
 
 #include <stdio.h>
 
@@ -249,7 +250,7 @@ struct TestRenderable : public zpRenderable {
 		time = 0;
 
 		engine->getImmediateRenderingContext()->bindRenderTargetAndDepthBuffer();
-		engine->setVSyncEnabled( false );
+		engine->setVSyncEnabled( true );
 
 		zpSamplerStateDesc samplerDesc;
 		state = engine->createSamplerState( samplerDesc );
@@ -300,28 +301,34 @@ struct TestRenderable : public zpRenderable {
 
 		i->bindBuffer( cameraBuffer, 0 );
 
-		i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
+		if( sr->isLoaded() ) {
+			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 		
-		i->bindBuffer( buff );
-		i->bindShader( sr );
-		i->draw( 4 );
+			i->bindBuffer( buff );
+			i->bindShader( sr );
+			i->draw( 4 );
 		
-		i->setTopology( ZP_TOPOLOGY_LINE_LIST );
-		i->bindBuffer( origBuff );
-		i->draw( 6 );
 
-		i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
+			i->setTopology( ZP_TOPOLOGY_LINE_LIST );
+			i->bindBuffer( origBuff );
+			i->draw( 6 );
+		}
 
-		i->bindBuffer( buff2 );
-		i->bindShader( srtex );
-		i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
-		i->draw( 4 );
+		
+		if( srtex->isLoaded() ) {
+			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 
-		i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
+			i->bindBuffer( buff2 );
+			i->bindShader( srtex );
+			i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
+			i->draw( 4 );
+
+			i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
 		
-		i->bindBuffer( mesh->getVertexBuffer() );
-		i->draw( mesh->getNumVertices() );
-		
+			i->bindBuffer( mesh->getVertexBuffer() );
+			i->draw( mesh->getNumVertices() );
+		}
+
 		engine->present();
 		zp_long end = zpTime::getInstance()->getTime();
 
@@ -378,6 +385,8 @@ void rendering_test_main() {
 	cm.registerFileExtension( "png", &rrc );
 	cm.registerFileExtension( "obj", &rrc );
 
+	zpInputManager im;
+
 	zpRenderingManager rm;
 #if TEST_RENDERING == TEST_DX
 	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_DX );
@@ -387,6 +396,7 @@ void rendering_test_main() {
 
 	game.addGameManager( &rm );
 	game.addGameManager( &cm );
+	game.addGameManager( &im );
 
 	game.create();
 
@@ -399,6 +409,25 @@ void rendering_test_main() {
 	//zpLog::getInstance()->disableLogLevel( ZP_LOG_LEVEL_DEBUG );
 	//zpLogOutput& d = zpLog::debug();
 	//zpLog::debug() << "hello" << zpLogOptions::endl << zpLogOptions::red << "debug log" << zpLogOptions::reset << " Log";
+
+	struct KeyboardListener : public zpKeyboardListener {
+		zpContentManager* content;
+
+		void onKeyDown( zpKeyCode key ) { zp_printfln( "Key Down %d", key ); };
+		void onKeyRepeat( zpKeyCode key ) { zp_printfln( "Key Repeat %d", key ); };
+		void onKeyUp( zpKeyCode key ) { if( key == ZP_KEY_CODE_R ) { content->reloadAllResources(); } zp_printfln( "Key Up %d", key ); };
+	};
+	struct MouseListener : public zpMouseListener {
+		void onMouseMove( const zpVector2i& loc ) { zp_printfln( "Mouse Move %d %d", loc.getX(), loc.getY() ); };
+		void onMouseChange( const zpVector2i& loc ) { zp_printfln( "Mouse Change %d %d", loc.getX(), loc.getY() ); };
+		void onMouseButtonUp( zpMouseButton button ) { zp_printfln( "Mouse Up %d", button ); };
+	};
+
+	KeyboardListener kl;
+	kl.content = &cm;
+
+	im.getKeyboard()->addListener( &kl );
+	im.getMouse()->addListener( new MouseListener );
 
 	TestRenderable tr;
 	tr.start( &cm );
@@ -481,11 +510,10 @@ int main() {
 	//printNode( node, 0 );
 
 	return 0;
-
+	
 	//zpDelegate<int ()> dd = zpCreateFunctionDelegate( fffff );
 	
 	//int ab = dd();
-
 	zpVector2f vec2;
 	zpVector4f vec4;
 	zpVector2i vec2i;

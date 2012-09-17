@@ -26,7 +26,7 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 		m_resources[ alias ] = resource;
 		m_fileToAlias[ filename ] = alias;
 
-		return resource->load();
+		//return resource->load();
 		m_resourcesToLoad.pushBack( resource );
 		return true;
 	}
@@ -46,6 +46,7 @@ zp_bool zpContentManager::unloadResource( const zpString& alias ) {
 	zpResource* resource;
 	if( m_resources.find( alias, &resource ) ) {
 		resource->unload();
+		resource->setIsLoaded( false );
 		return true;
 	}
 	ZP_ON_DEBUG_MSG( "Unable to unload resource, alias not found '%s'", alias.c_str() );
@@ -61,6 +62,7 @@ zp_uint zpContentManager::unloadResources( const zpArrayList<zpString>& aliases 
 void zpContentManager::unloadAllResources() {
 	m_resources.foreach( []( const zpString& alias, zpResource* resource ){
 		resource->unload();
+		resource->setIsLoaded( false );
 	} );
 }
 
@@ -68,7 +70,10 @@ zp_bool zpContentManager::reloadResource( const zpString& alias ) {
 	zpResource* resource;
 	if( m_resources.find( alias, &resource ) ) {
 		resource->unload();
-		return resource->load();
+		resource->setIsLoaded( false );
+		//return resource->load();
+		m_resourcesToLoad.pushBack( resource );
+		return true;
 	}
 	ZP_ON_DEBUG_MSG( "Unable to reload resource, alias not found '%s'", alias.c_str() );
 	return false;
@@ -81,9 +86,11 @@ zp_uint zpContentManager::reloadResources( const zpArrayList<zpString>& aliases 
 	return count;
 }
 void zpContentManager::reloadAllResources() {
-	m_resources.foreach( []( const zpString& alias, zpResource* resource ){
+	m_resources.foreach( [ this ]( const zpString& alias, zpResource* resource ){
 		resource->unload();
-		resource->load();
+		resource->setIsLoaded( false );
+		//resource->load();
+		m_resourcesToLoad.pushBack( resource );
 	} );
 }
 
@@ -116,7 +123,10 @@ void zpContentManager::onDestroy() {}
 
 void zpContentManager::onUpdate() {
 	if( !m_resourcesToLoad.isEmpty() ) {
-		m_resourcesToLoad.back()->load();
+		zpResource* r = m_resourcesToLoad.back();
+		zp_bool loaded = r->load();
+		r->setIsLoaded( loaded );
+
 		m_resourcesToLoad.popBack();
 	}
 }

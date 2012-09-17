@@ -38,7 +38,7 @@
 #define ZP_FASTCALL		__fastcall
 
 #define ZP_INLINE		inline
-#define ZP_FORCE_INLINE	inline
+#define ZP_FORCE_INLINE	__forceinline
 #define ZP_NO_VTABLE	__declspec( novtable )
 #define ZP_ALIGN(x)		__declspec( align( x ) )
 #define ZP_ALIGN16		ZP_ALIGN( 16 )
@@ -50,21 +50,59 @@
 #define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
 #define ZP_SAFE_RELEASE( r )		{ if( (r) ) { (r)->Release(); (r) = ZP_NULL; } }
 #define ZP_SAFE_REMOVE_REF( r )		{ if( (r) ) { (r)->removeReference(); (r) = ZP_NULL; } }
-#define ZP_SAFE_FREE( p )			{ if( (p) ) { free( (p) ); (p) = ZP_NULL; } }
+#define ZP_SAFE_FREE( p )			{ if( (p) ) { zp_free( (p) ); (p) = ZP_NULL; } }
 
 #define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
 
 #define ZP_USE_COLOR_CONSOLE	1
 #define ZP_USE_FAST_MATH		0
+#define ZP_USE_SAFE_FUNCTIONS	1
 
 #include "zpBaseTypes.h"
 
 void zp_printf( const zp_char* text, ... );
 void zp_printfln( const zp_char* text, ... );
 
+void* zp_malloc( zp_uint size );
+void* zp_calloc( zp_uint num, zp_uint size );
+void* zp_realloc( void* ptr, zp_uint size );
+void zp_free( void* ptr );
+
+void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size );
+void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size );
+void* zp_memset( void* dest, zp_int value, zp_uint size );
+
+template<zp_uint Size>
+zp_char* zp_strcpy( zp_char (&destString)[Size], const zp_char* srcString ) { return zp_strcpy( destString, Size, srcString ); }
+zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* srcString );
+zp_uint zp_strlen( const zp_char* srcString );
+zp_int zp_strcmp( const zp_char* str1, const zp_char* str2 );
+zp_char* zp_strstr( zp_char* str, const zp_char* subStr );
+const zp_char* zp_strstr(  const zp_char* str, const zp_char* subStr );
+
+zp_int zp_atoi( const zp_char* str );
+zp_float zp_atof( const zp_char* str );
+
+zp_int zp_rand();
+zp_float zp_randf();
+void zp_srand( zp_uint seed );
+
 zp_char zp_to_lower( zp_char ch );
 zp_char zp_to_upper( zp_char ch );
+
+zp_bool zp_is_ctrl( zp_char ch );
 zp_bool zp_is_whitespace( zp_char ch );
+zp_bool zp_is_upper( zp_char ch );
+zp_bool zp_is_lower( zp_char ch );
+zp_bool zp_is_alpha( zp_char ch );
+zp_bool zp_is_digit( zp_char ch );
+zp_bool zp_is_xdigit( zp_char ch );
+zp_bool zp_is_alpha_numeric( zp_char ch );
+zp_bool zp_is_punctuation( zp_char ch );
+zp_bool zp_is_graphic( zp_char ch );
+zp_bool zp_is_print( zp_char ch );
+
+zp_uint zp_near_pow2( zp_uint number );
 
 class zpLog;
 class zpLogOutput;
@@ -162,11 +200,11 @@ ZP_FORCE_INLINE T& zp_as( A& a ) {
 }
 template<typename T>
 void zp_zero_memory( T* ptr ) {
-	memset( ptr, 0, sizeof( T ) );
+	zp_memset( ptr, 0, sizeof( T ) );
 }
 template<typename T, zp_uint Size>
 void zp_zero_memory_array( T (&arr)[Size] ) {
-	memset( arr, 0, Size * sizeof( T ) );
+	zp_memset( arr, 0, Size * sizeof( T ) );
 }
 
 template<typename T>
@@ -220,6 +258,5 @@ void zp_qsort( T* arr, zp_uint count ) {
 	zp_qsort( arr, 0, count - 1 );
 }
 
-zp_uint zp_near_pow2( zp_uint number );
 
 #endif

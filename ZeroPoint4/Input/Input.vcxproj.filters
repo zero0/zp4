@@ -27,6 +27,9 @@
     <ClInclude Include="zpController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpMouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpInput.cpp">
@@ -36,6 +39,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpKeyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpMouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

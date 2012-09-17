@@ -12,14 +12,17 @@ public:
 
 	zpContentManager* getContentManager() const;
 	const zpString& getFilename() const;
+	zp_bool isLoaded() const;
 
 private:
+	void setIsLoaded( zp_bool loaded );
 	void setContentManager( zpContentManager* manager );
 	void setFilename( const zpString& filename );
 
+	zp_bool m_isLoaded;
 	zpContentManager* m_manager;
 	zpString m_filename;
-
+	
 	friend class zpContentManager;
 };
 

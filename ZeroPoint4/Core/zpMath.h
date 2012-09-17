@@ -2,7 +2,7 @@
 #ifndef ZP_MATH_H
 #define ZP_MATH_H
 
-#define ZP_EPSILON	0.0001f
+#define ZP_EPSILON	1e-5f
 #define ZP_PI		3.1415926f
 #define ZP_1OVERPI	( 1.0f / ZP_PI )
 #define ZP_2PI		( 2.0f * ZP_PI )
@@ -16,10 +16,14 @@
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
 
 template<typename T>
-ZP_FORCE_INLINE T zp_clamp01( T& val ) { return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val; }
+ZP_FORCE_INLINE T zp_clamp01( T& val ) {
+	return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val;
+}
 
 template<typename T>
-ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high ) { return val > high ? high : val < low ? low : val; }
+ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high ) {
+	return val > high ? high : val < low ? low : val;
+}
 
 zp_float zp_cos( zp_float v );
 zp_float zp_sin( zp_float v );
@@ -30,7 +34,7 @@ zp_float zp_pow( zp_float b, zp_float p );
 zp_float zp_sqrt( zp_float v );
 
 template<typename T>
-T zp_abs( T& value ) {
+ZP_FORCE_INLINE T zp_abs( T& value ) {
 	return value > (T)0 ? value : -value;
 }
 

@@ -75,6 +75,7 @@
     <ClInclude Include="zpInput.h" />
     <ClInclude Include="zpInputManager.h" />
     <ClInclude Include="zpKeyboard.h" />
+    <ClInclude Include="zpMouse.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpController.cpp" />
@@ -83,6 +84,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpInputManager.cpp" />
+    <ClCompile Include="zpKeyboard.cpp" />
+    <ClCompile Include="zpMouse.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

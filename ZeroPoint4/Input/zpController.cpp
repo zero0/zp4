@@ -16,7 +16,26 @@
 #define FIRE_CONTROLLER_EVENT_TO_LISTENERS( e )	\
 	m_listeners.foreach( []( zpControllerListener* listener ) {	listener->e(); } )
 
-zpController::zpController( zpControllerNumber number ) {}
+zpController::zpController( zpControllerNumber number )
+	: m_controller( number )
+	, m_leftThumbDeadZone( XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE )
+	, m_rightThumbDeadZone( XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
+	, m_isConnected( false )
+	, m_buttons( 0 )
+	, m_leftTrigger( 0 )
+	, m_rightTrigger( 0 )
+	, m_leftTriggerThreshold( XINPUT_GAMEPAD_TRIGGER_THRESHOLD )
+	, m_rightTriggerThreshold( XINPUT_GAMEPAD_TRIGGER_THRESHOLD )
+	, m_isRumbleEnabled( false )
+	, m_leftRumbleTime( 0 )
+	, m_leftRumbleTimer( 0 )
+	, m_leftRumbleAmount( 0 )
+	, m_maxLeftRumbleAmount( 0 )
+	, m_rightRumbleTime( 0 )
+	, m_rightRumbleTimer( 0 )
+	, m_rightRumbleAmount( 0 )
+	, m_maxRightRumbleAmount( 0 )
+{}
 zpController::~zpController() {
 	destroy();
 }
@@ -81,7 +100,7 @@ void zpController::poll() {
 		zp_ushort currentButtons = state.Gamepad.wButtons;
 		zp_ushort previousButtons = m_buttons;///*m_state.Gamepad.wButtons*/m_buttons;
 
-		static const zpControllerButton buttons[] = {
+		const zpControllerButton buttons[] = {
 			ZP_CONTROLLER_BUTTON_A,
 			ZP_CONTROLLER_BUTTON_B,
 			ZP_CONTROLLER_BUTTON_X,
@@ -355,7 +374,7 @@ zpControllerBatterType zpController::getBatteryType() const {
 }
 
 void zpController::setVibrationEnabled( zp_bool enabled ) {
-	bool wasEnabled = m_isRumbleEnabled;
+	zp_bool wasEnabled = m_isRumbleEnabled;
 	m_isRumbleEnabled = enabled;
 	if( wasEnabled ) stopVibrate();
 }

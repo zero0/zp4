@@ -4,10 +4,12 @@
 
 #include "Core\zpCore.h"
 
-class zpInputManager;
+class zpMouse;
 class zpKeyboard;
 class zpController;
+class zpInputManager;
 
+#include "zpMouse.h"
 #include "zpKeyboard.h"
 #include "zpController.h"
 #include "zpInputManager.h"

@@ -1,6 +1,4 @@
 #include "zpCore.h"
-#include <malloc.h>
-#include <string.h>
 #include <stdio.h>
 
 #define ZP_STRING_BUFFER_DEFAULT_SIZE	16
@@ -8,10 +6,10 @@
 zpStringBuffer::zpStringBuffer() : m_buffer( (zp_char*)calloc( ZP_STRING_BUFFER_DEFAULT_SIZE, sizeof( zp_char ) ) ), m_length( 0 ), m_capacity( ZP_STRING_BUFFER_DEFAULT_SIZE ) {}
 zpStringBuffer::zpStringBuffer( const zpString& str ) : m_buffer( ZP_NULL ), m_length( str.length() ), m_capacity( 1 ) {
 	ensureCapacity( str.capacity() + 1 );
-	memcpy_s( m_buffer, m_capacity * sizeof( zp_char ), str.getChars(), str.capacity() * sizeof( zp_char ) );
+	zp_memcpy( m_buffer, m_capacity * sizeof( zp_char ), str.getChars(), str.capacity() * sizeof( zp_char ) );
 }
 zpStringBuffer::zpStringBuffer( const zpStringBuffer& buff ) : m_buffer( (zp_char*)calloc( buff.m_capacity, sizeof( zp_char ) ) ), m_length( buff.m_length ), m_capacity( buff.m_capacity ) {
-	memcpy_s( m_buffer, m_capacity * sizeof( zp_char ), buff.m_buffer, buff.m_capacity * sizeof( zp_char ) );
+	zp_memcpy( m_buffer, m_capacity * sizeof( zp_char ), buff.m_buffer, buff.m_capacity * sizeof( zp_char ) );
 }
 zpStringBuffer::zpStringBuffer( zpStringBuffer&& buff ) : m_buffer( buff.m_buffer ), m_length( buff.m_length ), m_capacity( buff.m_capacity ) {
 	buff.m_buffer = ZP_NULL;
@@ -24,7 +22,7 @@ void zpStringBuffer::operator=( const zpStringBuffer& buff ) {
 	ZP_SAFE_DELETE( m_buffer );
 
 	m_buffer = (zp_char*)calloc( buff.m_capacity, sizeof( zp_char ) );
-	memcpy_s( m_buffer, m_capacity * sizeof( zp_char ), buff.m_buffer, buff.m_capacity * sizeof( zp_char ) );
+	zp_memcpy( m_buffer, m_capacity * sizeof( zp_char ), buff.m_buffer, buff.m_capacity * sizeof( zp_char ) );
 
 	m_capacity = buff.m_capacity;
 	m_length = buff.m_length;
@@ -125,7 +123,7 @@ void zpStringBuffer::append( const zp_char* value, zp_uint length ) {
 	if( !value ) return;
 
 	if( length == npos ) {
-		length = strlen( value );
+		length = zp_strlen( value );
 	}
 	if( length == 0 ) {
 		return;
@@ -148,7 +146,7 @@ void zpStringBuffer::append( const zp_char* value, zp_uint length ) {
 	zp_uint newLength = m_length + length;
 	ensureCapacity( newLength + 1 );
 
-	memcpy_s( m_buffer + m_length, ( m_capacity - m_length ) * sizeof( zp_char ), value, length * sizeof( zp_char ) );
+	zp_memcpy( m_buffer + m_length, ( m_capacity - m_length ) * sizeof( zp_char ), value, length * sizeof( zp_char ) );
 	
 	m_length = newLength;
 	m_buffer[ m_length ] = '\0';
@@ -288,5 +286,5 @@ void zpStringBuffer::ensureCapacity( zp_uint size ) {
 
 	while( m_capacity < size ) m_capacity *= 2;
 
-	m_buffer = (zp_char*)realloc( m_buffer, m_capacity * sizeof( zp_char ) );
+	m_buffer = (zp_char*)zp_realloc( m_buffer, m_capacity * sizeof( zp_char ) );
 }
