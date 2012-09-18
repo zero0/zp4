@@ -66,7 +66,8 @@ zp_uint zpAudioManager::getNumListeners() const {
 	return m_numListeners;
 }
 
-void zpAudioManager::play( zpAudioInstance* soundInstance ) {
+//void zpAudioManager::play( zpAudioInstance* soundInstance ) {
+void zpAudioManager::play( zpResourceInstance<zpAudioResource>* soundInstance ) {
 	if( !soundInstance ) return;
 	FMOD_RESULT r;
 

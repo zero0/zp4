@@ -33,9 +33,9 @@ public:
 //#endif
 	}
 
-	template<typename I, typename R>
-	I* createInstanceOfResource( const zpString& alias ) const {
-		return new I( getResourceOfType<R>( alias ) );
+	template<typename R>
+	zpResourceInstance<R> createInstanceOfResource( const zpString& alias ) const {
+		return zpResourceInstance<R>( getResourceOfType<R>( alias ) );
 	}
 
 	void receiveMessage( const zpMessage& message );

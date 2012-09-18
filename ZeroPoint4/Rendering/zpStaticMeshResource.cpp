@@ -1,32 +1,31 @@
 #include "zpRendering.h"
 
-zpStaticMeshResource::zpStaticMeshResource() :
-	m_numVertices( 0 ),
-	m_vertexBuffer( ZP_NULL ),
-	m_indexBuffer( ZP_NULL )
+zpStaticMeshPart::zpStaticMeshPart()
+	: topology( ZP_TOPOLOGY_TRIANGLE_LIST )
+	, numVertices( 0 )
+	, vertexBuffer( ZP_NULL )
+	, indexBuffer( ZP_NULL )
+{}
+zpStaticMeshPart::~zpStaticMeshPart() {
+	if( vertexBuffer ) vertexBuffer->destroy();
+	if( indexBuffer ) indexBuffer->destroy();
+}
+
+zpStaticMeshResource::zpStaticMeshResource()
+	: m_meshParts( 1 )
 {}
 zpStaticMeshResource::~zpStaticMeshResource() {
 	unload();
 }
 
-zpBuffer* zpStaticMeshResource::getVertexBuffer() const {
-	return m_vertexBuffer;
-}
-zpBuffer* zpStaticMeshResource::getIndexBuffer() const {
-	return m_indexBuffer;
+const zpStaticMeshPart& zpStaticMeshResource::getMeshPart( zp_uint index ) const {
+	return m_meshParts[ index ];
 }
 
-zp_uint zpStaticMeshResource::getNumVertices() const {
-	return m_numVertices;
+zp_uint zpStaticMeshResource::getNumMeshParts() const {
+	return m_meshParts.size();
 }
 
 void zpStaticMeshResource::unload() {
-	if( m_vertexBuffer ) {
-		m_vertexBuffer->destroy();
-		m_vertexBuffer = ZP_NULL;
-	}
-	if( m_indexBuffer ) {
-		m_indexBuffer->destroy();
-		m_indexBuffer = ZP_NULL;
-	}
+	m_meshParts.clear();
 }

@@ -29,7 +29,11 @@ void zpGame::addWorld( zpWorld* world, zp_bool andCreate ) {
 		world->setGame( this );
 		if( andCreate ) world->create();
 	}
-	if( !m_currentWorld ) m_nextWorld = world;
+	if( m_currentWorld != ZP_NULL ) {
+		m_nextWorld = world;
+	} else {
+		m_currentWorld = world;
+	}
 }
 void zpGame::removeWorld( zpWorld* world ) {
 	if( world ) {

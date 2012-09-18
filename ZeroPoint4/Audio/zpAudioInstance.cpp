@@ -7,7 +7,7 @@ FMOD_RESULT F_CALLBACK __fmodChannelCallback( FMOD_CHANNEL *channel, FMOD_CHANNE
 
 	switch( type ) {
 	case FMOD_CHANNEL_CALLBACKTYPE_END:
-		zpAudioInstance* sound = ZP_NULL;
+		zpResourceInstance<zpAudioResource>* sound = ZP_NULL;
 		chan->getUserData( (void**)&sound );
 		if( sound ) {
 			sound->setChannel( ZP_NULL );
@@ -18,21 +18,56 @@ FMOD_RESULT F_CALLBACK __fmodChannelCallback( FMOD_CHANNEL *channel, FMOD_CHANNE
 	return FMOD_OK;
 }
 
-zpAudioInstance::zpAudioInstance() :
-	m_resource( ZP_NULL )
+zpResourceInstance<zpAudioResource>::zpResourceInstance() 
+	: m_resource( ZP_NULL )
+	, m_channel( ZP_NULL )
+	, m_minDistance( 1.f )
+	, m_maxDistance( 10.f )
 {}
-zpAudioInstance::zpAudioInstance( zpAudioResource* resource ) :
-	m_resource( resource )
+zpResourceInstance<zpAudioResource>::zpResourceInstance( zpAudioResource* resource )
+	: m_resource( resource )
+	, m_channel( ZP_NULL )
+	, m_minDistance( 1.f )
+	, m_maxDistance( 10.f )
 {}
-zpAudioInstance::~zpAudioInstance() {
+zpResourceInstance<zpAudioResource>::~zpResourceInstance() {
 	m_resource = ZP_NULL;
+	m_channel = ZP_NULL;
 }
 
-zpAudioResource* zpAudioInstance::getAudioResource() const {
+void zpResourceInstance<zpAudioResource>::operator=( const zpResourceInstance<zpAudioResource>& instance ) {
+	m_resource = instance.m_resource;
+	m_channel = instance.m_channel;
+	m_minDistance = instance.m_minDistance;
+	m_maxDistance = instance.m_maxDistance;
+
+	m_position = instance.m_position;
+	m_velocity = instance.m_velocity;
+	m_coneOrientation = instance.m_coneOrientation;
+}
+void zpResourceInstance<zpAudioResource>::operator=( zpResourceInstance<zpAudioResource>&& instance ) {
+	m_resource = instance.m_resource;
+	m_channel = instance.m_channel;
+	m_minDistance = instance.m_minDistance;
+	m_maxDistance = instance.m_maxDistance;
+
+	m_position = instance.m_position;
+	m_velocity = instance.m_velocity;
+	m_coneOrientation = instance.m_coneOrientation;
+
+	instance.m_resource = ZP_NULL;
+	instance.m_channel = ZP_NULL;
+}
+
+zpResourceInstance<zpAudioResource>::operator zp_bool() const {
+	return m_resource && m_resource->isLoaded();
+}
+
+zpAudioResource* zpResourceInstance<zpAudioResource>::getAudioResource() const {
 	return m_resource;
 }
 
-zp_bool zpAudioInstance::isPlaying() const {
+zp_bool zpResourceInstance<zpAudioResource>::isPlaying() const {
 	if( m_channel ) {
 		zp_bool playing = false;
 		( (FMOD::Channel*)m_channel )->isPlaying( &playing );
@@ -41,65 +76,65 @@ zp_bool zpAudioInstance::isPlaying() const {
 	return false;
 }
 
-void zpAudioInstance::setPosition( const zpVector4f& position ) {
+void zpResourceInstance<zpAudioResource>::setPosition( const zpVector4f& position ) {
 	m_position = position;
 }
-const zpVector4f& zpAudioInstance::getPosition() const {
+const zpVector4f& zpResourceInstance<zpAudioResource>::getPosition() const {
 	return m_position;
 }
 
-void zpAudioInstance::setVelocity( const zpVector4f& velocity ) {
+void zpResourceInstance<zpAudioResource>::setVelocity( const zpVector4f& velocity ) {
 	m_velocity = velocity;
 }
-const zpVector4f& zpAudioInstance::getVelocity() const {
+const zpVector4f& zpResourceInstance<zpAudioResource>::getVelocity() const {
 	return m_velocity;
 }
 
-void zpAudioInstance::setConeOrientation( const zpVector4f& orientation ) {
+void zpResourceInstance<zpAudioResource>::setConeOrientation( const zpVector4f& orientation ) {
 	m_coneOrientation = orientation;
 }
-const zpVector4f& zpAudioInstance::getConeOrientation() const {
+const zpVector4f& zpResourceInstance<zpAudioResource>::getConeOrientation() const {
 	return m_coneOrientation;
 }
 
-void zpAudioInstance::setVolume( zp_float volume ) {
+void zpResourceInstance<zpAudioResource>::setVolume( zp_float volume ) {
 	if( m_channel ) ( (FMOD::Channel*)m_channel )->setVolume( volume );
 }
-zp_float zpAudioInstance::getVolume() const {
+zp_float zpResourceInstance<zpAudioResource>::getVolume() const {
 	zp_float volume = -1.f;
 	if( m_channel ) ( (FMOD::Channel*)m_channel )->getVolume( &volume );
 	return volume;
 }
 
-void zpAudioInstance::setMinMaxDistance( zp_float minDistance, zp_float maxDistance ) {
+void zpResourceInstance<zpAudioResource>::setMinMaxDistance( zp_float minDistance, zp_float maxDistance ) {
 	m_minDistance = minDistance;
 	m_maxDistance = maxDistance;
 }
-zp_float zpAudioInstance::getMinDistance() const {
+zp_float zpResourceInstance<zpAudioResource>::getMinDistance() const {
 	return m_minDistance;
 }
-zp_float zpAudioInstance::getMaxDistance() const {
+zp_float zpResourceInstance<zpAudioResource>::getMaxDistance() const {
 	return m_maxDistance;
 }
-	
-void zpAudioInstance::update() {
+
+void zpResourceInstance<zpAudioResource>::update() {
 	if( m_channel && m_resource && m_resource->is3DSound() ) {
 		FMOD::Channel* channel = (FMOD::Channel*)m_channel;
-		
+
 		zp_float pos[ 3 ];
 		zp_float vel[ 3 ];
 		m_position.store3( pos );
 		m_velocity.store3( vel );
-		
+
 		channel->set3DAttributes( (const FMOD_VECTOR*)pos, (const FMOD_VECTOR*)vel );
 		channel->set3DMinMaxDistance( m_minDistance, m_maxDistance );
 	}
 }
-void zpAudioInstance::stop() {
+void zpResourceInstance<zpAudioResource>::stop() {
 	if( m_channel && isPlaying() ) ( (FMOD::Channel*)m_channel )->stop();
 }
 
-void zpAudioInstance::setChannel( void* channel ) {
+void zpResourceInstance<zpAudioResource>::setChannel( void* channel ) {
 	m_channel = channel;
 	if( m_channel ) {
 		FMOD::Channel* channel = (FMOD::Channel*)m_channel;

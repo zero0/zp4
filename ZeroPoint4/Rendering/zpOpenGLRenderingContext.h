@@ -26,16 +26,16 @@ public:
 	void bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
 	void unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
 
-	void bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture );
-	void unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture );
+	void bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpResourceInstance<zpTextureResource>* texture );
+	void unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpResourceInstance<zpTextureResource>* texture );
 
 	void setVertexLayout( zpVertexLayout* layout );
 
 	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );
 	void unmap( zpBuffer* buffer, zp_uint subResource );
 
-	void bindShader( zpShaderResource* shader );
-	void unbindShader( zpShaderResource* shader );
+	void bindShader( zpResourceInstance<zpShaderResource>* shader );
+	void unbindShader( zpResourceInstance<zpShaderResource>* shader );
 
 	void setTopology( zpTopology topology );
 

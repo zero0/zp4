@@ -48,11 +48,14 @@ zp_bool zpDX11TextureResource::load() {
 }
 void zpDX11TextureResource::unload() {
 	// release texture so it can be recreated (if need be)
-	ID3D11Resource* texture = m_texture.getTexture();
-	ID3D11ShaderResourceView* view = m_texture.getResourceView();
-
-	ZP_SAFE_RELEASE( texture );
-	ZP_SAFE_RELEASE( view );
+	if( m_texture.m_texture ) {
+		m_texture.m_texture->Release();
+		m_texture.m_texture = ZP_NULL;
+	}
+	if( m_texture.m_textureResourceView ) {
+		m_texture.m_textureResourceView->Release();
+		m_texture.m_textureResourceView = ZP_NULL;
+	}
 
 	m_texture.m_height = 0;
 	m_texture.m_width = 0;

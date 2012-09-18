@@ -5,6 +5,7 @@
 #include "Core\zpCore.h"
 
 class zpContentManager;
+template<typename R> class zpResourceInstance;
 ZP_ABSTRACT_CLASS zpResource;
 ZP_ABSTRACT_CLASS zpResourceCreator;
 class zpPrefabs;

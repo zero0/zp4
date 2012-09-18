@@ -2,10 +2,17 @@
 #ifndef ZP_AUDIO_INSTANCE_H
 #define ZP_AUDIO_INSTANCE_H
 
-class zpAudioInstance {
+template<>
+class zpResourceInstance<zpAudioResource> {
 public:
-	zpAudioInstance( zpAudioResource* resource );
-	~zpAudioInstance();
+	zpResourceInstance();
+	zpResourceInstance( zpAudioResource* resource );
+	~zpResourceInstance();
+
+	void operator=( const zpResourceInstance<zpAudioResource>& instance );
+	void operator=( zpResourceInstance<zpAudioResource>&& instance );
+
+	operator zp_bool() const;
 
 	zpAudioResource* getAudioResource() const;
 
@@ -26,15 +33,13 @@ public:
 	void setMinMaxDistance( zp_float minDistance, zp_float maxDistance );
 	zp_float getMinDistance() const;
 	zp_float getMaxDistance() const;
-	
+
 	void update();
 	void stop();
 
 	void setChannel( void* channel );
 
 private:
-	zpAudioInstance();
-
 	zpAudioResource* m_resource;
 	void* m_channel;
 

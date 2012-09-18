@@ -193,13 +193,15 @@ struct TestRenderable : public zpRenderable {
 
 	zpCamera camera; 
 
-	zpShaderResource* sr;
-	zpShaderResource* srtex;
+	zpResourceInstance<zpShaderResource> sr;
+	zpResourceInstance<zpShaderResource> srtex;
+
 	zpRenderingEngine* engine;
-	zpTextureResource* tex;
+	zpResourceInstance<zpTextureResource> tex;
 	zpSamplerState* state;
 	zpRasterState* raster;
 	zpStaticMeshResource* mesh;
+	zpStaticMeshRenderingComponent smrc;
 	zp_float time;
 	zp_uint frames;
 	void start( zpContentManager* cm ) {
@@ -241,8 +243,8 @@ struct TestRenderable : public zpRenderable {
 		};
 		origBuff->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, orig );
 
-		sr = cm->getResourceOfType<zpShaderResource>( "simple_shader" );
-		srtex = cm->getResourceOfType<zpShaderResource>( "tex_norm_shader" );
+		sr = cm->createInstanceOfResource<zpShaderResource>( "simple_shader" );
+		srtex = cm->createInstanceOfResource<zpShaderResource>( "tex_norm_shader" );
 		tex = cm->getResourceOfType<zpTextureResource>( "tex" );
 		mesh = cm->getResourceOfType<zpStaticMeshResource>( "cube" );
 
@@ -282,6 +284,8 @@ struct TestRenderable : public zpRenderable {
 		cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
 		//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
 
+		cm->getGame()->getCurrentWorld()->getRootGameObject()->addComponent( &smrc );
+		smrc.create();
 #endif
 	}
 	void render() {
@@ -301,11 +305,11 @@ struct TestRenderable : public zpRenderable {
 
 		i->bindBuffer( cameraBuffer, 0 );
 
-		if( sr->isLoaded() ) {
+		if( sr ) {
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 		
 			i->bindBuffer( buff );
-			i->bindShader( sr );
+			i->bindShader( &sr );
 			i->draw( 4 );
 		
 
@@ -314,21 +318,26 @@ struct TestRenderable : public zpRenderable {
 			i->draw( 6 );
 		}
 
-		
-		if( srtex->isLoaded() ) {
+		if( srtex ) {
+			i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &tex );
+			i->bindShader( &srtex );
+			smrc.render();
+		}
+		/*
+		if( srtex ) {
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 
 			i->bindBuffer( buff2 );
-			i->bindShader( srtex );
-			i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
+			i->bindShader( &srtex );
+			//i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
 			i->draw( 4 );
 
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
 		
-			i->bindBuffer( mesh->getVertexBuffer() );
-			i->draw( mesh->getNumVertices() );
+			//i->bindBuffer( mesh->getVertexBuffer() );
+			//i->draw( mesh->getNumVertices() );
 		}
-
+		*/
 		engine->present();
 		zp_long end = zpTime::getInstance()->getTime();
 
@@ -348,6 +357,8 @@ void rendering_test_main() {
 	zpConsole::getInstance()->create();
 
 	zpGameObject ro;
+	zpWorld world;
+	world.setRootGameObject( &ro );
 
 	zp_printfcln( ZP_CC( ZP_CC_RED, ZP_CC_LIGHT_BLUE ), "Size: %d", sizeof( zpGameObject ) );
 
@@ -429,11 +440,12 @@ void rendering_test_main() {
 	im.getKeyboard()->addListener( &kl );
 	im.getMouse()->addListener( new MouseListener );
 
+	game.addWorld( &world, true );
+
 	TestRenderable tr;
 	tr.start( &cm );
-
 	game.setRenderable( &tr );
-	
+
 	while( wnd.processMessages() ) {
 		game.process();
 	}

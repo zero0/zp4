@@ -22,7 +22,7 @@ enum zpAudioSpeakerMode {
 class zpAudioManager;
 class zpAudioResourceCreator;
 class zpAudioResource;
-class zpAudioInstance;
+template<> class zpResourceInstance<zpAudioResource>;
 class zpAudioEmitterComponent;
 
 #include "zpAudioManager.h"

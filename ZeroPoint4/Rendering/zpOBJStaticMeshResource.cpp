@@ -89,12 +89,15 @@ zp_bool zpOBJStaticMeshResource::load() {
 	// if there are no triangles, return
 	if( triangles.isEmpty() ) return false;
 
+	zpStaticMeshPart part;
+
 	// calculate the number of vertices
-	m_numVertices = triangles.size();
+	part.numVertices = triangles.size();
 
 	// create the buffer and fill with verticies
-	m_vertexBuffer = zpRenderingFactory::getRenderingEngine()->createBuffer();
-	m_vertexBuffer->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, m_numVertices, sizeof( zpVertexPositionNormalTexture ), triangles.begin() );
-
+	part.vertexBuffer = zpRenderingFactory::getRenderingEngine()->createBuffer();
+	part.vertexBuffer->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, part.numVertices, sizeof( zpVertexPositionNormalTexture ), triangles.begin() );
+	
+	m_meshParts.pushBack( part );
 	return true;
 }

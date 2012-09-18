@@ -117,9 +117,13 @@
     <ClInclude Include="zpRenderingResourceCreator.h" />
     <ClInclude Include="zpRenderTarget.h" />
     <ClInclude Include="zpSamplerState.h" />
+    <ClInclude Include="zpShaderInstance.h" />
     <ClInclude Include="zpShaderResource.h" />
+    <ClInclude Include="zpStaticMeshInstance.h" />
+    <ClInclude Include="zpStaticMeshRenderingComponent.h" />
     <ClInclude Include="zpStaticMeshResource.h" />
     <ClInclude Include="zpTexture.h" />
+    <ClInclude Include="zpTextureInstance.h" />
     <ClInclude Include="zpTextureResource.h" />
     <ClInclude Include="zpVertex.h" />
     <ClInclude Include="zpVertexLayout.h" />
@@ -174,8 +178,12 @@
     <ClCompile Include="zpRenderingFactory.cpp" />
     <ClCompile Include="zpRenderingManager.cpp" />
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
+    <ClCompile Include="zpShaderInstance.cpp" />
     <ClCompile Include="zpShaderResource.cpp" />
+    <ClCompile Include="zpStaticMeshInstance.cpp" />
+    <ClCompile Include="zpStaticMeshRenderingComponent.cpp" />
     <ClCompile Include="zpStaticMeshResource.cpp" />
+    <ClCompile Include="zpTextureInstance.cpp" />
     <ClCompile Include="zpViewport.cpp" />
   </ItemGroup>
   <ItemGroup>

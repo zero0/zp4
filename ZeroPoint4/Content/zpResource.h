@@ -26,4 +26,9 @@ private:
 	friend class zpContentManager;
 };
 
+template<typename R>
+class zpResourceInstance {
+
+};
+
 #endif

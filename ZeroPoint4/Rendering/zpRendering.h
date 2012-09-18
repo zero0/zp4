@@ -132,10 +132,10 @@ enum zpTopology {
 };
 
 enum zpResourceBindSlot {
-	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER,
-	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER,
-	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER,
-	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER,
+	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER =	0x01,
+	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER =	0x02,
+	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER =	0x04,
+	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER =	0x08,
 };
 
 enum zpMeshTextureBindSlot {
@@ -234,7 +234,11 @@ class zpViewport;
 ZP_PURE_INTERFACE zpTexture;
 
 ZP_PURE_INTERFACE zpShaderResource;
+template<> class zpResourceInstance<zpShaderResource>;
+
 ZP_PURE_INTERFACE zpTextureResource;
+template<> class zpResourceInstance<zpTextureResource>;
+
 class zpRenderingResourceCreator;
 
 ZP_PURE_INTERFACE zpBuffer;
@@ -246,6 +250,7 @@ ZP_PURE_INTERFACE zpRasterState;
 
 ZP_ABSTRACT_CLASS zpStaticMeshResource;
 class zpOBJStaticMeshResource;
+template<> class zpResourceInstance<zpStaticMeshResource>;
 
 ZP_PURE_INTERFACE zpRenderingContext;
 ZP_PURE_INTERFACE zpRenderingEngine;
@@ -255,13 +260,18 @@ class zpCamera;
 class zpRenderingManager;
 
 class zpCameraComponent;
+class zpStaticMeshRenderingComponent;
 
 #include "zpVertex.h"
 #include "zpViewport.h"
 #include "zpTexture.h"
 
 #include "zpShaderResource.h"
+#include "zpShaderInstance.h"
+
 #include "zpTextureResource.h"
+#include "zpTextureInstance.h"
+
 #include "zpRenderingResourceCreator.h"
 
 #include "zpBuffer.h"
@@ -273,6 +283,7 @@ class zpCameraComponent;
 
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"
+#include "zpStaticMeshInstance.h"
 
 #include "zpRenderingContext.h"
 #include "zpRenderingEngine.h"
@@ -282,5 +293,6 @@ class zpCameraComponent;
 #include "zpRenderingManager.h"
 
 #include "zpCameraComponent.h"
+#include "zpStaticMeshRenderingComponent.h"
 
 #endif

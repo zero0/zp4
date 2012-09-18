@@ -153,6 +153,18 @@
     <ClInclude Include="zpDX11RasterState.h">
       <Filter>Header Files\DirectX 11</Filter>
     </ClInclude>
+    <ClInclude Include="zpStaticMeshRenderingComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpShaderInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpStaticMeshInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpTextureInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -237,6 +249,18 @@
       <Filter>Source Files\DirectX 11</Filter>
     </ClCompile>
     <ClCompile Include="zpShaderResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpShaderInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpStaticMeshRenderingComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpStaticMeshInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpTextureInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -95,8 +95,8 @@ void zpOpenGLRenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, z
 }
 void zpOpenGLRenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {}
 
-void zpOpenGLRenderingContext::bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture ) {}
-void zpOpenGLRenderingContext::unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpTexture* texture ) {}
+void zpOpenGLRenderingContext::bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpResourceInstance<zpTextureResource>* texture ) {}
+void zpOpenGLRenderingContext::unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpResourceInstance<zpTextureResource>* texture ) {}
 
 void zpOpenGLRenderingContext::setVertexLayout( zpVertexLayout* layout ) {}
 
@@ -107,10 +107,10 @@ void zpOpenGLRenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
 	buffer->unmap( subResource );
 }
 
-void zpOpenGLRenderingContext::bindShader( zpShaderResource* shader ) {
+void zpOpenGLRenderingContext::bindShader( zpResourceInstance<zpShaderResource>* shader ) {
 	glUseProgram( ( (zpOpenGLShaderResource*)shader )->getShaderProgram() );
 }
-void zpOpenGLRenderingContext::unbindShader( zpShaderResource* shader ) {
+void zpOpenGLRenderingContext::unbindShader( zpResourceInstance<zpShaderResource>* shader ) {
 	glUseProgram( 0 );
 }
 
