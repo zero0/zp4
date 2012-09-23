@@ -184,6 +184,12 @@ void core_test_main() {
 	getchar();
 }
 
+void on_loaded( const zpString& filename, zp_bool loaded ){
+	zp_printfln( "File '%s' %s", filename.c_str(), loaded ? "loaded" : "failed to load" );
+}
+void on_finish() {
+	zp_printfln( "finished loading" );
+}
 
 struct TestRenderable : public zpRenderable {
 	zpBuffer* buff;
@@ -323,15 +329,16 @@ struct TestRenderable : public zpRenderable {
 			i->setShader( &srtex );
 			smrc.render();
 		}
-		/*
+		
 		if( srtex ) {
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 
-			i->bindBuffer( buff2 );
-			i->bindShader( &srtex );
-			//i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex->getTexture() );
+			i->setBuffer( buff2 );
+			i->setShader( &srtex );
+			i->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &tex );
 			i->draw( 4 );
-
+		}
+		/*
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_LIST );
 		
 			//i->bindBuffer( mesh->getVertexBuffer() );
@@ -381,7 +388,6 @@ void rendering_test_main() {
 		zp_printfln( "%s : %s", key.c_str(), value.c_str() );
 	} );
 
-
 	zpGame game;
 	game.setWindow( &wnd );
 
@@ -395,6 +401,8 @@ void rendering_test_main() {
 	cm.registerFileExtension( "shader", &rrc );
 	cm.registerFileExtension( "png", &rrc );
 	cm.registerFileExtension( "obj", &rrc );
+	cm.onResourceLoaded() += zpCreateFunctionDelegate( on_loaded );
+	cm.onAllResourcesLoaded() += zpCreateFunctionDelegate( on_finish );
 
 	zpInputManager im;
 

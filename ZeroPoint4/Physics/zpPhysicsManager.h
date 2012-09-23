@@ -1,0 +1,28 @@
+#pragma once
+#ifndef ZP_PHYSICS_MANAGER_H
+#define ZP_PHYSICS_MANAGER_H
+
+class zpPhysicsManager : public zpGameManager {
+public:
+	zpPhysicsManager();
+	virtual ~zpPhysicsManager();
+
+	void serialize( zpSerializedOutput* out );
+	void deserialize( zpSerializedInput* in );
+
+	void receiveMessage( const zpMessage& message );
+
+protected:
+	void onCreate();
+	void onDestroy();
+
+	void onUpdate();
+
+	void onEnabled();
+	void onDisabled();
+
+private:
+	
+};
+
+#endif

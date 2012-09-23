@@ -12,12 +12,12 @@ void zpStaticMeshRenderingComponent::render() {
 	for( zp_uint i = 0; i < numParts; ++i ) {
 		const zpStaticMeshPart& part = m_mesh.getResource()->getMeshPart( i );
 
-		//if( !part.shader ) continue;
+		if( !part.shader ) continue;
 
 		c->setTopology( part.topology );
 		c->setBuffer( part.vertexBuffer );
 		if( part.indexBuffer ) c->setBuffer( part.indexBuffer );
-		//c->bindShader( (zpResourceInstance<zpShaderResource>*)&part.shader );
+		c->setShader( &part.shader );
 
 		for( zp_uint t = 0; t < ZP_STATIC_MESH_PART_NUM_TEXTURES; ++t ) {
 			if( part.textures[ i ] ) c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, i, &part.textures[ i ] );

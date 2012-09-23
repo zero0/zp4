@@ -115,6 +115,13 @@ const zpString& zpContentManager::getRootDirectory() const {
 	return m_rootDirectory;
 }
 
+zpDelegateEvent<void( const zpString& filname, zp_bool loaded )>& zpContentManager::onResourceLoaded() {
+	return m_onResourceLoaded;
+}
+zpDelegateEvent<void()>& zpContentManager::onAllResourcesLoaded() {
+	return m_onAllResourcesLoaded;
+}
+
 void zpContentManager::onCreate() {
 	//m_rootDirectory = zpFile::getCurrentDirectory();
 	m_rootDirectory = "./";
@@ -126,19 +133,16 @@ void zpContentManager::onUpdate() {
 		zpResource* r = m_resourcesToLoad.back();
 		zp_bool loaded = r->load();
 		r->setIsLoaded( loaded );
+		
+		m_onResourceLoaded( r->getFilename(), loaded );
 
 		m_resourcesToLoad.popBack();
+
+		if( m_resourcesToLoad.isEmpty() ) {
+			m_onAllResourcesLoaded();
+		}
 	}
 }
 
 void zpContentManager::onEnabled() {}
 void zpContentManager::onDisabled() {}
-
-zpResource* zpContentManager::getResource_T( const void* type, const zpString& alias ) const {
-	const std::type_info& info = *(const std::type_info*)type;
-	zpResource* resource = m_resources.get( alias );
-
-	ZP_ASSERT_RETURN_( ( resource && info == typeid( *resource ) ), ZP_NULL, "Resource '%s' is not type %s but type %s", alias.c_str(), info.name(), typeid(*resource).name() );
-	
-	return resource;
-}

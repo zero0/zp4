@@ -26,11 +26,7 @@ public:
 
 	template<typename T>
 	T* getResourceOfType( const zpString& alias ) const {
-//#if ZP_DEBUG
-//		return (T*)getResource_T( (const void*)&typeid( T ), alias );
-//#else
 		return (T*)getResource( alias );
-//#endif
 	}
 
 	template<typename R>
@@ -46,6 +42,9 @@ public:
 	void setRootDirectory( const zpString& rootDirectory );
 	const zpString& getRootDirectory() const;
 
+	zpDelegateEvent<void( const zpString& filename, zp_bool loaded )>& onResourceLoaded();
+	zpDelegateEvent<void()>& onAllResourcesLoaded();
+
 protected:
 	void onCreate();
 	void onDestroy();
@@ -56,10 +55,11 @@ protected:
 	void onDisabled();
 
 private:
-	zpResource* getResource_T( const void* type, const zpString& alias ) const;
-
 	zpString m_assetsFolder;
 	zpString m_rootDirectory;
+
+	zpDelegateEvent<void( const zpString& filename, zp_bool loaded )> m_onResourceLoaded;
+	zpDelegateEvent<void()> m_onAllResourcesLoaded;
 
 	zpArrayList<zpResource*> m_resourcesToLoad;
 	zpHashMap<zpString, zpResourceCreator*> m_creators;
