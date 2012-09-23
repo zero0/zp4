@@ -1,6 +1,12 @@
 #include "zpRendering.h"
-#include "zpDX11.h"
-#include "zpOpenGL.h"
+
+#if ZP_RENDERING_TYPE == ZP_DX
+#include "RenderingDX/zpDX11.h"
+#elif ZP_RENDERING_TYPE == ZP_OPENGL
+#include "RenderingOpenGL/zpOpenGL.h"
+#else
+#error( "No rendering engine selected!" )
+#endif
 
 zpRenderingFactory::zpRenderingFactory() {}
 zpRenderingFactory::~zpRenderingFactory() {}
@@ -8,14 +14,13 @@ zpRenderingFactory::~zpRenderingFactory() {}
 zpRenderingEngine* zpRenderingFactory::s_renderingEngine = ZP_NULL;
 zpRenderingEngine* zpRenderingFactory::createRenderingEngine( zpRenderingEngineType type ) {
 	if( !s_renderingEngine ) {
-		switch( type ) {
-		case ZP_RENDERING_ENGINE_DX:
-			s_renderingEngine = new zpDX11RenderingEngine;
-			break;
-		case ZP_RENDERING_ENGINE_OPENGL:
-			s_renderingEngine = new zpOpenGLRenderingEngine;
-			break;
-		}
+
+#if ZP_RENDERING_TYPE == ZP_DX
+		s_renderingEngine = new zpDX11RenderingEngine;
+#elif ZP_RENDERING_TYPE == ZP_OPENGL
+		s_renderingEngine = new zpOpenGLRenderingEngine;
+#endif
+
 		if( s_renderingEngine ) s_renderingEngine->initialize();
 	}
 	return s_renderingEngine;

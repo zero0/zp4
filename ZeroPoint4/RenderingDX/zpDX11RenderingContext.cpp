@@ -1,4 +1,3 @@
-#include "zpRendering.h"
 #include "zpDX11.h"
 #include <D3D11.h>
 #include "zpDX11Util.h"
@@ -73,9 +72,9 @@ void zpDX11RenderingContext::clearDepthStencilBuffer( zp_float clearDepth, zp_ui
 	m_context->ClearDepthStencilView( ( (zpDX11DepthStencilBuffer*)m_depthStencilBuffer )->getDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, (zp_byte)clearStencil );
 }
 
-void zpDX11RenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {
+void zpDX11RenderingContext::setBuffer( const zpBuffer* buffer, zp_uint slot ) {
 	zp_uint offset = 0;
-	ID3D11Buffer* b = ( (zpDX11Buffer*)buffer )->getBuffer();
+	ID3D11Buffer* b = buffer == ZP_NULL ? ZP_NULL : ( (zpDX11Buffer*)buffer )->getBuffer();
 	zp_uint stride = buffer->getStride();
 
 	switch( buffer->getBufferType() ) {
@@ -90,21 +89,7 @@ void zpDX11RenderingContext::bindBuffer( zpBuffer* buffer, zp_uint slot ) {
 		break;
 	}
 }
-void zpDX11RenderingContext::unbindBuffer( zpBuffer* buffer, zp_uint slot ) {
-	switch( buffer->getBufferBindType() ) {
-	case ZP_BUFFER_TYPE_VERTEX:
-		m_context->IASetVertexBuffers( slot, 1, ZP_NULL, ZP_NULL, ZP_NULL );
-		break;
-	case ZP_BUFFER_TYPE_INDEX:
-		m_context->IASetIndexBuffer( ZP_NULL, DXGI_FORMAT_UNKNOWN, 0 );
-		break;
-	case ZP_BUFFER_TYPE_CONSTANT:
-		m_context->VSSetConstantBuffers( slot, 1, ZP_NULL );
-		break;
-	}
-}
-
-void zpDX11RenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {
+void zpDX11RenderingContext::setBuffers( const zpBuffer** buffers, zp_uint count, zp_uint slot ) {
 	switch( buffers[ 0 ]->getBufferBindType() ) {
 	case ZP_BUFFER_TYPE_VERTEX:
 		{
@@ -124,18 +109,30 @@ void zpDX11RenderingContext::bindBuffers( zp_uint count, zpBuffer** buffers, zp_
 		break;
 	}
 }
-void zpDX11RenderingContext::unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot ) {
-	switch( buffers[ 0 ]->getBufferBindType() ) {
-	case ZP_BUFFER_TYPE_VERTEX:
-		m_context->IASetVertexBuffers( slot, count, ZP_NULL, ZP_NULL, ZP_NULL );
-		break;
-	case ZP_BUFFER_TYPE_INDEX:
-		m_context->IASetIndexBuffer( ZP_NULL, DXGI_FORMAT_UNKNOWN, 0 );
-		break;
-	}
+
+void zpDX11RenderingContext::setVertexLayout( const zpVertexLayout* layout ) {
+	ID3D11InputLayout* i = layout == ZP_NULL ? ZP_NULL : ( (zpDX11VertexLayout*)layout )->getInputLayout();
+	
+	m_context->IASetInputLayout( i );
 }
 
-void zpDX11RenderingContext::bindTexture( zpResourceBindSlot bindType, zp_uint slot, zpResourceInstance<zpTextureResource>* texture ) {
+void zpDX11RenderingContext::setShader( const zpResourceInstance<zpShaderResource>* shader ) {
+	zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader->getShaderResource();
+	if( s->getVertexShader() ) {
+		setVertexLayout( s->getVertexLayout() );
+		m_context->VSSetShader( s->getVertexShader(), ZP_NULL, 0 );
+	}
+	if( s->getPixelShader() ) {
+		m_context->PSSetShader( s->getPixelShader(), ZP_NULL, 0 );
+	}
+	if( s->getGeometryShader() ) {
+		m_context->GSSetShader( s->getGeometryShader(), ZP_NULL, 0 );
+	}
+	if( s->getComputeShader() ) {
+		m_context->CSSetShader( s->getComputeShader(), ZP_NULL, 0 );
+	}
+}
+void zpDX11RenderingContext::setTexture( zpResourceBindSlot bindType, zp_uint slot, const zpResourceInstance<zpTextureResource>* texture ) {
 	ID3D11ShaderResourceView* view = texture ? ( (zpDX11Texture*)texture->getTextureResource()->getTexture() )->getResourceView() : ZP_NULL;
 	switch( bindType ) {
 	case ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER:
@@ -146,62 +143,9 @@ void zpDX11RenderingContext::bindTexture( zpResourceBindSlot bindType, zp_uint s
 		break;
 	}
 }
-void zpDX11RenderingContext::unbindTexture( zpResourceBindSlot bindType, zp_uint slot, zpResourceInstance<zpTextureResource>* texture ) {
-	switch( bindType ) {
-	case ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER:
-		m_context->VSSetShaderResources( slot, 1, ZP_NULL );
-		break;
-	case ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER:
-		m_context->PSSetShaderResources( slot, 1, ZP_NULL );
-		break;
-	}
-}
-
-void zpDX11RenderingContext::setVertexLayout( zpVertexLayout* layout ) {
-	zpDX11VertexLayout* i = (zpDX11VertexLayout*)layout;
-	if( !i ) {
-		m_context->IASetInputLayout( ZP_NULL );
-	} else if( i->getInputLayout() ) {
-		m_context->IASetInputLayout( i->getInputLayout() );
-	}
-}
-
-void zpDX11RenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {
-	D3D11_MAPPED_SUBRESOURCE r;
-	m_context->Map( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource, __zpToDX( mapType ), 0, &r );
-	data = &r.pData;
-}
-void zpDX11RenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
-	m_context->Unmap( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource );
-}
-
-void zpDX11RenderingContext::bindShader( zpResourceInstance<zpShaderResource>* shader ) {
-	zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader->getShaderResource();
-	if( s->getVertexShader() ) {
-		setVertexLayout( s->getVertexLayout() );
-		m_context->VSSetShader( s->getVertexShader(), ZP_NULL, 0 );
-	}
-	if( s->getPixelShader() ) m_context->PSSetShader( s->getPixelShader(), ZP_NULL, 0 );
-	if( s->getGeometryShader() ) m_context->GSSetShader( s->getGeometryShader(), ZP_NULL, 0 );
-	if( s->getComputeShader() ) m_context->CSSetShader( s->getComputeShader(), ZP_NULL, 0 );
-}
-void zpDX11RenderingContext::unbindShader( zpResourceInstance<zpShaderResource>* shader ) {
-	zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader->getShaderResource();
-	if( !s || s->getVertexShader() ) {
-		setVertexLayout( ZP_NULL );
-		m_context->VSSetShader( ZP_NULL, ZP_NULL, 0 );
-	}
-	if( !s || s->getPixelShader() ) m_context->PSSetShader( ZP_NULL, ZP_NULL, 0 );
-	if( !s || s->getGeometryShader() ) m_context->GSSetShader( ZP_NULL, ZP_NULL, 0 );
-	if( !s || s->getComputeShader() ) m_context->CSSetShader( ZP_NULL, ZP_NULL, 0 );
-}
 
 void zpDX11RenderingContext::setTopology( zpTopology topology ) {
 	m_context->IASetPrimitiveTopology( __zpToDX( topology ) );
-}
-
-void zpDX11RenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
-	m_context->Draw( vertexCount, startIndex );
 }
 
 void zpDX11RenderingContext::setViewport( const zpViewport& viewport ) {
@@ -237,6 +181,26 @@ void zpDX11RenderingContext::setSamplerState( zpResourceBindSlot bindSlot, zp_ui
 void zpDX11RenderingContext::setRasterState( zpRasterState* raster ) {
 	m_context->RSSetState( raster ? ( (zpDX11RasterState*)raster )->m_raster : ZP_NULL );
 }
+
+void zpDX11RenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {
+	D3D11_MAPPED_SUBRESOURCE r;
+	m_context->Map( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource, __zpToDX( mapType ), 0, &r );
+	data = &r.pData;
+}
+void zpDX11RenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
+	m_context->Unmap( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource );
+}
+
+void zpDX11RenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
+	m_context->Draw( vertexCount, startIndex );
+}
+void zpDX11RenderingContext::drawAuto() {
+	m_context->DrawAuto();
+}
+void zpDX11RenderingContext::drawIndexed( zp_uint indexCount, zp_uint startIndex, zp_uint startVertex ) {
+	m_context->DrawIndexed( indexCount, startIndex, startVertex );
+}
+
 
 
 void zpDX11RenderingContext::addReference() const {

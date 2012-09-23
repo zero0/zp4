@@ -15,6 +15,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Content", "Content\Content.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Audio", "Audio\Audio.vcxproj", "{D1AF3EE6-A733-4511-978F-EBB52E43CDC5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderingDX", "RenderingDX\RenderingDX.vcxproj", "{C17F4C40-8EDF-47DE-8961-94D77E14C8F6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderingOpenGL", "RenderingOpenGL\RenderingOpenGL.vcxproj", "{C4B54DE6-3D4C-41B6-9327-6F49FE6ECD70}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -71,6 +75,18 @@ Global
 		{D1AF3EE6-A733-4511-978F-EBB52E43CDC5}.Release|Win32.ActiveCfg = Release|Win32
 		{D1AF3EE6-A733-4511-978F-EBB52E43CDC5}.Release|Win32.Build.0 = Release|Win32
 		{D1AF3EE6-A733-4511-978F-EBB52E43CDC5}.Release|x64.ActiveCfg = Release|Win32
+		{C17F4C40-8EDF-47DE-8961-94D77E14C8F6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C17F4C40-8EDF-47DE-8961-94D77E14C8F6}.Debug|Win32.Build.0 = Debug|Win32
+		{C17F4C40-8EDF-47DE-8961-94D77E14C8F6}.Debug|x64.ActiveCfg = Debug|Win32
+		{C17F4C40-8EDF-47DE-8961-94D77E14C8F6}.Release|Win32.ActiveCfg = Release|Win32
+		{C17F4C40-8EDF-47DE-8961-94D77E14C8F6}.Release|Win32.Build.0 = Release|Win32
+		{C17F4C40-8EDF-47DE-8961-94D77E14C8F6}.Release|x64.ActiveCfg = Release|Win32
+		{C4B54DE6-3D4C-41B6-9327-6F49FE6ECD70}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C4B54DE6-3D4C-41B6-9327-6F49FE6ECD70}.Debug|Win32.Build.0 = Debug|Win32
+		{C4B54DE6-3D4C-41B6-9327-6F49FE6ECD70}.Debug|x64.ActiveCfg = Debug|Win32
+		{C4B54DE6-3D4C-41B6-9327-6F49FE6ECD70}.Release|Win32.ActiveCfg = Release|Win32
+		{C4B54DE6-3D4C-41B6-9327-6F49FE6ECD70}.Release|Win32.Build.0 = Release|Win32
+		{C4B54DE6-3D4C-41B6-9327-6F49FE6ECD70}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

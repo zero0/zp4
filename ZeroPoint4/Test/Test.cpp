@@ -303,24 +303,24 @@ struct TestRenderable : public zpRenderable {
 		i->setSamplerState( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, state );
 		i->setRasterState( raster );
 
-		i->bindBuffer( cameraBuffer, 0 );
+		i->setBuffer( cameraBuffer, 0 );
 
 		if( sr ) {
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
 		
-			i->bindBuffer( buff );
-			i->bindShader( &sr );
+			i->setBuffer( buff );
+			i->setShader( &sr );
 			i->draw( 4 );
 		
 
 			i->setTopology( ZP_TOPOLOGY_LINE_LIST );
-			i->bindBuffer( origBuff );
+			i->setBuffer( origBuff );
 			i->draw( 6 );
 		}
 
 		if( srtex ) {
-			i->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &tex );
-			i->bindShader( &srtex );
+			i->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &tex );
+			i->setShader( &srtex );
 			smrc.render();
 		}
 		/*

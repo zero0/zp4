@@ -2,6 +2,8 @@
 #ifndef ZP_OPENGL_H
 #define ZP_OPENGL_H
 
+#include "Rendering/zpRendering.h"
+
 #pragma comment( lib, "glew32s.lib" )
 #pragma comment( lib, "opengl32.lib" )
 // fixes linker errors with glew32s.lib

@@ -2,6 +2,8 @@
 #include <Windows.h>
 #include <XInput.h>
 
+#pragma comment(lib, "xinput" )
+
 #define IS_BUTTON_PRESSED( b )	( ( m_buttons & XINPUT_GAMEPAD_##b ) == XINPUT_GAMEPAD_##b )
 
 #define IS_BUTTON_DOWN(s, b)			(( (s) & (b) ) == (b))

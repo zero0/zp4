@@ -6,7 +6,6 @@
 
 struct zpStaticMeshPart {
 	zpTopology topology;
-	zp_uint numVertices;
 	zpBuffer* vertexBuffer;
 	zpBuffer* indexBuffer;
 	zpResourceInstance<zpShaderResource> shader;

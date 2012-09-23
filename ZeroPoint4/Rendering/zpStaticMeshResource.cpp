@@ -2,7 +2,6 @@
 
 zpStaticMeshPart::zpStaticMeshPart()
 	: topology( ZP_TOPOLOGY_TRIANGLE_LIST )
-	, numVertices( 0 )
 	, vertexBuffer( ZP_NULL )
 	, indexBuffer( ZP_NULL )
 {}

@@ -1,4 +1,3 @@
-#include "zpRendering.h"
 #include "zpOpenGL.h"
 
 zpOpenGLRenderingContext::zpOpenGLRenderingContext() :
@@ -122,6 +121,12 @@ void zpOpenGLRenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
 	glDrawArrays( m_topology, startIndex, vertexCount );
 
 	checkError();
+}
+void zpOpenGLRenderingContext::drawAuto() {
+	
+}
+void zpOpenGLRenderingContext::drawIndexed( zp_uint indexCount, zp_uint startIndex, zp_uint startVertex ) {
+	glDrawElements( m_topology, 0, GL_UNSIGNED_SHORT, 0 );
 }
 
 void zpOpenGLRenderingContext::setViewport( const zpViewport& viewport ) {

@@ -15,18 +15,18 @@ void zpStaticMeshRenderingComponent::render() {
 		//if( !part.shader ) continue;
 
 		c->setTopology( part.topology );
-		c->bindBuffer( part.vertexBuffer );
-		if( part.indexBuffer ) c->bindBuffer( part.indexBuffer );
+		c->setBuffer( part.vertexBuffer );
+		if( part.indexBuffer ) c->setBuffer( part.indexBuffer );
 		//c->bindShader( (zpResourceInstance<zpShaderResource>*)&part.shader );
 
 		for( zp_uint t = 0; t < ZP_STATIC_MESH_PART_NUM_TEXTURES; ++t ) {
-			if( part.textures[ i ] ) c->bindTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, i, (zpResourceInstance<zpTextureResource>*)&part.textures[ i ] );
+			if( part.textures[ i ] ) c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, i, &part.textures[ i ] );
 		}
 
 		if( part.indexBuffer ) {
-			//c->drawIndexed();
+			c->drawIndexed( part.indexBuffer->getCount() );
 		} else {
-			c->draw( part.numVertices );
+			c->draw( part.vertexBuffer->getCount() );
 		}
 	}
 }

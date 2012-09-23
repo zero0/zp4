@@ -91,12 +91,9 @@ zp_bool zpOBJStaticMeshResource::load() {
 
 	zpStaticMeshPart part;
 
-	// calculate the number of vertices
-	part.numVertices = triangles.size();
-
 	// create the buffer and fill with verticies
 	part.vertexBuffer = zpRenderingFactory::getRenderingEngine()->createBuffer();
-	part.vertexBuffer->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, part.numVertices, sizeof( zpVertexPositionNormalTexture ), triangles.begin() );
+	part.vertexBuffer->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, triangles.size(), sizeof( zpVertexPositionNormalTexture ), triangles.begin() );
 	
 	m_meshParts.pushBack( part );
 	return true;

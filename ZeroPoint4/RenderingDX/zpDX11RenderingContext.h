@@ -22,31 +22,27 @@ public:
 	void clearRenderTarget( const zpColor4f* colors, zp_uint count = 1 );
 	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
 
-	void bindBuffer( zpBuffer* buffer, zp_uint slot );
-	void unbindBuffer( zpBuffer* buffer, zp_uint slot );
+	void setBuffer( const zpBuffer* buffer, zp_uint slot = 0 );
+	void setBuffers( const zpBuffer** buffers, zp_uint count, zp_uint slot = 0 );
 
-	void bindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
-	void unbindBuffers( zp_uint count, zpBuffer** buffers, zp_uint slot );
+	void setVertexLayout( const zpVertexLayout* layout );
 
-	void setVertexLayout( zpVertexLayout* layout );
-
-	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );
-	void unmap( zpBuffer* buffer, zp_uint subResource );
-
-	void bindShader( zpResourceInstance<zpShaderResource>* shader );
-	void unbindShader( zpResourceInstance<zpShaderResource>* shader );
-
-	void bindTexture( zpResourceBindSlot bindSlot, zp_uint slot, zpResourceInstance<zpTextureResource>* texture );
-	void unbindTexture( zpResourceBindSlot bindSlot, zp_uint slot, zpResourceInstance<zpTextureResource>* texture );
+	void setShader( const zpResourceInstance<zpShaderResource>* shader );
+	void setTexture( zpResourceBindSlot bindSlot, zp_uint slot, const zpResourceInstance<zpTextureResource>* texture );
 
 	void setTopology( zpTopology topology );
-
-	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
 
 	void setViewport( const zpViewport& viewport );
 
 	void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state );
 	void setRasterState( zpRasterState* raster );
+
+	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );
+	void unmap( zpBuffer* buffer, zp_uint subResource );
+
+	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
+	void drawAuto();
+	void drawIndexed( zp_uint indexCount, zp_uint startIndex = 0, zp_uint startVertex = 0 );
 
 
 	void addReference() const;

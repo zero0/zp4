@@ -1,5 +1,6 @@
 #include "zpScripting.h"
 #include "zpAngelScript.h"
+#include "angelscript.h"
 
 zpScriptingComponent::zpScriptingComponent() : 
 	m_scriptInstance( ZP_NULL ),

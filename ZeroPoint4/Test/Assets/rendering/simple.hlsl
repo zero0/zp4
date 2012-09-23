@@ -20,10 +20,10 @@ struct PS_Input {
 PS_Input main_vs( VS_Input input ) {
 	PS_Input output = (PS_Input)0;
 	output.position = mul( input.position, world );
-	output.position = mul( output.position, view );
-	output.position = mul( output.position, projection );
+	//output.position = mul( output.position, view );
+	//output.position = mul( output.position, projection );
 	
-	//output.position = mul( input.position, ( viewProjection ) );
+	output.position = mul( input.position, ( viewProjection ) );
 	output.color = input.color;
 	
 	return output;

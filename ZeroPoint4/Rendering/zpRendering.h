@@ -11,6 +11,18 @@
 
 #define ZP_RENDER_TARGET_MAX_COUNT		8
 
+#define ZP_DX		0x0d11
+#define ZP_OPENGL	0x09l4
+#define ZP_RENDERING_TYPE	ZP_DX
+
+#if ZP_RENDERING_TYPE == ZP_DX
+#include "RenderingDX\zpDX11Lib.inc"
+#elif ZP_RENDERING_TYPE == ZP_OPENGL
+#include "RenderingOpenGL\zpOpenGLLib.inc"
+#else
+#error( "No rendering engine selected!" )
+#endif
+
 enum zpRenderingEngineType {
 	ZP_RENDERING_ENGINE_NONE =			0,
 

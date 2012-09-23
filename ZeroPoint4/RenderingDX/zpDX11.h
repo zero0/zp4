@@ -2,15 +2,7 @@
 #ifndef ZP_DX11_H
 #define ZP_DX11_H
 
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "dxgi.lib" )
-#pragma comment( lib, "dxguid.lib" )
-
-#if ZP_DEBUG
-#pragma comment( lib, "d3dx11d.lib" )
-#else
-#pragma comment( lib, "d3dx11.lib" )
-#endif
+#include "Rendering/zpRendering.h"
 
 class zpDX11Texture;
 

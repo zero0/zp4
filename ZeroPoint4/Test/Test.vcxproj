@@ -36,9 +36,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(SolutionDir)Scripting\lib\x86\;$(SolutionDir)Rendering\lib\x86\;$(LibraryPath)</LibraryPath>
-  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(SolutionDir)Scripting\lib\x86\;$(SolutionDir)Rendering\lib\x86\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -51,6 +49,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetPath)" "$(ProjectDir)$(TargetFileName)"</Command>
@@ -71,6 +70,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Audio\Audio.vcxproj">
       <Project>{d1af3ee6-a733-4511-978f-ebb52e43cdc5}</Project>
     </ProjectReference>
@@ -83,15 +85,15 @@
     <ProjectReference Include="..\Input\Input.vcxproj">
       <Project>{eed15947-2655-4c7a-ad5f-83f51ae8f6ce}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\RenderingDX\RenderingDX.vcxproj">
+      <Project>{c17f4c40-8edf-47de-8961-94d77e14c8f6}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Rendering\Rendering.vcxproj">
       <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Scripting\Scripting.vcxproj">
       <Project>{23b9d3dd-536d-4afb-bacd-736612e095c5}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

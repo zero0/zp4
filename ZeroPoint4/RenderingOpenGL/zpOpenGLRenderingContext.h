@@ -40,6 +40,8 @@ public:
 	void setTopology( zpTopology topology );
 
 	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
+	void drawAuto();
+	void drawIndexed( zp_uint indexCount, zp_uint startIndex = 0, zp_uint startVertex = 0 );
 
 	void setViewport( const zpViewport& viewport );
 

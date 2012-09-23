@@ -2,8 +2,6 @@
 #ifndef ZP_CONTROLLER_H
 #define ZP_CONTROLLER_H
 
-#pragma comment(lib, "xinput.lib" )
-
 enum zpControllerNumber : zp_ushort {
 	ZP_CONTROLLER_1 = 0,
 	ZP_CONTROLLER_2,

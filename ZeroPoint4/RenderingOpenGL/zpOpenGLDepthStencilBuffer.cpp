@@ -1,4 +1,3 @@
-#include "zpRendering.h"
 #include "zpOpenGL.h"
 
 zpOpenGLDepthStencilBuffer::zpOpenGLDepthStencilBuffer() :

@@ -1,5 +1,12 @@
 #include "zpScripting.h"
 #include "zpAngelScript.h"
+#include "angelscript.h"
+
+#if ZP_DEBUG
+#pragma comment( lib, "angelscriptd.lib" )
+#else
+#pragma comment( lib, "angelscript.lib" )
+#endif
 
 #define AS_ASSERT( r )	if( (r) < asSUCCESS ) { zpLog::debug() << "Assert Failed: (" << r << ") " << __FILE__ << ':' << __LINE__ << zpLog::endl; }
 

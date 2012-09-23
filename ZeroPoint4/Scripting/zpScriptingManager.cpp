@@ -1,5 +1,6 @@
 #include "zpScripting.h"
 #include "zpAngelScript.h"
+#include "angelscript.h"
 
 #define ZP_SCRIPTING_MANAGER_DEFAULT_NUM_THREADS	10
 

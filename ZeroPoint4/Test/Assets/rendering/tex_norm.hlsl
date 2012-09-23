@@ -25,8 +25,9 @@ SamplerState linearSampler : register( s0 );
 PS_Input main_vs( VS_Input input ) {
 	PS_Input output = (PS_Input)0;
 	output.position = mul( input.position, world );
-	output.position = mul( output.position, view );
-	output.position = mul( output.position, projection );
+	//output.position = mul( output.position, view );
+	//output.position = mul( output.position, projection );
+	output.position = mul( output.position, viewProjection );
 	
 	output.normal = input.normal;
 	output.texCoord0 = input.texCoord0;
