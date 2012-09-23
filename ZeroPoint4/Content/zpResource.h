@@ -28,7 +28,77 @@ private:
 
 template<typename R>
 class zpResourceInstance {
+public:
+	zpResourceInstance()
+		: m_resource( ZP_NULL )
+	{}
+	zpResourceInstance( R* resource )
+		: m_resource( resource )
+	{}
+	zpResourceInstance( const zpResourceInstance<R>& instance )
+		: m_resource( instance.m_resource )
+	{}
+	zpResourceInstance( zpResourceInstance<R>&& instance )
+		: m_resource( instance.m_resource )
+	{
+		instance.m_resource = ZP_NULL;
+	}
+	~zpResourceInstance() {
+		m_resource = ZP_NULL;
+	}
 
+	void operator=( const zpResourceInstance<R>& instance )	{
+		m_resource = instance.m_resource;
+	}
+	void operator=( zpResourceInstance<R>&& instance )	{
+		m_resource = instance.m_resource;
+		instance.m_resource = ZP_NULL;
+	}
+
+	operator zp_bool() const {
+		return m_resource && m_resource->isLoaded();
+	}
+
+	R* getResource() const {
+		return m_resource;
+	}
+
+private:
+	R* m_resource;
 };
+
+#define ZP_RESOURCE_INSTANCE_TEMPLATE_START( T )	\
+template<>	\
+class zpResourceInstance<T> {	\
+public:	\
+	zpResourceInstance() : m_resource( ZP_NULL ) {}\
+	zpResourceInstance( T* resource ) : m_resource( resource ) {}\
+	zpResourceInstance( const zpResourceInstance<T>& instance )	: m_resource( instance.m_resource ) {}\
+	zpResourceInstance( zpResourceInstance<T>&& instance ) : m_resource( instance.m_resource ) { instance.m_resource = ZP_NULL; }\
+	~zpResourceInstance() { m_resource = ZP_NULL; }\
+	void operator=( const zpResourceInstance<T>& instance )	{ m_resource = instance.m_resource; }\
+	void operator=( zpResourceInstance<T>&& instance ) { m_resource = instance.m_resource; instance.m_resource = ZP_NULL; }\
+	operator zp_bool() const { return m_resource && m_resource->isLoaded(); }\
+	T* getResource() const { return m_resource;	}\
+private:	\
+	T* m_resource;
+
+#define ZP_RESOURCE_INSTANCE_TEMPLATE_START_COPY( T, Copy )	\
+	template<>	\
+class zpResourceInstance<T> {	\
+public:	\
+	zpResourceInstance() : m_resource( ZP_NULL ) {}\
+	zpResourceInstance( T* resource ) : m_resource( resource ) {}\
+	zpResourceInstance( const zpResourceInstance<T>& instance )	: m_resource( instance.m_resource) { Copy( instance ); }\
+	zpResourceInstance( zpResourceInstance<T>&& instance ) : m_resource( instance.m_resource ) { Copy( instance ); instance.m_resource = ZP_NULL; }\
+	~zpResourceInstance() { m_resource = ZP_NULL; }\
+	void operator=( const zpResourceInstance<T>& instance )	{ m_resource = instance.m_resource; Copy( instance ); }\
+	void operator=( zpResourceInstance<T>&& instance ) { m_resource = instance.m_resource; Copy( instance ); instance.m_resource = ZP_NULL; }\
+	operator zp_bool() const { return m_resource && m_resource->isLoaded(); }\
+	T* getResource() const { return m_resource;	}\
+private:	\
+	T* m_resource;
+
+#define ZP_RESOURCE_INSTANCE_TEMPLATE_END	};
 
 #endif

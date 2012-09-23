@@ -71,7 +71,7 @@ void zpAudioManager::play( zpResourceInstance<zpAudioResource>* soundInstance ) 
 	if( !soundInstance ) return;
 	FMOD_RESULT r;
 
-	zpAudioResource* resource = soundInstance->getAudioResource();
+	zpAudioResource* resource = soundInstance->getResource();
 
 	FMOD::ChannelGroup* group = (FMOD::ChannelGroup*)m_channelGroups[ resource->getChannelGroup() ];
 	

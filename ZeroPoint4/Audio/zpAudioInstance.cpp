@@ -18,53 +18,14 @@ FMOD_RESULT F_CALLBACK __fmodChannelCallback( FMOD_CHANNEL *channel, FMOD_CHANNE
 	return FMOD_OK;
 }
 
-zpResourceInstance<zpAudioResource>::zpResourceInstance() 
-	: m_resource( ZP_NULL )
-	, m_channel( ZP_NULL )
-	, m_minDistance( 1.f )
-	, m_maxDistance( 10.f )
-{}
-zpResourceInstance<zpAudioResource>::zpResourceInstance( zpAudioResource* resource )
-	: m_resource( resource )
-	, m_channel( ZP_NULL )
-	, m_minDistance( 1.f )
-	, m_maxDistance( 10.f )
-{}
-zpResourceInstance<zpAudioResource>::~zpResourceInstance() {
-	m_resource = ZP_NULL;
-	m_channel = ZP_NULL;
-}
+void zpResourceInstance<zpAudioResource>::copy( const zpResourceInstance<zpAudioResource>& copy ) {
+	m_channel = copy.m_channel;
+	m_minDistance = copy.m_minDistance;
+	m_maxDistance = copy.m_maxDistance;
 
-void zpResourceInstance<zpAudioResource>::operator=( const zpResourceInstance<zpAudioResource>& instance ) {
-	m_resource = instance.m_resource;
-	m_channel = instance.m_channel;
-	m_minDistance = instance.m_minDistance;
-	m_maxDistance = instance.m_maxDistance;
-
-	m_position = instance.m_position;
-	m_velocity = instance.m_velocity;
-	m_coneOrientation = instance.m_coneOrientation;
-}
-void zpResourceInstance<zpAudioResource>::operator=( zpResourceInstance<zpAudioResource>&& instance ) {
-	m_resource = instance.m_resource;
-	m_channel = instance.m_channel;
-	m_minDistance = instance.m_minDistance;
-	m_maxDistance = instance.m_maxDistance;
-
-	m_position = instance.m_position;
-	m_velocity = instance.m_velocity;
-	m_coneOrientation = instance.m_coneOrientation;
-
-	instance.m_resource = ZP_NULL;
-	instance.m_channel = ZP_NULL;
-}
-
-zpResourceInstance<zpAudioResource>::operator zp_bool() const {
-	return m_resource && m_resource->isLoaded();
-}
-
-zpAudioResource* zpResourceInstance<zpAudioResource>::getAudioResource() const {
-	return m_resource;
+	m_position = copy.m_position;
+	m_velocity = copy.m_velocity;
+	m_coneOrientation = copy.m_coneOrientation;
 }
 
 zp_bool zpResourceInstance<zpAudioResource>::isPlaying() const {
