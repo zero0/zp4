@@ -8,9 +8,9 @@ void zpStaticMeshRenderingComponent::render() {
 
 	zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 
-	zp_uint numParts = m_mesh.getStaticMeshResource()->getNumMeshParts();
+	zp_uint numParts = m_mesh.getResource()->getNumMeshParts();
 	for( zp_uint i = 0; i < numParts; ++i ) {
-		const zpStaticMeshPart& part = m_mesh.getStaticMeshResource()->getMeshPart( i );
+		const zpStaticMeshPart& part = m_mesh.getResource()->getMeshPart( i );
 
 		//if( !part.shader ) continue;
 

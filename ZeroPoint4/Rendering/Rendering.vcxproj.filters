@@ -13,18 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\DirectX 11">
-      <UniqueIdentifier>{e0ac6e35-2971-4141-bff5-817220006a8d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\DirectX 11">
-      <UniqueIdentifier>{584ed23e-4404-41a2-8af1-763506f366fb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\OpenGL">
-      <UniqueIdentifier>{fb435fd5-218b-4b88-99f7-644b8cd25406}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\OpenGL">
-      <UniqueIdentifier>{c2993514-4629-434e-a0e2-7c19fb577c04}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpRendering.h">
