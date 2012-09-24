@@ -4,6 +4,8 @@
 
 #include "Core\zpCore.h"
 
+#include "zpPhysicsLib.inc"
+
 class zpPhysicsManager;
 class zpColliderComponent;
 class zpRigidBodyComponent;

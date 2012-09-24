@@ -4,7 +4,7 @@
 #include "Scripting\zpScripting.h"
 #include "Audio\zpAudio.h"
 #include "Input\zpInput.h"
-
+#include "Physics\zpPhysics.h"
 #include <stdio.h>
 
 #define TEST_NONE		0
@@ -413,9 +413,12 @@ void rendering_test_main() {
 	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_OPENGL );
 #endif
 
+	zpPhysicsManager pm;
+
 	game.addGameManager( &rm );
 	game.addGameManager( &cm );
 	game.addGameManager( &im );
+	game.addGameManager( &pm );
 
 	game.create();
 
