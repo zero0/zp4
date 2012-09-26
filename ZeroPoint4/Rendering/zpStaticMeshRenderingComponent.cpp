@@ -45,3 +45,6 @@ void zpStaticMeshRenderingComponent::onUpdate() {}
 
 void zpStaticMeshRenderingComponent::onEnabled() {}
 void zpStaticMeshRenderingComponent::onDisabled() {}
+
+void zpStaticMeshRenderingComponent::onShow() {}
+void zpStaticMeshRenderingComponent::onHide() {}

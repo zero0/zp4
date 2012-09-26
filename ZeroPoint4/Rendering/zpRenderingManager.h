@@ -2,7 +2,7 @@
 #ifndef ZP_RENDERING_MANAGER_H
 #define ZP_RENDERING_MANAGER_H
 
-class zpRenderingManager : public zpGameManager {
+class zpRenderingManager : public zpGameManager, public zpRenderable {
 public:
 	zpRenderingManager();
 	virtual ~zpRenderingManager();
@@ -12,10 +12,14 @@ public:
 
 	zpRenderingEngine* getRenderingEngine() const;
 
-	void setRenderingEngineType( zpRenderingEngineType type );
-	zpRenderingEngineType getRenderingEngineType() const;
-
 	void receiveMessage( const zpMessage& message );
+
+	void render();
+
+	zp_bool addRenderingComponent( zpRenderingComponent* component );
+	zp_bool removeRenderingComponent( zpRenderingComponent* component );
+
+	void renderLayer( zp_uint layer );
 
 protected:
 	void onCreate();
@@ -29,7 +33,11 @@ protected:
 private:
 	zpRenderingEngine* m_engine;
 
-	zpRenderingEngineType m_type;
+	zpCamera* m_currentCamera;
+	zpArrayList<zpCameraComponent*> m_cameraStack;
+
+	zpArray<zpArrayList<zpRenderingComponent*>, ZP_RENDERING_LAYER_COUNT> m_renderingComponents;
+
 };
 
 #endif

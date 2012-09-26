@@ -2,7 +2,7 @@
 #ifndef ZP_STATIC_MESH_RENDERING_COMPONENT_H
 #define ZP_STATIC_MESH_RENDERING_COMPONENT_H
 
-class zpStaticMeshRenderingComponent : public zpComponent, public zpRenderable {
+class zpStaticMeshRenderingComponent : public zpRenderingComponent {
 public:
 	zpStaticMeshRenderingComponent();
 	virtual ~zpStaticMeshRenderingComponent();
@@ -23,8 +23,10 @@ protected:
 	void onEnabled();
 	void onDisabled();
 
-private:
+	void onShow();
+	void onHide();
 
+private:
 	zpResourceInstance<zpStaticMeshResource> m_mesh;
 
 	zpMatrix4f m_localTransform;

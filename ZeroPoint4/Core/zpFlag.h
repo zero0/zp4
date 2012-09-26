@@ -24,7 +24,8 @@ public:
 	zp_bool isMarked( zp_uint index ) const { return isAllMarked( (F)( 1 << index ) ); }
 	zp_bool isAnyMarked( F mask ) const { return ( m_flag & mask ) != 0; }
 	zp_bool isAllMarked( F mask ) const { return ( m_flag & mask ) == mask; }
-	
+	zp_bool isZero() const { return m_flag == (F)0; };
+
 	void clear() { m_flag = 0; }
 
 	void set( F flag ) { m_flag = flag; }

@@ -6,14 +6,18 @@
 #include "Content\zpContent.h"
 
 #if ZP_WIN_32 || ZP_WIN_64
-#define ZP_DIRECTX_SUPPORT		1
+#define ZP_DIRECTX_SUPPORT				1
 #endif
 
 #define ZP_RENDER_TARGET_MAX_COUNT		8
 
-#define ZP_DX		0x0d11
-#define ZP_OPENGL	0x09l4
-#define ZP_RENDERING_TYPE	ZP_DX
+#define ZP_DX							0x0d11
+#define ZP_OPENGL						0x09l4
+#define ZP_RENDERING_TYPE				ZP_DX
+
+#define ZP_RENDERING_LAYER_TYPE			zp_byte
+#define ZP_RENDERING_LAYER_COUNT		( sizeof( ZP_RENDERING_LAYER_TYPE ) * 8 )
+typedef zpFlag<ZP_RENDERING_LAYER_TYPE>	zpRenderLayer;
 
 #if ZP_RENDERING_TYPE == ZP_DX
 #include "RenderingDX\zpDX11Lib.inc"
@@ -271,7 +275,9 @@ class zpRenderingFactory;
 class zpCamera;
 class zpRenderingManager;
 
+ZP_ABSTRACT_CLASS zpRenderingComponent;
 class zpCameraComponent;
+class zpLightComponent;
 class zpStaticMeshRenderingComponent;
 
 #include "zpVertex.h"
@@ -304,7 +310,9 @@ class zpStaticMeshRenderingComponent;
 #include "zpCamera.h"
 #include "zpRenderingManager.h"
 
+#include "zpRenderingComponent.h"
 #include "zpCameraComponent.h"
+#include "zpLightComponent.h"
 #include "zpStaticMeshRenderingComponent.h"
 
 #endif

@@ -6,12 +6,6 @@ class zpRenderingFactory {
 public:
 	~zpRenderingFactory();
 
-	template<zpRenderingEngineType type>
-	static zpRenderingEngine* createRenderingEngine() {
-		return createRenderingEngine( type );
-	}
-	static zpRenderingEngine* createRenderingEngine( zpRenderingEngineType type );
-
 	static zpRenderingEngine* getRenderingEngine();
 
 	static void destroyRenderingEngine();

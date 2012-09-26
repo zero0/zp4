@@ -34,9 +34,10 @@ private:
 	mutable zp_uint m_referenceCount;
 	zp_uint m_width;
 	zp_uint m_height;
+	zp_uint m_count;
 
-	zpArray<ID3D11RenderTargetView*> m_renderTargets;
-	zpArray<ID3D11Texture2D*> m_textures;
+	zpArray<ID3D11RenderTargetView*, ZP_RENDER_TARGET_MAX_COUNT> m_renderTargets;
+	zpArray<ID3D11Texture2D*, ZP_RENDER_TARGET_MAX_COUNT> m_textures;
 
 	friend class zpDX11RenderingContext;
 	friend class zpDX11RenderingEngine;

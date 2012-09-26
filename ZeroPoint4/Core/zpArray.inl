@@ -1,78 +1,74 @@
 
-template<typename T>
-const zp_uint zpArray<T>::npos = (zp_uint)-1;
+template<typename T, zp_uint Size>
+const zp_uint zpArray<T, Size>::npos = (zp_uint)-1;
 
-template<typename T>
-zpArray<T>::zpArray() : m_array( ZP_NULL ), m_size( 0 ) {}
-template<typename T>
-zpArray<T>::zpArray( zp_uint size ) : m_array( size == 0 ? ZP_NULL : (T*)calloc( size, sizeof( T ) ) ), m_size( size ) {}
-template<typename T>
-zpArray<T>::zpArray( const zpArray& arr ) : m_array( (T*)calloc( arr.m_size, sizeof( T ) ) ), m_size( arr.m_size ) {
-	zp_memcpy( m_array, m_size * sizeof( T ), arr.m_array, m_size * sizeof( T ) );
+template<typename T, zp_uint Size>
+zpArray<T, Size>::zpArray() {
+	zp_memset( m_array, 0, Size * sizeof( T ) );
 }
-template<typename T>
-zpArray<T>::zpArray( zpArray&& arr ) : m_array( arr.m_array ), m_size( arr.m_size ) {
-	arr.m_array = ZP_NULL;
+template<typename T, zp_uint Size>
+zpArray<T, Size>::zpArray( T* data, zp_uint size ) {
+	zp_memcpy( m_array, Size * sizeof( T ), data, size );
 }
-template<typename T>
-zpArray<T>::~zpArray() {
+template<typename T, zp_uint Size>
+zpArray<T, Size>::zpArray( const zpArray& arr ) {
+	zp_memcpy( m_array, Size * sizeof( T ), arr.m_array, Size * sizeof( T ) );
+}
+template<typename T, zp_uint Size>
+zpArray<T, Size>::zpArray( zpArray&& arr ) {
+	zp_memcpy( m_array, Size * sizeof( T ), arr.m_array, Size * sizeof( T ) );
+	arr.clear();
+}
+template<typename T, zp_uint Size>
+zpArray<T, Size>::~zpArray() {
 	clear();
-	ZP_SAFE_FREE( m_array );
 }
 
-template<typename T>
-void zpArray<T>::operator=( const zpArray& arr ) {
+template<typename T, zp_uint Size>
+void zpArray<T, Size>::operator=( const zpArray& arr ) {
 	clear();
-	ZP_SAFE_FREE( m_array );
-	m_size = arr.m_size;
-	m_array = (T*)calloc( m_size, sizeof( T ) );
-	zp_memcpy( m_array, m_size * sizeof( T ), arr.m_array, m_size * sizeof( T ) );
+	zp_memcpy( m_array, Size * sizeof( T ), arr.m_array, Size * sizeof( T ) );
 }
-template<typename T>
-void zpArray<T>::operator=( zpArray&& arr ) {
+template<typename T, zp_uint Size>
+void zpArray<T, Size>::operator=( zpArray&& arr ) {
 	clear();
-	ZP_SAFE_FREE( m_array );
-	m_size = arr.m_size;
-	m_array = arr.m_array;
-
-	arr.m_array = ZP_NULL;
 }
 
-template<typename T>
-T& zpArray<T>::operator[]( zp_uint index ) {
+template<typename T, zp_uint Size>
+T& zpArray<T, Size>::operator[]( zp_uint index ) {
 	return m_array[ index ];
 }
-template<typename T>
-const T& zpArray<T>::operator[]( zp_uint index ) const {
+template<typename T, zp_uint Size>
+const T& zpArray<T, Size>::operator[]( zp_uint index ) const {
 	return m_array[ index ];
 }
 
-template<typename T>
-T* zpArray<T>::data() {
+template<typename T, zp_uint Size>
+T* zpArray<T, Size>::data() {
 	return m_array;
 }
-template<typename T>
-const T* zpArray<T>::data() const {
+template<typename T, zp_uint Size>
+const T* zpArray<T, Size>::data() const {
 	return m_array;
 }
 
-template<typename T>
-const T& zpArray<T>::at( zp_uint index ) const {
+template<typename T, zp_uint Size>
+const T& zpArray<T, Size>::at( zp_uint index ) const {
 	return m_array[ index ];
 }
 
-template<typename T>
-zp_uint zpArray<T>::size() const {
-	return m_size;
+template<typename T, zp_uint Size>
+zp_uint zpArray<T, Size>::size() const {
+	return Size;
 }
 
-template<typename T>
-void zpArray<T>::remove( zp_uint index, T* outVal = ZP_NULL ) {
+template<typename T, zp_uint Size>
+void zpArray<T, Size>::remove( zp_uint index, T* outVal = ZP_NULL ) {
 	if( outVal ) *outVal = (T&&)m_array[ index ];
 	zp_memset( &m_array[ index ], 0, sizeof( T ) );
 }
-template<typename T>
-void zpArray<T>::erase( zp_uint index ) {
+template<typename T, zp_uint Size>
+void zpArray<T, Size>::erase( zp_uint index ) {
 	if( &m_array[ index ] ) {
 		(&m_array[ index ])->~T();
 		//m_array[ index ] = T();
@@ -80,33 +76,33 @@ void zpArray<T>::erase( zp_uint index ) {
 	}
 }
 
-template<typename T>
-void zpArray<T>::clear() {
+template<typename T, zp_uint Size>
+void zpArray<T, Size>::clear() {
 	if( !m_array ) return;
-	for( zp_uint i = m_size; i --> 0; ) {
+	for( zp_uint i = Size; i --> 0; ) {
 		erase( i );
 	}
 }
 
-template<typename T>
-zp_uint zpArray<T>::indexOf( const T& val ) const {
-	for( zp_uint i = 0; i < m_size; ++i ) {
+template<typename T, zp_uint Size>
+zp_uint zpArray<T, Size>::indexOf( const T& val ) const {
+	for( zp_uint i = 0; i < Size; ++i ) {
 		if( m_array[ i ] == val ) return i;
 	}
 	return npos;
 }
-template<typename T>
-zp_uint zpArray<T>::lastIndexOf( const T& val ) const {
-	for( zp_uint i = m_size; i --> 0; ) {
+template<typename T, zp_uint Size>
+zp_uint zpArray<T, Size>::lastIndexOf( const T& val ) const {
+	for( zp_uint i = Size; i --> 0; ) {
 		if( m_array[ i ] == val ) return i;
 	}
 	return npos;
 }
 
-template<typename T>
-void zpArray<T>::fill( const T* vals, zp_uint size, zp_uint startIndex ) {
-	if( startIndex > m_size ) return;
-	zp_uint count = m_size - startIndex;
+template<typename T, zp_uint Size>
+void zpArray<T, Size>::fill( const T* vals, zp_uint size, zp_uint startIndex ) {
+	if( startIndex > Size ) return;
+	zp_uint count = Size - startIndex;
 	count = ZP_MIN( count, size );
 
 	for( zp_uint i = startIndex, j = 0; i < count; ++i, ++j ) {
@@ -114,35 +110,42 @@ void zpArray<T>::fill( const T* vals, zp_uint size, zp_uint startIndex ) {
 	}
 }
 
-template<typename T> template<typename Func>
-void zpArray<T>::foreach( Func func ) const {
-	for( zp_uint i = 0; i < m_size; ++i ) {
+template<typename T, zp_uint Size> template<typename Func>
+void zpArray<T, Size>::foreach( Func func ) const {
+	for( zp_uint i = 0; i < Size; ++i ) {
 		func( m_array[ i ] );
 	}
 }
-template<typename T> template<typename Func>
-void zpArray<T>::foreachIf( Func func ) const {
-	for( zp_uint i = 0; i < m_size; ++i ) {
+template<typename T, zp_uint Size> template<typename Func>
+void zpArray<T, Size>::foreachIf( Func func ) const {
+	for( zp_uint i = 0; i < Size; ++i ) {
 		if( func( m_array[ i ] ) ) break;
 	}
 }
+template<typename T, zp_uint Size> template<typename Func>
+void zpArray<T, Size>::foreachInRange( zp_uint start, zp_int count, Func func ) const {
+	zp_uint end = ZP_MIN( start + count, Size );
+	for( zp_uint i = start; i < end; ++i ) {
+		func( m_array[ i ] );
+	}
+}
 
-template<typename T> template<typename Func>
-void zpArray<T>::foreachIndexed( Func func ) const {
-	for( zp_uint i = 0; i < m_size; ++i ) {
+template<typename T, zp_uint Size> template<typename Func>
+void zpArray<T, Size>::foreachIndexed( Func func ) const {
+	for( zp_uint i = 0; i < Size; ++i ) {
 		func( i, m_array[ i ] );
 	}
 }
-template<typename T> template<typename Func>
-void zpArray<T>::foreachIndexedIf( Func func ) const {
-	for( zp_uint i = 0; i < m_size; ++i ) {
+template<typename T, zp_uint Size> template<typename Func>
+void zpArray<T, Size>::foreachIndexedIf( Func func ) const {
+	for( zp_uint i = 0; i < Size; ++i ) {
 		if( func( i, m_array[ i ] ) ) break;
 	}
 }
 
-template<typename T> template<typename Func>
-void zpArray<T>::map( Func func ) const {
-	for( zp_uint i = 0; i < m_size; ++i ) {
+template<typename T, zp_uint Size> template<typename Func>
+void zpArray<T, Size>::map( Func func ) const {
+	for( zp_uint i = 0; i < Size; ++i ) {
 		m_array[ i ] = func( m_array[ i ] );
 	}
 }

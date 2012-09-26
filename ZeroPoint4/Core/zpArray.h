@@ -2,11 +2,11 @@
 #ifndef ZP_ARRAY_H
 #define ZP_ARRAY_H
 
-template<typename T>
+template<typename T, zp_uint Size>
 class zpArray {
 public:
 	zpArray();
-	zpArray( zp_uint size );
+	zpArray( T* data, zp_uint count );
 	zpArray( const zpArray& arr );
 	zpArray( zpArray&& arr );
 	~zpArray();
@@ -38,6 +38,8 @@ public:
 	void foreach( Func func ) const;
 	template<typename Func>
 	void foreachIf( Func func ) const;
+	template<typename Func>
+	void foreachInRange( zp_uint start, zp_int count, Func func ) const;
 
 	template<typename Func>
 	void foreachIndexed( Func func ) const;
@@ -51,8 +53,7 @@ public:
 	static const zp_uint npos;
 
 private:
-	T* m_array;
-	zp_uint m_size;
+	T m_array[ Size ];
 };
 
 #include "zpArray.inl"

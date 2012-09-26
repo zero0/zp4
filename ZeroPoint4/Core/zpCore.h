@@ -121,7 +121,7 @@ template<typename T> class zpFlag;
 template<typename T> class zpLinkedList;
 template<typename T> class zpIntrusiveList;
 template<typename F, typename S> class zpPair;
-template<typename T> class zpArray;
+template<typename T, zp_uint Size> class zpArray;
 template<typename T> class zpArrayList;
 template<typename K, typename V> class zpMap;
 template<typename F, typename S> class zpHashMap;

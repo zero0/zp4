@@ -12,22 +12,15 @@ zpRenderingFactory::zpRenderingFactory() {}
 zpRenderingFactory::~zpRenderingFactory() {}
 
 zpRenderingEngine* zpRenderingFactory::s_renderingEngine = ZP_NULL;
-zpRenderingEngine* zpRenderingFactory::createRenderingEngine( zpRenderingEngineType type ) {
+zpRenderingEngine* zpRenderingFactory::getRenderingEngine() {
 	if( !s_renderingEngine ) {
-
 #if ZP_RENDERING_TYPE == ZP_DX
 		s_renderingEngine = new zpDX11RenderingEngine;
 #elif ZP_RENDERING_TYPE == ZP_OPENGL
 		s_renderingEngine = new zpOpenGLRenderingEngine;
 #endif
-
-		if( s_renderingEngine ) s_renderingEngine->initialize();
+		s_renderingEngine->initialize();
 	}
-	return s_renderingEngine;
-}
-
-zpRenderingEngine* zpRenderingFactory::getRenderingEngine() {
-	ZP_ASSERT_RETURN_( s_renderingEngine, ZP_NULL, "Rendering Engine not created!" );
 	return s_renderingEngine;
 }
 

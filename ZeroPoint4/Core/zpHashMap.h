@@ -78,7 +78,7 @@ private:
 	void addMapEntity( Key&& key, const Value& value, zp_hash hash, zp_uint index, zpMapEntity** entity );
 	void addMapEntity( Key&& key, Value&& value, zp_hash hash, zp_uint index, zpMapEntity** entity );
 	
-	zpArray<zpMapEntity*> m_map;
+	zpArrayList<zpMapEntity*> m_map;
 	zp_uint m_size;
 	zp_float m_loadFactor;
 };

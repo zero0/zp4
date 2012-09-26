@@ -407,11 +407,6 @@ void rendering_test_main() {
 	zpInputManager im;
 
 	zpRenderingManager rm;
-#if TEST_RENDERING == TEST_DX
-	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_DX );
-#elif TEST_RENDERING == TEST_OPENGL
-	rm.setRenderingEngineType( ZP_RENDERING_ENGINE_OPENGL );
-#endif
 
 	zpPhysicsManager pm;
 
