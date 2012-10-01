@@ -401,6 +401,7 @@ void rendering_test_main() {
 	cm.registerFileExtension( "shader", &rrc );
 	cm.registerFileExtension( "png", &rrc );
 	cm.registerFileExtension( "obj", &rrc );
+	cm.registerFileExtension( "fnt", &rrc );
 	cm.onResourceLoaded() += zpCreateFunctionDelegate( on_loaded );
 	cm.onAllResourcesLoaded() += zpCreateFunctionDelegate( on_finish );
 
@@ -422,6 +423,7 @@ void rendering_test_main() {
 	loaded = cm.loadResource( "tex_norm.shader", "tex_norm_shader" );
 	loaded = cm.loadResource( "test.png", "tex" );
 	loaded = cm.loadResource( "cube.obj", "cube" );
+	loaded = cm.loadResource( "verdana.fnt", "verdana" );
 
 	//zpLog::getInstance()->disableLogLevel( ZP_LOG_LEVEL_DEBUG );
 	//zpLogOutput& d = zpLog::debug();

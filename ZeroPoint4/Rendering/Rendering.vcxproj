@@ -83,6 +83,9 @@
     <ClInclude Include="zpDepthStencilBuffer.h" />
     <ClInclude Include="zpBuffer.h" />
     <ClInclude Include="zpCamera.h" />
+    <ClInclude Include="zpFontInstance.h" />
+    <ClInclude Include="zpFontResource.h" />
+    <ClInclude Include="zpImmediateBuffer.h" />
     <ClInclude Include="zpLightComponent.h" />
     <ClInclude Include="zpOBJStaticMeshResource.h" />
     <ClInclude Include="zpRasterState.h" />
@@ -100,6 +103,7 @@
     <ClInclude Include="zpStaticMeshInstance.h" />
     <ClInclude Include="zpStaticMeshRenderingComponent.h" />
     <ClInclude Include="zpStaticMeshResource.h" />
+    <ClInclude Include="zpTextRenderingComponent.h" />
     <ClInclude Include="zpTexture.h" />
     <ClInclude Include="zpTextureInstance.h" />
     <ClInclude Include="zpTextureResource.h" />
@@ -110,6 +114,7 @@
   <ItemGroup>
     <ClCompile Include="zpCamera.cpp" />
     <ClCompile Include="zpCameraComponent.cpp" />
+    <ClCompile Include="zpFontResource.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpOBJStaticMeshResource.cpp" />
     <ClCompile Include="zpRendering.cpp">
@@ -125,6 +130,7 @@
     <ClCompile Include="zpStaticMeshInstance.cpp" />
     <ClCompile Include="zpStaticMeshRenderingComponent.cpp" />
     <ClCompile Include="zpStaticMeshResource.cpp" />
+    <ClCompile Include="zpTextRenderingComponent.cpp" />
     <ClCompile Include="zpTextureInstance.cpp" />
     <ClCompile Include="zpViewport.cpp" />
   </ItemGroup>
@@ -135,6 +141,9 @@
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpImmediateBuffer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

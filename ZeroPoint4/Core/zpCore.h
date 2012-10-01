@@ -62,6 +62,7 @@
 
 void zp_printf( const zp_char* text, ... );
 void zp_printfln( const zp_char* text, ... );
+void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... );
 
 void* zp_malloc( zp_uint size );
 void* zp_calloc( zp_uint num, zp_uint size );

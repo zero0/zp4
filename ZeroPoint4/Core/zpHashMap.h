@@ -2,8 +2,8 @@
 #ifndef ZP_HASH_MAP_H
 #define ZP_HASH_MAP_H
 
-#define ZP_HASH_MAP_DEFAULT_LOAD_FACTOR	0.75f
-#define ZP_HASH_MAP_DEFAULT_SIZE		8
+#define ZP_HASH_MAP_DEFAULT_LOAD_FACTOR		0.75f
+#define ZP_HASH_MAP_DEFAULT_CAPACITY		8
 
 template<typename Key, typename Value>
 class zpHashMap {
@@ -45,10 +45,16 @@ public:
 	void foreach( Func func ) const;
 
 private:
-	zp_hash hash( zp_hash hash ) const;
+	zp_hash generateHash( zp_hash hash ) const;
 	void resize( zp_uint newSize );
 
 	struct zpMapEntity {
+		zpMapEntity()
+			: key()
+			, value()
+			, hash( 0 )
+			, next( ZP_NULL )
+		{}
 		zpMapEntity( const Key& key, const Value& value, zp_hash hash, zpMapEntity* next ) :
 			key( key ),
 			value( value ),
@@ -78,7 +84,8 @@ private:
 	void addMapEntity( Key&& key, const Value& value, zp_hash hash, zp_uint index, zpMapEntity** entity );
 	void addMapEntity( Key&& key, Value&& value, zp_hash hash, zp_uint index, zpMapEntity** entity );
 	
-	zpArrayList<zpMapEntity*> m_map;
+	zpMapEntity** m_map;
+	zp_uint m_capacity;
 	zp_uint m_size;
 	zp_float m_loadFactor;
 };

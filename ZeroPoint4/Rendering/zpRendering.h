@@ -264,6 +264,7 @@ ZP_PURE_INTERFACE zpVertexLayout;
 ZP_PURE_INTERFACE zpSamplerState;
 ZP_PURE_INTERFACE zpRasterState;
 
+class zpFontResource;
 ZP_ABSTRACT_CLASS zpStaticMeshResource;
 class zpOBJStaticMeshResource;
 template<> class zpResourceInstance<zpStaticMeshResource>;
@@ -275,10 +276,13 @@ class zpRenderingFactory;
 class zpCamera;
 class zpRenderingManager;
 
+template<typename V, typename I> class zpImmediateBuffer;
+
 ZP_ABSTRACT_CLASS zpRenderingComponent;
 class zpCameraComponent;
 class zpLightComponent;
 class zpStaticMeshRenderingComponent;
+class zpTextRenderingComponent;
 
 #include "zpVertex.h"
 #include "zpViewport.h"
@@ -299,6 +303,7 @@ class zpStaticMeshRenderingComponent;
 #include "zpSamplerState.h"
 #include "zpRasterState.h"
 
+#include "zpFontResource.h"
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"
 #include "zpStaticMeshInstance.h"
@@ -310,9 +315,12 @@ class zpStaticMeshRenderingComponent;
 #include "zpCamera.h"
 #include "zpRenderingManager.h"
 
+#include "zpImmediateBuffer.h"
+
 #include "zpRenderingComponent.h"
 #include "zpCameraComponent.h"
 #include "zpLightComponent.h"
 #include "zpStaticMeshRenderingComponent.h"
+#include "zpTextRenderingComponent.h"
 
 #endif

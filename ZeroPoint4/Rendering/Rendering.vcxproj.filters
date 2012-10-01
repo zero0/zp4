@@ -96,6 +96,18 @@
     <ClInclude Include="zpLightComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpFontResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpImmediateBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpFontInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpTextRenderingComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -146,5 +158,16 @@
     <ClCompile Include="zpLightComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpFontResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpTextRenderingComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpImmediateBuffer.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

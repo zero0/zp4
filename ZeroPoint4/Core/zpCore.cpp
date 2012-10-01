@@ -27,6 +27,16 @@ void zp_printfln( const zp_char* text, ... ) {
 #endif
 	va_end( vl );
 }
+void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... ) {
+	va_list vl;
+	va_start( vl, format );
+#if ZP_USE_SAFE_FUNCTIONS
+	vsnprintf_s( dest, destSize, maxCount, format, vl );
+#else
+	vsnprintf( dest, destSize, format, vl );
+#endif
+	va_end( vl );
+}
 
 void* zp_malloc( zp_uint size ) {
 	return malloc( size );

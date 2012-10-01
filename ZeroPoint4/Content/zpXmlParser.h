@@ -14,11 +14,13 @@ enum zpXmlNodeType {
 struct zpXmlNode {
 	zpXmlNodeType type;
 	zpXmlNode* parent;
+	zpXmlNode* nextSibling;
+	zpXmlNode* prevSibling;
 
 	zpString name;
 	zpString value;
 
-	zpHashMap<zpString, zpString> attributes;
+	zpProperties attributes;
 	zpArrayList<zpXmlNode*> children;
 
 	zpXmlNode();
@@ -30,9 +32,21 @@ public:
 	zpXmlParser();
 	~zpXmlParser();
 
-	static zpXmlNode* parseFile( const zpString& filename );
-	
+	zp_bool parseFile( const zpString& filename, zp_bool includeSiblings = false );
+
+	zpXmlNode* getRootNode() const;
+	zpXmlNode* getCurrentNode() const;
+
+	zp_bool push( const zpString& nodeName );
+	zp_bool next();
+	void pop();
+
 private:
+	zpXmlNode* m_root;
+	zpXmlNode* m_current;
+
+	zpArrayList<zpString> m_nodeNameStack;
+	zpArrayList<zpXmlNode*> m_nodeStack;
 };
 
 #endif

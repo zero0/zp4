@@ -28,14 +28,10 @@ zpString& zpProperties::operator[]( zpString&& key ) {
 }
 
 zp_int zpProperties::getInt( const zpString& key ) const {
-	zp_int value;
-	m_properties.get( key ).scan( "%d", &value );
-	return value;
+	return zp_atoi( m_properties.get( key ).c_str() );
 }
 zp_float zpProperties::getFloat( const zpString& key ) const {
-	zp_float value;
-	m_properties.get( key ).scan( "%f", &value );
-	return value;
+	return zp_atof( m_properties.get( key ).c_str() );
 }
 const zpString& zpProperties::getString( const zpString& key ) const {
 	return m_properties.get( key );
@@ -43,12 +39,12 @@ const zpString& zpProperties::getString( const zpString& key ) const {
 
 void zpProperties::setInt( const zpString& key, zp_int value ) {
 	zp_char buff[16];
-	sprintf_s( buff, "%d", value );
+	zp_snprintf( buff, 16, 16, "%d", value );
 	m_properties[ key ] = buff;
 }
 void zpProperties::setFloat( const zpString& key, zp_float value ) {
 	zp_char buff[16];
-	sprintf_s( buff, "%f", value );
+	zp_snprintf( buff, 16, 16, "%f", value );
 	m_properties[ key ] = buff;
 }
 void zpProperties::setString( const zpString& key, const zpString& value ) {

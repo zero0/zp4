@@ -34,7 +34,7 @@ void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint cou
 	desc.Usage = __zpToDX( bind );
 	desc.ByteWidth = m_stride * m_count;
 	desc.BindFlags = __zpToDX( type );
-	desc.CPUAccessFlags = 0;
+	desc.CPUAccessFlags = bind == ZP_BUFFER_BIND_DYNAMIC ? D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE : 0;
 	desc.MiscFlags = 0;
 
 	ID3D11Device* device = ( (zpDX11RenderingEngine*)zpRenderingFactory::getRenderingEngine() )->getDevice();

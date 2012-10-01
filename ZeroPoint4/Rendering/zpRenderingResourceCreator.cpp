@@ -13,6 +13,8 @@ zpResource* zpRenderingResourceCreator::createResource( const zpString& filename
 		resource = engine->createShaderResource();
 	} else if( filename.endsWith( ".obj" ) ) {
 		resource = new zpOBJStaticMeshResource;
+	} else if( filename.endsWith( ".fnt" ) ) {
+		resource = new zpFontResource;
 	} else {
 		zpLog::warning() << "Unknown file extension for file: " << filename << zpLog::endl;
 	}

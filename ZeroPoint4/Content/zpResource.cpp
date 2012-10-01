@@ -23,7 +23,7 @@ void zpResource::setIsLoaded( zp_bool loaded ) {
 }
 
 void zpResource::setContentManager( zpContentManager* manager ) {
-	manager = m_manager;
+	m_manager = manager;
 }
 void zpResource::setFilename( const zpString& filename ) {
 	m_filename = filename;
