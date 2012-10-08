@@ -72,6 +72,8 @@ public:
 	zp_bool writeDouble( zp_double value );
 	zp_int writeFormat( const zp_char* format, ... );
 
+	zp_int writeBuffer( const zpStringBuffer& buffer );
+
 	void flush();
 	void seek( zp_long pos, zpFileSeek seek = ZP_FILE_SEEK_SET );
 	zp_long tell();

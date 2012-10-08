@@ -5,6 +5,54 @@
 #include <string.h>
 #include <memory.h>
 
+#if ZP_DEBUG
+#if ZP_WIN_32 || ZP_WIN_64
+#include <Windows.h>
+
+void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... ) {
+	if( !test ) {
+		zp_char message[256];
+		zp_char text[256];
+		zp_char title[256];
+
+		va_list vl;
+		va_start( vl, msg );
+#if ZP_USE_SAFE_FUNCTIONS
+		vsnprintf_s( message, sizeof( message ), sizeof( message ), msg, vl );
+#else
+		vsnprintf( message, 256, msg, vl );
+#endif
+		va_end( vl );
+
+		zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
+		
+		zpString filename( file );
+		zpFile::convertToFilePath( filename );
+		zp_uint s = filename.lastIndexOf( zpFile::sep );
+		if( s != zpString::npos ) {
+			filename = filename.substring( s + 1 );
+		}
+
+		zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", filename.c_str(), line );
+
+		zp_int result = MessageBox( ZP_NULL, text, title, MB_YESNOCANCEL | MB_ICONEXCLAMATION );
+	
+		switch( result ) {
+		case IDOK:
+			__debugbreak();
+			break;
+		case IDNO:
+			exit( 0 );
+			break;
+		case IDCANCEL:
+			// ignore
+			break;
+		}
+	}
+}
+#endif
+#endif
+
 void zp_printf( const zp_char* text, ... ) {
 	va_list vl;
 	va_start( vl, text );
@@ -22,7 +70,7 @@ void zp_printfln( const zp_char* text, ... ) {
 	vprintf_s( text, vl );
 	printf_s( "\n" );
 #else
-	vprint( text, v1 );
+	vprintf( text, v1 );
 	printf( "\n" );
 #endif
 	va_end( vl );

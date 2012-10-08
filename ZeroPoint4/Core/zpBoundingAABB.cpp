@@ -51,6 +51,32 @@ void zpBoundingAABB::setCenter( const zpVector4f& center ) {
 	translate( center - getCenter() );
 }
 
+zpBoundingSphere zpBoundingAABB::generateBoundingSphere( zp_bool isSphereContained ) const {
+	zp_real r;
+	zpVector4f center = getCenter();
+
+	if( isSphereContained ) {
+		r = 
+		zp_real_min(
+			zp_real_sub( m_max.getX(), m_min.getX() ),
+			zp_real_min(
+				zp_real_sub( m_max.getY(), m_min.getY() ),
+				zp_real_sub( m_max.getZ(), m_min.getZ() )
+			)
+		);
+		r = zp_real_mul( r, zp_real_from_float( 0.5f ) ); 
+	} else {
+		zpVector4f maxLength( m_max );
+		maxLength.sub3( center );
+		zpVector4f minLength( m_min );
+		minLength.sub3( center );
+		
+		r = zp_real_max( maxLength.magnitude3(), minLength.magnitude3() );
+	}
+
+	return zpBoundingSphere( center, zp_real_to_float( r ) );
+}
+
 zp_float zpBoundingAABB::getWidth() const {
 	return zp_real_to_float( zp_real_sub( m_max.getX(), m_min.getX() ) );
 }
@@ -119,7 +145,7 @@ void zpBoundingAABB::add( const zpBoundingAABB& box ) {
 void zpBoundingAABB::add( const zpBoundingSphere& sphere ) {
 	zpVector4f min( sphere.getCenter() );
 	zpVector4f max( sphere.getCenter() );
-
+	
 	min.add3( zp_real_neg( min.getW() ) );
 	max.add3( max.getW() );
 

@@ -10,12 +10,42 @@ zpPhysicsManager::zpPhysicsManager()
 	, m_solver( ZP_NULL )
 	, m_world( ZP_NULL )
 	, m_fixedTimeStep( 1.f / 60.f )
+	, m_maxSubSteps( 6 )
 	, m_gravity( 0, -9.81f, 0 )
 {}
 zpPhysicsManager::~zpPhysicsManager() {}
 
-void zpPhysicsManager::serialize( zpSerializedOutput* out ) {}
-void zpPhysicsManager::deserialize( zpSerializedInput* in ) {}
+void zpPhysicsManager::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeFloat( m_fixedTimeStep, "@fixed-timestep" );
+	out->writeInt( m_maxSubSteps, "@max-sub-steps" );
+
+	out->writeBlock( "Gravity" );
+	{
+		zpSerializableObject<zpVector4f> gravity( m_gravity );
+		gravity.serialize( out );
+	}
+	out->endBlock();
+
+	out->endBlock();
+}
+void zpPhysicsManager::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readFloat( &m_fixedTimeStep, "@fixed-timestep" );
+	in->readInt( &m_maxSubSteps, "@max-sub-steps" );
+
+	if( in->readBlock( "Gravity" ) )
+	{
+		zpSerializableObject<zpVector4f> gravity( m_gravity );
+		gravity.deserialize( in );
+		m_gravity = gravity;
+	}
+	in->endBlock();
+
+	in->endBlock();
+}
 
 void zpPhysicsManager::receiveMessage( const zpMessage& message ) {}
 
@@ -47,7 +77,7 @@ void zpPhysicsManager::onDestroy() {
 }
 
 void zpPhysicsManager::onUpdate() {
-	m_world->stepSimulation( zpTime::getInstance()->getDeltaSeconds(), 6, m_fixedTimeStep );
+	m_world->stepSimulation( zpTime::getInstance()->getDeltaSeconds(), m_maxSubSteps, m_fixedTimeStep );
 }
 
 void zpPhysicsManager::onEnabled() {}

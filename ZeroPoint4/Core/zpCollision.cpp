@@ -143,5 +143,17 @@ zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBounding
 	return type;
 }
 zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingSphere& b ) {
-	return ZP_COLLISION_TYPE_NONE;
+	zp_real r = zp_real_from_float( b.getRadius() );
+	zp_real z = zp_real_zero();
+	zpVector4f center( b.getCenter().xyz1() );
+
+	for( zp_uint i = 6; i --> 0; ) {
+		zp_real d = a.getPlane( (zpFrustumPlane)i ).getVector().dot4( center );
+		d = zp_real_add( d, r );
+		if( zp_real_lt( d, z ) ) {
+			return ZP_COLLISION_TYPE_NONE;
+		}
+	}
+
+	return ZP_COLLISION_TYPE_CONTAINS;
 }

@@ -128,12 +128,18 @@ public:
 #define SWIZZEL2( x, y )		ZP_FORCE_INLINE zpVector4f x##y() const			{ return zpVector4f( _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##y, cti_##y, cti_##y ) ) ); }
 #define SWIZZEL1( x )			ZP_FORCE_INLINE zpVector4f x##() const			{ return zpVector4f( _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##x, cti_##x, cti_##x ) ) ); }
 
+#define SWIZZEL30( x, y, z )	ZP_FORCE_INLINE zpVector4f x##y##z##0() const		{ __m128 _xyz0 = _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##y, cti_##z, cti_##z ) ); _xyz0.m128_f32[3] = 0.f; return zpVector4f( _xyz0 ); }
+#define SWIZZEL31( x, y, z )	ZP_FORCE_INLINE zpVector4f x##y##z##1() const		{ __m128 _xyz1 = _mm_shuffle_ps( m_xyzw, m_xyzw, _MM_SHUFFLE( cti_##x, cti_##y, cti_##z, cti_##z ) ); _xyz1.m128_f32[3] = 1.f; return zpVector4f( _xyz1 ); }
+
 #else
 
 #define SWIZZEL4( x, y, z, w )	ZP_FORCE_INLINE zpVector4f x##y##z##w() const	{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, m_xyzw.##w ); }
 #define SWIZZEL3( x, y, z )		ZP_FORCE_INLINE zpVector4f x##y##z() const		{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, m_xyzw.##z ); }
 #define SWIZZEL2( x, y )		ZP_FORCE_INLINE zpVector4f x##y() const			{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##y, m_xyzw.##y ); }
 #define SWIZZEL1( x )			ZP_FORCE_INLINE zpVector4f x##() const			{ return zpVector4f( m_xyzw.##x, m_xyzw.##x, m_xyzw.##x, m_xyzw.##x ); }
+
+#define SWIZZEL30( x, y, z )	ZP_FORCE_INLINE zpVector4f x##y##z##0() const		{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, 0.f ); }
+#define SWIZZEL31( x, y, z )	ZP_FORCE_INLINE zpVector4f x##y##z##1() const		{ return zpVector4f( m_xyzw.##x, m_xyzw.##y, m_xyzw.##z, 1.f ); }
 
 #endif
 	// swizzel 4 ( abcd )
@@ -553,6 +559,168 @@ public:
 	SWIZZEL3( w, w, y );
 	SWIZZEL3( w, w, z );
 	SWIZZEL3( w, w, w );
+
+	// swizzel 30 ( abc0 )
+	SWIZZEL30( x, x, x );
+	SWIZZEL30( x, x, y );
+	SWIZZEL30( x, x, z );
+	SWIZZEL30( x, x, w );
+
+	SWIZZEL30( x, y, x );
+	SWIZZEL30( x, y, y );
+	SWIZZEL30( x, y, z );
+	SWIZZEL30( x, y, w );
+
+	SWIZZEL30( x, z, x );
+	SWIZZEL30( x, z, y );
+	SWIZZEL30( x, z, z );
+	SWIZZEL30( x, z, w );
+
+	SWIZZEL30( x, w, x );
+	SWIZZEL30( x, w, y );
+	SWIZZEL30( x, w, z );
+	SWIZZEL30( x, w, w );
+
+	SWIZZEL30( y, x, x );
+	SWIZZEL30( y, x, y );
+	SWIZZEL30( y, x, z );
+	SWIZZEL30( y, x, w );
+
+	SWIZZEL30( y, y, x );
+	SWIZZEL30( y, y, y );
+	SWIZZEL30( y, y, z );
+	SWIZZEL30( y, y, w );
+
+	SWIZZEL30( y, z, x );
+	SWIZZEL30( y, z, y );
+	SWIZZEL30( y, z, z );
+	SWIZZEL30( y, z, w );
+
+	SWIZZEL30( y, w, x );
+	SWIZZEL30( y, w, y );
+	SWIZZEL30( y, w, z );
+	SWIZZEL30( y, w, w );
+
+	SWIZZEL30( z, x, x );
+	SWIZZEL30( z, x, y );
+	SWIZZEL30( z, x, z );
+	SWIZZEL30( z, x, w );
+
+	SWIZZEL30( z, y, x );
+	SWIZZEL30( z, y, y );
+	SWIZZEL30( z, y, z );
+	SWIZZEL30( z, y, w );
+
+	SWIZZEL30( z, z, x );
+	SWIZZEL30( z, z, y );
+	SWIZZEL30( z, z, z );
+	SWIZZEL30( z, z, w );
+
+	SWIZZEL30( z, w, x );
+	SWIZZEL30( z, w, y );
+	SWIZZEL30( z, w, z );
+	SWIZZEL30( z, w, w );
+
+	SWIZZEL30( w, x, x );
+	SWIZZEL30( w, x, y );
+	SWIZZEL30( w, x, z );
+	SWIZZEL30( w, x, w );
+
+	SWIZZEL30( w, y, x );
+	SWIZZEL30( w, y, y );
+	SWIZZEL30( w, y, z );
+	SWIZZEL30( w, y, w );
+
+	SWIZZEL30( w, z, x );
+	SWIZZEL30( w, z, y );
+	SWIZZEL30( w, z, z );
+	SWIZZEL30( w, z, w );
+
+	SWIZZEL30( w, w, x );
+	SWIZZEL30( w, w, y );
+	SWIZZEL30( w, w, z );
+	SWIZZEL30( w, w, w );
+
+	// swizzel 31 ( abc1 )
+	SWIZZEL31( x, x, x );
+	SWIZZEL31( x, x, y );
+	SWIZZEL31( x, x, z );
+	SWIZZEL31( x, x, w );
+
+	SWIZZEL31( x, y, x );
+	SWIZZEL31( x, y, y );
+	SWIZZEL31( x, y, z );
+	SWIZZEL31( x, y, w );
+
+	SWIZZEL31( x, z, x );
+	SWIZZEL31( x, z, y );
+	SWIZZEL31( x, z, z );
+	SWIZZEL31( x, z, w );
+
+	SWIZZEL31( x, w, x );
+	SWIZZEL31( x, w, y );
+	SWIZZEL31( x, w, z );
+	SWIZZEL31( x, w, w );
+
+	SWIZZEL31( y, x, x );
+	SWIZZEL31( y, x, y );
+	SWIZZEL31( y, x, z );
+	SWIZZEL31( y, x, w );
+
+	SWIZZEL31( y, y, x );
+	SWIZZEL31( y, y, y );
+	SWIZZEL31( y, y, z );
+	SWIZZEL31( y, y, w );
+
+	SWIZZEL31( y, z, x );
+	SWIZZEL31( y, z, y );
+	SWIZZEL31( y, z, z );
+	SWIZZEL31( y, z, w );
+
+	SWIZZEL31( y, w, x );
+	SWIZZEL31( y, w, y );
+	SWIZZEL31( y, w, z );
+	SWIZZEL31( y, w, w );
+
+	SWIZZEL31( z, x, x );
+	SWIZZEL31( z, x, y );
+	SWIZZEL31( z, x, z );
+	SWIZZEL31( z, x, w );
+
+	SWIZZEL31( z, y, x );
+	SWIZZEL31( z, y, y );
+	SWIZZEL31( z, y, z );
+	SWIZZEL31( z, y, w );
+
+	SWIZZEL31( z, z, x );
+	SWIZZEL31( z, z, y );
+	SWIZZEL31( z, z, z );
+	SWIZZEL31( z, z, w );
+
+	SWIZZEL31( z, w, x );
+	SWIZZEL31( z, w, y );
+	SWIZZEL31( z, w, z );
+	SWIZZEL31( z, w, w );
+
+	SWIZZEL31( w, x, x );
+	SWIZZEL31( w, x, y );
+	SWIZZEL31( w, x, z );
+	SWIZZEL31( w, x, w );
+
+	SWIZZEL31( w, y, x );
+	SWIZZEL31( w, y, y );
+	SWIZZEL31( w, y, z );
+	SWIZZEL31( w, y, w );
+
+	SWIZZEL31( w, z, x );
+	SWIZZEL31( w, z, y );
+	SWIZZEL31( w, z, z );
+	SWIZZEL31( w, z, w );
+
+	SWIZZEL31( w, w, x );
+	SWIZZEL31( w, w, y );
+	SWIZZEL31( w, w, z );
+	SWIZZEL31( w, w, w );
 
 	// swizzel 2 ( abbb )
 	SWIZZEL2( x, x );

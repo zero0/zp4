@@ -21,15 +21,15 @@ public:
 	void setAspectRatio( zp_float aspectRatio );
 
 	void setPosition( const zpVector4f& position );
+	void setLookTo( const zpVector4f& lookTo );
 	void setLookAt( const zpVector4f& lookAt );
 	void setUp( const zpVector4f& up );
-	void set( const zpVector4f& position, const zpVector4f& lookAt, const zpVector4f& up );
 
 	zp_float getAspectRation() const;
 	zp_float getFovy() const;
 
 	const zpVector4f& getPosition() const;
-	const zpVector4f& getLookAt() const;
+	const zpVector4f& getLookTo() const;
 	const zpVector4f& getUp() const;
 
 	const zpFrustum& getFrustum() const;
@@ -38,6 +38,8 @@ public:
 	const zpMatrix4f& getProjection() const;
 	const zpMatrix4f& getViewProjection() const;
 	const zpMatrix4f& getInvViewProjection() const;
+
+	zpRay generateRay( const zpVector2i& windowPosition ) const;
 
 private:
 	zpCameraProjection m_projectionType;
@@ -50,8 +52,10 @@ private:
 	zp_float m_fovy;
 	zp_float m_aspectRatio;
 
+	zpRect m_orthoRect;
+
 	zpVector4f m_up;
-	zpVector4f m_lookAt;
+	zpVector4f m_lookTo;
 	zpVector4f m_position;
 
 	zpFrustum m_frustum;

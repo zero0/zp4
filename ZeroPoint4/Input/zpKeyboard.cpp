@@ -5,7 +5,7 @@
 #define KEY_UP		(zp_byte)0
 
 zpKeyboard::zpKeyboard()
-	: m_hasFocus( false )
+	: m_hasFocus( true )
 {
 	zp_memset( m_keyDownBuffer, 0, sizeof( m_keyDownBuffer ) );
 }
@@ -14,7 +14,7 @@ zpKeyboard::~zpKeyboard() {
 }
 
 void zpKeyboard::poll() {
-	if( m_hasFocus ) return;
+	if( !m_hasFocus ) return;
 
 	for( zp_uint k = 256; k --> 0; ) {
 		if( m_keyBuffer[ k ] == KEY_DOWN ) {
@@ -40,7 +40,9 @@ void zpKeyboard::poll() {
 		}
 	}
 }
-void zpKeyboard::create() {}
+void zpKeyboard::create() {
+	zp_memset( m_keyDownBuffer, 0, sizeof( m_keyDownBuffer ) );
+}
 void zpKeyboard::destroy() {
 	removeAllListeners();
 	zp_memset( m_keyDownBuffer, 0, sizeof( m_keyDownBuffer ) );

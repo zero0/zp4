@@ -184,7 +184,7 @@ void core_test_main() {
 	getchar();
 }
 
-void on_loaded( const zpString& filename, zp_bool loaded ){
+void on_loaded( const zpString& filename, zp_bool loaded, zp_uint ){
 	zp_printfln( "File '%s' %s", filename.c_str(), loaded ? "loaded" : "failed to load" );
 }
 void on_finish() {
@@ -270,7 +270,9 @@ struct TestRenderable : public zpRenderable {
 
 		camera.setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
 		camera.setNearFar( 1, 1000 );
-		camera.set( zpVector4f( 5, 6, 7 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );
+		camera.setPosition( zpVector4f( 5, 6, 7 ) );
+		camera.setLookAt( zpVector4f() );
+		camera.setUp( zpVector4f( 0, 1, 0 ) );
 		camera.setAspectRatio( 800.f / 600.f );
 		camera.setFovy( 45.f );
 		camera.update();
@@ -282,10 +284,8 @@ struct TestRenderable : public zpRenderable {
 		};
 		cb cambuf[1];
 		cambuf[0].v = camera.getView();//.lookAt( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
-		//cambuf[0].p.ortho( 800, 600, 1, 1000 );// = camera.getProjection();
 		cambuf[0].p = camera.getProjection();//.perspective( 45.f, 4.f / 3.f, 1, 1000 );
 		cambuf[0].vp = camera.getViewProjection();
-		//cambuf[0].w.scale( zp_real_from_float( .5f ) );
 
 		cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
 		//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
@@ -296,9 +296,9 @@ struct TestRenderable : public zpRenderable {
 	}
 	void render() {
 #if TEST_RENDERING
-		zp_long start = zpTime::getInstance()->getTime();
-
+		
 		zpRenderingContext* i = engine->getImmediateRenderingContext();
+		zp_long start = zpTime::getInstance()->getTime();
 
 		zpColor4f c(.23f, .15f, .88f, 1.f );
 		i->setViewport( zpViewport( 800, 600 ) );
@@ -345,9 +345,9 @@ struct TestRenderable : public zpRenderable {
 			//i->draw( mesh->getNumVertices() );
 		}
 		*/
-		engine->present();
 		zp_long end = zpTime::getInstance()->getTime();
-
+		engine->present();
+		
 		++frames;
 		time += zpTime::getInstance()->getDeltaSeconds();
 		if( time > 1.f ) {
@@ -434,12 +434,27 @@ void rendering_test_main() {
 
 		void onKeyDown( zpKeyCode key ) { zp_printfln( "Key Down %d", key ); };
 		void onKeyRepeat( zpKeyCode key ) { zp_printfln( "Key Repeat %d", key ); };
-		void onKeyUp( zpKeyCode key ) { if( key == ZP_KEY_CODE_R ) { content->reloadAllResources(); } zp_printfln( "Key Up %d", key ); };
+		void onKeyUp( zpKeyCode key ) {
+			if( key == ZP_KEY_CODE_R ) { 
+				content->reloadAllResources(); 
+			} else if( key == ZP_KEY_CODE_A ) {
+				content->unloadAllResources();
+			}
+			zp_printfln( "Key Up %d", key );
+		};
 	};
 	struct MouseListener : public zpMouseListener {
 		void onMouseMove( const zpVector2i& loc ) { zp_printfln( "Mouse Move %d %d", loc.getX(), loc.getY() ); };
 		void onMouseChange( const zpVector2i& loc ) { zp_printfln( "Mouse Change %d %d", loc.getX(), loc.getY() ); };
 		void onMouseButtonUp( zpMouseButton button ) { zp_printfln( "Mouse Up %d", button ); };
+	};
+	struct ControllerListener : public zpControllerListener {
+		void onButtonDown( zpControllerButton button ) { zp_printfln( "Button Down %d", button ); }
+		void onLeftStickMove( const zpVector2i& move ) { zp_printfln( "Left Stick %d %d", move.getX(), move.getY() ); }
+		void onRightTriggerPull( zp_ushort amount ) { zp_printfln( "Right Trigger %d", amount ); }
+
+		void onControllerDisconnected() {};
+		void onControllerReconnected() {};
 	};
 
 	KeyboardListener kl;
@@ -447,6 +462,7 @@ void rendering_test_main() {
 
 	im.getKeyboard()->addListener( &kl );
 	im.getMouse()->addListener( new MouseListener );
+	im.getController( ZP_CONTROLLER_1 )->addListener( new ControllerListener );
 
 	game.addWorld( &world, true );
 
@@ -503,6 +519,17 @@ void scripting_test_main() {
 
 	game.addWorld( &world, true );
 
+	zpStringBuffer buff;
+	zpXmlParser xml;
+	zpXmlNode rootNode;
+	rootNode.type = ZP_XML_NODE_TYPE_DOCUMENT;
+	xml.setRootNode( &rootNode, false );
+	zpXmlSerializedOutput out( xml.getRootNode() );
+	
+	world.serialize( &out );
+
+	xml.writeToBuffer( xml.getRootNode(), buff );
+
 	while( wnd.processMessages() ) game.process();
 }
 
@@ -522,8 +549,8 @@ void printNode( const zpXmlNode* node, zp_int tab ) {
 }
 
 int main() {
-	rendering_test_main();
-	//scripting_test_main();
+	//rendering_test_main();
+	scripting_test_main();
 
 	//zpXmlNode* node = zpXmlParser::parseFile( "Assets/test.xml" );
 

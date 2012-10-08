@@ -39,6 +39,7 @@ public:
 
 	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );
 	void unmap( zpBuffer* buffer, zp_uint subResource );
+	void updateBuffer( zpBuffer* buffer, const void* data );
 
 	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
 	void drawAuto();

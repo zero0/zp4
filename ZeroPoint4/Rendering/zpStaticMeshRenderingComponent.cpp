@@ -1,12 +1,20 @@
 #include "zpRendering.h"
 
-zpStaticMeshRenderingComponent::zpStaticMeshRenderingComponent() {}
+zpStaticMeshRenderingComponent::zpStaticMeshRenderingComponent()
+	: m_manager( ZP_NULL )
+{}
 zpStaticMeshRenderingComponent::~zpStaticMeshRenderingComponent() {}
 
 void zpStaticMeshRenderingComponent::render() {
 	if( !m_mesh ) return;
 
 	zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
+
+	zpMatrix4f trans;
+	getParentGameObject()->getComputedTransform( trans );
+	trans.mul( m_localTransform, trans );
+
+	m_manager->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_WORLD )->update( (zp_float*)trans );
 
 	zp_uint numParts = m_mesh.getResource()->getNumMeshParts();
 	for( zp_uint i = 0; i < numParts; ++i ) {
@@ -33,15 +41,37 @@ void zpStaticMeshRenderingComponent::render() {
 
 void zpStaticMeshRenderingComponent::receiveMessage( const zpMessage& message ) {}
 
-void zpStaticMeshRenderingComponent::serialize( zpSerializedOutput* out ) {}
-void zpStaticMeshRenderingComponent::deserialize( zpSerializedInput* in ) {}
+void zpStaticMeshRenderingComponent::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeString( m_meshAlias, "@mesh" );
+
+	out->endBlock();
+}
+void zpStaticMeshRenderingComponent::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readString( &m_meshAlias, "@mesh" );
+
+	in->endBlock();
+}
 
 void zpStaticMeshRenderingComponent::onCreate() {
-	m_mesh = getGameManagerOfType<zpContentManager>()->createInstanceOfResource<zpStaticMeshResource>( "cube" );
+	zpContentManager* content = getGameManagerOfType<zpContentManager>();
+	m_manager = getGameManagerOfType<zpRenderingManager>();
+	m_meshAlias = "cube";
+	m_mesh = content->createInstanceOfResource<zpStaticMeshResource>( m_meshAlias );
 }
 void zpStaticMeshRenderingComponent::onDestroy() {}
 
-void zpStaticMeshRenderingComponent::onUpdate() {}
+void zpStaticMeshRenderingComponent::onUpdate() {
+	zpMatrix4f trans;
+	getParentGameObject()->getComputedTransform( trans );
+	zpVector4f pos;
+	trans.getPosition( pos );
+
+	m_boundingSphere.setCenter( pos );
+}
 
 void zpStaticMeshRenderingComponent::onEnabled() {}
 void zpStaticMeshRenderingComponent::onDisabled() {}

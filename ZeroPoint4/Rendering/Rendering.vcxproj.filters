@@ -108,6 +108,9 @@
     <ClInclude Include="zpTextRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpBufferData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">

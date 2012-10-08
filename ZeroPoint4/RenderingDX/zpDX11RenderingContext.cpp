@@ -184,11 +184,18 @@ void zpDX11RenderingContext::setRasterState( zpRasterState* raster ) {
 
 void zpDX11RenderingContext::map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) {
 	D3D11_MAPPED_SUBRESOURCE r;
-	m_context->Map( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource, __zpToDX( mapType ), 0, &r );
+	HRESULT hr;
+
+	hr = m_context->Map( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource, __zpToDX( mapType ), 0, &r );
+	if( FAILED( hr ) ) zpLog::error() << "Failed to map buffer" << zpLog::endl;
+
 	data = &r.pData;
 }
 void zpDX11RenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
 	m_context->Unmap( ( (zpDX11Buffer*)buffer )->getBuffer(), subResource );
+}
+void zpDX11RenderingContext::updateBuffer( zpBuffer* buffer, const void* data ) {
+	m_context->UpdateSubresource( ( (zpDX11Buffer*)buffer )->getBuffer(), 0, ZP_NULL, data, 0, 0 );
 }
 
 void zpDX11RenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {

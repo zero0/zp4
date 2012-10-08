@@ -79,6 +79,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpBufferData.h" />
     <ClInclude Include="zpCameraComponent.h" />
     <ClInclude Include="zpDepthStencilBuffer.h" />
     <ClInclude Include="zpBuffer.h" />

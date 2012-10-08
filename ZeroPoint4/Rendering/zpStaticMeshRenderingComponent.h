@@ -27,6 +27,9 @@ protected:
 	void onHide();
 
 private:
+	zpRenderingManager* m_manager;
+
+	zpString m_meshAlias;
 	zpResourceInstance<zpStaticMeshResource> m_mesh;
 
 	zpMatrix4f m_localTransform;

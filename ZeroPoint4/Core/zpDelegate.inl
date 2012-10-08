@@ -78,10 +78,10 @@ public:
 	~zpDelegateEvent() { clear(); }
 
 	void operator+=( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.pushBack( del ); }
-	void operator-=( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.removeAll( del ); }
+	void operator-=( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.eraseAll( del ); }
 
 	void add( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.pushBack( del ); }
-	void remove( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.removeAll( del ); }
+	void remove( const zpDelegate<R ( DELEGATE_CLASS_TEMPLATE_ARGS )>& del ) { m_delegates.eraseAll( del ); }
 	void clear() { m_delegates.clear(); }
 
 	zp_uint size() const { return m_delegates.size(); }

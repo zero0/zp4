@@ -89,7 +89,7 @@ void* zpScriptingResource::getScriptObjectType() const {
 }
 void* zpScriptingResource::getMethod( const zpString& functionName ) {
 	void* method = ZP_NULL;
-	if( !m_cachedMethods.find( functionName, &method ) ) {
+	if( !m_cachedMethods.find( functionName, &method ) && m_scriptObjectType ) {
 		asIScriptFunction* func = ( (asIObjectType*)m_scriptObjectType )->GetMethodByName( functionName.c_str() );
 		if( func ) {
 			func->AddRef();

@@ -360,6 +360,20 @@ zp_int zpFile::writeFormat( const zp_char* format, ... ) {
 	return count;
 }
 
+zp_int zpFile::writeBuffer( const zpStringBuffer& buffer ) {
+	zp_int count = 0;
+
+	if( m_file ) {
+		FILE* f = (FILE*)m_file;
+
+		const zp_char* str = buffer.getChars();
+
+		count = fputs( str, f );
+	}
+
+	return count;
+}
+
 void zpFile::flush() {
 	if( m_file ) {
 		fflush( (FILE*)m_file );

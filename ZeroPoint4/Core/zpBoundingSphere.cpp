@@ -35,6 +35,18 @@ void zpBoundingSphere::setRadius( zp_float radius ) {
 	m_sphere.setW( zp_real_from_float( radius ) );
 }
 
+zpBoundingAABB zpBoundingSphere::generateBoundingAABB() const {
+	zp_real r = m_sphere.getW();
+	zp_real nr = zp_real_neg( r );
+
+	zpVector4f min( nr, nr, nr );
+	zpVector4f max( r, r, r );
+	min.add3( m_sphere );
+	max.add3( m_sphere );
+
+	return zpBoundingAABB( min, max );
+}
+
 void zpBoundingSphere::translate( const zpVector4f& translate ) {
 	m_sphere.add3( translate );
 }

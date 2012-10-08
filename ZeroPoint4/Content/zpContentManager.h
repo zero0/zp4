@@ -9,7 +9,7 @@ public:
 	
 	void registerFileExtension( const zpString& extension, zpResourceCreator* creator );
 	
-	zp_bool loadResource( const zpString& filename, const zpString& alias );
+	zp_bool loadResource( const zpString& filename, const zpString& alias, zp_bool immediateLoad = false );
 	zp_uint loadResources( const zpProperties& aliasToFilenames );
 
 	zp_bool unloadResource( const zpString& alias );
@@ -42,7 +42,7 @@ public:
 	void setRootDirectory( const zpString& rootDirectory );
 	const zpString& getRootDirectory() const;
 
-	zpDelegateEvent<void( const zpString& filename, zp_bool loaded )>& onResourceLoaded();
+	zpDelegateEvent<void( const zpString&, zp_bool, zp_uint )>& onResourceLoaded();
 	zpDelegateEvent<void()>& onAllResourcesLoaded();
 
 protected:
@@ -58,7 +58,7 @@ private:
 	zpString m_assetsFolder;
 	zpString m_rootDirectory;
 
-	zpDelegateEvent<void( const zpString& filename, zp_bool loaded )> m_onResourceLoaded;
+	zpDelegateEvent<void( const zpString& filename, zp_bool loaded, zp_uint numLeft )> m_onResourceLoaded;
 	zpDelegateEvent<void()> m_onAllResourcesLoaded;
 
 	zpArrayList<zpResource*> m_resourcesToLoad;

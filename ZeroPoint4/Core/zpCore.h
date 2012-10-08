@@ -23,15 +23,11 @@
 #if ZP_DEBUG
 #define ZP_ON_DEBUG( code )							do { code ; } while( 0 )
 #define ZP_ON_DEBUG_MSG( msg, ... )					zp_printfln( msg, __VA_ARGS__ )
-#define ZP_ASSERT( test, msg, ... )					do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); } } while( 0 )
-#define ZP_ASSERT_RETURN( test, msg, ... )			do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); return; } } while( 0 ) 
-#define ZP_ASSERT_RETURN_( test, ret, msg, ... )	do { if( !( test ) ) { zp_printfln( msg, __VA_ARGS__ ); return (ret); } } while( 0 ) 
+#define ZP_ASSERT( test, msg, ... )					zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
 #else
 #define ZP_ON_DEBUG( code )							(void)0
 #define ZP_ON_DEBUG_MSG( msg, ... )					(void)0
 #define ZP_ASSERT( test, msg, ... )					(void)0
-#define ZP_ASSERT_RETURN( test, msg, ... )			(void)0
-#define ZP_ASSERT_RETURN_( test, ret, msg, ... )	(void)0
 #endif
 
 #define ZP_STDCALL		__stdcall
@@ -59,6 +55,8 @@
 #define ZP_USE_SAFE_FUNCTIONS	1
 
 #include "zpBaseTypes.h"
+
+void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... );
 
 void zp_printf( const zp_char* text, ... );
 void zp_printfln( const zp_char* text, ... );
@@ -129,6 +127,7 @@ template<typename F, typename S> class zpHashMap;
 class zpFile;
 
 class zpColor4f;
+class zpRect;
 
 class zpConsole;
 class zpWindow;
@@ -177,6 +176,7 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpReferencedPointer.h"
 
 #include "zpColor4f.h"
+#include "zpRect.h"
 
 #include "zpConsole.h"
 #include "zpWindow.h"

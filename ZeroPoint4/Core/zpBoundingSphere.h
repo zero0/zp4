@@ -21,6 +21,8 @@ public:
 	zp_float getRadius() const;
 	void setRadius( zp_float radius );
 
+	zpBoundingAABB generateBoundingAABB() const;
+
 	void translate( const zpVector4f& translate );
 	void scale( zp_float scale );
 	void pad( zp_float padding );

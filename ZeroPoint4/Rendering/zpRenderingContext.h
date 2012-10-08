@@ -44,6 +44,7 @@ public:
 
 	virtual void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data ) = 0;
 	virtual void unmap( zpBuffer* buffer, zp_uint subResource ) = 0;
+	virtual void updateBuffer( zpBuffer* buffer, const void* data ) = 0;
 
 	virtual void draw( zp_uint vertexCount, zp_uint startIndex = 0 ) = 0;
 	virtual void drawAuto() = 0;

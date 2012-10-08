@@ -146,7 +146,7 @@ zpRenderingEngineType zpDX11RenderingEngine::getEngineType() const {
 zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpDisplayFormat displayFormat, zpArrayList<zpDisplayMode>* outDisplayModes ) {
 	if( !m_dxgiAdapter ) return 0;
 
-	ZP_ASSERT_RETURN_( outDisplayModes, 0, "Out parameter not set." );
+	ZP_ASSERT( outDisplayModes != ZP_NULL, "Out parameter not set." );
 
 	IDXGIOutput* adapterOutput;
 	HRESULT hr;
@@ -180,10 +180,10 @@ zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpDisplayFormat displayFor
 zp_bool zpDX11RenderingEngine::findClosestDisplayMode( const zpDisplayMode& displayMode, zpDisplayMode* outDisplayMode ) {
 	if( !m_dxgiAdapter ) return false;
 
-	ZP_ASSERT_RETURN_( outDisplayMode, false, "Out parameter not set." );
+	ZP_ASSERT( outDisplayMode != ZP_NULL, "Out parameter not set." );
 
 	DXGI_FORMAT format = __zpToDX( displayMode.displayFormat );
-	ZP_ASSERT_RETURN_( format != DXGI_FORMAT_UNKNOWN, false, "Display mode format must be set." );
+	ZP_ASSERT( format != DXGI_FORMAT_UNKNOWN, "Display mode format must be set." );
 
 	IDXGIOutput* adapterOutput;
 	HRESULT hr;

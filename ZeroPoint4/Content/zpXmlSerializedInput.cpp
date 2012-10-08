@@ -12,7 +12,6 @@ zpXmlSerializedInput::zpXmlSerializedInput( zpXmlNode* root, const zpProperties&
 {}
 zpXmlSerializedInput::~zpXmlSerializedInput() {
 	m_nodeStack.clear();
-	m_siblingStack.clear();
 	m_properties.clear();
 }
 
@@ -143,18 +142,28 @@ zp_bool zpXmlSerializedInput::readSerializable( zpSerializable** value, const zp
 }
 
 zp_bool zpXmlSerializedInput::readBlock( const zp_char* name ) {
-	if( m_siblingStack.isEmpty() || m_siblingStack.front() != name ) {
+	if( m_nodeStack.isEmpty() || m_nodeStack.back()->name != name ) {
 
-		m_nodeStack.pushFront( m_currentNode );
-		m_siblingStack.pushFront( name );
+		zpXmlNode* node = ZP_NULL;
+		if( !m_currentNode->children.findIf( [ name ]( zpXmlNode* n ) {
+			return n->name == name;
+		}, &node ) ) {
+			return false;
+		}
+		m_nodeStack.pushBack( m_currentNode );
 
-		zpXmlNode* element = 0;
+		m_currentNode = node;
 	} else {
-
+		m_currentNode = m_currentNode->nextSibling;
 	}
 	return m_currentNode != ZP_NULL;
 }
 zp_bool zpXmlSerializedInput::endBlock() {
+	if( !m_currentNode || !m_currentNode->nextSibling ) {
+		m_currentNode = m_nodeStack.back();
+		m_nodeStack.popBack();
+		return false;
+	}
 	return true;
 }
 
@@ -170,7 +179,7 @@ void zpXmlSerializedInput::readValueOrProperty( const zp_char* name, zpString& o
 			return n != current && n->name == name;
 		}, &node ) )
 		{
-			outString = node->name;
+			outString = node->value;
 		}
 	}
 

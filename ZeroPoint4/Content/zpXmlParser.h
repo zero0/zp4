@@ -33,7 +33,12 @@ public:
 	~zpXmlParser();
 
 	zp_bool parseFile( const zpString& filename, zp_bool includeSiblings = false );
+	zp_bool parseNode( zpXmlNode* root, zp_bool includeSiblings = false );
 
+	zp_bool writeToFile( zpXmlNode* root, const zpString& filename );
+	void writeToBuffer( zpXmlNode* root, zpStringBuffer& buffer );
+
+	void setRootNode( zpXmlNode* root, zp_bool ownsRoot );
 	zpXmlNode* getRootNode() const;
 	zpXmlNode* getCurrentNode() const;
 
@@ -42,6 +47,8 @@ public:
 	void pop();
 
 private:
+	zp_bool m_ownsRoot;
+
 	zpXmlNode* m_root;
 	zpXmlNode* m_current;
 

@@ -8,7 +8,7 @@ void zpContentManager::registerFileExtension( const zpString& extension, zpResou
 	m_creators.put( extension, creator );
 }
 	
-zp_bool zpContentManager::loadResource( const zpString& filename, const zpString& alias ) {
+zp_bool zpContentManager::loadResource( const zpString& filename, const zpString& alias, zp_bool immediateLoad ) {
 	zpString extension = filename.substring( filename.lastIndexOf( '.' ) + 1 );
 	extension.toLower();
 
@@ -19,16 +19,25 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 		zpString fullFilePath = filepath.toString();
 
 		zpResource* resource = creator->createResource( fullFilePath );
-		ZP_ASSERT_RETURN_( resource, false, "Unable to create resource %s => %s", alias.c_str(), filename.c_str() );
+		ZP_ASSERT( resource != ZP_NULL, "Unable to create resource %s => %s", alias.c_str(), filename.c_str() );
+		
 		resource->setContentManager( this );
 		resource->setFilename( fullFilePath );
 
 		m_resources[ alias ] = resource;
 		m_fileToAlias[ filename ] = alias;
 
-		//return resource->load();
-		m_resourcesToLoad.pushBack( resource );
-		return true;
+		zp_bool loaded = true;
+		if( immediateLoad ) {
+			loaded = resource->load();
+			resource->setIsLoaded( loaded );
+
+			m_onResourceLoaded( resource->getFilename(), loaded, 1 );
+		} else {
+			m_resourcesToLoad.pushBack( resource );
+		}
+		
+		return loaded;
 	}
 
 	ZP_ON_DEBUG_MSG( "No resource creator registered for file extension '%s'", extension.c_str() );
@@ -47,7 +56,7 @@ zp_bool zpContentManager::unloadResource( const zpString& alias ) {
 	if( m_resources.find( alias, &resource ) ) {
 		resource->unload();
 		resource->setIsLoaded( false );
-		return true;
+		return m_resources.erase( alias );
 	}
 	ZP_ON_DEBUG_MSG( "Unable to unload resource, alias not found '%s'", alias.c_str() );
 	return false;
@@ -64,6 +73,7 @@ void zpContentManager::unloadAllResources() {
 		resource->unload();
 		resource->setIsLoaded( false );
 	} );
+	m_resources.clear();
 }
 
 zp_bool zpContentManager::reloadResource( const zpString& alias ) {
@@ -71,7 +81,6 @@ zp_bool zpContentManager::reloadResource( const zpString& alias ) {
 	if( m_resources.find( alias, &resource ) ) {
 		resource->unload();
 		resource->setIsLoaded( false );
-		//return resource->load();
 		m_resourcesToLoad.pushBack( resource );
 		return true;
 	}
@@ -89,7 +98,6 @@ void zpContentManager::reloadAllResources() {
 	m_resources.foreach( [ this ]( const zpString& alias, zpResource* resource ){
 		resource->unload();
 		resource->setIsLoaded( false );
-		//resource->load();
 		m_resourcesToLoad.pushBack( resource );
 	} );
 }
@@ -115,7 +123,7 @@ const zpString& zpContentManager::getRootDirectory() const {
 	return m_rootDirectory;
 }
 
-zpDelegateEvent<void( const zpString& filname, zp_bool loaded )>& zpContentManager::onResourceLoaded() {
+zpDelegateEvent<void( const zpString&, zp_bool, zp_uint )>& zpContentManager::onResourceLoaded() {
 	return m_onResourceLoaded;
 }
 zpDelegateEvent<void()>& zpContentManager::onAllResourcesLoaded() {
@@ -125,18 +133,19 @@ zpDelegateEvent<void()>& zpContentManager::onAllResourcesLoaded() {
 void zpContentManager::onCreate() {
 	//m_rootDirectory = zpFile::getCurrentDirectory();
 	m_rootDirectory = "./";
+	m_rootDirectory[1] = zpFile::sep;
 }
 void zpContentManager::onDestroy() {}
 
 void zpContentManager::onUpdate() {
 	if( !m_resourcesToLoad.isEmpty() ) {
 		zpResource* r = m_resourcesToLoad.back();
+		m_resourcesToLoad.popBack();
+		
 		zp_bool loaded = r->load();
 		r->setIsLoaded( loaded );
 		
-		m_onResourceLoaded( r->getFilename(), loaded );
-
-		m_resourcesToLoad.popBack();
+		m_onResourceLoaded( r->getFilename(), loaded, m_resourcesToLoad.size() );
 
 		if( m_resourcesToLoad.isEmpty() ) {
 			m_onAllResourcesLoaded();

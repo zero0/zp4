@@ -7,8 +7,12 @@ public:
 	zpCameraComponent();
 	~zpCameraComponent();
 
+	zp_bool isLocalToGameObject() const;
+
 	zpCamera& getCamera();
-	zpFlag32& getRenderLayers();
+
+	void setRenderLayers( const zpRenderLayer& layers );
+	const zpRenderLayer& getRenderLayers() const;
 
 	void receiveMessage( const zpMessage& message );
 
@@ -25,7 +29,10 @@ protected:
 	void onDisabled();
 
 private:
-	zpFlag32 m_renderLayers;
+	zp_bool m_isLocalToGameObject;
+	zpRenderLayer m_renderLayers;
+	zpRenderingManager* m_manager;
+
 	zpCamera m_camera;
 };
 

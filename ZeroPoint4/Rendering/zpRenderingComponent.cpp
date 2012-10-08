@@ -9,6 +9,9 @@ zpRenderingComponent::~zpRenderingComponent() {}
 const zpRenderLayer& zpRenderingComponent::getRenderLayers() const {
 	return m_renderLayers;
 }
+const zpBoundingSphere& zpRenderingComponent::getBoundingSphere() const {
+	return m_boundingSphere;
+}
 
 void zpRenderingComponent::setVisible( zp_bool isVisible ) {
 	zp_bool wasVisible = m_isVisible;
@@ -26,4 +29,7 @@ zp_bool zpRenderingComponent::isVisible() const {
 
 void zpRenderingComponent::setRenderLayers( const zpRenderLayer& layers ) {
 	m_renderLayers = layers;
+}
+void zpRenderingComponent::setBoundingSphere( const zpBoundingSphere& sphere ) {
+	m_boundingSphere = sphere;
 }

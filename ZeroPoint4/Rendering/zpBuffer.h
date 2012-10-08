@@ -15,9 +15,19 @@ public:
 		create( type, bind, I, sizeof( S ), (void*)data );
 	}
 
+	template<typename S>
+	void create( zpBufferType type, zpBufferBindType bind, const S& data ) {
+		create( type, bind, 1, sizeof( S ), (void*)data );
+	}
+
 	template<typename S, zp_uint I>
 	void update( const S (&data)[I] ) {
-		update( I, data );
+		update( I, (void*)data );
+	}
+
+	template<typename S>
+	void update( const S& data ) {
+		update( 1, (void*)&data );
 	}
 
 	template<typename S>

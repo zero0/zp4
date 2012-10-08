@@ -11,17 +11,12 @@ ZP_FORCE_INLINE void zpMatrix4f::operator delete( void* ptr ) {
 */
 
 ZP_FORCE_INLINE void zpMatrix4f::translate( const zpVector4f& position ) {
-	zp_real col, x, y, z, w;
+	zp_vec4 col;
 
-	x = position.getX();
-	y = position.getY();
-	z = position.getZ();
-	w = position.getW();
-
-	col = _mm_mul_ps( x, m_m1 );
-	col = _mm_add_ps( col, _mm_mul_ps( y, m_m2 ) );
-	col = _mm_add_ps( col, _mm_mul_ps( z, m_m3 ) );
-	col = _mm_add_ps( col, _mm_mul_ps( w, m_m4 ) );
+	col = _mm_mul_ps( position.getX(), m_m1 );
+	col = _mm_add_ps( col, _mm_mul_ps( position.getY(), m_m2 ) );
+	col = _mm_add_ps( col, _mm_mul_ps( position.getZ(), m_m3 ) );
+	col = _mm_add_ps( col, _mm_mul_ps( position.getW(), m_m4 ) );
 
 	m_m4 = col;
 }
@@ -32,7 +27,16 @@ ZP_FORCE_INLINE void zpMatrix4f::rotateZ( zp_real angle ) {}
 ZP_FORCE_INLINE void zpMatrix4f::scale( zp_real uniformScale ) {}
 ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {}
 
-ZP_FORCE_INLINE void zpMatrix4f::mul( const zpVector4f& vector, zpVector4f& outVector ) const {}
+ZP_FORCE_INLINE void zpMatrix4f::mul( const zpVector4f& vector, zpVector4f& outVector ) const {
+	zp_vec4 col;
+
+	col = _mm_mul_ps( vector.getX(), m_m1 );
+	col = _mm_add_ps( col, _mm_mul_ps( vector.getY(), m_m2 ) );
+	col = _mm_add_ps( col, _mm_mul_ps( vector.getZ(), m_m3 ) );
+	col = _mm_add_ps( col, _mm_mul_ps( vector.getW(), m_m4 ) );
+
+	outVector = col;
+}
 ZP_FORCE_INLINE void zpMatrix4f::mul( const zpMatrix4f& matrix, zpMatrix4f& outMatrix ) const {
 	zp_vec4 col1, col2, col3, col4;
 
@@ -80,7 +84,7 @@ ZP_FORCE_INLINE void zpMatrix4f::lookTo( const zpVector4f& eye, const zpVector4f
 	zpVector4f y( z.cross3( x ) );
 	
 	zpVector4f e( -eye );
-	
+
 	m_m1 = zpVector4f( zp_real_neg( x.getX() ), y.getX(), z.getX(), x.dot3( e ) ).toVec4();
 	m_m2 = zpVector4f( zp_real_neg( x.getY() ), y.getY(), z.getY(), y.dot3( e ) ).toVec4();
 	m_m3 = zpVector4f( zp_real_neg( x.getZ() ), y.getZ(), z.getZ(), z.dot3( e ) ).toVec4();
@@ -130,6 +134,133 @@ ZP_FORCE_INLINE void zpMatrix4f::frustum( zp_float left, zp_float right, zp_floa
 
 ZP_FORCE_INLINE void zpMatrix4f::transpose() {
 	_MM_TRANSPOSE4_PS( m_m1, m_m2, m_m3, m_m4 );
+}
+
+ZP_FORCE_INLINE zp_float zpMatrix4f::determinant() const {
+	// TODO: optimize for SIMD
+	return 
+		m_14*m_23*m_32*m_41 - m_13*m_24*m_32*m_41 - m_14*m_22*m_33*m_41 + m_12*m_24*m_33*m_41+
+		m_13*m_22*m_34*m_41 - m_12*m_23*m_34*m_41 - m_14*m_23*m_31*m_42 + m_13*m_24*m_31*m_42+
+		m_14*m_21*m_33*m_42 - m_11*m_24*m_33*m_42 - m_13*m_21*m_34*m_42 + m_11*m_23*m_34*m_42+
+		m_14*m_22*m_31*m_43 - m_12*m_24*m_31*m_43 - m_14*m_21*m_32*m_43 + m_11*m_24*m_32*m_43+
+		m_12*m_21*m_34*m_43 - m_11*m_22*m_34*m_43 - m_13*m_22*m_31*m_44 + m_12*m_23*m_31*m_44+
+		m_13*m_21*m_32*m_44 - m_11*m_23*m_32*m_44 - m_12*m_21*m_33*m_44 + m_11*m_22*m_33*m_44;
+}
+ZP_FORCE_INLINE void zpMatrix4f::invert() {
+	zp_float* src = m_data;
+
+	//
+	// From "Streaming SIMD Extension - Inverse of 4x4 Matrix" - http://download.intel.com/design/PentiumIII/sml/24504301.pdf
+	//
+	zp_vec4 minor0, minor1, minor2, minor3;
+	zp_vec4 row0, row1, row2, row3;
+	zp_vec4 det, tmp1;
+	
+	tmp1 = _mm_loadh_pi(_mm_loadl_pi(tmp1, (__m64*)(src)), (__m64*)(src+ 4));
+	row1 = _mm_loadh_pi(_mm_loadl_pi(row1, (__m64*)(src+8)), (__m64*)(src+12));
+
+	row0 = _mm_shuffle_ps(tmp1, row1, 0x88);
+	row1 = _mm_shuffle_ps(row1, tmp1, 0xDD);
+
+	tmp1 = _mm_loadh_pi(_mm_loadl_pi(tmp1, (__m64*)(src+ 2)), (__m64*)(src+ 6));
+	row3 = _mm_loadh_pi(_mm_loadl_pi(row3, (__m64*)(src+10)), (__m64*)(src+14));
+
+	row2 = _mm_shuffle_ps(tmp1, row3, 0x88);
+	row3 = _mm_shuffle_ps(row3, tmp1, 0xDD);
+
+	tmp1 = _mm_mul_ps(row2, row3);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
+
+	minor0 = _mm_mul_ps(row1, tmp1);
+	minor1 = _mm_mul_ps(row0, tmp1);
+
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
+
+	minor0 = _mm_sub_ps(_mm_mul_ps(row1, tmp1), minor0);
+	minor1 = _mm_sub_ps(_mm_mul_ps(row0, tmp1), minor1);
+	minor1 = _mm_shuffle_ps(minor1, minor1, 0x4E);
+
+	tmp1 = _mm_mul_ps(row1, row2);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
+
+	minor0 = _mm_add_ps(_mm_mul_ps(row3, tmp1), minor0);
+	minor3 = _mm_mul_ps(row0, tmp1);
+
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
+
+	minor0 = _mm_sub_ps(minor0, _mm_mul_ps(row3, tmp1));
+	minor3 = _mm_sub_ps(_mm_mul_ps(row0, tmp1), minor3);
+	minor3 = _mm_shuffle_ps(minor3, minor3, 0x4E);
+
+	tmp1 = _mm_mul_ps(_mm_shuffle_ps(row1, row1, 0x4E), row3);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
+	row2 = _mm_shuffle_ps(row2, row2, 0x4E);
+
+	minor0 = _mm_add_ps(_mm_mul_ps(row2, tmp1), minor0);
+	minor2 = _mm_mul_ps(row0, tmp1);
+
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
+
+	minor0 = _mm_sub_ps(minor0, _mm_mul_ps(row2, tmp1));
+	minor2 = _mm_sub_ps(_mm_mul_ps(row0, tmp1), minor2);
+	minor2 = _mm_shuffle_ps(minor2, minor2, 0x4E);
+
+	tmp1 = _mm_mul_ps(row0, row1);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
+
+	minor2 = _mm_add_ps(_mm_mul_ps(row3, tmp1), minor2);
+	minor3 = _mm_sub_ps(_mm_mul_ps(row2, tmp1), minor3);
+
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
+
+	minor2 = _mm_sub_ps(_mm_mul_ps(row3, tmp1), minor2);
+	minor3 = _mm_sub_ps(minor3, _mm_mul_ps(row2, tmp1));
+
+	tmp1 = _mm_mul_ps(row0, row3);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
+
+	minor1 = _mm_sub_ps(minor1, _mm_mul_ps(row2, tmp1));
+	minor2 = _mm_add_ps(_mm_mul_ps(row1, tmp1), minor2);
+
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
+
+	minor1 = _mm_add_ps(_mm_mul_ps(row2, tmp1), minor1);
+	minor2 = _mm_sub_ps(minor2, _mm_mul_ps(row1, tmp1));
+
+	tmp1 = _mm_mul_ps(row0, row2);
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
+
+	minor1 = _mm_add_ps(_mm_mul_ps(row3, tmp1), minor1);
+	minor3 = _mm_sub_ps(minor3, _mm_mul_ps(row1, tmp1));
+
+	tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
+
+	minor1 = _mm_sub_ps(minor1, _mm_mul_ps(row3, tmp1));
+	minor3 = _mm_add_ps(_mm_mul_ps(row1, tmp1), minor3);
+
+	det = _mm_mul_ps(row0, minor0);
+	det = _mm_add_ps(_mm_shuffle_ps(det, det, 0x4E), det);
+	det = _mm_add_ss(_mm_shuffle_ps(det, det, 0xB1), det);
+	tmp1 = _mm_rcp_ss(det);
+
+	det = _mm_sub_ss(_mm_add_ss(tmp1, tmp1), _mm_mul_ss(det, _mm_mul_ss(tmp1, tmp1)));
+	det = _mm_shuffle_ps(det, det, 0x00);
+
+	minor0 = _mm_mul_ps(det, minor0);
+	_mm_storel_pi((__m64*)(src), minor0);
+	_mm_storeh_pi((__m64*)(src+2), minor0);
+
+	minor1 = _mm_mul_ps(det, minor1);
+	_mm_storel_pi((__m64*)(src+4), minor1);
+	_mm_storeh_pi((__m64*)(src+6), minor1);
+
+	minor2 = _mm_mul_ps(det, minor2);
+	_mm_storel_pi((__m64*)(src+ 8), minor2);
+	_mm_storeh_pi((__m64*)(src+10), minor2);
+
+	minor3 = _mm_mul_ps(det, minor3);
+	_mm_storel_pi((__m64*)(src+12), minor3);
+	_mm_storeh_pi((__m64*)(src+14), minor3);
 }
 
 ZP_FORCE_INLINE zp_bool zpMatrix4f::operator==( const zpMatrix4f& matrix ) const {

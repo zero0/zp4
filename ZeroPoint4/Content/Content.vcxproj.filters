@@ -39,6 +39,12 @@
     <ClInclude Include="zpXmlSerializedInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpXmlSerializedOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpLoadContentComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
@@ -60,6 +66,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpXmlSerializedInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpXmlSerializedOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpLoadContentComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

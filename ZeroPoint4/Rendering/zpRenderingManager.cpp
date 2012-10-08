@@ -1,9 +1,9 @@
 #include "zpRendering.h"
 
 zpRenderingManager::zpRenderingManager()
-	: m_engine( ZP_NULL )
+	: m_isFrustimCullingEnabled( true )
+	, m_engine( ZP_NULL )
 	, m_currentCamera( ZP_NULL )
-	, m_cameraStack()
 	, m_renderingComponents()
 {}
 zpRenderingManager::~zpRenderingManager() {}
@@ -59,16 +59,47 @@ zp_bool zpRenderingManager::removeRenderingComponent( zpRenderingComponent* comp
 void zpRenderingManager::renderLayer( zp_uint layer ) {
 	zpArrayList<zpRenderingComponent*>& components = m_renderingComponents[ layer ];
 	if( !components.isEmpty() ) {
-		components.foreach( []( zpRenderingComponent* component ) {
-			if( component->isVisible() ) component->render();
+		components.foreach( [ this ]( zpRenderingComponent* component ) {
+			if( component->isVisible() ) {
+				if( m_isFrustimCullingEnabled && m_currentCamera ) {
+					if( ZP_IS_COLLISION( zpCollision::testCollision( m_currentCamera->getFrustum(), component->getBoundingSphere() ) ) ) {
+						component->render();
+					}
+				} else {
+					component->render();
+				}
+			}
 		} );
 	}
+}
+
+zpBuffer* zpRenderingManager::getGlobalBuffer( zp_uint index ) {
+	return m_globalBuffers[ index ];
+}
+
+void zpRenderingManager::setFrustumCullingEnabled( zp_bool frustumCulling ) {
+	m_isFrustimCullingEnabled = frustumCulling;
+}
+zp_bool zpRenderingManager::isFrustumCullingEnabled() const {
+	return m_isFrustimCullingEnabled;
+}
+
+void zpRenderingManager::setCamera( zpCamera* camera ) {
+	m_currentCamera = camera;
+}
+zpCamera* zpRenderingManager::getCamera() const {
+	return m_currentCamera;
 }
 
 void zpRenderingManager::onCreate() {
 	m_engine = zpRenderingFactory::getRenderingEngine();
 	m_engine->setWindow( getGame()->getWindow() );
 	m_engine->create();
+
+	for( zp_uint i = ZP_RENDERING_GLOBAL_BUFFER_COUNT; i --> 0; ) m_globalBuffers[ i ] = m_engine->createBuffer();
+
+	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_WORLD ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpWorldBufferData ) );
+	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_CAMERA ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpCameraBufferData ) );
 }
 void zpRenderingManager::onDestroy() {
 	m_engine->destroy();

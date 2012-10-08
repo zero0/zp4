@@ -11,6 +11,9 @@ ZP_ABSTRACT_CLASS zpResourceCreator;
 class zpPrefabs;
 class zpXmlParser;
 class zpXmlSerializedInput;
+class zpXmlSerializedOutput;
+
+class zpLoadContentComponent;
 
 #include "zpContentManager.h"
 #include "zpResource.h"
@@ -18,5 +21,8 @@ class zpXmlSerializedInput;
 #include "zpPrefabs.h"
 #include "zpXmlParser.h"
 #include "zpXmlSerializedInput.h"
+#include "zpXmlSerializedOutput.h"
+
+#include "zpLoadContentComponent.h"
 
 #endif

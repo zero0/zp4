@@ -148,6 +148,7 @@
     <ClInclude Include="zpProperties.h" />
     <ClInclude Include="zpRay.h" />
     <ClInclude Include="zpReal.h" />
+    <ClInclude Include="zpRect.h" />
     <ClInclude Include="zpReferencedObject.h" />
     <ClInclude Include="zpReferencedPointer.h" />
     <ClInclude Include="zpRegisterSerializable.h" />
@@ -213,9 +214,10 @@
     <ClCompile Include="zpPlane.cpp" />
     <ClCompile Include="zpProperties.cpp" />
     <ClCompile Include="zpRay.cpp" />
+    <ClCompile Include="zpRect.cpp" />
     <ClCompile Include="zpReferencedObject.cpp" />
     <ClCompile Include="zpRegisterSerializable.cpp" />
-    <ClCompile Include="zpSerialize.cpp" />
+    <ClCompile Include="zpSerializable.cpp" />
     <ClCompile Include="zpString.cpp" />
     <ClCompile Include="zpStringBuffer.cpp" />
     <ClCompile Include="zpTime.cpp" />

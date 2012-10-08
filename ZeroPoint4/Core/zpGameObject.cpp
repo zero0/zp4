@@ -194,25 +194,37 @@ void zpGameObject::serialize( zpSerializedOutput* out ) {
 
 	out->writeString( m_name, "@name" );
 
-	out->writeBlock( "Components" );
+	out->writeBlock( "Transform" );
 	{
-		out->writeBlock( "Component" );
-		m_components.foreach( [ &out ]( zpComponent* comp ) {
-			comp->serialize( out );
-		} );
-		out->endBlock();
+		zpSerializableObject<zpMatrix4f> mat( m_transform );
+		mat.serialize( out );
+		m_transform = mat;
 	}
 	out->endBlock();
 
-	out->writeBlock( "Children" );
-	{
-		out->writeBlock( "Child" );
-		m_children.foreach( [ &out ]( zpGameObject* go ) {
-			go->serialize( out );
-		} );
+	if( m_components.isAttached() ) {
+		out->writeBlock( "Components" );
+		{
+			out->writeBlock( "Component" );
+			m_components.foreach( [ &out ]( zpComponent* comp ) {
+				comp->serialize( out );
+			} );
+			out->endBlock();
+		}
 		out->endBlock();
 	}
-	out->endBlock();
+
+	if( m_children.isAttached() ) {
+		out->writeBlock( "Children" );
+		{
+			out->writeBlock( "Child" );
+			m_children.foreach( [ &out ]( zpGameObject* go ) {
+				go->serialize( out );
+			} );
+			out->endBlock();
+		}
+		out->endBlock();
+	}
 
 	out->endBlock();
 }
@@ -221,9 +233,16 @@ void zpGameObject::deserialize( zpSerializedInput* in ) {
 
 	in->readString( &m_name, "@name" );
 
+	in->readBlock( "Transform" );
+	{
+		zpSerializableObject<zpMatrix4f> mat( m_transform );
+		mat.deserialize( in );
+	}
+	in->endBlock();
+
 	if( in->readBlock( "Components" ) )
 	{
-		in->readEachBlock( "Component", [ this, &in ]() {
+		in->readEachBlock( "Component", [ this ]( zpSerializedInput* in ) {
 			zpComponent* comp = ZP_NULL;
 			in->readSerializableOfType<zpComponent>( &comp );
 			if( comp ) addComponent( comp );
@@ -233,7 +252,7 @@ void zpGameObject::deserialize( zpSerializedInput* in ) {
 
 	if( in->readBlock( "Children" ) )
 	{
-		in->readEachBlock( "Child", [ this, &in ]() {
+		in->readEachBlock( "Child", [ this ]( zpSerializedInput* in ) {
 			zpGameObject* go = ZP_NULL;
 			in->readSerializableOfType<zpGameObject>( &go );
 			if( go ) addChildGameObject( go );

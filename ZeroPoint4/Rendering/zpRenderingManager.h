@@ -21,6 +21,14 @@ public:
 
 	void renderLayer( zp_uint layer );
 
+	zpBuffer* getGlobalBuffer( zp_uint index );
+
+	void setFrustumCullingEnabled( zp_bool frustumCulling );
+	zp_bool isFrustumCullingEnabled() const;
+
+	void setCamera( zpCamera* camer );
+	zpCamera* getCamera() const;
+
 protected:
 	void onCreate();
 	void onDestroy();
@@ -31,13 +39,14 @@ protected:
 	void onDisabled();
 
 private:
+	zp_bool m_isFrustimCullingEnabled;
+
 	zpRenderingEngine* m_engine;
 
 	zpCamera* m_currentCamera;
-	zpArrayList<zpCameraComponent*> m_cameraStack;
 
 	zpArray<zpArrayList<zpRenderingComponent*>, ZP_RENDERING_LAYER_COUNT> m_renderingComponents;
-
+	zpArray<zpBuffer*, ZP_RENDERING_GLOBAL_BUFFER_COUNT> m_globalBuffers;
 };
 
 #endif

@@ -196,6 +196,25 @@ ZP_FORCE_INLINE zpVector4f zpVector4f::cross4( const zpVector4f& vector ) const 
 	return zpVector4f();
 }
 
+ZP_FORCE_INLINE void zpVector4f::abs3() {
+	zp_float w = m_xyzw.v.m128_f32[3];
+	m_xyzw = _mm_and_ps( m_xyzw, *(zp_vec4*)&_mm_set1_epi32( 0x7fffffff ) );
+	m_xyzw.v.m128_f32[3] = w;
+}
+ZP_FORCE_INLINE void zpVector4f::abs4() {
+	m_xyzw = _mm_and_ps( m_xyzw, *(zp_vec4*)&_mm_set1_epi32( 0x7fffffff ) );
+}
+ZP_FORCE_INLINE zpVector4f zpVector4f::abs3() const {
+	zp_float w = m_xyzw.v.m128_f32[3];
+	zp_vec4 v = _mm_and_ps( m_xyzw, *(zp_vec4*)&_mm_set1_epi32( 0x7fffffff ) );
+	v.v.m128_f32[3] = w;
+
+	return zpVector4f( v );
+}
+ZP_FORCE_INLINE zpVector4f zpVector4f::abs4() const {
+	return zpVector4f( _mm_and_ps( m_xyzw, *(zp_vec4*)&_mm_set1_epi32( 0x7fffffff ) ) );
+}
+
 ZP_FORCE_INLINE zp_bool zpVector4f::equals3( const zpVector4f& vector ) const {
 	zp_real cmp = _mm_cmpeq_ps( m_xyzw, vector.m_xyzw );
 	return cmp.m128_i32[0] && cmp.m128_i32[1] && cmp.m128_i32[2];

@@ -54,6 +54,9 @@ public:
 
 	ZP_FORCE_INLINE void transpose();
 
+	ZP_FORCE_INLINE zp_float determinant() const;
+	ZP_FORCE_INLINE void invert();
+
 	ZP_FORCE_INLINE zp_bool operator==( const zpMatrix4f& matrix ) const;
 	ZP_FORCE_INLINE zp_bool operator!=( const zpMatrix4f& matrix ) const;
 

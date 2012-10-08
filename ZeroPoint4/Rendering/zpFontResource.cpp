@@ -40,7 +40,7 @@ zpFontResource::~zpFontResource() {}
 zp_bool zpFontResource::load() {
 	zpXmlParser xml;
 	if( !xml.parseFile( getFilename(), true ) ) return false;
-	
+	//xml.writeToFile( xml.getRootNode(), "" );
 	if( xml.push( "font" ) ) {
 		if( xml.push( "info" ) ) {
 			
@@ -100,7 +100,7 @@ zp_bool zpFontResource::load() {
 
 			xml.pop();
 		}
-
+		/*
 		if( xml.push( "kernings" ) ) {
 
 			if( xml.push( "kerning" ) ) {
@@ -124,7 +124,7 @@ zp_bool zpFontResource::load() {
 
 			xml.pop();
 		}
-
+		*/
 		xml.pop();
 	}
 

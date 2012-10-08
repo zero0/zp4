@@ -1,5 +1,12 @@
 #include "zpContent.h"
 
+#define XML_OUTPUT_USE_TAB	1
+#if XML_OUTPUT_USE_TAB
+#define XML_OUTPUT_TAB	'\t'
+#else
+#define XML_OUTPUT_TAB	"    "
+#endif
+
 #define XML_START_COMMENT( x, i )	( \
 	(x)[ (i) + 1 ] == xml_exclamation && \
 	(x)[ (i) + 2 ] == xml_minus && \
@@ -26,12 +33,12 @@
 	(x)[ (i) + 2 ] == xml_close )
 
 
-void __linkSiblings( zpXmlNode* node, zpHashMap<zpString, zpArrayList<zpXmlNode*>>& siblingMap ) {
+void __xmlLinkSiblings( zpXmlNode* node, zpHashMap<zpString, zpArrayList<zpXmlNode*>>& siblingMap ) {
 	node->children.foreach( [ &siblingMap ]( zpXmlNode* n ) {
 		siblingMap[ n->name ].pushBack( n );
 	} );
 
-	siblingMap.foreach( []( const zpString& name, const zpArrayList<zpXmlNode*>& sibs ) {
+	siblingMap.foreach( []( const zpString& name, zpArrayList<zpXmlNode*>& sibs ) {
 		sibs[ 0 ]->prevSibling = ZP_NULL;
 		for( zp_uint i = 1; i < sibs.size() - 1; ++i ) {
 			sibs[ i - 1 ]->nextSibling = sibs[ i ];
@@ -45,8 +52,65 @@ void __linkSiblings( zpXmlNode* node, zpHashMap<zpString, zpArrayList<zpXmlNode*
 	siblingMap.clear();
 
 	node->children.foreach( [ &siblingMap ]( zpXmlNode* n ) {
-		__linkSiblings( n, siblingMap );
+		__xmlLinkSiblings( n, siblingMap );
 	} );
+}
+void __xmlNodeToString( zpXmlNode* node, zp_uint i, zpStringBuffer& buffer ) {
+	zpStringBuffer t;
+	for( zp_uint count = i; count --> 0; ) t << XML_OUTPUT_TAB;
+	const zp_char* tabs = t.getChars();
+	zp_char endl = '\n';
+
+	switch( node->type ) {
+	case ZP_XML_NODE_TYPE_ELEMENT:
+		{
+			buffer << tabs << '<' << node->name;
+			node->attributes.foreach( [ &buffer ]( const zpString& key, const zpString& val ) {
+				buffer << ' ' << key << "=\"" << val << '"';
+			} );
+
+			zp_bool isBlockElement = false;
+			if( !node->children.isEmpty() ) {
+				buffer << '>' << endl;
+
+				isBlockElement = true;
+
+				node->children.foreach( [ &i, &buffer ]( zpXmlNode* node ) {
+					__xmlNodeToString( node, i + 1, buffer );
+				} );
+			} else if( !node->value.isEmpty() ) {
+				isBlockElement = true;
+
+				buffer << '>' << endl << tabs << XML_OUTPUT_TAB << node->value;
+			}
+
+			if( isBlockElement ) {
+				buffer << tabs << "</" << node->name << '>' << endl;
+			} else {
+				buffer << " />" << endl;
+			}
+		}
+		break;
+	case ZP_XML_NODE_TYPE_COMMENT:
+		buffer << tabs << "<!-- " << node->value << " -->" << endl;
+		break;
+	case ZP_XML_NODE_TYPE_CDATA:
+		buffer << tabs << "<![CDATA[" << node->value << "]]>" << endl;
+		break;
+	case ZP_XML_NODE_TYPE_DOCUMENT:
+		node->children.foreach( [ &i, &buffer ]( zpXmlNode* node ) {
+			__xmlNodeToString( node, 0, buffer );
+		} );
+		break;
+	case ZP_XML_NODE_TYPE_PROCESS_INSTRUCTION:
+		buffer << tabs << "<?" << node->name;
+		node->attributes.foreach( [ &buffer ]( const zpString& key, const zpString& val ) {
+			buffer << ' ' << key << "=\"" << val << '"';
+		} );
+		buffer << " ?>" << endl;
+		break;
+	}
+	
 }
 
 zpXmlNode::zpXmlNode()
@@ -54,10 +118,10 @@ zpXmlNode::zpXmlNode()
 	, parent( ZP_NULL )
 	, nextSibling( ZP_NULL )
 	, prevSibling( ZP_NULL )
-	, name()
-	, value()
+	, name( "" )
+	, value( "" )
 	, attributes()
-	, children( 4 )
+	, children()
 {}
 zpXmlNode::~zpXmlNode() {
 	attributes.clear();
@@ -68,11 +132,14 @@ zpXmlNode::~zpXmlNode() {
 }
 
 zpXmlParser::zpXmlParser()
-	: m_root( ZP_NULL )
+	: m_ownsRoot( false )
+	, m_root( ZP_NULL )
 	, m_current( ZP_NULL )
 {}
 zpXmlParser::~zpXmlParser() {
-	ZP_SAFE_DELETE( m_root );
+	if( m_ownsRoot ) {
+		ZP_SAFE_DELETE( m_root );
+	}
 }
 
 zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSiblings ) {
@@ -117,7 +184,10 @@ zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSibling
 	zpStringBuffer buff;
 	zpString attrName, attrValue;
 
-	ZP_SAFE_DELETE( m_root );
+	if( m_ownsRoot ) {
+		ZP_SAFE_DELETE( m_root );
+	}
+	m_ownsRoot = true;
 	m_root = new zpXmlNode;
 	m_root->type = ZP_XML_NODE_TYPE_DOCUMENT;
 	m_root->name = "XML_DOC";
@@ -291,13 +361,49 @@ zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSibling
 
 	if( includeSiblings ) {
 		zpHashMap<zpString, zpArrayList<zpXmlNode*>> siblings;
-		__linkSiblings( m_root, siblings );
+		__xmlLinkSiblings( m_root, siblings );
 	}
 
 	m_current = m_root;
 	return true;
 }
+zp_bool zpXmlParser::parseNode( zpXmlNode* root, zp_bool includeSiblings ) {
+	if( m_ownsRoot ) {
+		ZP_SAFE_DELETE( m_root );
+	}
+	m_ownsRoot = false;
 
+	m_root = root;
+	m_current = root;
+
+	if( includeSiblings ) {
+		zpHashMap<zpString, zpArrayList<zpXmlNode*>> siblings;
+		__xmlLinkSiblings( m_root, siblings );
+	}
+
+	return true;
+}
+
+zp_bool zpXmlParser::writeToFile( zpXmlNode* root, const zpString& filename ) {
+	zpFile file( filename, ZP_FILE_MODE_TRUNCATE_WRITE );
+	if( !file.open() ) return false;
+
+	zpStringBuffer buffer;
+	__xmlNodeToString( root, 0, buffer );
+
+	zp_int count = file.writeBuffer( buffer );
+	file.close();
+
+	return count > 0;
+}
+void zpXmlParser::writeToBuffer( zpXmlNode* root, zpStringBuffer& buffer ) {
+	__xmlNodeToString( root, 0, buffer );
+}
+
+void zpXmlParser::setRootNode( zpXmlNode* root, zp_bool ownsRoot ) {
+	m_root = root;
+	m_ownsRoot = ownsRoot;
+}
 zpXmlNode* zpXmlParser::getRootNode() const {
 	return m_root;
 }

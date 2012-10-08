@@ -8,6 +8,7 @@ public:
 	virtual ~zpRenderingComponent();
 	
 	const zpRenderLayer& getRenderLayers() const;
+	const zpBoundingSphere& getBoundingSphere() const;
 
 	void setVisible( zp_bool isVisible );
 	zp_bool isVisible() const;
@@ -17,10 +18,11 @@ protected:
 	virtual void onHide() = 0;
 
 	void setRenderLayers( const zpRenderLayer& layers );
+	void setBoundingSphere( const zpBoundingSphere& sphere );
 
-private:
 	zp_bool m_isVisible;
 	zpRenderLayer m_renderLayers;
+	zpBoundingSphere m_boundingSphere;
 };
 
 #endif

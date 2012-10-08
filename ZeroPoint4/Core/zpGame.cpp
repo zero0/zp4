@@ -123,5 +123,11 @@ zpGameManager* zpGame::getGameManager_T( const void* type ) const {
 	return manager;
 }
 
-void zpGame::serialize( zpSerializedOutput* out ) {}
+void zpGame::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeSerializable( m_window );
+
+	out->endBlock();
+}
 void zpGame::deserialize( zpSerializedInput* in ) {}

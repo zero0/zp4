@@ -19,6 +19,13 @@
 #define ZP_RENDERING_LAYER_COUNT		( sizeof( ZP_RENDERING_LAYER_TYPE ) * 8 )
 typedef zpFlag<ZP_RENDERING_LAYER_TYPE>	zpRenderLayer;
 
+enum {
+	ZP_RENDERING_GLOBAL_BUFFER_WORLD,
+	ZP_RENDERING_GLOBAL_BUFFER_CAMERA,
+
+	ZP_RENDERING_GLOBAL_BUFFER_COUNT
+};
+
 #if ZP_RENDERING_TYPE == ZP_DX
 #include "RenderingDX\zpDX11Lib.inc"
 #elif ZP_RENDERING_TYPE == ZP_OPENGL
@@ -283,6 +290,8 @@ class zpCameraComponent;
 class zpLightComponent;
 class zpStaticMeshRenderingComponent;
 class zpTextRenderingComponent;
+
+#include "zpBufferData.h"
 
 #include "zpVertex.h"
 #include "zpViewport.h"

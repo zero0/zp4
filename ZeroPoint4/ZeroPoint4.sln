@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RenderingOpenGL", "Renderin
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Physics", "Physics\Physics.vcxproj", "{0C2B608B-1858-4139-8D69-E9C8A165DA02}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{9E421772-601C-488C-B988-16A9414A2C7D}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -95,6 +97,12 @@ Global
 		{0C2B608B-1858-4139-8D69-E9C8A165DA02}.Release|Win32.ActiveCfg = Release|Win32
 		{0C2B608B-1858-4139-8D69-E9C8A165DA02}.Release|Win32.Build.0 = Release|Win32
 		{0C2B608B-1858-4139-8D69-E9C8A165DA02}.Release|x64.ActiveCfg = Release|Win32
+		{9E421772-601C-488C-B988-16A9414A2C7D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9E421772-601C-488C-B988-16A9414A2C7D}.Debug|Win32.Build.0 = Debug|Win32
+		{9E421772-601C-488C-B988-16A9414A2C7D}.Debug|x64.ActiveCfg = Debug|Win32
+		{9E421772-601C-488C-B988-16A9414A2C7D}.Release|Win32.ActiveCfg = Release|Win32
+		{9E421772-601C-488C-B988-16A9414A2C7D}.Release|Win32.Build.0 = Release|Win32
+		{9E421772-601C-488C-B988-16A9414A2C7D}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

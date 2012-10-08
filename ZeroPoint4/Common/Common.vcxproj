@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8F28BFAD-31EC-42D1-9D92-C2A2BCB5DB5F}</ProjectGuid>
-    <RootNamespace>Content</RootNamespace>
+    <ProjectGuid>{9E421772-601C-488C-B988-16A9414A2C7D}</ProjectGuid>
+    <RootNamespace>Common</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -21,7 +21,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -41,10 +41,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>zpContent.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>_MBCS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>zpCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -56,9 +55,6 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>zpContent.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -67,30 +63,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="zpContent.h" />
-    <ClInclude Include="zpContentManager.h" />
-    <ClInclude Include="zpLoadContentComponent.h" />
-    <ClInclude Include="zpPrefabs.h" />
-    <ClInclude Include="zpResource.h" />
-    <ClInclude Include="zpResourceCreator.h" />
-    <ClInclude Include="zpSerializedFactory.h" />
-    <ClInclude Include="zpXmlParser.h" />
-    <ClInclude Include="zpXmlSerializedInput.h" />
-    <ClInclude Include="zpXmlSerializedOutput.h" />
+    <ClInclude Include="zpCommon.h" />
+    <ClInclude Include="zpHealthComponent.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zpContent.cpp">
+    <ClCompile Include="zpCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="zpContentManager.cpp" />
-    <ClCompile Include="zpLoadContentComponent.cpp" />
-    <ClCompile Include="zpPrefabs.cpp" />
-    <ClCompile Include="zpResource.cpp" />
-    <ClCompile Include="zpResourceCreator.cpp" />
-    <ClCompile Include="zpXmlParser.cpp" />
-    <ClCompile Include="zpXmlSerializedInput.cpp" />
-    <ClCompile Include="zpXmlSerializedOutput.cpp" />
+    <ClCompile Include="zpHealthComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

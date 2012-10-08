@@ -66,8 +66,24 @@ void zpWorld::receiveMessage( const zpMessage& message ) {
 	if( m_root ) m_root->receiveMessage( message );
 }
 
-void zpWorld::serialize( zpSerializedOutput* out ) {}
-void zpWorld::deserialize( zpSerializedInput* in ) {}
+void zpWorld::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeString( m_name, "@name" );
+
+	out->writeSerializable( m_root, "Root" );
+
+	out->endBlock();
+}
+void zpWorld::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readString( &m_name, "@name" );
+
+	in->readSerializableOfType<zpGameObject>( &m_root, "Root" );
+
+	in->endBlock();
+}
 
 void zpWorld::addReference() const {
 	++m_referenceCount;

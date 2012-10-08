@@ -66,9 +66,13 @@ void zpDX11Buffer::update( zp_uint count, void* data ) {
 	zpRenderingContext* context = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 	m_count = count;
 
-	context->map( this, ZP_MAP_TYPE_WRITE_DISCARD, 0, &d );
-	memcpy_s( d, count * m_stride, data, count * m_stride );
-	context->unmap( this, 0 );
+	if( m_type == ZP_BUFFER_TYPE_CONSTANT ) {
+		context->updateBuffer( this, data );
+	} else {
+		context->map( this, ZP_MAP_TYPE_WRITE_DISCARD, 0, &d );
+		memcpy_s( d, count * m_stride, data, count * m_stride );
+		context->unmap( this, 0 );
+	}
 }
 
 zp_uint zpDX11Buffer::getCount() const {

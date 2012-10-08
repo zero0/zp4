@@ -55,7 +55,6 @@ void zpTextRenderingComponent::onUpdate() {
 
 		zp_float fontSize = 12.f;
 		zp_float sizeScale = fontSize / (zp_float)set.size;
-		zp_float maxWidth = 10.f;
 		zp_float lineWidth = 0.f;
 		zp_float wordWidth = 0.f;
 		zp_float maxWidth = m_size.getX();

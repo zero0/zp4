@@ -91,8 +91,7 @@ ZP_FORCE_INLINE zpVector4f zpVector4f::homogenize4() const {
 		return zpVector4f();
 	} else {
 		zpVector4f v( m_xyzw );
-		v.div3( w );
-		v.setW( zp_real_from_float( 1 ) );
+		v.div4( w );
 		return v;
 	}
 }
@@ -101,8 +100,7 @@ ZP_FORCE_INLINE void zpVector4f::homogenize4() {
 	if( zp_real_eq( w, zp_real_zero() ) ) {
 		zero4();
 	} else {
-		div3( w );
-		setW( zp_real_from_float( 1 ) );
+		div4( w );
 	}
 }
 

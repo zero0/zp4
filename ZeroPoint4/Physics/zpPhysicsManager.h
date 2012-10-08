@@ -37,6 +37,7 @@ private:
 	btDynamicsWorld* m_world;
 
 	zp_float m_fixedTimeStep;
+	zp_int m_maxSubSteps;
 	zpVector4f m_gravity;
 };
 

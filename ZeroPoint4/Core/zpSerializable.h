@@ -5,7 +5,7 @@
 const zp_char* __zp_serialize_type( const void* type );
 
 template<typename T>
-const zp_char* zp_serialize_type( const T* type = ZP_NULL ) {
+const zp_char* zp_serialize_type( const T* /*type = ZP_NULL*/ ) {
 	return __zp_serialize_type( &typeid( T ) );
 };
 
@@ -38,7 +38,7 @@ public:
 	void readEachBlock( const zp_char* name, Func func ) {
 		do {
 			if( readBlock( name ) ) {
-				func();
+				func( this );
 			}
 		} while( endBlock() );
 	}
@@ -74,6 +74,26 @@ ZP_PURE_INTERFACE zpSerializable {
 public:
 	virtual void serialize( zpSerializedOutput* out ) = 0;
 	virtual void deserialize( zpSerializedInput* in ) = 0;
+};
+
+template<typename T>
+class zpSerializableObject {
+public:
+	zpSerializableObject() : m_object() {}
+	zpSerializableObject( const T& obj ) : m_object( obj ) {}
+	virtual ~zpSerializableObject() {}
+
+	operator T&() { return m_object; }
+	operator const T&() const { return m_object; }
+
+	void serialize( zpSerializedOutput* out ) { serializeAs( out, m_object ); }
+	void deserialize( zpSerializedInput* in ) { deserializeAs( in, m_object ); }
+
+	static void serializeAs( zpSerializedOutput* out, T& in );
+	static void deserializeAs( zpSerializedInput* in, T& out );
+
+private:
+	T m_object;
 };
 
 #endif
