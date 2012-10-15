@@ -105,6 +105,7 @@ private:
 	};
 
 	zp_uint m_length;
+	mutable zp_hash m_hash;
 };
 
 zp_bool operator==( const zpString& string1, const zpString& string2 );
@@ -114,10 +115,5 @@ zp_bool operator==( const zp_char* string1, const zpString& string2 );
 zp_bool operator!=( const zpString& string1, const zpString& string2 );
 zp_bool operator!=( const zpString& string1, const zp_char* string2 );
 zp_bool operator!=( const zp_char* string1, const zpString& string2 );
-
-zp_char zp_to_lower( zp_char ch );
-zp_char zp_to_upper( zp_char ch );
-
-zp_bool zp_is_whitespace( zp_char ch );
 
 #endif

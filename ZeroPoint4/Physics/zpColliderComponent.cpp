@@ -9,8 +9,54 @@ zpColliderComponent::~zpColliderComponent() {}
 
 void zpColliderComponent::receiveMessage( const zpMessage& message ) {}
 
-void zpColliderComponent::serialize( zpSerializedOutput* out ) {}
-void zpColliderComponent::deserialize( zpSerializedInput* in ) {}
+const zp_char* s_types[] = {
+	"",
+	"plane",
+	"box",
+	"capsule",
+	"sphere",
+	"cylinder",
+	"convex",
+};
+
+void zpColliderComponent::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	zpString type( s_types[ m_shapeType ] );
+	out->writeString( type, "@type" );
+
+	out->writeBlock( "Size" );
+	{
+		zpSerializableObject<zpVector4f> size( m_size );
+		size.serialize( out );
+	}
+	out->endBlock();
+
+	out->endBlock();
+}
+void zpColliderComponent::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	zpString type;
+	in->readString( &type, "@type" );
+	
+	for( zp_uint i = ZP_COLLIDER_SHAPE_Count; i --> 0; ) {
+		if( zp_strcmp( s_types[ i ], type.c_str() ) == 0 ) {
+			m_shapeType = (zpColliderShape)i;
+			break;
+		}
+	}
+
+	if( in->readBlock( "Size" ) )
+	{
+		zpSerializableObject<zpVector4f> size;
+		size.deserialize( in );
+		m_size = size;
+	}
+	in->endBlock();
+	
+	in->endBlock();
+}
 
 
 btCollisionShape* zpColliderComponent::getShape() const {

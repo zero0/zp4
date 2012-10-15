@@ -7,6 +7,10 @@ zpArray<T, Size>::zpArray() {
 	zp_memset( m_array, 0, Size * sizeof( T ) );
 }
 template<typename T, zp_uint Size>
+zpArray<T, Size>::zpArray( T (&arr)[ Size ] ) {
+	zp_memcpy( m_array, Size * sizeof( T ), arr, size );
+}
+template<typename T, zp_uint Size>
 zpArray<T, Size>::zpArray( T* data, zp_uint size ) {
 	zp_memcpy( m_array, Size * sizeof( T ), data, size );
 }
@@ -24,6 +28,11 @@ zpArray<T, Size>::~zpArray() {
 	clear();
 }
 
+template<typename T, zp_uint Size>
+void zpArray<T, Size>::operator=( T (&arr)[ Size ] ) {
+	clear();
+	zp_memcpy( m_array, Size * sizeof( T ), arr, Size * sizeof( T ) );
+}
 template<typename T, zp_uint Size>
 void zpArray<T, Size>::operator=( const zpArray& arr ) {
 	clear();

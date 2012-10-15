@@ -18,8 +18,28 @@ zpRigidBodyComponent::~zpRigidBodyComponent() {
 
 void zpRigidBodyComponent::receiveMessage( const zpMessage& message ) {}
 
-void zpRigidBodyComponent::serialize( zpSerializedOutput* out ) {}
-void zpRigidBodyComponent::deserialize( zpSerializedInput* in ) {}
+void zpRigidBodyComponent::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeFloat( m_mass, "@mass" );
+
+	out->writeString( m_groupName, "@group" );
+
+	out->writeString( m_maskName, "@mask" );
+
+	out->endBlock();
+}
+void zpRigidBodyComponent::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readFloat( &m_mass, "@mass" );
+
+	in->readString( &m_groupName, "@group" );
+
+	in->readString( &m_maskName, "@mask" );
+
+	in->endBlock();
+}
 
 void zpRigidBodyComponent::addToWorld() const {
 	m_manager->getWorld()->addRigidBody( m_body, m_collisionGroup, m_collisionMask );
@@ -48,6 +68,9 @@ void zpRigidBodyComponent::onCreate() {
 	btRigidBody::btRigidBodyConstructionInfo info ( m_mass, m_motionState, shape, inertia );
 	
 	m_body = new btRigidBody( info );
+
+	m_collisionGroup = m_manager->getCollisionGroup( m_groupName );
+	m_collisionMask = m_manager->getCollisionMask( m_maskName );
 
 	if( m_shouldAddOnCreate ) {
 		addToWorld();

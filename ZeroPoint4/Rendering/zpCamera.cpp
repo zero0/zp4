@@ -56,6 +56,7 @@ void zpCamera::update() {
 
 		m_invViewProjection = m_viewProjection;
 		m_invViewProjection.invert();
+		m_isDirty = true;
 	}
 }
 
@@ -127,6 +128,13 @@ const zpMatrix4f& zpCamera::getViewProjection() const {
 }
 const zpMatrix4f& zpCamera::getInvViewProjection() const {
 	return m_invViewProjection;
+}
+
+zp_bool zpCamera::isDirty() const {
+	return m_isDirty;
+}
+void zpCamera::unmarkDirty() {
+	m_isDirty = false;
 }
 
 zpRay zpCamera::generateRay( const zpVector2i& windowPosition ) const {

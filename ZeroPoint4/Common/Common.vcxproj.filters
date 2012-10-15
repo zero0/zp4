@@ -21,12 +21,18 @@
     <ClInclude Include="zpHealthComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpEditorCameraComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpHealthComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpEditorCameraComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

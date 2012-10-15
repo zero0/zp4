@@ -20,6 +20,12 @@ public:
 
 	btDynamicsWorld* getWorld() const;
 
+	zp_short getCollisionGroup( const zpString& groupName );
+	zp_short getCollisionMask( const zpString& mask );
+
+	void setGravity( const zpVector4f& gravity );
+	const zpVector4f& getGravity() const;
+
 protected:
 	void onCreate();
 	void onDestroy();
@@ -39,6 +45,9 @@ private:
 	zp_float m_fixedTimeStep;
 	zp_int m_maxSubSteps;
 	zpVector4f m_gravity;
+
+	zpArrayList<zpString> m_collisionGroups;
+	zpHashMap<zpString, zp_short> m_collisionMasks;
 };
 
 #endif

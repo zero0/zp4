@@ -126,6 +126,7 @@ template<typename K, typename V> class zpMap;
 template<typename F, typename S> class zpHashMap;
 class zpFile;
 
+class zpRandom;
 class zpColor4f;
 class zpRect;
 
@@ -175,6 +176,7 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpReferencedObject.h"
 #include "zpReferencedPointer.h"
 
+#include "zpRandom.h"
 #include "zpColor4f.h"
 #include "zpRect.h"
 

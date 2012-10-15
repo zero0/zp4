@@ -10,6 +10,8 @@ enum zpColliderShape {
 	ZP_COLLIDER_SHAPE_SPHERE,
 	ZP_COLLIDER_SHAPE_CYLINDER,
 	ZP_COLLIDER_SHAPE_CONVEX_HULL,
+
+	ZP_COLLIDER_SHAPE_Count
 };
 
 class btCollisionShape;

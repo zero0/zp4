@@ -106,7 +106,16 @@ void zpRenderingManager::onDestroy() {
 	zpRenderingFactory::destroyRenderingEngine();
 }
 
-void zpRenderingManager::onUpdate() {}
+void zpRenderingManager::onUpdate() {
+	if( m_currentCamera ) {
+		zpCameraBufferData camera;
+		camera.viewProjection = m_currentCamera->getViewProjection();
+		camera.invViewProjection = m_currentCamera->getInvViewProjection();
+
+		m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_CAMERA ]->update( camera );
+		m_currentCamera->unmarkDirty();
+	}
+}
 
 void zpRenderingManager::onEnabled() {}
 void zpRenderingManager::onDisabled() {}

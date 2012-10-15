@@ -21,7 +21,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -55,6 +55,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -64,17 +65,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h" />
+    <ClInclude Include="zpEditorCameraComponent.h" />
     <ClInclude Include="zpHealthComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zpEditorCameraComponent.cpp" />
     <ClCompile Include="zpHealthComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Input\Input.vcxproj">
+      <Project>{eed15947-2655-4c7a-ad5f-83f51ae8f6ce}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Rendering\Rendering.vcxproj">
+      <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

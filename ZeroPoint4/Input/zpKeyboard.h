@@ -146,7 +146,7 @@ enum zpKeyCode : zp_ushort {
 };
 
 #define ZP_KEY_CODE_IS_MODDED( code )			( 0x7000 & (code) > 0 )
-#define ZP_KEY_CODE_IS_MOD_DOWN( mod, code )	( ZP_KEY_CODE_MOD_##mod & (code) == ZP_KEY_CODE_MOD_##mod )
+#define ZP_KEY_CODE_IS_MOD_DOWN( mod, code )	( ( ZP_KEY_CODE_MOD_##mod & (code) ) == ZP_KEY_CODE_MOD_##mod )
 #define ZP_KEY_CODE_STRIP_MOD( code )			( 0x0FFF & (code) )
 
 ZP_PURE_INTERFACE zpKeyboardListener {

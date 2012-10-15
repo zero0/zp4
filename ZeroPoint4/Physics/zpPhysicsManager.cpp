@@ -28,6 +28,45 @@ void zpPhysicsManager::serialize( zpSerializedOutput* out ) {
 	}
 	out->endBlock();
 
+	out->writeBlock( "CollisionGroups" );
+	{
+		m_collisionGroups.foreach( [ out ]( const zpString& group ) {
+			out->writeBlock( "CollisionGroup" );
+			{
+				out->writeString( group, "@name" );
+			}
+			out->endBlock();
+		} );
+	}
+	out->endBlock();
+
+	out->writeBlock( "CollisionMasks" );
+	{
+		m_collisionMasks.foreach( [ out, this ]( const zpString& maskName, zp_short mask ) {
+			out->writeBlock( "CollisionMask" );
+			{
+				out->writeString( maskName, "@name" );
+				
+				zpStringBuffer maskBuffer;
+				if( !m_collisionGroups.isEmpty() ) {
+					if( mask & ( 1 << 0 ) != 0 ) {
+						maskBuffer << m_collisionMasks[ 0 ];
+					}
+					for( zp_uint i = 1; i < m_collisionGroups.size(); ++i ) {
+						if( mask & ( 1 << i ) != 0 ) {
+							maskBuffer << '|' << m_collisionGroups[ i ];
+						}
+					}
+				}
+				zpString maskText( maskBuffer.toString() );
+
+				out->writeString( maskText, "@mask" );
+			}
+			out->endBlock();
+		} );
+	}
+	out->endBlock();
+
 	out->endBlock();
 }
 void zpPhysicsManager::deserialize( zpSerializedInput* in ) {
@@ -44,6 +83,49 @@ void zpPhysicsManager::deserialize( zpSerializedInput* in ) {
 	}
 	in->endBlock();
 
+	if( in->readBlock( "CollisionGroups" ) )
+	{
+		zpString groupName;	
+		in->readEachBlock( "CollisionGroup", [ this, &groupName ]( zpSerializedInput* in ) {
+			in->readString( &groupName, "@name" );
+
+			m_collisionGroups.pushBack( groupName );
+		} );
+	}
+	in->endBlock();
+
+	if( in->readBlock( "CollisionMasks" ) )
+	{
+		zpString maskText;
+		zpString maskName;
+		in->readEachBlock( "CollisionMask", [ this, &maskText, &maskName ]( zpSerializedInput* in ) {
+			in->readString( &maskName, "@name" );
+			in->readString( &maskText, "@mask" );
+
+			zp_short mask = 0;
+			zp_uint start = 0;
+			zp_uint end = maskText.indexOf( '|' );
+			do {
+				zp_short group;
+				if( end == zpString::npos ) {
+					group = getCollisionGroup( maskText.substring( start ) );
+				} else {
+					group = getCollisionGroup( maskText.substring( start, end ) );
+				}
+				mask |= group;
+
+				start = end;
+				if( start != zpString::npos ) {
+					end = maskText.indexOf( '|', start );
+				}
+				
+			} while( end != zpString::npos );
+
+			m_collisionMasks[ maskName ] = mask;
+		} );
+	}
+	in->endBlock();
+
 	in->endBlock();
 }
 
@@ -51,6 +133,30 @@ void zpPhysicsManager::receiveMessage( const zpMessage& message ) {}
 
 btDynamicsWorld* zpPhysicsManager::getWorld() const {
 	return m_world;
+}
+
+zp_short zpPhysicsManager::getCollisionGroup( const zpString& groupName ) {
+	zp_short group = m_collisionGroups.indexOf( groupName );
+	if( group == zpArrayList<zpString>::npos ) {
+		group = m_collisionGroups.size();
+		m_collisionGroups.pushBack( groupName );
+	}
+	return ( 1 << group );
+}
+zp_short zpPhysicsManager::getCollisionMask( const zpString& mask ) {
+	return m_collisionMasks[ mask ];
+}
+
+void zpPhysicsManager::setGravity( const zpVector4f& gravity ) {
+	m_gravity = gravity;
+	if( m_world ) {
+		btVector3 g;
+		m_gravity.store3( g );
+		m_world->setGravity( g );
+	}
+}
+const zpVector4f& zpPhysicsManager::getGravity() const {
+	return m_gravity;
 }
 
 void zpPhysicsManager::onCreate() {

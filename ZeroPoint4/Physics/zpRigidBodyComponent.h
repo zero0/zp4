@@ -41,6 +41,9 @@ private:
 	zp_short m_collisionMask;
 
 	zp_float m_mass;
+
+	zpString m_groupName;
+	zpString m_maskName;
 };
 
 #endif

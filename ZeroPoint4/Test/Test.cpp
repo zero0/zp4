@@ -5,6 +5,7 @@
 #include "Audio\zpAudio.h"
 #include "Input\zpInput.h"
 #include "Physics\zpPhysics.h"
+#include "Common\zpCommon.h"
 #include <stdio.h>
 
 #define TEST_NONE		0
@@ -277,21 +278,14 @@ struct TestRenderable : public zpRenderable {
 		camera.setFovy( 45.f );
 		camera.update();
 
-		cameraBuffer = engine->createBuffer();
-
-		struct cb {
-			zpMatrix4f v, p, vp, w;
-		};
-		cb cambuf[1];
-		cambuf[0].v = camera.getView();//.lookAt( zpVector4f( 5, 5, 5 ), zpVector4f( 0, 0, 0 ), zpVector4f( 0, 1, 0 ) );// = camera.getView();
-		cambuf[0].p = camera.getProjection();//.perspective( 45.f, 4.f / 3.f, 1, 1000 );
-		cambuf[0].vp = camera.getViewProjection();
-
-		cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, cambuf );
-		//cameraBuffer->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 3, sizeof( zpMatrix4f ), (void*)(const zp_float*)camera.getViewProjection() );
-
 		cm->getGame()->getCurrentWorld()->getRootGameObject()->addComponent( &smrc );
 		smrc.create();
+
+		zpCameraBufferData cbd;
+		cbd.viewProjection = camera.getViewProjection();
+		cbd.invViewProjection = camera.getInvViewProjection();
+
+		smrc.getGameManagerOfType<zpRenderingManager>()->setCamera( &camera );
 #endif
 	}
 	void render() {
@@ -309,7 +303,7 @@ struct TestRenderable : public zpRenderable {
 		i->setSamplerState( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, state );
 		i->setRasterState( raster );
 
-		i->setBuffer( cameraBuffer, 0 );
+		i->setBuffer( smrc.getGameManagerOfType<zpRenderingManager>()->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_CAMERA ), 4 );
 
 		if( sr ) {
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
@@ -366,6 +360,8 @@ void rendering_test_main() {
 	zpGameObject ro;
 	zpWorld world;
 	world.setRootGameObject( &ro );
+
+	ro.addComponent( new zpEditorCameraComponent );
 
 	zp_printfcln( ZP_CC( ZP_CC_RED, ZP_CC_LIGHT_BLUE ), "Size: %d", sizeof( zpGameObject ) );
 
@@ -549,8 +545,8 @@ void printNode( const zpXmlNode* node, zp_int tab ) {
 }
 
 int main() {
-	//rendering_test_main();
-	scripting_test_main();
+	rendering_test_main();
+	//scripting_test_main();
 
 	//zpXmlNode* node = zpXmlParser::parseFile( "Assets/test.xml" );
 

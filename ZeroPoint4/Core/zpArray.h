@@ -6,11 +6,13 @@ template<typename T, zp_uint Size>
 class zpArray {
 public:
 	zpArray();
+	zpArray( T (&arr)[ Size ] );
 	zpArray( T* data, zp_uint count );
 	zpArray( const zpArray& arr );
 	zpArray( zpArray&& arr );
 	~zpArray();
 
+	void operator=( T (&arr)[ Size ] );
 	void operator=( const zpArray& arr );
 	void operator=( zpArray&& arr );
 

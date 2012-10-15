@@ -39,6 +39,9 @@ public:
 	const zpMatrix4f& getViewProjection() const;
 	const zpMatrix4f& getInvViewProjection() const;
 
+	zp_bool isDirty() const;
+	void unmarkDirty();
+
 	zpRay generateRay( const zpVector2i& windowPosition ) const;
 
 private:
@@ -46,7 +49,8 @@ private:
 
 	zp_bool m_isViewDirty;
 	zp_bool m_isProjectionDirty;
-	
+	zp_bool m_isDirty;
+
 	zp_float m_near;
 	zp_float m_far;
 	zp_float m_fovy;

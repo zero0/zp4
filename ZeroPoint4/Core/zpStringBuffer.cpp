@@ -114,7 +114,7 @@ zp_uint zpStringBuffer::size() const {
 }
 
 void zpStringBuffer::append( zp_char value ) {
-	ensureCapacity( m_length + 1 );
+	ensureCapacity( m_length + 2 );
 	m_buffer[ m_length ] = value;
 	m_length++;
 	m_buffer[ m_length ] = '\0';
@@ -131,7 +131,7 @@ void zpStringBuffer::append( const zp_char* value, zp_uint length ) {
 		append( value[0] );
 		return;
 	} else if( length < 8 ) {
-		ensureCapacity( m_length + length + 1 );
+		ensureCapacity( m_length + length + 2 );
 
 		zp_char* c = m_buffer + m_length;
 		for( zp_uint i = 0; i < length; ++i, ++c ) {
@@ -144,7 +144,7 @@ void zpStringBuffer::append( const zp_char* value, zp_uint length ) {
 	}
 	
 	zp_uint newLength = m_length + length;
-	ensureCapacity( newLength + 1 );
+	ensureCapacity( newLength + 2 );
 
 	zp_memcpy( m_buffer + m_length, ( m_capacity - m_length ) * sizeof( zp_char ), value, length * sizeof( zp_char ) );
 	
