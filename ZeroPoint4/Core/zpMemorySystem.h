@@ -2,18 +2,11 @@
 #ifndef ZP_MEMORY_SYSTEM_H
 #define ZP_MEMORY_SYSTEM_H
 
-ZP_PURE_INTERFACE zpMemoryAllocator {
-public:
-	virtual void* allocate( zp_uint size ) = 0;
-	virtual void* allocateArray( zp_uint size, zp_uint count ) = 0;
-	virtual void* allocateAligned( zp_uint size, zp_uint align ) = 0;
-	virtual void* allocatePlacement( zp_uint size, void* ptr ) = 0;
+void* operator new( zp_uint size );
+void* operator new[]( zp_uint size );
 
-	virtual void deallocate( void* ptr ) = 0;
-	virtual void deallocateArray( void* ptr ) = 0;
-	virtual void deallocateAligned( void* ptr ) = 0;
-	virtual void deallocatePlacement( void* ptr ) = 0;
-};
+void operator delete( void* ptr );
+void operator delete[]( void* ptr );
 
 class zpMemorySystem {
 public:
@@ -21,18 +14,22 @@ public:
 
 	static zpMemorySystem* getInstance();
 
-	static void initialize( zpMemoryAllocator* allocator );
-	static void initializeDefault();
-	static void initializeDebug();
-	static zp_bool isInitialized();
-	static void destroy();
+	void* allocate( zp_uint size );
+	void* allocateArray( zp_uint size );
 
-	zpMemoryAllocator* getMemoryAllocator() const;
+	void deallocate( void* ptr );
+	void deallocateArray( void* ptr );
 
 private:
 	zpMemorySystem();
 
-	zpMemoryAllocator* m_allocator;
+	zp_uint m_numAllocs;
+	zp_uint m_numArrayAllocs;
+	zp_uint m_numDeallocs;
+	zp_uint m_numArrayDeallocs;
+
+	zp_uint m_memAllocated;
+	zp_uint m_memDeallocated;
 
 	static zpMemorySystem s_instance;
 };

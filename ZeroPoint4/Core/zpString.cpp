@@ -466,7 +466,6 @@ zpString zpString::toCamelCase( zp_bool capitalFirstLetter ) const {
 			shouldCapital = false;
 		}
 	}
-	camel.append( '\0' );
 
 	return camel.toString();
 }

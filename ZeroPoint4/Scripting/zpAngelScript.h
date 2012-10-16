@@ -10,7 +10,7 @@ class zpAngelScript {
 public:
 	~zpAngelScript();
 
-	static zp_bool createInstance( zpMemoryAllocator* memoryAllocator = ZP_NULL );
+	static zp_bool createInstance();
 	static void destroyInstance();
 
 	static asIScriptEngine* getInstance();
@@ -22,7 +22,6 @@ private:
 	static void deallocate( void* ptr );
 
 	static asIScriptEngine* s_engine;
-	static zpMemoryAllocator* s_allocator;
 };
 
 #endif

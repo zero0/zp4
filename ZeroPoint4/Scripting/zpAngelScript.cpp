@@ -396,15 +396,11 @@ void as_zpGameObject_Register( asIScriptEngine* engine ) {
 zpAngelScript::zpAngelScript() {}
 zpAngelScript::~zpAngelScript() {}
 
-zpMemoryAllocator* zpAngelScript::s_allocator = ZP_NULL;
 asIScriptEngine* zpAngelScript::s_engine = ZP_NULL;
-zp_bool zpAngelScript::createInstance( zpMemoryAllocator* memoryAllocator ) {
+zp_bool zpAngelScript::createInstance() {
 	if( s_engine ) return false;
 
-	if( memoryAllocator ) {
-		s_allocator = memoryAllocator;
-		asSetGlobalMemoryFunctions( allocate, deallocate );
-	}
+	asSetGlobalMemoryFunctions( allocate, deallocate );
 
 	s_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
 	if( !s_engine ) return false;
@@ -431,8 +427,8 @@ asIScriptEngine* zpAngelScript::getInstance() {
 }
 
 void* zpAngelScript::allocate( zp_uint size ) {
-	return s_allocator->allocate( size );
+	return zpMemorySystem::getInstance()->allocate( size );
 }
 void zpAngelScript::deallocate( void* ptr ) {
-	s_allocator->deallocate( ptr );
+	zpMemorySystem::getInstance()->deallocate( ptr );
 }

@@ -49,11 +49,11 @@ void zpPhysicsManager::serialize( zpSerializedOutput* out ) {
 				
 				zpStringBuffer maskBuffer;
 				if( !m_collisionGroups.isEmpty() ) {
-					if( mask & ( 1 << 0 ) != 0 ) {
+					if( ( mask & ( 1 << 0 ) ) != 0 ) {
 						maskBuffer << m_collisionMasks[ 0 ];
 					}
 					for( zp_uint i = 1; i < m_collisionGroups.size(); ++i ) {
-						if( mask & ( 1 << i ) != 0 ) {
+						if( ( mask & ( 1 << i ) ) != 0 ) {
 							maskBuffer << '|' << m_collisionGroups[ i ];
 						}
 					}

@@ -34,6 +34,7 @@ void zpEditorCameraComponent::onKeyUp( zpKeyCode key ) {
 		m_editorCamera.setLookTo( m_prevCamera->getLookTo() );
 		m_editorCamera.setUp( m_prevCamera->getUp() );
 		m_editorCamera.setAspectRatio( m_prevCamera->getAspectRation() );
+		m_editorCamera.setFovy( m_prevCamera->getFovy() );
 		m_editorCamera.update();
 
 		m_rendering->setCamera( &m_editorCamera );
@@ -58,17 +59,26 @@ void zpEditorCameraComponent::onMouseMove( const zpVector2i& location ) {}
 void zpEditorCameraComponent::onMouseChange( const zpVector2i& delta ) {}
 
 void zpEditorCameraComponent::onCreate() {
-	zpInputManager* input = getGameManagerOfType<zpInputManager>();
+	m_input = getGameManagerOfType<zpInputManager>();
 	m_rendering = getGameManagerOfType<zpRenderingManager>();
 
-	input->getKeyboard()->addListener( this );
-	input->getMouse()->addListener( this );
+	m_input->getKeyboard()->addListener( this );
+	m_input->getMouse()->addListener( this );
 }
-void zpEditorCameraComponent::onDestroy() {}
+void zpEditorCameraComponent::onDestroy() {
+	m_input->getKeyboard()->removeListener( this );
+	m_input->getMouse()->removeListener( this );
+}
 
 void zpEditorCameraComponent::onUpdate() {
 	if( m_isActive ) {
-		
+		if( m_input->getMouse()->isButtonDown( ZP_MOUSE_BUTTON_LEFT ) ) {
+			zpVector2i d = m_input->getMouse()->getDelta();
+			if( !d.isZero() ) {
+				m_editorCamera.setPosition( m_editorCamera.getPosition() + zpVector4f( d.getX(), d.getY(), 0 ) * 0.1f );
+			}
+		}
+		m_editorCamera.update();
 	}
 }
 

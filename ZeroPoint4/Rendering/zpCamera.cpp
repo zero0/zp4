@@ -15,8 +15,7 @@ zpCamera::zpCamera()
 	, m_frustum()
 	, m_view()
 	, m_projection()
-	, m_viewProjection()
-	, m_invViewProjection()
+	, m_bufferData()
 {}
 zpCamera::~zpCamera() {}
 
@@ -52,10 +51,10 @@ void zpCamera::update() {
 	if( isViewProjectionDirty ) {
 		m_frustum.setLookTo( m_position, m_lookTo, m_up, m_aspectRatio, m_fovy, m_near, m_far );
 
-		m_view.mul( m_projection, m_viewProjection );
+		m_view.mul( m_projection, m_bufferData.viewProjection );
 
-		m_invViewProjection = m_viewProjection;
-		m_invViewProjection.invert();
+		m_bufferData.invViewProjection = m_bufferData.viewProjection;
+		m_bufferData.invViewProjection.invert();
 		m_isDirty = true;
 	}
 }
@@ -124,10 +123,13 @@ const zpMatrix4f& zpCamera::getProjection() const {
 	return m_projection;
 }
 const zpMatrix4f& zpCamera::getViewProjection() const {
-	return m_viewProjection;
+	return m_bufferData.viewProjection;
 }
 const zpMatrix4f& zpCamera::getInvViewProjection() const {
-	return m_invViewProjection;
+	return m_bufferData.invViewProjection;
+}
+const zpCameraBufferData& zpCamera::getCameraBufferData() const {
+	return m_bufferData;
 }
 
 zp_bool zpCamera::isDirty() const {
@@ -146,10 +148,10 @@ zpRay zpCamera::generateRay( const zpVector2i& windowPosition ) const {
 	zpVector4f nearZ( x, y, 0.f, 1.f );
 	zpVector4f farZ( x, y, 1.f, 1.f );
 
-	m_invViewProjection.mul( nearZ, nearZ );
+	m_bufferData.invViewProjection.mul( nearZ, nearZ );
 	nearZ.homogenize4();
 	
-	m_invViewProjection.mul( farZ, farZ );
+	m_bufferData.invViewProjection.mul( farZ, farZ );
 	farZ.homogenize4();
 
 	return zpRay( nearZ, farZ - nearZ );

@@ -41,9 +41,11 @@ protected:
 private:
 	zp_bool m_isActive;
 	zpRenderingManager* m_rendering;
-
+	zpInputManager* m_input;
 	zpCamera* m_prevCamera;
+
 	zpCamera m_editorCamera;
+	zp_float padding;
 };
 
 #endif

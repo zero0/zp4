@@ -361,6 +361,8 @@ void rendering_test_main() {
 	zpWorld world;
 	world.setRootGameObject( &ro );
 
+	zpEditorCameraComponent ecc;
+	ro.addComponent( &ecc );
 	ro.addComponent( new zpEditorCameraComponent );
 
 	zp_printfcln( ZP_CC( ZP_CC_RED, ZP_CC_LIGHT_BLUE ), "Size: %d", sizeof( zpGameObject ) );

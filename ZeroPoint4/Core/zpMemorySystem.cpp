@@ -1,7 +1,62 @@
 #include "zpCore.h"
 #include <malloc.h>
 
-zpMemorySystem::zpMemorySystem() : m_allocator( ZP_NULL ) {}
+#if ZP_USE_MEMORY_SYSTEM
+void* operator new( zp_uint size ) {
+	return zpMemorySystem::getInstance()->allocate( size );
+}
+void* operator new[]( zp_uint size ) {
+	return zpMemorySystem::getInstance()->allocateArray( size );
+}
+
+void operator delete( void* ptr ) {
+	zpMemorySystem::getInstance()->deallocate( ptr );
+}
+void operator delete[]( void* ptr ) {
+	zpMemorySystem::getInstance()->deallocateArray( ptr );
+}
+#else
+
+#if ZP_USE_ALIGNMENT
+void* operator new( zp_uint size ) {
+	return zp_aligned_malloc( size, ZP_MALLOC_ALIGNMENT );
+}
+void* operator new[]( zp_uint size ) {
+	return zp_aligned_calloc( size, 1, ZP_MALLOC_ALIGNMENT );
+}
+
+void operator delete( void* ptr ) {
+	zp_aligned_free( ptr );
+}
+void operator delete[]( void* ptr ) {
+	zp_aligned_free( ptr );
+}
+#else
+void* operator new( zp_uint size ) {
+	return zp_malloc( size );
+}
+void* operator new[]( zp_uint size ) {
+	return zp_calloc( 1, size );
+}
+
+void operator delete( void* ptr ) {
+	zp_free( ptr );
+}
+void operator delete[]( void* ptr ) {
+	zp_free( ptr );
+}
+#endif
+
+#endif
+
+zpMemorySystem::zpMemorySystem()
+	: m_numAllocs( 0 )
+	, m_numArrayAllocs( 0 )
+	, m_numDeallocs( 0 )
+	, m_numArrayDeallocs( 0 )
+	, m_memAllocated( 0 )
+	, m_memDeallocated( 0 )
+{}
 zpMemorySystem::~zpMemorySystem() {}
 
 zpMemorySystem zpMemorySystem::s_instance;
@@ -9,99 +64,38 @@ zpMemorySystem* zpMemorySystem::getInstance() {
 	return &s_instance;
 }
 
-void zpMemorySystem::initialize( zpMemoryAllocator* allocator ) {
-	if( isInitialized() ) return;
-
-	s_instance.m_allocator = allocator;
+#if ZP_USE_ALIGNMENT
+void* zpMemorySystem::allocate( zp_uint size ) {
+	m_memAllocated += size;
+	++m_numAllocs;
+	return zp_aligned_malloc( size, ZP_MALLOC_ALIGNMENT );
 }
-void zpMemorySystem::initializeDefault() {
-	if( isInitialized() ) return;
-
-	struct zpDefaultMemoryAllocator : zpMemoryAllocator {
-		void* allocate( zp_uint size ) {
-			return malloc( size );
-		}
-		void* allocateArray( zp_uint size, zp_uint count ) {
-			return malloc( size );
-		}
-		void* allocateAligned( zp_uint size, zp_uint align ) {
-			return _aligned_malloc( size, align );
-		}
-		void* allocatePlacement( zp_uint size, void* ptr ) {
-			return ptr;
-		}
-
-		void deallocate( void* ptr ) {
-			free( ptr );
-		}
-		void deallocateArray( void* ptr ) {
-			free( ptr) ;
-		}
-		void deallocateAligned( void* ptr ) {
-			_aligned_free( ptr );
-		}
-		void deallocatePlacement( void* ptr ) {}
-	};
-
-	initialize( new zpDefaultMemoryAllocator );
+void* zpMemorySystem::allocateArray( zp_uint size ) {
+	m_memAllocated += size;
+	++m_numArrayAllocs;
+	return zp_aligned_calloc( size, 1, ZP_MALLOC_ALIGNMENT );
 }
-void zpMemorySystem::initializeDebug() {
-#if ZP_DEBUG
-	if( isInitialized() ) return;
 
-	struct zpDebugMemoryAllocator : zpMemoryAllocator {
-		void* allocate( zp_uint size ) {
-			void* mem = malloc( size );
-			if( !mem ) {
-				ZP_ON_DEBUG_MSG( "Error allocating memory: %u bytes", size );
-			}
-			return mem;
-		}
-		void* allocateArray( zp_uint size, zp_uint count ) {
-			void* mem = malloc( size );
-			if( !mem ) {
-				ZP_ON_DEBUG_MSG( "Error allocating array memory: %u bytes, %u count", size, count );
-			}
-			return mem;
-		}
-		void* allocateAligned( zp_uint size, zp_uint align ) {
-			void* mem = _aligned_malloc( size, align );
-			if( !mem ) {
-				ZP_ON_DEBUG_MSG( "Error allocating aligned memory: %u bytes, %u alignment", size, align );
-			}
-			return mem;
-		}
-		void* allocatePlacement( zp_uint size, void* ptr ) {
-			if( !ptr ) {
-				ZP_ON_DEBUG_MSG( "Error allocating placement memory: %u bytes", size );
-			}
-			return ptr;
-		}
-
-		void deallocate( void* ptr ) {
-			free( ptr );
-		}
-		void deallocateArray( void* ptr ) {
-			free( ptr) ;
-		}
-		void deallocateAligned( void* ptr ) {
-			_aligned_free( ptr );
-		}
-		void deallocatePlacement( void* ptr ) {}
-	};
-
-	initialize( new zpDebugMemoryAllocator );
+void zpMemorySystem::deallocate( void* ptr ) {
+	++m_numDeallocs;
+	zp_aligned_free( ptr );
+}
+void zpMemorySystem::deallocateArray( void* ptr ) {
+	++m_numArrayDeallocs;
+	zp_aligned_free( ptr );
+}
 #else
-	initializeDefault();
-#endif
+void* zpMemorySystem::allocate( zp_uint size ) {
+	return zp_malloc( size );
 }
-zp_bool zpMemorySystem::isInitialized() {
-	return s_instance.m_allocator != ZP_NULL;
-}
-void zpMemorySystem::destroy() {
-	s_instance.m_allocator = ZP_NULL;
+void* zpMemorySystem::allocateArray( zp_uint size ) {
+	return zp_calloc( 1, size );
 }
 
-zpMemoryAllocator* zpMemorySystem::getMemoryAllocator() const {
-	return m_allocator;
+void zpMemorySystem::deallocate( void* ptr ) {
+	zp_free( ptr );
 }
+void zpMemorySystem::deallocateArray( void* ptr ) {
+	zp_free( ptr );
+}
+#endif

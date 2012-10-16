@@ -2,7 +2,7 @@
 #include <Windows.h>
 
 zpMouse::zpMouse() 
-	: m_hasFocus( false )
+	: m_hasFocus( true )
 	, m_scrollWheel( 0 )
 	, m_scrollWheelBuffer( 0 )
 {}

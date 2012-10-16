@@ -95,8 +95,28 @@ void* zp_calloc( zp_uint num, zp_uint size ) {
 void* zp_realloc( void* ptr, zp_uint size ) {
 	return realloc( ptr, size );
 }
+zp_uint zp_memsize( void* ptr ) {
+	return _msize( ptr );
+}
+
+void* zp_aligned_malloc( zp_uint size, zp_uint alignment ) {
+	return _aligned_malloc( size, alignment );
+}
+void* zp_aligned_calloc( zp_uint size, zp_uint count, zp_uint alignment ) {
+	return _aligned_recalloc( ZP_NULL, count, size, alignment );
+}
+void* zp_aligned_realloc( void* ptr, zp_uint size, zp_uint alignment ) {
+	return _aligned_realloc( ptr, size, alignment );
+}
+zp_uint zp_aligned_memsize( void* ptr, zp_uint alignment ) {
+	return _aligned_msize( ptr, alignment, 0 );
+}
+
 void zp_free( void* ptr ) {
 	free( ptr );
+}
+void zp_aligned_free( void* ptr ) {
+	_aligned_free( ptr );
 }
 
 void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size ) {

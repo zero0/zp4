@@ -38,6 +38,7 @@ public:
 	const zpMatrix4f& getProjection() const;
 	const zpMatrix4f& getViewProjection() const;
 	const zpMatrix4f& getInvViewProjection() const;
+	const zpCameraBufferData& getCameraBufferData() const;
 
 	zp_bool isDirty() const;
 	void unmarkDirty();
@@ -66,8 +67,8 @@ private:
 
 	zpMatrix4f m_view;
 	zpMatrix4f m_projection;
-	zpMatrix4f m_viewProjection;
-	zpMatrix4f m_invViewProjection;
+
+	zpCameraBufferData m_bufferData;
 };
 
 #endif

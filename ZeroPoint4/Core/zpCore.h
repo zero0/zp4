@@ -18,6 +18,13 @@
 #define ZP_USE_SIMD			1
 //#endif
 
+#define ZP_USE_ALIGNMENT	1
+#if ZP_USE_ALIGNMENT
+#define ZP_MALLOC_ALIGNMENT	16
+#endif
+
+#define ZP_USE_MEMORY_SYSTEM	1
+
 #define ZP_LOG_ENABLED		1
 
 #if ZP_DEBUG
@@ -65,7 +72,15 @@ void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_ch
 void* zp_malloc( zp_uint size );
 void* zp_calloc( zp_uint num, zp_uint size );
 void* zp_realloc( void* ptr, zp_uint size );
+zp_uint zp_memsize( void* ptr );
+
+void* zp_aligned_malloc( zp_uint size, zp_uint alignment );
+void* zp_aligned_calloc( zp_uint size, zp_uint count, zp_uint alignment );
+void* zp_aligned_realloc( void* ptr, zp_uint size, zp_uint alignment );
+zp_uint zp_aligned_memsize( void* ptr, zp_uint alignment );
+
 void zp_free( void* ptr );
+void zp_aligned_free( void* ptr );
 
 void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size );
 void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size );
