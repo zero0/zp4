@@ -8,7 +8,10 @@ zpDX11Texture::zpDX11Texture()
 	, m_texture( ZP_NULL )
 	, m_textureResourceView( ZP_NULL )
 {}
-zpDX11Texture::~zpDX11Texture() {}
+zpDX11Texture::~zpDX11Texture() {
+	ZP_SAFE_RELEASE( m_texture );
+	ZP_SAFE_RELEASE( m_textureResourceView );
+}
 
 zpTextureType zpDX11Texture::getTextureType() const {
 	return m_type;

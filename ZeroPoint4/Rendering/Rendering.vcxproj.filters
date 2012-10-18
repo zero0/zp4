@@ -111,6 +111,15 @@
     <ClInclude Include="zpBufferData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpUIRenderingComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpUIResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpUIInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -165,6 +174,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpTextRenderingComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpUIRenderingComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

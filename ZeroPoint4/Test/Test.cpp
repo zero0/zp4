@@ -209,6 +209,7 @@ struct TestRenderable : public zpRenderable {
 	zpRasterState* raster;
 	zpStaticMeshResource* mesh;
 	zpStaticMeshRenderingComponent smrc;
+	zpUIRenderingComponent uirc;
 	zp_float time;
 	zp_uint frames;
 	void start( zpContentManager* cm ) {
@@ -319,7 +320,7 @@ struct TestRenderable : public zpRenderable {
 		}
 
 		if( srtex ) {
-			i->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &tex );
+			i->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex.getResource()->getTexture() );
 			i->setShader( &srtex );
 			smrc.render();
 		}
@@ -329,7 +330,7 @@ struct TestRenderable : public zpRenderable {
 
 			i->setBuffer( buff2 );
 			i->setShader( &srtex );
-			i->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &tex );
+			i->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, tex.getResource()->getTexture() );
 			i->draw( 4 );
 		}
 		/*
@@ -455,12 +456,12 @@ void rendering_test_main() {
 		void onControllerReconnected() {};
 	};
 
-	KeyboardListener kl;
-	kl.content = &cm;
+	//KeyboardListener kl;
+	//kl.content = &cm;
 
-	im.getKeyboard()->addListener( &kl );
-	im.getMouse()->addListener( new MouseListener );
-	im.getController( ZP_CONTROLLER_1 )->addListener( new ControllerListener );
+	//im.getKeyboard()->addListener( &kl );
+	//im.getMouse()->addListener( new MouseListener );
+	//im.getController( ZP_CONTROLLER_1 )->addListener( new ControllerListener );
 
 	game.addWorld( &world, true );
 

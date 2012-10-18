@@ -213,6 +213,13 @@ enum zpFrontFace {
 	ZP_FRONT_FACE_CCW,
 };
 
+enum zpCpuAccess {
+	ZP_CPU_ACCESS_NONE =	0,
+	ZP_CPU_ACCESS_READ,
+	ZP_CPU_ACCESS_WRITE,
+	ZP_CPU_ACCESS_READ_WRITE,
+};
+
 struct zpSamplerStateDesc {
 	struct {
 		zpComparisonFunc cmpFunc : 8;
@@ -262,6 +269,9 @@ template<> class zpResourceInstance<zpShaderResource>;
 ZP_PURE_INTERFACE zpTextureResource;
 template<> class zpResourceInstance<zpTextureResource>;
 
+class zpUIResource;
+template<> class zpResourceInstance<zpUIResource>;
+
 class zpRenderingResourceCreator;
 
 ZP_PURE_INTERFACE zpBuffer;
@@ -290,6 +300,7 @@ class zpCameraComponent;
 class zpLightComponent;
 class zpStaticMeshRenderingComponent;
 class zpTextRenderingComponent;
+class zpUIRenderingComponent;
 
 #include "zpBufferData.h"
 
@@ -302,6 +313,9 @@ class zpTextRenderingComponent;
 
 #include "zpTextureResource.h"
 #include "zpTextureInstance.h"
+
+#include "zpUIResource.h"
+#include "zpUIInstance.h"
 
 #include "zpRenderingResourceCreator.h"
 
@@ -331,5 +345,6 @@ class zpTextRenderingComponent;
 #include "zpLightComponent.h"
 #include "zpStaticMeshRenderingComponent.h"
 #include "zpTextRenderingComponent.h"
+#include "zpUIRenderingComponent.h"
 
 #endif

@@ -44,6 +44,7 @@ public:
 	zpRenderingContext* getImmediateRenderingContext() const;
 
 	zpBuffer* createBuffer();
+	zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpDisplayFormat format, zpCpuAccess access );
 
 	zpTextureResource* createTextureResource();
 	zpShaderResource* createShaderResource();

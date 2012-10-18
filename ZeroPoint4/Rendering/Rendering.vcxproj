@@ -48,15 +48,17 @@
       <PreprocessorDefinitions>_MBCS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>zpRendering.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
     </Lib>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)bin\$(ProcessorArchitecture)\*" "$(TargetDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -66,7 +68,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>zpRendering.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(DXSDK_DIR)Include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -74,9 +76,11 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
     </Lib>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)bin\$(ProcessorArchitecture)\*" "$(TargetDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="zpBufferData.h" />
@@ -108,6 +112,9 @@
     <ClInclude Include="zpTexture.h" />
     <ClInclude Include="zpTextureInstance.h" />
     <ClInclude Include="zpTextureResource.h" />
+    <ClInclude Include="zpUIInstance.h" />
+    <ClInclude Include="zpUIRenderingComponent.h" />
+    <ClInclude Include="zpUIResource.h" />
     <ClInclude Include="zpVertex.h" />
     <ClInclude Include="zpVertexLayout.h" />
     <ClInclude Include="zpViewport.h" />
@@ -133,6 +140,7 @@
     <ClCompile Include="zpStaticMeshResource.cpp" />
     <ClCompile Include="zpTextRenderingComponent.cpp" />
     <ClCompile Include="zpTextureInstance.cpp" />
+    <ClCompile Include="zpUIRenderingComponent.cpp" />
     <ClCompile Include="zpViewport.cpp" />
   </ItemGroup>
   <ItemGroup>

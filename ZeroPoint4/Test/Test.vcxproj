@@ -49,7 +49,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(SolutionDir)Physics\lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(SolutionDir)Physics\lib\$(ProcessorArchitecture)\;$(SolutionDir)Rendering\lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetPath)" "$(ProjectDir)$(TargetFileName)"</Command>
@@ -67,7 +67,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(SolutionDir)Physics\lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(SolutionDir)Physics\lib\$(ProcessorArchitecture)\;$(SolutionDir)Rendering\lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

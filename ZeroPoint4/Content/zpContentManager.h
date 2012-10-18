@@ -41,6 +41,7 @@ public:
 
 	void setRootDirectory( const zpString& rootDirectory );
 	const zpString& getRootDirectory() const;
+	zp_bool getRootDirectoryForExtension( const zpString& extension, zpString& outRoot ) const;
 
 	zpDelegateEvent<void( const zpString&, zp_bool, zp_uint )>& onResourceLoaded();
 	zpDelegateEvent<void()>& onAllResourcesLoaded();

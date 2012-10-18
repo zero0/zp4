@@ -27,8 +27,8 @@ void zpImmediateBuffer<V, I>::create( zp_uint vertexBufferCount, zp_uint indexBu
 }
 template<typename V, typename I>
 void zpImmediateBuffer<V, I>::destroy() {
-	m_vertexBuffer->destroy();
-	m_indexBuffer->destroy();
+	if( m_vertexBuffer ) m_vertexBuffer->destroy();
+	if( m_indexBuffer ) m_indexBuffer->destroy();
 }
 
 template<typename V, typename I>
@@ -93,7 +93,7 @@ void zpImmediateBuffer<V, I>::addQuad( const V& v0, const V& v1, const V& v2, co
 	if( m_topology != ZP_TOPOLOGY_TRIANGLE_LIST ) return;
 	
 	V* verts = ZP_NULL;
-	m_vertexBuffer->map( &verts, ZP_MAP_TYPE_WRITE );
+	m_vertexBuffer->map( (void**)&verts, ZP_MAP_TYPE_WRITE );
 	verts[ m_vertexSize + 0 ] = v0;
 	verts[ m_vertexSize + 1 ] = v1;
 	verts[ m_vertexSize + 2 ] = v2;
@@ -101,7 +101,7 @@ void zpImmediateBuffer<V, I>::addQuad( const V& v0, const V& v1, const V& v2, co
 	m_vertexBuffer->unmap();
 
 	I* index = ZP_NULL;
-	m_indexBuffer->map( &index, ZP_MAP_TYPE_WRITE );
+	m_indexBuffer->map( (void**)&index, ZP_MAP_TYPE_WRITE );
 	index[ m_indexSize + 0 ] = (I)m_vertexSize + 0;
 	index[ m_indexSize + 1 ] = (I)m_vertexSize + 1;
 	index[ m_indexSize + 2 ] = (I)m_vertexSize + 2;

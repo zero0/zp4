@@ -28,7 +28,7 @@ public:
 	void setVertexLayout( const zpVertexLayout* layout );
 
 	void setShader( const zpResourceInstance<zpShaderResource>* shader );
-	void setTexture( zpResourceBindSlot bindSlot, zp_uint slot, const zpResourceInstance<zpTextureResource>* texture );
+	void setTexture( zpResourceBindSlot bindSlot, zp_uint slot, const zpTexture* texture );
 
 	void setTopology( zpTopology topology );
 
@@ -40,7 +40,8 @@ public:
 	void map( zpBuffer* buffer, zpMapType mapType, zp_uint subResource, void** data );
 	void unmap( zpBuffer* buffer, zp_uint subResource );
 	void updateBuffer( zpBuffer* buffer, const void* data );
-
+	void updateTexture( zpTexture* texture, const void* data );
+	
 	void draw( zp_uint vertexCount, zp_uint startIndex = 0 );
 	void drawAuto();
 	void drawIndexed( zp_uint indexCount, zp_uint startIndex = 0, zp_uint startVertex = 0 );

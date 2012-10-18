@@ -288,6 +288,61 @@ zpRenderingContext* zpDX11RenderingEngine::getImmediateRenderingContext() const 
 zpBuffer* zpDX11RenderingEngine::createBuffer() {
 	return new zpDX11Buffer();
 }
+zpTexture* zpDX11RenderingEngine::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpDisplayFormat format, zpCpuAccess access ) {
+	HRESULT hr;
+	ID3D11Texture2D* texture;
+	ID3D11ShaderResourceView* srv;
+
+	D3D11_TEXTURE2D_DESC texDesc;
+	zp_zero_memory( &texDesc );
+	texDesc.ArraySize = 1;
+	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texDesc.CPUAccessFlags = __zpToDX( access );
+	texDesc.Format = __zpToDX( format );
+	texDesc.Height = height;
+	texDesc.MipLevels = 1;
+	texDesc.MiscFlags = 0;
+	texDesc.SampleDesc.Count = 0;
+	texDesc.SampleDesc.Quality = 1;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.Width = width;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+	zp_zero_memory( &desc );
+	desc.Format = texDesc.Format;
+	switch( type ) {
+	case ZP_TEXTURE_TYPE_1D:
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+		desc.Texture1D.MipLevels = 1;
+		break;
+	case ZP_TEXTURE_TYPE_2D:
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MipLevels = 1;
+		break;
+	case ZP_TEXTURE_TYPE_CUBE_MAP:
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+		desc.TextureCube.MipLevels = 1;
+		break;
+	}
+
+	hr = m_d3dDevice->CreateTexture2D( &texDesc, ZP_NULL, &texture );
+	HR_V( hr, ZP_NULL );
+
+	hr = m_d3dDevice->CreateShaderResourceView( texture, &desc, &srv );
+	HR_V( hr, ZP_NULL );
+
+	// remove reference to texture so render target now owns pointer
+	texture->Release();
+
+	zpDX11Texture* tex = new zpDX11Texture();
+	tex->m_width = width;
+	tex->m_height = height;
+	tex->m_type = type;
+	tex->m_texture = texture;
+	tex->m_textureResourceView = srv;
+	
+	return tex;
+}
 
 zpTextureResource* zpDX11RenderingEngine::createTextureResource() {
 	return new zpDX11TextureResource();

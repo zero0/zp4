@@ -122,6 +122,14 @@ void zpContentManager::setRootDirectory( const zpString& rootDirectory ) {
 const zpString& zpContentManager::getRootDirectory() const {
 	return m_rootDirectory;
 }
+zp_bool zpContentManager::getRootDirectoryForExtension( const zpString& extension, zpString& outRoot ) const {
+	zpResourceCreator* creator = ZP_NULL;
+	if( m_creators.find( extension, &creator ) ) {
+		outRoot = creator->getRootDirectory();
+		return true;
+	}
+	return false;
+}
 
 zpDelegateEvent<void( const zpString&, zp_bool, zp_uint )>& zpContentManager::onResourceLoaded() {
 	return m_onResourceLoaded;

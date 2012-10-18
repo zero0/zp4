@@ -15,6 +15,8 @@ zpDX11Buffer::~zpDX11Buffer() {
 }
 
 void zpDX11Buffer::create( zpBufferType type, zpBufferBindType bind, zp_uint count, zp_uint stride, void* data ) {
+	if( m_buffer ) return;
+
 	m_type = type;
 	m_bind = bind;
 	m_count = count;
@@ -70,7 +72,7 @@ void zpDX11Buffer::update( zp_uint count, void* data ) {
 		context->updateBuffer( this, data );
 	} else {
 		context->map( this, ZP_MAP_TYPE_WRITE_DISCARD, 0, &d );
-		memcpy_s( d, count * m_stride, data, count * m_stride );
+		zp_memcpy( d, count * m_stride, data, count * m_stride );
 		context->unmap( this, 0 );
 	}
 }

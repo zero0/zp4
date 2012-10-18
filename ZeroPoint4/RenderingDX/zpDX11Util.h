@@ -246,4 +246,15 @@ ZP_FORCE_INLINE D3D11_FILL_MODE __zpToDX( zpFillMode t ) {
 	default: return D3D11_FILL_SOLID;
 	}
 }
+
+ZP_FORCE_INLINE zp_uint __zpToDX( zpCpuAccess t ) {
+	switch( t ) {
+	case ZP_CPU_ACCESS_NONE:		return 0;
+	case ZP_CPU_ACCESS_READ:		return D3D11_CPU_ACCESS_READ;
+	case ZP_CPU_ACCESS_WRITE:		return D3D11_CPU_ACCESS_WRITE;
+	case ZP_CPU_ACCESS_READ_WRITE:	return D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+	default:						return 0;
+	}
+}
+
 #endif

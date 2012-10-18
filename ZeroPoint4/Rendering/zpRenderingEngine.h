@@ -33,6 +33,7 @@ public:
 	virtual zpRenderingContext* getImmediateRenderingContext() const = 0;
 
 	virtual zpBuffer* createBuffer() = 0;
+	virtual zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpDisplayFormat format, zpCpuAccess access ) = 0;
 
 	virtual zpTextureResource* createTextureResource() = 0;
 	virtual zpShaderResource* createShaderResource() = 0;

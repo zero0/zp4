@@ -20,7 +20,7 @@ void zpTextRenderingComponent::render() {
 	zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 
 	c->setShader( &m_shader );
-	c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_MESH_TEXTURE_BIND_SLOT_DIFFUSE, &m_font.getResource()->getTexture() );
+	c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_MESH_TEXTURE_BIND_SLOT_DIFFUSE, m_font.getResource()->getTexture().getResource()->getTexture() );
 	m_buffer.draw();
 }
 

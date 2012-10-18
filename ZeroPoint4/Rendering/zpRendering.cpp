@@ -1,5 +1,7 @@
 #include "zpRendering.h"
 
+#pragma comment( lib, "Awesomium" )
+
 zpSamplerStateDesc::zpSamplerStateDesc() :
 	cmpFunc( ZP_COMPARISON_FUNC_NONE ),
 	minFilter (ZP_TEXTURE_FILTER_POINT ),

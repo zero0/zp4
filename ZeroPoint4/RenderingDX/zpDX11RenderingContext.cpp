@@ -117,26 +117,36 @@ void zpDX11RenderingContext::setVertexLayout( const zpVertexLayout* layout ) {
 }
 
 void zpDX11RenderingContext::setShader( const zpResourceInstance<zpShaderResource>* shader ) {
-	zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader->getResource();
-	if( s->getVertexShader() ) {
-		setVertexLayout( s->getVertexLayout() );
-		m_context->VSSetShader( s->getVertexShader(), ZP_NULL, 0 );
-	}
-	if( s->getPixelShader() ) {
-		m_context->PSSetShader( s->getPixelShader(), ZP_NULL, 0 );
-	}
-	if( s->getGeometryShader() ) {
-		m_context->GSSetShader( s->getGeometryShader(), ZP_NULL, 0 );
-	}
-	if( s->getComputeShader() ) {
-		m_context->CSSetShader( s->getComputeShader(), ZP_NULL, 0 );
+	if( shader == ZP_NULL ) {
+		m_context->VSSetShader( ZP_NULL, ZP_NULL, 0 );
+		m_context->PSSetShader( ZP_NULL, ZP_NULL, 0 );
+		m_context->GSSetShader( ZP_NULL, ZP_NULL, 0 );
+		m_context->CSSetShader( ZP_NULL, ZP_NULL, 0 );
+	} else {
+		zpDX11ShaderResource* s = (zpDX11ShaderResource*)shader->getResource();
+		if( s->getVertexShader() ) {
+			setVertexLayout( s->getVertexLayout() );
+			m_context->VSSetShader( s->getVertexShader(), ZP_NULL, 0 );
+		}
+		if( s->getPixelShader() ) {
+			m_context->PSSetShader( s->getPixelShader(), ZP_NULL, 0 );
+		}
+		if( s->getGeometryShader() ) {
+			m_context->GSSetShader( s->getGeometryShader(), ZP_NULL, 0 );
+		}
+		if( s->getComputeShader() ) {
+			m_context->CSSetShader( s->getComputeShader(), ZP_NULL, 0 );
+		}
 	}
 }
-void zpDX11RenderingContext::setTexture( zpResourceBindSlot bindType, zp_uint slot, const zpResourceInstance<zpTextureResource>* texture ) {
-	ID3D11ShaderResourceView* view = texture ? ( (zpDX11Texture*)texture->getResource()->getTexture() )->getResourceView() : ZP_NULL;
+void zpDX11RenderingContext::setTexture( zpResourceBindSlot bindType, zp_uint slot, const zpTexture* texture ) {
+	ID3D11ShaderResourceView* view = texture ? ( (zpDX11Texture*)texture )->getResourceView() : ZP_NULL;
 	switch( bindType ) {
 	case ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER:
 		m_context->VSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
+		break;
+	case ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER:
+		m_context->GSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
 		break;
 	case ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER:
 		m_context->PSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
@@ -196,6 +206,9 @@ void zpDX11RenderingContext::unmap( zpBuffer* buffer, zp_uint subResource ) {
 }
 void zpDX11RenderingContext::updateBuffer( zpBuffer* buffer, const void* data ) {
 	m_context->UpdateSubresource( ( (zpDX11Buffer*)buffer )->getBuffer(), 0, ZP_NULL, data, 0, 0 );
+}
+void zpDX11RenderingContext::updateTexture( zpTexture* texture, const void* data ) {
+	m_context->UpdateSubresource( ( ( zpDX11Texture*)texture )->getTexture(), 0, NULL, data, 0, 0 );
 }
 
 void zpDX11RenderingContext::draw( zp_uint vertexCount, zp_uint startIndex ) {
