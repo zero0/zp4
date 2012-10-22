@@ -5,18 +5,17 @@
 #include "Core\zpCore.h"
 #include "Content\zpContent.h"
 
+class zpScriptingResourceCreator;
+class zpScriptResource;
+
 class zpScriptingManager;
 class zpScriptingComponent;
 
-class zpScriptingResourceCreator;
-class zpScriptingResource;
-class zpScriptingInstance;
+#include "zpScriptingResourceCreator.h"
+#include "zpScriptResource.h"
+#include "zpScriptInstance.h"
 
 #include "zpScriptingManager.h"
 #include "zpScriptingComponent.h"
-
-#include "zpScriptingResourceCreator.h"
-#include "zpScriptingResource.h"
-#include "zpScriptingInstance.h"
 
 #endif

@@ -3,7 +3,7 @@
 #include "angelscript.h"
 
 zpScriptingComponent::zpScriptingComponent() : 
-	m_scriptInstance( ZP_NULL ),
+	m_scriptInstance(),
 	m_manager( ZP_NULL ),
 	m_scriptAlias()
 {}
@@ -21,14 +21,14 @@ void zpScriptingComponent::receiveMessage( const zpMessage& message ) {
 		m_messageFunctions.put( message.getMessageType(), func );
 	}
 	
-	m_manager->callObjectFunction( m_scriptInstance->getScriptObject(), m_scriptInstance->getMethod( func ) );
+	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( func ) );
 }
 
 void zpScriptingComponent::serialize( zpSerializedOutput* out ) {}
 void zpScriptingComponent::deserialize( zpSerializedInput* in ) {}
 
 void zpScriptingComponent::callFunction( const zpString& functionName ) {
-	m_manager->callObjectFunction( m_scriptInstance->getScriptObject(), m_scriptInstance->getMethod( functionName ) );
+	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( functionName ) );
 }
 
 void zpScriptingComponent::setScriptAlias( const zpString& alias ) {
@@ -41,25 +41,23 @@ const zpString& zpScriptingComponent::getScriptAlias() const {
 void zpScriptingComponent::onCreate() {
 	zpContentManager* content = getGameManagerOfType<zpContentManager>();
 
-	zpScriptingResource* script = content->getResourceOfType<zpScriptingResource>( m_scriptAlias );
-
-	m_scriptInstance = new zpScriptingInstance( script );
+	m_scriptInstance = content->createInstanceOfResource<zpScriptResource>( m_scriptAlias );
 
 	m_manager = (zpScriptingManager*)zpAngelScript::getInstance()->GetUserData();
-	m_manager->callObjectFunction( m_scriptInstance->getScriptObject(), m_scriptInstance->getMethod( "onCreate" ) );
+	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( "onCreate" ) );
 }
 void zpScriptingComponent::onDestroy() {
-	m_manager->callObjectFunction( m_scriptInstance->getScriptObject(), m_scriptInstance->getMethod( "onDestroy" ) );
+	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( "onDestroy" ) );
 }
 
 void zpScriptingComponent::onUpdate() {
-	m_manager->callObjectFunction( m_scriptInstance->getScriptObject(), m_scriptInstance->getMethod( "onUpdate" ) );
+	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( "onUpdate" ) );
 }
 
 void zpScriptingComponent::onEnabled() {
-	m_manager->callObjectFunction( m_scriptInstance->getScriptObject(), m_scriptInstance->getMethod( "onEnabled" ) );
+	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( "onEnabled" ) );
 }
 void zpScriptingComponent::onDisabled() {
-	m_manager->callObjectFunction( m_scriptInstance->getScriptObject(), m_scriptInstance->getMethod( "onDisabled" ) );
+	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( "onDisabled" ) );
 }
 

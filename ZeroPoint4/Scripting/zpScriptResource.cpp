@@ -4,14 +4,14 @@
 
 #define AS_ASSERT( r )	if( (r) < asSUCCESS ) { return false; }
 
-zpScriptingResource::zpScriptingResource() : 
+zpScriptResource::zpScriptResource() : 
 	m_scriptObjectType( ZP_NULL )
 {}
-zpScriptingResource::~zpScriptingResource() {
+zpScriptResource::~zpScriptResource() {
 	unload();
 }
 
-zp_bool zpScriptingResource::load() {
+zp_bool zpScriptResource::load() {
 	asIScriptEngine* engine = zpAngelScript::getInstance();
 	zp_int r;
 
@@ -70,7 +70,7 @@ zp_bool zpScriptingResource::load() {
 
 	return true;
 }
-void zpScriptingResource::unload() {
+void zpScriptResource::unload() {
 	if( m_scriptObjectType ) {
 		( (asIObjectType*)m_scriptObjectType )->Release();
 		m_scriptObjectType = ZP_NULL;
@@ -84,10 +84,10 @@ void zpScriptingResource::unload() {
 	zpAngelScript::getInstance()->DiscardModule( getFilename().c_str() );
 }
 
-void* zpScriptingResource::getScriptObjectType() const {
+void* zpScriptResource::getScriptObjectType() const {
 	return m_scriptObjectType;
 }
-void* zpScriptingResource::getMethod( const zpString& functionName ) {
+void* zpScriptResource::getMethod( const zpString& functionName ) {
 	void* method = ZP_NULL;
 	if( !m_cachedMethods.find( functionName, &method ) && m_scriptObjectType ) {
 		asIScriptFunction* func = ( (asIObjectType*)m_scriptObjectType )->GetMethodByName( functionName.c_str() );

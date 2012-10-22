@@ -161,12 +161,14 @@ enum zpResourceBindSlot {
 	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER =	0x08,
 };
 
-enum zpMeshTextureBindSlot {
-	ZP_MESH_TEXTURE_BIND_SLOT_DIFFUSE =		0,
-	ZP_MESH_TEXTURE_BIND_SLOT_NORMAL,
-	ZP_MESH_TEXTURE_BIND_SLOT_SPECULAR,
-	ZP_MESH_TEXTURE_BIND_SLOT_OPACITY,
-	ZP_MESH_TEXTURE_BIND_SLOT_OTHER,
+enum zpMaterialTextureSlot {
+	ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE =		0,
+	ZP_MATERIAL_TEXTURE_SLOT_NORMAL,
+	ZP_MATERIAL_TEXTURE_SLOT_SPECULAR,
+	ZP_MATERIAL_TEXTURE_SLOT_OPACITY,
+	ZP_MATERIAL_TEXTURE_SLOT_OTHER,
+
+	ZP_MATERIAL_TEXTURE_SLOT_Count
 };
 
 enum zpTextureWrap {
@@ -281,6 +283,7 @@ ZP_PURE_INTERFACE zpVertexLayout;
 ZP_PURE_INTERFACE zpSamplerState;
 ZP_PURE_INTERFACE zpRasterState;
 
+class zpMaterialResource;
 class zpFontResource;
 ZP_ABSTRACT_CLASS zpStaticMeshResource;
 class zpOBJStaticMeshResource;
@@ -326,6 +329,7 @@ class zpUIRenderingComponent;
 #include "zpSamplerState.h"
 #include "zpRasterState.h"
 
+#include "zpMaterialResource.h"
 #include "zpFontResource.h"
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"

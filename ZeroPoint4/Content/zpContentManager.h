@@ -22,13 +22,6 @@ public:
 
 	zp_bool isFileAlreadyLoaded( const zpString& filename, zpString* outAlias = ZP_NULL ) const;
 
-	zpResource* getResource( const zpString& alias ) const;
-
-	template<typename T>
-	T* getResourceOfType( const zpString& alias ) const {
-		return (T*)getResource( alias );
-	}
-
 	template<typename R>
 	zpResourceInstance<R> createInstanceOfResource( const zpString& alias ) const {
 		return zpResourceInstance<R>( getResourceOfType<R>( alias ) );
@@ -56,6 +49,13 @@ protected:
 	void onDisabled();
 
 private:
+	zpResource* getResource( const zpString& alias ) const;
+
+	template<typename T>
+	T* getResourceOfType( const zpString& alias ) const {
+		return (T*)getResource( alias );
+	}
+
 	zpString m_assetsFolder;
 	zpString m_rootDirectory;
 

@@ -49,7 +49,7 @@ public:
 	void foreachIndexedIf( Func func ) const;
 
 	template<typename Func>
-	void map( Func func ) const;
+	void map( Func func );
 	
 	
 	static const zp_uint npos;

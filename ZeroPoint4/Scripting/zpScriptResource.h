@@ -1,11 +1,11 @@
 #pragma once
-#ifndef ZP_SCRIPTING_RESOURCE_H
-#define ZP_SCRIPTING_RESOURCE_H
+#ifndef ZP_SCRIPT_RESOURCE_H
+#define ZP_SCRIPT_RESOURCE_H
 
-class zpScriptingResource : public zpResource {
+class zpScriptResource : public zpResource {
 public:
-	zpScriptingResource();
-	virtual ~zpScriptingResource();
+	zpScriptResource();
+	virtual ~zpScriptResource();
 
 	zp_bool load();
 	void unload();

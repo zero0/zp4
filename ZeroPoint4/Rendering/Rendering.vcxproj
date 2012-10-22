@@ -83,6 +83,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpAnimatedMeshResource.h" />
     <ClInclude Include="zpBufferData.h" />
     <ClInclude Include="zpCameraComponent.h" />
     <ClInclude Include="zpDepthStencilBuffer.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="zpFontResource.h" />
     <ClInclude Include="zpImmediateBuffer.h" />
     <ClInclude Include="zpLightComponent.h" />
+    <ClInclude Include="zpMaterialResource.h" />
     <ClInclude Include="zpOBJStaticMeshResource.h" />
     <ClInclude Include="zpRasterState.h" />
     <ClInclude Include="zpRendering.h" />
@@ -124,6 +126,7 @@
     <ClCompile Include="zpCameraComponent.cpp" />
     <ClCompile Include="zpFontResource.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
+    <ClCompile Include="zpMaterialResource.cpp" />
     <ClCompile Include="zpOBJStaticMeshResource.cpp" />
     <ClCompile Include="zpRendering.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

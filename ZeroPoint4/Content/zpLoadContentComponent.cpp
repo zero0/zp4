@@ -2,7 +2,7 @@
 
 zpLoadContentComponent::zpLoadContentComponent()
 	: m_manager( ZP_NULL )
-	, m_isDestroyedWhenFinished( true )
+	, m_isUnloadWhenDestroyed( true )
 	, m_isWorldDisabledWhenLoading( true )
 {}
 zpLoadContentComponent::~zpLoadContentComponent() {
@@ -14,7 +14,7 @@ void zpLoadContentComponent::receiveMessage( const zpMessage& message ) {}
 void zpLoadContentComponent::serialize( zpSerializedOutput* out ) {
 	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
 
-	out->writeBoolean( m_isDestroyedWhenFinished, "@destroy-when-finished" );
+	out->writeBoolean( m_isUnloadWhenDestroyed, "@unload-when-destroyed" );
 	out->writeBoolean( m_isWorldDisabledWhenLoading, "@disable-world-when-loading" );
 
 	m_immediateResources.foreach( [ out ]( const zpString& alias, const zpString& filename ){
@@ -41,7 +41,7 @@ void zpLoadContentComponent::serialize( zpSerializedOutput* out ) {
 void zpLoadContentComponent::deserialize( zpSerializedInput* in ) {
 	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
 
-	in->readBoolean( &m_isDestroyedWhenFinished, "@destroy-when-finished" );
+	in->readBoolean( &m_isUnloadWhenDestroyed, "@destroy-when-finished" );
 	in->readBoolean( &m_isWorldDisabledWhenLoading, "@disable-world-when-loading" );
 
 	zpString filename, alias;
@@ -64,6 +64,11 @@ void zpLoadContentComponent::deserialize( zpSerializedInput* in ) {
 void zpLoadContentComponent::onCreate() {
 	m_manager = getGameManagerOfType<zpContentManager>();
 	
+	// if the world should be disabled while loading, disable it now
+	if( m_isWorldDisabledWhenLoading ) {
+		getWorld()->setEnabled( false );
+	}
+	
 	// preload the buffered resources
 	m_bufferedResources.foreach( [ this ]( const zpString& alias, const zpString& filename ) {
 		m_manager->loadResource( filename, alias, false );
@@ -77,11 +82,6 @@ void zpLoadContentComponent::onCreate() {
 	m_immediateResources.foreach( [ this ]( const zpString& alias, const zpString& filename ) {
 		m_manager->loadResource( filename, alias, true );
 	} );
-
-	// if the world should be disabled while loading, disable it now
-	if( m_isWorldDisabledWhenLoading ) {
-		getWorld()->setEnabled( false );
-	}
 }
 void zpLoadContentComponent::onDestroy() {
 	m_manager->onResourceLoaded() -= zpCreateMemberDelegate( &zpLoadContentComponent::onResourceLoaded, this );
@@ -106,10 +106,5 @@ void zpLoadContentComponent::onResourcesFinishedLoading() {
 		getWorld()->setEnabled( true );
 	}
 
-	sendMessageToSiblingComponents( zpMessage( zpMessageTypes::RESOURCE_FINISHED_LOADING, this ) );
-
-	// if this component should be destroyed when finished, destroy it
-	if( m_isDestroyedWhenFinished ) {
-		destroy();
-	}
+	sendMessageToSiblingComponents( zpMessage( zpMessageTypes::RESOURCES_FINISHED_LOADING, this ) );
 }

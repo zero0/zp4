@@ -27,7 +27,7 @@ protected:
 private:
 	zpContentManager* m_manager;
 
-	zp_bool m_isDestroyedWhenFinished;
+	zp_bool m_isUnloadWhenDestroyed;
 	zp_bool m_isWorldDisabledWhenLoading;
 
 	zpHashMap<zpString, zpString> m_immediateResources;

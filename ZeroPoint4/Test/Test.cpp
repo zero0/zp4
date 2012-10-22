@@ -253,8 +253,8 @@ struct TestRenderable : public zpRenderable {
 
 		sr = cm->createInstanceOfResource<zpShaderResource>( "simple_shader" );
 		srtex = cm->createInstanceOfResource<zpShaderResource>( "tex_norm_shader" );
-		tex = cm->getResourceOfType<zpTextureResource>( "tex" );
-		mesh = cm->getResourceOfType<zpStaticMeshResource>( "cube" );
+		tex = cm->createInstanceOfResource<zpTextureResource>( "tex" );
+		//mesh = cm->createInstanceOfResource<zpStaticMeshResource>( "cube" );
 
 		frames = 0;
 		time = 0;

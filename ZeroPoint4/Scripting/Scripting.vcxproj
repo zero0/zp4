@@ -76,9 +76,9 @@
     <ClInclude Include="zpAngelScript.h" />
     <ClInclude Include="zpScripting.h" />
     <ClInclude Include="zpScriptingComponent.h" />
-    <ClInclude Include="zpScriptingInstance.h" />
+    <ClInclude Include="zpScriptInstance.h" />
     <ClInclude Include="zpScriptingManager.h" />
-    <ClInclude Include="zpScriptingResource.h" />
+    <ClInclude Include="zpScriptResource.h" />
     <ClInclude Include="zpScriptingResourceCreator.h" />
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +88,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpScriptingComponent.cpp" />
-    <ClCompile Include="zpScriptingInstance.cpp" />
+    <ClCompile Include="zpScriptInstance.cpp" />
     <ClCompile Include="zpScriptingManager.cpp" />
-    <ClCompile Include="zpScriptingResource.cpp" />
+    <ClCompile Include="zpScriptResource.cpp" />
     <ClCompile Include="zpScriptingResourceCreator.cpp" />
   </ItemGroup>
   <ItemGroup>

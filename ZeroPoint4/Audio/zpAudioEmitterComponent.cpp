@@ -11,11 +11,8 @@ void zpAudioEmitterComponent::playSound( const zpString& soundAlias ) {
 	zpResourceInstance<zpAudioResource>* instance = ZP_NULL;
 	if( !m_audioInstances.find( soundAlias, instance ) ) {
 		zpContentManager* content = getGameManagerOfType<zpContentManager>();
-		zpAudioResource* resource = content->getResourceOfType<zpAudioResource>( soundAlias );
 
-		//instance = new zpAudioInstance( resource );
-		//m_audioInstances[ soundAlias ] = instance;
-		m_audioInstances[ soundAlias ] = zpResourceInstance<zpAudioResource>( resource );
+		m_audioInstances[ soundAlias ] = content->createInstanceOfResource<zpAudioResource>( soundAlias );
 	}
 	if( !instance->isPlaying() ) m_manager->play( instance );
 }

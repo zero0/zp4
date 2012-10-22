@@ -15,6 +15,8 @@ zpResource* zpRenderingResourceCreator::createResource( const zpString& filename
 		resource = new zpOBJStaticMeshResource;
 	} else if( filename.endsWith( ".fnt" ) ) {
 		resource = new zpFontResource;
+	} else if( filename.endsWith( ".material" ) ) {
+		resource = new zpMaterialResource;
 	} else {
 		zpLog::warning() << "Unknown file extension for file: " << filename << zpLog::endl;
 	}

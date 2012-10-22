@@ -153,7 +153,7 @@ void zpArray<T, Size>::foreachIndexedIf( Func func ) const {
 }
 
 template<typename T, zp_uint Size> template<typename Func>
-void zpArray<T, Size>::map( Func func ) const {
+void zpArray<T, Size>::map( Func func ) {
 	for( zp_uint i = 0; i < Size; ++i ) {
 		m_array[ i ] = func( m_array[ i ] );
 	}

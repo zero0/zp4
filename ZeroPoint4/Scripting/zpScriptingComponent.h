@@ -27,9 +27,9 @@ protected:
 	void onDisabled();
 
 private:
-	zpScriptingInstance* m_scriptInstance;
 	zpScriptingManager* m_manager;
-
+	zpResourceInstance<zpScriptResource> m_scriptInstance;
+	
 	zpString m_scriptAlias;
 	zpHashMap<zpMessageType, zpString> m_messageFunctions;
 };

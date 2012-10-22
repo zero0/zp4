@@ -30,13 +30,13 @@
     <ClInclude Include="zpScriptingResourceCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpScriptingResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpScriptingInstance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpAngelScript.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpScriptResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpScriptInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,13 +53,13 @@
     <ClCompile Include="zpScriptingResourceCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpScriptingResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpScriptingInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpAngelScript.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpScriptResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpScriptInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
