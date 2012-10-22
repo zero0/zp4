@@ -90,7 +90,7 @@ void zpRigidBodyComponent::onUpdate() {
 	zpMatrix4f matrix;
 	transform.getOpenGLMatrix( matrix );
 
-	getParentGameObject()->setTransform( matrix );
+	getParentGameObject()->setLocalTransform( matrix );
 }
 
 void zpRigidBodyComponent::onEnabled() {

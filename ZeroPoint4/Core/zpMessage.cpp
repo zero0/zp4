@@ -1,6 +1,4 @@
 #include "zpCore.h"
-#include <malloc.h>
-#include <memory.h>
 
 zpMessage::zpMessage() : m_type( ZP_MESSAGE_TYPE_NULL ), m_sender( ZP_NULL ), m_data( 0 ), m_dataSize( 0 ) {}
 zpMessage::zpMessage( zpMessageType type, zpMessageReceiver* sender ) : m_type( type ), m_sender( sender ), m_data( 0 ), m_dataSize( 0 ) {}
@@ -36,15 +34,15 @@ zpMessageDataCache* zpMessageDataCache::getInstance() {
 
 void zpMessageDataCache::removeMessageData( zpMessageDataHandle handle, zp_uint size ) {
 	if( size > sizeof( zpMessageDataHandle ) ) {
-		free( (void*)handle );
+		zp_free( (void*)handle );
 	}
 }
 zpMessageDataHandle zpMessageDataCache::allocateMessageData( void* data, zp_uint size ) {
 	if( size <= sizeof( zpMessageDataHandle ) ) {
 		return (zpMessageDataHandle)*( zp_ptr*)data;
 	} else {
-		void* d = malloc( size );
-		memcpy_s( d, size, data, size );
+		void* d = zp_malloc( size );
+		zp_memcpy( d, size, data, size );
 		return (zpMessageDataHandle)d;
 	}
 }

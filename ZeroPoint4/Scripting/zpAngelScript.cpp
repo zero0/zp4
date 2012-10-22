@@ -388,7 +388,8 @@ void as_zpGameObject_Register( asIScriptEngine* engine ) {
 	r = engine->RegisterObjectBehaviour( "GameObject", asBEHAVE_RELEASE, "void f()", asMETHODPR( zpGameObject, removeReference, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
 
 	r = engine->RegisterObjectMethod( "GameObject", "const string& getName() const", asMETHODPR( zpGameObject, getName, () const, const zpString& ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "GameObject", "const Matrix4f& getTransform() const", asMETHODPR( zpGameObject, getTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "GameObject", "const Matrix4f& getLocalTransform() const", asMETHODPR( zpGameObject, getLocalTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "GameObject", "const Matrix4f& getWorldTransform() const", asMETHODPR( zpGameObject, getWorldTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
 
 }
 #pragma endregion

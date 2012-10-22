@@ -2,25 +2,15 @@
 #ifndef ZP_LIGHT_COMPONENT_H
 #define ZP_LIGHT_COMPONENT_H
 
-struct zpDirectionalLightData {
-	zpVector4f direction;
-	zpColor4f color;
-	zpColor4f specular;
-};
-
-struct zpPointLightData {
-	zpVector4f position;
-	zpColor4f color;
-	zpColor4f specular;
-};
-
-struct zpSpotLightData {
+struct zpLightBufferData {
 	zpVector4f position;
 	zpVector4f direction;
 	zpColor4f color;
 	zpColor4f specular;
 	zp_float innerAngle;
 	zp_float outerAngle;
+	zp_float radius;
+	zp_int type;
 };
 
 enum zpLightType {
@@ -71,16 +61,11 @@ protected:
 	void onHide();
 
 private:
-	zpLightType m_type;
 	zp_bool m_isLocalToGameObject;
-	
-	zpColor4f m_color;
-	zpColor4f m_specular;
-	zpVector4f m_position;
-	zpVector4f m_direction;
-	zp_float m_innerAngle;
-	zp_float m_outerAngle;
-	zp_float m_radius;
+	zpRenderingManager* m_manager;
+
+	zpVector4f m_localPosition;
+	zpLightBufferData m_lightData;
 };
 
 #endif

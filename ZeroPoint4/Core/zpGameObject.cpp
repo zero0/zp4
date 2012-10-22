@@ -12,17 +12,18 @@ void zpGameObject::operator delete( void* ptr ) {
 	_aligned_free( ptr );
 }
 */
-zpGameObject::zpGameObject() :
-	m_isEnabled( true ),
-	m_isCreated( false ),
-	m_referenceCount( 1 ),
-	m_isMarkedForAutoDelete( false ),
-	m_parentGameObject( ZP_NULL ),
-	m_world( ZP_NULL ),
-	m_children(),
-	m_components(),
-	m_transform(),
-	m_name()
+zpGameObject::zpGameObject()
+	: m_isEnabled( true )
+	, m_isCreated( false )
+	, m_referenceCount( 1 )
+	, m_isMarkedForAutoDelete( false )
+	, m_parentGameObject( ZP_NULL )
+	, m_world( ZP_NULL )
+	, m_children()
+	, m_components()
+	, m_name()
+	, m_localTransform()
+	, m_worldTransform()
 {}
 zpGameObject::~zpGameObject() {
 	destroy();
@@ -97,6 +98,10 @@ zpWorld* zpGameObject::getWorld() const {
 
 void zpGameObject::update() {
 	if( m_isEnabled && m_isCreated ) {
+		if( m_parentGameObject ) {
+			m_localTransform.mul( m_parentGameObject->getWorldTransform(), m_worldTransform );
+		}
+
 		m_components.foreach( []( zpComponent* goc ) {
 			goc->update();
 		} );
@@ -146,19 +151,17 @@ void zpGameObject::setName( const zpString& name ) {
 	m_name = name;
 }
 
-const zpMatrix4f& zpGameObject::getTransform() const {
-	return m_transform;
+const zpMatrix4f& zpGameObject::getLocalTransform() const {
+	return m_localTransform;
 }
-void zpGameObject::getComputedTransform( zpMatrix4f& outTransform ) const {
-	if( m_parentGameObject ) {
-		m_parentGameObject->getComputedTransform( outTransform );
-		m_transform.mul( outTransform, outTransform );
-	} else {
-		outTransform = m_transform;
+const zpMatrix4f& zpGameObject::getWorldTransform() const {
+	return m_worldTransform;
+}
+void zpGameObject::setLocalTransform( const zpMatrix4f& transform ) {
+	m_localTransform = transform;
+	if( !m_parentGameObject ) {
+		m_worldTransform = m_localTransform;
 	}
-}
-void zpGameObject::setTransform( const zpMatrix4f& transform ) {
-	m_transform = transform;
 }
 
 zpComponent* zpGameObject::getComponent_T( const void* type ) {
@@ -196,9 +199,9 @@ void zpGameObject::serialize( zpSerializedOutput* out ) {
 
 	out->writeBlock( "Transform" );
 	{
-		zpSerializableObject<zpMatrix4f> mat( m_transform );
+		zpSerializableObject<zpMatrix4f> mat( m_localTransform );
 		mat.serialize( out );
-		m_transform = mat;
+		m_localTransform = mat;
 	}
 	out->endBlock();
 
@@ -235,7 +238,7 @@ void zpGameObject::deserialize( zpSerializedInput* in ) {
 
 	in->readBlock( "Transform" );
 	{
-		zpSerializableObject<zpMatrix4f> mat( m_transform );
+		zpSerializableObject<zpMatrix4f> mat( m_localTransform );
 		mat.deserialize( in );
 	}
 	in->endBlock();

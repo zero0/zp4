@@ -46,7 +46,7 @@ private:
 	zpCamera* m_currentCamera;
 
 	zpArray<zpArrayList<zpRenderingComponent*>, ZP_RENDERING_LAYER_COUNT> m_renderingComponents;
-	zpArray<zpBuffer*, ZP_RENDERING_GLOBAL_BUFFER_COUNT> m_globalBuffers;
+	zpArray<zpBuffer*, ZP_RENDERING_GLOBAL_BUFFER_Count> m_globalBuffers;
 };
 
 #endif

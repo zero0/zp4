@@ -54,9 +54,9 @@ public:
 	const zpString& getName() const;
 	void setName( const zpString& name );
 
-	const zpMatrix4f& getTransform() const;
-	void getComputedTransform( zpMatrix4f& outTransform ) const;
-	void setTransform( const zpMatrix4f& transform );
+	const zpMatrix4f& getLocalTransform() const;
+	const zpMatrix4f& getWorldTransform() const;
+	void setLocalTransform( const zpMatrix4f& transform );
 
 	void receiveMessage( const zpMessage& message );
 	void sendMessageToComponents( const zpMessage& message );
@@ -91,8 +91,9 @@ private:
 	zpIntrusiveList<zpGameObject> m_children;
 	zpIntrusiveList<zpComponent> m_components;
 
-	zpMatrix4f m_transform;
 	zpString m_name;
+	zpMatrix4f m_localTransform;
+	zpMatrix4f m_worldTransform;
 };
 
 #endif

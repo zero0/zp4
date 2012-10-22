@@ -31,7 +31,8 @@ private:
 
 	zpAudioManager* m_manager;
 
-	//zpHashMap<zpString, zpAudioInstance*> m_audioInstances;
+	zpVector4f m_oldPosition;
+
 	zpHashMap<zpString, zpResourceInstance<zpAudioResource> > m_audioInstances;
 };
 

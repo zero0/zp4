@@ -7,7 +7,6 @@ zpAudioEmitterComponent::zpAudioEmitterComponent() :
 zpAudioEmitterComponent::~zpAudioEmitterComponent() {}
 
 void zpAudioEmitterComponent::playSound( const zpString& soundAlias ) {
-	//zpAudioInstance* instance = ZP_NULL;
 	zpResourceInstance<zpAudioResource>* instance = ZP_NULL;
 	if( !m_audioInstances.find( soundAlias, instance ) ) {
 		zpContentManager* content = getGameManagerOfType<zpContentManager>();
@@ -17,20 +16,30 @@ void zpAudioEmitterComponent::playSound( const zpString& soundAlias ) {
 	if( !instance->isPlaying() ) m_manager->play( instance );
 }
 void zpAudioEmitterComponent::stopSound( const zpString& soundAlias ) {
-	//zpAudioInstance* instance = ZP_NULL;
 	zpResourceInstance<zpAudioResource>* instance = ZP_NULL;
 	if( m_audioInstances.find( soundAlias, instance ) ) {
 		instance->stop();
 	}
 }
 void zpAudioEmitterComponent::stopAllSounds() {
-	//m_audioInstances.foreach( []( const zpString& key, zpAudioInstance* instance ) {
 	m_audioInstances.foreach( []( const zpString& key, zpResourceInstance<zpAudioResource>& instance ) {
 		instance.stop();
 	} );
 }
 
-void zpAudioEmitterComponent::receiveMessage( const zpMessage& message ) {}
+void zpAudioEmitterComponent::receiveMessage( const zpMessage& message ) {
+	switch( message.getMessageType() ) {
+	case zpMessageTypes::PLAY_SOUND:
+		playSound( message.getMessageData<zpString>() );
+		break;
+	case zpMessageTypes::STOP_SOUND:
+		stopSound( message.getMessageData<zpString>() );
+		break;
+	case zpMessageTypes::STOP_ALL_SOUNDS:
+		stopAllSounds();
+		break;
+	}
+}
 
 void zpAudioEmitterComponent::serialize( zpSerializedOutput* out ) {}
 void zpAudioEmitterComponent::deserialize( zpSerializedInput* in ) {}
@@ -45,8 +54,16 @@ void zpAudioEmitterComponent::onDestroy() {
 void zpAudioEmitterComponent::onUpdate() {
 	if( !m_isMoving ) return;
 
-	m_audioInstances.foreach( []( const zpString& key, zpResourceInstance<zpAudioResource>& instance ) {
+	zpVector4f position;
+	getParentGameObject()->getWorldTransform().getPosition( position );
+
+	zpVector4f velocity = position - m_oldPosition;
+	m_oldPosition = position;
+
+	m_audioInstances.foreach( [ &position, &velocity ]( const zpString& key, zpResourceInstance<zpAudioResource>& instance ) {
 		if( instance.isPlaying() ) {
+			instance.setPosition( position );
+			instance.setVelocity( velocity );
 			instance.update();
 		}
 	} );

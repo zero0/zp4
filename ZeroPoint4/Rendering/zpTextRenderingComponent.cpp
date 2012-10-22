@@ -66,8 +66,7 @@ void zpTextRenderingComponent::onUpdate() {
 		zpVector4f position;
 		if( m_isLocalToGameObject ) {
 			zpMatrix4f transform;
-			getParentGameObject()->getComputedTransform( transform );
-			transform.mul( m_localTransform, transform );
+			m_localTransform.mul( getParentGameObject()->getWorldTransform(), transform );
 			transform.getPosition( position );
 		} else {
 			m_localTransform.getPosition( position );

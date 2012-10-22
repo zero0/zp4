@@ -11,8 +11,7 @@ void zpStaticMeshRenderingComponent::render() {
 	zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 
 	zpMatrix4f trans;
-	getParentGameObject()->getComputedTransform( trans );
-	trans.mul( m_localTransform, trans );
+	m_localTransform.mul( getParentGameObject()->getWorldTransform(), trans );
 
 	m_manager->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_WORLD )->update( (zp_float*)trans );
 
@@ -65,10 +64,8 @@ void zpStaticMeshRenderingComponent::onCreate() {
 void zpStaticMeshRenderingComponent::onDestroy() {}
 
 void zpStaticMeshRenderingComponent::onUpdate() {
-	zpMatrix4f trans;
-	getParentGameObject()->getComputedTransform( trans );
 	zpVector4f pos;
-	trans.getPosition( pos );
+	getParentGameObject()->getWorldTransform().getPosition( pos );
 
 	m_boundingSphere.setCenter( pos );
 }

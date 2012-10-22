@@ -97,10 +97,11 @@ void zpRenderingManager::onCreate() {
 	m_engine->setWindow( getGame()->getWindow() );
 	m_engine->create();
 
-	for( zp_uint i = ZP_RENDERING_GLOBAL_BUFFER_COUNT; i --> 0; ) m_globalBuffers[ i ] = m_engine->createBuffer();
+	for( zp_uint i = ZP_RENDERING_GLOBAL_BUFFER_Count; i --> 0; ) m_globalBuffers[ i ] = m_engine->createBuffer();
 
 	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_WORLD ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpWorldBufferData ) );
 	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_CAMERA ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpCameraBufferData ) );
+	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_LIGHT ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpLightBufferData ) );
 
 	zpContentManager* content = this->getGame()->getGameManagerOfType<zpContentManager>();
 	
