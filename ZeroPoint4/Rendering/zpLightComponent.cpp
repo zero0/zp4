@@ -2,17 +2,30 @@
 
 zpLightComponent::zpLightComponent() 
 	: m_isLocalToGameObject( true )
+	, m_castsShadow( false )
 {}
 zpLightComponent::~zpLightComponent() {}
 
-void zpLightComponent::render() {
-	m_manager->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_LIGHT )->update( m_lightData );
-}
-
 void zpLightComponent::receiveMessage( const zpMessage& message ) {}
 
-void zpLightComponent::serialize( zpSerializedOutput* out ) {}
-void zpLightComponent::deserialize( zpSerializedInput* in ) {}
+void zpLightComponent::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeInt( m_lightData.type, "@type" );
+	out->writeBoolean( m_isLocalToGameObject, "@is-local" );
+	out->writeBoolean( m_castsShadow, "@casts-shadow" );
+
+	out->endBlock();
+}
+void zpLightComponent::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readInt( &m_lightData.type, "@type" );
+	in->readBoolean( &m_isLocalToGameObject, "@is-local" );
+	in->readBoolean( &m_castsShadow, "@casts-shadow" );
+
+	in->endBlock();
+}
 
 zpLightType zpLightComponent::getLightType() const {
 	return (zpLightType)m_lightData.type;
@@ -46,6 +59,9 @@ void zpLightComponent::setSpotAngles( zp_float innerAngle, zp_float outerAngle )
 void zpLightComponent::setPointRadius( zp_float radius ) {
 	m_lightData.radius = radius;
 }
+void zpLightComponent::setCastsShadow( zp_bool castsShadow ) {
+	m_castsShadow = castsShadow;
+}
 
 const zpColor4f& zpLightComponent::getColor() const {
 	return m_lightData.color;
@@ -68,10 +84,15 @@ zp_float zpLightComponent::getOuterAngle() const {
 zp_float zpLightComponent::getPointRadius() const {
 	return m_lightData.radius;
 }
-
-void zpLightComponent::onCreate() {
-	m_manager = getGameManagerOfType<zpRenderingManager>();
+zp_bool zpLightComponent::getCastsShadow() const {
+	return m_castsShadow;
 }
+
+const zpLightBufferData& zpLightComponent::getLightBufferData() const {
+	return m_lightData;
+}
+
+void zpLightComponent::onCreate() {}
 void zpLightComponent::onDestroy() {}
 
 void zpLightComponent::onUpdate() {}
@@ -79,5 +100,3 @@ void zpLightComponent::onUpdate() {}
 void zpLightComponent::onEnabled() {}
 void zpLightComponent::onDisabled() {}
 
-void zpLightComponent::onShow() {}
-void zpLightComponent::onHide() {}

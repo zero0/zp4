@@ -28,6 +28,7 @@ zp_bool zpDX11TextureResource::load() {
 	// set the texture variables directly
 	m_texture.m_texture = texture;
 	m_texture.m_textureResourceView = resourceView;
+	m_texture.m_type = ZP_TEXTURE_TYPE_TEXTURE;
 	
 	// try and get the image info from the file, ok if fails
 	D3DX11_IMAGE_INFO info;
@@ -36,10 +37,10 @@ zp_bool zpDX11TextureResource::load() {
 		m_texture.m_width = info.Width;
 		m_texture.m_height = info.Height;
 		switch( info.ResourceDimension ) {
-			case D3D11_RESOURCE_DIMENSION_TEXTURE1D: m_texture.m_type = ZP_TEXTURE_TYPE_1D; break;
+			case D3D11_RESOURCE_DIMENSION_TEXTURE1D: m_texture.m_dimension = ZP_TEXTURE_DIMENSION_1D; break;
 			default:
-			case D3D11_RESOURCE_DIMENSION_TEXTURE2D: m_texture.m_type = ZP_TEXTURE_TYPE_2D; break;
-			case D3D11_RESOURCE_DIMENSION_TEXTURE3D: m_texture.m_type = ZP_TEXTURE_TYPE_3D; break;
+			case D3D11_RESOURCE_DIMENSION_TEXTURE2D: m_texture.m_dimension = ZP_TEXTURE_DIMENSION_2D; break;
+			case D3D11_RESOURCE_DIMENSION_TEXTURE3D: m_texture.m_dimension = ZP_TEXTURE_DIMENSION_3D; break;
 		}
 	}
 	
@@ -47,18 +48,12 @@ zp_bool zpDX11TextureResource::load() {
 }
 void zpDX11TextureResource::unload() {
 	// release texture so it can be recreated (if need be)
-	if( m_texture.m_texture ) {
-		m_texture.m_texture->Release();
-		m_texture.m_texture = ZP_NULL;
-	}
-	if( m_texture.m_textureResourceView ) {
-		m_texture.m_textureResourceView->Release();
-		m_texture.m_textureResourceView = ZP_NULL;
-	}
+	ZP_SAFE_RELEASE( m_texture.m_texture );
+	ZP_SAFE_RELEASE( m_texture.m_textureResourceView );
 
 	m_texture.m_height = 0;
 	m_texture.m_width = 0;
-	m_texture.m_type = ZP_TEXTURE_TYPE_UNKNOWN;
+	m_texture.m_dimension = ZP_TEXTURE_DIMENSION_UNKNOWN;
 }
 
 zpTexture* zpDX11TextureResource::getTexture() const {

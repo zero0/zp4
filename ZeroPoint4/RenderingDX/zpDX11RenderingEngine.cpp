@@ -116,7 +116,16 @@ zp_bool zpDX11RenderingEngine::create() {
 	backBuffer->Release();
 
 	// create the render target and depth buffer for the immediate context
-	m_immediateRenderTarget = new zpDX11RenderTarget( &backBuffer, &backBufferView, 1, m_displayMode.width, m_displayMode.height );
+	zpDX11Texture* target = new zpDX11Texture();
+	target->m_dimension = ZP_TEXTURE_DIMENSION_2D;
+	target->m_height = m_displayMode.height;
+	target->m_texture = backBuffer;
+	target->m_textureRenderTarget = backBufferView;
+	target->m_textureResourceView = ZP_NULL;
+	target->m_type = ZP_TEXTURE_TYPE_RENDER_TARGET;
+	target->m_width = m_displayMode.width;
+	m_immediateRenderTarget = target;
+	
 	m_immediateDepthStencilBuffer = createDepthBuffer( ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT, m_displayMode.width, m_displayMode.height );
 
 	// set render target and depth buffer for the immediate context automatically
@@ -281,65 +290,111 @@ zpRenderingContext* zpDX11RenderingEngine::getRenderingContext( const zpString& 
 zp_uint zpDX11RenderingEngine::getRenderingContextCount() const {
 	return m_contexts.size();
 }
+
 zpRenderingContext* zpDX11RenderingEngine::getImmediateRenderingContext() const {
 	return m_immediateContext;
+}
+zpTexture* zpDX11RenderingEngine::getBackBufferRenderTarget() const {
+	return m_immediateRenderTarget;
+}
+zpDepthStencilBuffer* zpDX11RenderingEngine::getBackBufferDepthStencilBuffer() const {
+	return m_immediateDepthStencilBuffer;
 }
 
 zpBuffer* zpDX11RenderingEngine::createBuffer() {
 	return new zpDX11Buffer();
 }
-zpTexture* zpDX11RenderingEngine::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpDisplayFormat format, zpCpuAccess access ) {
+zpTexture* zpDX11RenderingEngine::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels ) {
 	HRESULT hr;
-	ID3D11Texture2D* texture;
-	ID3D11ShaderResourceView* srv;
+	ID3D11Texture2D* texture = ZP_NULL;
+	ID3D11ShaderResourceView* srv = ZP_NULL;
+	ID3D11RenderTargetView* rtv = ZP_NULL;
 
 	D3D11_TEXTURE2D_DESC texDesc;
 	zp_zero_memory( &texDesc );
 	texDesc.ArraySize = 1;
-	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	switch( type ) {
+	case ZP_TEXTURE_TYPE_TEXTURE:
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		break;
+	case ZP_TEXTURE_TYPE_RENDER_TARGET:
+		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+		break;
+	case ZP_TEXTURE_TYPE_RENDER_TEXTURE:
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		break;
+	}
 	texDesc.CPUAccessFlags = __zpToDX( access );
 	texDesc.Format = __zpToDX( format );
 	texDesc.Height = height;
-	texDesc.MipLevels = 1;
+	texDesc.MipLevels = type == ZP_TEXTURE_TYPE_TEXTURE ? mipLevels : 1;
 	texDesc.MiscFlags = 0;
 	texDesc.SampleDesc.Count = 0;
 	texDesc.SampleDesc.Quality = 1;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.Width = width;
 
-	D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-	zp_zero_memory( &desc );
-	desc.Format = texDesc.Format;
-	switch( type ) {
-	case ZP_TEXTURE_TYPE_1D:
-		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
-		desc.Texture1D.MipLevels = 1;
-		break;
-	case ZP_TEXTURE_TYPE_2D:
-		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipLevels = 1;
-		break;
-	case ZP_TEXTURE_TYPE_CUBE_MAP:
-		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-		desc.TextureCube.MipLevels = 1;
-		break;
+	// create the texture with or without data
+	if( data ) {
+		D3D11_SUBRESOURCE_DATA subData;
+		zp_zero_memory( &subData );
+		subData.pSysMem = data;
+
+		hr = m_d3dDevice->CreateTexture2D( &texDesc, &subData, &texture );
+	} else {
+		hr = m_d3dDevice->CreateTexture2D( &texDesc, ZP_NULL, &texture );
+	}
+	HR_V( hr, ZP_NULL );
+
+	// create the shader resource view if the texture is a normal texture or a render texture
+	if( type == ZP_TEXTURE_TYPE_TEXTURE || type == ZP_TEXTURE_TYPE_RENDER_TEXTURE ) {
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		zp_zero_memory( &srvDesc );
+		srvDesc.Format = texDesc.Format;
+		switch( type ) {
+		case ZP_TEXTURE_DIMENSION_1D:
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+			srvDesc.Texture1D.MipLevels = texDesc.MipLevels;
+			break;
+		case ZP_TEXTURE_DIMENSION_2D:
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+			break;
+		case ZP_TEXTURE_DIMENSION_CUBE_MAP:
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+			srvDesc.TextureCube.MipLevels = texDesc.MipLevels;
+			break;
+		}
+
+		hr = m_d3dDevice->CreateShaderResourceView( texture, &srvDesc, &srv );
+		HR_V( hr, ZP_NULL );
 	}
 
-	hr = m_d3dDevice->CreateTexture2D( &texDesc, ZP_NULL, &texture );
-	HR_V( hr, ZP_NULL );
+	// create the render target view if the texture is a render target or a render texture
+	if( type == ZP_TEXTURE_TYPE_RENDER_TARGET || type == ZP_TEXTURE_TYPE_RENDER_TEXTURE ) {
+		// TODO: assert if trying to create a 1D or cube map render target
+		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+		zp_zero_memory( &rtvDesc );
+		rtvDesc.Format = texDesc.Format;
+		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-	hr = m_d3dDevice->CreateShaderResourceView( texture, &desc, &srv );
-	HR_V( hr, ZP_NULL );
+		hr = m_d3dDevice->CreateRenderTargetView( texture, &rtvDesc, &rtv );
+		HR_V( hr, ZP_NULL );
+	}
 
-	// remove reference to texture so render target now owns pointer
-	texture->Release();
+	// remove references so texture now owns pointers
+	ZP_SAFE_RELEASE( texture );
+	ZP_SAFE_RELEASE( srv );
+	ZP_SAFE_RELEASE( rtv );
 
 	zpDX11Texture* tex = new zpDX11Texture();
 	tex->m_width = width;
 	tex->m_height = height;
+	tex->m_dimension = dimension;
 	tex->m_type = type;
 	tex->m_texture = texture;
 	tex->m_textureResourceView = srv;
+	tex->m_textureRenderTarget = rtv;
 	
 	return tex;
 }
@@ -350,11 +405,12 @@ zpTextureResource* zpDX11RenderingEngine::createTextureResource() {
 zpShaderResource* zpDX11RenderingEngine::createShaderResource() {
 	return new zpDX11ShaderResource();
 }
-
+/*
 zpRenderTarget* zpDX11RenderingEngine::createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height ) {
 	HRESULT hr;
 	ID3D11Texture2D* texture;
 	ID3D11RenderTargetView* rtv;
+	ID3D11ShaderResourceView* srv;
 
 	D3D11_TEXTURE2D_DESC texDesc;
 	zp_zero_memory( &texDesc );
@@ -370,15 +426,25 @@ zpRenderTarget* zpDX11RenderingEngine::createRenderTarget( zpDisplayFormat forma
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.Width = width;
 
-	D3D11_RENDER_TARGET_VIEW_DESC desc;
-	zp_zero_memory( &desc );
-	desc.Format = texDesc.Format;
-	desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+	zp_zero_memory( &rtvDesc );
+	rtvDesc.Format = texDesc.Format;
+	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	zp_zero_memory( &srvDesc );
+	srvDesc.Format = texDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+	srvDesc.Texture2D.MostDetailedMip = 0;
 
 	hr = m_d3dDevice->CreateTexture2D( &texDesc, ZP_NULL, &texture );
 	HR_V( hr, ZP_NULL );
 
-	hr = m_d3dDevice->CreateRenderTargetView( texture, &desc, &rtv );
+	hr = m_d3dDevice->CreateRenderTargetView( texture, &rtvDesc, &rtv );
+	HR_V( hr, ZP_NULL );
+
+	hr = m_d3dDevice->CreateShaderResourceView( texture, &srvDesc, &srv );
 	HR_V( hr, ZP_NULL );
 
 	// remove reference to texture so render target now owns pointer
@@ -432,6 +498,7 @@ zpRenderTarget* zpDX11RenderingEngine::createMultiRenderTarget( zp_uint targetCo
 
 	return new zpDX11RenderTarget( textures.begin(), targets.begin(), targets.size(), width, height );
 }
+*/
 zpDepthStencilBuffer* zpDX11RenderingEngine::createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) {
 	HRESULT hr;
 	ID3D11Texture2D* texture;

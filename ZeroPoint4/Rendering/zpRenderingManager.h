@@ -2,7 +2,7 @@
 #ifndef ZP_RENDERING_MANAGER_H
 #define ZP_RENDERING_MANAGER_H
 
-class zpRenderingManager : public zpGameManager, public zpRenderable {
+class zpRenderingManager : public zpGameManager {
 public:
 	zpRenderingManager();
 	virtual ~zpRenderingManager();
@@ -14,12 +14,14 @@ public:
 
 	void receiveMessage( const zpMessage& message );
 
-	void render();
-
 	zp_bool addRenderingComponent( zpRenderingComponent* component );
 	zp_bool removeRenderingComponent( zpRenderingComponent* component );
 
+	zp_bool addLightComponent( zpLightComponent* light );
+	zp_bool removeLightComponent( zpLightComponent* light );
+
 	void renderLayer( zp_uint layer );
+	void renderLights();
 
 	zpBuffer* getGlobalBuffer( zp_uint index );
 
@@ -45,6 +47,7 @@ private:
 
 	zpCamera* m_currentCamera;
 
+	zpArrayList<zpLightComponent*> m_lightComponents;
 	zpArray<zpArrayList<zpRenderingComponent*>, ZP_RENDERING_LAYER_COUNT> m_renderingComponents;
 	zpArray<zpBuffer*, ZP_RENDERING_GLOBAL_BUFFER_Count> m_globalBuffers;
 };

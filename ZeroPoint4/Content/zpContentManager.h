@@ -2,6 +2,13 @@
 #ifndef ZP_CONTENT_MANAGER_H
 #define ZP_CONTENT_MANAGER_H
 
+struct zpResourceElement {
+	zpResource* resource;
+	zp_uint refCount;
+	zpString alias;
+	zpString file;
+};
+
 class zpContentManager : public zpGameManager {
 public:
 	zpContentManager();
@@ -56,16 +63,17 @@ private:
 		return (T*)getResource( alias );
 	}
 
+	zp_bool m_shouldCleanUp;
 	zpString m_assetsFolder;
 	zpString m_rootDirectory;
 
 	zpDelegateEvent<void( const zpString& filename, zp_bool loaded, zp_uint numLeft )> m_onResourceLoaded;
 	zpDelegateEvent<void()> m_onAllResourcesLoaded;
 
-	zpArrayList<zpResource*> m_resourcesToLoad;
 	zpHashMap<zpString, zpResourceCreator*> m_creators;
-	zpHashMap<zpString, zpResource*> m_resources;
-	zpHashMap<zpString, zpString> m_fileToAlias;
+
+	zpArrayList<zpResource*> m_resourcesToLoad;
+	zpArrayList<zpResourceElement> m_elements;
 };
 
 #endif

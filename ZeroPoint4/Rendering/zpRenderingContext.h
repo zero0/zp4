@@ -6,8 +6,8 @@ ZP_PURE_INTERFACE zpRenderingContext : public zpReferencedObject {
 public:
 	virtual const zpString& getName() const = 0;
 
-	virtual void setRenderTarget( zpRenderTarget* target ) = 0;
-	virtual zpRenderTarget* getRenderTarget() const = 0;
+	virtual void setRenderTarget( zpTexture* target, zp_uint index = 0 ) = 0;
+	virtual zpTexture* getRenderTarget( zp_uint index = 0 ) const = 0;
 
 	virtual void setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer ) = 0;
 	virtual zpDepthStencilBuffer* getDepthStencilBuffer() const = 0;
@@ -15,6 +15,9 @@ public:
 	virtual void bindRenderTargetAndDepthBuffer() = 0;
 	virtual void unbindRenderTargetAndDepthBuffer() = 0;
 
+	void clearRenderTarget( const zpColor4f color ) {
+		clearRenderTarget( &color, 1 );
+	}
 	template<zp_uint I>
 	void clearRenderTarget( const zpColor4f (&colors)[I] ) {
 		clearRenderTarget( colors, I );

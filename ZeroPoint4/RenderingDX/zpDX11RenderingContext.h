@@ -10,8 +10,8 @@ public:
 
 	const zpString& getName() const;
 
-	void setRenderTarget( zpRenderTarget* target );
-	zpRenderTarget* getRenderTarget() const;
+	void setRenderTarget( zpTexture* target, zp_uint index = 0 );
+	zpTexture* getRenderTarget( zp_uint index = 0 ) const;
 
 	void setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer );
 	zpDepthStencilBuffer* getDepthStencilBuffer() const;
@@ -63,7 +63,9 @@ private:
 
 	ID3D11DeviceContext* m_context;
 
-	zpRenderTarget* m_renderTarget;
+	zpArray<zpTexture*, ZP_RENDER_TARGET_MAX_COUNT> m_renderTargets;
+	zpArray<ID3D11RenderTargetView*, ZP_RENDER_TARGET_MAX_COUNT> m_targets;
+
 	zpDepthStencilBuffer* m_depthStencilBuffer;
 
 	mutable zp_uint m_referenceCount;

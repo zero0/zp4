@@ -1,7 +1,9 @@
 #include "zpContent.h"
 #include <typeinfo>
 
-zpContentManager::zpContentManager() {}
+zpContentManager::zpContentManager()
+	: m_shouldCleanUp( false )
+{}
 zpContentManager::~zpContentManager() {}
 	
 void zpContentManager::registerFileExtension( const zpString& extension, zpResourceCreator* creator ) {
@@ -24,9 +26,9 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 		resource->setContentManager( this );
 		resource->setFilename( fullFilePath );
 
-		m_resources[ alias ] = resource;
-		m_fileToAlias[ filename ] = alias;
-
+		zpResourceElement element = { resource, 0, alias, filename };
+		m_elements.pushBack( element );
+		
 		zp_bool loaded = true;
 		if( immediateLoad ) {
 			loaded = resource->load();
@@ -52,13 +54,18 @@ zp_uint zpContentManager::loadResources( const zpProperties& aliasToFilenames ) 
 }
 
 zp_bool zpContentManager::unloadResource( const zpString& alias ) {
-	zpResource* resource;
-	if( m_resources.find( alias, &resource ) ) {
-		resource->unload();
-		resource->setIsLoaded( false );
-		return m_resources.erase( alias );
+	zpResourceElement* found = ZP_NULL;
+	if( m_elements.findIf( [ &alias ]( zpResourceElement& element ) {
+		return alias == element.alias;
+	}, found ) ) {
+		if( found->refCount == 0 ) return true;
+
+		found->refCount--;
+		if( found->refCount == 0 ) {
+			m_shouldCleanUp = true;
+			return true;
+		}
 	}
-	ZP_ON_DEBUG_MSG( "Unable to unload resource, alias not found '%s'", alias.c_str() );
 	return false;
 }
 zp_uint zpContentManager::unloadResources( const zpArrayList<zpString>& aliases ) {
@@ -69,22 +76,26 @@ zp_uint zpContentManager::unloadResources( const zpArrayList<zpString>& aliases 
 	return count;
 }
 void zpContentManager::unloadAllResources() {
-	m_resources.foreach( []( const zpString& alias, zpResource* resource ){
-		resource->unload();
-		resource->setIsLoaded( false );
+	m_elements.foreach( [ this ]( zpResourceElement& element ) {
+		if( element.refCount == 0 ) return;
+
+		element.refCount--;
+		if( element.refCount == 0 ) {
+			m_shouldCleanUp = true;
+		}
 	} );
-	m_resources.clear();
 }
 
 zp_bool zpContentManager::reloadResource( const zpString& alias ) {
-	zpResource* resource;
-	if( m_resources.find( alias, &resource ) ) {
-		resource->unload();
-		resource->setIsLoaded( false );
-		m_resourcesToLoad.pushBack( resource );
+	zpResourceElement* found = ZP_NULL;
+	if( m_elements.findIf( [ &alias, this ]( zpResourceElement& element ) {
+		return alias == element.alias;
+	}, found ) ) {
+		found->resource->unload();
+		found->resource->setIsLoaded( false );
+		m_resourcesToLoad.pushBack( found->resource );
 		return true;
 	}
-	ZP_ON_DEBUG_MSG( "Unable to reload resource, alias not found '%s'", alias.c_str() );
 	return false;
 }
 zp_uint zpContentManager::reloadResources( const zpArrayList<zpString>& aliases ) {
@@ -95,19 +106,34 @@ zp_uint zpContentManager::reloadResources( const zpArrayList<zpString>& aliases 
 	return count;
 }
 void zpContentManager::reloadAllResources() {
-	m_resources.foreach( [ this ]( const zpString& alias, zpResource* resource ){
-		resource->unload();
-		resource->setIsLoaded( false );
-		m_resourcesToLoad.pushBack( resource );
+	m_elements.foreach( [ this ]( zpResourceElement& element ) {
+		element.resource->unload();
+		element.resource->setIsLoaded( false );
+		m_resourcesToLoad.pushBack( element.resource );
 	} );
 }
 
 zp_bool zpContentManager::isFileAlreadyLoaded( const zpString& filename, zpString* outAlias ) const {
-	return m_fileToAlias.find( filename, outAlias );
+	zpResourceElement* found = ZP_NULL;
+	if( m_elements.findIf( [ &filename ]( zpResourceElement& element ) {
+		return filename == element.file;
+	}, found ) ) {
+		if( outAlias ) *outAlias = found->alias;
+		return true;
+	}
+	return false;
 }
 
 zpResource* zpContentManager::getResource( const zpString& alias ) const {
-	return m_resources.get( alias );
+	zpResourceElement found;
+	zpResource* resource = ZP_NULL;
+	if( m_elements.findIf( [ &alias ]( zpResourceElement& element ) {
+		return alias == element.alias;
+	}, &found ) ) {
+		found.refCount++;
+		resource = found.resource;
+	}
+	return resource;
 }
 
 void zpContentManager::receiveMessage( const zpMessage& message ) {}
@@ -157,6 +183,17 @@ void zpContentManager::onUpdate() {
 
 		if( m_resourcesToLoad.isEmpty() ) {
 			m_onAllResourcesLoaded();
+		}
+	}
+
+	if( m_shouldCleanUp ) {
+		m_shouldCleanUp = false;
+		for( zp_uint i = m_elements.size(); i --> 0; ) {
+			if( m_elements[i].refCount == 0 ) {
+				m_elements[i].resource->unload();
+				ZP_SAFE_DELETE( m_elements[i].resource );
+				m_elements.erase( i );
+			}
 		}
 	}
 }

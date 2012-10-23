@@ -124,7 +124,7 @@ void zpUIRenderingComponent::onCreate() {
 	m_uiVertexBuffer.create( 6, 4 );
 	m_uiVertexBuffer.addQuad( v0, v1, v2, v3 );
 
-	m_texture = zpRenderingFactory::getRenderingEngine()->createTexture( m_size.getX(), m_size.getY(), ZP_TEXTURE_TYPE_2D, ZP_DISPLAY_FORMAT_RGBA8_UNORM, ZP_CPU_ACCESS_WRITE );
+	m_texture = zpRenderingFactory::getRenderingEngine()->createTexture( m_size.getX(), m_size.getY(), ZP_TEXTURE_TYPE_TEXTURE, ZP_TEXTURE_DIMENSION_2D, ZP_DISPLAY_FORMAT_RGBA8_UNORM, ZP_CPU_ACCESS_WRITE, ZP_NULL, 1 );
 }
 void zpUIRenderingComponent::onDestroy() {
 	awe_webview_destroy( (awe_webview*)m_webView );

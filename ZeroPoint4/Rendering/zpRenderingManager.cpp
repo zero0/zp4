@@ -18,8 +18,6 @@ zpRenderingEngine* zpRenderingManager::getRenderingEngine() const {
 
 void zpRenderingManager::receiveMessage( const zpMessage& message ) {}
 
-void zpRenderingManager::render() {}
-
 zp_bool zpRenderingManager::addRenderingComponent( zpRenderingComponent* component ) {
 	if( !component ) return false;
 
@@ -57,23 +55,72 @@ zp_bool zpRenderingManager::removeRenderingComponent( zpRenderingComponent* comp
 	return numRemoved > 0;
 }
 
+zp_bool zpRenderingManager::addLightComponent( zpLightComponent* light ) {
+	if( !light ) return false;
+
+	m_lightComponents.pushBack( light );
+	light->addReference();
+	return true;
+}
+zp_bool zpRenderingManager::removeLightComponent( zpLightComponent* light ) {
+	if( !light ) return false;
+
+	zp_uint numRemoved = m_lightComponents.removeAll( light );
+	light->removeReference();
+
+	return numRemoved > 0;
+}
+
 void zpRenderingManager::renderLayer( zp_uint layer ) {
 	zpArrayList<zpRenderingComponent*>& components = m_renderingComponents[ layer ];
 	if( !components.isEmpty() ) {
 		components.foreach( [ this ]( zpRenderingComponent* component ) {
+			zp_bool shouldRender = false;
 			if( component->isVisible() ) {
 				if( m_isFrustimCullingEnabled && m_currentCamera ) {
 					if( ZP_IS_COLLISION( zpCollision::testCollision( m_currentCamera->getFrustum(), component->getBoundingSphere() ) ) ) {
-						component->render();
+						shouldRender = true;
 					}
 				} else {
-					component->render();
+					shouldRender = true;
 				}
 			}
+
+			if( shouldRender ) component->render();
 		} );
 	}
 }
+void zpRenderingManager::renderLights() {
+	zpBuffer* lightBuffer = getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_LIGHT );
 
+	m_lightComponents.foreach( [ this, lightBuffer ]( zpLightComponent* light ) {
+		zp_bool shouldRender = false;
+		if( light->isEnabled() ) {
+			if( m_isFrustimCullingEnabled && m_currentCamera ) {
+				switch( light->getLightType() ) {
+				case ZP_LIGHT_TYPE_DIRECTIONAL:
+					shouldRender = true;
+					break;
+				case ZP_LIGHT_TYPE_POINT:
+				case ZP_LIGHT_TYPE_SPOT:
+					{
+						zpBoundingSphere lightSphere( light->getPosition(), light->getPointRadius() );
+						if( zpCollision::testCollision( m_currentCamera->getFrustum(), lightSphere ) ) {
+							shouldRender = true;
+						}
+					}
+					break;
+				}
+			} else {
+				shouldRender = true;
+			}
+		}
+
+		if( shouldRender ) {
+			lightBuffer->update( light->getLightBufferData() );
+		}
+	} );
+}
 zpBuffer* zpRenderingManager::getGlobalBuffer( zp_uint index ) {
 	return m_globalBuffers[ index ];
 }

@@ -41,16 +41,19 @@ public:
 	zpRenderingContext* getRenderingContextByIndex( zp_uint index ) const;
 	zpRenderingContext* getRenderingContext( const zpString& name ) const;
 	zp_uint getRenderingContextCount() const;
+
 	zpRenderingContext* getImmediateRenderingContext() const;
+	zpTexture* getBackBufferRenderTarget() const;
+	zpDepthStencilBuffer* getBackBufferDepthStencilBuffer() const;
 
 	zpBuffer* createBuffer();
-	zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpDisplayFormat format, zpCpuAccess access );
+	zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 10 );
 
 	zpTextureResource* createTextureResource();
 	zpShaderResource* createShaderResource();
 
-	zpRenderTarget* createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height );
-	zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height );
+	//zpRenderTarget* createRenderTarget( zpDisplayFormat format, zp_uint width, zp_uint height );
+	//zpRenderTarget* createMultiRenderTarget( zp_uint targetCount, zpDisplayFormat* formats, zp_uint width, zp_uint height );
 	zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height );
 
 	zpVertexLayout* createVertexLayout( const zpString& desc );
@@ -77,7 +80,7 @@ private:
 	zpWindow* m_window;
 
 	zpRenderingContext* m_immediateContext;
-	zpRenderTarget* m_immediateRenderTarget;
+	zpTexture* m_immediateRenderTarget;
 	zpDepthStencilBuffer* m_immediateDepthStencilBuffer;
 
 	zpScreenMode m_screenMode;

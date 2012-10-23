@@ -278,7 +278,6 @@ template<> class zpResourceInstance<zpUIResource>;
 class zpRenderingResourceCreator;
 
 ZP_PURE_INTERFACE zpBuffer;
-ZP_PURE_INTERFACE zpRenderTarget;
 ZP_PURE_INTERFACE zpDepthStencilBuffer;
 ZP_PURE_INTERFACE zpVertexLayout;
 ZP_PURE_INTERFACE zpSamplerState;
@@ -306,6 +305,8 @@ class zpStaticMeshRenderingComponent;
 class zpTextRenderingComponent;
 class zpUIRenderingComponent;
 
+class zpDeferredRenderingComponent;
+
 #include "zpBufferData.h"
 
 #include "zpVertex.h"
@@ -324,7 +325,6 @@ class zpUIRenderingComponent;
 #include "zpRenderingResourceCreator.h"
 
 #include "zpBuffer.h"
-#include "zpRenderTarget.h"
 #include "zpDepthStencilBuffer.h"
 #include "zpVertexLayout.h"
 #include "zpSamplerState.h"
@@ -351,5 +351,7 @@ class zpUIRenderingComponent;
 #include "zpStaticMeshRenderingComponent.h"
 #include "zpTextRenderingComponent.h"
 #include "zpUIRenderingComponent.h"
+
+#include "zpDeferredRenderingComponent.h"
 
 #endif

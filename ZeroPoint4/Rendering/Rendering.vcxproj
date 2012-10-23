@@ -86,6 +86,7 @@
     <ClInclude Include="zpAnimatedMeshResource.h" />
     <ClInclude Include="zpBufferData.h" />
     <ClInclude Include="zpCameraComponent.h" />
+    <ClInclude Include="zpDeferredRenderingComponent.h" />
     <ClInclude Include="zpDepthStencilBuffer.h" />
     <ClInclude Include="zpBuffer.h" />
     <ClInclude Include="zpCamera.h" />
@@ -103,7 +104,6 @@
     <ClInclude Include="zpRenderingFactory.h" />
     <ClInclude Include="zpRenderingManager.h" />
     <ClInclude Include="zpRenderingResourceCreator.h" />
-    <ClInclude Include="zpRenderTarget.h" />
     <ClInclude Include="zpSamplerState.h" />
     <ClInclude Include="zpShaderInstance.h" />
     <ClInclude Include="zpShaderResource.h" />
@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClCompile Include="zpCamera.cpp" />
     <ClCompile Include="zpCameraComponent.cpp" />
+    <ClCompile Include="zpDeferredRenderingComponent.cpp" />
     <ClCompile Include="zpFontResource.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpMaterialResource.cpp" />

@@ -19,12 +19,10 @@ enum zpLightType {
 	ZP_LIGHT_TYPE_SPOT,
 };
 
-class zpLightComponent : public zpRenderingComponent {
+class zpLightComponent : public zpComponent {
 public:
 	zpLightComponent();
 	virtual ~zpLightComponent();
-
-	void render();
 
 	void receiveMessage( const zpMessage& message );
 
@@ -39,6 +37,7 @@ public:
 	void setDirection( const zpVector4f& direction );
 	void setSpotAngles( zp_float innerAngle, zp_float outerAngle );
 	void setPointRadius( zp_float radius );
+	void setCastsShadow( zp_bool castsShadow );
 
 	const zpColor4f& getColor() const;
 	const zpColor4f& getSpecularColor() const;
@@ -47,6 +46,9 @@ public:
 	zp_float getInnerAngle() const;
 	zp_float getOuterAngle() const;
 	zp_float getPointRadius() const;
+	zp_bool getCastsShadow() const;
+
+	const zpLightBufferData& getLightBufferData() const;
 
 protected:
 	void onCreate();
@@ -57,12 +59,9 @@ protected:
 	void onEnabled();
 	void onDisabled();
 
-	void onShow();
-	void onHide();
-
 private:
 	zp_bool m_isLocalToGameObject;
-	zpRenderingManager* m_manager;
+	zp_bool m_castsShadow;
 
 	zpVector4f m_localPosition;
 	zpLightBufferData m_lightData;

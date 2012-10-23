@@ -3,6 +3,7 @@
 zpResource::zpResource()
 	: m_isLoaded( false )
 	, m_manager( ZP_NULL )
+	, m_filename()
 {}
 zpResource::~zpResource() {
 	m_manager = ZP_NULL;

@@ -7,6 +7,11 @@ struct zpVertexPositionColor {
 	zpColor4f color;
 };
 
+struct zpVertexPositionlTexture {
+	zpVector4f position;
+	zpVector2f texCoord0;
+};
+
 struct zpVertexPositionNormalTexture {
 	zpVector4f position;
 	zpVector4f normal;
