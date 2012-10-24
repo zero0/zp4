@@ -8,4 +8,7 @@ public:
 	void unload() {}
 };
 
+ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpUIResource )
+ZP_RESOURCE_INSTANCE_TEMPLATE_END
+
 #endif

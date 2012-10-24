@@ -57,7 +57,7 @@ zp_bool zpContentManager::unloadResource( const zpString& alias ) {
 	zpResourceElement* found = ZP_NULL;
 	if( m_elements.findIf( [ &alias ]( zpResourceElement& element ) {
 		return alias == element.alias;
-	}, found ) ) {
+	}, &found ) ) {
 		if( found->refCount == 0 ) return true;
 
 		found->refCount--;
@@ -90,7 +90,7 @@ zp_bool zpContentManager::reloadResource( const zpString& alias ) {
 	zpResourceElement* found = ZP_NULL;
 	if( m_elements.findIf( [ &alias, this ]( zpResourceElement& element ) {
 		return alias == element.alias;
-	}, found ) ) {
+	}, &found ) ) {
 		found->resource->unload();
 		found->resource->setIsLoaded( false );
 		m_resourcesToLoad.pushBack( found->resource );
@@ -117,23 +117,36 @@ zp_bool zpContentManager::isFileAlreadyLoaded( const zpString& filename, zpStrin
 	zpResourceElement* found = ZP_NULL;
 	if( m_elements.findIf( [ &filename ]( zpResourceElement& element ) {
 		return filename == element.file;
-	}, found ) ) {
+	}, &found ) ) {
 		if( outAlias ) *outAlias = found->alias;
 		return true;
 	}
 	return false;
 }
 
-zpResource* zpContentManager::getResource( const zpString& alias ) const {
-	zpResourceElement found;
+zpResource* zpContentManager::getResource( const zpString& alias ) {
+	zpResourceElement* found;
 	zpResource* resource = ZP_NULL;
 	if( m_elements.findIf( [ &alias ]( zpResourceElement& element ) {
 		return alias == element.alias;
 	}, &found ) ) {
-		found.refCount++;
-		resource = found.resource;
+		found->refCount++;
+		resource = found->resource;
 	}
 	return resource;
+}
+void zpContentManager::unloadResource( zpResource* resource ) {
+	zpResourceElement* found = ZP_NULL;
+	if( m_elements.findIf( [ &resource ]( zpResourceElement& element ) {
+		return resource == element.resource;
+	}, &found ) ) {
+		if( found->refCount == 0 ) return;
+
+		found->refCount--;
+		if( found->refCount == 0 ) {
+			m_shouldCleanUp = true;
+		}
+	}
 }
 
 void zpContentManager::receiveMessage( const zpMessage& message ) {}

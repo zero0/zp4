@@ -412,13 +412,13 @@ zpXmlNode* zpXmlParser::getCurrentNode() const {
 }
 
 zp_bool zpXmlParser::push( const zpString& nodeName ) {
-	zpXmlNode* found = ZP_NULL;
+	zpXmlNode** found = ZP_NULL;
 	if( m_current->children.findIf( [ &nodeName ]( zpXmlNode* node ) {
 		return node->name == nodeName;
 	}, &found ) ) {
 		m_nodeStack.pushFront( m_current );
 		m_nodeNameStack.pushFront( nodeName );
-		m_current = found;
+		m_current = *found;
 		return true;
 	}
 	return false;

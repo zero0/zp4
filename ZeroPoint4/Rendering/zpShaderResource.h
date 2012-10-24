@@ -21,4 +21,7 @@ protected:
 	zpFlag8 m_type;
 };
 
+ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpShaderResource )
+ZP_RESOURCE_INSTANCE_TEMPLATE_END
+
 #endif

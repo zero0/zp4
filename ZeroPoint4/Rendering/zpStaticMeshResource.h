@@ -29,4 +29,8 @@ protected:
 	zpArrayList<zpStaticMeshPart> m_meshParts;
 };
 
+
+ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpStaticMeshResource )
+ZP_RESOURCE_INSTANCE_TEMPLATE_END
+
 #endif

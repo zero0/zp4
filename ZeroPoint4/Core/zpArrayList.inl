@@ -330,12 +330,20 @@ const T* zpArrayList<T>::end() const {
 }
 
 template<typename T> template<typename Func>
-zp_bool zpArrayList<T>::findIf( Func func, T* found ) const {
+zp_bool zpArrayList<T>::findIf( Func func, T** found ) const {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		if( func( m_array[ i ] ) ) {
-			if( found ) {
-				*found = m_array[ i ];
-			}
+			*found = &m_array[ i ];
+			return true;
+		}
+	}
+	return false;
+}
+template<typename T> template<typename Func>
+zp_bool zpArrayList<T>::findIf( Func func, T** found ) {
+	for( zp_uint i = 0; i < m_size; ++i ) {
+		if( func( m_array[ i ] ) ) {
+			*found = &m_array[ i ];
 			return true;
 		}
 	}
@@ -396,7 +404,7 @@ void zpArrayList<T>::removeAllIf( Func func, T* outVal ) {
 }
 
 template<typename T> template<typename Func>
-void zpArrayList<T>::map( Func func ) const {
+void zpArrayList<T>::map( Func func ) {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		m_array[ i ] = func( m_array[ i ] );
 	}

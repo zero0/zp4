@@ -52,4 +52,7 @@ private:
 	zpResourceInstance<zpTextureResource> m_fontTexture;
 };
 
+ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpFontResource )
+ZP_RESOURCE_INSTANCE_TEMPLATE_END
+
 #endif

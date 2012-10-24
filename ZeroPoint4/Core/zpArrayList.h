@@ -73,8 +73,11 @@ public:
 	const T* end() const;
 
 	template<typename Func>
-	zp_bool findIf( Func func, T* found = ZP_NULL ) const;
-
+	zp_bool findIf( Func func, T** found ) const;
+	
+	template<typename Func>
+	zp_bool findIf( Func func, T** found );
+	
 	template<typename Func>
 	void foreach( Func func ) const;
 	template<typename Func>
@@ -93,7 +96,7 @@ public:
 	void removeAllIf( Func func, T* outVal = ZP_NULL );
 
 	template<typename Func>
-	void map( Func func ) const;
+	void map( Func func );
 	
 	static const zp_uint npos;
 

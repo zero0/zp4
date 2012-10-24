@@ -284,7 +284,10 @@ ZP_PURE_INTERFACE zpSamplerState;
 ZP_PURE_INTERFACE zpRasterState;
 
 class zpMaterialResource;
+
 class zpFontResource;
+template<> class zpResourceInstance<zpFontResource>;
+
 ZP_ABSTRACT_CLASS zpStaticMeshResource;
 class zpOBJStaticMeshResource;
 template<> class zpResourceInstance<zpStaticMeshResource>;
@@ -314,13 +317,10 @@ class zpDeferredRenderingComponent;
 #include "zpTexture.h"
 
 #include "zpShaderResource.h"
-#include "zpShaderInstance.h"
 
 #include "zpTextureResource.h"
-#include "zpTextureInstance.h"
 
 #include "zpUIResource.h"
-#include "zpUIInstance.h"
 
 #include "zpRenderingResourceCreator.h"
 
@@ -334,7 +334,6 @@ class zpDeferredRenderingComponent;
 #include "zpFontResource.h"
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"
-#include "zpStaticMeshInstance.h"
 
 #include "zpRenderingContext.h"
 #include "zpRenderingEngine.h"

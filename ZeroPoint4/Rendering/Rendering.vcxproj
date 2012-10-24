@@ -90,7 +90,6 @@
     <ClInclude Include="zpDepthStencilBuffer.h" />
     <ClInclude Include="zpBuffer.h" />
     <ClInclude Include="zpCamera.h" />
-    <ClInclude Include="zpFontInstance.h" />
     <ClInclude Include="zpFontResource.h" />
     <ClInclude Include="zpImmediateBuffer.h" />
     <ClInclude Include="zpLightComponent.h" />
@@ -105,16 +104,12 @@
     <ClInclude Include="zpRenderingManager.h" />
     <ClInclude Include="zpRenderingResourceCreator.h" />
     <ClInclude Include="zpSamplerState.h" />
-    <ClInclude Include="zpShaderInstance.h" />
     <ClInclude Include="zpShaderResource.h" />
-    <ClInclude Include="zpStaticMeshInstance.h" />
     <ClInclude Include="zpStaticMeshRenderingComponent.h" />
     <ClInclude Include="zpStaticMeshResource.h" />
     <ClInclude Include="zpTextRenderingComponent.h" />
     <ClInclude Include="zpTexture.h" />
-    <ClInclude Include="zpTextureInstance.h" />
     <ClInclude Include="zpTextureResource.h" />
-    <ClInclude Include="zpUIInstance.h" />
     <ClInclude Include="zpUIRenderingComponent.h" />
     <ClInclude Include="zpUIResource.h" />
     <ClInclude Include="zpVertex.h" />

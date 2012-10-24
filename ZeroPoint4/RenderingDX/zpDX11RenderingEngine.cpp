@@ -279,13 +279,13 @@ zpRenderingContext* zpDX11RenderingEngine::getRenderingContextByIndex( zp_uint i
 	return m_contexts[ index ];
 }
 zpRenderingContext* zpDX11RenderingEngine::getRenderingContext( const zpString& name ) const {
-	zpRenderingContext* ctx = ZP_NULL;
+	zpRenderingContext** ctx = ZP_NULL;
 	
-	m_contexts.findIf( [ &name ]( zpRenderingContext* c ) -> zp_bool {
+	m_contexts.findIf( [ &name ]( zpRenderingContext* c ) {
 		return c->getName() == name;
 	}, &ctx );
 
-	return ctx;
+	return *ctx;
 }
 zp_uint zpDX11RenderingEngine::getRenderingContextCount() const {
 	return m_contexts.size();

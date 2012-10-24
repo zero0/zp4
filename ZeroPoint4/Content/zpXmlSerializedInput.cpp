@@ -144,7 +144,7 @@ zp_bool zpXmlSerializedInput::readSerializable( zpSerializable** value, const zp
 zp_bool zpXmlSerializedInput::readBlock( const zp_char* name ) {
 	if( m_nodeStack.isEmpty() || m_nodeStack.back()->name != name ) {
 
-		zpXmlNode* node = ZP_NULL;
+		zpXmlNode** node = ZP_NULL;
 		if( !m_currentNode->children.findIf( [ name ]( zpXmlNode* n ) {
 			return n->name == name;
 		}, &node ) ) {
@@ -152,7 +152,7 @@ zp_bool zpXmlSerializedInput::readBlock( const zp_char* name ) {
 		}
 		m_nodeStack.pushBack( m_currentNode );
 
-		m_currentNode = node;
+		m_currentNode = *node;
 	} else {
 		m_currentNode = m_currentNode->nextSibling;
 	}
@@ -173,13 +173,13 @@ void zpXmlSerializedInput::readValueOrProperty( const zp_char* name, zpString& o
 	} else if( name[ 0 ] == '@' ) {
 		m_currentNode->attributes.find( &name[ 1 ], &outString );
 	} else {
-		zpXmlNode* node = ZP_NULL;
+		zpXmlNode** node = ZP_NULL;
 		zpXmlNode* current = m_currentNode;
 		if( m_currentNode->parent->children.findIf( [ &name, &current ]( zpXmlNode* n ){
 			return n != current && n->name == name;
 		}, &node ) )
 		{
-			outString = node->value;
+			outString = (*node)->value;
 		}
 	}
 

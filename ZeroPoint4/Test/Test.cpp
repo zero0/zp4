@@ -435,7 +435,7 @@ void rendering_test_main() {
 		void onKeyRepeat( zpKeyCode key ) { zp_printfln( "Key Repeat %d", key ); };
 		void onKeyUp( zpKeyCode key ) {
 			if( key == ZP_KEY_CODE_R ) { 
-				content->reloadAllResources(); 
+				content->reloadResource( "simple_shader" ); 
 			} else if( key == ZP_KEY_CODE_A ) {
 				content->unloadAllResources();
 			}
@@ -456,10 +456,10 @@ void rendering_test_main() {
 		void onControllerReconnected() {};
 	};
 
-	//KeyboardListener kl;
-	//kl.content = &cm;
+	KeyboardListener kl;
+	kl.content = &cm;
 
-	//im.getKeyboard()->addListener( &kl );
+	im.getKeyboard()->addListener( &kl );
 	//im.getMouse()->addListener( new MouseListener );
 	//im.getController( ZP_CONTROLLER_1 )->addListener( new ControllerListener );
 

@@ -30,8 +30,14 @@ public:
 	zp_bool isFileAlreadyLoaded( const zpString& filename, zpString* outAlias = ZP_NULL ) const;
 
 	template<typename R>
-	zpResourceInstance<R> createInstanceOfResource( const zpString& alias ) const {
-		return zpResourceInstance<R>( getResourceOfType<R>( alias ) );
+	zpResourceInstance<R> createInstanceOfResource( const zpString& alias ) {
+		return zpResourceInstance<R>( (R*)getResource( alias ) );
+	}
+		
+	template<typename R>
+	void destroyInstanceOfResource( zpResourceInstance<R>& instance ) {
+		unloadResource( (zpResource*)instance.getResource() );
+		instance.m_resource = ZP_NULL;
 	}
 
 	void receiveMessage( const zpMessage& message );
@@ -56,12 +62,8 @@ protected:
 	void onDisabled();
 
 private:
-	zpResource* getResource( const zpString& alias ) const;
-
-	template<typename T>
-	T* getResourceOfType( const zpString& alias ) const {
-		return (T*)getResource( alias );
-	}
+	zpResource* getResource( const zpString& alias );
+	void unloadResource( zpResource* resource );
 
 	zp_bool m_shouldCleanUp;
 	zpString m_assetsFolder;

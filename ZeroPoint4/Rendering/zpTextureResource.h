@@ -7,4 +7,9 @@ public:
 	virtual zpTexture* getTexture() const = 0;
 };
 
+
+ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpTextureResource )
+ZP_RESOURCE_INSTANCE_TEMPLATE_END
+
+
 #endif

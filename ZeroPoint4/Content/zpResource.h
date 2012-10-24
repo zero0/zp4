@@ -25,7 +25,7 @@ private:
 	
 	friend class zpContentManager;
 };
-
+/*
 template<typename R>
 class zpResourceInstance {
 public:
@@ -44,6 +44,9 @@ public:
 		instance.m_resource = ZP_NULL;
 	}
 	~zpResourceInstance() {
+		if( m_resource ) {
+			m_resource->getContentManager()->destroyInstanceOfResource( *this );
+		}
 		m_resource = ZP_NULL;
 	}
 
@@ -65,8 +68,10 @@ public:
 
 private:
 	R* m_resource;
-};
 
+	friend class zpContentManager;
+};
+*/
 #define ZP_RESOURCE_INSTANCE_TEMPLATE_START( T )	\
 template<>	\
 class zpResourceInstance<T> {	\
@@ -75,13 +80,14 @@ public:	\
 	zpResourceInstance( T* resource ) : m_resource( resource ) {}\
 	zpResourceInstance( const zpResourceInstance<T>& instance )	: m_resource( instance.m_resource ) {}\
 	zpResourceInstance( zpResourceInstance<T>&& instance ) : m_resource( instance.m_resource ) { instance.m_resource = ZP_NULL; }\
-	~zpResourceInstance() { m_resource = ZP_NULL; }\
+	~zpResourceInstance() { if( m_resource ) { m_resource->getContentManager()->destroyInstanceOfResource( *this ); }; m_resource = ZP_NULL; }\
 	void operator=( const zpResourceInstance<T>& instance )	{ m_resource = instance.m_resource; }\
 	void operator=( zpResourceInstance<T>&& instance ) { m_resource = instance.m_resource; instance.m_resource = ZP_NULL; }\
 	operator zp_bool() const { return m_resource && m_resource->isLoaded(); }\
 	T* getResource() const { return m_resource;	}\
 private:	\
-	T* m_resource;
+	T* m_resource;	\
+	friend class zpContentManager;
 
 #define ZP_RESOURCE_INSTANCE_TEMPLATE_START_COPY( T, Copy )	\
 	template<>	\
@@ -97,7 +103,8 @@ public:	\
 	operator zp_bool() const { return m_resource && m_resource->isLoaded(); }\
 	T* getResource() const { return m_resource;	}\
 private:	\
-	T* m_resource;
+	T* m_resource;	\
+	friend class zpContentManager;
 
 #define ZP_RESOURCE_INSTANCE_TEMPLATE_END	};
 

@@ -78,15 +78,6 @@
     <ClInclude Include="zpStaticMeshRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpShaderInstance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpStaticMeshInstance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpTextureInstance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -99,9 +90,6 @@
     <ClInclude Include="zpImmediateBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpFontInstance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpTextRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -112,9 +100,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpUIResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpUIInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpAnimatedMeshResource.h">
