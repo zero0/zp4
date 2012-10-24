@@ -2,6 +2,38 @@
 #ifndef ZP_PREFABS_H
 #define ZP_PREFABS_H
 
+class zpPrefabResource : public zpResource {
+public:
+	zpPrefabResource();
+	virtual ~zpPrefabResource();
+
+	zp_bool load();
+	void unload();
+
+	zpXmlNode* getRootNode();
+
+private:
+	zpXmlNode m_root;
+};
+
+ZP_RESOURCE_INSTANCE_TEMPLATE_START_COPY( zpPrefabResource, copy )
+public:
+	const zpProperties& getOverrides() const;
+
+private:
+	void copy( const zpResourceInstance<zpPrefabResource>& other );
+
+	zpProperties m_overrides;
+ZP_RESOURCE_INSTANCE_TEMPLATE_END
+
+class zpPrefabResourceCreator : public zpResourceCreator {
+public:
+	zpPrefabResourceCreator();
+	virtual ~zpPrefabResourceCreator();
+
+	zpResource* createResource( const zpString& filename );
+};
+
 class zpPrefabs {
 public:
 	~zpPrefabs();
@@ -27,8 +59,24 @@ public:
 
 private:
 	zpPrefabs();
+	
+	void setContentManager( zpContentManager* content );
+	void update();
 
+	struct zpPrefabToLoad {
+		zpPrefabResource* prefab;
+		zpSerializable* serializable;
+		zpProperties overrides;
+	};
+
+	zpContentManager* m_contentManager;
+	zpPrefabResourceCreator m_prefabCreator;
 	zpString m_prefabRoot;
+	zpHashMap<zpString, zpResourceInstance<zpPrefabResource>> m_prefabs;
+	zpArrayList<zpPrefabToLoad> m_prefabsToLoad;
+
+	friend class zpContentManager;
 };
+
 
 #endif

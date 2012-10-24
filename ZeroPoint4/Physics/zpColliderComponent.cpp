@@ -91,7 +91,7 @@ zpColliderCache* zpColliderCache::getInstance() {
 }
 
 btCollisionShape* zpColliderCache::getColliderShape( zpColliderShape shapeType, const zpVector4f& size ) {
-	btCollisionShape* shape = ZP_NULL;
+	btCollisionShape** shape = ZP_NULL;
 
 	zp_float s[4];
 	size.store4( s );
@@ -103,54 +103,54 @@ btCollisionShape* zpColliderCache::getColliderShape( zpColliderShape shapeType, 
 	colliderName = 31 * colliderName + *(zp_uint*)(zp_float*)&s[3];
 
 	if( m_colliderShapes.find( colliderName, &shape ) ) {
-		m_colliderRefCounts[ shape ]++;
+		m_colliderRefCounts[ *shape ]++;
 	} else {
 		switch( shapeType ) {
 		case ZP_COLLIDER_SHAPE_NONE:
-			shape = new btEmptyShape();
+			*shape = new btEmptyShape();
 			break;
 		case ZP_COLLIDER_SHAPE_PLANE:
 			{
 				btVector3 normal;
 				size.store3( normal );
-				shape = new btStaticPlaneShape( normal, zp_real_to_float( size.getW() ) );
+				*shape = new btStaticPlaneShape( normal, zp_real_to_float( size.getW() ) );
 			}
 			break;
 		case ZP_COLLIDER_SHAPE_BOX:
 			{
 				btVector3 halfSize;
 				size.store3( halfSize );
-				shape = new btBoxShape( halfSize );
+				*shape = new btBoxShape( halfSize );
 			}
 			break;
 		case ZP_COLLIDER_SHAPE_CAPSULE:
-			shape = new btCapsuleShape( zp_real_to_float( size.getX() ), zp_real_to_float( size.getY() ) );
+			*shape = new btCapsuleShape( zp_real_to_float( size.getX() ), zp_real_to_float( size.getY() ) );
 			break;
 		case ZP_COLLIDER_SHAPE_SPHERE:
-			shape = new btSphereShape( zp_real_to_float( size.getX() ) );
+			*shape = new btSphereShape( zp_real_to_float( size.getX() ) );
 			break;
 		case ZP_COLLIDER_SHAPE_CYLINDER:
 			{
 				btVector3 halfSize;
 				size.store3( halfSize );
-				shape = new btCylinderShape( halfSize );
+				*shape = new btCylinderShape( halfSize );
 			}
 			break;
 		case ZP_COLLIDER_SHAPE_CONVEX_HULL:
-			shape = new btConvexHullShape();
+			*shape = new btConvexHullShape();
 			break;
 		}
 
-		shape->setUserPointer( (void*)colliderName );
-		m_colliderShapes[ colliderName ] = shape;
-		m_colliderRefCounts[ shape ] = 1;
+		(*shape)->setUserPointer( (void*)colliderName );
+		m_colliderShapes[ colliderName ] = *shape;
+		m_colliderRefCounts[ *shape ] = 1;
 	}
 
-	return shape;
+	return *shape;
 }
 void zpColliderCache::removeColliderShapeReference( btCollisionShape* shape ) {
 	zp_int* count = ZP_NULL;
-	if( m_colliderRefCounts.find( shape, count ) ) {
+	if( m_colliderRefCounts.find( shape, &count ) ) {
 		if( --(*count) <= 0 ) {
 			zp_hash colliderName = (zp_hash)shape->getUserPointer();
 

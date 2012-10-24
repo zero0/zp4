@@ -16,8 +16,11 @@ zp_uint zpDX11VertexLayout::getStride() const {
 zpHashMap<zpString, zpDX11VertexLayout*> zpDX11VertexLayout::s_layouts;
 zpDX11VertexLayout* zpDX11VertexLayout::getLayoutFromDesc( const zpString& inputDesc, void* vertexShaderBlob, zp_uint vertexShaderBlobSize ) {
 	zpDX11VertexLayout* vertexLayout = ZP_NULL;
+	zpDX11VertexLayout** found = ZP_NULL;
 
-	if( !s_layouts.find( inputDesc, &vertexLayout ) ) {
+	if( s_layouts.find( inputDesc, &found ) ) {
+		vertexLayout = *found;
+	} else {
 		// @TODO: for now, just do a simple look up for the defined vertex types
 		if( inputDesc == "simple" ) {
 			D3D11_INPUT_ELEMENT_DESC desc[] = {

@@ -3,7 +3,7 @@
 
 zpGame::zpGame()
 	: m_timer( zpTime::getInstance() )
-	,m_currentWorld( ZP_NULL )
+	, m_currentWorld( ZP_NULL )
 	, m_nextWorld( ZP_NULL )
 	, m_renderable( ZP_NULL )
 	, m_window( ZP_NULL )
@@ -130,4 +130,10 @@ void zpGame::serialize( zpSerializedOutput* out ) {
 
 	out->endBlock();
 }
-void zpGame::deserialize( zpSerializedInput* in ) {}
+void zpGame::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readSerializableOfType( &m_window );
+
+	in->endBlock();
+}

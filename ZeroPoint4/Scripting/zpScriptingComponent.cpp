@@ -10,18 +10,21 @@ zpScriptingComponent::zpScriptingComponent() :
 zpScriptingComponent::~zpScriptingComponent() {}
 
 void zpScriptingComponent::receiveMessage( const zpMessage& message ) {
-	zpString func;
+	zpString* func = ZP_NULL;
 
 	if( !m_messageFunctions.find( message.getMessageType(), &func ) ) {
 		zpStringBuffer buff;
 		buff.append( "onMessage" );
 		buff.append( zpMessageTypeSystem::getInstance()->getMessageName( message.getMessageType() ) );
-		func = buff.toString();
+		
+		zpString msgFunc = buff.toString();
 
-		m_messageFunctions.put( message.getMessageType(), func );
+		m_messageFunctions.put( message.getMessageType(), msgFunc );
+
+		m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( msgFunc ) );
+	} else {
+		m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( *func ) );
 	}
-	
-	m_manager->callObjectFunction( m_scriptInstance.getScriptObject(), m_scriptInstance.getMethod( func ) );
 }
 
 void zpScriptingComponent::serialize( zpSerializedOutput* out ) {}

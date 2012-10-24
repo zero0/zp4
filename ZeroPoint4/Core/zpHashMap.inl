@@ -223,13 +223,26 @@ zp_bool zpHashMap<Key, Value>::erase( const Key& key ) {
 }
 
 template<typename Key, typename Value>
-zp_bool zpHashMap<Key, Value>::find( const Key& key, Value* outValue ) const {
+zp_bool zpHashMap<Key, Value>::find( const Key& key, const Value** outValue ) const {
 	zp_hash h = generateHash( (zp_hash)key );
 	zp_uint index = h & m_capacity - 1;
 	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next ) {
 		next = e->next;
 		if( e->hash == h && e->key == key ) {
-			if( outValue ) *outValue = e->value;
+			if( outValue ) *outValue = &e->value;
+			return true;
+		}
+	}
+	return false;
+}
+template<typename Key, typename Value>
+zp_bool zpHashMap<Key, Value>::find( const Key& key, Value** outValue ) {
+	zp_hash h = generateHash( (zp_hash)key );
+	zp_uint index = h & m_capacity - 1;
+	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next ) {
+		next = e->next;
+		if( e->hash == h && e->key == key ) {
+			if( outValue ) *outValue = &e->value;
 			return true;
 		}
 	}

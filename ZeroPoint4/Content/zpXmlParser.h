@@ -35,8 +35,8 @@ public:
 	zp_bool parseFile( const zpString& filename, zp_bool includeSiblings = false );
 	zp_bool parseNode( zpXmlNode* root, zp_bool includeSiblings = false );
 
-	zp_bool writeToFile( zpXmlNode* root, const zpString& filename );
-	void writeToBuffer( zpXmlNode* root, zpStringBuffer& buffer );
+	static zp_bool writeToFile( zpXmlNode* root, const zpString& filename );
+	static void writeToBuffer( zpXmlNode* root, zpStringBuffer& buffer );
 
 	void setRootNode( zpXmlNode* root, zp_bool ownsRoot );
 	zpXmlNode* getRootNode() const;

@@ -168,10 +168,11 @@ zp_bool zpXmlSerializedInput::endBlock() {
 }
 
 void zpXmlSerializedInput::readValueOrProperty( const zp_char* name, zpString& outString ) {
+	const zpString* outStr = &outString;
 	if( name == ZP_NULL ) {
 		outString = m_currentNode->value;
 	} else if( name[ 0 ] == '@' ) {
-		m_currentNode->attributes.find( &name[ 1 ], &outString );
+		m_currentNode->attributes.find( &name[ 1 ], &outStr );
 	} else {
 		zpXmlNode** node = ZP_NULL;
 		zpXmlNode* current = m_currentNode;
@@ -185,7 +186,7 @@ void zpXmlSerializedInput::readValueOrProperty( const zp_char* name, zpString& o
 
 	zpString n( name ), def;
 	if( isProperty( n, def ) ) {
-		if( !m_properties.find( n, &outString ) ) {
+		if( !m_properties.find( n, &outStr ) ) {
 			outString = def;
 		}
 	}

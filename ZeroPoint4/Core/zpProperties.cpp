@@ -54,7 +54,7 @@ void zpProperties::setString( const zpString& key, const zpString& value ) {
 zp_bool zpProperties::hasProperty( const zpString& key ) const {
 	return m_properties.containsKey( key );
 }
-zp_bool zpProperties::find( const zpString& key, zpString* outValue ) const {
+zp_bool zpProperties::find( const zpString& key, const zpString** outValue ) const {
 	return m_properties.find( key, outValue );
 }
 

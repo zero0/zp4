@@ -132,7 +132,7 @@ zpXmlNode::~zpXmlNode() {
 }
 
 zpXmlParser::zpXmlParser()
-	: m_ownsRoot( false )
+	: m_ownsRoot( true )
 	, m_root( ZP_NULL )
 	, m_current( ZP_NULL )
 {}
@@ -186,9 +186,10 @@ zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSibling
 
 	if( m_ownsRoot ) {
 		ZP_SAFE_DELETE( m_root );
+		m_root = new zpXmlNode;
+	} else {
+		m_root->children.clear();
 	}
-	m_ownsRoot = true;
-	m_root = new zpXmlNode;
 	m_root->type = ZP_XML_NODE_TYPE_DOCUMENT;
 	m_root->name = "XML_DOC";
 	m_root->type = ZP_XML_NODE_TYPE_DOCUMENT;

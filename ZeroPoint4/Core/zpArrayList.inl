@@ -330,7 +330,7 @@ const T* zpArrayList<T>::end() const {
 }
 
 template<typename T> template<typename Func>
-zp_bool zpArrayList<T>::findIf( Func func, T** found ) const {
+zp_bool zpArrayList<T>::findIf( Func func, const T** found ) const {
 	for( zp_uint i = 0; i < m_size; ++i ) {
 		if( func( m_array[ i ] ) ) {
 			*found = &m_array[ i ];

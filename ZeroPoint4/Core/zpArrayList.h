@@ -73,7 +73,7 @@ public:
 	const T* end() const;
 
 	template<typename Func>
-	zp_bool findIf( Func func, T** found ) const;
+	zp_bool findIf( Func func, const T** found ) const;
 	
 	template<typename Func>
 	zp_bool findIf( Func func, T** found );

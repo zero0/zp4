@@ -14,13 +14,13 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 	zpString extension = filename.substring( filename.lastIndexOf( '.' ) + 1 );
 	extension.toLower();
 
-	zpResourceCreator* creator;
+	zpResourceCreator** creator;
 	if( m_creators.find( extension, &creator ) ) {
 		zpStringBuffer filepath;
-		filepath << m_rootDirectory << m_assetsFolder << creator->getRootDirectory() << filename;
+		filepath << m_rootDirectory << m_assetsFolder << (*creator)->getRootDirectory() << filename;
 		zpString fullFilePath = filepath.toString();
 
-		zpResource* resource = creator->createResource( fullFilePath );
+		zpResource* resource = (*creator)->createResource( fullFilePath );
 		ZP_ASSERT( resource != ZP_NULL, "Unable to create resource %s => %s", alias.c_str(), filename.c_str() );
 		
 		resource->setContentManager( this );
@@ -114,7 +114,7 @@ void zpContentManager::reloadAllResources() {
 }
 
 zp_bool zpContentManager::isFileAlreadyLoaded( const zpString& filename, zpString* outAlias ) const {
-	zpResourceElement* found = ZP_NULL;
+	const zpResourceElement* found = ZP_NULL;
 	if( m_elements.findIf( [ &filename ]( zpResourceElement& element ) {
 		return filename == element.file;
 	}, &found ) ) {
@@ -162,11 +162,11 @@ const zpString& zpContentManager::getRootDirectory() const {
 	return m_rootDirectory;
 }
 zp_bool zpContentManager::getRootDirectoryForExtension( const zpString& extension, zpString& outRoot ) const {
-	zpResourceCreator* creator = ZP_NULL;
-	if( m_creators.find( extension, &creator ) ) {
-		outRoot = creator->getRootDirectory();
-		return true;
-	}
+	//const zpResourceCreator** creator = ZP_NULL;
+	//if( m_creators.find( extension, &creator ) ) {
+	//	outRoot = (*creator)->getRootDirectory();
+	//	return true;
+	//}
 	return false;
 }
 
@@ -181,6 +181,8 @@ void zpContentManager::onCreate() {
 	//m_rootDirectory = zpFile::getCurrentDirectory();
 	m_rootDirectory = "./";
 	m_rootDirectory[1] = zpFile::sep;
+
+	zpPrefabs::getInstance()->setContentManager( this );
 }
 void zpContentManager::onDestroy() {}
 
