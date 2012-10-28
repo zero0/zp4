@@ -1,0 +1,16 @@
+<zpGame>
+	<zpWindow title="test">
+		<Position x="800" y="50" />
+		<ScreenSize x="960" y="540" />
+	</zpWindow>
+	<Managers>
+		<Manager>
+			<zpContentManager root="./" assets="Assets/">
+				<Creator type="zpRenderingResourceCreator" extension="shader" root="shaders/" />
+			</zpContentManager>
+		</Manager>
+		<Manager>
+			<zpRenderingManager />
+		</Manager>
+	</Managers>
+</zpGame>

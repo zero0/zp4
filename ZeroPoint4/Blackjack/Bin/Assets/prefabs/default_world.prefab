@@ -1,0 +1,20 @@
+<zpWorld name="default">
+	<zpGameObject>
+		<Transform />
+		<Components>
+			<Component>
+				<zpLoadContentComponent disable-world-when-loading="false">
+					<Content file="simple.shader" alias="simple" immediate="false" />
+				</zpLoadContentComponent>
+			</Component>
+			<Component>
+				<zpDeferredRenderingComponent>
+				
+				</zpDeferredRenderingComponent>
+			</Component>
+		</Components>
+		<Children>
+			
+		</Children>
+	</zpGameObject>
+</zpWorld>
