@@ -5,12 +5,12 @@
 const zp_char* __zp_serialize_type( const void* type );
 
 template<typename T>
-const zp_char* zp_serialize_type( const T* /*type = ZP_NULL*/ ) {
+const zp_char* zp_serialize_type( const T* ) {
 	return __zp_serialize_type( &typeid( T ) );
 };
 
 #define ZP_SERIALIZE_TYPE_THIS		( zp_serialize_type( this ) )
-#define ZP_SERIALIZE_TYPE( t )		( zp_serialize_type<t>() )
+#define ZP_SERIALIZE_TYPE( t )		( zp_serialize_type<t>( ZP_NULL ) )
 
 ZP_PURE_INTERFACE zpSerializable;
 
@@ -36,11 +36,15 @@ public:
 
 	template<typename Func>
 	void readEachBlock( const zp_char* name, Func func ) {
-		do {
+		zp_bool hasMore = true;
+		while( hasMore ) {
 			if( readBlock( name ) ) {
 				func( this );
+				hasMore = endBlock();
+			} else {
+				hasMore = false;
 			}
-		} while( endBlock() );
+		}
 	}
 
 	template<typename T>
@@ -79,21 +83,27 @@ public:
 template<typename T>
 class zpSerializableObject {
 public:
-	zpSerializableObject() : m_object() {}
-	zpSerializableObject( const T& obj ) : m_object( obj ) {}
-	virtual ~zpSerializableObject() {}
+	~zpSerializableObject();
 
-	operator T&() { return m_object; }
-	operator const T&() const { return m_object; }
+	static void serializeFrom( zpSerializedOutput* out, const T& in );
+	static void deserializeTo( zpSerializedInput* in, T& out );
 
-	void serialize( zpSerializedOutput* out ) { serializeAs( out, m_object ); }
-	void deserialize( zpSerializedInput* in ) { deserializeAs( in, m_object ); }
-
-	static void serializeAs( zpSerializedOutput* out, T& in );
-	static void deserializeAs( zpSerializedInput* in, T& out );
+	static void serializeFromBlock( zpSerializedOutput* out, const zp_char* block, const T& in ) {
+		out->writeBlock( block );
+		serializeFrom( out, in );
+		out->endBlock();
+	}
+	static zp_bool deserializeToBlock( zpSerializedInput* in, const zp_char* block, T& out ) {
+		if( in->readBlock( block ) ) {
+			deserializeTo( in, out );
+			in->endBlock();
+			return true;
+		}
+		return false;
+	}
 
 private:
-	T m_object;
+	zpSerializableObject() {}
 };
 
 #endif

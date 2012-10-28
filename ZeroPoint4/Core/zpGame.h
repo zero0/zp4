@@ -2,7 +2,7 @@
 #ifndef ZP_GAME_H
 #define ZP_GAME_H
 
-class zpGame : public zpSerializable {
+class zpGame : public zpSerializable, public zpMessageReceiver {
 public:
 	zpGame();
 	~zpGame();
@@ -31,6 +31,8 @@ public:
 	void setWindow( zpWindow* window );
 	zpWindow* getWindow() const;
 
+	void receiveMessage( const zpMessage& message );
+
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
@@ -44,7 +46,9 @@ private:
 	zpRenderable* m_renderable;
 	zpWindow* m_window;
 
-	zp_bool m_asynchCreateNextWorld;
+	zp_long m_lastTime;
+	zp_long m_simulateHz;
+	zp_int m_renderMsHz;
 
 	zpIntrusiveList<zpWorld> m_worlds;
 	zpIntrusiveList<zpGameManager> m_managers;

@@ -75,7 +75,7 @@ void zpEditorCameraComponent::onUpdate() {
 		if( m_input->getMouse()->isButtonDown( ZP_MOUSE_BUTTON_LEFT ) ) {
 			zpVector2i d = m_input->getMouse()->getDelta();
 			if( !d.isZero() ) {
-				m_editorCamera.setPosition( m_editorCamera.getPosition() + zpVector4f( (zp_float)d.getX(), (zp_float)d.getY(), 0.f ) * 0.1f );
+				m_editorCamera.setPosition( m_editorCamera.getPosition() + zpVector4f( (zp_float)d.getX(), (zp_float)d.getY(), 0.f ) * zpTime::getInstance()->getDeltaSeconds() * zpTime::getInstance()->getInterpolation());
 			}
 		}
 		m_editorCamera.update();

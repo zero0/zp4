@@ -85,6 +85,10 @@ void zpMessageTypeSystem::createMessages() {
 
 #include "zpMessageTypes.inc"
 
+#ifdef ZP_MESSAGE_EXTERNAL_TYPES
+#include ZP_MESSAGE_EXTERNAL_TYPES
+#endif
+
 #undef MT_DEF
 #undef MT_SYS
 }

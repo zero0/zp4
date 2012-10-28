@@ -23,6 +23,7 @@ void zpDeferredRenderingComponent::render() {
 	zpRenderingContext* c = m_renderingEngine->getImmediateRenderingContext();
 
 	// deferred render
+	if( 0 )
 	{
 		c->setRenderTarget( m_gbuffer[0] );
 		c->setDepthStencilBuffer( m_renderingEngine->getBackBufferDepthStencilBuffer() );
@@ -44,12 +45,16 @@ void zpDeferredRenderingComponent::render() {
 		c->setRenderTarget( m_renderingEngine->getBackBufferRenderTarget() );
 		c->setDepthStencilBuffer( m_renderingEngine->getBackBufferDepthStencilBuffer() );
 
-		c->clearRenderTarget( zpColor4f( 0, 0, 0, 1 ) );
+		c->clearRenderTarget( zpColor4f( 1, 0, 0, 1 ) );
 		c->clearDepthStencilBuffer( 1.f, 0 );
 
-		c->setBuffer( m_screenBuffer );
+		if( m_fullscreenShader ) {
+			c->setShader( &m_fullscreenShader );
+			c->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
+			c->setBuffer( m_screenBuffer );
 
-		c->draw( 4, ZP_SCREEN_QUAD_FULLSCREEN );
+			c->draw( 4, ZP_SCREEN_QUAD_FULLSCREEN );
+		}
 	}
 	
 	m_renderingEngine->present();
@@ -57,8 +62,16 @@ void zpDeferredRenderingComponent::render() {
 
 void zpDeferredRenderingComponent::receiveMessage( const zpMessage& message ) {}
 
-void zpDeferredRenderingComponent::serialize( zpSerializedOutput* out ) {}
-void zpDeferredRenderingComponent::deserialize( zpSerializedInput* in ) {}
+void zpDeferredRenderingComponent::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->endBlock();
+}
+void zpDeferredRenderingComponent::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->endBlock();
+}
 
 void zpDeferredRenderingComponent::onCreate() {
 	m_renderingManager = getGameManagerOfType<zpRenderingManager>();
@@ -132,6 +145,8 @@ void zpDeferredRenderingComponent::onCreate() {
 	m_screenBuffer->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, screen );
 
 	getGame()->setRenderable( this );
+
+	m_fullscreenShader = m_contentManager->createInstanceOfResource<zpShaderResource>( "simple" );
 }
 void zpDeferredRenderingComponent::onDestroy() {
 	getGame()->setRenderable( ZP_NULL );

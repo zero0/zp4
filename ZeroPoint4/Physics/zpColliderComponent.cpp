@@ -27,8 +27,7 @@ void zpColliderComponent::serialize( zpSerializedOutput* out ) {
 
 	out->writeBlock( "Size" );
 	{
-		zpSerializableObject<zpVector4f> size( m_size );
-		size.serialize( out );
+		zpSerializableObject<zpVector4f>::serializeFrom( out, m_size );
 	}
 	out->endBlock();
 
@@ -49,9 +48,7 @@ void zpColliderComponent::deserialize( zpSerializedInput* in ) {
 
 	if( in->readBlock( "Size" ) )
 	{
-		zpSerializableObject<zpVector4f> size;
-		size.deserialize( in );
-		m_size = size;
+		zpSerializableObject<zpVector4f>::deserializeTo( in, m_size );
 	}
 	in->endBlock();
 	

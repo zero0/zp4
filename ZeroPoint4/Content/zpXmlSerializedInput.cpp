@@ -101,7 +101,7 @@ zp_bool zpXmlSerializedInput::readString( zpString* value, const zp_char* name )
 }
 
 zp_bool zpXmlSerializedInput::readSerializable( zpSerializable** value, const zp_char* name ) {
-	zpSerializable* obj;
+	zpSerializable* obj = ZP_NULL;
 	if( name ) {
 		obj = zpRegisterSerializable::createSerializable( name );
 	} else {
@@ -132,6 +132,10 @@ zp_bool zpXmlSerializedInput::readSerializable( zpSerializable** value, const zp
 					return true;
 				}
 			}
+			else
+			{
+				obj = zpRegisterSerializable::createSerializable( prefab->name );
+			}
 		}
 	}
 
@@ -142,16 +146,17 @@ zp_bool zpXmlSerializedInput::readSerializable( zpSerializable** value, const zp
 }
 
 zp_bool zpXmlSerializedInput::readBlock( const zp_char* name ) {
-	if( m_nodeStack.isEmpty() || m_nodeStack.back()->name != name ) {
-
+	if( m_siblingStack.isEmpty() || m_siblingStack.back() != name ) {
 		zpXmlNode** node = ZP_NULL;
 		if( !m_currentNode->children.findIf( [ name ]( zpXmlNode* n ) {
 			return n->name == name;
 		}, &node ) ) {
 			return false;
 		}
-		m_nodeStack.pushBack( m_currentNode );
 
+		m_nodeStack.pushBack( m_currentNode );
+		m_siblingStack.pushBack( name );
+		
 		m_currentNode = *node;
 	} else {
 		m_currentNode = m_currentNode->nextSibling;
@@ -159,20 +164,24 @@ zp_bool zpXmlSerializedInput::readBlock( const zp_char* name ) {
 	return m_currentNode != ZP_NULL;
 }
 zp_bool zpXmlSerializedInput::endBlock() {
-	if( !m_currentNode || !m_currentNode->nextSibling ) {
+	if( !m_currentNode || !m_currentNode->nextSibling || m_currentNode->nextSibling->name != m_siblingStack.back()) {
 		m_currentNode = m_nodeStack.back();
+		ZP_ASSERT( m_nodeStack.size() != 0, "Trying to popBack when node stack is already empty." );
 		m_nodeStack.popBack();
+		if( !m_siblingStack.isEmpty() ) m_siblingStack.popBack();
 		return false;
 	}
 	return true;
 }
 
 void zpXmlSerializedInput::readValueOrProperty( const zp_char* name, zpString& outString ) {
-	const zpString* outStr = &outString;
+	const zpString* outStr = ZP_NULL;
 	if( name == ZP_NULL ) {
 		outString = m_currentNode->value;
 	} else if( name[ 0 ] == '@' ) {
-		m_currentNode->attributes.find( &name[ 1 ], &outStr );
+		if( m_currentNode->attributes.find( &name[ 1 ], &outStr ) ) {
+			outString = *outStr;
+		}
 	} else {
 		zpXmlNode** node = ZP_NULL;
 		zpXmlNode* current = m_currentNode;

@@ -16,6 +16,7 @@ public:
 	zpGameObject* getRootGameObject() const;
 
 	void update();
+	void simulate();
 
 	void create();
 	void destroy();

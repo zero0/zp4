@@ -39,7 +39,7 @@ private:
 
 	template<typename T>
 	static zpSerializable* defaultCreateSerializable() {
-		return new T();
+		return (zpSerializable*)new T();
 	}
 
 	static zpHashMap<zpString, CreateSerializableFunction> s_creators;

@@ -210,8 +210,10 @@ struct TestRenderable : public zpRenderable {
 	zpStaticMeshResource* mesh;
 	zpStaticMeshRenderingComponent smrc;
 	zpUIRenderingComponent uirc;
-	zp_float time;
+	zp_int time;
 	zp_uint frames;
+	zp_uint avgFrameTime;
+	zpRenderingManager* rendering;
 	void start( zpContentManager* cm ) {
 		engine = zpRenderingFactory::getRenderingEngine();
 #if TEST_RENDERING
@@ -258,9 +260,10 @@ struct TestRenderable : public zpRenderable {
 
 		frames = 0;
 		time = 0;
+		avgFrameTime = 0;
 
 		engine->getImmediateRenderingContext()->bindRenderTargetAndDepthBuffer();
-		engine->setVSyncEnabled( true );
+		engine->setVSyncEnabled( false );
 
 		zpSamplerStateDesc samplerDesc;
 		state = engine->createSamplerState( samplerDesc );
@@ -286,7 +289,8 @@ struct TestRenderable : public zpRenderable {
 		cbd.viewProjection = camera.getViewProjection();
 		cbd.invViewProjection = camera.getInvViewProjection();
 
-		smrc.getGameManagerOfType<zpRenderingManager>()->setCamera( &camera );
+		rendering = smrc.getGameManagerOfType<zpRenderingManager>();
+		rendering->setCamera( &camera );
 #endif
 	}
 	void render() {
@@ -304,7 +308,15 @@ struct TestRenderable : public zpRenderable {
 		i->setSamplerState( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, state );
 		i->setRasterState( raster );
 
-		i->setBuffer( smrc.getGameManagerOfType<zpRenderingManager>()->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_CAMERA ), 4 );
+
+		zpVector4f pos( 0, 2.f * zpTime::getInstance()->getDeltaSeconds() * zpTime::getInstance()->getInterpolation(), 0 );
+		pos.add4( camera.getPosition() );
+		//pos = camera.getPosition().lerp4( pos, zp_real_from_float( zpTime::getInstance()->getInterpolation() ) );
+		camera.setPosition( pos );
+		
+		camera.update();
+		//rendering->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_CAMERA )->update( camera.getCameraBufferData() );
+		i->setBuffer( rendering->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_CAMERA ), 4 );
 
 		if( sr ) {
 			i->setTopology( ZP_TOPOLOGY_TRIANGLE_STRIP );
@@ -340,17 +352,23 @@ struct TestRenderable : public zpRenderable {
 			//i->draw( mesh->getNumVertices() );
 		}
 		*/
+
+
 		zp_long end = zpTime::getInstance()->getTime();
+		end -= start;
 		engine->present();
-		
+		/*
 		++frames;
-		time += zpTime::getInstance()->getDeltaSeconds();
-		if( time > 1.f ) {
-			end -= start;
-			zp_printfcln( ZP_CC( ZP_CC_GREEN, ZP_CC_WHITE ), "FPS: %d\tFT(ms): %.3f", frames, ( end / 1000.f ) );
+		time += zpTime::getInstance()->getDeltaTime();
+		avgFrameTime += end;
+		if( time > 1000000 ) {
+			
+			zp_printfcln( ZP_CC( ZP_CC_GREEN, ZP_CC_WHITE ), "FPS: %d\tavgFT(ms): %.3f", frames, (zp_float)avgFrameTime / frames / 1000.f );
 			time = 0;
 			frames = 0;
+			avgFrameTime = 0;
 		}
+		*/
 #endif
 	}
 };
@@ -459,7 +477,7 @@ void rendering_test_main() {
 	KeyboardListener kl;
 	kl.content = &cm;
 
-	im.getKeyboard()->addListener( &kl );
+	//im.getKeyboard()->addListener( &kl );
 	//im.getMouse()->addListener( new MouseListener );
 	//im.getController( ZP_CONTROLLER_1 )->addListener( new ControllerListener );
 
@@ -469,9 +487,9 @@ void rendering_test_main() {
 	tr.start( &cm );
 	game.setRenderable( &tr );
 
-	while( wnd.processMessages() ) {
+	//while( wnd.processMessages() ) {
 		game.process();
-	}
+	//s}
 }
 
 void scripting_test_main() {

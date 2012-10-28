@@ -330,8 +330,8 @@ zpTexture* zpDX11RenderingEngine::createTexture( zp_uint width, zp_uint height, 
 	texDesc.Height = height;
 	texDesc.MipLevels = type == ZP_TEXTURE_TYPE_TEXTURE ? mipLevels : 1;
 	texDesc.MiscFlags = 0;
-	texDesc.SampleDesc.Count = 0;
-	texDesc.SampleDesc.Quality = 1;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.Width = width;
 

@@ -15,6 +15,8 @@ void zpLightComponent::serialize( zpSerializedOutput* out ) {
 	out->writeBoolean( m_isLocalToGameObject, "@is-local" );
 	out->writeBoolean( m_castsShadow, "@casts-shadow" );
 
+	zpSerializableObject<zpColor4f>::serializeFromBlock( out, "Color", m_lightData.color );
+
 	out->endBlock();
 }
 void zpLightComponent::deserialize( zpSerializedInput* in ) {
@@ -23,6 +25,8 @@ void zpLightComponent::deserialize( zpSerializedInput* in ) {
 	in->readInt( &m_lightData.type, "@type" );
 	in->readBoolean( &m_isLocalToGameObject, "@is-local" );
 	in->readBoolean( &m_castsShadow, "@casts-shadow" );
+
+	zpSerializableObject<zpColor4f>::deserializeToBlock( in, "Color", m_lightData.color );
 
 	in->endBlock();
 }

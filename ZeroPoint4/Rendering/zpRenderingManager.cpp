@@ -9,8 +9,16 @@ zpRenderingManager::zpRenderingManager()
 {}
 zpRenderingManager::~zpRenderingManager() {}
 
-void zpRenderingManager::serialize( zpSerializedOutput* out ) {}
-void zpRenderingManager::deserialize( zpSerializedInput* in ) {}
+void zpRenderingManager::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->endBlock();
+}
+void zpRenderingManager::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->endBlock();
+}
 
 zpRenderingEngine* zpRenderingManager::getRenderingEngine() const {
 	return m_engine;
@@ -149,7 +157,7 @@ void zpRenderingManager::onCreate() {
 	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_WORLD ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpWorldBufferData ) );
 	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_CAMERA ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpCameraBufferData ) );
 	m_globalBuffers[ ZP_RENDERING_GLOBAL_BUFFER_LIGHT ]->create( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, 1, sizeof( zpLightBufferData ) );
-
+/*
 	zpContentManager* content = this->getGame()->getGameManagerOfType<zpContentManager>();
 	
 	zpString root;
@@ -157,7 +165,7 @@ void zpRenderingManager::onCreate() {
 
 	awe_webcore_initialize_default();
 
-	/*
+	
 	awe_webcore_initialize(
 	false,
 	true,
@@ -197,7 +205,7 @@ void zpRenderingManager::onUpdate() {
 		m_currentCamera->unmarkDirty();
 	}
 
-	awe_webcore_update();
+	//awe_webcore_update();
 }
 
 void zpRenderingManager::onEnabled() {}

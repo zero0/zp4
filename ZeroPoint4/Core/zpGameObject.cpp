@@ -1,17 +1,6 @@
 #include "zpCore.h"
 #include <typeinfo>
 
-/*
-void* zpGameObject::operator new( zp_uint size ) {
-	return _aligned_malloc( size, 16 );
-}
-void* zpGameObject::operator new[]( zp_uint size ) {
-	return _aligned_malloc( size, 16 );
-}
-void zpGameObject::operator delete( void* ptr ) {
-	_aligned_free( ptr );
-}
-*/
 zpGameObject::zpGameObject()
 	: m_isEnabled( true )
 	, m_isCreated( false )
@@ -111,6 +100,17 @@ void zpGameObject::update() {
 		} );
 	}
 }
+void zpGameObject::simulate() {
+	if( m_isEnabled && m_isCreated ) {
+		m_components.foreach( []( zpComponent* goc ) {
+			goc->simulate();
+		} );
+
+		m_children.foreach( []( zpGameObject* go ) {
+			go->simulate();
+		} );
+	}
+}
 
 void zpGameObject::create() {
 	if( m_isCreated ) return;
@@ -197,13 +197,7 @@ void zpGameObject::serialize( zpSerializedOutput* out ) {
 
 	out->writeString( m_name, "@name" );
 
-	out->writeBlock( "Transform" );
-	{
-		zpSerializableObject<zpMatrix4f> mat( m_localTransform );
-		mat.serialize( out );
-		m_localTransform = mat;
-	}
-	out->endBlock();
+	zpSerializableObject<zpMatrix4f>::serializeFromBlock( out, "Transform", m_localTransform );
 
 	if( m_components.isAttached() ) {
 		out->writeBlock( "Components" );
@@ -236,33 +230,28 @@ void zpGameObject::deserialize( zpSerializedInput* in ) {
 
 	in->readString( &m_name, "@name" );
 
-	in->readBlock( "Transform" );
-	{
-		zpSerializableObject<zpMatrix4f> mat( m_localTransform );
-		mat.deserialize( in );
-	}
-	in->endBlock();
+	zpSerializableObject<zpMatrix4f>::deserializeToBlock( in, "Transform", m_localTransform );
 
 	if( in->readBlock( "Components" ) )
 	{
 		in->readEachBlock( "Component", [ this ]( zpSerializedInput* in ) {
-			zpComponent* comp = ZP_NULL;
-			in->readSerializableOfType<zpComponent>( &comp );
-			if( comp ) addComponent( comp );
+			zpSerializable* comp = ZP_NULL;
+			in->readSerializable( &comp );
+			if( comp ) addComponent( (zpComponent*)comp );
 		} );
+		in->endBlock();
 	}
-	in->endBlock();
 
 	if( in->readBlock( "Children" ) )
 	{
 		in->readEachBlock( "Child", [ this ]( zpSerializedInput* in ) {
-			zpGameObject* go = ZP_NULL;
-			in->readSerializableOfType<zpGameObject>( &go );
-			if( go ) addChildGameObject( go );
+			zpSerializable* go = ZP_NULL;
+			in->readSerializable( &go );
+			if( go ) addChildGameObject( (zpGameObject*)go );
 		} );
+		in->endBlock();
 	}
-	in->endBlock();
-
+	
 	in->endBlock();
 }
 

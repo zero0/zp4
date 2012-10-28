@@ -23,8 +23,7 @@ void zpPhysicsManager::serialize( zpSerializedOutput* out ) {
 
 	out->writeBlock( "Gravity" );
 	{
-		zpSerializableObject<zpVector4f> gravity( m_gravity );
-		gravity.serialize( out );
+		zpSerializableObject<zpVector4f>::serializeFrom( out, m_gravity );
 	}
 	out->endBlock();
 
@@ -77,9 +76,7 @@ void zpPhysicsManager::deserialize( zpSerializedInput* in ) {
 
 	if( in->readBlock( "Gravity" ) )
 	{
-		zpSerializableObject<zpVector4f> gravity( m_gravity );
-		gravity.deserialize( in );
-		m_gravity = gravity;
+		zpSerializableObject<zpVector4f>::deserializeTo( in, m_gravity );
 	}
 	in->endBlock();
 

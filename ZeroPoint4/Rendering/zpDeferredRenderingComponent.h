@@ -41,6 +41,8 @@ private:
 
 	zpArray<zpTexture*, ZP_GBUFFER_TARGET_Count> m_gbuffer;
 	zpArray<zpColor4f, ZP_GBUFFER_TARGET_Count> m_clearColors;
+
+	zpResourceInstance<zpShaderResource> m_fullscreenShader;
 };
 
 #endif

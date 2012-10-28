@@ -20,7 +20,7 @@ void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* m
 #if ZP_USE_SAFE_FUNCTIONS
 		vsnprintf_s( message, sizeof( message ), sizeof( message ), msg, vl );
 #else
-		vsnprintf( message, 256, msg, vl );
+		vsnprintf( message, sizeof( message ), msg, vl );
 #endif
 		va_end( vl );
 
@@ -39,6 +39,7 @@ void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* m
 	
 		switch( result ) {
 		case IDOK:
+		case IDYES:
 			__debugbreak();
 			break;
 		case IDNO:
@@ -222,4 +223,14 @@ zp_uint zp_near_pow2( zp_uint number ) {
 	zp_uint i = 1;
 	while( i < number ) i <<= 1;
 	return i;
+}
+
+void zpCoreRegisterSerializables() {
+	zpRegisterSerializable::registerSerializable<zpGame>();
+	zpRegisterSerializable::registerSerializable<zpWindow>();
+
+	zpRegisterSerializable::registerSerializable<zpWorld>();
+	zpRegisterSerializable::registerSerializable<zpGameObject>();
+	
+	zpRegisterSerializable::registerSerializable<zpProperties>();
 }

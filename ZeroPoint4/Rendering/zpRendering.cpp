@@ -29,3 +29,12 @@ zpRasterStateDesc::zpRasterStateDesc() :
 	multisampleEnable( false ),
 	antialiasedLineEnable( false )
 {}
+
+void zpRenderingRegisterSerializables() {
+	zpRegisterSerializable::registerSerializable<zpRenderingManager>();
+	zpRegisterSerializable::registerSerializable<zpRenderingResourceCreator>();
+	zpRegisterSerializable::registerSerializable<zpCameraComponent>();
+	zpRegisterSerializable::registerSerializable<zpLightComponent>();
+	zpRegisterSerializable::registerSerializable<zpDeferredRenderingComponent>();
+	zpRegisterSerializable::registerSerializable<zpStaticMeshRenderingComponent>();
+}

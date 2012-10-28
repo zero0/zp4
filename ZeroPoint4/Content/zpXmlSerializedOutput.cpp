@@ -70,11 +70,11 @@ void zpXmlSerializedOutput::writeString( const zpString& value, const zp_char* n
 }
 
 void zpXmlSerializedOutput::writeSerializable( zpSerializable* value, const zp_char* name ) {
-	writeBlock( name );
+	if( name ) writeBlock( name );
 
 	value->serialize( this );
 
-	endBlock();
+	if( name ) endBlock();
 }
 
 void zpXmlSerializedOutput::writeBlock( const zp_char* name ) {

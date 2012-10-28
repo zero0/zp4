@@ -31,4 +31,6 @@ class zpAudioEmitterComponent;
 #include "zpAudioInstance.h"
 #include "zpAudioEmitterComponent.h"
 
+void zpAudioRegisterSerializables();
+
 #endif

@@ -57,6 +57,8 @@
 
 #define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
 
+#define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
+
 #define ZP_USE_COLOR_CONSOLE	1
 #define ZP_USE_FAST_MATH		0
 #define ZP_USE_SAFE_FUNCTIONS	1
@@ -163,6 +165,8 @@ ZP_ABSTRACT_CLASS zpGameManager;
 class zpGameObject;
 ZP_ABSTRACT_CLASS zpComponent;
 
+class zpApplication;
+
 #include "zpLog.h"
 #include "zpMath.h"
 #include "zpTween.h"
@@ -203,14 +207,13 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpMessage.h"
 #include "zpMessageReceiver.h"
 
-
-
 #include "zpGame.h"
 #include "zpWorld.h"
 #include "zpGameManager.h"
 #include "zpGameObject.h"
 #include "zpComponent.h"
 
+#include "zpApplication.h"
 
 template<typename T, typename A>
 ZP_FORCE_INLINE T& zp_as( A& a ) {
@@ -276,5 +279,6 @@ void zp_qsort( T* arr, zp_uint count ) {
 	zp_qsort( arr, 0, count - 1 );
 }
 
+void zpCoreRegisterSerializables();
 
 #endif

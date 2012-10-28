@@ -16,6 +16,7 @@ public:
 	void destroy();
 
 	void update();
+	void simulate();
 
 	void setEnabled( zp_bool enabled );
 	zp_bool isEnabled() const;
@@ -36,6 +37,7 @@ protected:
 	virtual void onDestroy() = 0;
 
 	virtual void onUpdate() = 0;
+	virtual void onSimulate() {};
 
 	virtual void onEnabled() = 0;
 	virtual void onDisabled() = 0;

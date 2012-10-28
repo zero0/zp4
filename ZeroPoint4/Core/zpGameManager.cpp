@@ -25,6 +25,9 @@ void zpGameManager::destroy() {
 void zpGameManager::update() {
 	if( m_isEnabled && m_isCreated ) onUpdate();
 }
+void zpGameManager::simulate() {
+	if( m_isEnabled && m_isCreated ) onSimulate();
+}
 
 void zpGameManager::setEnabled( zp_bool enabled ) {
 	bool wasEnabled = m_isEnabled;

@@ -29,4 +29,6 @@ class zpLoadContentComponent;
 
 #include "zpLoadContentComponent.h"
 
+void zpContentRegisterSerializables();
+
 #endif

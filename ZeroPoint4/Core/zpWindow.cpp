@@ -251,10 +251,20 @@ void zpWindow::resizeWindow() {
 void zpWindow::serialize( zpSerializedOutput* out ) {
 	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
 
+	out->writeString( m_title, "@title" );
+
+	zpSerializableObject<zpVector2i>::serializeFromBlock( out, "Position", m_position );
+	zpSerializableObject<zpVector2i>::serializeFromBlock( out, "ScreenSize", m_screenSize );
+
 	out->endBlock();
 }
 void zpWindow::deserialize( zpSerializedInput* in ) {
 	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readString( &m_title, "@title" );
+
+	zpSerializableObject<zpVector2i>::deserializeToBlock( in, "Position", m_position );
+	zpSerializableObject<zpVector2i>::deserializeToBlock( in, "ScreenSize", m_screenSize );
 
 	in->endBlock();
 }

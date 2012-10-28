@@ -7,11 +7,15 @@ zpGame::zpGame()
 	, m_nextWorld( ZP_NULL )
 	, m_renderable( ZP_NULL )
 	, m_window( ZP_NULL )
-	, m_asynchCreateNextWorld( false )
+	, m_lastTime( zpTime::getInstance()->getTime() )
+	, m_simulateHz( 10000000 / 30 )
+	, m_renderMsHz( 1000 / 120 )
 {}
 zpGame::~zpGame() {}
 
 void zpGame::create() {
+	if( m_window ) m_window->create();
+
 	m_managers.foreach( []( zpGameManager* manager ) {
 		manager->create();
 	} );
@@ -20,6 +24,8 @@ void zpGame::destroy() {
 	m_managers.foreach( []( zpGameManager* manager ) {
 		manager->destroy();
 	} );
+
+	if( m_window ) m_window->destroy();
 }
 
 void zpGame::addWorld( zpWorld* world, zp_bool andCreate ) {
@@ -67,13 +73,12 @@ void zpGame::removeGameManager( zpGameManager* manager ) {
 	}
 }
 
-void zpGame::setNextWorld( const zpString& worldName, zp_bool asynchCreateNextWorld ) {
+void zpGame::setNextWorld( const zpString& worldName, zp_bool ) {
 	zpWorld* world = m_worlds.findFirstIf( [ &worldName ]( zpWorld* world ) {
 		return world->getName() == worldName;
 	} );
 	if( world && world != m_currentWorld ) {
 		m_nextWorld = world;
-		m_asynchCreateNextWorld = asynchCreateNextWorld;
 	}
 }
 
@@ -85,26 +90,54 @@ zpRenderable* zpGame::getRenderable() const {
 }
 
 void zpGame::process() {
-	m_timer->tick();
+	while( m_window->processMessages() ) {
+		m_timer->tick();
+		zp_long now = m_timer->getTime();
+		zp_uint numUpdates = 0;
 
-	m_managers.foreach( []( zpGameManager* manager ) {
-		manager->update();
-	} );
+		// update
+		m_managers.foreach( []( zpGameManager* manager ) {
+			manager->update();
+		} );
+		if( m_currentWorld ) m_currentWorld->update();
 
-	if( m_currentWorld ) m_currentWorld->update();
+		// simulate
+		while( ( now - m_lastTime ) > m_simulateHz && numUpdates < 5 ) {
+			m_managers.foreach( []( zpGameManager* manager ) {
+				manager->simulate();
+			} );
+			if( m_currentWorld ) m_currentWorld->simulate();
 
-	if( m_renderable ) m_renderable->render();
-	
-	if( m_nextWorld ) {
-		if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::LEAVE_WORLD );
-		if( m_nextWorld ) m_nextWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
+			m_lastTime += m_simulateHz;
+			++numUpdates;
+		}
 
-		m_currentWorld = m_nextWorld;
+		// adjust timer
+		if( ( now - m_lastTime ) > m_simulateHz ) {
+			m_lastTime = now - m_simulateHz;
+		}
 
-		if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
+		// render
+		m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
+		if( m_renderable ) m_renderable->render();
 
-		m_nextWorld = ZP_NULL;
-		m_asynchCreateNextWorld = false;
+		// sleep for the remainder of the frame
+		m_timer->sleep( m_renderMsHz );
+
+		// if there is a next world to set, do it now for the next frame
+		if( m_nextWorld ) {
+			if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::LEAVE_WORLD );
+			if( m_nextWorld ) m_nextWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
+
+			m_currentWorld = m_nextWorld;
+			if( !m_currentWorld->isCreated() ) {
+				m_currentWorld->create();
+			}
+
+			if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
+
+			m_nextWorld = ZP_NULL;
+		}
 	}
 }
 
@@ -123,10 +156,33 @@ zpGameManager* zpGame::getGameManager_T( const void* type ) const {
 	return manager;
 }
 
+void zpGame::receiveMessage( const zpMessage& message ) {
+	switch( message.getMessageType() ) {
+	case zpMessageTypes::SYS_SET_NEXT_WORLD:
+		setNextWorld( message.getMessageData<zpString>() );
+		break;
+	case zpMessageTypes::SYS_SET_SCREEN_SIZE:
+		m_window->setScreenSize( message.getMessageData<zpVector2i>() );
+		break;
+	}
+}
+
 void zpGame::serialize( zpSerializedOutput* out ) {
 	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
 
 	out->writeSerializable( m_window );
+
+	out->writeBlock( "Managers" );
+	{
+		out->writeBlock( "Manager" );
+		{
+			m_managers.foreach( [ out ]( zpGameManager* manager ) {
+				manager->serialize( out );
+			} );
+		}
+		out->endBlock();
+	}
+	out->endBlock();
 
 	out->endBlock();
 }
@@ -134,6 +190,16 @@ void zpGame::deserialize( zpSerializedInput* in ) {
 	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
 
 	in->readSerializableOfType( &m_window );
+
+	if( in->readBlock( "Managers" ) )
+	{
+		in->readEachBlock( "Manager", [ this ]( zpSerializedInput* in ) {
+			zpSerializable* manager = ZP_NULL;
+			in->readSerializable( &manager );
+			if( manager ) addGameManager( (zpGameManager*)manager );
+		} );
+		in->endBlock();
+	}
 
 	in->endBlock();
 }

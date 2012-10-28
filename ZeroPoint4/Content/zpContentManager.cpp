@@ -3,6 +3,8 @@
 
 zpContentManager::zpContentManager()
 	: m_shouldCleanUp( false )
+	, m_assetsFolder( "Assets/" )
+	, m_rootDirectory( "./" )
 {}
 zpContentManager::~zpContentManager() {}
 	
@@ -151,8 +153,41 @@ void zpContentManager::unloadResource( zpResource* resource ) {
 
 void zpContentManager::receiveMessage( const zpMessage& message ) {}
 
-void zpContentManager::serialize( zpSerializedOutput* out ) {}
-void zpContentManager::deserialize( zpSerializedInput* in ) {}
+void zpContentManager::serialize( zpSerializedOutput* out ) {
+	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	out->writeString( m_rootDirectory, "@root" );
+
+	out->writeString( m_assetsFolder, "@assets" );
+
+	out->endBlock();
+}
+void zpContentManager::deserialize( zpSerializedInput* in ) {
+	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+
+	in->readString( &m_rootDirectory, "@root" );
+
+	in->readString( &m_assetsFolder, "@assets" );
+
+	in->readEachBlock( "Creator", [ this ]( zpSerializedInput* in ) {
+		zpString type;
+		zpString extension;
+		zpString root;
+
+		in->readString( &type, "@type" );
+		in->readString( &extension, "@extension" );
+		in->readString( &root, "@root" );
+
+		zpSerializable* serial = zpRegisterSerializable::createSerializable( type );
+		if( serial ) {
+			zpResourceCreator* creator = (zpResourceCreator*)serial;
+			creator->setRootDirectory( root );
+			registerFileExtension( extension, creator );
+		}
+	} );
+
+	in->endBlock();
+}
 
 void zpContentManager::setRootDirectory( const zpString& rootDirectory ) {
 	m_assetsFolder = rootDirectory;
@@ -162,11 +197,13 @@ const zpString& zpContentManager::getRootDirectory() const {
 	return m_rootDirectory;
 }
 zp_bool zpContentManager::getRootDirectoryForExtension( const zpString& extension, zpString& outRoot ) const {
-	//const zpResourceCreator** creator = ZP_NULL;
-	//if( m_creators.find( extension, &creator ) ) {
-	//	outRoot = (*creator)->getRootDirectory();
-	//	return true;
-	//}
+	const zpResourceCreator** creator = ZP_NULL;
+	if( m_creators.find( extension, (zpResourceCreator*const**)&creator ) ) {
+		zpStringBuffer buff( m_rootDirectory );
+		buff << m_assetsFolder << (*creator)->getRootDirectory();
+		outRoot = buff.toString();
+		return true;
+	}
 	return false;
 }
 
@@ -178,9 +215,8 @@ zpDelegateEvent<void()>& zpContentManager::onAllResourcesLoaded() {
 }
 
 void zpContentManager::onCreate() {
-	//m_rootDirectory = zpFile::getCurrentDirectory();
-	m_rootDirectory = "./";
-	m_rootDirectory[1] = zpFile::sep;
+	zpFile::convertToFilePath( m_rootDirectory );
+	zpFile::convertToFilePath( m_assetsFolder );
 
 	zpPrefabs::getInstance()->setContentManager( this );
 }
@@ -200,6 +236,8 @@ void zpContentManager::onUpdate() {
 			m_onAllResourcesLoaded();
 		}
 	}
+
+	zpPrefabs::getInstance()->update();
 
 	if( m_shouldCleanUp ) {
 		m_shouldCleanUp = false;

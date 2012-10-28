@@ -14,4 +14,6 @@ class zpInputManager;
 #include "zpController.h"
 #include "zpInputManager.h"
 
+void zpInputRegisterSerializables();
+
 #endif

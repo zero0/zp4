@@ -18,4 +18,6 @@ class zpScriptingComponent;
 #include "zpScriptingManager.h"
 #include "zpScriptingComponent.h"
 
+void zpScriptingRegisterSerializables();
+
 #endif

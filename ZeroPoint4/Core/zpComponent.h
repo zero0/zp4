@@ -23,6 +23,7 @@ public:
 	zp_bool isCreated() const;
 
 	void update();
+	void simulate();
 
 	void create();
 	void destroy();
@@ -49,12 +50,12 @@ public:
 	void markForAutoDelete( zp_bool marked ) const;
 	zp_bool isMarkedForAutoDelete() const;
 
-
 protected:
 	virtual void onCreate() = 0;
 	virtual void onDestroy() = 0;
 
 	virtual void onUpdate() = 0;
+	virtual void onSimulate() {};
 
 	virtual void onEnabled() = 0;
 	virtual void onDisabled() = 0;

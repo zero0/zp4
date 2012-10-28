@@ -41,6 +41,9 @@ zp_bool zpComponent::isCreated() const {
 void zpComponent::update() {
 	if( m_isEnabled && m_isCreated ) onUpdate();
 }
+void zpComponent::simulate() {
+	if( m_isEnabled && m_isCreated ) onSimulate();
+}
 
 void zpComponent::create() {
 	if( m_isCreated ) return;

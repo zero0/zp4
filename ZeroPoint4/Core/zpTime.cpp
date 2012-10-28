@@ -1,15 +1,16 @@
 #include "zpCore.h"
 #include <Windows.h>
 
-zpTime::zpTime() :
-	m_baseTime( 0 ),
-	m_currentTime( 0 ),
-	m_previousTime( 0 ),
-	m_deltaTime( 0 ),
-	m_secondsPerTick( 0.f ),
-	m_timeScale( 1.f ),
-	m_deltaSeconds( 0.f ),
-	m_actualDeltaSeconds( 0.f )
+zpTime::zpTime()
+	: m_baseTime( 0 )
+	, m_currentTime( 0 )
+	, m_previousTime( 0 )
+	, m_deltaTime( 0 )
+	, m_secondsPerTick( 0.f )
+	, m_timeScale( 1.f )
+	, m_deltaSeconds( 0.f )
+	, m_actualDeltaSeconds( 0.f )
+	, m_interpolation( 0.f )
 {
 	zp_long countsPerSecond;
 	QueryPerformanceFrequency( (LARGE_INTEGER*)&countsPerSecond );
@@ -29,6 +30,9 @@ zp_float zpTime::getDeltaSeconds() const {
 }
 zp_float zpTime::getActualDeltaSeconds() const {
 	return m_actualDeltaSeconds;
+}
+zp_float zpTime::getSecondsPerTick() const {
+	return m_secondsPerTick;
 }
 
 void zpTime::setTimeScale( zp_float timeScale ) {
@@ -63,4 +67,16 @@ zp_long zpTime::getTime() const {
 }
 zp_long zpTime::getDeltaTime() const {
 	return m_deltaTime;
+}
+
+
+zp_float zpTime::getInterpolation() const {
+	return m_interpolation;
+}
+void zpTime::setInterpolation( zp_float interpolation ) {
+	m_interpolation = interpolation;
+}
+
+void zpTime::sleep( zp_int milliseconds ) {
+	Sleep( milliseconds );
 }

@@ -353,4 +353,6 @@ class zpDeferredRenderingComponent;
 
 #include "zpDeferredRenderingComponent.h"
 
+void zpRenderingRegisterSerializables();
+
 #endif

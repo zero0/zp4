@@ -41,6 +41,7 @@ zpResource* zpPrefabResourceCreator::createResource( const zpString& filename ) 
 
 zpPrefabs::zpPrefabs()
 	: m_contentManager( ZP_NULL )
+	, m_prefabRoot( "prefabs/" )
 {}
 zpPrefabs::~zpPrefabs() {}
 
@@ -60,28 +61,41 @@ zpSerializable* zpPrefabs::loadPrefab( const zpString& prefabName ) {
 	return loadPrefabWithOverrides( prefabName, zpProperties() );
 }
 zpSerializable* zpPrefabs::loadPrefabWithOverrides( const zpString& prefabName, const zpProperties& overrides ) {
-	zpStringBuffer buff;
-	buff << m_contentManager->getRootDirectory() << m_prefabRoot << prefabName << ".prefab";
-	zpString prefabFile = buff.toString();
+	zpSerializable* serializable = ZP_NULL;
+	zp_bool lazyLoad = false;
+	if( m_contentManager ) {
+		//zpString root;
+		//m_contentManager->getRootDirectoryForExtension( "prefab", root );
 
-	zpPrefabResource* resource = ZP_NULL;
-	zpResourceInstance<zpPrefabResource>* prefabInstance;
-	if( m_prefabs.find( prefabName, &prefabInstance ) ) {
-		resource = prefabInstance->getResource();
-	} else {
-		// load the prefab immediately so it can be used later
-		m_contentManager->loadResource( prefabFile, prefabName, true );
+		zpStringBuffer buff;
+		buff << prefabName << ".prefab";
+		zpString prefabFile = buff.toString();
 
-		m_prefabs[ prefabName ] = m_contentManager->createInstanceOfResource<zpPrefabResource>( prefabName );
-		resource = m_prefabs[ prefabName ].getResource();
+		zpPrefabResource* resource = ZP_NULL;
+		zpResourceInstance<zpPrefabResource>* prefabInstance;
+		if( m_prefabs.find( prefabName, &prefabInstance ) ) {
+			resource = prefabInstance->getResource();
+		} else {
+			// load the prefab immediately so it can be used later
+			m_contentManager->loadResource( prefabFile, prefabName, true );
+
+			m_prefabs[ prefabName ] = m_contentManager->createInstanceOfResource<zpPrefabResource>( prefabName );
+			resource = m_prefabs[ prefabName ].getResource();
+		}
+
+		// create a serializable that will be de-serialized later
+		serializable = zpRegisterSerializable::createSerializable( resource->getRootNode()->children[ 0 ]->name );
+
+		if( lazyLoad ) {
+			// store this instance for later parsing
+			zpPrefabToLoad load = { resource, serializable, overrides };
+			m_prefabsToLoad.pushBack( load );
+		} else {
+			zpXmlSerializedInput in( resource->getRootNode(), overrides );
+			in.readSerializable( &serializable, ZP_NULL );
+		}
 	}
 
-	// create a serializable that will be de-serialized later
-	zpSerializable* serializable = zpRegisterSerializable::createSerializable( resource->getRootNode()->children[ 0 ]->name );
-
-	// store this instance for later parsing
-	zpPrefabToLoad load = { resource, serializable, overrides };
-	m_prefabsToLoad.pushBack( load );
 
 	// return the created serializable
 	return serializable;
@@ -100,6 +114,7 @@ zp_bool zpPrefabs::saveAsPrefab( const zpString& prefabName, zpSerializable* obj
 }
 
 void zpPrefabs::setContentManager( zpContentManager* content ) {
+	m_prefabCreator.setRootDirectory( m_prefabRoot );
 	m_contentManager = content;
 	m_contentManager->registerFileExtension( "prefab", &m_prefabCreator );
 }

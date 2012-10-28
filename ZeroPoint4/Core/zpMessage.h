@@ -17,6 +17,12 @@ class zpMessageDataCache;
 struct zpMessageTypes {
 	enum Types {
 #include "zpMessageTypes.inc"
+
+#ifdef ZP_MESSAGE_EXTERNAL_TYPES
+#undef MT_SYS
+#define MT_SYS( m ) ,
+#include ZP_MESSAGE_EXTERNAL_TYPES
+#endif
 	};
 };
 

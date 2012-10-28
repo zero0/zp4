@@ -34,6 +34,7 @@ private:
 	zpXmlNode* m_currentNode;
 
 	zpArrayList<zpXmlNode*> m_nodeStack;
+	zpArrayList<zpString> m_siblingStack;
 	zpProperties m_properties;
 };
 

@@ -39,14 +39,21 @@ void __xmlLinkSiblings( zpXmlNode* node, zpHashMap<zpString, zpArrayList<zpXmlNo
 	} );
 
 	siblingMap.foreach( []( const zpString& name, zpArrayList<zpXmlNode*>& sibs ) {
-		sibs[ 0 ]->prevSibling = ZP_NULL;
-		for( zp_uint i = 1; i < sibs.size() - 1; ++i ) {
-			sibs[ i - 1 ]->nextSibling = sibs[ i ];
-			sibs[ i ]->prevSibling = sibs[ i - 1 ];
-			sibs[ i ]->nextSibling = sibs[ i + 1 ];
-			sibs[ i + 1 ]->prevSibling = sibs[ i ];
+		if( sibs.size() > 2 ) {
+			sibs[ 0 ]->prevSibling = ZP_NULL;
+			for( zp_uint i = 1; i < sibs.size() - 1; ++i ) {
+				sibs[ i - 1 ]->nextSibling = sibs[ i ];
+				sibs[ i ]->prevSibling = sibs[ i - 1 ];
+				sibs[ i ]->nextSibling = sibs[ i + 1 ];
+				sibs[ i + 1 ]->prevSibling = sibs[ i ];
+			}
+			sibs[ sibs.size() - 1 ]->nextSibling = ZP_NULL;
+		} else if( sibs.size() == 2 ) {
+			sibs[ 0 ]->prevSibling = ZP_NULL;
+			sibs[ 0 ]->nextSibling = sibs[ 1 ];
+			sibs[ 1 ]->prevSibling = sibs[ 0 ];
+			sibs[ 1 ]->nextSibling = ZP_NULL;
 		}
-		sibs[ sibs.size() - 1 ]->nextSibling = ZP_NULL;
 	} );
 
 	siblingMap.clear();

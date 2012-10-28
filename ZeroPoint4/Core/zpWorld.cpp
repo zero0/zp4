@@ -23,6 +23,10 @@ zpGameObject* zpWorld::getRootGameObject() const {
 void zpWorld::update() {
 	if( m_isEnabled && m_root ) m_root->update();
 }
+void zpWorld::simulate() {
+	if( m_isEnabled && m_root ) m_root->simulate();
+}
+
 
 void zpWorld::create() {
 	if( m_isCreated ) return;
@@ -71,7 +75,7 @@ void zpWorld::serialize( zpSerializedOutput* out ) {
 
 	out->writeString( m_name, "@name" );
 
-	out->writeSerializable( m_root, "Root" );
+	out->writeSerializable( m_root );
 
 	out->endBlock();
 }
@@ -80,7 +84,9 @@ void zpWorld::deserialize( zpSerializedInput* in ) {
 
 	in->readString( &m_name, "@name" );
 
-	in->readSerializableOfType<zpGameObject>( &m_root, "Root" );
+	zpSerializable* root = ZP_NULL;
+	in->readSerializable( &root );
+	if( root ) setRootGameObject( (zpGameObject*)root );
 
 	in->endBlock();
 }

@@ -33,6 +33,7 @@ public:
 	zpWorld* getWorld() const;
 
 	void update();
+	void simulate();
 
 	void create();
 	void destroy();
