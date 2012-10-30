@@ -23,7 +23,6 @@ void zpStaticMeshRenderingComponent::render() {
 
 		c->setTopology( part.topology );
 		c->setBuffer( part.vertexBuffer );
-		if( part.indexBuffer ) c->setBuffer( part.indexBuffer );
 		c->setShader( &part.shader );
 
 		for( zp_uint t = 0; t < ZP_STATIC_MESH_PART_NUM_TEXTURES; ++t ) {
@@ -31,6 +30,7 @@ void zpStaticMeshRenderingComponent::render() {
 		}
 
 		if( part.indexBuffer ) {
+			c->setBuffer( part.indexBuffer );
 			c->drawIndexed( part.indexBuffer->getCount() );
 		} else {
 			c->draw( part.vertexBuffer->getCount() );

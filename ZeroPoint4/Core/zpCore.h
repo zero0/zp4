@@ -165,8 +165,6 @@ ZP_ABSTRACT_CLASS zpGameManager;
 class zpGameObject;
 ZP_ABSTRACT_CLASS zpComponent;
 
-class zpApplication;
-
 #include "zpLog.h"
 #include "zpMath.h"
 #include "zpTween.h"
@@ -212,8 +210,6 @@ class zpApplication;
 #include "zpGameManager.h"
 #include "zpGameObject.h"
 #include "zpComponent.h"
-
-#include "zpApplication.h"
 
 template<typename T, typename A>
 ZP_FORCE_INLINE T& zp_as( A& a ) {
