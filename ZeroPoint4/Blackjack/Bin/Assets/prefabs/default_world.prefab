@@ -3,8 +3,11 @@
 		<Transform />
 		<Components>
 			<Component>
-				<zpLoadContentComponent disable-world-when-loading="false">
+				<zpLoadContentComponent disable-world-when-loading="true">
 					<Content file="simple.shader" alias="simple" immediate="false" />
+					<Content file="test.png" alias="test_texture" immediate="false" />
+					
+					<Content file="fullscreenNoAlpha.shader" alias="fullscreenNoAlpha" immediate="true" />
 				</zpLoadContentComponent>
 			</Component>
 			<Component>
