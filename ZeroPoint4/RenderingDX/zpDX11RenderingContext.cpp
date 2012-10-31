@@ -33,9 +33,6 @@ zpTexture* zpDX11RenderingContext::getRenderTarget( zp_uint index ) const {
 }
 
 void zpDX11RenderingContext::setDepthStencilBuffer( zpDepthStencilBuffer* depthBuffer ) {
-	if( m_depthStencilBuffer ) m_depthStencilBuffer->removeReference();
-	if( depthBuffer ) depthBuffer->addReference();
-
 	m_depthStencilBuffer = depthBuffer;
 }
 zpDepthStencilBuffer* zpDX11RenderingContext::getDepthStencilBuffer() const {

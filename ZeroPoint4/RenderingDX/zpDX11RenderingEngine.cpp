@@ -47,7 +47,8 @@ zp_bool zpDX11RenderingEngine::create() {
 	}
 	// if the refresh rate is not set, find the closest display mode that matches
 	if( !m_displayMode.refreshRate ) {
-		findClosestDisplayMode( m_displayMode, &m_displayMode );
+		//findClosestDisplayMode( m_displayMode, &m_displayMode );
+		m_displayMode.refreshRate = 60;
 	}
 	
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;

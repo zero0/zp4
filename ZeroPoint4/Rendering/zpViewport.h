@@ -4,6 +4,7 @@
 
 class zpViewport {
 public:
+	zpViewport();
 	zpViewport( zp_float width, zp_float height, zp_float minDepth = 0.f, zp_float maxDepth = 1.0f, zp_float topX = 0.f, zp_float topY = 0.f );
 
 	zp_float getWidth() const;
@@ -14,8 +15,6 @@ public:
 	zp_float getTopY() const;
 
 private:
-	zpViewport();
-	
 	zp_float m_width;
 	zp_float m_height;
 	zp_float m_minDepth;

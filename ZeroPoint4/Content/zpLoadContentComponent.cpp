@@ -41,7 +41,7 @@ void zpLoadContentComponent::serialize( zpSerializedOutput* out ) {
 void zpLoadContentComponent::deserialize( zpSerializedInput* in ) {
 	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
 
-	in->readBoolean( &m_isUnloadWhenDestroyed, "@destroy-when-finished" );
+	in->readBoolean( &m_isUnloadWhenDestroyed, "@unload-when-destroyed" );
 	in->readBoolean( &m_isWorldDisabledWhenLoading, "@disable-world-when-loading" );
 
 	zpString filename, alias;
@@ -84,8 +84,15 @@ void zpLoadContentComponent::onCreate() {
 	} );
 }
 void zpLoadContentComponent::onDestroy() {
-	m_manager->onResourceLoaded() -= zpCreateMemberDelegate( &zpLoadContentComponent::onResourceLoaded, this );
-	m_manager->onAllResourcesLoaded() -= zpCreateMemberDelegate( &zpLoadContentComponent::onResourcesFinishedLoading, this );
+	if( m_isUnloadWhenDestroyed ) {
+		m_immediateResources.foreach( [ this ]( const zpString& alias, const zpString& value ) {
+			m_manager->unloadResource( alias );
+		} );
+		m_bufferedResources.foreach( [ this ]( const zpString& alias, const zpString& value ) {
+			m_manager->unloadResource( alias );
+		} );
+	}
+
 	m_manager = ZP_NULL;
 
 	m_immediateResources.clear();
@@ -107,4 +114,7 @@ void zpLoadContentComponent::onResourcesFinishedLoading() {
 	}
 
 	sendMessageToSiblingComponents( zpMessage( zpMessageTypes::RESOURCES_FINISHED_LOADING, this ) );
+
+	m_manager->onResourceLoaded() -= zpCreateMemberDelegate( &zpLoadContentComponent::onResourceLoaded, this );
+	m_manager->onAllResourcesLoaded() -= zpCreateMemberDelegate( &zpLoadContentComponent::onResourcesFinishedLoading, this );
 }

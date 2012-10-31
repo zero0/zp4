@@ -42,7 +42,13 @@ private:
 	zpArray<zpTexture*, ZP_GBUFFER_TARGET_Count> m_gbuffer;
 	zpArray<zpColor4f, ZP_GBUFFER_TARGET_Count> m_clearColors;
 
+	zpSamplerState* m_pointSampler;
+	zpSamplerState* m_linearSampler;
+
 	zpResourceInstance<zpShaderResource> m_fullscreenShader;
+	zpResourceInstance<zpTextureResource> m_texture;
+
+	zpViewport m_viewport;
 };
 
 #endif

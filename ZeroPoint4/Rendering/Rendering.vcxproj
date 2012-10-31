@@ -83,6 +83,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpUIManager.h" />
     <ClInclude Include="zpAnimatedMeshResource.h" />
     <ClInclude Include="zpBufferData.h" />
     <ClInclude Include="zpCameraComponent.h" />
@@ -139,6 +140,7 @@
     <ClCompile Include="zpStaticMeshResource.cpp" />
     <ClCompile Include="zpTextRenderingComponent.cpp" />
     <ClCompile Include="zpTextureInstance.cpp" />
+    <ClCompile Include="zpUIManager.cpp" />
     <ClCompile Include="zpUIRenderingComponent.cpp" />
     <ClCompile Include="zpViewport.cpp" />
   </ItemGroup>

@@ -16,7 +16,7 @@
 #define ZP_RENDERING_TYPE				ZP_DX
 
 #define ZP_RENDERING_LAYER_TYPE			zp_byte
-#define ZP_RENDERING_LAYER_COUNT		( sizeof( ZP_RENDERING_LAYER_TYPE ) * 8 )
+#define ZP_RENDERING_LAYER_Count		( sizeof( ZP_RENDERING_LAYER_TYPE ) * 8 )
 typedef zpFlag<ZP_RENDERING_LAYER_TYPE>	zpRenderLayer;
 
 enum {
@@ -298,6 +298,7 @@ class zpRenderingFactory;
 
 class zpCamera;
 class zpRenderingManager;
+class zpUIManager;
 
 template<typename V, typename I> class zpImmediateBuffer;
 
@@ -341,6 +342,7 @@ class zpDeferredRenderingComponent;
 
 #include "zpCamera.h"
 #include "zpRenderingManager.h"
+#include "zpUIManager.h"
 
 #include "zpImmediateBuffer.h"
 
