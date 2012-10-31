@@ -32,6 +32,7 @@ zpRasterStateDesc::zpRasterStateDesc() :
 
 void zpRenderingRegisterSerializables() {
 	zpRegisterSerializable::registerSerializable<zpRenderingManager>();
+	zpRegisterSerializable::registerSerializable<zpUIManager>();
 	zpRegisterSerializable::registerSerializable<zpRenderingResourceCreator>();
 	zpRegisterSerializable::registerSerializable<zpCameraComponent>();
 	zpRegisterSerializable::registerSerializable<zpLightComponent>();
