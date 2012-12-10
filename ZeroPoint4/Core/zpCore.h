@@ -155,6 +155,7 @@ class zpTime;
 class zpMessage;
 ZP_PURE_INTERFACE zpMessageReceiver;
 
+template<typename T, zp_uint Count> class zpPooledObject;
 class zpProperties;
 class zpMemorySystem;
 ZP_PURE_INTERFACE zpReferencedObject;
@@ -188,6 +189,7 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpMap.h"
 #include "zpFile.h"
 
+#include "zpPooledObject.h"
 #include "zpProperties.h"
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"
@@ -204,6 +206,9 @@ ZP_ABSTRACT_CLASS zpComponent;
 
 #include "zpMessage.h"
 #include "zpMessageReceiver.h"
+
+#include "zpAllComponents.h"
+#include "zpAllGameManagers.h"
 
 #include "zpGame.h"
 #include "zpWorld.h"

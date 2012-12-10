@@ -5,8 +5,7 @@
 struct zpResourceElement {
 	zpResource* resource;
 	zp_uint refCount;
-	zpString alias;
-	zpString file;
+	zpString filename;
 };
 
 class zpContentManager : public zpGameManager {
@@ -15,23 +14,16 @@ public:
 	virtual ~zpContentManager();
 	
 	void registerFileExtension( const zpString& extension, zpResourceCreator* creator );
-	
-	zp_bool loadResource( const zpString& filename, const zpString& alias, zp_bool immediateLoad = false );
-	zp_uint loadResources( const zpProperties& aliasToFilenames );
 
-	zp_bool unloadResource( const zpString& alias );
-	zp_uint unloadResources( const zpArrayList<zpString>& aliases );
-	void unloadAllResources();
-
-	zp_bool reloadResource( const zpString& alias );
-	zp_uint reloadResources( const zpArrayList<zpString>& aliases );
+	zp_bool reloadResource( const zpString& filename );
+	zp_uint reloadResources( const zpArrayList<zpString>& filenames );
 	void reloadAllResources();
 
-	zp_bool isFileAlreadyLoaded( const zpString& filename, zpString* outAlias = ZP_NULL ) const;
+	zp_bool isFileAlreadyLoaded( const zpString& filename ) const;
 
 	template<typename R>
-	zpResourceInstance<R> createInstanceOfResource( const zpString& alias ) {
-		return zpResourceInstance<R>( (R*)getResource( alias ) );
+	zpResourceInstance<R> createInstanceOfResource( const zpString& filename ) {
+		return zpResourceInstance<R>( (R*)getResource( filename ) );
 	}
 		
 	template<typename R>
@@ -62,7 +54,7 @@ protected:
 	void onDisabled();
 
 private:
-	zpResource* getResource( const zpString& alias );
+	zpResource* getResource( const zpString& filename );
 	void unloadResource( zpResource* resource );
 
 	zp_bool m_shouldCleanUp;

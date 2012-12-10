@@ -2,5 +2,5 @@
 
 void zpContentRegisterSerializables() {
 	zpRegisterSerializable::registerSerializable<zpContentManager>();
-	zpRegisterSerializable::registerSerializable<zpLoadContentComponent>();
+	//zpRegisterSerializable::registerSerializable<zpLoadContentComponent>();
 }

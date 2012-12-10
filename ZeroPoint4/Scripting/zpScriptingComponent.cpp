@@ -42,7 +42,7 @@ const zpString& zpScriptingComponent::getScriptAlias() const {
 }
 
 void zpScriptingComponent::onCreate() {
-	zpContentManager* content = getGameManagerOfType<zpContentManager>();
+	zpContentManager* content = getGame()->getGameManagers()->getContentManager();
 
 	m_scriptInstance = content->createInstanceOfResource<zpScriptResource>( m_scriptAlias );
 

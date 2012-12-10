@@ -50,9 +50,18 @@
     <ClCompile Include="zpKinematicComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpPhantomComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpPhysicsLib.inc">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpPhysicsManagers.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpPhysicsComponents.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

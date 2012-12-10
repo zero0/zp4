@@ -69,6 +69,7 @@
       <PreprocessorDefinitions>_MBCS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>zpCore.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -115,6 +116,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpAllComponents.h" />
+    <ClInclude Include="zpAllGameManagers.h" />
     <ClInclude Include="zpArray.h" />
     <ClInclude Include="zpArrayList.h" />
     <ClInclude Include="zpBaseTypes.h" />
@@ -145,6 +148,7 @@
     <ClInclude Include="zpMessageReceiver.h" />
     <ClInclude Include="zpPair.h" />
     <ClInclude Include="zpPlane.h" />
+    <ClInclude Include="zpPooledObject.h" />
     <ClInclude Include="zpProperties.h" />
     <ClInclude Include="zpRandom.h" />
     <ClInclude Include="zpRay.h" />
@@ -166,6 +170,8 @@
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="zpAllComponents.inl" />
+    <None Include="zpAllGameManagers.inl" />
     <None Include="zpArray.inl" />
     <None Include="zpArrayList.inl" />
     <None Include="zpBaseTypesFpu.inl" />
@@ -181,6 +187,7 @@
     <None Include="zpMatrix4Simd.inl" />
     <None Include="zpMessageTypes.inc" />
     <None Include="zpPair.inl" />
+    <None Include="zpPooledObject.inl" />
     <None Include="zpRealFpu.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />
@@ -191,6 +198,8 @@
     <None Include="zpVector4Simd.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpAllComponents.cpp" />
+    <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpBoundingAABB.cpp" />
     <ClCompile Include="zpBoundingSphere.cpp" />
     <ClCompile Include="zpCollision.cpp" />

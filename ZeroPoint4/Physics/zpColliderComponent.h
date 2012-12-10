@@ -45,7 +45,6 @@ private:
 	zpVector4f m_size;
 };
 
-
 class zpColliderCache {
 public:
 	~zpColliderCache();

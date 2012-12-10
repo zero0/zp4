@@ -5,7 +5,7 @@
 
 #define DEFAULT_BLACKJACK_CONFIG	"blackjack.config"
 
-zpGame* ProcessConfig() {
+void ProcessConfig( zpGame& game ) {
 	zpProperties properties( DEFAULT_BLACKJACK_CONFIG );
 	ZP_ASSERT( properties.hasProperty( "game.file" ), "Game file not defined" );
 	const zpString& gameFile = properties[ "game.file" ];
@@ -14,30 +14,23 @@ zpGame* ProcessConfig() {
 		zpConsole::getInstance()->create();
 	}
 
-	zpXmlNode gameRoot;
 	zpXmlParser gameParser;
-	gameParser.setRootNode( &gameRoot, false );
 	gameParser.parseFile( gameFile, true );
 
 	zpProperties gameOverrides( properties.getSubProperties( "game.overrides" ) );
 
 	zpXmlSerializedInput gameIn( gameParser.getRootNode(), gameOverrides );
-	zpSerializable* gameSerial = ZP_NULL;
-
-	gameIn.readSerializable( &gameSerial, ZP_NULL );
-	ZP_ASSERT( gameSerial != ZP_NULL, "Failed to parse game file %s", gameFile.c_str() );
-	
-	zpGame* game = (zpGame*)gameSerial;
-	game->create();
+	game.deserialize( &gameIn );
+	game.create();
 
 	const zpString& worldPrefab = properties[ "world.prefab" ];
 	
-	zpSerializable* world = zpPrefabs::getInstance()->loadPrefab( worldPrefab );
-	ZP_ASSERT( world != ZP_NULL, "Failed to load world prefab %s", worldPrefab.c_str() );
+	//zpSerializable* world = zpPrefabs::getInstance()->loadPrefab( worldPrefab );
+	//ZP_ASSERT( world != ZP_NULL, "Failed to load world prefab %s", worldPrefab.c_str() );
+	
+	//game.setNextWorld( (zpWorld*)world );
 
-	game->addWorld((zpWorld*)world, true );
-
-	return game;
+	//return game;
 }
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
@@ -48,14 +41,15 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	ZP_REGISTER_SERIALIZABLES( zpInput );
 	ZP_REGISTER_SERIALIZABLES( zpScripting );
 	ZP_REGISTER_SERIALIZABLES( zpRendering );
+	ZP_REGISTER_SERIALIZABLES( zpPhysics );
 
-	zpGame* game = ProcessConfig();
+	zpGame game;
 
-	game->process();
+	ProcessConfig( game );
 
-	game->destroy();
+	game.process();
 
-	ZP_SAFE_DELETE( game );
+	game.destroy();
 
 	return 0;
 }

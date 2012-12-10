@@ -36,11 +36,11 @@ zp_bool zpKinematicComponent::isInWorld() const {
 void zpKinematicComponent::onCreate() {
 	if( m_character ) return;
 
-	zpColliderComponent* collider = getParentGameObject()->getComponentOfType<zpColliderComponent>();
+	zpColliderComponent* collider = getParentGameObject()->getComponents()->getColliderComponent();
 	if( !collider ) return;
 	if( !collider->isCreated() ) collider->create();
 
-	m_manager = getGameManagerOfType<zpPhysicsManager>();
+	m_manager = getGame()->getGameManagers()->getPhysicsManager();
 	
 	btConvexShape* shape = (btConvexShape*)collider->getShape();
 	m_ghostObject = new btPairCachingGhostObject();

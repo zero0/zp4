@@ -25,8 +25,8 @@ public:
 	void setNumListeners( zp_uint numListeners );
 	zp_uint getNumListeners() const;
 
-	//void set3DSettings( zp_float dopperScale, zp_float distanceFactor, zp_float rolloffScale );
-	//void set3DListener( int listener, const Point3f& position, const Vector3f& velocity, const Vector3f& forward, const Vector3f& up );
+	void set3DSettings( zp_float dopperScale, zp_float distanceFactor, zp_float rolloffScale );
+	void set3DListener( zp_uint listener, const zpVector4f& position, const zpVector4f& velocity, const zpVector4f& forward, const zpVector4f& up );
 
 	//void stop( zpAudioChannelGroup channel );
 	//void play( zpAudioInstance* sound );

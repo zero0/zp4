@@ -97,6 +97,11 @@ template<typename T> template<zp_uint Count>
 void zpArrayList<T>::pushBack( const T (&arr)[Count] ) {
 	pushBack( arr, Count );
 }
+template<typename T>
+T& zpArrayList<T>::pushBackEmpty() {
+	pushBack( T() );
+	return *end();
+}
 
 template<typename T>
 void zpArrayList<T>::pushFront( const T& val ) {
@@ -120,6 +125,11 @@ void zpArrayList<T>::pushFront( const T* arr, zp_uint count ) {
 template<typename T> template<zp_uint Count>
 void zpArrayList<T>::pushFront( const T (&arr)[Count] ) {
 	pushFront( arr, Count );
+}
+template<typename T>
+T& zpArrayList<T>::pushFrontEmpty() {
+	pushFront( T() );
+	return *begin();
 }
 
 template<typename T>

@@ -11,7 +11,7 @@ void zpStaticMeshRenderingComponent::render() {
 	zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 
 	zpMatrix4f trans;
-	m_localTransform.mul( getParentGameObject()->getWorldTransform(), trans );
+	m_localTransform.mul( getParentGameObject()->getTransform(), trans );
 
 	m_manager->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_WORLD )->update( (zp_float*)trans );
 
@@ -56,8 +56,9 @@ void zpStaticMeshRenderingComponent::deserialize( zpSerializedInput* in ) {
 }
 
 void zpStaticMeshRenderingComponent::onCreate() {
-	zpContentManager* content = getGameManagerOfType<zpContentManager>();
-	m_manager = getGameManagerOfType<zpRenderingManager>();
+	zpContentManager* content = getGame()->getGameManagers()->getContentManager();
+	m_manager = getGame()->getGameManagers()->getRenderingManager();
+
 	m_meshAlias = "cube";
 	m_mesh = content->createInstanceOfResource<zpStaticMeshResource>( m_meshAlias );
 }
@@ -65,7 +66,7 @@ void zpStaticMeshRenderingComponent::onDestroy() {}
 
 void zpStaticMeshRenderingComponent::onUpdate() {
 	zpVector4f pos;
-	getParentGameObject()->getWorldTransform().getPosition( pos );
+	getParentGameObject()->getTransform().getPosition( pos );
 
 	m_boundingSphere.setCenter( pos );
 }

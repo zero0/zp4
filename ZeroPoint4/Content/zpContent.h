@@ -15,7 +15,9 @@ class zpPrefabs;
 class zpXmlSerializedInput;
 class zpXmlSerializedOutput;
 
-class zpLoadContentComponent;
+class zpWorldResource;
+class zpGameObjectResource;
+//class zpLoadContentComponent;
 
 #include "zpXmlParser.h"
 
@@ -27,7 +29,9 @@ class zpLoadContentComponent;
 #include "zpXmlSerializedInput.h"
 #include "zpXmlSerializedOutput.h"
 
-#include "zpLoadContentComponent.h"
+#include "zpWorldResource.h"
+#include "zpGameObjectResource.h"
+//#include "zpLoadContentComponent.h"
 
 void zpContentRegisterSerializables();
 

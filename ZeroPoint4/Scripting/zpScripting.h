@@ -18,6 +18,8 @@ class zpScriptingComponent;
 #include "zpScriptingManager.h"
 #include "zpScriptingComponent.h"
 
+typedef zpPooledObject<zpScriptingComponent, 128> zpScriptingComponentPool;
+
 void zpScriptingRegisterSerializables();
 
 #endif

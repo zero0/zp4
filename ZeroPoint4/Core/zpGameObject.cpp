@@ -2,278 +2,125 @@
 #include <typeinfo>
 
 zpGameObject::zpGameObject()
-	: m_isEnabled( true )
-	, m_isCreated( false )
-	, m_referenceCount( 1 )
-	, m_isMarkedForAutoDelete( false )
-	, m_parentGameObject( ZP_NULL )
+	: m_flags( 0 )
 	, m_world( ZP_NULL )
-	, m_children()
-	, m_components()
+	, m_components()	
+	, m_transform()
 	, m_name()
-	, m_localTransform()
-	, m_worldTransform()
 {}
-zpGameObject::~zpGameObject() {
+zpGameObject::~zpGameObject()
+{
 	destroy();
 }
 
-void zpGameObject::setParentGameObject( zpGameObject* go ) {
-	if( go == this ) return;
-	if( go ) go->addReference();
-	if( m_parentGameObject ) m_parentGameObject->removeReference();
-	m_parentGameObject = go;
-	
-	setWorld( m_parentGameObject ? m_parentGameObject->getWorld() : ZP_NULL );
-}
-zpGameObject* zpGameObject::getParentGameObject() const {
-	return m_parentGameObject;
-}
-
-void zpGameObject::addChildGameObject( zpGameObject* go ) {
-	if( go && go != this ) {
-		m_children.pushBack( go );
-		go->setParentGameObject( this );
-		go->addReference();
-	}
-}
-void zpGameObject::removeChildGameObject( zpGameObject* go ) {
-	if( go && go != this ) {
-		m_children.remove( go );
-		go->setParentGameObject( ZP_NULL );
-		go->removeReference();
-	}
-}
-
-void zpGameObject::addComponent( zpComponent* goc ) {
-	if( goc ) {
-		m_components.pushBack( goc );
-		goc->setParentGameObject( this );
-		goc->addReference();
-	}
-}
-void zpGameObject::removeComponent( zpComponent* goc ) {
-	if( goc ) {
-		m_components.remove( goc );
-		goc->setParentGameObject( ZP_NULL );
-		goc->removeReference();
-	}
-}
-
-void zpGameObject::setEnabled( zp_bool enabled ) {
-	if( m_isEnabled == enabled ) return;
-	m_isEnabled = enabled;
-
-	m_components.foreach( [ enabled ]( zpComponent* goc ) {
-		goc->setEnabled( enabled );
-	} );
-
-	m_children.foreach( [ enabled ]( zpGameObject* goc ) {
-		goc->setEnabled( enabled );
-	});
-}
-zp_bool zpGameObject::isEnabled() const {
-	return m_isEnabled;
-}
-
-void zpGameObject::setWorld( zpWorld* world ) {
-	if( world ) world->addReference();
-	if( m_world ) m_world->removeReference();
-	m_world = world;
-}
-zpWorld* zpGameObject::getWorld() const {
-	return m_world;
-}
-
-void zpGameObject::update() {
-	if( m_isEnabled && m_isCreated ) {
-		if( m_parentGameObject ) {
-			m_localTransform.mul( m_parentGameObject->getWorldTransform(), m_worldTransform );
-		}
-
-		m_components.foreach( []( zpComponent* goc ) {
-			goc->update();
-		} );
-
-		m_children.foreach( []( zpGameObject* go ) {
-			go->update();
-		} );
-	}
-}
-void zpGameObject::simulate() {
-	if( m_isEnabled && m_isCreated ) {
-		m_components.foreach( []( zpComponent* goc ) {
-			goc->simulate();
-		} );
-
-		m_children.foreach( []( zpGameObject* go ) {
-			go->simulate();
-		} );
-	}
-}
-
-void zpGameObject::create() {
-	if( m_isCreated ) return;
-	m_isCreated = true;
-
-	m_components.foreach( []( zpComponent* goc ) {
-		goc->create();
-	} );
-	
-	m_children.foreach( []( zpGameObject* go ) {
-		go->create();
-	} );
-}
-void zpGameObject::destroy() {
-	if( !m_isCreated ) return;
-	m_isCreated = false;
-
-	m_components.foreach( []( zpComponent* goc ) {
-		goc->destroy();
-	} );
-
-	m_children.foreach( []( zpGameObject* go ) {
-		go->destroy();
-	} );
-}
-
-const zpIntrusiveList<zpGameObject>* zpGameObject::getChildGameObjects() const {
-	return &m_children;
-}
-const zpIntrusiveList<zpComponent>* zpGameObject::getComponents() const {
+zpAllComponents* zpGameObject::getComponents()
+{
 	return &m_components;
 }
 
-const zpString& zpGameObject::getName() const {
+void zpGameObject::setFlag( zpGameObjectFlag flag )
+{
+	m_flags.mark( (zp_uint)flag );
+}
+
+void zpGameObject::unsetFlag( zpGameObjectFlag flag )
+{
+	m_flags.unmark( (zp_uint)flag );
+}
+
+zp_bool zpGameObject::isFlagSet( zpGameObjectFlag flag ) const
+{
+	return m_flags.isMarked( (zp_uint)flag );
+}
+
+void zpGameObject::setWorld( zpWorld* world )
+{
+	//if( world ) world->addReference();
+	//if( m_world ) m_world->removeReference();
+	m_world = world;
+}
+zpWorld* zpGameObject::getWorld() const
+{
+	return m_world;
+}
+
+void zpGameObject::update()
+{
+	
+}
+void zpGameObject::simulate()
+{
+	
+}
+
+void zpGameObject::create()
+{
+	
+}
+void zpGameObject::destroy()
+{
+	
+}
+
+const zpString& zpGameObject::getName() const
+{
 	return m_name;
 }
-void zpGameObject::setName( const zpString& name ) {
+void zpGameObject::setName( const zpString& name )
+{
 	m_name = name;
 }
 
-const zpMatrix4f& zpGameObject::getLocalTransform() const {
-	return m_localTransform;
-}
-const zpMatrix4f& zpGameObject::getWorldTransform() const {
-	return m_worldTransform;
-}
-void zpGameObject::setLocalTransform( const zpMatrix4f& transform ) {
-	m_localTransform = transform;
-	if( !m_parentGameObject ) {
-		m_worldTransform = m_localTransform;
-	}
+const zpMatrix4f& zpGameObject::getTransform() const
+{
+	return m_transform;
 }
 
-zpComponent* zpGameObject::getComponent_T( const void* type ) {
-	const std::type_info& info = *(const std::type_info*)type;
-	
-	zpComponent* component = m_components.findFirstIf( [ &info ]( const zpComponent* component ) {
-		return typeid( component ) == info;
-	});
 
-	return component;
+void zpGameObject::setTransform( const zpMatrix4f& transform )
+{
+	m_transform = transform;
 }
 
-void zpGameObject::receiveMessage( const zpMessage& message ) {
+void zpGameObject::receiveMessage( const zpMessage& message )
+{
 	sendMessageToComponents( message );
 	sendMessageToChildGameObjects( message );
 }
-void zpGameObject::sendMessageToComponents( const zpMessage& message ) {
-	m_components.foreach( [ &message ]( zpComponent* goc ) {
-		goc->receiveMessage( message );
-	} );
+void zpGameObject::sendMessageToComponents( const zpMessage& message )
+{
+	
 }
-void zpGameObject::sendMessageToChildGameObjects( const zpMessage& message ) {
-	m_children.foreach( [ &message ]( zpGameObject* go ) {
-		go->receiveMessage( message );
-	} );
+void zpGameObject::sendMessageToChildGameObjects( const zpMessage& message )
+{
+	
 }
-void zpGameObject::sendMessageToParentGameObject( const zpMessage& message ) {
-	if( m_parentGameObject ) m_parentGameObject->receiveMessage( message );
+void zpGameObject::sendMessageToParentGameObject( const zpMessage& message )
+{
 }
 
-void zpGameObject::serialize( zpSerializedOutput* out ) {
+void zpGameObject::serialize( zpSerializedOutput* out )
+{
 	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
 
 	out->writeString( m_name, "@name" );
 
-	zpSerializableObject<zpMatrix4f>::serializeFromBlock( out, "Transform", m_localTransform );
+	zpSerializableObject<zpMatrix4f>::serializeFromBlock( out, "Transform", m_transform );
 
-	if( m_components.isAttached() ) {
-		out->writeBlock( "Components" );
-		{
-			out->writeBlock( "Component" );
-			m_components.foreach( [ &out ]( zpComponent* comp ) {
-				comp->serialize( out );
-			} );
-			out->endBlock();
-		}
-		out->endBlock();
-	}
-
-	if( m_children.isAttached() ) {
-		out->writeBlock( "Children" );
-		{
-			out->writeBlock( "Child" );
-			m_children.foreach( [ &out ]( zpGameObject* go ) {
-				go->serialize( out );
-			} );
-			out->endBlock();
-		}
-		out->endBlock();
-	}
+	m_components.serialize( out );
 
 	out->endBlock();
 }
-void zpGameObject::deserialize( zpSerializedInput* in ) {
-	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
-
-	in->readString( &m_name, "@name" );
-
-	zpSerializableObject<zpMatrix4f>::deserializeToBlock( in, "Transform", m_localTransform );
-
-	if( in->readBlock( "Components" ) )
+void zpGameObject::deserialize( zpSerializedInput* in )
+{
+	if( in->readBlock( ZP_SERIALIZE_TYPE_THIS ) )
 	{
-		in->readEachBlock( "Component", [ this ]( zpSerializedInput* in ) {
-			zpSerializable* comp = ZP_NULL;
-			in->readSerializable( &comp );
-			if( comp ) addComponent( (zpComponent*)comp );
-		} );
+		in->readString( &m_name, "@name" );
+
+		zpSerializableObject<zpMatrix4f>::deserializeToBlock( in, "Transform", m_transform );
+
+		m_components.deserialize( in );
+
 		in->endBlock();
 	}
-
-	if( in->readBlock( "Children" ) )
-	{
-		in->readEachBlock( "Child", [ this ]( zpSerializedInput* in ) {
-			zpSerializable* go = ZP_NULL;
-			in->readSerializable( &go );
-			if( go ) addChildGameObject( (zpGameObject*)go );
-		} );
-		in->endBlock();
-	}
-	
-	in->endBlock();
-}
-
-void zpGameObject::addReference() const {
-	++m_referenceCount;
-}
-zp_bool zpGameObject::removeReference() const {
-	--m_referenceCount;
-	if( m_referenceCount == 0 ) {
-		if( m_isMarkedForAutoDelete ) delete this;
-		return true;
-	}
-	return false;
-}
-
-zp_uint zpGameObject::getReferenceCount() const {
-	return m_referenceCount;
-}
-
-void zpGameObject::markForAutoDelete( zp_bool marked ) const {
-	m_isMarkedForAutoDelete = marked;
-}
-zp_bool zpGameObject::isMarkedForAutoDelete() const {
-	return m_isMarkedForAutoDelete;
 }

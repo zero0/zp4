@@ -355,6 +355,11 @@ class zpDeferredRenderingComponent;
 
 #include "zpDeferredRenderingComponent.h"
 
+typedef zpPooledObject<zpUIRenderingComponent, 32> zpUIRenderingComponentPool;
+typedef zpPooledObject<zpCameraComponent, 32> zpCameraComponentPool;
+typedef zpPooledObject<zpLightComponent, 128> zpLightComponentPool;
+typedef zpPooledObject<zpStaticMeshRenderingComponent, 128> zpStaticMeshRenderingComponentPool;
+
 void zpRenderingRegisterSerializables();
 
 #endif

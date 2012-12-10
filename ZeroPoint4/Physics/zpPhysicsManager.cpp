@@ -69,61 +69,62 @@ void zpPhysicsManager::serialize( zpSerializedOutput* out ) {
 	out->endBlock();
 }
 void zpPhysicsManager::deserialize( zpSerializedInput* in ) {
-	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
-
-	in->readFloat( &m_fixedTimeStep, "@fixed-timestep" );
-	in->readInt( &m_maxSubSteps, "@max-sub-steps" );
-
-	if( in->readBlock( "Gravity" ) )
+	if( in->readBlock( ZP_SERIALIZE_TYPE_THIS ) )
 	{
-		zpSerializableObject<zpVector4f>::deserializeTo( in, m_gravity );
+		in->readFloat( &m_fixedTimeStep, "@fixed-timestep" );
+		in->readInt( &m_maxSubSteps, "@max-sub-steps" );
+
+		if( in->readBlock( "Gravity" ) )
+		{
+			zpSerializableObject<zpVector4f>::deserializeTo( in, m_gravity );
+			in->endBlock();
+		}
+
+		if( in->readBlock( "CollisionGroups" ) )
+		{
+			zpString groupName;	
+			in->readEachBlock( "CollisionGroup", [ this, &groupName ]( zpSerializedInput* in ) {
+				in->readString( &groupName, "@name" );
+
+				m_collisionGroups.pushBack( groupName );
+			} );
+			in->endBlock();
+		}
+
+		if( in->readBlock( "CollisionMasks" ) )
+		{
+			zpString maskText;
+			zpString maskName;
+			in->readEachBlock( "CollisionMask", [ this, &maskText, &maskName ]( zpSerializedInput* in ) {
+				in->readString( &maskName, "@name" );
+				in->readString( &maskText, "@mask" );
+
+				zp_short mask = 0;
+				zp_uint start = 0;
+				zp_uint end = maskText.indexOf( '|' );
+				do {
+					zp_short group;
+					if( end == zpString::npos ) {
+						group = getCollisionGroup( maskText.substring( start ) );
+					} else {
+						group = getCollisionGroup( maskText.substring( start, end ) );
+					}
+					mask |= group;
+
+					start = end;
+					if( start != zpString::npos ) {
+						end = maskText.indexOf( '|', start );
+					}
+
+				} while( end != zpString::npos );
+
+				m_collisionMasks[ maskName ] = mask;
+			} );
+			in->endBlock();
+		}
+
+		in->endBlock();
 	}
-	in->endBlock();
-
-	if( in->readBlock( "CollisionGroups" ) )
-	{
-		zpString groupName;	
-		in->readEachBlock( "CollisionGroup", [ this, &groupName ]( zpSerializedInput* in ) {
-			in->readString( &groupName, "@name" );
-
-			m_collisionGroups.pushBack( groupName );
-		} );
-	}
-	in->endBlock();
-
-	if( in->readBlock( "CollisionMasks" ) )
-	{
-		zpString maskText;
-		zpString maskName;
-		in->readEachBlock( "CollisionMask", [ this, &maskText, &maskName ]( zpSerializedInput* in ) {
-			in->readString( &maskName, "@name" );
-			in->readString( &maskText, "@mask" );
-
-			zp_short mask = 0;
-			zp_uint start = 0;
-			zp_uint end = maskText.indexOf( '|' );
-			do {
-				zp_short group;
-				if( end == zpString::npos ) {
-					group = getCollisionGroup( maskText.substring( start ) );
-				} else {
-					group = getCollisionGroup( maskText.substring( start, end ) );
-				}
-				mask |= group;
-
-				start = end;
-				if( start != zpString::npos ) {
-					end = maskText.indexOf( '|', start );
-				}
-				
-			} while( end != zpString::npos );
-
-			m_collisionMasks[ maskName ] = mask;
-		} );
-	}
-	in->endBlock();
-
-	in->endBlock();
 }
 
 void zpPhysicsManager::receiveMessage( const zpMessage& message ) {}

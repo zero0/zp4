@@ -39,7 +39,7 @@ const zpString& zpTextRenderingComponent::getText() const {
 
 void zpTextRenderingComponent::onCreate() {
 	m_buffer.create( 256 * 4, 256 * 6 );
-	zpContentManager* content = getGameManagerOfType<zpContentManager>();
+	zpContentManager* content = getGame()->getGameManagers()->getContentManager();
 
 	m_font = content->createInstanceOfResource<zpFontResource>( m_fontAlias );
 	m_shader = content->createInstanceOfResource<zpShaderResource>( m_shaderAlias );
@@ -66,7 +66,7 @@ void zpTextRenderingComponent::onUpdate() {
 		zpVector4f position;
 		if( m_isLocalToGameObject ) {
 			zpMatrix4f transform;
-			m_localTransform.mul( getParentGameObject()->getWorldTransform(), transform );
+			m_localTransform.mul( getParentGameObject()->getTransform(), transform );
 			transform.getPosition( position );
 		} else {
 			m_localTransform.getPosition( position );

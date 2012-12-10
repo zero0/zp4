@@ -31,11 +31,13 @@ public:
 	void pushBack( const T* arr, zp_uint count );
 	template<zp_uint Count>
 	void pushBack( const T (&arr)[Count] );
+	T& pushBackEmpty();
 
 	void pushFront( const T& val );
 	void pushFront( const T* arr, zp_uint count );
 	template<zp_uint Count>
 	void pushFront( const T (&arr)[Count] );
+	T& pushFrontEmpty();
 
 	void popBack( zp_uint numToPop = 1 );
 	void popFront( zp_uint numToPop = 1 );

@@ -2,32 +2,25 @@
 #ifndef ZP_GAME_OBJECT_H
 #define ZP_GAME_OBJECT_H
 
-class zpGameObject : 
-	public zpIntrusiveListNode<zpGameObject>, 
-	public zpReferencedObject, 
-	public zpMessageReceiver,
-	public zpSerializable
+enum zpGameObjectFlag
+{
+	ZP_GAME_OBJECT_FLAG_ENABLED,
+	ZP_GAME_OBJECT_FLAG_CREATED,
+
+	ZP_GAME_OBJECT_FLAG_SHOULD_DESTROY,
+};
+
+class zpGameObject : public zpMessageReceiver, public zpSerializable
 {
 public:
-	/*
-	void* operator new( zp_uint size );
-	void* operator new[]( zp_uint size );
-	void operator delete( void* ptr );
-	*/
 	zpGameObject();
 	virtual ~zpGameObject();
 
-	void setParentGameObject( zpGameObject* go );
-	zpGameObject* getParentGameObject() const;
+	zpAllComponents* getComponents();
 
-	void addChildGameObject( zpGameObject* go );
-	void removeChildGameObject( zpGameObject* go );
-
-	void addComponent( zpComponent* goc );
-	void removeComponent( zpComponent* goc );
-
-	void setEnabled( zp_bool enabled );
-	zp_bool isEnabled() const;
+	void setFlag( zpGameObjectFlag flag );
+	void unsetFlag( zpGameObjectFlag flag );
+	zp_bool isFlagSet( zpGameObjectFlag flag ) const;
 
 	void setWorld( zpWorld* world );
 	zpWorld* getWorld() const;
@@ -38,26 +31,11 @@ public:
 	void create();
 	void destroy();
 
-	const zpIntrusiveList<zpGameObject>* getChildGameObjects() const;
-	const zpIntrusiveList<zpComponent>* getComponents() const;
-
-	const zpGameObject* getChildGameObjectByName( const zpString& name ) const;
-	zpGameObject* getChildGameObjectByName( const zpString& name );
-
-	const zpComponent* getComponentByName( const zpString& name ) const;
-	zpComponent* getComponentByName( const zpString& name );
-
-	template<typename T>
-	const T* getComponentOfType() const { return (const T*)getComponent_T( &typeid( T ) ); }
-	template<typename T>
-	T* getComponentOfType() { return (T*)getComponent_T( &typeid( T ) ); }
-
 	const zpString& getName() const;
 	void setName( const zpString& name );
 
-	const zpMatrix4f& getLocalTransform() const;
-	const zpMatrix4f& getWorldTransform() const;
-	void setLocalTransform( const zpMatrix4f& transform );
+	const zpMatrix4f& getTransform() const;
+	void setTransform( const zpMatrix4f& transform );
 
 	void receiveMessage( const zpMessage& message );
 	void sendMessageToComponents( const zpMessage& message );
@@ -67,34 +45,14 @@ public:
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
-	void addReference() const;
-	zp_bool removeReference() const;
-
-	zp_uint getReferenceCount() const;
-
-	void markForAutoDelete( zp_bool marked ) const;
-	zp_bool isMarkedForAutoDelete() const;
-
 private:
-	zpComponent* getComponent_T( const void* type );
-
-	zp_bool m_isEnabled;
-	zp_bool m_isCreated;
-
-	struct {
-		mutable zp_uint m_referenceCount : 31;
-		mutable zp_bool m_isMarkedForAutoDelete : 1;
-	};
-
-	zpGameObject* m_parentGameObject;
+	zpFlag8 m_flags;
 	zpWorld* m_world;
 
-	zpIntrusiveList<zpGameObject> m_children;
-	zpIntrusiveList<zpComponent> m_components;
-
+	zpAllComponents m_components;
+	zpMatrix4f m_transform;
+	
 	zpString m_name;
-	zpMatrix4f m_localTransform;
-	zpMatrix4f m_worldTransform;
 };
 
 #endif

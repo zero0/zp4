@@ -94,7 +94,7 @@ void zpUIRenderingComponent::serialize( zpSerializedOutput* out ) {}
 void zpUIRenderingComponent::deserialize( zpSerializedInput* in ) {}
 
 void zpUIRenderingComponent::onCreate() {
-	zpContentManager* content = getGameManagerOfType<zpContentManager>();
+	zpContentManager* content = getGame()->getGameManagers()->getContentManager();
 
 	m_ui = content->createInstanceOfResource<zpUIResource>( m_uiAlias );
 

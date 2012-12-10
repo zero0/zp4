@@ -3,28 +3,25 @@
 zpWorld::zpWorld() :
 	m_isEnabled( true ),
 	m_isCreated( false ),
-	m_referenceCount( 1 ),
-	m_isMarkedForAutoDelete( false ),
-	m_root( ZP_NULL ),
 	m_game( ZP_NULL )
 {}
 zpWorld::~zpWorld() {}
 
-void zpWorld::setRootGameObject( zpGameObject* root ) {
-	if( root ) root->addReference();
-	if( m_root ) m_root->removeReference();
-	m_root = root;
-	if( m_root ) m_root->setWorld( this );
-}
-zpGameObject* zpWorld::getRootGameObject() const {
-	return m_root;
-}
-
 void zpWorld::update() {
-	if( m_isEnabled && m_root ) m_root->update();
+	if( m_isEnabled )
+	{
+		m_gameObjects.foreach( []( zpGameObject* go ) {
+			go->update();
+		} );
+	}
 }
 void zpWorld::simulate() {
-	if( m_isEnabled && m_root ) m_root->simulate();
+	if( m_isEnabled )
+	{
+		m_gameObjects.foreach( []( zpGameObject* go ) {
+			go->simulate();
+		} );
+	}
 }
 
 
@@ -32,13 +29,17 @@ void zpWorld::create() {
 	if( m_isCreated ) return;
 	m_isCreated = true;
 
-	if( m_root ) m_root->create();
+	m_gameObjects.foreach( []( zpGameObject* go ) {
+		go->create();
+	} );
 }
 void zpWorld::destroy() {
 	if( !m_isCreated ) return;
 	m_isCreated = false;
 
-	if( m_root ) m_root->destroy();
+	m_gameObjects.foreach( []( zpGameObject* go ) {
+		go->destroy();
+	} );
 }
 
 zp_bool zpWorld::isCreated() const {
@@ -67,49 +68,35 @@ zpGame* zpWorld::getGame() const {
 }
 
 void zpWorld::receiveMessage( const zpMessage& message ) {
-	if( m_root ) m_root->receiveMessage( message );
+	//if( m_root ) m_root->receiveMessage( message );
 }
 
-void zpWorld::serialize( zpSerializedOutput* out ) {
+void zpWorld::serialize( zpSerializedOutput* out )
+{
 	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
 
 	out->writeString( m_name, "@name" );
 
-	out->writeSerializable( m_root );
+	//out->writeSerializable( m_root );
 
 	out->endBlock();
 }
-void zpWorld::deserialize( zpSerializedInput* in ) {
-	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+void zpWorld::deserialize( zpSerializedInput* in )
+{
+	if( in->readBlock( ZP_SERIALIZE_TYPE_THIS ) )
+	{
+		in->readString( &m_name, "@name" );
 
-	in->readString( &m_name, "@name" );
+		in->readEachBlock( "GameObject", [ this ]( zpSerializedInput* in ) {
+			zpString goFile;
+			in->readString( &goFile, "@file" );
 
-	zpSerializable* root = ZP_NULL;
-	in->readSerializable( &root );
-	if( root ) setRootGameObject( (zpGameObject*)root );
+			zpMatrix4f transform;
+			zpSerializableObject<zpMatrix4f>::deserializeToBlock( in, "Transform", transform );
 
-	in->endBlock();
-}
 
-void zpWorld::addReference() const {
-	++m_referenceCount;
-}
-zp_bool zpWorld::removeReference() const {
-	--m_referenceCount;
-	if( m_referenceCount == 0 ) {
-		if( m_isMarkedForAutoDelete ) delete this;
-		return true;
+		} );
+
+		in->endBlock();
 	}
-	return false;
-}
-
-zp_uint zpWorld::getReferenceCount() const {
-	return m_referenceCount;
-}
-
-void zpWorld::markForAutoDelete( zp_bool marked ) const {
-	m_isMarkedForAutoDelete = marked;
-}
-zp_bool zpWorld::isMarkedForAutoDelete() const {
-	return m_isMarkedForAutoDelete;
 }

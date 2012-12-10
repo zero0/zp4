@@ -36,6 +36,9 @@
     <ClInclude Include="zpAudioEmitterComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpAudioListenerComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpAudio.cpp">
@@ -59,5 +62,16 @@
     <ClCompile Include="zpAudioEmitterComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpAudioListenerComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpAudioComponents.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpAudioManagers.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

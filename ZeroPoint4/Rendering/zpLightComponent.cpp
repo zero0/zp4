@@ -47,7 +47,7 @@ void zpLightComponent::setPosition( const zpVector4f& position ) {
 
 	if( m_isLocalToGameObject ) {
 		zpVector4f worldPosition;
-		getParentGameObject()->getWorldTransform().getPosition( worldPosition );
+		getParentGameObject()->getTransform().getPosition( worldPosition );
 
 		m_lightData.position.add4( worldPosition );
 	}

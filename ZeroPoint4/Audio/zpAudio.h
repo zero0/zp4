@@ -24,12 +24,17 @@ class zpAudioResourceCreator;
 class zpAudioResource;
 template<> class zpResourceInstance<zpAudioResource>;
 class zpAudioEmitterComponent;
+class zpAudioListenerComponent;
 
 #include "zpAudioManager.h"
 #include "zpAudioResourceCreator.h"
 #include "zpAudioResource.h"
 #include "zpAudioInstance.h"
 #include "zpAudioEmitterComponent.h"
+#include "zpAudioListenerComponent.h"
+
+typedef zpPooledObject<zpAudioEmitterComponent, 64> zpAudioEmitterComponentPool;
+typedef zpPooledObject<zpAudioListenerComponent, 8> zpAudioListenerComponentPool;
 
 void zpAudioRegisterSerializables();
 

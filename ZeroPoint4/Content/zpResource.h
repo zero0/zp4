@@ -106,6 +106,23 @@ private:	\
 	T* m_resource;	\
 	friend class zpContentManager;
 
+#define ZP_RESOURCE_INSTANCE_TEMPLATE_START_KDC( T, Construct, Deconstruct, Copy )	\
+	template<>	\
+class zpResourceInstance<T> {	\
+public:	\
+	zpResourceInstance() : m_resource( ZP_NULL ) { Construct(); }\
+	zpResourceInstance( T* resource ) : m_resource( resource ) { Construct(); }\
+	zpResourceInstance( const zpResourceInstance<T>& instance )	: m_resource( instance.m_resource ) { Copy( instance ); }\
+	zpResourceInstance( zpResourceInstance<T>&& instance ) : m_resource( instance.m_resource ) { Copy( instance ); instance.m_resource = ZP_NULL; }\
+	~zpResourceInstance() { Deconstruct(); m_resource = ZP_NULL; }\
+	void operator=( const zpResourceInstance<T>& instance )	{ m_resource = instance.m_resource; Copy( instance ); }\
+	void operator=( zpResourceInstance<T>&& instance ) { m_resource = instance.m_resource; Copy( instance ); instance.m_resource = ZP_NULL; }\
+	operator zp_bool() const { return m_resource && m_resource->isLoaded(); }\
+	T* getResource() const { return m_resource;	}\
+private:	\
+	T* m_resource;	\
+	friend class zpContentManager;
+
 #define ZP_RESOURCE_INSTANCE_TEMPLATE_END	};
 
 #endif

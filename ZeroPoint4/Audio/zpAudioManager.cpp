@@ -61,12 +61,28 @@ zp_bool zpAudioManager::isPaused( zpAudioChannelGroup channel ) const {
 
 void zpAudioManager::setNumListeners( zp_uint numListeners ) {
 	m_numListeners = numListeners;
+	zpFMOD::getInstance()->set3DNumListeners( m_numListeners );
 }
 zp_uint zpAudioManager::getNumListeners() const {
 	return m_numListeners;
 }
 
-//void zpAudioManager::play( zpAudioInstance* soundInstance ) {
+void zpAudioManager::set3DSettings( zp_float dopperScale, zp_float distanceFactor, zp_float rolloffScale ) {
+	zpFMOD::getInstance()->set3DSettings( dopperScale, distanceFactor, rolloffScale );
+}
+void zpAudioManager::set3DListener( zp_uint listener, const zpVector4f& position, const zpVector4f& velocity, const zpVector4f& forward, const zpVector4f& up ) {
+	FMOD_VECTOR p;
+	FMOD_VECTOR v;
+	FMOD_VECTOR f;
+	FMOD_VECTOR u;
+	position.store3( (zp_float*)&p );
+	velocity.store3( (zp_float*)&v );
+	forward.store3( (zp_float*)&f );
+	up.store3( (zp_float*)&u );
+	
+	zpFMOD::getInstance()->set3DListenerAttributes( listener, &p, &v, &f, &u );
+}
+
 void zpAudioManager::play( zpResourceInstance<zpAudioResource>* soundInstance ) {
 	if( !soundInstance ) return;
 	FMOD_RESULT r;

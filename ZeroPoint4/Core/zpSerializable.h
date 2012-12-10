@@ -12,6 +12,9 @@ const zp_char* zp_serialize_type( const T* ) {
 #define ZP_SERIALIZE_TYPE_THIS		( zp_serialize_type( this ) )
 #define ZP_SERIALIZE_TYPE( t )		( zp_serialize_type<t>( ZP_NULL ) )
 
+#define ZP_SERIALIZE_POOLED_OBJECT( cmp ) zpSerializable* seriaize##cmp() { return zp##cmp##Pool::getInstance()->aquire(); }
+#define ZP_REGISTER_SERIALZED_POOL( cmp ) zpRegisterSerializable::registerSerializable<zp##cmp>( seriaize##cmp )
+
 ZP_PURE_INTERFACE zpSerializable;
 
 ZP_PURE_INTERFACE zpSerializedInput {

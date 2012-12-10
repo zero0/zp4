@@ -2,14 +2,15 @@
 #ifndef ZP_COMPONENT_H
 #define ZP_COMPONENT_H
 
-class zpWorld;
-class zpGame;
+enum zpComponentFlag
+{
+	ZP_COMPONENT_FLAG_ENABLED,
+	ZP_COMPONENT_FLAG_CREATED,
+	ZP_COMPONENT_FLAG_DESTROYED,
+	ZP_COMPONENT_FLAG_SHOULD_DESTROY
+};
 
-ZP_ABSTRACT_CLASS zpComponent : 
-	public zpIntrusiveListNode<zpComponent>,
-	public zpReferencedObject, 
-	public zpMessageReceiver,
-	public zpSerializable
+ZP_ABSTRACT_CLASS zpComponent : public zpMessageReceiver, public zpSerializable
 {
 public:
 	zpComponent();
@@ -28,27 +29,11 @@ public:
 	void create();
 	void destroy();
 
-	const zpString& getName() const;
-	void setName( const zpString& name );
-
 	void sendMessageToParentGameObject( const zpMessage& message );
 	void sendMessageToSiblingComponents( const zpMessage& message );
 
 	zpWorld* getWorld() const;
 	zpGame* getGame() const;
-
-	template<typename T>
-	T* getGameManagerOfType() const {
-		return getGame()->getGameManagerOfType<T>();
-	}
-
-	void addReference() const;
-	zp_bool removeReference() const;
-
-	zp_uint getReferenceCount() const;
-
-	void markForAutoDelete( zp_bool marked ) const;
-	zp_bool isMarkedForAutoDelete() const;
 
 protected:
 	virtual void onCreate() = 0;
@@ -61,17 +46,9 @@ protected:
 	virtual void onDisabled() = 0;
 
 private:
-	zp_bool m_isEnabled;
-	zp_bool m_isCreated;
-
-	struct {
-		mutable zp_uint m_referenceCount : 31;
-		mutable zp_bool m_isMarkedForAutoDelete : 1;
-	};
+	zpFlag8 m_flags;
 
 	zpGameObject* m_parentGameObject;
-
-	zpString m_name;
 };
 
 #endif

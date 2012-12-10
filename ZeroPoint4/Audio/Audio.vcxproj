@@ -79,6 +79,7 @@
     <ClInclude Include="zpAudio.h" />
     <ClInclude Include="zpAudioEmitterComponent.h" />
     <ClInclude Include="zpAudioInstance.h" />
+    <ClInclude Include="zpAudioListenerComponent.h" />
     <ClInclude Include="zpAudioManager.h" />
     <ClInclude Include="zpAudioResource.h" />
     <ClInclude Include="zpAudioResourceCreator.h" />
@@ -91,6 +92,7 @@
     </ClCompile>
     <ClCompile Include="zpAudioEmitterComponent.cpp" />
     <ClCompile Include="zpAudioInstance.cpp" />
+    <ClCompile Include="zpAudioListenerComponent.cpp" />
     <ClCompile Include="zpAudioManager.cpp" />
     <ClCompile Include="zpAudioResource.cpp" />
     <ClCompile Include="zpAudioResourceCreator.cpp" />
@@ -103,6 +105,10 @@
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpAudioComponents.inl" />
+    <None Include="zpAudioManagers.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,9 +14,10 @@ void zpRenderingManager::serialize( zpSerializedOutput* out ) {
 	out->endBlock();
 }
 void zpRenderingManager::deserialize( zpSerializedInput* in ) {
-	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
-
-	in->endBlock();
+	if( in->readBlock( ZP_SERIALIZE_TYPE_THIS ) )
+	{
+		in->endBlock();
+	}
 }
 
 zpRenderingEngine* zpRenderingManager::getRenderingEngine() const {
@@ -33,7 +34,6 @@ zp_bool zpRenderingManager::addRenderingComponent( zpRenderingComponent* compone
 
 	for( zp_uint i = ZP_RENDERING_LAYER_Count; i --> 0; ) {
 		if( layers.isMarked( i ) ) {
-			component->addReference();
 			m_renderingComponents[ i ].pushBack( component );
 		}
 	}
@@ -52,10 +52,6 @@ zp_bool zpRenderingManager::removeRenderingComponent( zpRenderingComponent* comp
 			zpRenderingComponent* found = ZP_NULL;
 			zp_uint count = m_renderingComponents[ i ].removeAll( component );
 			numRemoved += count;
-
-			for( ; count --> 0; ) {
-				component->removeReference();
-			}
 		}
 	}
 
@@ -66,14 +62,12 @@ zp_bool zpRenderingManager::addLightComponent( zpLightComponent* light ) {
 	if( !light ) return false;
 
 	m_lightComponents.pushBack( light );
-	light->addReference();
 	return true;
 }
 zp_bool zpRenderingManager::removeLightComponent( zpLightComponent* light ) {
 	if( !light ) return false;
 
 	zp_uint numRemoved = m_lightComponents.removeAll( light );
-	light->removeReference();
 
 	return numRemoved > 0;
 }

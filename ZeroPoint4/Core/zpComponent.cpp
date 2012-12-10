@@ -1,29 +1,27 @@
 #include "zpCore.h"
 
-zpComponent::zpComponent() :
-	m_parentGameObject( ZP_NULL ),
-	m_isEnabled( true ),
-	m_isCreated( false ),
-	m_referenceCount( 1 ),
-	m_isMarkedForAutoDelete( false ),
-	m_name()
+zpComponent::zpComponent()
+	: m_flags( 0 )
+	, m_parentGameObject( ZP_NULL )
 {}
-zpComponent::~zpComponent() {
+zpComponent::~zpComponent()
+{
 	destroy();
 }
 
-void zpComponent::setParentGameObject( zpGameObject* parent ) {
-	if( parent ) parent->addReference();
-	if( m_parentGameObject ) m_parentGameObject->removeReference();
+void zpComponent::setParentGameObject( zpGameObject* parent )
+{
 	m_parentGameObject = parent;
 }
-zpGameObject* zpComponent::getParentGameObject() const {
+zpGameObject* zpComponent::getParentGameObject() const
+{
 	return m_parentGameObject;
 }
 
-void zpComponent::setEnabled( zp_bool enabled ) {
-	bool wasEnabled = m_isEnabled;
-	m_isEnabled = enabled;
+void zpComponent::setEnabled( zp_bool enabled )
+{
+	bool wasEnabled = m_flags.isMarked( ZP_COMPONENT_FLAG_ENABLED );
+	m_flags.setMarked( ZP_COMPONENT_FLAG_ENABLED, enabled );
 
 	if( wasEnabled && !enabled ) {
 		onDisabled();
@@ -31,74 +29,54 @@ void zpComponent::setEnabled( zp_bool enabled ) {
 		onEnabled();
 	}
 }
-zp_bool zpComponent::isEnabled() const {
-	return m_isEnabled;
+zp_bool zpComponent::isEnabled() const
+{
+	return m_flags.isMarked( ZP_COMPONENT_FLAG_ENABLED );
 }
-zp_bool zpComponent::isCreated() const {
-	return m_isCreated;
-}
-
-void zpComponent::update() {
-	if( m_isEnabled && m_isCreated ) onUpdate();
-}
-void zpComponent::simulate() {
-	if( m_isEnabled && m_isCreated ) onSimulate();
+zp_bool zpComponent::isCreated() const
+{
+	return m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED );
 }
 
-void zpComponent::create() {
-	if( m_isCreated ) return;
-	m_isCreated = true;
+void zpComponent::update()
+{
+	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) ) onUpdate();
+}
+void zpComponent::simulate()
+{
+	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) ) onSimulate();
+}
+
+void zpComponent::create()
+{
+	if( m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) ) return;
+	m_flags.mark( ZP_COMPONENT_FLAG_CREATED );
 	onCreate();
 }
-void zpComponent::destroy() {
-	if( !m_isCreated ) return;
-	m_isCreated = false;
+void zpComponent::destroy()
+{
+	if( !m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) ) return;
+	m_flags.unmark( ZP_COMPONENT_FLAG_CREATED );
 	onDestroy();
 }
 
-const zpString& zpComponent::getName() const {
-	return m_name;
+void zpComponent::sendMessageToParentGameObject( const zpMessage& message )
+{
+	//m_parentGameObject->receiveMessage( message );
 }
-void zpComponent::setName( const zpString& name ) {
-	m_name = name;
-}
-
-void zpComponent::sendMessageToParentGameObject( const zpMessage& message ) {
-	m_parentGameObject->receiveMessage( message );
-}
-void zpComponent::sendMessageToSiblingComponents( const zpMessage& message ) {
-	const zpComponent* self = this;
-	m_parentGameObject->getComponents()->foreach( [ &self, &message ]( zpComponent* goc ){
-		if( goc != self ) goc->receiveMessage( message );
-	} );
+void zpComponent::sendMessageToSiblingComponents( const zpMessage& message )
+{
+	//const zpComponent* self = this;
+	//m_parentGameObject->getComponents()->foreach( [ &self, &message ]( zpComponent* goc ){
+	//	if( goc != self ) goc->receiveMessage( message );
+	//} );
 }
 
-zpWorld* zpComponent::getWorld() const {
+zpWorld* zpComponent::getWorld() const
+{
 	return m_parentGameObject->getWorld();
 }
-zpGame* zpComponent::getGame() const {
+zpGame* zpComponent::getGame() const
+{
 	return m_parentGameObject->getWorld()->getGame();
-}
-
-void zpComponent::addReference() const {
-	++m_referenceCount;
-}
-zp_bool zpComponent::removeReference() const {
-	--m_referenceCount;
-	if( m_referenceCount == 0 ) {
-		if( m_isMarkedForAutoDelete ) delete this;
-		return true;
-	}
-	return false;
-}
-
-zp_uint zpComponent::getReferenceCount() const {
-	return m_referenceCount;
-}
-
-void zpComponent::markForAutoDelete( zp_bool marked ) const {
-	m_isMarkedForAutoDelete = marked;
-}
-zp_bool zpComponent::isMarkedForAutoDelete() const {
-	return m_isMarkedForAutoDelete;
 }

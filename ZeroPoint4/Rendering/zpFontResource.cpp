@@ -128,7 +128,7 @@ zp_bool zpFontResource::load() {
 		xml.pop();
 	}
 
-	if( !getContentManager()->loadResource( m_fontSet.file, m_fontSet.file ) ) return false;
+	//if( !getContentManager()->loadResource( m_fontSet.file, m_fontSet.file ) ) return false;
 
 	m_fontTexture = getContentManager()->createInstanceOfResource<zpTextureResource>( m_fontSet.file );
 

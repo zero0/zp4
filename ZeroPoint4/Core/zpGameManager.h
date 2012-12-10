@@ -2,11 +2,13 @@
 #ifndef ZP_GAME_MANAGER_H
 #define ZP_GAME_MANAGER_H
 
-ZP_ABSTRACT_CLASS zpGameManager : 
-	public zpIntrusiveListNode<zpGameManager>, 
-	public zpReferencedObject, 
-	public zpMessageReceiver,
-	public zpSerializable
+enum zpGameManagerFlag
+{
+	ZP_GAME_MANAGER_FLAG_ENABLED,
+	ZP_GAME_MANAGER_FLAG_CREATED,
+};
+
+ZP_ABSTRACT_CLASS zpGameManager : public zpMessageReceiver, public zpSerializable
 {
 public:
 	zpGameManager();
@@ -24,14 +26,6 @@ public:
 	void setGame( zpGame* game );
 	zpGame* getGame() const;
 
-	void addReference() const;
-	zp_bool removeReference() const;
-
-	zp_uint getReferenceCount() const;
-
-	void markForAutoDelete( zp_bool marked ) const;
-	zp_bool isMarkedForAutoDelete() const;
-
 protected:
 	virtual void onCreate() = 0;
 	virtual void onDestroy() = 0;
@@ -43,15 +37,9 @@ protected:
 	virtual void onDisabled() = 0;
 
 private:
-	zp_bool m_isEnabled;
-	zp_bool m_isCreated;
+	zpFlag8 m_flags;
 
 	zpGame* m_game;
-
-	struct {
-		mutable zp_uint m_referenceCount : 31;
-		mutable zp_bool m_isMarkedForAutoDelete : 1;
-	};
 };
 
 #endif

@@ -2,11 +2,11 @@
 #ifndef ZP_MEMORY_SYSTEM_H
 #define ZP_MEMORY_SYSTEM_H
 
-void* operator new( zp_uint size );
-void* operator new[]( zp_uint size );
-
-void operator delete( void* ptr );
-void operator delete[]( void* ptr );
+//void* operator new( zp_uint size );
+//void* operator new[]( zp_uint size );
+//
+//void operator delete( void* ptr );
+//void operator delete[]( void* ptr );
 
 class zpMemorySystem {
 public:

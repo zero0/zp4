@@ -59,8 +59,8 @@ void zpEditorCameraComponent::onMouseMove( const zpVector2i& location ) {}
 void zpEditorCameraComponent::onMouseChange( const zpVector2i& delta ) {}
 
 void zpEditorCameraComponent::onCreate() {
-	m_input = getGameManagerOfType<zpInputManager>();
-	m_rendering = getGameManagerOfType<zpRenderingManager>();
+	m_input = getGame()->getGameManagers()->getInputManager();
+	m_rendering = getGame()->getGameManagers()->getRenderingManager();
 
 	m_input->getKeyboard()->addListener( this );
 	m_input->getMouse()->addListener( this );

@@ -1,5 +1,5 @@
 #include "zpContent.h"
-
+#if 0
 zpLoadContentComponent::zpLoadContentComponent()
 	: m_manager( ZP_NULL )
 	, m_isUnloadWhenDestroyed( true )
@@ -62,7 +62,7 @@ void zpLoadContentComponent::deserialize( zpSerializedInput* in ) {
 }
 
 void zpLoadContentComponent::onCreate() {
-	m_manager = getGameManagerOfType<zpContentManager>();
+	m_manager = getGame()->getGameManagers()->getContentManager();
 	
 	// if the world should be disabled while loading, disable it now
 	if( m_isWorldDisabledWhenLoading ) {
@@ -118,3 +118,4 @@ void zpLoadContentComponent::onResourcesFinishedLoading() {
 	m_manager->onResourceLoaded() -= zpCreateMemberDelegate( &zpLoadContentComponent::onResourceLoaded, this );
 	m_manager->onAllResourcesLoaded() -= zpCreateMemberDelegate( &zpLoadContentComponent::onResourcesFinishedLoading, this );
 }
+#endif

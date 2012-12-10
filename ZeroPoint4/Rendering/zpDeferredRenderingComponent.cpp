@@ -82,8 +82,8 @@ void zpDeferredRenderingComponent::deserialize( zpSerializedInput* in ) {
 }
 
 void zpDeferredRenderingComponent::onCreate() {
-	m_renderingManager = getGameManagerOfType<zpRenderingManager>();
-	m_contentManager = getGameManagerOfType<zpContentManager>();
+	m_renderingManager = getGame()->getGameManagers()->getRenderingManager();
+	m_contentManager = getGame()->getGameManagers()->getContentManager();
 	m_renderingEngine = zpRenderingFactory::getRenderingEngine();
 	
 	const zpVector2i& size = this->getGame()->getWindow()->getScreenSize();

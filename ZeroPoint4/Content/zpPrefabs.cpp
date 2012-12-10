@@ -77,9 +77,9 @@ zpSerializable* zpPrefabs::loadPrefabWithOverrides( const zpString& prefabName, 
 			resource = prefabInstance->getResource();
 		} else {
 			// load the prefab immediately so it can be used later
-			m_contentManager->loadResource( prefabFile, prefabName, true );
+			//m_contentManager->loadResource( prefabFile, prefabName, true );
 
-			m_prefabs[ prefabName ] = m_contentManager->createInstanceOfResource<zpPrefabResource>( prefabName );
+			m_prefabs[ prefabName ] = m_contentManager->createInstanceOfResource<zpPrefabResource>( prefabFile );
 			resource = m_prefabs[ prefabName ].getResource();
 		}
 
@@ -95,7 +95,6 @@ zpSerializable* zpPrefabs::loadPrefabWithOverrides( const zpString& prefabName, 
 			in.readSerializable( &serializable, ZP_NULL );
 		}
 	}
-
 
 	// return the created serializable
 	return serializable;

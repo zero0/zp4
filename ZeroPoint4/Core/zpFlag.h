@@ -21,6 +21,8 @@ public:
 	void unmark( zp_uint index ) { unmarkAll( (F)( 1 << index ) ); }
 	void unmarkAll( F mask ) { and( ~mask ); }
 
+	void setMarked( zp_uint index, zp_bool marked ) { marked ? mark( index ) : unmark( index ); }
+
 	zp_bool isMarked( zp_uint index ) const { return isAllMarked( (F)( 1 << index ) ); }
 	zp_bool isAnyMarked( F mask ) const { return ( m_flag & mask ) != 0; }
 	zp_bool isAllMarked( F mask ) const { return ( m_flag & mask ) == mask; }

@@ -10,18 +10,11 @@ public:
 	void create();
 	void destroy();
 
-	void addWorld( zpWorld* world, zp_bool andCreate = false );
-	void removeWorld( zpWorld* world );
+	void setNextWorld( zpWorld* world );
 	zpWorld* getCurrentWorld() const;
+	zpWorld* getNextWorld() const;
 
-	void setNextWorld( const zpString& worldName, zp_bool asynchCreateNextWorld = false );
-	
-	void addGameManager( zpGameManager* manager );
-	void removeGameManager( zpGameManager* manager );
-	template<typename T>
-	T* getGameManagerOfType() const {
-		return (T*)getGameManager_T( &typeid( T ) );
-	}
+	zpAllGameManagers* getGameManagers();
 
 	void setRenderable( zpRenderable* renderable );
 	zpRenderable* getRenderable() const;
@@ -50,8 +43,7 @@ private:
 	zp_long m_simulateHz;
 	zp_int m_renderMsHz;
 
-	zpIntrusiveList<zpWorld> m_worlds;
-	zpIntrusiveList<zpGameManager> m_managers;
+	zpAllGameManagers m_managers;
 };
 
 #endif

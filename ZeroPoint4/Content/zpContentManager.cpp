@@ -6,12 +6,13 @@ zpContentManager::zpContentManager()
 	, m_assetsFolder( "Assets/" )
 	, m_rootDirectory( "./" )
 {}
-zpContentManager::~zpContentManager() {}
+zpContentManager::~zpContentManager()
+{}
 	
 void zpContentManager::registerFileExtension( const zpString& extension, zpResourceCreator* creator ) {
 	m_creators.put( extension, creator );
 }
-	
+#if 0	
 zp_bool zpContentManager::loadResource( const zpString& filename, const zpString& alias, zp_bool immediateLoad ) {
 	zpString extension = filename.substring( filename.lastIndexOf( '.' ) + 1 );
 	extension.toLower();
@@ -87,11 +88,11 @@ void zpContentManager::unloadAllResources() {
 		}
 	} );
 }
-
-zp_bool zpContentManager::reloadResource( const zpString& alias ) {
+#endif
+zp_bool zpContentManager::reloadResource( const zpString& filename ) {
 	zpResourceElement* found = ZP_NULL;
-	if( m_elements.findIf( [ &alias, this ]( zpResourceElement& element ) {
-		return alias == element.alias;
+	if( m_elements.findIf( [ &filename, this ]( zpResourceElement& element ) {
+		return filename == element.filename;
 	}, &found ) ) {
 		found->resource->unload();
 		found->resource->setIsLoaded( false );
@@ -115,25 +116,55 @@ void zpContentManager::reloadAllResources() {
 	} );
 }
 
-zp_bool zpContentManager::isFileAlreadyLoaded( const zpString& filename, zpString* outAlias ) const {
+zp_bool zpContentManager::isFileAlreadyLoaded( const zpString& filename ) const {
 	const zpResourceElement* found = ZP_NULL;
 	if( m_elements.findIf( [ &filename ]( zpResourceElement& element ) {
-		return filename == element.file;
+		return filename == element.filename;
 	}, &found ) ) {
-		if( outAlias ) *outAlias = found->alias;
 		return true;
 	}
 	return false;
 }
 
-zpResource* zpContentManager::getResource( const zpString& alias ) {
+zpResource* zpContentManager::getResource( const zpString& filename ) {
 	zpResourceElement* found;
 	zpResource* resource = ZP_NULL;
-	if( m_elements.findIf( [ &alias ]( zpResourceElement& element ) {
-		return alias == element.alias;
+	if( m_elements.findIf( [ &filename ]( zpResourceElement& element ) {
+		return filename == element.filename;
 	}, &found ) ) {
 		found->refCount++;
 		resource = found->resource;
+	} else {
+		zpString extension = filename.substring( filename.lastIndexOf( '.' ) + 1 );
+		extension.toLower();
+
+		zpResourceCreator** creator;
+		if( m_creators.find( extension, &creator ) ) {
+			zpStringBuffer filepath;
+			filepath << m_rootDirectory << m_assetsFolder << (*creator)->getRootDirectory() << filename;
+			zpString fullFilePath = filepath.toString();
+
+			zpResource* resource = (*creator)->createResource( fullFilePath );
+			ZP_ASSERT( resource != ZP_NULL, "Unable to create resource %s", filename.c_str() );
+
+			resource->setContentManager( this );
+			resource->setFilename( fullFilePath );
+
+			zpResourceElement element = { resource, 1, filename };
+			m_elements.pushBack( element );
+
+			//if( immediateLoad ) {
+			//	loaded = resource->load();
+			//	resource->setIsLoaded( loaded );
+			//
+			//	m_onResourceLoaded( resource->getFilename(), loaded, 1 );
+			//} else {
+			//	m_resourcesToLoad.pushBack( resource );
+			//}
+			m_resourcesToLoad.pushBack( resource );
+		} else {
+			ZP_ASSERT( false, "No resource creator set for extension %s", extension.c_str() );
+		}
 	}
 	return resource;
 }
@@ -163,30 +194,31 @@ void zpContentManager::serialize( zpSerializedOutput* out ) {
 	out->endBlock();
 }
 void zpContentManager::deserialize( zpSerializedInput* in ) {
-	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
+	if( in->readBlock( ZP_SERIALIZE_TYPE_THIS ) ) {
 
-	in->readString( &m_rootDirectory, "@root" );
+		in->readString( &m_rootDirectory, "@root" );
 
-	in->readString( &m_assetsFolder, "@assets" );
+		in->readString( &m_assetsFolder, "@assets" );
 
-	in->readEachBlock( "Creator", [ this ]( zpSerializedInput* in ) {
-		zpString type;
-		zpString extension;
-		zpString root;
+		in->readEachBlock( "Creator", [ this ]( zpSerializedInput* in ) {
+			zpString type;
+			zpString extension;
+			zpString root;
 
-		in->readString( &type, "@type" );
-		in->readString( &extension, "@extension" );
-		in->readString( &root, "@root" );
+			in->readString( &type, "@type" );
+			in->readString( &extension, "@extension" );
+			in->readString( &root, "@root" );
 
-		zpSerializable* serial = zpRegisterSerializable::createSerializable( type );
-		if( serial ) {
-			zpResourceCreator* creator = (zpResourceCreator*)serial;
-			creator->setRootDirectory( root );
-			registerFileExtension( extension, creator );
-		}
-	} );
+			zpSerializable* serial = zpRegisterSerializable::createSerializable( type );
+			if( serial ) {
+				zpResourceCreator* creator = (zpResourceCreator*)serial;
+				creator->setRootDirectory( root );
+				registerFileExtension( extension, creator );
+			}
+		} );
 
-	in->endBlock();
+		in->endBlock();
+	}
 }
 
 void zpContentManager::setRootDirectory( const zpString& rootDirectory ) {
@@ -241,11 +273,14 @@ void zpContentManager::onUpdate() {
 
 	if( m_shouldCleanUp ) {
 		m_shouldCleanUp = false;
-		for( zp_uint i = m_elements.size(); i --> 0; ) {
-			if( m_elements[i].refCount == 0 ) {
-				m_elements[i].resource->unload();
-				ZP_SAFE_DELETE( m_elements[i].resource );
-				m_elements.erase( i );
+		for( zp_uint i = 0; i < m_elements.size(); ++i ) {
+			if( m_elements[ i ].refCount == 0 ) {
+				m_elements[ i ].resource->unload();
+				// upfdate to be correct
+				//ZP_SAFE_DELETE( m_elements[i].resource );
+				//m_elements[ i ] = m_elements.back();
+				//m_elements.popBack();
+				//--i;
 			}
 		}
 	}

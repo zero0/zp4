@@ -187,5 +187,11 @@
     <None Include="zpImmediateBuffer.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpRenderingManagers.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpRenderingComponents.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

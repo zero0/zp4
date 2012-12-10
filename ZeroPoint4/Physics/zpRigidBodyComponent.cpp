@@ -54,11 +54,11 @@ zp_bool zpRigidBodyComponent::isInWorld() const {
 void zpRigidBodyComponent::onCreate() {
 	if( m_body ) return;
 
-	zpColliderComponent* collider = getParentGameObject()->getComponentOfType<zpColliderComponent>();
+	zpColliderComponent* collider = getParentGameObject()->getComponents()->getColliderComponent();
 	if( !collider ) return;
 	if( !collider->isCreated() ) collider->create();
 
-	m_manager = getGameManagerOfType<zpPhysicsManager>();
+	m_manager = getGame()->getGameManagers()->getPhysicsManager();
 
 	btCollisionShape* shape = collider->getShape();
 
@@ -90,7 +90,7 @@ void zpRigidBodyComponent::onUpdate() {
 	zpMatrix4f matrix;
 	transform.getOpenGLMatrix( matrix );
 
-	getParentGameObject()->setLocalTransform( matrix );
+	getParentGameObject()->setTransform( matrix );
 }
 
 void zpRigidBodyComponent::onEnabled() {
