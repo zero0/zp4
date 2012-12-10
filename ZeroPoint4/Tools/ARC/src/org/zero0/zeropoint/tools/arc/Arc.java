@@ -1,32 +1,36 @@
 package org.zero0.zeropoint.tools.arc;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.eclipse.swt.widgets.Display;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompilerListener;
-import org.zero0.zeropoint.tools.arc.compiler.ShaderCompiler;
 
-public class Arc implements FileWatcherListener, ArcCompilerListener {
+public final class Arc implements FileWatcherListener, ArcCompilerListener {
 
     private static String arcPropertiesFile = "arc.properties";
 
     private static String arcThreads = "arc.threads";
     private static String arcCompiler = "arc.compiler";
     private static String arcRoot = "arc.root";
-    private static String arcIncludeExt = "arc.include.ext";
+    private static String arcPlatform = "arc.platform";
+    private static String arcRendering = "arc.rendering";
+    private static String arcOutputLevel = "arc.output-level";
+    private static String arcAutoCompile = "arc.auto-compile";
+    
+    private final Map<Class<? extends ArcCompiler>, Properties> compilerProperties = new HashMap<Class<? extends ArcCompiler>, Properties>();
 
     private static Arc instance = null;
 
@@ -38,51 +42,56 @@ public class Arc implements FileWatcherListener, ArcCompilerListener {
     }
 
     FileWatcher fileWatcher;
-    Executor compilerExecutor;
+    ExecutorService compilerExecutor;
     Map<String, Class<? extends ArcCompiler>> compilers;
     Map<String, String> extensionToCompiler;
     Properties properties;
-    List<String> includeExts;
-
+    boolean autoCompile;
+    
     String rootDir;
 
     Platform platform;
     Rendering rendering;
-
+    OutputLevel outputLevel;
+    
+    OutputAppender outputAppender;
+    
+    volatile int numTasks;
+    volatile int numSuccess;
+    volatile int numErrored;
+    
     private Arc() {
 	properties = new Properties();
 	compilers = new HashMap<String, Class<? extends ArcCompiler>>();
 	extensionToCompiler = new HashMap<String, String>();
-	includeExts = new ArrayList<String>();
-
+    }
+    
+    public final void initialize() {
 	loadProperties();
-
 	fileWatcher.addListener( this );
     }
 
-    @SuppressWarnings( "unchecked" )
-    public void loadProperties() {
+    public final void loadProperties() {
 	try {
 	    properties.load( new FileInputStream( new File( arcPropertiesFile ) ) );
-	} catch( FileNotFoundException e ) {
-	    e.printStackTrace();
-	} catch( IOException e ) {
-	    e.printStackTrace();
+	} catch( Exception e ) {
+	    err( e.getMessage() );
 	}
 
+	rendering = Rendering.valueOf( properties.getProperty( arcRendering, Rendering.DX11.name() ) );
+	platform = Platform.valueOf( properties.getProperty( arcPlatform, Platform.Win32.name() ) );
+	outputLevel = OutputLevel.valueOf( properties.getProperty( arcOutputLevel, OutputLevel.Normal.name() ) );
+	
+	out( OutputLevel.Verbos, "Loading properties..." );
+	
 	rootDir = properties.getProperty( arcRoot );
 	fileWatcher = new FileWatcher( rootDir );
 
+	autoCompile = Boolean.parseBoolean( properties.getProperty( arcAutoCompile, "false" ) );
+	fileWatcher.setIsEnabled( autoCompile );
+	
 	int numThreads = Integer.parseInt( properties.getProperty( arcThreads, "10" ) );
 	compilerExecutor = Executors.newFixedThreadPool( numThreads );
-
-	String includeExt = properties.getProperty( arcIncludeExt, "" ).toLowerCase();
-	for( String ext : includeExt.split( "," ) ) {
-	    fileWatcher.addAcceptedFileExtension( ext.trim() );
-	}
-	
-	rendering = Rendering.DIRECTX11;
-	platform = Platform.WIN32;
 
 	String compilerName = "";
 	Properties compiler = getSubProperties( properties, arcCompiler );
@@ -95,23 +104,53 @@ public class Arc implements FileWatcherListener, ArcCompilerListener {
 		try {
 		    Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass( value );
 		    if( ArcCompiler.class.isAssignableFrom( clazz ) ) {
-			compilers.put( key, (Class<? extends ArcCompiler>)clazz );
+			@SuppressWarnings( "unchecked" )
+			Class<? extends ArcCompiler> compilerClass = (Class<? extends ArcCompiler>)clazz;
+			
+			compilerProperties.put( compilerClass, new Properties() );
+			compilers.put( key, compilerClass );
 			compilerName = key;
 
 			// get the sub properties for this compiler
 			String exts = compiler.getProperty( compilerName + ".ext", "" ).toLowerCase();
 			for( String ext : exts.split( "," ) ) {
-			    extensionToCompiler.put( ext.trim(), compilerName );
+			    String extension = ext.trim();
+			    extensionToCompiler.put( extension, compilerName );
+			    fileWatcher.addAcceptedFileExtension( extension );
 			}
 		    }
 		} catch( ClassNotFoundException e1 ) {
-		    e1.printStackTrace();
+		    err( e1.getMessage() );
 		}
 	    }
 	}
     }
+    
+    private final void saveProperties() {
+	OutputStream out = null;
+	try {
+	    out = new BufferedOutputStream( new FileOutputStream( new File( arcPropertiesFile ) ) );
+	    properties.store( out, "" );
+	} catch( Exception e ) {
+	    err( e.getMessage() );
+	} finally {
+	    try {
+		if( out != null ) out.close();
+	    } catch( Exception e ) {
+		 err( e.getMessage() );
+	    }
+	}
+    }
+    
+    public final Collection<Class<? extends ArcCompiler>> getCompilers() {
+	return Collections.unmodifiableCollection( compilers.values() );
+    }
+    
+    public final Properties getCompilerProperties( Class<? extends ArcCompiler> clazz ) {
+	return compilerProperties.get( clazz );
+    }
 
-    public String getRootDirectory() {
+    public final String getRootDirectory() {
 	return rootDir;
     }
 
@@ -132,12 +171,16 @@ public class Arc implements FileWatcherListener, ArcCompilerListener {
 	return sub;
     }
 
-    public void reloadProperties() {
+    public final void reloadProperties() {
 	properties.clear();
 	loadProperties();
     }
 
-    public void addCompilerTask( String filePath ) {
+    public final void addCompilerTask( String filePath ) {
+	numTasks = 1;
+	numErrored = 0;
+	numSuccess = 0;
+	
 	String extension = filePath.substring( filePath.lastIndexOf( '.' ) + 1 ).toLowerCase();
 
 	try {
@@ -153,16 +196,40 @@ public class Arc implements FileWatcherListener, ArcCompilerListener {
 		//arcCompiler.run();
 		compilerExecutor.execute( arcCompiler );
 	    }
-	} catch( InstantiationException e ) {
-	    e.printStackTrace();
-	} catch( IllegalAccessException e ) {
-	    e.printStackTrace();
+	} catch( Exception e ) {
+	    err( e.getMessage() );
+	}
+    }
+    
+    public final void addBulkCompilerTasks( String ... filePaths ) {
+	numTasks = filePaths.length;
+	numErrored = 0;
+	numSuccess = 0;
+	
+	for( String filePath : filePaths ) {
+	    String extension = filePath.substring( filePath.lastIndexOf( '.' ) + 1 ).toLowerCase();
+
+	    try {
+		String compiler = extensionToCompiler.get( extension );
+		Class<? extends ArcCompiler> clazz = compilers.get( compiler );
+		if( clazz != null ) {
+		    ArcCompiler arcCompiler = clazz.newInstance();
+		    arcCompiler.setFileToCompile( filePath );
+		    arcCompiler.setPlatform( getPlatform() );
+		    arcCompiler.setRendering( getRendering() );
+		    arcCompiler.setListener( this );
+
+		    // arcCompiler.run();
+		    compilerExecutor.execute( arcCompiler );
+		}
+	    } catch( Exception e ) {
+		err( e.getMessage() );
+	    }
 	}
     }
 
     @Override
-    public void fileChanged( String filePath ) {
-	System.out.println( "File changed " + filePath );
+    public final void fileChanged( String filePath ) {
 	addCompilerTask( filePath );
     }
 
@@ -172,32 +239,84 @@ public class Arc implements FileWatcherListener, ArcCompilerListener {
 
     public final void setPlatform( Platform platform ) {
 	this.platform = platform;
+	saveProperties();
     }
 
+    public final OutputLevel getOutputLevel() {
+	return outputLevel;
+    }
+    
+    public final void setOutputLevel( OutputLevel outputLevel ) {
+	this.outputLevel = outputLevel;
+	saveProperties();
+    }
+    
     public final Rendering getRendering() {
 	return rendering;
     }
 
     public final void setRendering( Rendering rendering ) {
 	this.rendering = rendering;
+	saveProperties();
     }
 
-    public void shutdown() {
+    public final boolean getAutoCompile() {
+	return autoCompile;
+    }
+    
+    public final void setAutoCompile( boolean autoCompile ) {
+	this.autoCompile = autoCompile;
+	fileWatcher.setIsEnabled( autoCompile );
+	saveProperties();
+    }
+    
+    public final OutputAppender getOutputAppender() {
+	return outputAppender;
+    }
+    
+    public final void setOutputAppender( OutputAppender outputAppender ) {
+	this.outputAppender = outputAppender;
+    }
+    
+    public final void shutdown() {
+	fileWatcher.removeAllListeners();
 	fileWatcher.shutdown();
+	compilerExecutor.shutdown();
     }
 
-    @Override
-    public void onCompileMessage( String filePath, String msg ) {
-	System.out.println( "Compile Message " + filePath );
+    public final void out( OutputLevel level, String text ) {
+	//if( outputLevel.level >= level.level ) {
+	//    if( outputAppender != null ) {
+	//	outputAppender.printOut( text );
+	//    } else {
+	//	System.out.println( text );
+	//    }
+	//}
+	System.out.println( text );
     }
 
-    @Override
-    public void onCompileSuccess( String filePath, String msg ) {
-	System.out.println( "Compile Success " + filePath );
+    public final void err( String text ) {
+	//if( outputAppender != null ) {
+	//    outputAppender.printErr( text );
+	//} else {
+	//    System.err.println( text );
+	//}
+	System.err.println( text );
     }
 
-    @Override
-    public void onCompileFailed( String filePath, String msg ) {
-	System.out.println( "Compile Failed " + filePath );
+    public final void onCompileMessage( String filePath, String msg ) {
+	out( OutputLevel.Normal, "Compile Message " + filePath );
+    }
+
+    public final void onCompileSuccess( String filePath, String msg ) {
+	numTasks--;
+	numSuccess++;
+	out( OutputLevel.Compact, "Compile Success " + filePath );
+    }
+
+    public final void onCompileFailed( String filePath, String msg ) {
+	numTasks--;
+	numErrored++;
+	err( "Compile Failed " + filePath );
     }
 }

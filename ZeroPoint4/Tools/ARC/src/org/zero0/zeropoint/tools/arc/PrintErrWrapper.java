@@ -3,10 +3,10 @@ package org.zero0.zeropoint.tools.arc;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-public class PrintOutWrapper extends PrintStream {
-    private PrintOutAppender appender;
+public class PrintErrWrapper extends PrintStream {
+    private PrintErrAppender appender;
 
-    public PrintOutWrapper( PrintOutAppender appender ) {
+    public PrintErrWrapper( PrintErrAppender appender ) {
 	super( new ByteArrayOutputStream() );
 	this.appender = appender;
     }
@@ -14,7 +14,7 @@ public class PrintOutWrapper extends PrintStream {
     @Override
     public void write( byte[] buf, int off, int len ) {
 	super.write( buf, off, len );
-	appender.appendFromPrintOut( new String( buf, off, len ) );
+	appender.appendFromPrintErr( new String( buf, off, len ) );
     }
 
     public void clear() {

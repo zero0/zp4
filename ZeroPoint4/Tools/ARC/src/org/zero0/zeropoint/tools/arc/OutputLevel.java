@@ -1,17 +1,11 @@
 package org.zero0.zeropoint.tools.arc;
 
 public enum OutputLevel {
-	NORMAL( "Normal" ),
-	VERBOSE( "Verbose" ),
-	;
-	
-	private String name;
-	
-	private OutputLevel( String name ) {
-		this.name = name;
-	}
-	
-	final String getName() {
-		return name;
-	}
+    Compact(1), Normal(2), Verbos(3);
+    
+    public final int level;
+    
+    private OutputLevel( int level ) {
+	this.level = level;
+    }
 }

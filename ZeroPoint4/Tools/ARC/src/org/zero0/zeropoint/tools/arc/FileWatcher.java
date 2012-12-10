@@ -9,139 +9,147 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 public class FileWatcher implements Runnable, FilenameFilter {
 
-	Object lock = new Object();
-	
-	Map<File, Long> filesToWatch;
-	List<FileWatcherListener> listeners;
-	List<String> includeExtensions;
+    Object lock = new Object();
 
-	File rootDir;
-	Thread thread;
+    Map<File, Long> filesToWatch;
+    List<FileWatcherListener> listeners;
+    List<String> includeExtensions;
 
-	boolean isRunning;
-	boolean isEnabled;
-	long delay;
+    File rootDir;
+    Thread thread;
 
-	public FileWatcher( String rootPath ) {
-		filesToWatch = new HashMap<File, Long>();
-		listeners = new ArrayList<FileWatcherListener>();
-		includeExtensions = new ArrayList<String>();
+    boolean isRunning;
+    boolean isEnabled;
+    long delay;
 
-		isRunning = true;
-		isEnabled = true;
-		delay = 1000;
+    public FileWatcher( String rootPath ) {
+	filesToWatch = new HashMap<File, Long>();
+	listeners = new ArrayList<FileWatcherListener>();
+	includeExtensions = new ArrayList<String>();
 
-		rootDir = new File( rootPath );
+	isRunning = true;
+	isEnabled = false;
+	delay = 1000;
 
-		thread = new Thread( this );
-		thread.start();
+	rootDir = new File( rootPath );
+
+	thread = new Thread( this );
+	thread.start();
+    }
+
+    public Set<File> getFiles() {
+	return Collections.unmodifiableSet( filesToWatch.keySet() );
+    }
+
+    public synchronized void addFile( File file ) {
+	if( file.isDirectory() ) {
+	    for( File f : file.listFiles( this ) ) {
+		addFile( f );
+	    }
+	} else {
+	    filesToWatch.put( file, file.lastModified() );
 	}
+    }
 
-	public Set<File> getFiles() {
-		return Collections.unmodifiableSet( filesToWatch.keySet() );
-	}
+    public void addAcceptedFileExtension( String extension ) {
+	includeExtensions.add( extension );
+    }
 
-	public synchronized void addFile( File file ) {
-		if( file.isDirectory() ) {
-			for( File f : file.listFiles( this ) ) {
-				addFile( f );
-			}
-		} else {
-			filesToWatch.put( file, file.lastModified() );
-		}
-	}
+    public void addListener( FileWatcherListener listener ) {
+	listeners.add( listener );
+    }
 
-	public void addAcceptedFileExtension( String extension ) {
-		includeExtensions.add( extension );
+    public void removeListener( FileWatcherListener listener ) {
+	listeners.remove( listener );
+    }
+    
+    public void removeAllListeners() {
+	listeners.clear();
+    }
+    
+    void fireListeners( String filePath ) {
+	for( FileWatcherListener l : listeners ) {
+	    l.fileChanged( filePath );
 	}
-	
-	public void addListener( FileWatcherListener listener ) {
-		listeners.add( listener );
-	}
+    }
 
-	void fireListeners( String filePath ) {
-		for( FileWatcherListener l : listeners ) {
-			l.fileChanged( filePath );
-		}
+    public void setIsEnabled( boolean enabled ) {
+	isEnabled = enabled;
+	synchronized( lock ) {
+	    lock.notify();
 	}
+    }
 
-	public void setIsEnabled( boolean enabled ) {
-		isEnabled = enabled;
+    public boolean getIsEnabled() {
+	return isEnabled;
+    }
+
+    public void shutdown() {
+	isRunning = false;
+	synchronized( lock ) {
+	    lock.notify();
 	}
+    }
 
-	public boolean getIsEnabled() {
-		return isEnabled;
+    void checkUpdateFiles() {
+	for( Map.Entry<File, Long> e : filesToWatch.entrySet() ) {
+	    long lastModified = e.getValue();
+	    long currentModified = e.getKey().lastModified();
+	    if( lastModified != currentModified ) {
+		e.setValue( currentModified );
+		fireListeners( e.getKey().getName() );
+	    }
 	}
+    }
 
-	public void shutdown() {
-		isRunning = false;
+    void checkNewFiles( File file ) {
+	if( file.isDirectory() ) {
+	    for( File f : file.listFiles( this ) ) {
+		checkNewFiles( f );
+	    }
+	} else {
+	    if( !filesToWatch.containsKey( file ) ) {
+		filesToWatch.put( file, file.lastModified() );
+		fireListeners( file.getName() );
+	    }
+	}
+    }
+
+    @Override
+    public void run() {
+	while( isRunning ) {
+	    try {
 		synchronized( lock ) {
-			lock.notify();
+		    lock.wait( delay );
 		}
-	}
+	    } catch( InterruptedException e ) {
+	    }
+	    if( !isRunning )
+		break;
 
-	void checkUpdateFiles() {
-		for( Map.Entry<File, Long> e : filesToWatch.entrySet() ) {
-			long lastModified = e.getValue();
-			long currentModified = e.getKey().lastModified();
-			if( lastModified != currentModified ) {
-				e.setValue( currentModified );
-				fireListeners( e.getKey().getName() );
-			}
+	    if( isEnabled ) {
+		synchronized( this ) {
+		    checkUpdateFiles();
+
+		    checkNewFiles( rootDir );
 		}
+	    }
 	}
+    }
 
-	void checkNewFiles( File file ) {
-		if( file.isDirectory() ) {
-			for( File f : file.listFiles( this ) ) {
-				checkNewFiles( f );
-			}
-		} else {
-			if( !filesToWatch.containsKey( file ) ) {
-				filesToWatch.put( file, file.lastModified() );
-				fireListeners( file.getName() );
-			}
+    @Override
+    public boolean accept( File dir, String name ) {
+	if( new File( dir, name ).isDirectory() ) {
+	    return true;
+	} else {
+	    for( String ext : includeExtensions ) {
+		if( name.endsWith( ext ) ) {
+		    return true;
 		}
+	    }
 	}
-
-
-	@Override
-	public void run() {
-		while( isRunning ) {
-			try {
-				synchronized( lock ) {
-					lock.wait( delay );
-				}
-			} catch( InterruptedException e ) {
-			}
-			if( !isRunning )
-				break;
-
-			if( isEnabled ) {
-				synchronized( this ) {
-					checkUpdateFiles();
-
-					checkNewFiles( rootDir );
-				}
-			}
-		}
-	}
-
-	@Override
-	public boolean accept( File dir, String name ) {
-		if( new File( dir, name ).isDirectory() ) {
-			return true;
-		} else {
-			for( String ext : includeExtensions ) {
-				if( name.endsWith( ext ) ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+	return false;
+    }
 }

@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.zero0.zeropoint.tools.arc.Arc;
+import org.zero0.zeropoint.tools.arc.OutputLevel;
 import org.zero0.zeropoint.tools.arc.Platform;
 import org.zero0.zeropoint.tools.arc.Rendering;
 
@@ -62,33 +63,33 @@ public class ShaderCompiler extends ArcCompiler {
 
     static EnumMap<Platform, EnumMap<Rendering, String>> shaders = new EnumMap<Platform, EnumMap<Rendering, String>>( Platform.class );
     static {
-	shaders.put( Platform.WIN32, new EnumMap<Rendering, String>( Rendering.class ) );
-	shaders.put( Platform.WIN64, new EnumMap<Rendering, String>( Rendering.class ) );
+	shaders.put( Platform.Win32, new EnumMap<Rendering, String>( Rendering.class ) );
+	shaders.put( Platform.Win64, new EnumMap<Rendering, String>( Rendering.class ) );
 
-	shaders.get( Platform.WIN32 ).put( Rendering.DIRECTX10, DX_X86_EXEC );
-	shaders.get( Platform.WIN32 ).put( Rendering.DIRECTX11, DX_X86_EXEC );
-	shaders.get( Platform.WIN32 ).put( Rendering.OPENGL, GL_X86_EXEC );
+	shaders.get( Platform.Win32 ).put( Rendering.DX10, DX_X86_EXEC );
+	shaders.get( Platform.Win32 ).put( Rendering.DX11, DX_X86_EXEC );
+	shaders.get( Platform.Win32 ).put( Rendering.GL, GL_X86_EXEC );
 
-	shaders.get( Platform.WIN64 ).put( Rendering.DIRECTX10, DX_X64_EXEC );
-	shaders.get( Platform.WIN64 ).put( Rendering.DIRECTX11, DX_X64_EXEC );
-	shaders.get( Platform.WIN64 ).put( Rendering.OPENGL, GL_X64_EXEC );
+	shaders.get( Platform.Win64 ).put( Rendering.DX10, DX_X64_EXEC );
+	shaders.get( Platform.Win64 ).put( Rendering.DX11, DX_X64_EXEC );
+	shaders.get( Platform.Win64 ).put( Rendering.GL, GL_X64_EXEC );
 
-	renderingOptions.put( Rendering.DIRECTX10, new HashMap<String, String>() );
-	renderingOptions.get( Rendering.DIRECTX10 ).put( OPTION_OPTIMIZATION_DEBUG, DX_OPTION_OPTIMIZATION_DEBUG );
-	renderingOptions.get( Rendering.DIRECTX10 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
-	renderingOptions.get( Rendering.DIRECTX10 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
+	renderingOptions.put( Rendering.DX10, new HashMap<String, String>() );
+	renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_DEBUG, DX_OPTION_OPTIMIZATION_DEBUG );
+	renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
+	renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
 
-	renderingOptions.put( Rendering.DIRECTX11, new HashMap<String, String>() );
-	renderingOptions.get( Rendering.DIRECTX11 ).put( OPTION_OPTIMIZATION_DEBUG, DX_OPTION_OPTIMIZATION_DEBUG );
-	renderingOptions.get( Rendering.DIRECTX11 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
-	renderingOptions.get( Rendering.DIRECTX11 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
+	renderingOptions.put( Rendering.DX11, new HashMap<String, String>() );
+	renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_DEBUG, DX_OPTION_OPTIMIZATION_DEBUG );
+	renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
+	renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
 
 	types.add( ShaderType.VERTEX );
 	types.add( ShaderType.GEOMETRY );
 	types.add( ShaderType.PIXEL );
 
-	dxProfiles.put( Rendering.DIRECTX10, DX10_TYPE );
-	dxProfiles.put( Rendering.DIRECTX11, DX11_TYPE );
+	dxProfiles.put( Rendering.DX10, DX10_TYPE );
+	dxProfiles.put( Rendering.DX11, DX11_TYPE );
     }
 
     Properties shaderFileDesc = new Properties();
@@ -121,20 +122,15 @@ public class ShaderCompiler extends ArcCompiler {
     }
 
     String getCompilerExecString( ShaderType type ) {
-	String compilerExec = "\"" + shaders.get( getPlatform() ).get( getRendering() );
-	
 	String options = getOptions( type );
 	if( options == null ) {
 	    return null;
 	}
 	
-	compilerExec += options + "\"";
-
-	return compilerExec;
+	return "\"" + shaders.get( getPlatform() ).get( getRendering() ) + options + "\"";
     }
 
     void compileDX() {
-	Runtime r = Runtime.getRuntime();
 	Process p = null;
 	for( ShaderType type : types ) {
 	    try {
@@ -142,26 +138,37 @@ public class ShaderCompiler extends ArcCompiler {
 		if( exec == null ) continue;
 		
 		ProcessBuilder pb = new ProcessBuilder();
-		pb.redirectInput( Redirect.INHERIT );
-		pb.redirectError( Redirect.INHERIT );
-		pb.redirectOutput( Redirect.INHERIT );
+		pb.redirectInput( Redirect.PIPE );
+		pb.redirectError( Redirect.PIPE );
+		pb.redirectOutput( Redirect.PIPE );
 		pb.command( "cmd.exe", "/C", exec );
 		
-		System.out.println( "Executing: " + exec );
+		Arc.getInstance().out( OutputLevel.Verbos, "Executing: " + exec );
 		p = pb.start();
-		
+
 		BufferedReader br = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
-		BufferedWriter bw = new BufferedWriter( new OutputStreamWriter( p.getOutputStream() ) );
+		//BufferedWriter bw = new BufferedWriter( new OutputStreamWriter( p.getOutputStream() ) );
 		BufferedReader be = new BufferedReader( new InputStreamReader( p.getErrorStream() ) );
 		
 		p.waitFor();
 		
-		System.out.println( br.readLine() );
-		System.err.println( br.readLine() );
-	    } catch( InterruptedException e ) {
-		System.err.println();
-	    } catch( IOException e ) {
-		e.printStackTrace();
+		StringBuilder sb = new StringBuilder();
+		String s;
+		while( ( s = br.readLine() ) != null ) {
+		    sb.append( s );
+		}
+		Arc.getInstance().out( OutputLevel.Normal, sb.toString() );
+		
+		sb.delete( 0, sb.length() );
+		while( ( s = be.readLine() ) != null ) {
+		    sb.append( s );
+		}
+		if( sb.length() > 0 ) {
+		    Arc.getInstance().err( sb.toString() );
+		}
+		
+	    } catch( Exception e ) {
+		Arc.getInstance().err( e.getMessage() );
 	    } finally {
 		if( p != null ) {
 		    p.destroy();
@@ -176,12 +183,12 @@ public class ShaderCompiler extends ArcCompiler {
 
     void compile() {
 	switch( getRendering() ) {
-	case DIRECTX10:
-	case DIRECTX11:
+	case DX10:
+	case DX11:
 	    compileDX();
 	    break;
 
-	case OPENGL:
+	case GL:
 	    compileGL();
 	    break;
 	}
@@ -191,10 +198,8 @@ public class ShaderCompiler extends ArcCompiler {
     public void run() {
 	try {
 	    shaderFileDesc.load( new FileInputStream( new File( fileToCompile ) ) );
-	} catch( FileNotFoundException e ) {
-	    e.printStackTrace();
-	} catch( IOException e ) {
-	    e.printStackTrace();
+	} catch( Exception e ) {
+	   Arc.getInstance().err( e.getMessage() );
 	}
 
 	shaderFileDesc.putAll( properties );
