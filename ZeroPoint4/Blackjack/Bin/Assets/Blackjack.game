@@ -4,14 +4,13 @@
 		<ScreenSize x="960" y="540" />
 	</zpWindow>
 	<Managers>
-		<Manager>
+		
 			<zpContentManager root="./" assets="Assets/">
 				<Creator type="zpRenderingResourceCreator" extension="shader" root="shaders/" />
 				<Creator type="zpRenderingResourceCreator" extension="png" root="textures/" />
 			</zpContentManager>
-		</Manager>
-		<Manager>
+
 			<zpRenderingManager />
-		</Manager>
+		
 	</Managers>
 </zpGame>
