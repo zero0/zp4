@@ -14,7 +14,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.eclipse.swt.widgets.Display;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompilerListener;
 

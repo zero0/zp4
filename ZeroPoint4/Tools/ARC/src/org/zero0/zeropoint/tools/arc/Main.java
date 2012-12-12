@@ -15,7 +15,7 @@ public final class Main {
 
 	Shell shell = new Shell( display );
 	shell.setLayout( new FillLayout() );
-	shell.setText( "ARC - Archive/Resource Compiler" );
+	shell.setText( "ARC - Automated Resource Compiler" );
 	shell.setSize( 800, 600 );
 	shell.setMinimumSize( 800, 600 );
 

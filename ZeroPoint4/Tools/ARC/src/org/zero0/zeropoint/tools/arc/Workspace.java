@@ -1,16 +1,18 @@
 package org.zero0.zeropoint.tools.arc;
 
+import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.zip.ZipFile;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -25,6 +27,8 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -40,6 +44,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -47,6 +53,36 @@ import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
 
 public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender {
 
+    static Map<String, Image> cachedImages = new HashMap<String, Image>();
+    private static Image CreateImage( Device device, String imageFile ) {
+	Image img = null;
+
+	if( cachedImages.containsKey( imageFile ) ) {
+	    img = cachedImages.get( imageFile );
+	} else {
+	    int sep = imageFile.indexOf( ":" );
+	    if( sep > -1 ) {
+		try {
+		    String archive = imageFile.substring( 0, sep );
+		    String image = imageFile.substring( sep + 1 );
+		    
+		    ZipFile zip = new ZipFile( new File( archive ) );
+		    img = new Image( device, new BufferedInputStream( zip.getInputStream( zip.getEntry( image ) ) ) );
+		} catch( Exception e ) {
+		    e.printStackTrace();
+		}
+	    } else {
+		img = new Image( device, imageFile );
+	    }
+	    cachedImages.put( imageFile, img );
+	}
+	return img;
+    }
+    
+    private static Image CreateIcon( Device device, String icon ) {
+	return CreateImage( device, "res/famfamfam_silk_icons_v013.zip:icons/" + icon + ".png" );
+    }
+    
     static final FormAttachment fa0 = new FormAttachment( 0 );
     static final FormAttachment fa100 = new FormAttachment( 100 );
 
@@ -58,6 +94,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
     SashForm form;
 
     Text search;
+    ToolBar bar;
     Tree tree;
     StyledText text;
 
@@ -86,10 +123,19 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
     
     String treeFilter;
     
+    Properties properties;
+    
     public Workspace( Composite parent ) {
 	super( parent, SWT.NONE );
 
 	Arc.getInstance().initialize();
+	
+	properties = new Properties();
+	try {
+	    properties.load( new BufferedInputStream( new FileInputStream( "workspace.properties" ) ) );
+	} catch( Exception e ) {
+	    e.printStackTrace();
+	}
 	
 	setLayout( new FormLayout() );
 
@@ -141,14 +187,14 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	//printErr = new PrintErrWrapper( this );
 	// System.setOut( printOut );
 	// System.setErr( printErr );
-	OutputStream out = new OutputStream() {
-	    @Override
-	    public void write( int b ) throws IOException {
-		text.append( Character.toString( (char)b ) );
-	    }
-	};
-	System.setOut( new PrintStream( out ) );
-	System.setErr( new PrintStream( out ) );
+	//OutputStream out = new OutputStream() {
+	//    @Override
+	//    public void write( int b ) throws IOException {
+	//	text.append( Character.toString( (char)b ) );
+	//    }
+	//};
+	//System.setOut( new PrintStream( out ) );
+	//System.setErr( new PrintStream( out ) );
     }
 
     void createSash() {
@@ -174,6 +220,67 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	    }
 	} );
 	
+	bar = new ToolBar( treeComposite, SWT.NONE );
+	
+	ToolItem item;
+	
+	item = new ToolItem( bar, SWT.PUSH );
+	item.setImage( CreateIcon( getDisplay(), "cancel" ) );
+	item.addListener( SWT.Selection, new Listener() {
+	    @Override
+	    public void handleEvent( Event event ) {
+		search.setText( "" );
+		filterTree( "" );
+	    }
+	} );
+	
+	item = new ToolItem( bar, SWT.SEPARATOR );
+	
+	item = new ToolItem( bar, SWT.PUSH );
+	item.setImage( CreateIcon( getDisplay(), "magnifier_zoom_in" ) );
+	item.addListener( SWT.Selection, new Listener() {
+	    private void expand( TreeItem item ) {
+		item.setExpanded( true );
+		for( int i = 0; i < item.getItemCount(); ++i ) {
+		    expand( item.getItem( i ) );
+		}
+	    }
+	    
+	    @Override
+	    public void handleEvent( Event event ) {
+		for( int i = 0; i < tree.getItemCount(); ++i ) {
+		    expand( tree.getItem( i ) );
+		}
+	    }
+	} );
+	
+	item = new ToolItem( bar, SWT.PUSH );
+	item.setImage( CreateIcon( getDisplay(), "magifier_zoom_out" ) );
+	item.addListener( SWT.Selection, new Listener() {
+	    private void contract( TreeItem item ) {
+		item.setExpanded( false );
+		for( int i = 0; i < item.getItemCount(); ++i ) {
+		    contract( item.getItem( i ) );
+		}
+	    }
+	    
+	    @Override
+	    public void handleEvent( Event event ) {
+		for( int i = 0; i < tree.getItemCount(); ++i ) {
+		    contract( tree.getItem( i ) );
+		}
+	    }
+	} );
+	
+	item = new ToolItem( bar, SWT.PUSH );
+	item.setImage( CreateIcon( getDisplay(), "arrow_refresh" ) );
+	item.addListener( SWT.Selection, new Listener() {
+	    @Override
+	    public void handleEvent( Event event ) {
+		refreshTree();
+	    }
+	} );
+	
 	tree = new Tree( treeComposite, SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.MULTI );
 	tree.setHeaderVisible( true );
 
@@ -190,6 +297,8 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	col.setMoveable( true );
 
 	tree.addListener( SWT.SetData, new Listener() {
+	    Properties icons = Arc.getSubProperties( properties, "arc.workspace.icon" );
+	    
 	    public void handleEvent( Event event ) {
 		TreeItem item = (TreeItem)event.item;
 		TreeItem parentItem = item.getParentItem();
@@ -208,8 +317,13 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		if( file.isDirectory() ) {
 		    item.setText( 1, "" );
 		    item.setItemCount( file.list().length );
+		    item.setImage( CreateIcon( getDisplay(), icons.getProperty( "directory" ) ) );
 		} else {
-		    item.setText( 1, text.substring( text.lastIndexOf( '.' ) + 1 ) );
+		    String ext = text.substring( text.lastIndexOf( '.' ) + 1 );
+		    item.setText( 1, ext );
+		    if( icons.containsKey( ext ) ) {
+			item.setImage( CreateIcon( getDisplay(), icons.getProperty( ext ) ) );
+		    }
 		}
 	    }
 	} );
@@ -222,28 +336,32 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	} );
 	tree.addListener( SWT.MenuDetect, new Listener() {
 	    public void handleEvent( Event e ) {
-		Tree t = (Tree)e.widget;
+		final Tree t = (Tree)e.widget;
 		if( t.getSelectionCount() > 0 ) {
-		    Menu clickMenu = new Menu( tree );
+		    final Menu clickMenu = new Menu( tree );
 		    tree.setMenu( clickMenu );
 		    clickMenu.setLocation( e.x, e.y );
 		    clickMenu.addListener( SWT.Hide, new Listener() {
 			public void handleEvent( Event e ) {
-			    e.widget.dispose();
+			    clickMenu.dispose();
 			}
 		    } );
 		    
 		    MenuItem item = new MenuItem( clickMenu, SWT.PUSH );
 		    item.setText( "Compile" + ( t.getSelectionCount() > 1 ? "..." : "" ) );
-		    
-		    for( TreeItem i : t.getSelection() ) {
-			Arc.getInstance().addCompilerTask( ( (File)i.getData() ).getAbsolutePath() );
-		    }
+		    item.addListener( SWT.Selection, new Listener() {
+		        @Override
+		        public void handleEvent( Event event ) {
+		            for( TreeItem i : t.getSelection() ) {
+				Arc.getInstance().addCompilerTask( ( (File)i.getData() ).getAbsolutePath() );
+			    }
+		        }
+		    } );
 		}
 	    }
 	} );
 	tree.setData( new File( Arc.getInstance().getRootDirectory() ) );
-	tree.setItemCount( ( (File)tree.getData() ).list().length );
+	refreshTree();
 	
 	FormData fd;
 	fd = new FormData();
@@ -256,8 +374,19 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	fd.top = new FormAttachment( search );
 	fd.left = fa0;
 	fd.right = fa100;
+	bar.setLayoutData( fd );
+	
+	fd = new FormData();
+	fd.top = new FormAttachment( bar );
+	fd.left = fa0;
+	fd.right = fa100;
 	fd.bottom = fa100;
 	tree.setLayoutData( fd );
+    }
+
+    private void refreshTree() {
+	tree.setItemCount( 0 );
+	tree.setItemCount( ( (File)tree.getData() ).list().length );
     }
 
     void createTop() {
@@ -431,7 +560,8 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	item.setAccelerator( SWT.MOD1 + 'A' );
 	item.addListener( SWT.Selection, new Listener() {
 	    public void handleEvent( Event e ) {
-		Arc.getInstance().setAutoCompile( ( (MenuItem)e.item ).getSelection() );
+		MenuItem i = (MenuItem)e.widget;
+		Arc.getInstance().setAutoCompile( i.getSelection() );
 		updateOptionsText();
 	    }
 	} );
