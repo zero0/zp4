@@ -1,8 +1,9 @@
-package org.zero0.zeropoint.tools.arc;
+package org.zero0.zeropoint.tools.arc.workspace;
 
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.zero0.zeropoint.tools.arc.Arc;
 
 public final class Main {
 

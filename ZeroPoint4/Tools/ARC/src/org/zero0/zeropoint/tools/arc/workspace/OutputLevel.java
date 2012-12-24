@@ -1,4 +1,4 @@
-package org.zero0.zeropoint.tools.arc;
+package org.zero0.zeropoint.tools.arc.workspace;
 
 public enum OutputLevel {
     Compact(1), Normal(2), Verbos(3);
