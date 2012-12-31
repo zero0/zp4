@@ -15,7 +15,7 @@
 //#ifdef _WIN32
 //#define ZP_USE_SIMD		0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD			1
+#define ZP_USE_SIMD			0
 //#endif
 
 #define ZP_USE_ALIGNMENT	1
@@ -74,7 +74,6 @@ void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_ch
 void* zp_malloc( zp_uint size );
 void* zp_calloc( zp_uint num, zp_uint size );
 void* zp_realloc( void* ptr, zp_uint size );
-zp_uint zp_memsize( void* ptr );
 
 void* zp_aligned_malloc( zp_uint size, zp_uint alignment );
 void* zp_aligned_calloc( zp_uint size, zp_uint count, zp_uint alignment );

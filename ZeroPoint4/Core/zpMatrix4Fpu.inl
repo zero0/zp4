@@ -11,59 +11,69 @@ ZP_FORCE_INLINE void zpMatrix4f::operator delete( void* ptr ) {
 */
 
 ZP_FORCE_INLINE void zpMatrix4f::translate( const zpVector4f& position ) {
-	zp_vec4 v = position.toVec4();
+	const zp_vec4& v = position.getVec4();
 	m_41 = m_11 * v.x + m_21 * v.y + m_31 * v.z + m_41;
 	m_42 = m_12 * v.x + m_22 * v.y + m_32 * v.z + m_42;
 	m_43 = m_13 * v.x + m_23 * v.y + m_33 * v.z + m_43;
 	m_44 = m_14 * v.x + m_24 * v.y + m_34 * v.z + m_44;
 }
 ZP_FORCE_INLINE void zpMatrix4f::rotate( const zpVector4f& axis, zp_float angle ) {}
-ZP_FORCE_INLINE void zpMatrix4f::rotateX( zp_real angle ) {
+ZP_FORCE_INLINE void zpMatrix4f::rotateX( const zpScalar& angle ) {
 	//left handed
-	zp_real c = zp_real_cos( angle );
-	zp_real s = zp_real_sin( angle );
+	zpScalar c;
+	zpScalar s;
+
+	zpScalarCos( c, angle );
+	zpScalarSin( s, angle );
 
 	zpMatrix4f rotX;
-	rotX.m_22 = c; rotX.m_23 = -s;
-	rotX.m_32 = s; rotX.m_33 = c;
+	rotX.m_22 = c.getFloat(); rotX.m_23 = -s.getFloat();
+	rotX.m_32 = s.getFloat(); rotX.m_33 =  c.getFloat();
 
 	rotX.mul( (*this), (*this) );
 }
-ZP_FORCE_INLINE void zpMatrix4f::rotateY( zp_real angle ) {
+ZP_FORCE_INLINE void zpMatrix4f::rotateY( const zpScalar& angle ) {
 	//left handed
-	zp_real c = zp_real_cos( angle );
-	zp_real s = zp_real_sin( angle );
+	zpScalar c;
+	zpScalar s;
+
+	zpScalarCos( c, angle );
+	zpScalarSin( s, angle );
 
 	zpMatrix4f rotY;
-	rotY.m_11 = c; rotY.m_13 = s;
-	rotY.m_31 = -s; rotY.m_33 = c;
+	rotY.m_11 =  c.getFloat(); rotY.m_13 = s.getFloat();
+	rotY.m_31 = -s.getFloat(); rotY.m_33 = c.getFloat();
 
 	rotY.mul( (*this), (*this) );
 }
-ZP_FORCE_INLINE void zpMatrix4f::rotateZ( zp_real angle ) {
+ZP_FORCE_INLINE void zpMatrix4f::rotateZ( const zpScalar& angle ) {
 	//left handed
-	zp_real c = zp_real_cos( angle );
-	zp_real s = zp_real_sin( angle );
+	zpScalar c;
+	zpScalar s;
+
+	zpScalarCos( c, angle );
+	zpScalarSin( s, angle );
 
 	zpMatrix4f rotZ;
-	rotZ.m_11 = c; rotZ.m_12 = -s;
-	rotZ.m_21 = s; rotZ.m_22 = c;
+	rotZ.m_11 = c.getFloat(); rotZ.m_12 = -s.getFloat();
+	rotZ.m_21 = s.getFloat(); rotZ.m_22 =  c.getFloat();
 
 	rotZ.mul( (*this), (*this) );
 }
-ZP_FORCE_INLINE void zpMatrix4f::scale( zp_real uniformScale ) {
+ZP_FORCE_INLINE void zpMatrix4f::scale( const zpScalar& uniformScale ) {
 	zpMatrix4f m;
-	m( 0, 0 ) = uniformScale;
-	m( 1, 1 ) = uniformScale;
-	m( 2, 2 ) = uniformScale;
+	m( 0, 0 ) = uniformScale.getFloat();
+	m( 1, 1 ) = uniformScale.getFloat();
+	m( 2, 2 ) = uniformScale.getFloat();
 
 	m.mul( (*this), (*this) );
 }
 ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {
 	zpMatrix4f m;
-	m( 0, 0 ) = scale.getX();
-	m( 1, 1 ) = scale.getY();
-	m( 2, 2 ) = scale.getZ();
+	const zp_vec4& vec = scale.getVec4();
+	m( 0, 0 ) = vec.x;
+	m( 1, 1 ) = vec.y;
+	m( 2, 2 ) = vec.z;
 
 	m.mul( (*this), (*this) );
 }
@@ -106,11 +116,15 @@ ZP_FORCE_INLINE void zpMatrix4f::lookTo( const zpVector4f& eye, const zpVector4f
 
 	zpVector4f e( -eye );
 
+	const zp_vec4& xx = x.getVec4();
+	const zp_vec4& yy = y.getVec4();
+	const zp_vec4& zz = z.getVec4();
+
 	// after transpose
-	m_11 = -x.getX();	m_12 = y.getX();	m_13 = z.getX();	m_14 = x.dot3( e );
-	m_21 = -x.getY();	m_22 = y.getY();	m_23 = z.getY();	m_24 = y.dot3( e );
-	m_31 = -x.getZ();	m_32 = y.getZ();	m_33 = z.getZ();	m_34 = z.dot3( e );
-	m_41 = 0;			m_42 = 0;			m_43 = 0;			m_44 = 1;
+	m_11 = -xx.x;	m_12 = yy.x;	m_13 = zz.x;	m_14 = x.dot3( e ).getFloat();
+	m_21 = -xx.y;	m_22 = yy.y;	m_23 = zz.y;	m_24 = y.dot3( e ).getFloat();
+	m_31 = -xx.z;	m_32 = yy.z;	m_33 = zz.z;	m_34 = z.dot3( e ).getFloat();
+	m_41 = 0;		m_42 = 0;		m_43 = 0;		m_44 = 1;
 }
 ZP_FORCE_INLINE void zpMatrix4f::perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance ) {
 	zp_float f = 1.f / zp_tan( ZP_DEG_TO_RAD( fovy * .5f ) );

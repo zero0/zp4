@@ -194,11 +194,11 @@ zp_float zpVector2<T>::angleBetween( const zpVector2<F>& normal, zp_bool inRadia
 
 template<typename T> template<typename F>
 zpVector2<T> zpVector2<T>::lerp( const zpVector2<F>& vector, zp_float alpha ) const {
-	return ( (*this) + ( vector - (*this) ) ) * zp_clamp01( alpha );
+	return ( (*this) + ( vector - (*this) ) ) * zp_saturate( alpha );
 }
 template<typename T> template<typename F>
 zpVector2<T> zpVector2<T>::slerp( const zpVector2<F>& vector, zp_float alpha ) const {
-	alpha = zp_clamp01( alpha );
+	alpha = zp_saturate( alpha );
 
 	const zp_float omega = dot( vector );
 	const zp_float somao = sinf( ( 1 - alpha ) * omega );

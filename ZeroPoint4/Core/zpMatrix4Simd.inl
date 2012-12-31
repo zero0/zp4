@@ -21,10 +21,10 @@ ZP_FORCE_INLINE void zpMatrix4f::translate( const zpVector4f& position ) {
 	m_m4 = col;
 }
 ZP_FORCE_INLINE void zpMatrix4f::rotate( const zpVector4f& axis, zp_float angle ) {}
-ZP_FORCE_INLINE void zpMatrix4f::rotateX( zp_real angle ) {}
-ZP_FORCE_INLINE void zpMatrix4f::rotateY( zp_real angle ) {}
-ZP_FORCE_INLINE void zpMatrix4f::rotateZ( zp_real angle ) {}
-ZP_FORCE_INLINE void zpMatrix4f::scale( zp_real uniformScale ) {}
+ZP_FORCE_INLINE void zpMatrix4f::rotateX( zpScalar angle ) {}
+ZP_FORCE_INLINE void zpMatrix4f::rotateY( zpScalar angle ) {}
+ZP_FORCE_INLINE void zpMatrix4f::rotateZ( zpScalar angle ) {}
+ZP_FORCE_INLINE void zpMatrix4f::scale( zpScalar uniformScale ) {}
 ZP_FORCE_INLINE void zpMatrix4f::scale( const zpVector4f& scale ) {}
 
 ZP_FORCE_INLINE void zpMatrix4f::mul( const zpVector4f& vector, zpVector4f& outVector ) const {
@@ -85,9 +85,9 @@ ZP_FORCE_INLINE void zpMatrix4f::lookTo( const zpVector4f& eye, const zpVector4f
 	
 	zpVector4f e( -eye );
 
-	m_m1 = zpVector4f( zp_real_neg( x.getX() ), y.getX(), z.getX(), x.dot3( e ) ).toVec4();
-	m_m2 = zpVector4f( zp_real_neg( x.getY() ), y.getY(), z.getY(), y.dot3( e ) ).toVec4();
-	m_m3 = zpVector4f( zp_real_neg( x.getZ() ), y.getZ(), z.getZ(), z.dot3( e ) ).toVec4();
+	m_m1 = zpVector4f( zpScalarNeg( x.getX() ), y.getX(), z.getX(), x.dot3( e ) ).toVec4();
+	m_m2 = zpVector4f( zpScalarNeg( x.getY() ), y.getY(), z.getY(), y.dot3( e ) ).toVec4();
+	m_m3 = zpVector4f( zpScalarNeg( x.getZ() ), y.getZ(), z.getZ(), z.dot3( e ) ).toVec4();
 	m_m4 = zp_vec4( 0, 0, 0, 1 );
 }
 ZP_FORCE_INLINE void zpMatrix4f::perspective( zp_float fovy, zp_float aspect, zp_float nearDistance, zp_float farDistance ) {

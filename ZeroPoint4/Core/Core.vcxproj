@@ -152,7 +152,7 @@
     <ClInclude Include="zpProperties.h" />
     <ClInclude Include="zpRandom.h" />
     <ClInclude Include="zpRay.h" />
-    <ClInclude Include="zpReal.h" />
+    <ClInclude Include="zpScalar.h" />
     <ClInclude Include="zpRect.h" />
     <ClInclude Include="zpReferencedObject.h" />
     <ClInclude Include="zpReferencedPointer.h" />
@@ -188,7 +188,7 @@
     <None Include="zpMessageTypes.inc" />
     <None Include="zpPair.inl" />
     <None Include="zpPooledObject.inl" />
-    <None Include="zpRealFpu.inl" />
+    <None Include="zpScalarFpu.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />
     <None Include="zpTween.inl" />

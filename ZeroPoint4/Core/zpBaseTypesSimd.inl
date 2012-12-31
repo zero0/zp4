@@ -2,7 +2,7 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
-typedef __m128 zp_real;
+typedef __m128 zpScalar;
 
 typedef __m128i zp_integer;
 
@@ -18,19 +18,19 @@ struct zp_vec4 {
 	{}
 
 	template<int I>
-	ZP_FORCE_INLINE zp_real get() const {
+	ZP_FORCE_INLINE zpScalar get() const {
 		return _mm_shuffle_ps( v, v, _MM_SHUFFLE( I, I, I, I ) );
 	}
-	ZP_FORCE_INLINE zp_real getX() const {
+	ZP_FORCE_INLINE zpScalar getX() const {
 		return get<0>();
 	}
-	ZP_FORCE_INLINE zp_real getY() const {
+	ZP_FORCE_INLINE zpScalar getY() const {
 		return get<1>();
 	}
-	ZP_FORCE_INLINE zp_real getZ() const {
+	ZP_FORCE_INLINE zpScalar getZ() const {
 		return get<2>();
 	}
-	ZP_FORCE_INLINE zp_real getW() const {
+	ZP_FORCE_INLINE zpScalar getW() const {
 		return get<3>();
 	}
 

@@ -96,9 +96,6 @@ void* zp_calloc( zp_uint num, zp_uint size ) {
 void* zp_realloc( void* ptr, zp_uint size ) {
 	return realloc( ptr, size );
 }
-zp_uint zp_memsize( void* ptr ) {
-	return _msize( ptr );
-}
 
 void* zp_aligned_malloc( zp_uint size, zp_uint alignment ) {
 	return _aligned_malloc( size, alignment );

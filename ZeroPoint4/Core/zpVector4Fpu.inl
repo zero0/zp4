@@ -1,28 +1,18 @@
 
-/*#include <malloc.h>
-
-ZP_FORCE_INLINE void* zpVector4f::operator new( zp_uint size ) {
-	return malloc( size );
-};
-ZP_FORCE_INLINE void zpVector4f::operator delete( void* ptr ) {
-	free( ptr );
-}
-*/
-
 ZP_FORCE_INLINE zpVector4f zpVector4f::operator-() const {
 	return zpVector4f( -m_xyzw.x, -m_xyzw.y, -m_xyzw.z, m_xyzw.w );
 }
 
-ZP_FORCE_INLINE void zpVector4f::set3( const zp_real& x, const zp_real& y, const zp_real& z ) {
-	m_xyzw.x = x;
-	m_xyzw.y = y;
-	m_xyzw.z = y;
+ZP_FORCE_INLINE void zpVector4f::set3( const zpScalar& x, const zpScalar& y, const zpScalar& z ) {
+	m_xyzw.x = x.getFloat();
+	m_xyzw.y = y.getFloat();
+	m_xyzw.z = y.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::set4( const zp_real& x, const zp_real& y, const zp_real& z, const zp_real& w ) {
-	m_xyzw.x = x;
-	m_xyzw.y = y;
-	m_xyzw.z = z;
-	m_xyzw.w = w;
+ZP_FORCE_INLINE void zpVector4f::set4( const zpScalar& x, const zpScalar& y, const zpScalar& z, const zpScalar& w ) {
+	m_xyzw.x = x.getFloat();
+	m_xyzw.y = y.getFloat();
+	m_xyzw.z = z.getFloat();
+	m_xyzw.w = w.getFloat();
 }
 ZP_FORCE_INLINE void zpVector4f::set3( const zpVector4f& vector ) {
 	m_xyzw.x = vector.m_xyzw.x;
@@ -36,17 +26,17 @@ ZP_FORCE_INLINE void zpVector4f::set4( const zpVector4f& vector ) {
 	m_xyzw.w = vector.m_xyzw.w;
 }
 
-ZP_FORCE_INLINE void zpVector4f::setX( const zp_real& x ) {
-	m_xyzw.x = x;
+ZP_FORCE_INLINE void zpVector4f::setX( const zpScalar& x ) {
+	m_xyzw.x = x.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::setY( const zp_real& y ) {
-	m_xyzw.y = y;
+ZP_FORCE_INLINE void zpVector4f::setY( const zpScalar& y ) {
+	m_xyzw.y = y.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::setZ( const zp_real& z ) {
-	m_xyzw.z = z;
+ZP_FORCE_INLINE void zpVector4f::setZ( const zpScalar& z ) {
+	m_xyzw.z = z.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::setW( const zp_real& w ) {
-	m_xyzw.w = w;
+ZP_FORCE_INLINE void zpVector4f::setW( const zpScalar& w ) {
+	m_xyzw.w = w.getFloat();
 }
 
 ZP_FORCE_INLINE void zpVector4f::store3( zp_float* xyz ) const {
@@ -118,51 +108,53 @@ ZP_FORCE_INLINE void zpVector4f::sub4( const zpVector4f& vector ) {
 	m_xyzw.w -= vector.m_xyzw.w;
 }
 
-ZP_FORCE_INLINE void zpVector4f::mul3( const zp_real& r ) {
-	m_xyzw.x *= r;
-	m_xyzw.y *= r;
-	m_xyzw.z *= r;
+ZP_FORCE_INLINE void zpVector4f::mul3( const zpScalar& r ) {
+	m_xyzw.x *= r.getFloat();
+	m_xyzw.y *= r.getFloat();
+	m_xyzw.z *= r.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::mul4( const zp_real& r ) {
-	m_xyzw.x *= r;
-	m_xyzw.y *= r;
-	m_xyzw.z *= r;
-	m_xyzw.w *= r;
+ZP_FORCE_INLINE void zpVector4f::mul4( const zpScalar& r ) {
+	m_xyzw.x *= r.getFloat();
+	m_xyzw.y *= r.getFloat();
+	m_xyzw.z *= r.getFloat();
+	m_xyzw.w *= r.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::div3( const zp_real& r ) {
-	zp_real invR = 1.f / r;
-	m_xyzw.x *= invR;
-	m_xyzw.y *= invR;
-	m_xyzw.z *= invR;
+ZP_FORCE_INLINE void zpVector4f::div3( const zpScalar& r ) {
+	zpScalar invR;
+	zpScalarRcp( invR, r );
+	m_xyzw.x *= invR.getFloat();
+	m_xyzw.y *= invR.getFloat();
+	m_xyzw.z *= invR.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::div4( const zp_real& r ) {
-	zp_real invR = 1.f / r;
-	m_xyzw.x *= invR;
-	m_xyzw.y *= invR;
-	m_xyzw.z *= invR;
-	m_xyzw.w *= invR;
+ZP_FORCE_INLINE void zpVector4f::div4( const zpScalar& r ) {
+	zpScalar invR;
+	zpScalarRcp( invR, r );
+	m_xyzw.x *= invR.getFloat();
+	m_xyzw.y *= invR.getFloat();
+	m_xyzw.z *= invR.getFloat();
+	m_xyzw.w *= invR.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::add3( const zp_real& r ) {
-	m_xyzw.x += r;
-	m_xyzw.y += r;
-	m_xyzw.z += r;
+ZP_FORCE_INLINE void zpVector4f::add3( const zpScalar& r ) {
+	m_xyzw.x += r.getFloat();
+	m_xyzw.y += r.getFloat();
+	m_xyzw.z += r.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::add4( const zp_real& r ) {
-	m_xyzw.x += r;
-	m_xyzw.y += r;
-	m_xyzw.z += r;
-	m_xyzw.w += r;
+ZP_FORCE_INLINE void zpVector4f::add4( const zpScalar& r ) {
+	m_xyzw.x += r.getFloat();
+	m_xyzw.y += r.getFloat();
+	m_xyzw.z += r.getFloat();
+	m_xyzw.w += r.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::sub3( const zp_real& r ) {
-	m_xyzw.x -= r;
-	m_xyzw.y -= r;
-	m_xyzw.z -= r;
+ZP_FORCE_INLINE void zpVector4f::sub3( const zpScalar& r ) {
+	m_xyzw.x -= r.getFloat();
+	m_xyzw.y -= r.getFloat();
+	m_xyzw.z -= r.getFloat();
 }
-ZP_FORCE_INLINE void zpVector4f::sub4( const zp_real& r ) {
-	m_xyzw.x -= r;
-	m_xyzw.y -= r;
-	m_xyzw.z -= r;
-	m_xyzw.w -= r;
+ZP_FORCE_INLINE void zpVector4f::sub4( const zpScalar& r ) {
+	m_xyzw.x -= r.getFloat();
+	m_xyzw.y -= r.getFloat();
+	m_xyzw.z -= r.getFloat();
+	m_xyzw.w -= r.getFloat();
 }
 
 ZP_FORCE_INLINE void zpVector4f::zero3() {
@@ -183,11 +175,11 @@ ZP_FORCE_INLINE zp_bool zpVector4f::isZero4() const {
 	return m_xyzw.x == 0 && m_xyzw.y == 0 && m_xyzw.z == 0 && m_xyzw.w == 0;
 }
 
-ZP_FORCE_INLINE zp_real zpVector4f::dot3( const zpVector4f& vector ) const {
-	return m_xyzw.x * vector.m_xyzw.x + m_xyzw.y * vector.m_xyzw.y + m_xyzw.z * vector.m_xyzw.z;
+ZP_FORCE_INLINE zpScalar zpVector4f::dot3( const zpVector4f& vector ) const {
+	return zpScalar( m_xyzw.x * vector.m_xyzw.x + m_xyzw.y * vector.m_xyzw.y + m_xyzw.z * vector.m_xyzw.z );
 }
-ZP_FORCE_INLINE zp_real zpVector4f::dot4( const zpVector4f& vector ) const {
-	return m_xyzw.x * vector.m_xyzw.x + m_xyzw.y * vector.m_xyzw.y + m_xyzw.z * vector.m_xyzw.z + m_xyzw.w * vector.m_xyzw.w;
+ZP_FORCE_INLINE zpScalar zpVector4f::dot4( const zpVector4f& vector ) const {
+	return zpScalar( m_xyzw.x * vector.m_xyzw.x + m_xyzw.y * vector.m_xyzw.y + m_xyzw.z * vector.m_xyzw.z + m_xyzw.w * vector.m_xyzw.w );
 }
 
 ZP_FORCE_INLINE zpVector4f zpVector4f::cross3( const zpVector4f& vector ) const {

@@ -79,14 +79,14 @@ void zpColor4f::set( zp_float r, zp_float g, zp_float b, zp_float a ) {
 }
 
 zpColor4f zpColor4f::lerp( const zpColor4f& color, zp_float alpha ) const {
-	alpha = zp_clamp01( alpha );
+	alpha = zp_saturate( alpha );
 	return (*this) + ( color - (*this) ) * alpha;
 }
 void zpColor4f::clamp() {
-	m_red = zp_clamp01( m_red );
-	m_green = zp_clamp01( m_green );
-	m_blue = zp_clamp01( m_blue );
-	m_alpha = zp_clamp01( m_alpha );
+	m_red = zp_saturate( m_red );
+	m_green = zp_saturate( m_green );
+	m_blue = zp_saturate( m_blue );
+	m_alpha = zp_saturate( m_alpha );
 }
 
 void zpColor4f::store3( zp_float* rgb ) const {

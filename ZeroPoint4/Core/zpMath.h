@@ -2,8 +2,8 @@
 #ifndef ZP_MATH_H
 #define ZP_MATH_H
 
-#define ZP_EPSILON	1e-5f
-#define ZP_PI		3.1415926f
+#define ZP_EPSILON	1e-8f
+#define ZP_PI		3.14159265359f
 #define ZP_1OVERPI	( 1.0f / ZP_PI )
 #define ZP_2PI		( 2.0f * ZP_PI )
 #define ZP_PIOVER2	( 0.5f * ZP_PI )
@@ -16,7 +16,7 @@
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
 
 template<typename T>
-ZP_FORCE_INLINE T zp_clamp01( T& val ) {
+ZP_FORCE_INLINE T zp_saturate( T& val ) {
 	return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val;
 }
 
@@ -38,8 +38,9 @@ ZP_FORCE_INLINE T zp_abs( T& value ) {
 	return value > (T)0 ? value : -value;
 }
 
+struct zpScalar;
+struct zp_vec4;
 class zpVector4f;
-class zpReal;
 class zpInteger;
 class zpMatrix4f;
 class zpPlane;
@@ -50,7 +51,14 @@ class zpBoundingAABB;
 class zpBoundingSphere;
 class zpCollision;
 
-#include "zpReal.h"
+#include "zpScalar.h"
+
+#if ZP_USE_SIMD
+#include "zpBaseTypesSimd.inl"
+#else
+#include "zpBaseTypesFpu.inl"
+#endif
+
 #include "zpVector2.h"
 #include "zpVector4.h"
 
@@ -73,7 +81,7 @@ class zpCollision;
 //#include "zpIntegerSimd.inl"
 #include "zpMatrix4Simd.inl"
 #else
-#include "zpRealFpu.inl"
+#include "zpScalarFpu.inl"
 #include "zpVector4Fpu.inl"
 //#include "zpIntegerFpu.inl"
 #include "zpMatrix4Fpu.inl"

@@ -110,7 +110,7 @@ btCollisionShape* zpColliderCache::getColliderShape( zpColliderShape shapeType, 
 			{
 				btVector3 normal;
 				size.store3( normal );
-				*shape = new btStaticPlaneShape( normal, zp_real_to_float( size.getW() ) );
+				*shape = new btStaticPlaneShape( normal, zpScalarToFloat( size.getW() ) );
 			}
 			break;
 		case ZP_COLLIDER_SHAPE_BOX:
@@ -121,10 +121,10 @@ btCollisionShape* zpColliderCache::getColliderShape( zpColliderShape shapeType, 
 			}
 			break;
 		case ZP_COLLIDER_SHAPE_CAPSULE:
-			*shape = new btCapsuleShape( zp_real_to_float( size.getX() ), zp_real_to_float( size.getY() ) );
+			*shape = new btCapsuleShape( zpScalarToFloat( size.getX() ), zpScalarToFloat( size.getY() ) );
 			break;
 		case ZP_COLLIDER_SHAPE_SPHERE:
-			*shape = new btSphereShape( zp_real_to_float( size.getX() ) );
+			*shape = new btSphereShape( zpScalarToFloat( size.getX() ) );
 			break;
 		case ZP_COLLIDER_SHAPE_CYLINDER:
 			{

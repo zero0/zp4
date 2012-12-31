@@ -11,7 +11,7 @@ void ProcessConfig( zpGame& game ) {
 	const zpString& gameFile = properties[ "game.file" ];
 
 	if( properties[ "console.enabled" ] == "true" ) {
-		zpConsole::getInstance()->create();
+	//	zpConsole::getInstance()->create();
 	}
 
 	zpXmlParser gameParser;
@@ -35,21 +35,21 @@ void ProcessConfig( zpGame& game ) {
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
-	ZP_REGISTER_SERIALIZABLES( zpCore );
-	ZP_REGISTER_SERIALIZABLES( zpContent );
-	ZP_REGISTER_SERIALIZABLES( zpAudio );
-	ZP_REGISTER_SERIALIZABLES( zpInput );
-	ZP_REGISTER_SERIALIZABLES( zpScripting );
-	ZP_REGISTER_SERIALIZABLES( zpRendering );
-	ZP_REGISTER_SERIALIZABLES( zpPhysics );
-
-	zpGame game;
-
-	ProcessConfig( game );
-
-	game.process();
-
-	game.destroy();
+	//ZP_REGISTER_SERIALIZABLES( zpCore );
+	//ZP_REGISTER_SERIALIZABLES( zpContent );
+	//ZP_REGISTER_SERIALIZABLES( zpAudio );
+	//ZP_REGISTER_SERIALIZABLES( zpInput );
+	//ZP_REGISTER_SERIALIZABLES( zpScripting );
+	//ZP_REGISTER_SERIALIZABLES( zpRendering );
+	//ZP_REGISTER_SERIALIZABLES( zpPhysics );
+	//
+	//zpGame game;
+	//
+	//ProcessConfig( game );
+	//
+	//game.process();
+	//
+	//game.destroy();
 
 	return 0;
 }

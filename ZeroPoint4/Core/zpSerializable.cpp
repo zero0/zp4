@@ -19,10 +19,10 @@ void zpSerializableObject<zpVector2i>::deserializeTo( zpSerializedInput* in, zpV
 }
 
 void zpSerializableObject<zpVector4f>::serializeFrom( zpSerializedOutput* out, const zpVector4f& in) {
-	out->writeFloat( zp_real_to_float( in.getX() ), "@x" );
-	out->writeFloat( zp_real_to_float( in.getY() ), "@y" );
-	out->writeFloat( zp_real_to_float( in.getZ() ), "@z" );
-	out->writeFloat( zp_real_to_float( in.getW() ), "@w" );
+	out->writeFloat( ( in.getX().getFloat() ), "@x" );
+	out->writeFloat( ( in.getY().getFloat() ), "@y" );
+	out->writeFloat( ( in.getZ().getFloat() ), "@z" );
+	out->writeFloat( ( in.getW().getFloat() ), "@w" );
 }
 void zpSerializableObject<zpVector4f>::deserializeTo( zpSerializedInput* in, zpVector4f& out ) {
 	zp_float x = 0.f, y = 0.f, z = 0.f, w = 0.f;

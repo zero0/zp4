@@ -2,10 +2,10 @@
 #include <typeinfo>
 
 zpGameObject::zpGameObject()
-	: m_flags( 0 )
+	: m_transform()
 	, m_world( ZP_NULL )
 	, m_components()	
-	, m_transform()
+	, m_flags( 0 )
 	, m_name()
 {}
 zpGameObject::~zpGameObject()

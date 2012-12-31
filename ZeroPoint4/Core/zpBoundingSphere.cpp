@@ -4,7 +4,7 @@ zpBoundingSphere::zpBoundingSphere() :
 	m_sphere( 0, 0, 0, 1 )
 {}
 zpBoundingSphere::zpBoundingSphere( const zpVector4f& center, zp_float radius ) :
-	m_sphere( center.getX(), center.getY(), center.getZ(), zp_real_from_float( radius ) )
+	m_sphere( center.getX(), center.getY(), center.getZ(), zpScalar( radius ) )
 {}
 zpBoundingSphere::zpBoundingSphere( const zpBoundingSphere& sphere ) :
 	m_sphere( sphere.m_sphere )
@@ -29,15 +29,16 @@ void zpBoundingSphere::setCenter( const zpVector4f& center ) {
 }
 
 zp_float zpBoundingSphere::getRadius() const {
-	return zp_real_to_float( m_sphere.getW() );
+	return m_sphere.getW().getFloat();
 }
 void zpBoundingSphere::setRadius( zp_float radius ) {
-	m_sphere.setW( zp_real_from_float( radius ) );
+	m_sphere.setW( zpScalar( radius ) );
 }
 
 zpBoundingAABB zpBoundingSphere::generateBoundingAABB() const {
-	zp_real r = m_sphere.getW();
-	zp_real nr = zp_real_neg( r );
+	zpScalar r( m_sphere.getW() );
+	zpScalar nr;
+	zpScalarNeg( nr, r );
 
 	zpVector4f min( nr, nr, nr );
 	zpVector4f max( r, r, r );
@@ -51,10 +52,10 @@ void zpBoundingSphere::translate( const zpVector4f& translate ) {
 	m_sphere.add3( translate );
 }
 void zpBoundingSphere::scale( zp_float scale ) {
-	m_sphere.setW( m_sphere.getW() * zp_real_from_float( scale ) );
+	m_sphere.setW( m_sphere.getW() * zpScalar( scale ) );
 }
 void zpBoundingSphere::pad( zp_float padding ) {
-	m_sphere.setW( m_sphere.getW() + zp_real_from_float( padding )  );
+	m_sphere.setW( m_sphere.getW() + zpScalar( padding )  );
 }
 
 void zpBoundingSphere::add( zp_float x, zp_float y, zp_float z ) {
@@ -63,9 +64,9 @@ void zpBoundingSphere::add( zp_float x, zp_float y, zp_float z ) {
 void zpBoundingSphere::add( const zpVector4f& point ) {
 	zpVector4f dist( m_sphere );
 	dist.sub3( point );
-	zp_real d = dist.magnitude3();
+	zpScalar d = dist.magnitude3();
 
-	if( zp_real_gt( d, m_sphere.getW() ) ) m_sphere.setW( d );
+	if( zpScalarGt( d, m_sphere.getW() ) ) m_sphere.setW( d );
 }
 void zpBoundingSphere::add( const zpBoundingAABB& box ) {
 	zpVector4f min( box.getMin() );
@@ -74,14 +75,14 @@ void zpBoundingSphere::add( const zpBoundingAABB& box ) {
 	min.sub3( m_sphere );
 	max.sub3( m_sphere );
 
-	zp_real d = zp_real_max( min.magnitude3(), max.magnitude3() );
-	if( zp_real_gt( d, m_sphere.getW() ) ) m_sphere.setW( d );
+	zpScalar d;
+	zpScalarMax( d, min.magnitude3(), max.magnitude3() );
+	if( zpScalarGt( d, m_sphere.getW() ) ) m_sphere.setW( d );
 }
 void zpBoundingSphere::add( const zpBoundingSphere& sphere ) {
 	zpVector4f dist( m_sphere );
 	dist.sub3( sphere.getCenter() );
-	zp_real d = dist.magnitude3();
-	d = zp_real_add( d, zp_real_add( m_sphere.getW(), sphere.getCenter().getW() ) );
+	zpScalar d( dist.magnitude3() + m_sphere.getW() + sphere.getCenter().getW() );
 
-	if( zp_real_gt( d, m_sphere.getW() ) ) m_sphere.setW( d );
+	if( zpScalarGt( d, m_sphere.getW() ) ) m_sphere.setW( d );
 }

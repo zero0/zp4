@@ -1,8 +1,4 @@
 
-typedef zp_float zp_real;
-
-typedef zp_int zp_integer;
-
 struct zp_vec4 {
 	ZP_FORCE_INLINE zp_vec4() : 
 		x( 0 ), y( 0 ), z( 0 ), w( 0 )
@@ -12,20 +8,20 @@ struct zp_vec4 {
 	{}
 
 	template<int I>
-	ZP_FORCE_INLINE zp_real get() const {
+	ZP_FORCE_INLINE zpScalar get() const {
 		return v[I];
 	}
-	ZP_FORCE_INLINE zp_real getX() const {
-		return x;
+	ZP_FORCE_INLINE zpScalar getX() const {
+		return zpScalar( x );
 	}
-	ZP_FORCE_INLINE zp_real getY() const {
-		return y;
+	ZP_FORCE_INLINE zpScalar getY() const {
+		return zpScalar( y );
 	}
-	ZP_FORCE_INLINE zp_real getZ() const {
-		return z;
+	ZP_FORCE_INLINE zpScalar getZ() const {
+		return zpScalar( z );
 	}
-	ZP_FORCE_INLINE zp_real getW() const {
-		return w;
+	ZP_FORCE_INLINE zpScalar getW() const {
+		return zpScalar( w );
 	}
 
 	ZP_FORCE_INLINE operator const zp_float*() const { return &v[0]; };
@@ -38,15 +34,6 @@ struct zp_vec4 {
 		zp_float v[4];
 		struct {
 			zp_float x, y, z, w;
-		};
-	};
-};
-
-struct zp_ivec4 {
-	union {
-		zp_int v[4];
-		struct {
-			zp_int x, y, z, w;
 		};
 	};
 };

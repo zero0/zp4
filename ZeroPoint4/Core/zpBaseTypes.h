@@ -44,10 +44,4 @@ typedef zp_ulong zp_qword;
 
 typedef zp_uint zp_hash;
 
-#if ZP_USE_SIMD
-#include "zpBaseTypesSimd.inl"
-#else
-#include "zpBaseTypesFpu.inl"
-#endif
-
 #endif

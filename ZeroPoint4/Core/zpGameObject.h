@@ -46,12 +46,12 @@ public:
 	void deserialize( zpSerializedInput* in );
 
 private:
+	zpMatrix4f m_transform;
+	
+	zpAllComponents m_components;
 	zpFlag8 m_flags;
 	zpWorld* m_world;
 
-	zpAllComponents m_components;
-	zpMatrix4f m_transform;
-	
 	zpString m_name;
 };
 

@@ -4,16 +4,9 @@
 
 class zpVector4f {
 public:
-	/*
-	ZP_FORCE_INLINE void* operator new( zp_uint size );
-	ZP_FORCE_INLINE void* operator new[]( zp_uint size );
-	ZP_FORCE_INLINE void operator delete( void* ptr );
-	*/
 	ZP_FORCE_INLINE zpVector4f();
-#if ZP_USE_SIMD
-	ZP_FORCE_INLINE zpVector4f( zp_float x, zp_float y, zp_float z, zp_float w = 0.f );
-#endif
-	ZP_FORCE_INLINE zpVector4f( const zp_real& x, const zp_real& y, const zp_real& z, const zp_real& w = zp_real_zero() );
+	ZP_FORCE_INLINE zpVector4f( zp_float x, zp_float y, zp_float z, zp_float w = 0.0f );
+	ZP_FORCE_INLINE zpVector4f( const zpScalar& x, const zpScalar& y, const zpScalar& z, const zpScalar& w = zpScalar() );
 	ZP_FORCE_INLINE zpVector4f( const zpVector4f& vector );
 	ZP_FORCE_INLINE zpVector4f( zpVector4f&& vector );
 	ZP_FORCE_INLINE explicit zpVector4f( const zp_vec4& vector );
@@ -24,22 +17,21 @@ public:
 	ZP_FORCE_INLINE void operator=( const zp_vec4& vector );
 
 	ZP_FORCE_INLINE zpVector4f operator-() const;
-	ZP_FORCE_INLINE zp_vec4 toVec4() const;
 
-	ZP_FORCE_INLINE void set3( const zp_real& x, const zp_real& y, const zp_real& z );
-	ZP_FORCE_INLINE void set4( const zp_real& x, const zp_real& y, const zp_real& z, const zp_real& w );
+	ZP_FORCE_INLINE void set3( const zpScalar& x, const zpScalar& y, const zpScalar& z );
+	ZP_FORCE_INLINE void set4( const zpScalar& x, const zpScalar& y, const zpScalar& z, const zpScalar& w );
 	ZP_FORCE_INLINE void set3( const zpVector4f& vector );
 	ZP_FORCE_INLINE void set4( const zpVector4f& vector );
 
-	ZP_FORCE_INLINE zp_real getX() const;
-	ZP_FORCE_INLINE zp_real getY() const;
-	ZP_FORCE_INLINE zp_real getZ() const;
-	ZP_FORCE_INLINE zp_real getW() const;
+	ZP_FORCE_INLINE zpScalar getX() const;
+	ZP_FORCE_INLINE zpScalar getY() const;
+	ZP_FORCE_INLINE zpScalar getZ() const;
+	ZP_FORCE_INLINE zpScalar getW() const;
 
-	ZP_FORCE_INLINE void setX( const zp_real& x );
-	ZP_FORCE_INLINE void setY( const zp_real& y );
-	ZP_FORCE_INLINE void setZ( const zp_real& z );
-	ZP_FORCE_INLINE void setW( const zp_real& w );
+	ZP_FORCE_INLINE void setX( const zpScalar& x );
+	ZP_FORCE_INLINE void setY( const zpScalar& y );
+	ZP_FORCE_INLINE void setZ( const zpScalar& z );
+	ZP_FORCE_INLINE void setW( const zpScalar& w );
 
 	ZP_FORCE_INLINE void store3( zp_float* xyz ) const;
 	ZP_FORCE_INLINE void store4( zp_float* xyzw ) const;
@@ -56,30 +48,30 @@ public:
 	ZP_FORCE_INLINE void sub3( const zpVector4f& vector );
 	ZP_FORCE_INLINE void sub4( const zpVector4f& vector );
 	
-	ZP_FORCE_INLINE void mul3( const zp_real& r );
-	ZP_FORCE_INLINE void mul4( const zp_real& r );
-	ZP_FORCE_INLINE void div3( const zp_real& r );
-	ZP_FORCE_INLINE void div4( const zp_real& r );
-	ZP_FORCE_INLINE void add3( const zp_real& r );
-	ZP_FORCE_INLINE void add4( const zp_real& r );
-	ZP_FORCE_INLINE void sub3( const zp_real& r );
-	ZP_FORCE_INLINE void sub4( const zp_real& r );
+	ZP_FORCE_INLINE void mul3( const zpScalar& r );
+	ZP_FORCE_INLINE void mul4( const zpScalar& r );
+	ZP_FORCE_INLINE void div3( const zpScalar& r );
+	ZP_FORCE_INLINE void div4( const zpScalar& r );
+	ZP_FORCE_INLINE void add3( const zpScalar& r );
+	ZP_FORCE_INLINE void add4( const zpScalar& r );
+	ZP_FORCE_INLINE void sub3( const zpScalar& r );
+	ZP_FORCE_INLINE void sub4( const zpScalar& r );
 	
 	ZP_FORCE_INLINE void zero3();
 	ZP_FORCE_INLINE void zero4();
 	ZP_FORCE_INLINE zp_bool isZero3() const;
 	ZP_FORCE_INLINE zp_bool isZero4() const;
 
-	ZP_FORCE_INLINE zp_real dot3( const zpVector4f& vector ) const;
-	ZP_FORCE_INLINE zp_real dot4( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zpScalar dot3( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zpScalar dot4( const zpVector4f& vector ) const;
 
 	ZP_FORCE_INLINE zpVector4f cross3( const zpVector4f& vector ) const;
 	ZP_FORCE_INLINE zpVector4f cross4( const zpVector4f& vector ) const;
 
-	ZP_FORCE_INLINE zp_real magnitude3() const;
-	ZP_FORCE_INLINE zp_real magnitude4() const;
-	ZP_FORCE_INLINE zp_real magnitudeSquared3() const;
-	ZP_FORCE_INLINE zp_real magnitudeSquared4() const;
+	ZP_FORCE_INLINE zpScalar magnitude3() const;
+	ZP_FORCE_INLINE zpScalar magnitude4() const;
+	ZP_FORCE_INLINE zpScalar magnitudeSquared3() const;
+	ZP_FORCE_INLINE zpScalar magnitudeSquared4() const;
 
 	ZP_FORCE_INLINE zpVector4f normalize3() const;
 	ZP_FORCE_INLINE void normalize3();
@@ -89,23 +81,25 @@ public:
 	ZP_FORCE_INLINE zpVector4f homogenize4() const;
 	ZP_FORCE_INLINE void homogenize4();
 
+	ZP_FORCE_INLINE const zp_vec4& getVec4() const;
+
 	ZP_FORCE_INLINE void abs3();
 	ZP_FORCE_INLINE void abs4();
 	ZP_FORCE_INLINE zpVector4f abs3() const;
 	ZP_FORCE_INLINE zpVector4f abs4() const;
 	
-	ZP_FORCE_INLINE zp_real angleBetween3( const zpVector4f& vector ) const;
-	ZP_FORCE_INLINE zp_real angleBetween4( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zpScalar angleBetween3( const zpVector4f& vector ) const;
+	ZP_FORCE_INLINE zpScalar angleBetween4( const zpVector4f& vector ) const;
 
-	ZP_FORCE_INLINE zpVector4f lerp3( const zpVector4f& vector, zp_real alpha ) const;
-	ZP_FORCE_INLINE void lerp3( const zpVector4f& vector, zp_real alpha );
-	ZP_FORCE_INLINE zpVector4f lerp4( const zpVector4f& vector, zp_real alpha ) const;
-	ZP_FORCE_INLINE void lerp4( const zpVector4f& vector, zp_real alpha );
+	ZP_FORCE_INLINE zpVector4f lerp3( const zpVector4f& vector, zpScalar alpha ) const;
+	ZP_FORCE_INLINE void lerp3( const zpVector4f& vector, zpScalar alpha );
+	ZP_FORCE_INLINE zpVector4f lerp4( const zpVector4f& vector, zpScalar alpha ) const;
+	ZP_FORCE_INLINE void lerp4( const zpVector4f& vector, zpScalar alpha );
 
-	ZP_FORCE_INLINE zpVector4f slerp3( const zpVector4f& vector, zp_real alpha ) const;
-	ZP_FORCE_INLINE void slerp3( const zpVector4f& vector, zp_real alpha );
-	ZP_FORCE_INLINE zpVector4f slerp4( const zpVector4f& vector, zp_real alpha ) const;
-	ZP_FORCE_INLINE void slerp4( const zpVector4f& vector, zp_real alpha );
+	ZP_FORCE_INLINE zpVector4f slerp3( const zpVector4f& vector, zpScalar alpha ) const;
+	ZP_FORCE_INLINE void slerp3( const zpVector4f& vector, zpScalar alpha );
+	ZP_FORCE_INLINE zpVector4f slerp4( const zpVector4f& vector, zpScalar alpha ) const;
+	ZP_FORCE_INLINE void slerp4( const zpVector4f& vector, zpScalar alpha );
 
 	ZP_FORCE_INLINE zp_bool equals3( const zpVector4f& vector ) const;
 	ZP_FORCE_INLINE zp_bool equals4( const zpVector4f& vector ) const;
@@ -772,5 +766,11 @@ ZP_FORCE_INLINE zpVector4f operator*( const zp_float& v1, const zpVector4f& v2 )
 
 ZP_FORCE_INLINE zpVector4f operator/( const zpVector4f& v1, const zp_float& v2 );
 ZP_FORCE_INLINE zpVector4f operator/( const zp_float& v1, const zpVector4f& v2 );
+
+ZP_FORCE_INLINE zpVector4f operator*( const zpVector4f& v1, const zpScalar& v2 );
+ZP_FORCE_INLINE zpVector4f operator*( const zpScalar& v1, const zpVector4f& v2 );
+
+ZP_FORCE_INLINE zpVector4f operator/( const zpVector4f& v1, const zpScalar& v2 );
+ZP_FORCE_INLINE zpVector4f operator/( const zpScalar& v1, const zpVector4f& v2 );
 
 #endif

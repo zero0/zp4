@@ -2,11 +2,20 @@
 #ifndef ZP_MEMORY_SYSTEM_H
 #define ZP_MEMORY_SYSTEM_H
 
-//void* operator new( zp_uint size );
-//void* operator new[]( zp_uint size );
-//
-//void operator delete( void* ptr );
-//void operator delete[]( void* ptr );
+#if ZP_USE_MEMORY_SYSTEM
+void* operator new( zp_uint size );
+
+void operator delete( void* ptr );
+#endif
+
+#define ZP_MEMORY_BLOCK_TABLE_SIZE	64
+#define ZP_MEMORY_INCREMENT_SHIFT	6
+#define ZP_MEMORY_INCREMENT_SIZE	( 1 << ZP_MEMORY_INCREMENT_SHIFT )	// 64bit alignment
+#define ZP_MEMORY_INCREMENT_MASK	( ZP_MEMORY_INCREMENT_SIZE - 1 )
+#define ZP_MEMORY_ALIGN_SIZE( s )	( ( (s) + ZP_MEMORY_INCREMENT_SIZE ) & ( ~ZP_MEMORY_INCREMENT_MASK ) )
+#define ZP_MEMORY_KB( s )			( (s) * 1024 )
+#define ZP_MEMORY_MB( s )			( ZP_MEMORY_KB(s) * 1024 )
+#define ZP_MEMORY_TABLE_INDEX( s )	ZP_MIN( ( (s) >> ZP_MEMORY_INCREMENT_SHIFT ), ( ZP_MEMORY_BLOCK_TABLE_SIZE - 1 ) )
 
 class zpMemorySystem {
 public:
@@ -15,23 +24,33 @@ public:
 	static zpMemorySystem* getInstance();
 
 	void* allocate( zp_uint size );
-	void* allocateArray( zp_uint size );
 
 	void deallocate( void* ptr );
-	void deallocateArray( void* ptr );
 
 private:
 	zpMemorySystem();
 
-	zp_uint m_numAllocs;
-	zp_uint m_numArrayAllocs;
-	zp_uint m_numDeallocs;
-	zp_uint m_numArrayDeallocs;
+	struct zpMemoryBlock {
+		zpMemoryBlock* next;
+		zpMemoryBlock* prev;
 
+		zp_uint size;
+	};
+
+	void initialize( zp_uint size );
+	void addBlock( zpMemoryBlock* block );
+	void removeBlock( zpMemoryBlock* block );
+
+	zp_uint m_numAllocs;
+	zp_uint m_numDeallocs;
 	zp_uint m_memAllocated;
 	zp_uint m_memDeallocated;
+	zp_uint m_totalMemorySize;
 
-	static zpMemorySystem s_instance;
+	zp_byte* m_allMemory;
+	zp_byte* m_alignedMemory;
+
+	zpMemoryBlock* m_blockTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
 };
 
 #endif

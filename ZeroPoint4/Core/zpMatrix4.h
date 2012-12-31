@@ -34,10 +34,10 @@ public:
 
 	ZP_FORCE_INLINE void translate( const zpVector4f& position );
 	ZP_FORCE_INLINE void rotate( const zpVector4f& axis, zp_float angle );
-	ZP_FORCE_INLINE void rotateX( zp_real angle );
-	ZP_FORCE_INLINE void rotateY( zp_real angle );
-	ZP_FORCE_INLINE void rotateZ( zp_real angle );
-	ZP_FORCE_INLINE void scale( zp_real uniformScale );
+	ZP_FORCE_INLINE void rotateX( const zpScalar& angle );
+	ZP_FORCE_INLINE void rotateY( const zpScalar& angle );
+	ZP_FORCE_INLINE void rotateZ( const zpScalar& angle );
+	ZP_FORCE_INLINE void scale( const zpScalar& uniformScale );
 	ZP_FORCE_INLINE void scale( const zpVector4f& scale );
 
 	ZP_FORCE_INLINE zp_bool isIdentity() const;

@@ -54,9 +54,6 @@
     <ClInclude Include="zpMatrix4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpReal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpInteger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -177,6 +174,9 @@
     <ClInclude Include="zpAllGameManagers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpScalar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -187,9 +187,6 @@
     </None>
     <None Include="zpRealSimd.inl">
       <Filter>Source Files\Simd</Filter>
-    </None>
-    <None Include="zpRealFpu.inl">
-      <Filter>Source Files\Fpu</Filter>
     </None>
     <None Include="zpVector4Fpu.inl">
       <Filter>Source Files\Fpu</Filter>
@@ -256,6 +253,9 @@
     </None>
     <None Include="zpAllGameManagers.inl">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpScalarFpu.inl">
+      <Filter>Source Files\Fpu</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
