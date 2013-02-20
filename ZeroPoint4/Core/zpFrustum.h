@@ -9,6 +9,8 @@ enum zpFrustumPlane {
 	ZP_FRUSTUM_PLANE_TOP,
 	ZP_FRUSTUM_PLANE_NEAR,
 	ZP_FRUSTUM_PLANE_FAR,
+
+	zpFrustumPlane_Count,
 };
 
 enum zpFrustumPoint {
@@ -47,7 +49,7 @@ private:
 					m_far;
 		};
 		struct {
-			zpPlane m_planes[6];
+			zpPlane m_planes[ 6 ];
 		};
 	};
 
@@ -57,7 +59,7 @@ private:
 			zpVector4f m_ftl, m_ftr, m_fbl, m_fbr;
 		};
 		struct {
-			zpVector4f m_points[8];
+			zpVector4f m_points[ 8 ];
 		};
 	};
 };

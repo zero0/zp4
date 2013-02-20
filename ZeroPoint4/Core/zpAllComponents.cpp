@@ -1,9 +1,9 @@
 #include "zpCore.h"
-#include "Audio/zpAudio.h"
-#include "Content/zpContent.h"
-#include "Physics/zpPhysics.h"
-#include "Rendering/zpRendering.h"
-#include "Scripting/zpScripting.h"
+//#include "Audio/zpAudio.h"
+//#include "Content/zpContent.h"
+//#include "Physics/zpPhysics.h"
+//#include "Rendering/zpRendering.h"
+//#include "Scripting/zpScripting.h"
 
 zpAllComponents::zpAllComponents()
 	: m_unused( 0 )
@@ -41,6 +41,13 @@ void zpAllComponents::update()
 {
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->update();
+	#include "zpAllComponents.inl"
+}
+
+void zpAllComponents::receiveMessage( const zpMessage& message )
+{
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->receiveMessage( message );
 	#include "zpAllComponents.inl"
 }
 

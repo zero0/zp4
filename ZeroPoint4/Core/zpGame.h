@@ -30,8 +30,6 @@ public:
 	void deserialize( zpSerializedInput* in );
 
 private:
-	zpGameManager* getGameManager_T( const void* type ) const;
-
 	zpTime* m_timer;
 
 	zpWorld* m_currentWorld;

@@ -141,6 +141,9 @@ void zpDX11RenderingContext::setTexture( zpResourceBindSlot bindType, zp_uint sl
 	case ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER:
 		m_context->GSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
 		break;
+	case ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER:
+		m_context->CSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
+		break;
 	case ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER:
 		m_context->PSSetShaderResources( slot, 1, view == ZP_NULL ? ZP_NULL : &view );
 		break;
@@ -151,7 +154,8 @@ void zpDX11RenderingContext::setTopology( zpTopology topology ) {
 	m_context->IASetPrimitiveTopology( __zpToDX( topology ) );
 }
 
-void zpDX11RenderingContext::setViewport( const zpViewport& viewport ) {
+void zpDX11RenderingContext::setViewport( const zpViewport& viewport )
+{
 	D3D11_VIEWPORT v;
 	v.Width = viewport.getWidth();
 	v.Height = viewport.getHeight();
@@ -160,7 +164,34 @@ void zpDX11RenderingContext::setViewport( const zpViewport& viewport ) {
 	v.TopLeftX = viewport.getTopX();
 	v.TopLeftY = viewport.getTopY();
 
+	D3D11_RECT r;
+	r.left = v.TopLeftX;
+	r.right = v.TopLeftX + v.Width;
+	r.top = v.TopLeftY;
+	r.bottom = v.TopLeftY + v.Height;
+
 	m_context->RSSetViewports( 1, &v );
+	m_context->RSSetScissorRects( 1, & r );
+}
+void zpDX11RenderingContext::setScissorRect( const zpRect& rect )
+{
+	D3D11_RECT r;
+	r.left = rect.getPosition().getX();
+	r.right = rect.getPosition().getX() + rect.getSize().getX();
+	r.top = rect.getPosition().getY();
+	r.bottom = rect.getPosition().getY() + rect.getSize().getY();
+
+	m_context->RSSetScissorRects( 1, &r );
+}
+void zpDX11RenderingContext::getScissorRect( zpRect& rect ) const
+{
+	zp_uint num;
+	D3D11_RECT r;
+
+	m_context->RSGetScissorRects( &num, &r );
+
+	rect.setPosition( zpVector2f( r.left, r.top ) );
+	rect.setSize( zpVector2f( r.right - r.left, r.bottom - r.top ) );
 }
 
 void zpDX11RenderingContext::setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state ) {

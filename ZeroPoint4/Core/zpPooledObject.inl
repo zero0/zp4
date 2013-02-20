@@ -1,12 +1,12 @@
 template<typename T, zp_uint Count>
 zpPooledObject<T, Count>::zpPooledObject()
-	//: m_lastUsedIndex( 0 )
-	//, m_pool( (T*)zp_calloc( Count, sizeof( T ) ) )
+	: m_capacity( Count * sizeof( T ) )
+	, m_pool( zpMemorySystem::getInstance()->allocate( m_capacity ) )
 {}
 template<typename T, zp_uint Count>
 zpPooledObject<T, Count>::~zpPooledObject()
 {
-	//ZP_SAFE_FREE( m_pool );
+	zpMemorySystem::getInstance()->deallocate( m_pool );
 }
 
 template<typename T, zp_uint Count>
@@ -23,9 +23,10 @@ T* zpPooledObject<T, Count>::aquire()
 	{
 		if( !isUsed( i ) )
 		{
+			T* ptr = ( ( (T*)m_pool ) + i );
 			markUsed( i, true );
-			//new (&m_pool[ i ]) T;
-			return &m_pool[ i ];
+			new (ptr) T;
+			return ptr;
 		}
 	}
 	return ZP_NULL;
@@ -35,10 +36,12 @@ void zpPooledObject<T, Count>::release( T* obj )
 {
 	for( zp_uint i = 0; i < Count; ++i )
 	{
-		if( &m_pool[ i ] == obj )
+		T* ptr = ( ( (T*)m_pool ) + i );
+		if( ptr == obj )
 		{
 			markUsed( i, false );
-			//(&m_pool[ i ])->~T();
+			ptr->~T();
+			zp_zero_memory( ptr );
 			return;
 		}
 	}
@@ -47,14 +50,7 @@ void zpPooledObject<T, Count>::release( T* obj )
 template<typename T, zp_uint Count>
 void zpPooledObject<T, Count>::markUsed( zp_uint index, zp_bool used )
 {
-	if( used )
-	{
-		m_isUsed[ index / 8 ].mark( index % 8 );
-	}
-	else
-	{
-		m_isUsed[ index / 8 ].unmark( index % 8 );
-	}
+	m_isUsed[ index / 8 ].setMarked( index, used );
 }
 template<typename T, zp_uint Count>
 zp_bool zpPooledObject<T, Count>::isUsed( zp_uint index ) const

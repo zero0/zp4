@@ -118,6 +118,7 @@
   <ItemGroup>
     <ClInclude Include="zpAllComponents.h" />
     <ClInclude Include="zpAllGameManagers.h" />
+    <ClInclude Include="zpApplication.h" />
     <ClInclude Include="zpArray.h" />
     <ClInclude Include="zpArrayList.h" />
     <ClInclude Include="zpBaseTypes.h" />
@@ -135,7 +136,6 @@
     <ClInclude Include="zpGameManager.h" />
     <ClInclude Include="zpGameObject.h" />
     <ClInclude Include="zpComponent.h" />
-    <ClInclude Include="zpInteger.h" />
     <ClInclude Include="zpIntrusiveList.h" />
     <ClInclude Include="zpLinkedList.h" />
     <ClInclude Include="zpHashMap.h" />
@@ -152,7 +152,6 @@
     <ClInclude Include="zpProperties.h" />
     <ClInclude Include="zpRandom.h" />
     <ClInclude Include="zpRay.h" />
-    <ClInclude Include="zpScalar.h" />
     <ClInclude Include="zpRect.h" />
     <ClInclude Include="zpReferencedObject.h" />
     <ClInclude Include="zpReferencedPointer.h" />
@@ -182,13 +181,13 @@
     <None Include="zpIntrusiveList.inl" />
     <None Include="zpLinkedList.inl" />
     <None Include="zpMap.inl" />
+    <None Include="zpMathFpu.inl" />
     <None Include="zpMatrix4f.inl" />
     <None Include="zpMatrix4Fpu.inl" />
     <None Include="zpMatrix4Simd.inl" />
     <None Include="zpMessageTypes.inc" />
     <None Include="zpPair.inl" />
     <None Include="zpPooledObject.inl" />
-    <None Include="zpScalarFpu.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />
     <None Include="zpTween.inl" />

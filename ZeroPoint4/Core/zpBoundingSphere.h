@@ -7,7 +7,7 @@ class zpBoundingAABB;
 class zpBoundingSphere {
 public:
 	zpBoundingSphere();
-	zpBoundingSphere( const zpVector4f& center, zp_float radius );
+	zpBoundingSphere( const zpVector4f& center, const zpScalar& radius );
 	zpBoundingSphere( const zpBoundingSphere& sphere );
 	zpBoundingSphere( zpBoundingSphere&& sphere );
 	~zpBoundingSphere();
@@ -18,22 +18,24 @@ public:
 	const zpVector4f& getCenter() const;
 	void setCenter( const zpVector4f& center );
 	
-	zp_float getRadius() const;
-	void setRadius( zp_float radius );
+	const zpScalar& getRadius() const;
+	void setRadius( const zpScalar& radius );
 
 	zpBoundingAABB generateBoundingAABB() const;
 
 	void translate( const zpVector4f& translate );
-	void scale( zp_float scale );
-	void pad( zp_float padding );
+	void scale( const zpScalar& scale );
+	void pad( const zpScalar& padding );
 	
 	void add( zp_float x, zp_float y, zp_float z );
+	void add( const zpScalar& x, const zpScalar& y, const zpScalar& z );
 	void add( const zpVector4f& point );
 	void add( const zpBoundingAABB& box );
 	void add( const zpBoundingSphere& sphere );
 
 private:
-	zpVector4f m_sphere;
+	zpVector4f m_center;
+	zpScalar m_radius;
 };
 
 #endif

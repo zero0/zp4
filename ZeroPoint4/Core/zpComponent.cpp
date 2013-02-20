@@ -20,7 +20,7 @@ zpGameObject* zpComponent::getParentGameObject() const
 
 void zpComponent::setEnabled( zp_bool enabled )
 {
-	bool wasEnabled = m_flags.isMarked( ZP_COMPONENT_FLAG_ENABLED );
+	zp_bool wasEnabled = m_flags.isMarked( ZP_COMPONENT_FLAG_ENABLED );
 	m_flags.setMarked( ZP_COMPONENT_FLAG_ENABLED, enabled );
 
 	if( wasEnabled && !enabled ) {
@@ -40,11 +40,17 @@ zp_bool zpComponent::isCreated() const
 
 void zpComponent::update()
 {
-	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) ) onUpdate();
+	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) )
+	{
+		onUpdate();
+	}
 }
 void zpComponent::simulate()
 {
-	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) ) onSimulate();
+	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) )
+	{
+		onSimulate();
+	}
 }
 
 void zpComponent::create()
@@ -62,14 +68,11 @@ void zpComponent::destroy()
 
 void zpComponent::sendMessageToParentGameObject( const zpMessage& message )
 {
-	//m_parentGameObject->receiveMessage( message );
+	m_parentGameObject->receiveMessage( message );
 }
 void zpComponent::sendMessageToSiblingComponents( const zpMessage& message )
 {
-	//const zpComponent* self = this;
-	//m_parentGameObject->getComponents()->foreach( [ &self, &message ]( zpComponent* goc ){
-	//	if( goc != self ) goc->receiveMessage( message );
-	//} );
+	m_parentGameObject->getComponents()->receiveMessage( message );
 }
 
 zpWorld* zpComponent::getWorld() const

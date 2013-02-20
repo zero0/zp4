@@ -50,7 +50,7 @@ zpWindow::~zpWindow() {}
 
 void zpWindow::setTitle( const zpString& title ) {
 	m_title = title;
-	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.c_str() );
+	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.getChars() );
 }
 const zpString& zpWindow::getTitle() const {
 	return m_title;
@@ -111,7 +111,7 @@ void zpWindow::create() {
 	wc.hIconSm = LoadIcon( NULL, IDI_APPLICATION );
 	wc.hCursor = LoadCursor( NULL, IDC_ARROW );
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = m_title.c_str();
+	wc.lpszClassName = m_title.getChars();
 	wc.hIcon = LoadIcon( NULL, MAKEINTRESOURCE( IDI_APPLICATION ) );
 	wc.hIconSm = (HICON)LoadImage( NULL, MAKEINTRESOURCE( IDI_APPLICATION ), IMAGE_ICON, 16, 16, 0 );
 	
@@ -124,8 +124,8 @@ void zpWindow::create() {
 
 	m_hWnd = (zp_ptr)CreateWindowEx(
 		0,
-		m_title.c_str(),
-		m_title.c_str(),
+		m_title.getChars(),
+		m_title.getChars(),
 		__zpStyleToWS( m_style ),
 		m_position.getX(),
 		m_position.getY(),
@@ -197,7 +197,7 @@ void zpWindow::windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) {
 	case WM_SETTEXT:
 		{
 			if( lParam ) {
-				setTitle( (zp_char*)lParam );
+				setTitle( zpString( (zp_char*)lParam ) );
 			}
 		}
 		break;
@@ -221,7 +221,7 @@ void zpWindow::addFocusListener( zpWindowFocusListener* listener ) {
 	m_focusListeners.pushBack( listener );
 }
 void zpWindow::removeFocusListener( zpWindowFocusListener* listener ) {
-	m_focusListeners.removeAll( listener );
+	m_focusListeners.eraseAll( listener );
 }
 void zpWindow::removeAllFocusListeners() {
 	m_focusListeners.clear();
@@ -231,7 +231,7 @@ void zpWindow::addProcListener( zpWindowProcListener* listener ) {
 	m_procListeners.pushBack( listener );
 }
 void zpWindow::removeProcListener( zpWindowProcListener* listener ) {
-	m_procListeners.removeAll( listener );
+	m_procListeners.eraseAll( listener );
 }
 void zpWindow::removeAllProcListeners() {
 	m_procListeners.clear();

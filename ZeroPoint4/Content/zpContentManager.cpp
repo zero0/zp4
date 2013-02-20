@@ -140,8 +140,8 @@ zpResource* zpContentManager::getResource( const zpString& filename ) {
 
 		zpResourceCreator** creator;
 		if( m_creators.find( extension, &creator ) ) {
-			zpStringBuffer filepath;
-			filepath << m_rootDirectory << m_assetsFolder << (*creator)->getRootDirectory() << filename;
+			zpStringBuffer filepath( m_rootDirectory );
+			filepath << m_assetsFolder << filename;
 			zpString fullFilePath = filepath.toString();
 
 			zpResource* resource = (*creator)->createResource( fullFilePath );
@@ -199,7 +199,7 @@ void zpContentManager::deserialize( zpSerializedInput* in ) {
 		in->readString( &m_rootDirectory, "@root" );
 
 		in->readString( &m_assetsFolder, "@assets" );
-
+#if 0
 		in->readEachBlock( "Creator", [ this ]( zpSerializedInput* in ) {
 			zpString type;
 			zpString extension;
@@ -216,7 +216,7 @@ void zpContentManager::deserialize( zpSerializedInput* in ) {
 				registerFileExtension( extension, creator );
 			}
 		} );
-
+#endif
 		in->endBlock();
 	}
 }
@@ -232,7 +232,7 @@ zp_bool zpContentManager::getRootDirectoryForExtension( const zpString& extensio
 	const zpResourceCreator** creator = ZP_NULL;
 	if( m_creators.find( extension, (zpResourceCreator*const**)&creator ) ) {
 		zpStringBuffer buff( m_rootDirectory );
-		buff << m_assetsFolder << (*creator)->getRootDirectory();
+		buff << m_assetsFolder;
 		outRoot = buff.toString();
 		return true;
 	}
@@ -276,11 +276,11 @@ void zpContentManager::onUpdate() {
 		for( zp_uint i = 0; i < m_elements.size(); ++i ) {
 			if( m_elements[ i ].refCount == 0 ) {
 				m_elements[ i ].resource->unload();
-				// upfdate to be correct
-				//ZP_SAFE_DELETE( m_elements[i].resource );
-				//m_elements[ i ] = m_elements.back();
-				//m_elements.popBack();
-				//--i;
+				// update to be correct
+				ZP_SAFE_DELETE( m_elements[i].resource );
+				m_elements[ i ] = m_elements.back();
+				m_elements.popBack();
+				--i;
 			}
 		}
 	}

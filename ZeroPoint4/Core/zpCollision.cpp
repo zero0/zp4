@@ -3,59 +3,60 @@
 zpCollision::zpCollision() {}
 zpCollision::~zpCollision() {}
 
-zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpVector4f& b ) {
-	zpScalar x = b.getX();
-	zpScalar y = b.getY();
-	zpScalar z = b.getZ();
-
-	if(	zpScalarGt( x, a.getMin().getX() ) &&
-		zpScalarGt( y, a.getMin().getY() ) &&
-		zpScalarGt( z, a.getMin().getZ() ) &&
-		zpScalarLt( x, a.getMax().getX() ) &&
-		zpScalarLt( y, a.getMax().getY() ) &&
-		zpScalarLt( z, a.getMax().getZ() ) ) return ZP_COLLISION_TYPE_CONTAINS;
-	return ZP_COLLISION_TYPE_NONE;
+zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpVector4f& b )
+{
+	zpScalar x( b.getX() );
+	zpScalar y( b.getY() );
+	zpScalar z( b.getZ() );
+	
+	return
+		zpMath::Cmp( x, a.getMin().getX() ) > 0 &&
+		zpMath::Cmp( y, a.getMin().getY() ) > 0 &&
+		zpMath::Cmp( z, a.getMin().getZ() ) > 0 &&
+		zpMath::Cmp( x, a.getMax().getX() ) < 0 &&
+		zpMath::Cmp( y, a.getMax().getY() ) < 0 &&
+		zpMath::Cmp( z, a.getMax().getZ() ) < 0 ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpRay& b ) {
-	zpVector4f inv( 1, 1, 1, 1 );
-	inv.div4( b.getDirection() );
-	
-	zpScalar tx1( ( a.getMin().getX() - b.getOrigin().getX() ) * inv.getX() );
-	zpScalar tx2( ( a.getMax().getX() - b.getOrigin().getX() ) * inv.getX() );
-	
-	zpScalar txmin;
-	zpScalar txmax;
-	zpScalarMin( txmin, tx1, tx2 );
-	zpScalarMax( txmax, tx1, tx2 );
-
-	zpScalar ty1( ( a.getMin().getY() - b.getOrigin().getY() ) * inv.getY() );
-	zpScalar ty2( ( a.getMax().getY() - b.getOrigin().getY() ) * inv.getY() );
-	
-	zpScalar tymin;
-	zpScalar tymax;
-	zpScalarMin( tymin, ty1, ty2 );
-	zpScalarMax( tymax, ty1, ty2 );
-	
-	if( zpScalarGt( txmin, tymax ) || zpScalarGt( tymin, txmax ) ) return ZP_COLLISION_TYPE_NONE;
-	if( zpScalarGt( tymin, txmin ) ) txmin = tymin;
-	if( zpScalarLt( tymax, txmax ) ) txmax = tymax;
-	
-	zpScalar tz1( ( a.getMin().getZ() - b.getOrigin().getZ() ) * inv.getZ() );
-	zpScalar tz2( ( a.getMax().getZ() - b.getOrigin().getZ() ) * inv.getZ() );
-	
-	zpScalar tzmin;
-	zpScalar tzmax;
-	zpScalarMin( tzmin, tz1, tz2 );
-	zpScalarMax( tzmax, tz1, tz2 );
-
-	if( zpScalarGt( txmin, tzmax ) || zpScalarGt( tzmin, txmax ) ) return ZP_COLLISION_TYPE_NONE;
-	if( zpScalarGt( tzmin, txmin ) ) txmin = tzmin;
-	if( zpScalarLt( tzmax, txmax ) ) txmax = tzmax;
-	
-	if( zpScalarGte( txmax, txmin ) ) {
-		if( testCollision( a, b.getOrigin() ) != ZP_COLLISION_TYPE_NONE ) return ZP_COLLISION_TYPE_CONTAINS;
-		return ZP_COLLISION_TYPE_INTERSECT;
-	}
+	//zpVector4f inv( 1, 1, 1, 1 );
+	//inv.div4( b.getDirection() );
+	//
+	//zpScalar tx1( ( a.getMin().getX() - b.getOrigin().getX() ) * inv.getX() );
+	//zpScalar tx2( ( a.getMax().getX() - b.getOrigin().getX() ) * inv.getX() );
+	//
+	//zpScalar txmin;
+	//zpScalar txmax;
+	//zpScalarMin( txmin, tx1, tx2 );
+	//zpScalarMax( txmax, tx1, tx2 );
+	//
+	//zpScalar ty1( ( a.getMin().getY() - b.getOrigin().getY() ) * inv.getY() );
+	//zpScalar ty2( ( a.getMax().getY() - b.getOrigin().getY() ) * inv.getY() );
+	//
+	//zpScalar tymin;
+	//zpScalar tymax;
+	//zpScalarMin( tymin, ty1, ty2 );
+	//zpScalarMax( tymax, ty1, ty2 );
+	//
+	//if( zpScalarGt( txmin, tymax ) || zpScalarGt( tymin, txmax ) ) return ZP_COLLISION_TYPE_NONE;
+	//if( zpScalarGt( tymin, txmin ) ) txmin = tymin;
+	//if( zpScalarLt( tymax, txmax ) ) txmax = tymax;
+	//
+	//zpScalar tz1( ( a.getMin().getZ() - b.getOrigin().getZ() ) * inv.getZ() );
+	//zpScalar tz2( ( a.getMax().getZ() - b.getOrigin().getZ() ) * inv.getZ() );
+	//
+	//zpScalar tzmin;
+	//zpScalar tzmax;
+	//zpScalarMin( tzmin, tz1, tz2 );
+	//zpScalarMax( tzmax, tz1, tz2 );
+	//
+	//if( zpScalarGt( txmin, tzmax ) || zpScalarGt( tzmin, txmax ) ) return ZP_COLLISION_TYPE_NONE;
+	//if( zpScalarGt( tzmin, txmin ) ) txmin = tzmin;
+	//if( zpScalarLt( tzmax, txmax ) ) txmax = tzmax;
+	//
+	//if( zpScalarGte( txmax, txmin ) ) {
+	//	if( testCollision( a, b.getOrigin() ) != ZP_COLLISION_TYPE_NONE ) return ZP_COLLISION_TYPE_CONTAINS;
+	//	return ZP_COLLISION_TYPE_INTERSECT;
+	//}
 	/*
 	zpVector4f inv( 1, 1, 1 ), minDir( a.getMin() ), maxDir( a.getMax() ), t1, t2, tmin, tmax;
 	inv.div3( b.getDirection() );
@@ -105,105 +106,145 @@ zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBou
 	return ZP_COLLISION_TYPE_NONE;
 }
 
-zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpVector4f& b ) {
-	zpVector4f dist( b );
-	dist.sub3( a.getCenter() );
-	zpScalar d( dist.magnitudeSquared3() );
-	zpScalar r( a.getCenter().getW() );
-	zpScalarMul( r, r, r );
+zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpVector4f& b )
+{
+	zpVector4f dist;
+	zpScalar d;
+	zpScalar r( a.getRadius() );
 
-	return zpScalarEq( d, r ) ? ZP_COLLISION_TYPE_INTERSECT : zpScalarLt( d, r ) ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
+	zpMath::Sub( dist, b, a.getCenter() );
+	zpMath::LengthSquared3( d, dist );
+	zpMath::Mul( r, r, r );
+
+	zp_int c;
+	zpMath::Cmp( c, d, r );
+
+	return c == 0 ? ZP_COLLISION_TYPE_INTERSECT : c < 0 ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpRay& b ) {
-	if( testCollision( a, b.getOrigin() ) != ZP_COLLISION_TYPE_NONE ) return ZP_COLLISION_TYPE_CONTAINS;
-
-	zpVector4f v( a.getCenter() );
-	zpScalar r( a.getCenter().getW() );
-	zpScalarMul( r, r, r );
-
-	v.sub3( b.getOrigin() );
-	zpScalar bb( zpScalar( 2.f ) * b.getDirection().dot3( v ) );
-	zpScalar c( v.dot3( v ) - r );
-
-	zpScalar disc( ( bb * bb ) - ( zpScalar( 4.f ) * c ) );
-
-	if( zpScalarLt( disc, zpScalar() ) ) return ZP_COLLISION_TYPE_NONE;
-
-	zpScalarSqrt( disc, disc );
-
-	zpScalarNeg( bb, bb );
-	zpScalar t = ( bb - disc ) / zpScalar( 2.f );
-	if( zpScalarLte( t, zpScalar() ) ) {
-		t = ( bb + disc ) / zpScalar( 2.f );
-	}
-
-	return zpScalarLt( t, zpScalar() ) ? ZP_COLLISION_TYPE_NONE : ZP_COLLISION_TYPE_INTERSECT;
+	//if( testCollision( a, b.getOrigin() ) != ZP_COLLISION_TYPE_NONE ) return ZP_COLLISION_TYPE_CONTAINS;
+	//
+	//zpVector4f v( a.getCenter() );
+	//zpScalar r( a.getRadius() );
+	//zpScalarMul( r, r, r );
+	//
+	//v.sub3( b.getOrigin() );
+	//zpScalar bb( zpScalar( 2.f ) * b.getDirection().dot3( v ) );
+	//zpScalar c( v.dot3( v ) - r );
+	//
+	//zpScalar disc( ( bb * bb ) - ( zpScalar( 4.f ) * c ) );
+	//
+	//if( zpScalarLt( disc, zpScalar() ) ) return ZP_COLLISION_TYPE_NONE;
+	//
+	//zpScalarSqrt( disc, disc );
+	//
+	//zpScalarNeg( bb, bb );
+	//zpScalar t = ( bb - disc ) / zpScalar( 2.f );
+	//if( zpScalarLte( t, zpScalar() ) ) {
+	//	t = ( bb + disc ) / zpScalar( 2.f );
+	//}
+	//
+	//return zpScalarLt( t, zpScalar() ) ? ZP_COLLISION_TYPE_NONE : ZP_COLLISION_TYPE_INTERSECT;
+	return ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpBoundingAABB& b ) {
 	return ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpBoundingSphere& b ) {
-	zpVector4f dist( b.getCenter() );
-	dist.sub3( a.getCenter() );
-	zpScalar d( dist.magnitudeSquared3() );
-	zpScalar r( a.getCenter().getW() );
-	zpScalar g( b.getCenter().getW() );
-	zpScalarMul( r, r, r );
-	zpScalarMul( g, g, g );
-	zpScalarAdd( r, r, g );
-
-	return zpScalarEq( d, r ) ? ZP_COLLISION_TYPE_INTERSECT : zpScalarLt( d, r ) ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
+	//zpVector4f dist( b.getCenter() );
+	//dist.sub3( a.getCenter() );
+	//zpScalar d( dist.magnitudeSquared3() );
+	//zpScalar r( a.getRadius() );
+	//zpScalar g( b.getRadius() );
+	//zpScalarMul( r, r, r );
+	//zpScalarMul( g, g, g );
+	//zpScalarAdd( r, r, g );
+	//
+	//return zpScalarEq( d, r ) ? ZP_COLLISION_TYPE_INTERSECT : zpScalarLt( d, r ) ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
+	return ZP_COLLISION_TYPE_NONE;
 }
 
-zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpVector4f& b ) {
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpVector4f& b )
+{
 	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
-	for( zp_uint i = 6; i --> 0; ) {
+
+	for( zp_uint i = 0; i < zpFrustumPlane_Count; ++i )
+	{
 		zpPlaneSide side = a.getPlane( (zpFrustumPlane)i ).getSideOfPlane( b );
-		switch( side ) {
-		case ZP_PLANE_SIDE_NEGATIVE: return ZP_COLLISION_TYPE_NONE;
-		case ZP_PLANE_SIDE_ON_PLANE: type = ZP_COLLISION_TYPE_INTERSECT;
+		switch( side )
+		{
+			case ZP_PLANE_SIDE_NEGATIVE:
+				return ZP_COLLISION_TYPE_NONE;
+			case ZP_PLANE_SIDE_ON_PLANE:
+				type = ZP_COLLISION_TYPE_INTERSECT;
+				break;
 		}
 	}
+
 	return type;
 }
 zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpRay& b ) {
 	return ZP_COLLISION_TYPE_NONE;
 }
-zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingAABB& b ) {
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingAABB& b )
+{
 	zpVector4f center( b.getCenter() );
-	zpVector4f extence( b.getMax() - center );
+	zpVector4f extence( b.getExtents() );
 	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
 
-	for( zp_uint i = 6; i --> 0; ) {
-		zpVector4f p( a.getPlane( (zpFrustumPlane)i ).getVector() );
-		zpVector4f absP( p );
-		absP.abs3();
+	for( zp_uint i = 0; i < zpFrustumPlane_Count; ++i )
+	{
+		const zpVector4f& p = a.getPlane( (zpFrustumPlane)i ).getVector();
+		zpVector4f absP;
+		zpMath::Abs( absP, p );
 
-		zpScalar d( center.dot3( p ) );
-		zpScalar r( extence.dot3( absP ) );
+		zpScalar d, r;
+		zpMath::Dot3( d, center, p );
+		zpMath::Dot3( r, extence, absP );
 
-		zpScalar n;
-		zpScalarNeg( n, p.getW() );
-		if( zpScalarLt( ( d + r ), n ) ) {
-			return ZP_COLLISION_TYPE_NONE;
-		} else if( zpScalarLt( ( d - r ), n ) ) {
+		zpScalar n, v;
+		zpMath::Neg( n, p.getW() );
+
+		zp_int c;
+
+		zpMath::Add( v, d, r );
+		zpMath::Cmp( c, v, n );
+		if( c < 0 )
+		{
+			type = ZP_COLLISION_TYPE_NONE;
+			break;
+		}
+
+		zpMath::Sub( v, d, r );
+		zpMath::Cmp( c, v, n );
+		if( c < 0 )
+		{
 			type = ZP_COLLISION_TYPE_INTERSECT;
 		}
 	}
+
 	return type;
 }
-zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingSphere& b ) {
-	zpScalar r( b.getCenter().getW() );
-	zpScalar z;
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingSphere& b )
+{
+	zpScalar z( 0.0f );
 	zpVector4f center( b.getCenter().xyz1() );
+	zpScalar d;
+	zp_int c;
+	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
 
-	for( zp_uint i = 6; i --> 0; ) {
-		zpScalar d( a.getPlane( (zpFrustumPlane)i ).getVector().dot4( center ) );
-		zpScalarAdd( d, d, r );
-		if( zpScalarLt( d, z ) ) {
-			return ZP_COLLISION_TYPE_NONE;
+	for( zp_uint i = 0; i < zpFrustumPlane_Count; ++i )
+	{
+		zpMath::Dot4( d, a.getPlane( (zpFrustumPlane)i ).getVector(), center );
+		zpMath::Add( d, d, b.getRadius() );
+		zpMath::Cmp( c, d, z );
+
+		if( c < 0 )
+		{
+			type = ZP_COLLISION_TYPE_NONE;
+			break;
 		}
 	}
 
-	return ZP_COLLISION_TYPE_CONTAINS;
+	return type;
 }

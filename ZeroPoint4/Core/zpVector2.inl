@@ -141,7 +141,7 @@ zp_float zpVector2<T>::magnitudeSquared() const {
 }
 template<typename T>
 zp_float zpVector2<T>::magnitude() const {
-	return sqrtf( magnitudeSquared() );
+	return zp_sqrt( magnitudeSquared() );
 }
 template<typename T>
 void zpVector2<T>::normalize() {
@@ -160,7 +160,7 @@ zp_float zpVector2<T>::distanceToSquared( const zpVector2<F>& vector ) const {
 }
 template<typename T> template<typename F>
 zp_float zpVector2<T>::distanceTo( const zpVector2<F>& vector ) const {
-	return sqrtf( distanceToSquared( vector ) );
+	return zp_sqrt( distanceToSquared( vector ) );
 }
 
 template<typename T> template<typename F>
@@ -218,8 +218,8 @@ zpVector2<T> zpVector2<T>::rotateRight() const {
 }
 template<typename T>
 zpVector2<T> zpVector2<T>::rotate( zp_float radians ) const {
-	const zp_float c = cosf( radians );
-	const zp_float s = sinf( radians );
+	const zp_float c = zp_cos( radians );
+	const zp_float s = zp_sin( radians );
 	return zpVector2<T>( m_x * c - m_y * s, m_x * s + m_y * c );
 }
 template<typename T>
@@ -228,7 +228,7 @@ zpVector2<T> zpVector2<T>::rotateDeg( zp_float degrees ) const {
 }
 template<typename T>
 zp_float zpVector2<T>::angle() const {
-	return atan2f( m_y, m_x );
+	return zp_atan2( m_y, m_x );
 }
 
 template<typename T> template<typename F>

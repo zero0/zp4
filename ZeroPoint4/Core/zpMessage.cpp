@@ -80,7 +80,7 @@ void zpMessageTypeSystem::createMessages() {
 #undef MT_DEF
 #undef MT_SYS
 
-#define MT_DEF( m )	{ m_names.pushBack( zpString( #m ).toCamelCase() ); m_types.pushBack( zpMessageTypes::m ); }
+#define MT_DEF( m )	(void)0; //{ m_names.pushBack( zpString( #m ).toCamelCase() ); m_types.pushBack( zpMessageTypes::m ); }
 #define MT_SYS( m )	(void)0;
 
 #include "zpMessageTypes.inc"

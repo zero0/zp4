@@ -1,3 +1,15 @@
+
+#include "Core\zpCore.h"
+
+
+int main()
+{
+	return 0;
+}
+
+#pragma region Old Test Code
+#if 0
+
 #include "Core\zpCore.h"
 #include "Rendering\zpRendering.h"
 #include "Content\zpContent.h"
@@ -626,3 +638,6 @@ int main() {
 
 	return 0;
 }
+
+#endif
+#pragma endregion

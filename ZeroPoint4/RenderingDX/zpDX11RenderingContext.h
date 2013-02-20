@@ -33,6 +33,8 @@ public:
 	void setTopology( zpTopology topology );
 
 	void setViewport( const zpViewport& viewport );
+	void setScissorRect( const zpRect& rect );
+	void getScissorRect( zpRect& rect ) const;
 
 	void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state );
 	void setRasterState( zpRasterState* raster );

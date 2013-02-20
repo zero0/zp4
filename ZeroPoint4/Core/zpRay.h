@@ -19,7 +19,7 @@ public:
 	const zpVector4f& getDirection() const;
 	void setDirection( const zpVector4f& direction );
 
-	zpVector4f getPointAt( zp_float t ) const;
+	zpVector4f getPointAt( const zpScalar& t ) const;
 	zp_bool isPointOnRay( const zpVector4f& point ) const;
 
 private:

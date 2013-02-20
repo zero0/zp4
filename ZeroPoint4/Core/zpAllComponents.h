@@ -18,6 +18,8 @@ public:
 	void simulate();
 	void update();
 
+	void receiveMessage( const zpMessage& message );
+
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) zp##cmp* get##cmp();
 	#include "zpAllComponents.inl"

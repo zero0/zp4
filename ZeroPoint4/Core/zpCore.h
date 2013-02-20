@@ -3,37 +3,42 @@
 #define ZP_CORE_H
 
 #if defined(DEBUG) || defined(_DEBUG)
-#define ZP_DEBUG			1
+#define ZP_DEBUG				1
 #endif
 
 #if _WIN32
-#define ZP_WIN_32			1
+#define ZP_WIN_32				1
 #elif _WIN64
-#define ZP_WIN_64			1
+#define ZP_WIN_64				1
 #endif
 
 //#ifdef _WIN32
-//#define ZP_USE_SIMD		0
+//#define ZP_USE_SIMD			0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD			0
+#define ZP_USE_SIMD				0
 //#endif
 
-#define ZP_USE_ALIGNMENT	1
+#define ZP_USE_ALIGNMENT		1
 #if ZP_USE_ALIGNMENT
-#define ZP_MALLOC_ALIGNMENT	16
+#define ZP_MALLOC_ALIGNMENT		16
 #endif
 
+#define ZP_USE_ASSERTIONS		1
 #define ZP_USE_MEMORY_SYSTEM	1
 
-#define ZP_LOG_ENABLED		1
+#define ZP_LOG_ENABLED			1
 
 #if ZP_DEBUG
 #define ZP_ON_DEBUG( code )							do { code ; } while( 0 )
 #define ZP_ON_DEBUG_MSG( msg, ... )					zp_printfln( msg, __VA_ARGS__ )
-#define ZP_ASSERT( test, msg, ... )					zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
 #else
 #define ZP_ON_DEBUG( code )							(void)0
 #define ZP_ON_DEBUG_MSG( msg, ... )					(void)0
+#endif
+
+#if ZP_USE_ASSERTIONS
+#define ZP_ASSERT( test, msg, ... )					zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
+#else
 #define ZP_ASSERT( test, msg, ... )					(void)0
 #endif
 
@@ -65,7 +70,9 @@
 
 #include "zpBaseTypes.h"
 
+#if ZP_USE_ASSERTIONS
 void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... );
+#endif
 
 void zp_printf( const zp_char* text, ... );
 void zp_printfln( const zp_char* text, ... );
@@ -216,20 +223,25 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpComponent.h"
 
 template<typename T, typename A>
-ZP_FORCE_INLINE T& zp_as( A& a ) {
+ZP_FORCE_INLINE T& zp_as( A& a )
+{
 	return (T)a;
 }
+
 template<typename T>
-void zp_zero_memory( T* ptr ) {
+void zp_zero_memory( T* ptr )
+{
 	zp_memset( ptr, 0, sizeof( T ) );
 }
 template<typename T, zp_uint Size>
-void zp_zero_memory_array( T (&arr)[Size] ) {
+void zp_zero_memory_array( T (&arr)[Size] )
+{
 	zp_memset( arr, 0, Size * sizeof( T ) );
 }
 
 template<typename T>
-ZP_FORCE_INLINE T&& zp_move( T& v ) {
+ZP_FORCE_INLINE T&& zp_move( T& v )
+{
 	return (T&&)v;
 }
 

@@ -38,6 +38,11 @@ zpResource* zpPrefabResourceCreator::createResource( const zpString& filename ) 
 	return resource;
 }
 
+void zpPrefabResourceCreator::destroyResource( zpResource* res )
+{
+	ZP_SAFE_DELETE( res );
+}
+
 
 zpPrefabs::zpPrefabs()
 	: m_contentManager( ZP_NULL )
@@ -113,7 +118,6 @@ zp_bool zpPrefabs::saveAsPrefab( const zpString& prefabName, zpSerializable* obj
 }
 
 void zpPrefabs::setContentManager( zpContentManager* content ) {
-	m_prefabCreator.setRootDirectory( m_prefabRoot );
 	m_contentManager = content;
 	m_contentManager->registerFileExtension( "prefab", &m_prefabCreator );
 }

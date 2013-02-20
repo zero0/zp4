@@ -21,7 +21,7 @@ typedef float zp_float;
 typedef double zp_double;
 
 typedef bool zp_bool;
-
+typedef char zp_char;
 
 #if defined(_WIN32) 
 typedef zp_uint zp_ptr;
@@ -31,13 +31,9 @@ typedef zp_ulong zp_ptr;
 typedef zp_ulong zp_lptr;
 #endif
 
-#if UNICODE
-typedef wchar_t zp_char;
-#else
-typedef char zp_char;
-#endif
+typedef void* zp_handle;
 
-typedef unsigned __int8 zp_byte;
+typedef unsigned char zp_byte;
 typedef zp_ushort zp_word;
 typedef zp_uint zp_dword;
 typedef zp_ulong zp_qword;

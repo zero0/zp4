@@ -21,7 +21,7 @@ public:
 	void operator=( zpPlane&& plane );
 
 	zpPlaneSide getSideOfPlane( const zpVector4f& point ) const;
-	zp_float getDistanceToPoint( const zpVector4f& point ) const;
+	zpScalar getDistanceToPoint( const zpVector4f& point ) const;
 
 	void set( zp_float a, zp_float b, zp_float c, zp_float d );
 	void set( const zpVector4f& p0, const zpVector4f& p1, const zpVector4f& p2 );

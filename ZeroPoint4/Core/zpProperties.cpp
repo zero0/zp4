@@ -28,10 +28,10 @@ zpString& zpProperties::operator[]( zpString&& key ) {
 }
 
 zp_int zpProperties::getInt( const zpString& key ) const {
-	return zp_atoi( m_properties.get( key ).c_str() );
+	return zp_atoi( m_properties.get( key ).getChars() );
 }
 zp_float zpProperties::getFloat( const zpString& key ) const {
-	return zp_atof( m_properties.get( key ).c_str() );
+	return zp_atof( m_properties.get( key ).getChars() );
 }
 const zpString& zpProperties::getString( const zpString& key ) const {
 	return m_properties.get( key );
@@ -59,14 +59,14 @@ zp_bool zpProperties::find( const zpString& key, const zpString** outValue ) con
 }
 
 void zpProperties::load( const zpString& file ) {
-	zpFile f( file, ZP_FILE_MODE_READ );
-	if( f.open() ) {
+	zpFile f( file );
+	if( f.open( ZP_FILE_MODE_READ ) ) {
 		zp_uint pos;
 
 		zpStringBuffer buff;
 		zpString str;
 
-		while( f.readLine( &buff ) > 0 ) {
+		while( f.readLine( buff ) > 0 ) {
 			str = buff.toString();
 			buff.clear();
 
@@ -88,8 +88,8 @@ void zpProperties::load( const zpProperties& properties ) {
 void zpProperties::save( const zpString& file ) const {
 	if( m_properties.isEmpty() ) return;
 	
-	zpFile f( file, ZP_FILE_MODE_TRUNCATE_WRITE );
-	if( f.open() ) {
+	zpFile f( file );
+	if( f.open( ZP_FILE_MODE_TRUNCATE_WRITE ) ) {
 		
 		zpStringBuffer buffer;
 		m_properties.foreach( [ &buffer, &f ]( const zpString& key, const zpString& value ) {

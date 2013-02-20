@@ -6,13 +6,13 @@
 #include <fcntl.h>
 #include <io.h>
 
-zpConsole::zpConsole() :
-	m_isCreated( false ),
-	m_bufferSize( ZP_CONSOLE_DEFAULT_BUFFER_SIZE ),
-	m_currentColor( ZP_CONSOLE_DEFAULT_COLOR ),
-	m_defaultColor( ZP_CONSOLE_DEFAULT_COLOR ),
-	m_hConsole( ZP_NULL ),
-	m_title( "ZeroPoint Console" )
+zpConsole::zpConsole()
+	: m_isCreated( false )
+	, m_bufferSize( ZP_CONSOLE_DEFAULT_BUFFER_SIZE )
+	, m_currentColor( ZP_CONSOLE_DEFAULT_COLOR )
+	, m_defaultColor( ZP_CONSOLE_DEFAULT_COLOR )
+	, m_hConsole( ZP_NULL )
+	, m_title( "ZeroPoint Console" )
 {}
 zpConsole::~zpConsole() {
 	destroy();
@@ -29,7 +29,7 @@ const zpString& zpConsole::getTitle() const {
 void zpConsole::setTitle( const zpString& title ) {
 	m_title = title;
 	if( m_isCreated ) {
-		SetConsoleTitle( m_title.c_str() );
+		SetConsoleTitle( m_title.getChars() );
 	}
 }
 
@@ -43,7 +43,7 @@ void zpConsole::create( zp_ushort bufferSize ) {
 
 	// allocate a console for this app
 	AllocConsole();
-	SetConsoleTitle( m_title.c_str() );
+	SetConsoleTitle( m_title.getChars() );
 
 	// grab STD handles
 	HANDLE m_hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );

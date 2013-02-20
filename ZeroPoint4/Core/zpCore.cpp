@@ -5,7 +5,8 @@
 #include <string.h>
 #include <memory.h>
 
-#if ZP_DEBUG
+#if ZP_USE_ASSERTIONS
+
 #if ZP_WIN_32 || ZP_WIN_64
 #include <Windows.h>
 
@@ -33,7 +34,7 @@ void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* m
 			filename = filename.substring( s + 1 );
 		}
 
-		zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", filename.c_str(), line );
+		zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", filename.getChars(), line );
 
 		zp_int result = MessageBox( ZP_NULL, text, title, MB_YESNOCANCEL | MB_ICONEXCLAMATION );
 	
@@ -52,6 +53,7 @@ void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* m
 	}
 }
 #endif
+
 #endif
 
 void zp_printf( const zp_char* text, ... ) {

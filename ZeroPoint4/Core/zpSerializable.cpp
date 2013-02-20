@@ -36,32 +36,32 @@ void zpSerializableObject<zpVector4f>::deserializeTo( zpSerializedInput* in, zpV
 }
 
 void zpSerializableObject<zpMatrix4f>::serializeFrom( zpSerializedOutput* out, const zpMatrix4f& in ) {
-	if( in.isIdentity() ) {
-		out->writeBlock( "Identity" );
-		out->endBlock();
-	} else {
-		zpVector4f pos;
-		in.getPosition( pos );
-
-		out->writeBlock( "Position" );
-		zpSerializableObject<zpVector4f>::serializeFrom( out, pos );
-		out->endBlock();
-	}
+	//if( in.isIdentity() ) {
+	//	out->writeBlock( "Identity" );
+	//	out->endBlock();
+	//} else {
+	//	zpVector4f pos;
+	//	in.getPosition( pos );
+	//
+	//	out->writeBlock( "Position" );
+	//	zpSerializableObject<zpVector4f>::serializeFrom( out, pos );
+	//	out->endBlock();
+	//}
 }
 void zpSerializableObject<zpMatrix4f>::deserializeTo( zpSerializedInput* in, zpMatrix4f& out ) {
-	zp_bool empty = true;
-	
-	if( in->readBlock( "Position" ) ) {
-		empty = false;
-		zpVector4f pos;
-		zpSerializableObject<zpVector4f>::deserializeTo( in, pos );
-		out.setPosition( pos );
-		in->endBlock();
-	}
-
-	if( empty ) {
-		out = zpMatrix4f::identity;
-	}
+	//zp_bool empty = true;
+	//
+	//if( in->readBlock( "Position" ) ) {
+	//	empty = false;
+	//	zpVector4f pos;
+	//	zpSerializableObject<zpVector4f>::deserializeTo( in, pos );
+	//	out.setPosition( pos );
+	//	in->endBlock();
+	//}
+	//
+	//if( empty ) {
+	//	out = zpMatrix4f::identity;
+	//}
 }
 
 void zpSerializableObject<zpColor4f>::serializeFrom( zpSerializedOutput* out, const zpColor4f& in) {

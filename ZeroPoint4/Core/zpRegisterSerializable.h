@@ -10,12 +10,12 @@ public:
 
 	template<typename T>
 	static void registerSerializable() {
-		registerSerializable( ZP_SERIALIZE_TYPE( T ), zpRegisterSerializable::template defaultCreateSerializable<T> );
+		registerSerializable( zpString( ZP_SERIALIZE_TYPE( T ) ), zpRegisterSerializable::template defaultCreateSerializable<T> );
 	}
 
 	template<typename T>
 	static void registerSerializable( CreateSerializableFunction createFunc ) {
-		registerSerializable( ZP_SERIALIZE_TYPE( T ), createFunc );
+		registerSerializable( zpString( ZP_SERIALIZE_TYPE( T ) ), createFunc );
 	}
 
 	template<typename T>

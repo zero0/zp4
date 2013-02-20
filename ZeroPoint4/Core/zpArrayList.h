@@ -2,14 +2,15 @@
 #ifndef ZP_ARRAY_LIST_H
 #define ZP_ARRAY_LIST_H
 
-#define ZP_ARRAY_DEFAULT_SIZE	10
-
 template<typename T>
 class zpArrayList {
 public:
+	enum
+	{
+		npos = -1,
+	};
+
 	zpArrayList();
-	zpArrayList( zp_uint size );
-	zpArrayList( T* arr, zp_uint size, zp_uint capacity );
 	zpArrayList( const zpArrayList& arr );
 	zpArrayList( zpArrayList&& arr );
 	~zpArrayList();
@@ -23,44 +24,27 @@ public:
 	const T& at( zp_uint index ) const;
 
 	zp_uint size() const;
-	zp_uint capacity() const;
 	zp_bool isEmpty() const;
-	zp_bool isFull() const;
+	zp_bool isFixed() const;
 
 	void pushBack( const T& val );
-	void pushBack( const T* arr, zp_uint count );
-	template<zp_uint Count>
-	void pushBack( const T (&arr)[Count] );
 	T& pushBackEmpty();
 
 	void pushFront( const T& val );
-	void pushFront( const T* arr, zp_uint count );
-	template<zp_uint Count>
-	void pushFront( const T (&arr)[Count] );
 	T& pushFrontEmpty();
 
-	void popBack( zp_uint numToPop = 1 );
-	void popFront( zp_uint numToPop = 1 );
-
-	void insert( zp_uint index, const T& val );
-	
-	void remove( zp_uint index, T* outVal = ZP_NULL );
-	zp_bool removeFirst( const T& val, T* outVal = ZP_NULL );
-	zp_bool removeLast( const T& val, T* outVal = ZP_NULL );
-	zp_uint removeAll( const T& val );
+	void popBack();
+	void popFront();
 
 	void erase( zp_uint index );
-	zp_bool eraseFirst( const T& val );
-	zp_bool eraseLast( const T& val );
 	zp_uint eraseAll( const T& val );
 
 	void clear();
 
-	zp_uint indexOf( const T& val ) const;
-	zp_uint lastIndexOf( const T& val ) const;
+	zp_int indexOf( const T& val ) const;
+	zp_int lastIndexOf( const T& val ) const;
 
 	void ensureCapacity( zp_uint size );
-	void shrinkToFit( zp_uint padding = 0 );
 
 	T& front();
 	T& back();
@@ -91,21 +75,27 @@ public:
 	void foreachIndexedIf( Func func ) const;
 
 	template<typename Func>
-	void removeFirstIf( Func func, T* outVal = ZP_NULL );
-	template<typename Func>
-	void removeLastIf( Func func, T* outVal = ZP_NULL );
-	template<typename Func>
-	void removeAllIf( Func func, T* outVal = ZP_NULL );
+	void eraseIf( Func func );
 
 	template<typename Func>
 	void map( Func func );
 	
-	static const zp_uint npos;
-
 private:
 	T* m_array;
 	zp_uint m_size;
 	zp_uint m_capacity;
+	zp_bool m_isFixed;
+};
+
+
+template<typename T, zp_uint Size>
+class zpFixedArrayList : public zpArrayList<T> {
+public:
+	zpFixedArrayList();
+	~zpFixedArrayList();
+
+private:
+	T m_fixedArray[ Size ];
 };
 
 #include "zpArrayList.inl"

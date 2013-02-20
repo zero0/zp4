@@ -32,6 +32,7 @@ public:
 	virtual ~zpPrefabResourceCreator();
 
 	zpResource* createResource( const zpString& filename );
+	void destroyResource( zpResource* res );
 };
 
 class zpPrefabs {

@@ -9,7 +9,7 @@ template<typename Key, typename Value>
 class zpHashMap {
 public:
 	zpHashMap();
-	zpHashMap( zp_uint size, zp_float loadFactor = ZP_HASH_MAP_DEFAULT_LOAD_FACTOR );
+	explicit zpHashMap( zp_uint size, zp_float loadFactor = ZP_HASH_MAP_DEFAULT_LOAD_FACTOR );
 	zpHashMap( const zpHashMap& map );
 	zpHashMap( zpHashMap&& map );
 	~zpHashMap();
@@ -34,7 +34,6 @@ public:
 	zp_bool containsKey( const Key& key ) const;
 	zp_bool containsValue( const Value& value ) const;
 
-	zp_bool remove( const Key& key, Value* outValue = ZP_NULL );
 	zp_bool erase( const Key& key );
 
 	zp_bool find( const Key& key, const Value** outValue ) const;
@@ -49,30 +48,31 @@ private:
 	zp_hash generateHash( zp_hash hash ) const;
 	void resize( zp_uint newSize );
 
-	struct zpMapEntity {
+	struct zpMapEntity
+	{
 		zpMapEntity()
 			: key()
 			, value()
 			, hash( 0 )
 			, next( ZP_NULL )
 		{}
-		zpMapEntity( const Key& key, const Value& value, zp_hash hash, zpMapEntity* next ) :
-			key( key ),
-			value( value ),
-			hash( hash ),
-			next( next )
+		zpMapEntity( const Key& key, const Value& value, zp_hash hash, zpMapEntity* next )
+			: key( key )
+			, value( value )
+			, hash( hash )
+			, next( next )
 		{};
-		zpMapEntity( Key&& key, const Value& value, zp_hash hash, zpMapEntity* next ) :
-			key( (Key&&)key ),
-			value( value ),
-			hash( hash ),
-			next( next )
+		zpMapEntity( Key&& key, const Value& value, zp_hash hash, zpMapEntity* next )
+			: key( zp_move( key ) )
+			, value( value )
+			, hash( hash )
+			, next( next )
 		{};
-		zpMapEntity( Key&& key, Value&& value, zp_hash hash, zpMapEntity* next ) :
-			key( (Key&&)key ),
-			value( (Value&&)value ),
-			hash( hash ),
-			next( next )
+		zpMapEntity( Key&& key, Value&& value, zp_hash hash, zpMapEntity* next )
+			: key( zp_move( key ) )
+			, value( zp_move( value ) )
+			, hash( hash )
+			, next( next )
 		{};
 
 		Key key;

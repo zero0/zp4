@@ -15,7 +15,7 @@ public:
 	virtual void bindRenderTargetAndDepthBuffer() = 0;
 	virtual void unbindRenderTargetAndDepthBuffer() = 0;
 
-	void clearRenderTarget( const zpColor4f color ) {
+	void clearRenderTarget( const zpColor4f& color ) {
 		clearRenderTarget( &color, 1 );
 	}
 	template<zp_uint I>
@@ -41,6 +41,8 @@ public:
 	virtual void setTopology( zpTopology topology ) = 0;
 
 	virtual void setViewport( const zpViewport& viewport ) = 0;
+	virtual void setScissorRect( const zpRect& rect ) = 0;
+	virtual void getScissorRect( zpRect& rect ) const = 0;
 
 	virtual void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state ) = 0;
 	virtual void setRasterState( zpRasterState* raster ) = 0;
