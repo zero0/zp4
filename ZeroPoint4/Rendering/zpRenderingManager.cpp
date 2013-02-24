@@ -50,7 +50,7 @@ zp_bool zpRenderingManager::removeRenderingComponent( zpRenderingComponent* comp
 	for( zp_uint i = ZP_RENDERING_LAYER_Count; i --> 0; ) {
 		if( layers.isMarked( i ) ) {
 			zpRenderingComponent* found = ZP_NULL;
-			zp_uint count = m_renderingComponents[ i ].removeAll( component );
+			zp_uint count = m_renderingComponents[ i ].eraseAll( component );
 			numRemoved += count;
 		}
 	}
@@ -67,7 +67,7 @@ zp_bool zpRenderingManager::addLightComponent( zpLightComponent* light ) {
 zp_bool zpRenderingManager::removeLightComponent( zpLightComponent* light ) {
 	if( !light ) return false;
 
-	zp_uint numRemoved = m_lightComponents.removeAll( light );
+	zp_uint numRemoved = m_lightComponents.eraseAll( light );
 
 	return numRemoved > 0;
 }
@@ -105,7 +105,7 @@ void zpRenderingManager::renderLights() {
 				case ZP_LIGHT_TYPE_POINT:
 				case ZP_LIGHT_TYPE_SPOT:
 					{
-						zpBoundingSphere lightSphere( light->getPosition(), light->getPointRadius() );
+						zpBoundingSphere lightSphere( light->getPosition(), zpScalar( light->getPointRadius() ) );
 						if( zpCollision::testCollision( m_currentCamera->getFrustum(), lightSphere ) ) {
 							shouldRender = true;
 						}

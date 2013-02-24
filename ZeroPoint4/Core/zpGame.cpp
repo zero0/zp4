@@ -140,7 +140,7 @@ void zpGame::serialize( zpSerializedOutput* out )
 {
 	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
 
-	out->writeSerializable( m_window );
+	m_window->serialize( out );
 
 	out->writeBlock( "Managers" );
 	{

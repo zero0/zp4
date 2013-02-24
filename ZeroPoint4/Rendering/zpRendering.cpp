@@ -30,18 +30,18 @@ zpRasterStateDesc::zpRasterStateDesc()
 	, antialiasedLineEnable( false )
 {}
 
-ZP_SERIALIZE_POOLED_OBJECT( CameraComponent )
-ZP_SERIALIZE_POOLED_OBJECT( LightComponent )
-ZP_SERIALIZE_POOLED_OBJECT( StaticMeshRenderingComponent )
+//ZP_SERIALIZE_POOLED_OBJECT( CameraComponent )
+//ZP_SERIALIZE_POOLED_OBJECT( LightComponent )
+//ZP_SERIALIZE_POOLED_OBJECT( StaticMeshRenderingComponent )
 
 void zpRenderingRegisterSerializables() {
-	zpRegisterSerializable::registerSerializable<zpRenderingManager>();
-	zpRegisterSerializable::registerSerializable<zpUIManager>();
-	zpRegisterSerializable::registerSerializable<zpRenderingResourceCreator>();
-
-	ZP_REGISTER_SERIALZED_POOL( CameraComponent );
-	ZP_REGISTER_SERIALZED_POOL( LightComponent );
-	ZP_REGISTER_SERIALZED_POOL( StaticMeshRenderingComponent );
-
-	zpRegisterSerializable::registerSerializable<zpDeferredRenderingComponent>();
+	//zpRegisterSerializable::registerSerializable<zpRenderingManager>();
+	//zpRegisterSerializable::registerSerializable<zpUIManager>();
+	//zpRegisterSerializable::registerSerializable<zpRenderingResourceCreator>();
+	//
+	//ZP_REGISTER_SERIALZED_POOL( CameraComponent );
+	//ZP_REGISTER_SERIALZED_POOL( LightComponent );
+	//ZP_REGISTER_SERIALZED_POOL( StaticMeshRenderingComponent );
+	//
+	//zpRegisterSerializable::registerSerializable<zpDeferredRenderingComponent>();
 }

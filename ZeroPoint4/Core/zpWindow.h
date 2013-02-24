@@ -2,7 +2,8 @@
 #ifndef ZP_WINDOW_H
 #define ZP_WINDOW_H
 
-enum zpWindowStyle : zp_uint {
+enum zpWindowStyle : zp_uint
+{
 	ZP_WINDOW_STYLE_MINIMIZE =		0x0001,
 	ZP_WINDOW_STYLE_MAXIMIZE =		0x0002,
 
@@ -14,18 +15,21 @@ enum zpWindowStyle : zp_uint {
 	ZP_WINDOW_STYLE_DEFAULT =		0,
 };
 
-ZP_PURE_INTERFACE zpWindowFocusListener {
+ZP_PURE_INTERFACE zpWindowFocusListener
+{
 public:
 	virtual void onFocusGained() = 0;
 	virtual void onFocusLost() = 0;
 };
 
-ZP_PURE_INTERFACE zpWindowProcListener {
+ZP_PURE_INTERFACE zpWindowProcListener
+{
 public:
 	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) = 0;
 };
 
-class zpWindow : public zpSerializable {
+class zpWindow
+{
 public:
 	zpWindow();
 	~zpWindow();
@@ -44,8 +48,8 @@ public:
 	void setStyle( zp_uint style );
 	zp_uint getStyle() const;
 
-	zp_ptr getWindowHandle() const;
-	zp_ptr getInstanceHandle() const;
+	zp_handle getWindowHandle() const;
+	zp_handle getInstanceHandle() const;
 
 	void create();
 	void destroy();
@@ -80,8 +84,8 @@ private:
 
 	zp_uint m_style;
 
-	zp_ptr m_hWnd;
-	zp_ptr m_hInstance;
+	zp_handle m_hWnd;
+	zp_handle m_hInstance;
 
 	zpString m_title;
 

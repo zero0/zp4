@@ -18,11 +18,11 @@ zp_bool zpDX11TextureResource::load() {
 	ID3D11ShaderResourceView* resourceView;
 
 	// create the texture from the file
-	hr = D3DX11CreateTextureFromFile( engine->getDevice(), getFilename().c_str(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
+	hr = D3DX11CreateTextureFromFile( engine->getDevice(), getFilename().getChars(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
 	if( FAILED( hr ) ) return false;
 
 	// create the shader resource view from the file
-	hr = D3DX11CreateShaderResourceViewFromFile( engine->getDevice(), getFilename().c_str(), ZP_NULL, ZP_NULL, &resourceView, ZP_NULL );
+	hr = D3DX11CreateShaderResourceViewFromFile( engine->getDevice(), getFilename().getChars(), ZP_NULL, ZP_NULL, &resourceView, ZP_NULL );
 	if( FAILED( hr ) ) return false;
 	
 	// set the texture variables directly
@@ -32,7 +32,7 @@ zp_bool zpDX11TextureResource::load() {
 	
 	// try and get the image info from the file, ok if fails
 	D3DX11_IMAGE_INFO info;
-	hr = D3DX11GetImageInfoFromFile( getFilename().c_str(), ZP_NULL, &info, ZP_NULL );
+	hr = D3DX11GetImageInfoFromFile( getFilename().getChars(), ZP_NULL, &info, ZP_NULL );
 	if( SUCCEEDED( hr ) ) {
 		m_texture.m_width = info.Width;
 		m_texture.m_height = info.Height;

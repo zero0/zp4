@@ -29,30 +29,30 @@
 #define ZP_LOG_ENABLED			1
 
 #if ZP_DEBUG
-#define ZP_ON_DEBUG( code )							do { code ; } while( 0 )
-#define ZP_ON_DEBUG_MSG( msg, ... )					zp_printfln( msg, __VA_ARGS__ )
+#define ZP_ON_DEBUG( code )			do { code ; } while( 0 )
+#define ZP_ON_DEBUG_MSG( msg, ... )	zp_printfln( msg, __VA_ARGS__ )
 #else
-#define ZP_ON_DEBUG( code )							(void)0
-#define ZP_ON_DEBUG_MSG( msg, ... )					(void)0
+#define ZP_ON_DEBUG( code )			(void)0
+#define ZP_ON_DEBUG_MSG( msg, ... )	(void)0
 #endif
 
 #if ZP_USE_ASSERTIONS
-#define ZP_ASSERT( test, msg, ... )					zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
+#define ZP_ASSERT( test, msg, ... )	zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
 #else
-#define ZP_ASSERT( test, msg, ... )					(void)0
+#define ZP_ASSERT( test, msg, ... )	(void)0
 #endif
 
-#define ZP_STDCALL		__stdcall
-#define ZP_FASTCALL		__fastcall
+#define ZP_STDCALL					__stdcall
+#define ZP_FASTCALL					__fastcall
 
-#define ZP_INLINE		inline
-#define ZP_FORCE_INLINE	__forceinline
-#define ZP_NO_VTABLE	__declspec( novtable )
-#define ZP_ALIGN(x)		__declspec( align( x ) )
-#define ZP_ALIGN16		ZP_ALIGN( 16 )
+#define ZP_INLINE					inline
+#define ZP_FORCE_INLINE				__forceinline
+#define ZP_NO_VTABLE				__declspec( novtable )
+#define ZP_ALIGN(x)					__declspec( align( x ) )
+#define ZP_ALIGN16					ZP_ALIGN( 16 )
 
-#define ZP_PURE_INTERFACE	class ZP_NO_VTABLE
-#define ZP_ABSTRACT_CLASS	class ZP_NO_VTABLE
+#define ZP_PURE_INTERFACE			class ZP_NO_VTABLE
+#define ZP_ABSTRACT_CLASS			class ZP_NO_VTABLE
 
 #define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }
 #define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }

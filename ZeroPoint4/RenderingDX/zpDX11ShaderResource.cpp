@@ -79,8 +79,8 @@ zp_bool zpDX11ShaderResource::load() {
 	zpArrayList<D3D10_SHADER_MACRO> macros;
 	macroProperties.foreach( [ &macros ]( const zpString& key, const zpString& val ) {
 		D3D10_SHADER_MACRO t;
-		t.Name = key.c_str();
-		t.Definition = val.c_str();
+		t.Name = key.getChars();
+		t.Definition = val.getChars();
 
 		macros.pushBack( t );
 	} );
@@ -90,7 +90,7 @@ zp_bool zpDX11ShaderResource::load() {
 	if( shaderProperties.hasProperty( "shader.ps" ) ) {
 		zpString function = shaderProperties[ "shader.ps" ];
 		
-		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), ps_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
+		hr = D3DX11CompileFromFile( shaderFile.getChars(), macros.begin(), ZP_NULL, function.getChars(), ps_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
 			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
@@ -116,7 +116,7 @@ zp_bool zpDX11ShaderResource::load() {
 		zpString function = shaderProperties[ "shader.vs" ];
 		zpString layout = shaderProperties[ "shader.vs.layout" ];
 
-		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), vs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
+		hr = D3DX11CompileFromFile( shaderFile.getChars(), macros.begin(), ZP_NULL, function.getChars(), vs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
 			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
@@ -147,7 +147,7 @@ zp_bool zpDX11ShaderResource::load() {
 	if( shaderProperties.hasProperty( "shader.gs" ) ) {
 		zpString function = shaderProperties[ "shader.gs" ];
 
-		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), gs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
+		hr = D3DX11CompileFromFile( shaderFile.getChars(), macros.begin(), ZP_NULL, function.getChars(), gs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
 			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}
@@ -169,15 +169,16 @@ zp_bool zpDX11ShaderResource::load() {
 			else
 			// create stream out geometry shader
 			{
-				zpArrayList<D3D11_SO_DECLARATION_ENTRY> entries( streamProperties.size() );
+				zpArrayList<D3D11_SO_DECLARATION_ENTRY> entries;
+				entries.ensureCapacity( streamProperties.size() );
 
 				streamProperties.foreach( [ &entries ]( const zpString& key, const zpString& val ) {
 					D3D11_SO_DECLARATION_ENTRY entry;
-					zp_uint index;
+					zp_uint index = 0;
 
 					// grab the values from the string using a scan
-					val.scan( "%d,%d,%d,%d,%d,%d", &index, &entry.Stream, &entry.SemanticIndex, &entry.StartComponent, &entry.ComponentCount, &entry.OutputSlot );
-					entry.SemanticName = key.c_str();
+					//val.scan( "%d,%d,%d,%d,%d,%d", &index, &entry.Stream, &entry.SemanticIndex, &entry.StartComponent, &entry.ComponentCount, &entry.OutputSlot );
+					entry.SemanticName = key.getChars();
 
 					entries[ index ] = entry;
 				} );
@@ -205,7 +206,7 @@ zp_bool zpDX11ShaderResource::load() {
 	if( shaderProperties.hasProperty( "shader.cs" ) ) {
 		zpString function = shaderProperties[ "shader.cs" ];
 
-		hr = D3DX11CompileFromFile( shaderFile.c_str(), macros.begin(), ZP_NULL, function.c_str(), cs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
+		hr = D3DX11CompileFromFile( shaderFile.getChars(), macros.begin(), ZP_NULL, function.getChars(), cs_version, shaderFlags, 0, ZP_NULL, &blob, &errors, ZP_NULL );
 		if( errors ) {
 			zpLog::error() << (const zp_char*)errors->GetBufferPointer() << zpLog::endl;
 		}

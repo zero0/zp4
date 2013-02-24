@@ -59,6 +59,13 @@ class zpCollision;
 
 namespace zpMath
 {
+	ZP_FORCE_INLINE void DegToRad( zpScalar& s, const zpScalar& a );
+	ZP_FORCE_INLINE void RadToDeg( zpScalar& s, const zpScalar& a );
+
+	ZP_FORCE_INLINE void Sin( zpScalar& s, const zpScalar& a );
+	ZP_FORCE_INLINE void Cos( zpScalar& s, const zpScalar& a );
+	ZP_FORCE_INLINE void Tan( zpScalar& s, const zpScalar& a );
+
 	ZP_FORCE_INLINE void Add( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	ZP_FORCE_INLINE void Sub( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	ZP_FORCE_INLINE void Mul( zpScalar& s, const zpScalar& a, const zpScalar& b );
@@ -99,6 +106,7 @@ namespace zpMath
 
 	ZP_FORCE_INLINE void Mul( zpVector4f& s, const zpVector4f& a, const zpMatrix4f& b );
 	ZP_FORCE_INLINE void Mul( zpMatrix4f& s, const zpMatrix4f& a, const zpMatrix4f& b );
+	ZP_FORCE_INLINE void Mul( zpMatrix4f& s, const zpScalar& a, const zpMatrix4f& b );
 
 	ZP_FORCE_INLINE void Abs( zpScalar& s, const zpScalar& a );
 	ZP_FORCE_INLINE void Abs( zpVector4f& s, const zpVector4f& a );
@@ -130,6 +138,13 @@ namespace zpMath
 		Cmp( s, a, b );
 		return s;
 	}
+
+	ZP_FORCE_INLINE void LookAtLH( zpMatrix4f& s, const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up );
+	ZP_FORCE_INLINE void PerspectiveLH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar );
+
+	ZP_FORCE_INLINE void Transpose( zpMatrix4f& s, const zpMatrix4f& a );
+	ZP_FORCE_INLINE void Determinant( zpScalar& s, const zpMatrix4f& a );
+	ZP_FORCE_INLINE void Invert( zpMatrix4f& s, const zpMatrix4f& a );
 };
 
 #if ZP_USE_SIMD

@@ -38,6 +38,7 @@ zpFontResource::zpFontResource() {}
 zpFontResource::~zpFontResource() {}
 
 zp_bool zpFontResource::load() {
+#if 0
 	zpXmlParser xml;
 	if( !xml.parseFile( getFilename(), true ) ) return false;
 	//xml.writeToFile( xml.getRootNode(), "" );
@@ -131,7 +132,7 @@ zp_bool zpFontResource::load() {
 	//if( !getContentManager()->loadResource( m_fontSet.file, m_fontSet.file ) ) return false;
 
 	m_fontTexture = getContentManager()->createInstanceOfResource<zpTextureResource>( m_fontSet.file );
-
+#endif
 	return true;
 }
 void zpFontResource::unload() {

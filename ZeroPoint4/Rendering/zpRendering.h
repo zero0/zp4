@@ -19,7 +19,8 @@
 #define ZP_RENDERING_LAYER_Count		( sizeof( ZP_RENDERING_LAYER_TYPE ) * 8 )
 typedef zpFlag<ZP_RENDERING_LAYER_TYPE>	zpRenderLayer;
 
-enum {
+enum
+{
 	ZP_RENDERING_GLOBAL_BUFFER_WORLD,
 	ZP_RENDERING_GLOBAL_BUFFER_CAMERA,
 	ZP_RENDERING_GLOBAL_BUFFER_LIGHT,
@@ -35,7 +36,8 @@ enum {
 #error( "No rendering engine selected!" )
 #endif
 
-enum zpRenderingEngineType {
+enum zpRenderingEngineType
+{
 	ZP_RENDERING_ENGINE_NONE =			0,
 
 	ZP_RENDERING_ENGINE_OPENGL =		0x1000,
@@ -53,7 +55,8 @@ enum zpRenderingEngineType {
 	ZP_RENDERING_ENGINE_DX11,
 };
 
-enum zpDisplayFormat {
+enum zpDisplayFormat
+{
 	ZP_DISPLAY_FORMAT_UNKNOWN	=		0,
 
 	// R Component
@@ -106,20 +109,23 @@ enum zpDisplayFormat {
 	ZP_DISPLAY_FORMAT_D32_FLOAT,
 };
 
-enum zpScreenMode {
+enum zpScreenMode
+{
 	ZP_SCREEN_MODE_FULLSCREEN,
 	ZP_SCREEN_MODE_WINDOWED,
 	ZP_SCREEN_MODE_FULLSCREEN_WINDOWED,
 };
 
-struct zpDisplayMode {
+struct zpDisplayMode
+{
 	zp_uint width;
 	zp_uint height;
 	zp_uint refreshRate;
 	zpDisplayFormat displayFormat;
 };
 
-enum zpBufferType {
+enum zpBufferType
+{
 	ZP_BUFFER_TYPE_VERTEX,
 	ZP_BUFFER_TYPE_INDEX,
 	ZP_BUFFER_TYPE_CONSTANT,
@@ -130,20 +136,23 @@ enum zpBufferType {
 	ZP_BUFFER_TYPE_UNORDERED_ACCESS,
 };
 
-enum zpBufferBindType {
+enum zpBufferBindType
+{
 	ZP_BUFFER_BIND_DEFAULT,
 	ZP_BUFFER_BIND_DYNAMIC,
 	ZP_BUFFER_BIND_IMMUTABLE,
 };
 
-enum zpMapType {
+enum zpMapType
+{
 	ZP_MAP_TYPE_READ,
 	ZP_MAP_TYPE_WRITE,
 	ZP_MAP_TYPE_READ_WRITE,
 	ZP_MAP_TYPE_WRITE_DISCARD,
 };
 
-enum zpTopology {
+enum zpTopology
+{
 	ZP_TOPOLOGY_UNKNOWN,
 
 	ZP_TOPOLOGY_POINT_LIST,
@@ -155,14 +164,16 @@ enum zpTopology {
 	ZP_TOPOLOGY_TRIANGLE_STRIP,
 };
 
-enum zpResourceBindSlot {
+enum zpResourceBindSlot
+{
 	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER =	0x01,
 	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER =	0x02,
 	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER =	0x04,
 	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER =	0x08,
 };
 
-enum zpMaterialTextureSlot {
+enum zpMaterialTextureSlot
+{
 	ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE =		0,
 	ZP_MATERIAL_TEXTURE_SLOT_NORMAL,
 	ZP_MATERIAL_TEXTURE_SLOT_SPECULAR,
@@ -172,14 +183,16 @@ enum zpMaterialTextureSlot {
 	ZP_MATERIAL_TEXTURE_SLOT_Count
 };
 
-enum zpTextureWrap {
+enum zpTextureWrap
+{
 	ZP_TEXTURE_WRAP_REPEAT =		1,
 	ZP_TEXTURE_WRAP_MIRROR,
 	ZP_TEXTURE_WRAP_CLAMP,
 	ZP_TEXTURE_WRAP_BORDER,
 };
 
-enum zpTextureFilter {
+enum zpTextureFilter
+{
 	ZP_TEXTURE_FILTER_POINT =					0x01,
 	ZP_TEXTURE_FILTER_LINEAR =					0x02,
 	ZP_TEXTURE_FILTER_ANISOTROPIC =				0x04,
@@ -189,8 +202,9 @@ enum zpTextureFilter {
 	ZP_TEXTURE_FILTER_COMPARISON_ANISOTROPIC =	0x14,
 };
 
-enum zpComparisonFunc {
-	ZP_COMPARISON_FUNC_NONE =		1,
+enum zpComparisonFunc
+{
+	ZP_COMPARISON_FUNC_NONE =		0,
 	ZP_COMPARISON_FUNC_LESS,
 	ZP_COMPARISON_FUNC_LESS_EQUAL,
 	ZP_COMPARISON_FUNC_EQUAL,
@@ -200,42 +214,49 @@ enum zpComparisonFunc {
 	ZP_COMPARISON_FUNC_ALWAYS,
 };
 
-enum zpCullMode {
-	ZP_CULL_MODE_NONE =		1,
+enum zpCullMode
+{
+	ZP_CULL_MODE_NONE =		0,
 	ZP_CULL_MODE_FRONT,
 	ZP_CULL_MODE_BACK,
 };
 
-enum zpFillMode {
+enum zpFillMode
+{
 	ZP_FILL_MODE_SOLID =	1,
 	ZP_FILL_MODE_WIREFRAME,
 };
 
-enum zpFrontFace {
+enum zpFrontFace
+{
 	ZP_FRONT_FACE_CW =		1,
 	ZP_FRONT_FACE_CCW,
 };
 
-enum zpCpuAccess {
+enum zpCpuAccess
+{
 	ZP_CPU_ACCESS_NONE =	0,
 	ZP_CPU_ACCESS_READ,
 	ZP_CPU_ACCESS_WRITE,
 	ZP_CPU_ACCESS_READ_WRITE,
 };
 
-struct zpSamplerStateDesc {
-	struct {
-		zpComparisonFunc cmpFunc : 8;
+struct zpSamplerStateDesc
+{
+	struct
+	{
+		zpComparisonFunc cmpFunc :  8;
 		zpTextureFilter minFilter : 8;
 		zpTextureFilter magFilter : 8;
 		zpTextureFilter mipFilter : 8;
 	};
 
-	struct {
+	struct
+	{
 		zpTextureWrap texWrapU : 8;
 		zpTextureWrap texWrapV : 8;
 		zpTextureWrap texWrapW : 8;
-		zp_byte maxAnisotrpy : 8;
+		zp_byte maxAnisotrpy :   8;
 	};
 
 	zp_float lodMin;
@@ -247,7 +268,8 @@ struct zpSamplerStateDesc {
 	zpSamplerStateDesc();
 };
 
-struct zpRasterStateDesc {
+struct zpRasterStateDesc
+{
 	zpFillMode fillMode;
 	zpCullMode cullMode;
 	zpFrontFace frontFace;
@@ -354,12 +376,12 @@ class zpDeferredRenderingComponent;
 #include "zpUIRenderingComponent.h"
 
 #include "zpDeferredRenderingComponent.h"
-
-typedef zpPooledObject<zpUIRenderingComponent, 32> zpUIRenderingComponentPool;
-typedef zpPooledObject<zpCameraComponent, 32> zpCameraComponentPool;
-typedef zpPooledObject<zpLightComponent, 128> zpLightComponentPool;
-typedef zpPooledObject<zpStaticMeshRenderingComponent, 128> zpStaticMeshRenderingComponentPool;
-
+//
+//typedef zpPooledObject<zpUIRenderingComponent, 32> zpUIRenderingComponentPool;
+//typedef zpPooledObject<zpCameraComponent, 32> zpCameraComponentPool;
+//typedef zpPooledObject<zpLightComponent, 128> zpLightComponentPool;
+//typedef zpPooledObject<zpStaticMeshRenderingComponent, 128> zpStaticMeshRenderingComponentPool;
+//
 void zpRenderingRegisterSerializables();
 
 #endif

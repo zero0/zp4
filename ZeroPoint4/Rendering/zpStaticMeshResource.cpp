@@ -11,7 +11,7 @@ zpStaticMeshPart::~zpStaticMeshPart() {
 }
 
 zpStaticMeshResource::zpStaticMeshResource()
-	: m_meshParts( 1 )
+	: m_meshParts()
 {}
 zpStaticMeshResource::~zpStaticMeshResource() {
 	unload();

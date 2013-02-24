@@ -29,7 +29,7 @@ public:
 	}
 	AweString( const zpString& str ) : m_aweString( ZP_NULL ) {
 		m_zpString = str;
-		m_aweString = awe_string_create_from_ascii( m_zpString.c_str(), m_zpString.length() );
+		m_aweString = awe_string_create_from_ascii( m_zpString.getChars(), m_zpString.length() );
 	}
 	~AweString() {
 		if( m_aweString ) {
@@ -63,12 +63,12 @@ void __jsout( awe_webview* caller, const awe_string* message, int line_number, c
 	zpString src;
 	awe_string_to_std( source, src );
 
-	//zp_printfcln( zp_console_color( CC_CYAN, CC_GRAY ), "%s[%d]: %s", src.c_str(), line_number, msg.c_str() );
+	//zp_printfcln( zp_console_color( CC_CYAN, CC_GRAY ), "%s[%d]: %s", src.getChars(), line_number, msg.getChars() );
 }
 awe_resource_response* __jsrequestresource( awe_webview* caller, awe_resource_request* request ) {
 	AweString url( awe_resource_request_get_url( request ) );
 
-	//zp_printfln( "Request: %s", ( (const std::string&)url ).c_str() );
+	//zp_printfln( "Request: %s", ( (const std::string&)url ).getChars() );
 
 	return awe_resource_response_create_from_file( url );
 }
@@ -80,12 +80,12 @@ zpUIRenderingComponent::zpUIRenderingComponent()
 zpUIRenderingComponent::~zpUIRenderingComponent() {}
 
 void zpUIRenderingComponent::render() {
-	zpRenderingContext* context = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
-
-	context->setShader( &m_uiShader );
-	context->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, m_texture );
-
-	m_uiVertexBuffer.draw();
+	//zpRenderingContext* context = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
+	//
+	//context->setShader( &m_uiShader );
+	//context->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, m_texture );
+	//
+	//m_uiVertexBuffer.draw();
 }
 
 void zpUIRenderingComponent::receiveMessage( const zpMessage& message ) {}
@@ -93,7 +93,9 @@ void zpUIRenderingComponent::receiveMessage( const zpMessage& message ) {}
 void zpUIRenderingComponent::serialize( zpSerializedOutput* out ) {}
 void zpUIRenderingComponent::deserialize( zpSerializedInput* in ) {}
 
-void zpUIRenderingComponent::onCreate() {
+void zpUIRenderingComponent::onCreate()
+{
+	/*
 	zpContentManager* content = getGame()->getGameManagers()->getContentManager();
 
 	m_ui = content->createInstanceOfResource<zpUIResource>( m_uiAlias );
@@ -141,6 +143,7 @@ void zpUIRenderingComponent::onUpdate() {
 			zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext()->updateTexture( m_texture, (void*)awe_renderbuffer_get_buffer( buffer ) );
 		}
 	}
+	*/
 }
 
 void zpUIRenderingComponent::onEnabled() {}

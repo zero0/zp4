@@ -92,7 +92,7 @@ zp_bool zpDX11RenderingEngine::create() {
 	}
 
 	// create the immediate context wrapper
-	m_immediateContext = new zpDX11RenderingContext( immediate, "immediate" );
+	m_immediateContext = new zpDX11RenderingContext( immediate, zpString( "immediate" ) );
 
 	// get the actual feature level of the rendering engine
 	switch( m_d3dDevice->GetFeatureLevel() ) {
@@ -169,7 +169,8 @@ zp_uint zpDX11RenderingEngine::enumerateDisplayModes( zpDisplayFormat displayFor
 	hr = adapterOutput->GetDisplayModeList( format, DXGI_ENUM_MODES_INTERLACED, &numModes, ZP_NULL );
 	HR_MSG_V( hr, 0, "Unable to list display modes." );
 
-	zpArrayList<DXGI_MODE_DESC> modes( numModes );
+	zpArrayList<DXGI_MODE_DESC> modes;
+	modes.ensureCapacity( numModes );
 	hr = adapterOutput->GetDisplayModeList( format, DXGI_ENUM_MODES_INTERLACED, &numModes, modes.begin() );
 	HR_MSG_V( hr, 0, "Unable to list display modes." );
 
@@ -264,16 +265,16 @@ zpRenderingContext* zpDX11RenderingEngine::createRenderingContext( const zpStrin
 	return ctx;
 }
 zp_bool zpDX11RenderingEngine::removeRenderingContext( const zpString& name ) {
-	zpRenderingContext* ctx = ZP_NULL;
-
-	m_contexts.removeFirstIf( [ &name ]( zpRenderingContext* c ) -> zp_bool {
-		return c->getName() == name;
-	}, &ctx );
-
-	if( ctx ) {
-		ctx->removeReference();
-		return true;
-	}
+	//zpRenderingContext* ctx = ZP_NULL;
+	//
+	//m_contexts.indexOf( [ &name ]( zpRenderingContext* c ) -> zp_bool {
+	//	return c->getName() == name;
+	//}, &ctx );
+	//
+	//if( ctx ) {
+	//	ctx->removeReference();
+	//	return true;
+	//}
 	return false;
 }
 zpRenderingContext* zpDX11RenderingEngine::getRenderingContextByIndex( zp_uint index ) const {

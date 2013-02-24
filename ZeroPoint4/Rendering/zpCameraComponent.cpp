@@ -31,7 +31,7 @@ void zpCameraComponent::serialize( zpSerializedOutput* out ) {
 void zpCameraComponent::deserialize( zpSerializedInput* in ) {}
 
 void zpCameraComponent::onCreate() {
-	m_manager = getGame()->getGameManagers()->getRenderingManager();
+	//m_manager = getGame()->getGameManagers()->getRenderingManager();
 }
 void zpCameraComponent::onDestroy() {}
 

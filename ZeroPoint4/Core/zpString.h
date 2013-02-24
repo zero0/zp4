@@ -29,16 +29,22 @@ public:
 	void setCharAt( zp_uint index, zp_char ch );
 	zp_char charAt( zp_uint index ) const;
 
+	zp_bool startsWith( const zp_char* string ) const;
 	zp_bool startsWith( const zpString& string ) const;
+
+	zp_bool endsWith( const zp_char* string ) const;
 	zp_bool endsWith( const zpString& string ) const;
 
 	zp_int indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
+	zp_int indexOf( const zp_char* string, zp_uint fromIndex = 0 ) const;
 	zp_int indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
 
 	zp_int indexOfIgnoreCase( zp_char ch, zp_uint fromIndex = 0 ) const;
+	zp_int indexOfIgnoreCase( const zp_char* string, zp_uint fromIndex = 0 ) const;
 	zp_int indexOfIgnoreCase( const zpString& string, zp_uint fromIndex = 0 ) const;
 
 	zp_int lastIndexOf( zp_char ch, zp_int fromIndex = 0 ) const;
+	zp_int lastIndexOf( const zp_char* string, zp_int fromIndex = 0 ) const;
 	zp_int lastIndexOf( const zpString& string, zp_int fromIndex = 0 ) const;
 
 	zp_int findFirstOf( const zpString& string, zp_uint fromIndex = 0 ) const;

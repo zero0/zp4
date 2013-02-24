@@ -81,7 +81,9 @@ void zpDeferredRenderingComponent::deserialize( zpSerializedInput* in ) {
 	in->endBlock();
 }
 
-void zpDeferredRenderingComponent::onCreate() {
+void zpDeferredRenderingComponent::onCreate()
+{
+	/*
 	m_renderingManager = getGame()->getGameManagers()->getRenderingManager();
 	m_contentManager = getGame()->getGameManagers()->getContentManager();
 	m_renderingEngine = zpRenderingFactory::getRenderingEngine();
@@ -166,6 +168,7 @@ void zpDeferredRenderingComponent::onCreate() {
 
 	m_fullscreenShader = m_contentManager->createInstanceOfResource<zpShaderResource>( "fullscreenNoAlpha" );
 	m_texture = m_contentManager->createInstanceOfResource<zpTextureResource>( "test_texture" );
+	*/
 }
 void zpDeferredRenderingComponent::onDestroy() {
 	getGame()->setRenderable( ZP_NULL );

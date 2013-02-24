@@ -14,6 +14,13 @@ struct zpScalar
 
 	zp_float getFloat() const { return m_x; }
 
+	friend void zpMath::DegToRad( zpScalar& s, const zpScalar& a );
+	friend void zpMath::RadToDeg( zpScalar& s, const zpScalar& a );
+
+	friend void zpMath::Sin( zpScalar& s, const zpScalar& a );
+	friend void zpMath::Cos( zpScalar& s, const zpScalar& a );
+	friend void zpMath::Tan( zpScalar& s, const zpScalar& a );
+
 	friend void zpMath::Add( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	friend void zpMath::Sub( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	friend void zpMath::Mul( zpScalar& s, const zpScalar& a, const zpScalar& b );
@@ -28,6 +35,8 @@ struct zpScalar
 	friend void zpMath::Sub( zpVector4f& s, const zpScalar& a, const zpVector4f& b );
 	friend void zpMath::Mul( zpVector4f& s, const zpScalar& a, const zpVector4f& b );
 	friend void zpMath::Div( zpVector4f& s, const zpScalar& a, const zpVector4f& b );
+
+	friend void zpMath::Mul( zpMatrix4f& s, const zpScalar& a, const zpMatrix4f& b );
 
 	friend void zpMath::Madd( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& c );
 	friend void zpMath::Madd( zpVector4f& s, const zpVector4f& a, const zpScalar& b, const zpVector4f& c );
@@ -48,6 +57,8 @@ struct zpScalar
 	friend void zpMath::Max( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	friend void zpMath::Min( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	friend void zpMath::Cmp( zp_int& s, const zpScalar& a, const zpScalar& b );
+
+	friend void zpMath::Determinant( zpScalar& s, const zpMatrix4f& a );
 
 private:
 	zp_float m_x, m_y, m_z, m_w;
@@ -135,7 +146,6 @@ struct zp_vec4
 		w = m.w;
 	}
 
-private:
 	union
 	{
 		zp_float v[4];

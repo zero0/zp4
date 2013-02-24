@@ -66,6 +66,14 @@ public:
 
 	friend void zpMath::Mul( zpVector4f& s, const zpVector4f& a, const zpMatrix4f& b );
 	friend void zpMath::Mul( zpMatrix4f& s, const zpMatrix4f& a, const zpMatrix4f& b );
+	friend void zpMath::Mul( zpMatrix4f& s, const zpScalar& a, const zpMatrix4f& b );
+
+	friend void zpMath::LookAtLH( zpMatrix4f& s, const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up );
+	friend void zpMath::PerspectiveLH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar );
+
+	friend void zpMath::Transpose( zpMatrix4f& s, const zpMatrix4f& a );
+	friend void zpMath::Determinant( zpScalar& s, const zpMatrix4f& a );
+	friend void zpMath::Invert( zpMatrix4f& s, const zpMatrix4f& a );
 
 private:
 	union
