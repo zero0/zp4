@@ -18,8 +18,8 @@ zpSamplerStateDesc::zpSamplerStateDesc()
 {}
 
 zpRasterStateDesc::zpRasterStateDesc()
-	: fillMode( ZP_FILL_MODE_SOLID )
-	, cullMode( ZP_CULL_MODE_BACK )
+	: cullMode( ZP_CULL_MODE_BACK )
+	, fillMode( ZP_FILL_MODE_SOLID )
 	, frontFace( ZP_FRONT_FACE_CW )
 	, depthBias( 0 )
 	, depthBiasClamp( 0.f )

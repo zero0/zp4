@@ -8,41 +8,41 @@ zpStaticMeshRenderingComponent::~zpStaticMeshRenderingComponent()
 
 void zpStaticMeshRenderingComponent::render()
 {
-	if( !m_mesh ) return;
-
-	zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
-
-	zpMatrix4f trans;
-	zpMath::Mul( trans, m_localTransform, getParentGameObject()->getTransform() );
-
-	//m_manager->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_WORLD )->update( (zp_float*)trans );
-
-	zp_uint numParts = m_mesh.getResource()->getNumMeshParts();
-	for( zp_uint i = 0; i < numParts; ++i )
-	{
-		const zpStaticMeshPart& part = m_mesh.getResource()->getMeshPart( i );
-
-		if( !part.shader ) continue;
-
-		c->setTopology( part.topology );
-		c->setBuffer( part.vertexBuffer );
-		c->setShader( &part.shader );
-
-		for( zp_uint t = 0; t < ZP_STATIC_MESH_PART_NUM_TEXTURES; ++t )
-		{
-			if( part.textures[ i ] ) c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, i, part.textures[ i ].getResource()->getTexture() );
-		}
-
-		if( part.indexBuffer )
-		{
-			c->setBuffer( part.indexBuffer );
-			c->drawIndexed( part.indexBuffer->getCount() );
-		}
-		else
-		{
-			c->draw( part.vertexBuffer->getCount() );
-		}
-	}
+	//if( !m_mesh ) return;
+	//
+	//zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
+	//
+	//zpMatrix4f trans;
+	//zpMath::Mul( trans, m_localTransform, getParentGameObject()->getTransform() );
+	//
+	////m_manager->getGlobalBuffer( ZP_RENDERING_GLOBAL_BUFFER_WORLD )->update( (zp_float*)trans );
+	//
+	//zp_uint numParts = m_mesh.getResource()->getNumMeshParts();
+	//for( zp_uint i = 0; i < numParts; ++i )
+	//{
+	//	const zpStaticMeshPart& part = m_mesh.getResource()->getMeshPart( i );
+	//
+	//	if( !part.shader ) continue;
+	//
+	//	c->setTopology( part.topology );
+	//	c->setBuffer( part.vertexBuffer );
+	//	c->setShader( &part.shader );
+	//
+	//	for( zp_uint t = 0; t < ZP_STATIC_MESH_PART_NUM_TEXTURES; ++t )
+	//	{
+	//		if( part.textures[ i ] ) c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, i, part.textures[ i ].getResource()->getTexture() );
+	//	}
+	//
+	//	if( part.indexBuffer )
+	//	{
+	//		c->setBuffer( part.indexBuffer );
+	//		c->drawIndexed( part.indexBuffer->getCount() );
+	//	}
+	//	else
+	//	{
+	//		c->draw( part.vertexBuffer->getCount() );
+	//	}
+	//}
 }
 
 void zpStaticMeshRenderingComponent::receiveMessage( const zpMessage& message )

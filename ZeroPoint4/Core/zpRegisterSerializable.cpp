@@ -1,5 +1,6 @@
 #include "zpCore.h"
 
+#if 0
 zpHashMap<zpString, zpRegisterSerializable::CreateSerializableFunction> zpRegisterSerializable::s_creators;
 
 zpRegisterSerializable::zpRegisterSerializable() {}
@@ -15,3 +16,4 @@ void zpRegisterSerializable::registerSerializable( const zpString& name, zpRegis
 zpSerializable* zpRegisterSerializable::createSerializable( const zpString& name ) {
 	return s_creators[ name ]();
 }
+#endif

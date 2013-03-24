@@ -57,7 +57,7 @@ private:
 	zp_float m_fovy;
 	zp_float m_aspectRatio;
 
-	zpRect m_orthoRect;
+	zpRecti m_orthoRect;
 
 	zpVector4f m_up;
 	zpVector4f m_lookTo;

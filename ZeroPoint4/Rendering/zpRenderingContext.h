@@ -2,7 +2,41 @@
 #ifndef ZP_RENDERING_CONTEXT
 #define ZP_RENDERING_CONTEXT
 
-ZP_PURE_INTERFACE zpRenderingContext : public zpReferencedObject {
+class zpRenderingEngineImpl;
+class zpRenderingContextImpl;
+
+class zpRenderingContext
+{
+	ZP_NON_COPYABLE( zpRenderingContext );
+public:
+
+	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
+
+	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
+	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
+
+	void setViewport( const zpViewport& viewport );
+	void setScissorRect( const zpRecti& rect );
+
+	void setRasterState( zpRasterState* raster );
+
+	void processCommands();
+
+private:
+	zpRenderingContext( zpRenderingEngine* engine, zpRenderingContextImpl* impl );
+
+	zpRenderingContextImpl* m_renderContextImpl;
+	zpRenderingEngine* m_renderingEngine;
+
+	zpRenderingCommand* m_currentCommnad;
+	zpFixedArrayList< zpRenderingCommand, ZP_RENDERING_MAX_COMMNADS > m_renderingCommands;
+
+	friend class zpRenderingEngine;
+};
+
+/*
+ZP_PURE_INTERFACE zpRenderingContext
+{
 public:
 	virtual const zpString& getName() const = 0;
 
@@ -41,8 +75,8 @@ public:
 	virtual void setTopology( zpTopology topology ) = 0;
 
 	virtual void setViewport( const zpViewport& viewport ) = 0;
-	virtual void setScissorRect( const zpRect& rect ) = 0;
-	virtual void getScissorRect( zpRect& rect ) const = 0;
+	virtual void setScissorRect( const zpRecti& rect ) = 0;
+	virtual void getScissorRect( zpRecti& rect ) const = 0;
 
 	virtual void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state ) = 0;
 	virtual void setRasterState( zpRasterState* raster ) = 0;
@@ -56,5 +90,6 @@ public:
 	virtual void drawAuto() = 0;
 	virtual void drawIndexed( zp_uint indexCount, zp_uint startIndex = 0, zp_uint startVertex = 0 ) = 0;
 };
+*/
 
 #endif

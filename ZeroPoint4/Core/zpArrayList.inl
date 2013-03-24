@@ -20,6 +20,13 @@ zpArrayList<T>::zpArrayList( const zpArrayList& arr )
 	}
 }
 template<typename T>
+zpArrayList<T>::zpArrayList( T* fixedArray, zp_uint count )
+	: m_array( fixedArray )
+	, m_size( 0 )
+	, m_capacity( count )
+	, m_isFixed( true )
+{}
+template<typename T>
 zpArrayList<T>::zpArrayList( zpArrayList&& arr )
 	: m_array( ZP_NULL )
 	, m_size( 0 )
@@ -215,6 +222,12 @@ void zpArrayList<T>::clear()
 }
 
 template<typename T>
+void zpArrayList<T>::reset()
+{
+	m_size = 0;
+}
+
+template<typename T>
 zp_int zpArrayList<T>::indexOf( const T& val ) const
 {
 	for( zp_uint i = 0; i < m_size; ++i )
@@ -264,7 +277,6 @@ void zpArrayList<T>::ensureCapacity( zp_uint size )
 		delete[] m_array;
 	}
 	m_array = newArray;
-	
 }
 
 template<typename T>
@@ -400,10 +412,7 @@ void zpArrayList<T>::map( Func func )
 
 template<typename T, zp_uint Size>
 zpFixedArrayList<T, Size>::zpFixedArrayList()
-	: m_array( m_fixedArray )
-	, m_size( 0 )
-	, m_capacity( Size )
-	, m_isFixed( true )
+	: zpArrayList<T>( m_fixedArray, Size )
 {}
 template<typename T, zp_uint Size>
 zpFixedArrayList<T, Size>::~zpFixedArrayList()

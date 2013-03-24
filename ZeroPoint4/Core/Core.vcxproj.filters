@@ -254,6 +254,9 @@
     <None Include="zpMathFpu.inl">
       <Filter>Source Files\Fpu</Filter>
     </None>
+    <None Include="zpRect.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpGameObject.cpp">
@@ -335,9 +338,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpCollision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpRect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpSerializable.cpp">

@@ -14,9 +14,9 @@ public:
 private:
 	zpDX11TextureResource();
 
-	zpDX11Texture m_texture;
+	//zpDX11Texture m_texture;
 
-	friend class zpDX11RenderingEngine;
+	//friend class zpDX11RenderingEngine;
 };
 
 #endif

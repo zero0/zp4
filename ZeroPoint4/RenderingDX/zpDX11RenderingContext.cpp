@@ -1,9 +1,111 @@
 #include "zpDX11.h"
 #include <D3D11.h>
 #include "zpDX11Util.h"
+#include "Rendering/zpRendering.h"
 
 #define MAX_SET_BUFFER_VERTEX_COUNT	8
 
+zpRenderingContextImpl::zpRenderingContextImpl( ID3D11DeviceContext* context )
+	: m_context( context )
+{}
+zpRenderingContextImpl::~zpRenderingContextImpl()
+{
+	ZP_SAFE_RELEASE( m_context );
+}
+
+void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingCommand >& renderCommands )
+{
+	const zp_uint count = renderCommands.size();
+	for( zp_uint i = 0; i < count; ++i )
+	{
+		const zpRenderingCommand& command = renderCommands[ i ];
+
+		switch( command.type )
+		{
+		case ZP_RENDERING_COMMNAD_NOOP:
+			break;
+
+		case ZP_RENDERING_COMMNAD_CLEAR_RT:
+			{
+				zpTextureImpl* t = command.clearRenderTarget->getTextureImpl();
+				m_context->ClearRenderTargetView( t->m_textureRenderTarget, command.clearColor.asFloat4() );
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_CLEAR_DEPTH_STENCIL:
+			{
+				m_context->ClearDepthStencilView( ZP_NULL, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, command.clearDepth, command.clearStencil );
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_SET_RT:
+			{
+				ID3D11RenderTargetView* rtvs[ ZP_RENDER_TARGET_MAX_COUNT ];
+				
+				zpTexture* t;
+				for( zp_uint i = 0; i < ZP_RENDER_TARGET_MAX_COUNT; ++i )
+				{
+					t = command.renderTargets[ i ];
+					rtvs[ i ] = t == ZP_NULL ? ZP_NULL : t->getTextureImpl()->m_textureRenderTarget;
+				}
+
+				m_context->OMSetRenderTargets( ZP_RENDER_TARGET_MAX_COUNT, rtvs, ZP_NULL );
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_SET_VIEWPORT:
+			{
+				D3D11_VIEWPORT viewport;
+				viewport.TopLeftX = command.viewport.topX;
+				viewport.TopLeftY = command.viewport.topY;
+				viewport.Width    = command.viewport.width;
+				viewport.Height   = command.viewport.height;
+				viewport.MinDepth = command.viewport.minDepth;
+				viewport.MaxDepth = command.viewport.maxDepth;
+
+				D3D11_RECT rect;
+				rect.left   = (LONG)command.viewport.topX;
+				rect.top    = (LONG)command.viewport.topY;
+				rect.right  = (LONG)command.viewport.width;
+				rect.bottom = (LONG)command.viewport.height;
+
+				m_context->RSSetViewports( 1, &viewport );
+				m_context->RSSetScissorRects( 1, &rect );
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT:
+			{
+				D3D11_RECT rect;
+				rect.left   = command.scissor.getPosition().getX();
+				rect.top    = command.scissor.getPosition().getY();
+				rect.right  = command.scissor.getSize().getX();
+				rect.bottom = command.scissor.getSize().getY();
+
+				m_context->RSSetScissorRects( 1, &rect );
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_SET_RASTER_STATE:
+			{
+
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_DRAW:
+			{
+				//m_context->IASetPrimitiveTopology( __zpToDX( command.topology ) );
+				//m_context->DrawIndexed( command.indexCount, command.indexOffset, command.vertexOffset );
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_DRAW_INSTANCED:
+			break;
+		}
+	}
+}
+
+#if 0
 zpDX11RenderingContext::zpDX11RenderingContext() :
 	m_context( ZP_NULL ),
 	m_depthStencilBuffer( ZP_NULL ),
@@ -157,12 +259,12 @@ void zpDX11RenderingContext::setTopology( zpTopology topology ) {
 void zpDX11RenderingContext::setViewport( const zpViewport& viewport )
 {
 	D3D11_VIEWPORT v;
-	v.Width =    viewport.getWidth();
-	v.Height =   viewport.getHeight();
-	v.MinDepth = viewport.getMinDepth();
-	v.MaxDepth = viewport.getMaxDepth();
-	v.TopLeftX = viewport.getTopX();
-	v.TopLeftY = viewport.getTopY();
+	v.Width =    viewport.width;
+	v.Height =   viewport.height;
+	v.MinDepth = viewport.minDepth;
+	v.MaxDepth = viewport.maxDepth;
+	v.TopLeftX = viewport.topX;
+	v.TopLeftY = viewport.topY;
 
 	D3D11_RECT r;
 	r.left =   (LONG)v.TopLeftX;
@@ -173,7 +275,7 @@ void zpDX11RenderingContext::setViewport( const zpViewport& viewport )
 	m_context->RSSetViewports( 1, &v );
 	m_context->RSSetScissorRects( 1, & r );
 }
-void zpDX11RenderingContext::setScissorRect( const zpRect& rect )
+void zpDX11RenderingContext::setScissorRect( const zpRecti& rect )
 {
 	D3D11_RECT r;
 	r.left =   (LONG)rect.getPosition().getX();
@@ -183,7 +285,7 @@ void zpDX11RenderingContext::setScissorRect( const zpRect& rect )
 
 	m_context->RSSetScissorRects( 1, &r );
 }
-void zpDX11RenderingContext::getScissorRect( zpRect& rect ) const
+void zpDX11RenderingContext::getScissorRect( zpRecti& rect ) const
 {
 	zp_uint num;
 	D3D11_RECT r;
@@ -271,3 +373,4 @@ zp_bool zpDX11RenderingContext::isMarkedForAutoDelete() const {
 ID3D11DeviceContext* zpDX11RenderingContext::getContext() const {
 	return m_context;
 }
+#endif

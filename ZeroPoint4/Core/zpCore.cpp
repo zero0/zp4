@@ -10,8 +10,10 @@
 #if ZP_WIN_32 || ZP_WIN_64
 #include <Windows.h>
 
-void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... ) {
-	if( !test ) {
+void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... )
+{
+	if( !test )
+	{
 		zp_char message[256];
 		zp_char text[256];
 		zp_char title[256];
@@ -29,8 +31,9 @@ void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* m
 		
 		zpString filename( file );
 		zpFile::convertToFilePath( filename );
-		zp_uint s = filename.lastIndexOf( zpFile::sep );
-		if( s != zpString::npos ) {
+		zp_int s = filename.lastIndexOf( zpFile::sep );
+		if( s != zpString::npos )
+		{
 			filename = filename.substring( s + 1 );
 		}
 
@@ -52,6 +55,40 @@ void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* m
 		}
 	}
 }
+
+void zp_assert_warning( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... )
+{
+	if( !test )
+	{
+		zp_char message[256];
+		zp_char text[256];
+		zp_char title[256];
+
+		va_list vl;
+		va_start( vl, msg );
+#if ZP_USE_SAFE_FUNCTIONS
+		vsnprintf_s( message, sizeof( message ), sizeof( message ), msg, vl );
+#else
+		vsnprintf( message, sizeof( message ), msg, vl );
+#endif
+		va_end( vl );
+
+		zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
+
+		zpString filename( file );
+		zpFile::convertToFilePath( filename );
+		zp_int s = filename.lastIndexOf( zpFile::sep );
+		if( s != zpString::npos )
+		{
+			filename = filename.substring( s + 1 );
+		}
+
+		zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Warning at %s:%d", filename.getChars(), line );
+
+		MessageBox( ZP_NULL, text, title, MB_OK | MB_ICONWARNING );
+	}
+}
+
 #endif
 
 #endif
@@ -225,11 +262,11 @@ zp_uint zp_near_pow2( zp_uint number ) {
 }
 
 void zpCoreRegisterSerializables() {
-	zpRegisterSerializable::registerSerializable<zpGame>();
-	zpRegisterSerializable::registerSerializable<zpWindow>();
-
-	zpRegisterSerializable::registerSerializable<zpWorld>();
-	zpRegisterSerializable::registerSerializable<zpGameObject>();
-	
-	zpRegisterSerializable::registerSerializable<zpProperties>();
+	//zpRegisterSerializable::registerSerializable<zpGame>();
+	//zpRegisterSerializable::registerSerializable<zpWindow>();
+	//
+	//zpRegisterSerializable::registerSerializable<zpWorld>();
+	//zpRegisterSerializable::registerSerializable<zpGameObject>();
+	//
+	//zpRegisterSerializable::registerSerializable<zpProperties>();
 }

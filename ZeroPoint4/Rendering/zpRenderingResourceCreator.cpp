@@ -8,9 +8,9 @@ zpResource* zpRenderingResourceCreator::createResource( const zpString& filename
 	zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
 	
 	if( filename.endsWith( ".png" ) || filename.endsWith( ".jpg" ) ) {
-		resource = engine->createTextureResource();
+		//resource = engine->createTextureResource();
 	} else if( filename.endsWith( ".shader" ) ) {
-		resource = engine->createShaderResource();
+		//resource = engine->createShaderResource();
 	} else if( filename.endsWith( ".obj" ) ) {
 		resource = new zpOBJStaticMeshResource;
 	} else if( filename.endsWith( ".fnt" ) ) {

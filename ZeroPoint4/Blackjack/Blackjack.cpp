@@ -5,8 +5,10 @@
 
 #define DEFAULT_BLACKJACK_CONFIG	"blackjack.config"
 
-void ProcessConfig( zpGame& game ) {
-	zpProperties properties( DEFAULT_BLACKJACK_CONFIG );
+void ProcessConfig( zpGame& game )
+{
+#if 0
+	zpProperties properties( zpString( DEFAULT_BLACKJACK_CONFIG ) );
 	ZP_ASSERT( properties.hasProperty( "game.file" ), "Game file not defined" );
 	const zpString& gameFile = properties[ "game.file" ];
 
@@ -31,25 +33,45 @@ void ProcessConfig( zpGame& game ) {
 	//game.setNextWorld( (zpWorld*)world );
 
 	//return game;
+#endif
 }
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
-	//ZP_REGISTER_SERIALIZABLES( zpCore );
-	//ZP_REGISTER_SERIALIZABLES( zpContent );
-	//ZP_REGISTER_SERIALIZABLES( zpAudio );
-	//ZP_REGISTER_SERIALIZABLES( zpInput );
-	//ZP_REGISTER_SERIALIZABLES( zpScripting );
-	//ZP_REGISTER_SERIALIZABLES( zpRendering );
-	//ZP_REGISTER_SERIALIZABLES( zpPhysics );
-	//
-	//zpGame game;
-	//
-	//ProcessConfig( game );
-	//
-	//game.process();
-	//
-	//game.destroy();
+	zpWindow wnd;
+	wnd.setPosition( zpVector2i( 20, 20 ) );
+	wnd.setScreenSize( zpVector2i( 640, 360 ) );
+	wnd.setTitle( zpString( "ZP4 - Blackjack" ) );
+
+	wnd.create();
+	
+	zpDisplayMode displayMode;
+	displayMode.width = 0;
+	displayMode.height = 0;
+	displayMode.refreshRate = 60;
+	displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
+
+	zpRenderingEngine* re = zpRenderingFactory::getRenderingEngine();
+	re->setWindow( &wnd );
+	re->setScreenMode( ZP_SCREEN_MODE_WINDOWED );
+	re->setDisplayMode( displayMode );
+	re->create();
+
+	zpRenderingContext* cxt = re->getImmediateRenderingContext();
+	zpTexture* t = re->getBackBufferRenderTarget();
+	cxt->setRenderTarget( 0, 1, &t, ZP_NULL );
+	
+	
+	while( wnd.processMessages() )
+	{
+		cxt->clearRenderTarget( t, zpColor4f( 1.f, 0, 0, 1.f ) );
+
+		cxt->processCommands();
+		re->present();
+	}
+
+	zpRenderingFactory::destroyRenderingEngine();
+	wnd.destroy();
 
 	return 0;
 }

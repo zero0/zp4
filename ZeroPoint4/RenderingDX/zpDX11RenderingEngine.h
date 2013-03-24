@@ -11,6 +11,41 @@ struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
 
+class zpRenderingEngineImpl
+{
+public:
+	zpRenderingEngineImpl();
+	~zpRenderingEngineImpl();
+
+	void initialize();
+	void create( zpWindow* window, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget );
+	void destroy();
+	void shutdown();
+
+	void setDisplayMode( const zpDisplayMode& mode );
+	void setScreenMode( zpScreenMode mode );
+	void setWindow( zpWindow* window );
+	void setVSyncEnabled( zp_bool enabled );
+
+	void present();
+
+private:
+	IDXGIFactory* m_dxgiFactory;
+	IDXGIAdapter* m_dxgiAdapter;
+	IDXGISwapChain* m_swapChain;
+	ID3D11Device* m_d3dDevice;
+};
+
+#if 0
+struct IDXGIFactory;
+struct IDXGIAdapter;
+struct IDXGISwapChain;
+struct ID3D11Device;
+struct ID3D11DeviceContext;
+struct ID3D11Texture2D;
+struct ID3D11RenderTargetView;
+struct ID3D11DepthStencilView;
+
 class zpDX11RenderingEngine : public zpRenderingEngine {
 public:
 	~zpDX11RenderingEngine();
@@ -97,5 +132,6 @@ private:
 	friend class zpDX11ShaderResource;
 	friend class zpDX11VertexLayout;
 };
+#endif
 
 #endif

@@ -1,7 +1,7 @@
 #include "zpDX11.h"
 #include <D3D11.h>
 #include "zpDX11Util.h"
-
+#if 0
 zpDX11Buffer::zpDX11Buffer() :
 	m_count( 0 ),
 	m_stride( 0 ),
@@ -96,3 +96,5 @@ zpBufferBindType zpDX11Buffer::getBufferBindType() const {
 ID3D11Buffer* zpDX11Buffer::getBuffer() const {
 	return m_buffer;
 }
+
+#endif

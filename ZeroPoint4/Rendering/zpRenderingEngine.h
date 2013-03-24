@@ -2,7 +2,72 @@
 #ifndef ZP_RENDERING_ENGINE_H
 #define ZP_RENDERING_ENGINE_H
 
-ZP_PURE_INTERFACE zpRenderingEngine {
+class zpRenderingEngineImpl;
+
+class zpRenderingEngine
+{
+	ZP_NON_COPYABLE( zpRenderingEngine );
+
+public:
+	zpRenderingEngine();
+	~zpRenderingEngine();
+
+	void initialize();
+	void create();
+	void destroy();
+	void shutdown();
+
+	zpRenderingEngineType getEngineType() const;
+
+	void setDisplayMode( const zpDisplayMode& mode );
+	const zpDisplayMode& getDisplayMode() const;
+
+	void setScreenMode( zpScreenMode mode );
+	zpScreenMode getScreenMode() const;
+
+	void setWindow( zpWindow* window );
+	zpWindow* getWindow() const;
+
+	void setVSyncEnabled( zp_bool enabled );
+	zp_bool isVSyncEnabled() const;
+
+	void present();
+
+	zpRenderingContext* getImmediateRenderingContext() const;
+	zpTexture* getBackBufferRenderTarget() const;
+	zpDepthStencilBuffer* getBackBufferDepthStencilBuffer() const;
+
+	zp_uint getNumRenderingContexts() const;
+	zpRenderingContext* getRenderingContext( zp_uint index ) const;
+	zpRenderingContext* createRenderingContext();
+
+
+	//zpBuffer* createBuffer();
+	zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 0 );
+
+	//virtual zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) = 0;
+
+	//virtual zpVertexLayout* createVertexLayout( const zpString& desc ) = 0;
+
+	//virtual zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc ) = 0;
+	//virtual zpRasterState* createRasterState( const zpRasterStateDesc& desc ) = 0;
+
+protected:
+	zpRenderingEngineImpl* m_rendingEngine;
+	
+	zpRenderingEngineType m_renderingEngineType;
+	zpDisplayMode m_displayMode;
+	zpScreenMode m_screenMode;
+	zpWindow* m_window;
+	zp_bool m_isVSyncEnabled;
+
+	zpTexture* m_immediateRenderTarget;
+	zpFixedArrayList< zpRenderingContext*, ZP_RENDERING_MAX_CONTEXTS > m_renderingContexts;
+};
+
+/*
+ZP_PURE_INTERFACE zpRenderingEngine
+{
 public:
 	virtual zp_bool create() = 0;
 	virtual void destroy() = 0;
@@ -56,5 +121,6 @@ protected:
 
 	friend class zpRenderingFactory;
 };
+*/
 
 #endif

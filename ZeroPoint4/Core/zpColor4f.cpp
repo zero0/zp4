@@ -47,7 +47,7 @@ void zpColor4f::operator=( zpColor4f&& color )
 	m_alpha = color.m_alpha;
 }
 
-zpColor4f::operator const zp_float*() const
+const zp_float* zpColor4f::asFloat4() const
 {
 	return m_rgba;
 }
@@ -155,4 +155,89 @@ zp_bool zpColor4f::operator==( const zpColor4f& color ) const
 zp_bool zpColor4f::operator!=( const zpColor4f& color ) const
 {
 	return !( m_red == color.m_red && m_green == color.m_green && m_blue == color.m_blue && m_alpha == color.m_alpha );
+}
+
+zpPackedColor::zpPackedColor()
+	: m_argb( 0 )
+{}
+zpPackedColor::zpPackedColor( zpPackedColorType argb )
+	: m_argb( argb )
+{}
+zpPackedColor::zpPackedColor( const zpColor4f& color )
+	: m_argb( 0 )
+{}
+zpPackedColor::zpPackedColor( const zpPackedColor& color )
+	: m_argb( color.m_argb )
+{}
+zpPackedColor::~zpPackedColor()
+{}
+
+zpPackedColorPartType zpPackedColor::getRed() const
+{
+	return (zpPackedColorPartType)( 0xFF & ( m_argb >> 16 ) );
+}
+zpPackedColorPartType zpPackedColor::getBlue() const
+{
+	return (zpPackedColorPartType)( 0xFF & ( m_argb ) );
+}
+zpPackedColorPartType zpPackedColor::getGreen() const
+{
+	return (zpPackedColorPartType)( 0xFF & ( m_argb >> 8 ) );
+}
+zpPackedColorPartType zpPackedColor::getAlpha() const
+{
+	return (zpPackedColorPartType)( 0xFF & ( m_argb >> 24 ) );
+}
+
+void zpPackedColor::setRed( zpPackedColorPartType r )
+{
+	m_argb &= 0xFF00FFFF;
+	m_argb |= ( r << 16 );
+}
+void zpPackedColor::setGreen( zpPackedColorPartType g )
+{
+	m_argb &= 0xFFFF00FF;
+	m_argb |= ( g << 8 );
+}
+void zpPackedColor::setBlue( zpPackedColorPartType b )
+{
+	m_argb &= 0xFFFFFF00;
+	m_argb |= ( b );
+}
+void zpPackedColor::setAlpha( zpPackedColorPartType a )
+{
+	m_argb &= 0x00FFFFFF;
+	m_argb |= ( a << 24 );
+}
+void zpPackedColor::set( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b )
+{
+	m_argb &= 0xFF000000;
+	m_argb |= ( r << 16 ) | ( g << 8 ) | ( b );
+}
+void zpPackedColor::set( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b, zpPackedColorPartType a )
+{
+	m_argb = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b );
+}
+
+zpPackedColorType zpPackedColor::getPackedColor() const
+{
+	return m_argb;
+}
+void zpPackedColor::toColor4f( zpColor4f& outColor ) const
+{
+	outColor.set(
+		(zp_float)getRed() / 255.0f,
+		(zp_float)getGreen() / 255.0f,
+		(zp_float)getBlue() / 255.0f,
+		(zp_float)getAlpha() / 255.0f
+	);
+}
+void zpPackedColor::fromColor4f( const zpColor4f& color )
+{
+	set(
+		(zpPackedColorPartType)( color.getRed() * 255.0f ),
+		(zpPackedColorPartType)( color.getGreen() * 255.0f ),
+		(zpPackedColorPartType)( color.getBlue() * 255.0f ),
+		(zpPackedColorPartType)( color.getAlpha() * 255.0f )
+	);
 }

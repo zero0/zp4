@@ -28,7 +28,7 @@ zpDX11ShaderResource::~zpDX11ShaderResource() {
 zp_bool zpDX11ShaderResource::load() {
 	zpProperties shaderProperties( getFilename() );
 	if( shaderProperties.isEmpty() ) return false;
-
+#if 0
 	zpDX11RenderingEngine* engine = (zpDX11RenderingEngine*)zpRenderingFactory::getRenderingEngine();
 	ID3DBlob* blob = ZP_NULL;
 	ID3DBlob* errors = ZP_NULL;
@@ -226,7 +226,7 @@ zp_bool zpDX11ShaderResource::load() {
 
 		m_type.mark( ZP_SHADER_TYPE_COMPUTE );
 	}
-
+#endif
 	return m_pixelShader || m_vertexShader || m_geometryShader || m_computeShader;
 }
 void zpDX11ShaderResource::unload() {

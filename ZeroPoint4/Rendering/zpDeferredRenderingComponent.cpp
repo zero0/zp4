@@ -10,6 +10,7 @@ enum zpScreenQuad {
 	ZP_SCREEN_QUAD_UPPER_RIGHT =		20,
 };
 
+#if 0
 zpDeferredRenderingComponent::zpDeferredRenderingComponent() 
 	: m_renderingManager( ZP_NULL )
 	, m_renderingEngine( ZP_NULL )
@@ -178,3 +179,5 @@ void zpDeferredRenderingComponent::onUpdate() {}
 
 void zpDeferredRenderingComponent::onEnabled() {}
 void zpDeferredRenderingComponent::onDisabled() {}
+
+#endif

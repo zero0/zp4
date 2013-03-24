@@ -2,6 +2,8 @@
 #ifndef ZP_TEXTURE_H
 #define ZP_TEXTURE_H
 
+class zpTextureImpl;
+
 enum zpTextureDimension
 {
 	ZP_TEXTURE_DIMENSION_UNKNOWN,
@@ -18,14 +20,27 @@ enum zpTextureType
 	ZP_TEXTURE_TYPE_RENDER_TEXTURE
 };
 
-ZP_PURE_INTERFACE zpTexture
+class zpTexture
 {
-public:
-	virtual zpTextureDimension getTextureDimension() const = 0;
-	virtual zpTextureType getTextureType() const = 0;
+	ZP_NON_COPYABLE( zpTexture );
 
-	virtual zp_uint getWidth() const = 0;
-	virtual zp_uint getHeight() const = 0;
+public:
+	~zpTexture();
+
+	zpTextureDimension getTextureDimension() const;
+	zpTextureType getTextureType() const;
+
+	zp_uint getWidth() const;
+	zp_uint getHeight() const;
+
+	zpTextureImpl* getTextureImpl() const;
+
+private:
+	zpTexture( zpTextureImpl* textureImpl );
+
+	zpTextureImpl* m_textureImpl;
+
+	friend class zpRenderingEngine;
 };
 
 #endif

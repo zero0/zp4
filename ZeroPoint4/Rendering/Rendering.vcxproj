@@ -130,6 +130,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpRenderingComponent.cpp" />
+    <ClCompile Include="zpRenderingContext.cpp" />
+    <ClCompile Include="zpRenderingEngine.cpp" />
     <ClCompile Include="zpRenderingFactory.cpp" />
     <ClCompile Include="zpRenderingManager.cpp" />
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
@@ -139,6 +141,7 @@
     <ClCompile Include="zpStaticMeshRenderingComponent.cpp" />
     <ClCompile Include="zpStaticMeshResource.cpp" />
     <ClCompile Include="zpTextRenderingComponent.cpp" />
+    <ClCompile Include="zpTexture.cpp" />
     <ClCompile Include="zpTextureInstance.cpp" />
     <ClCompile Include="zpUIManager.cpp" />
     <ClCompile Include="zpUIRenderingComponent.cpp" />

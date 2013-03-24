@@ -3,8 +3,8 @@
 #define ZP_MATERIAL_RESOURCE_H
 
 struct zpMaterial {
-	zpResourceInstance<zpShaderResource> shader;
-	zpArray<zpResourceInstance<zpTextureResource>, ZP_MATERIAL_TEXTURE_SLOT_Count> textures;
+	zpResourceInstance< zpShaderResource > shader;
+	zpArray< zpResourceInstance< zpTextureResource >, ZP_MATERIAL_TEXTURE_SLOT_Count > textures;
 };
 
 class zpMaterialResource : public zpResource {

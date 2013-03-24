@@ -14,7 +14,7 @@ public:
 	void operator=( const zpColor4f& color );
 	void operator=( zpColor4f&& color );
 
-	operator const zp_float*() const;
+	const zp_float* asFloat4() const;
 
 	zpColor4f operator+( const zpColor4f& color ) const;
 	zpColor4f operator-( const zpColor4f& color ) const;
@@ -50,6 +50,38 @@ private:
 		};
 		zp_float m_rgba[4];
 	};
+};
+
+typedef zp_dword zpPackedColorType;
+typedef zp_byte  zpPackedColorPartType;
+
+class zpPackedColor
+{
+public:
+	zpPackedColor();
+	explicit zpPackedColor( zpPackedColorType argb );
+	explicit zpPackedColor( const zpColor4f& color );
+	zpPackedColor( const zpPackedColor& color );
+	~zpPackedColor();
+
+	zpPackedColorPartType getRed() const;
+	zpPackedColorPartType getBlue() const;
+	zpPackedColorPartType getGreen() const;
+	zpPackedColorPartType getAlpha() const;
+
+	void setRed( zpPackedColorPartType r );
+	void setGreen( zpPackedColorPartType g );
+	void setBlue( zpPackedColorPartType b );
+	void setAlpha( zpPackedColorPartType a );
+	void set( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b );
+	void set( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b, zpPackedColorPartType a );
+
+	zpPackedColorType getPackedColor() const;
+	void toColor4f( zpColor4f& outColor ) const;
+	void fromColor4f( const zpColor4f& color );
+
+private:
+	zpPackedColorType m_argb;
 };
 
 #endif

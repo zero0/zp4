@@ -1,6 +1,6 @@
 #include "zpCore.h"
 
-#define IS_STRING_PACKED( end )	( (end)->m_length < ZP_STRING_MAX_SMALL_SIZE)
+#define IS_STRING_PACKED( end )	( ( (end)->m_length ) < ZP_STRING_MAX_SMALL_SIZE)
 #define NOT_STRING_PACKED( end )	( !IS_STRING_PACKED( end ) )
 
 zp_hash zp_fnv1_32( const zp_char* c, zp_hash h )
@@ -30,14 +30,14 @@ zpString::zpString( const zp_char* string )
 	{
 		if( IS_STRING_PACKED( this ) )
 		{
-			zp_strcpy( m_chars, m_length, string );
+			zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string );
 		}
 		else
 		{
 			m_capacity = m_length + 1;
 
 			m_string = new zp_char[ m_capacity ];
-			zp_strcpy( m_string, m_length * sizeof( zp_char ), string );
+			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string );
 		}
 	}
 	
@@ -50,14 +50,14 @@ zpString::zpString( const zp_char* string, zp_uint length, zp_uint offset )
 	{
 		if( IS_STRING_PACKED( this ) )
 		{
-			zp_strcpy( m_chars, m_length, string + offset );
+			zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string + offset );
 		}
 		else
 		{
 			m_capacity = m_length + 1;
 
 			m_string = new zp_char[ m_capacity ];
-			zp_strcpy( m_string, m_length * sizeof( zp_char ), string + offset );
+			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string + offset );
 		}
 	}
 }
@@ -69,14 +69,14 @@ zpString::zpString( const zpString& string )
 	{
 		if( IS_STRING_PACKED( this ) )
 		{
-			zp_strcpy( m_chars, m_length, string.getChars() );
+			zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars() );
 		}
 		else
 		{
 			m_capacity = m_length + 1;
 
 			m_string = new zp_char[ m_capacity ];
-			zp_strcpy( m_string, m_length * sizeof( zp_char ), string.getChars() );
+			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.getChars() );
 		}
 	}
 }
@@ -95,7 +95,7 @@ zpString::zpString( const zpString& string, zp_uint length, zp_uint offset )
 			m_capacity = m_length + 1;
 
 			m_string = new zp_char[ m_capacity ];
-			zp_strcpy( m_string, m_length * sizeof( zp_char ), string.getChars() + offset );
+			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.getChars() + offset );
 		}
 	}
 }
@@ -186,14 +186,14 @@ zpString& zpString::operator=( const zpString& string ) {
 		{
 			if( IS_STRING_PACKED( this ) )
 			{
-				zp_strcpy( m_chars, m_length, string.getChars() );
+				zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars() );
 			}
 			else
 			{
 				m_capacity = m_length + 1;
 
 				m_string = new zp_char[ m_capacity ];
-				zp_strcpy( m_string, m_length * sizeof( zp_char ), string.getChars() );
+				zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.getChars() );
 			}
 		}
 	}

@@ -1,5 +1,7 @@
+
 #include "zpDX11.h"
 #include <D3DX11.h>
+#if 0
 
 zpDX11TextureResource::zpDX11TextureResource() :
 	m_texture()
@@ -10,7 +12,6 @@ zpDX11TextureResource::~zpDX11TextureResource() {
 
 zp_bool zpDX11TextureResource::load() {
 	if( m_texture.m_texture ) return true;
-
 	zpDX11RenderingEngine* engine = (zpDX11RenderingEngine*)zpRenderingFactory::getRenderingEngine();
 	HRESULT hr;
 
@@ -43,7 +44,7 @@ zp_bool zpDX11TextureResource::load() {
 			case D3D11_RESOURCE_DIMENSION_TEXTURE3D: m_texture.m_dimension = ZP_TEXTURE_DIMENSION_3D; break;
 		}
 	}
-	
+
 	return true;
 }
 void zpDX11TextureResource::unload() {
@@ -58,4 +59,6 @@ void zpDX11TextureResource::unload() {
 
 zpTexture* zpDX11TextureResource::getTexture() const {
 	return (zpTexture*)&m_texture;
+
 }
+#endif

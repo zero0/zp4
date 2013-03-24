@@ -2,6 +2,7 @@
 #ifndef ZP_VIEWPORT_H
 #define ZP_VIEWPORT_H
 
+/*
 class zpViewport {
 public:
 	zpViewport();
@@ -22,5 +23,6 @@ private:
 	zp_float m_topX;
 	zp_float m_topY;
 };
+*/
 
 #endif

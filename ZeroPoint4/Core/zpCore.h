@@ -18,13 +18,14 @@
 #define ZP_USE_SIMD				0
 //#endif
 
-#define ZP_USE_ALIGNMENT		1
+#define ZP_USE_ALIGNMENT		0
+
 #if ZP_USE_ALIGNMENT
 #define ZP_MALLOC_ALIGNMENT		16
 #endif
 
 #define ZP_USE_ASSERTIONS		1
-#define ZP_USE_MEMORY_SYSTEM	1
+#define ZP_USE_MEMORY_SYSTEM	0
 
 #define ZP_LOG_ENABLED			1
 
@@ -37,9 +38,11 @@
 #endif
 
 #if ZP_USE_ASSERTIONS
-#define ZP_ASSERT( test, msg, ... )	zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
+#define ZP_ASSERT( test, msg, ... )			zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
+#define ZP_ASSERT_WARN( test, msg, ... )	zp_assert_warning( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
 #else
-#define ZP_ASSERT( test, msg, ... )	(void)0
+#define ZP_ASSERT( test, msg, ... )			(void)0
+#define ZP_ASSERT_WARN( test, msg, ... )	(void)0
 #endif
 
 #define ZP_STDCALL					__stdcall
@@ -62,6 +65,8 @@
 
 #define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
 
+#define ZP_NON_COPYABLE( t )		private: t( const t& ); t& operator=( const t& )
+
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
 #define ZP_USE_COLOR_CONSOLE	1
@@ -72,6 +77,7 @@
 
 #if ZP_USE_ASSERTIONS
 void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... );
+void zp_assert_warning( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... );
 #endif
 
 void zp_printf( const zp_char* text, ... );
@@ -151,7 +157,6 @@ class zpFile;
 
 class zpRandom;
 class zpColor4f;
-class zpRect;
 
 class zpConsole;
 class zpWindow;

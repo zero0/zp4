@@ -1,6 +1,7 @@
 #include "zpDX11.h"
 #include <D3D11.h>
-#include "zpDX11Util.h"
+
+#if 0
 
 zpDX11VertexLayout::zpDX11VertexLayout() :
 	m_layout( ZP_NULL )
@@ -17,14 +18,13 @@ zpHashMap<zpString, zpDX11VertexLayout*> zpDX11VertexLayout::s_layouts;
 zpDX11VertexLayout* zpDX11VertexLayout::getLayoutFromDesc( const zpString& inputDesc, void* vertexShaderBlob, zp_uint vertexShaderBlobSize ) {
 	zpDX11VertexLayout* vertexLayout = ZP_NULL;
 	zpDX11VertexLayout** found = ZP_NULL;
-
 	if( s_layouts.find( inputDesc, &found ) ) {
 		vertexLayout = *found;
 	} else {
 		ID3D11InputLayout* layout = ZP_NULL;
 		zp_uint stride = 0;
 		HRESULT hr;
-
+		
 		// @TODO: for now, just do a simple look up for the defined vertex types
 		if( inputDesc == "position_color" ) {
 			D3D11_INPUT_ELEMENT_DESC desc[] = {
@@ -69,3 +69,5 @@ zpDX11VertexLayout* zpDX11VertexLayout::getLayoutFromDesc( const zpString& input
 ID3D11InputLayout* zpDX11VertexLayout::getInputLayout() const {
 	return m_layout;
 }
+
+#endif

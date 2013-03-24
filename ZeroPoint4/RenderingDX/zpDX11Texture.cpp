@@ -1,6 +1,41 @@
 #include "zpDX11.h"
 #include <D3DX11.h>
 
+zpTextureImpl::zpTextureImpl()
+	: m_width( 0 )
+	, m_height( 0 )
+	, m_dimension( ZP_TEXTURE_DIMENSION_UNKNOWN )
+	, m_type( ZP_TEXTURE_TYPE_TEXTURE )
+	, m_texture( ZP_NULL )
+	, m_textureResourceView( ZP_NULL )
+	, m_textureRenderTarget( ZP_NULL )
+{}
+zpTextureImpl::~zpTextureImpl()
+{
+	ZP_SAFE_RELEASE( m_texture );
+	ZP_SAFE_RELEASE( m_textureResourceView );
+	ZP_SAFE_RELEASE( m_textureRenderTarget );
+}
+
+zpTextureDimension zpTextureImpl::getTextureDimension() const
+{
+	return m_dimension;
+}
+zpTextureType zpTextureImpl::getTextureType() const
+{
+	return m_type;
+}
+
+zp_uint zpTextureImpl::getWidth() const
+{
+	return m_width;
+}
+zp_uint zpTextureImpl::getHeight() const
+{
+	return m_height;
+}
+
+#if 0
 zpDX11Texture::zpDX11Texture()
 	: m_width( 0 )
 	, m_height( 0 )
@@ -39,3 +74,4 @@ ID3D11ShaderResourceView* zpDX11Texture::getResourceView() const {
 ID3D11RenderTargetView* zpDX11Texture::getRenderTargetView() const {
 	return m_textureRenderTarget;
 }
+#endif

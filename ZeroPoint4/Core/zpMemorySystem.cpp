@@ -43,7 +43,7 @@ zpMemorySystem::zpMemorySystem()
 	initialize( ZP_MEMORY_MB( 1 ) );
 }
 zpMemorySystem::~zpMemorySystem() {
-	ZP_ASSERT( m_memAllocated - m_memDeallocated == 0, "Memory leak of %d", m_memAllocated - m_memDeallocated );
+	ZP_ASSERT_WARN( m_memAllocated - m_memDeallocated == 0, "Memory leak of %d", m_memAllocated - m_memDeallocated );
 
 	ZP_SAFE_FREE( m_allMemory );
 }
@@ -65,25 +65,30 @@ void zpMemorySystem::deallocate( void* ptr ) {
 	zp_aligned_free( ptr );
 }
 #else
-void* zpMemorySystem::allocate( zp_uint size ) {
-	zp_uint b = ( ( (size) + ZP_MEMORY_INCREMENT_SIZE ) & ( ~ZP_MEMORY_INCREMENT_MASK ) );
-
+void* zpMemorySystem::allocate( zp_uint size )
+{
 	zp_uint alignedSize = ZP_MEMORY_ALIGN_SIZE( size + sizeof( zpMemoryBlock ) );
 
 	zpMemoryBlock* freeBlock = m_blockTable[ ZP_MEMORY_TABLE_INDEX( alignedSize ) ];
-	if( freeBlock == ZP_NULL ) {
-		for( zp_uint i = ZP_MEMORY_BLOCK_TABLE_SIZE; i --> 0; ) {
+	if( freeBlock == ZP_NULL )
+	{
+		for( zp_uint i = ZP_MEMORY_BLOCK_TABLE_SIZE - 1; i != 0 ; --i )
+		{
 			freeBlock = m_blockTable[ i ];
-			if( freeBlock != ZP_NULL ) {
+			if( freeBlock != ZP_NULL )
+			{
 				break;
 			}
 		}
 	}
 
 	zpMemoryBlock* block = ZP_NULL;
-	if( freeBlock->size < alignedSize ) {
+	if( freeBlock->size < alignedSize )
+	{
 		block = freeBlock;
-	} else {
+	}
+	else
+	{
 		freeBlock->size -= alignedSize;
 
 		zp_byte* memory = (zp_byte*)freeBlock;
@@ -91,22 +96,24 @@ void* zpMemorySystem::allocate( zp_uint size ) {
 
 		block = reinterpret_cast<zpMemoryBlock*>( memory );
 		block->size = alignedSize;
-
+	
 		addBlock( block );
 	}
-
+	
 	m_memAllocated += alignedSize;
 
 	return (void*)( block + 1 );
 }
 
-void zpMemorySystem::deallocate( void* ptr ) {
+void zpMemorySystem::deallocate( void* ptr )
+{
 	zpMemoryBlock* block = ( reinterpret_cast<zpMemoryBlock*>( ptr ) - 1 );
 
 	m_memDeallocated += block->size;
 
 	zpMemoryBlock* next = block->next;
-	if( next > block ) {
+	if( next > block )
+	{
 		removeBlock( next );
 
 		block->size += next->size;
@@ -115,21 +122,26 @@ void zpMemorySystem::deallocate( void* ptr ) {
 	}
 
 	zpMemoryBlock* prev = block->prev;
-	if( prev < block ) {
-		removeBlock( prev );
+	if( prev )
+	{
+		if( prev < block )
+		{
+			removeBlock( prev );
 
-		prev->size += block->size;
-		prev->next = block->next;
-		prev->next->prev = prev;
+			prev->size += block->size;
+			prev->next = block->next;
+			prev->next->prev = prev;
 
-		block = prev;
+			block = prev;
+		}
+
+		addBlock( prev );
 	}
-
-	addBlock( prev );
 }
 #endif
 
-void zpMemorySystem::initialize( zp_uint size ) {
+void zpMemorySystem::initialize( zp_uint size ) 
+{
 	zp_zero_memory_array( m_blockTable );
 
 	zp_uint paddedSize = ZP_MEMORY_ALIGN_SIZE( size );
@@ -144,42 +156,55 @@ void zpMemorySystem::initialize( zp_uint size ) {
 	m_alignedMemory = m_allMemory + distance;
 	
 	zpMemoryBlock* block = reinterpret_cast<zpMemoryBlock*>( m_alignedMemory );
+	block->size = paddedSize;
 	block->next = ZP_NULL;
 	block->prev = ZP_NULL;
-	block->size = paddedSize;
 
 	addBlock( block );
 }
-void zpMemorySystem::addBlock( zpMemoryBlock* block ) {
+void zpMemorySystem::addBlock( zpMemoryBlock* block )
+{
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
 	zpMemoryBlock* mem = m_blockTable[ index ];
 
-	if( mem != ZP_NULL ) {
+	if( mem != ZP_NULL )
+	{
 		block->next = mem;
 		block->prev = mem->prev;
-		block->prev->next = block;
+		if( block->prev )
+		{
+			block->prev->next = block;
+		}
 		mem->prev = block;
 
-		if( mem->size < block->size ) {
+		if( mem->size < block->size )
+		{
 			m_blockTable[ index ] = block;
 		}
-	} else {
+	} 
+	else
+	{
 		block->next = ZP_NULL;
 		block->prev = ZP_NULL;
 
 		m_blockTable[ index ] = block;
 	}
 }
-void zpMemorySystem::removeBlock( zpMemoryBlock* block ) {
+void zpMemorySystem::removeBlock( zpMemoryBlock* block )
+{
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
 
 	block->prev->next = block->next;
 	block->next->prev = block->prev;
 
-	if( block == m_blockTable[ index ] ) {
-		if( block != block->next ) {
+	if( block == m_blockTable[ index ] )
+	{
+		if( block != block->next )
+		{
 			m_blockTable[ index ] = block->next;
-		} else {
+		}
+		else
+		{
 			m_blockTable[ index ] = ZP_NULL;
 		}
 	}

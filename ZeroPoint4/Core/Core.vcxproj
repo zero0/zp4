@@ -190,6 +190,7 @@
     <None Include="zpPooledObject.inl" />
     <None Include="zpRealSimd.inl" />
     <None Include="zpBaseTypesSimd.inl" />
+    <None Include="zpRect.inl" />
     <None Include="zpTween.inl" />
     <None Include="zpVector2.inl" />
     <None Include="zpVector4.inl" />
@@ -224,7 +225,6 @@
     <ClCompile Include="zpProperties.cpp" />
     <ClCompile Include="zpRandom.cpp" />
     <ClCompile Include="zpRay.cpp" />
-    <ClCompile Include="zpRect.cpp" />
     <ClCompile Include="zpReferencedObject.cpp" />
     <ClCompile Include="zpRegisterSerializable.cpp" />
     <ClCompile Include="zpSerializable.cpp" />

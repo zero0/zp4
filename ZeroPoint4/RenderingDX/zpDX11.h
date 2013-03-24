@@ -18,6 +18,8 @@ class zpDX11RasterState;
 class zpDX11RenderingContext;
 class zpDX11RenderingEngine;
 
+class zpRenderingEngineImpl;
+
 #include "zpDX11Texture.h"
 
 #include "zpDX11ShaderResource.h"

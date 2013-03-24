@@ -2,10 +2,11 @@
 #ifndef ZP_RECT_H
 #define ZP_RECT_H
 
+template<typename T>
 class zpRect {
 public:
 	zpRect();
-	zpRect( const zpVector2f& position, const zpVector2f& size );
+	zpRect( const zpVector2<T>& position, const zpVector2<T>& size );
 	zpRect( const zpRect& rect );
 	zpRect( zpRect&& rect );
 	~zpRect();
@@ -13,15 +14,20 @@ public:
 	void operator=( const zpRect& rect );
 	void operator=( zpRect&& rect );
 
-	const zpVector2f& getPosition() const;
-	const zpVector2f& getSize() const;
+	const zpVector2<T>& getPosition() const;
+	const zpVector2<T>& getSize() const;
 
-	void setPosition( const zpVector2f& position );
-	void setSize( const zpVector2f& size );
+	void setPosition( const zpVector2<T>& position );
+	void setSize( const zpVector2<T>& size );
 
 private:
-	zpVector2f m_position;
-	zpVector2f m_size;
+	zpVector2<T> m_position;
+	zpVector2<T> m_size;
 };
+
+#include "zpRect.inl"
+
+typedef zpRect<zp_int> zpRecti;
+typedef zpRect<zp_float> zpRectf;
 
 #endif

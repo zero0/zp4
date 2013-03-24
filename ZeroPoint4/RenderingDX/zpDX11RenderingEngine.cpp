@@ -1,7 +1,163 @@
 #include "zpDX11.h"
 #include <D3D11.h>
 #include "zpDX11Util.h"
+#include "Core/zpCore.h"
 
+zpRenderingEngineImpl::zpRenderingEngineImpl()
+	: m_dxgiFactory( ZP_NULL )
+	, m_dxgiAdapter( ZP_NULL )
+	, m_swapChain( ZP_NULL )
+	, m_d3dDevice( ZP_NULL )
+{}
+zpRenderingEngineImpl::~zpRenderingEngineImpl()
+{}
+
+void zpRenderingEngineImpl::initialize()
+{
+	HRESULT hr;
+
+	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)&m_dxgiFactory );
+	ZP_ASSERT( SUCCEEDED( hr ), "Unable to Create DXGI Factory" );
+
+	hr = m_dxgiFactory->EnumAdapters( 0, &m_dxgiAdapter );
+	ZP_ASSERT( SUCCEEDED( hr ), "Unable to Get Adapter 0" );
+}
+void zpRenderingEngineImpl::create( zpWindow* window, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget )
+{
+	HRESULT hr;
+	zp_uint flags = 0;
+#if ZP_DEBUG
+	flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	// if neither of the display mode's dimensions are set, set to the window screen size
+	if( !displayMode.width || !displayMode.height )
+	{
+		displayMode.width = window->getScreenSize().getX();
+		displayMode.height = window->getScreenSize().getY();
+	}
+	// if the display mode is set to unknown, default to RGBA8_UNORM
+	if( displayMode.displayFormat == ZP_DISPLAY_FORMAT_UNKNOWN )
+	{
+		displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
+	}
+	// if the refresh rate is not set, find the closest display mode that matches
+	if( !displayMode.refreshRate )
+	{
+		//findClosestDisplayMode( displayMode, &displayMode );
+		displayMode.refreshRate = 60;
+	}
+
+	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+	zp_zero_memory( &swapChainDesc );
+	swapChainDesc.BufferDesc.Width = displayMode.width;
+	swapChainDesc.BufferDesc.Height = displayMode.height;
+	swapChainDesc.BufferDesc.RefreshRate.Numerator = displayMode.refreshRate;
+	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	swapChainDesc.BufferDesc.Format = __zpToDX( displayMode.displayFormat );
+	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.BufferCount = 1;
+	swapChainDesc.OutputWindow = (HWND)window->getWindowHandle();
+	swapChainDesc.Windowed = screenMode == ZP_SCREEN_MODE_WINDOWED;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.Flags = 0;//DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+	D3D_FEATURE_LEVEL actualFeatureLevel;
+	D3D_FEATURE_LEVEL featureLevels[] =
+	{
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0
+	};
+	zp_uint featureLevelCount = ZP_ARRAY_LENGTH( featureLevels );
+	ID3D11DeviceContext* immediate = ZP_NULL;
+
+	//hr = D3D11CreateDevice( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+	hr = D3D11CreateDeviceAndSwapChain( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
+	if( FAILED( hr ) )
+	{
+		//hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+		hr = D3D11CreateDeviceAndSwapChain( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
+		if( FAILED( hr ) )
+		{
+			//hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+			hr = D3D11CreateDeviceAndSwapChain( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
+			if( FAILED( hr ) )
+			{
+				//hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+				hr = D3D11CreateDeviceAndSwapChain( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
+
+				ZP_ASSERT( SUCCEEDED( hr ), "Unable to create DirectX device." );
+			}
+		}
+	}
+
+	// create the immediate context wrapper
+	//m_immediateContext = new zpDX11RenderingContext( immediate, zpString( "immediate" ) );
+	outImmediateContext = new zpRenderingContextImpl( immediate );
+
+	// get the actual feature level of the rendering engine
+	switch( actualFeatureLevel )
+	{
+		case D3D_FEATURE_LEVEL_11_0: outEngineType = ZP_RENDERING_ENGINE_DX11; break;
+		case D3D_FEATURE_LEVEL_10_1: outEngineType = ZP_RENDERING_ENGINE_DX10_1; break;
+		case D3D_FEATURE_LEVEL_10_0: outEngineType = ZP_RENDERING_ENGINE_DX10; break;
+	}
+
+
+	// get the back buffer
+	ID3D11Texture2D* backBuffer;
+	ID3D11RenderTargetView* backBufferView;
+
+	m_swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer );
+	m_d3dDevice->CreateRenderTargetView( backBuffer, ZP_NULL, &backBufferView );
+
+	// remove reference to texture so render target now owns pointer
+	backBuffer->Release();
+
+	// create the render target and depth buffer for the immediate context
+	outImmediateRenderTarget = new zpTextureImpl;
+	outImmediateRenderTarget->m_width = displayMode.width;
+	outImmediateRenderTarget->m_height = displayMode.height;
+	outImmediateRenderTarget->m_dimension = ZP_TEXTURE_DIMENSION_2D;
+	outImmediateRenderTarget->m_type = ZP_TEXTURE_TYPE_RENDER_TARGET;
+	outImmediateRenderTarget->m_texture = backBuffer;
+	outImmediateRenderTarget->m_textureResourceView = ZP_NULL;
+	outImmediateRenderTarget->m_textureRenderTarget = backBufferView;
+	//m_immediateRenderTarget = target;
+	//
+	//m_immediateDepthStencilBuffer = createDepthBuffer( ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT, displayMode.width, displayMode.height );
+	//
+	//// set render target and depth buffer for the immediate context automatically
+	//m_immediateContext->setRenderTarget( m_immediateRenderTarget );
+	//m_immediateContext->setDepthStencilBuffer( m_immediateDepthStencilBuffer );
+}
+void zpRenderingEngineImpl::destroy()
+{
+	ZP_SAFE_RELEASE( m_swapChain );
+	ZP_SAFE_RELEASE( m_d3dDevice );
+}
+void zpRenderingEngineImpl::shutdown()
+{
+	ZP_SAFE_RELEASE( m_dxgiAdapter );
+	ZP_SAFE_RELEASE( m_dxgiFactory );
+}
+
+void zpRenderingEngineImpl::setDisplayMode( const zpDisplayMode& mode ) {}
+void zpRenderingEngineImpl::setScreenMode( zpScreenMode mode ) {}
+void zpRenderingEngineImpl::setWindow( zpWindow* window ) {}
+void zpRenderingEngineImpl::setVSyncEnabled( zp_bool enabled ) {}
+
+void zpRenderingEngineImpl::present()
+{
+	m_swapChain->Present( 1, 0 );
+}
+
+#if 0
 #define HR( r )						if( FAILED( (r) ) ) { return false; }
 #define HR_( r )					if( FAILED( (r) ) ) { return; }
 #define HR_V( r, v )				if( FAILED( (r) ) ) { return (v); }
@@ -608,3 +764,4 @@ void zpDX11RenderingEngine::shutdown() {
 ID3D11Device* zpDX11RenderingEngine::getDevice() const {
 	return m_d3dDevice;
 }
+#endif

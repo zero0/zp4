@@ -5,6 +5,7 @@ zpOBJStaticMeshResource::zpOBJStaticMeshResource() {}
 zpOBJStaticMeshResource::~zpOBJStaticMeshResource() {}
 
 zp_bool zpOBJStaticMeshResource::load() {
+#if 0
 	// that data passed was the name of the file to load
 	zpFile objFile( getFilename() );
 	zpArrayList<zpVertexPositionNormalTexture> triangles;
@@ -98,5 +99,6 @@ zp_bool zpOBJStaticMeshResource::load() {
 	part.vertexBuffer->create( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, triangles.size(), sizeof( zpVertexPositionNormalTexture ), triangles.begin() );
 	
 	m_meshParts.pushBack( part );
+#endif
 	return true;
 }

@@ -40,6 +40,7 @@ public:
 	zp_uint eraseAll( const T& val );
 
 	void clear();
+	void reset();
 
 	zp_int indexOf( const T& val ) const;
 	zp_int lastIndexOf( const T& val ) const;
@@ -80,6 +81,9 @@ public:
 	template<typename Func>
 	void map( Func func );
 	
+protected:
+	zpArrayList( T* fixedArray, zp_uint count );
+
 private:
 	T* m_array;
 	zp_uint m_size;

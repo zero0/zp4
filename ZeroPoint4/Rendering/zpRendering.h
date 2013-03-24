@@ -11,9 +11,15 @@
 
 #define ZP_RENDER_TARGET_MAX_COUNT		8
 
-#define ZP_DX							0x0d11
-#define ZP_OPENGL						0x09l4
-#define ZP_RENDERING_TYPE				ZP_DX
+#define ZP_DX11							0xd011
+#define ZP_DX11_INC						"DX11"
+
+#define ZP_GL2							0x9l20
+#define ZP_GL2_INC						"GL2"
+
+#define ZP_RENDERING_TYPE				ZP_DX11
+#define ZP_RENDERING_INCLUDE			ZP_DX11_INC
+
 
 #define ZP_RENDERING_LAYER_TYPE			zp_byte
 #define ZP_RENDERING_LAYER_Count		( sizeof( ZP_RENDERING_LAYER_TYPE ) * 8 )
@@ -28,9 +34,12 @@ enum
 	ZP_RENDERING_GLOBAL_BUFFER_Count
 };
 
-#if ZP_RENDERING_TYPE == ZP_DX
+#define ZP_RENDERING_MAX_COMMNADS		1024
+#define ZP_RENDERING_MAX_CONTEXTS		8
+
+#if ZP_RENDERING_TYPE == ZP_DX11
 #include "RenderingDX\zpDX11Lib.inc"
-#elif ZP_RENDERING_TYPE == ZP_OPENGL
+#elif ZP_RENDERING_TYPE == ZP_GL2
 #include "RenderingOpenGL\zpOpenGLLib.inc"
 #else
 #error( "No rendering engine selected!" )
@@ -109,6 +118,14 @@ enum zpDisplayFormat
 	ZP_DISPLAY_FORMAT_D32_FLOAT,
 };
 
+enum zpVertexFormat
+{
+	ZP_VERTEX_FORMAT_POSITION_COLOR,
+	ZP_VERTEX_FORMAT_POSITION_UV,
+	ZP_VERTEX_FORMAT_POSITION_NORMAL_UV,
+	ZP_VERTEX_FORMAT_POSITION_NORMAL_UV2,
+};
+
 enum zpScreenMode
 {
 	ZP_SCREEN_MODE_FULLSCREEN,
@@ -166,10 +183,10 @@ enum zpTopology
 
 enum zpResourceBindSlot
 {
-	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER =	0x01,
-	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER =	0x02,
-	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER =	0x04,
-	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER =	0x08,
+	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER,
+	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER,
+	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER,
+	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER,
 };
 
 enum zpMaterialTextureSlot
@@ -223,13 +240,13 @@ enum zpCullMode
 
 enum zpFillMode
 {
-	ZP_FILL_MODE_SOLID =	1,
+	ZP_FILL_MODE_SOLID =	0,
 	ZP_FILL_MODE_WIREFRAME,
 };
 
 enum zpFrontFace
 {
-	ZP_FRONT_FACE_CW =		1,
+	ZP_FRONT_FACE_CW =		0,
 	ZP_FRONT_FACE_CCW,
 };
 
@@ -249,14 +266,10 @@ struct zpSamplerStateDesc
 		zpTextureFilter minFilter : 8;
 		zpTextureFilter magFilter : 8;
 		zpTextureFilter mipFilter : 8;
-	};
-
-	struct
-	{
-		zpTextureWrap texWrapU : 8;
-		zpTextureWrap texWrapV : 8;
-		zpTextureWrap texWrapW : 8;
-		zp_byte maxAnisotrpy :   8;
+		zpTextureWrap texWrapU :    8;
+		zpTextureWrap texWrapV :    8;
+		zpTextureWrap texWrapW :    8;
+		zp_byte maxAnisotrpy :      8;
 	};
 
 	zp_float lodMin;
@@ -270,22 +283,36 @@ struct zpSamplerStateDesc
 
 struct zpRasterStateDesc
 {
-	zpFillMode fillMode;
-	zpCullMode cullMode;
-	zpFrontFace frontFace;
+	struct
+	{
+		zpCullMode cullMode :			2;
+		zpFillMode fillMode :			1;
+		zpFrontFace frontFace :			1;
+		zp_bool depthClipEnable :		1;
+		zp_bool scissorEnable :			1;
+		zp_bool multisampleEnable :		1;
+		zp_bool antialiasedLineEnable :	1;
+	};
+
 	zp_int depthBias;
 	zp_float depthBiasClamp;
 	zp_float slopeScaledDepthBias;
-	zp_bool depthClipEnable;
-	zp_bool scissorEnable;
-	zp_bool multisampleEnable;
-	zp_bool antialiasedLineEnable;
 
 	zpRasterStateDesc();
 };
 
+struct zpViewport
+{
+	zp_float width;
+	zp_float height;
+	zp_float minDepth;
+	zp_float maxDepth;
+	zp_float topX;
+	zp_float topY;
 
-class zpViewport;
+	zpViewport();
+};
+
 ZP_PURE_INTERFACE zpTexture;
 
 ZP_PURE_INTERFACE zpShaderResource;
@@ -314,8 +341,81 @@ ZP_ABSTRACT_CLASS zpStaticMeshResource;
 class zpOBJStaticMeshResource;
 template<> class zpResourceInstance<zpStaticMeshResource>;
 
-ZP_PURE_INTERFACE zpRenderingContext;
-ZP_PURE_INTERFACE zpRenderingEngine;
+
+enum zpRenderingCommandType
+{
+	ZP_RENDERING_COMMNAD_NOOP,
+
+	ZP_RENDERING_COMMNAD_CLEAR_RT,
+	ZP_RENDERING_COMMNAD_CLEAR_DEPTH_STENCIL,
+
+	ZP_RENDERING_COMMNAD_SET_RT,
+	ZP_RENDERING_COMMNAD_SET_VIEWPORT,
+	ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT,
+	ZP_RENDERING_COMMNAD_SET_RASTER_STATE,
+
+	ZP_RENDERING_COMMNAD_DRAW,
+	ZP_RENDERING_COMMNAD_DRAW_INSTANCED,
+
+	zpRenderingCommandType_Count,
+};
+
+struct zpRenderingCommand
+{
+	zpRenderingCommandType type;
+
+	union
+	{
+		struct
+		{
+			zpColor4f clearColor;
+			zpTexture* clearRenderTarget;
+		};
+
+		struct 
+		{
+			zp_float clearDepth;
+			zp_uint clearStencil;
+			zpDepthStencilBuffer* clearDepthStencilBuffer;
+		};
+
+		struct
+		{
+			zpTexture* renderTargets[ ZP_RENDER_TARGET_MAX_COUNT ];
+			zpDepthStencilBuffer* depthStencilBuffer;	
+		};
+
+		struct
+		{
+			zpViewport viewport;
+		};
+
+		struct
+		{
+			zpRecti scissor;
+		};
+
+		struct
+		{
+			zpRasterState* rasterState;
+		};
+
+		struct
+		{
+			zpTopology topology;
+			zpResourceInstance< zpMaterialResource >* material;
+			zpVertexFormat vertexFormat;
+			zp_uint vertexOffset;
+			zp_uint vertexCount;
+			zp_uint indexOffset;
+			zp_uint indexCount;
+			zpBoundingSphere sphere;
+		};
+	};
+};
+
+class zpRenderingContext;
+class zpRenderingEngine;
 class zpRenderingFactory;
 
 class zpCamera;
@@ -332,6 +432,7 @@ class zpTextRenderingComponent;
 class zpUIRenderingComponent;
 
 class zpDeferredRenderingComponent;
+
 
 #include "zpBufferData.h"
 

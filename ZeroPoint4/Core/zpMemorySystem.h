@@ -8,7 +8,7 @@ void* operator new( zp_uint size );
 void operator delete( void* ptr );
 #endif
 
-#define ZP_MEMORY_BLOCK_TABLE_SIZE	64
+#define ZP_MEMORY_BLOCK_TABLE_SIZE	32
 #define ZP_MEMORY_INCREMENT_SHIFT	6
 #define ZP_MEMORY_INCREMENT_SIZE	( 1 << ZP_MEMORY_INCREMENT_SHIFT )	// 64bit alignment
 #define ZP_MEMORY_INCREMENT_MASK	( ZP_MEMORY_INCREMENT_SIZE - 1 )
@@ -31,10 +31,9 @@ private:
 	zpMemorySystem();
 
 	struct zpMemoryBlock {
+		zp_uint size;
 		zpMemoryBlock* next;
 		zpMemoryBlock* prev;
-
-		zp_uint size;
 	};
 
 	void initialize( zp_uint size );

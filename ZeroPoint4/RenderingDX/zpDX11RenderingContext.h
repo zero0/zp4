@@ -4,6 +4,19 @@
 
 struct ID3D11DeviceContext;
 
+class zpRenderingContextImpl
+{
+public:
+	zpRenderingContextImpl( ID3D11DeviceContext* context );
+	~zpRenderingContextImpl();
+
+	void processCommands( const zpArrayList< zpRenderingCommand >& renderCommands );
+
+private:
+	ID3D11DeviceContext* m_context;
+};
+
+#if 0
 class zpDX11RenderingContext : public zpRenderingContext {
 public:
 	virtual ~zpDX11RenderingContext();
@@ -33,8 +46,8 @@ public:
 	void setTopology( zpTopology topology );
 
 	void setViewport( const zpViewport& viewport );
-	void setScissorRect( const zpRect& rect );
-	void getScissorRect( zpRect& rect ) const;
+	void setScissorRect( const zpRecti& rect );
+	void getScissorRect( zpRecti& rect ) const;
 
 	void setSamplerState( zpResourceBindSlot bindSlot, zp_uint slot, zpSamplerState* state );
 	void setRasterState( zpRasterState* raster );
@@ -76,5 +89,6 @@ private:
 
 	friend class zpDX11RenderingEngine;
 };
+#endif
 
 #endif

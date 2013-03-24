@@ -19,9 +19,9 @@ void zpTextRenderingComponent::render() {
 
 	zpRenderingContext* c = zpRenderingFactory::getRenderingEngine()->getImmediateRenderingContext();
 
-	c->setShader( &m_shader );
-	c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE, m_font.getResource()->getTexture().getResource()->getTexture() );
-	m_buffer.draw();
+	//c->setShader( &m_shader );
+	//c->setTexture( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE, m_font.getResource()->getTexture().getResource()->getTexture() );
+	//m_buffer.draw();
 }
 
 void zpTextRenderingComponent::receiveMessage( const zpMessage& message ) {}
