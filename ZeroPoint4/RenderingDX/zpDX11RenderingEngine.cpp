@@ -332,6 +332,32 @@ zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterState
 
 	return impl;
 }
+zpSamplerStateImpl* zpRenderingEngineImpl::createSamplerState( const zpSamplerStateDesc& desc )
+{
+	HRESULT hr;
+	D3D11_SAMPLER_DESC samplerDesc;
+	zp_zero_memory( &samplerDesc );
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;	// TODO: update with real value
+	samplerDesc.AddressU = __zpToDX( desc.texWrapU );
+	samplerDesc.AddressV = __zpToDX( desc.texWrapV );
+	samplerDesc.AddressW = __zpToDX( desc.texWrapW );
+	samplerDesc.MipLODBias = desc.lodBias;
+	samplerDesc.MaxAnisotropy = desc.maxAnisotrpy;
+	samplerDesc.ComparisonFunc = __zpToDX( desc.cmpFunc );
+	desc.borderColor.store4( samplerDesc.BorderColor );
+	samplerDesc.MinLOD = desc.lodMin;
+	samplerDesc.MaxLOD = desc.lodMax;
+
+	ID3D11SamplerState* state;
+	hr = m_d3dDevice->CreateSamplerState( &samplerDesc, &state );
+	ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Sampler State" );
+
+	zpSamplerStateImpl* impl = new zpSamplerStateImpl;
+	impl->m_sampler = 0;
+	impl->m_desc = desc;
+
+	return impl;
+}
 
 void zpRenderingEngineImpl::present()
 {

@@ -125,19 +125,19 @@ void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingComm
 				
 				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
 				{
-					m_context->VSSetSamplers( 0, 1, ZP_NULL );
+					m_context->VSSetSamplers( command.samplerIndex, 1, ZP_NULL );
 				}
 				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
 				{
-					m_context->GSSetSamplers( 0, 1, ZP_NULL );
+					m_context->GSSetSamplers( command.samplerIndex, 1, ZP_NULL );
 				}
 				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER )
 				{
-					m_context->CSSetSamplers( 0, 1, ZP_NULL );
+					m_context->CSSetSamplers( command.samplerIndex, 1, ZP_NULL );
 				}
 				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
 				{
-					m_context->PSSetSamplers( 0, 1, ZP_NULL );
+					m_context->PSSetSamplers( command.samplerIndex, 1, ZP_NULL );
 				}
 			}
 			break;

@@ -197,6 +197,9 @@
     <ClCompile Include="zpBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpSamplerState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpImmediateBuffer.inl">

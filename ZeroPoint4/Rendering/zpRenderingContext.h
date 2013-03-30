@@ -21,7 +21,7 @@ public:
 	void setScissorRect( const zpRecti& rect );
 
 	void setRasterState( zpRasterState* raster );
-	void setSamplerState( zp_uint bindSlots, zpSamplerState* sampler );
+	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
 
 	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat );
 

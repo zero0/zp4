@@ -13,9 +13,11 @@ public:
 	zpRasterStateImpl* getRasterStateImpl() const;
 
 private:
-	zpRasterState( zpRasterStateImpl* rasterState );
+	zpRasterState();	
+	zpRasterState( zpRasterStateImpl* rasterState, zp_hash descHash );
 
 	zpRasterStateImpl* m_rasterState;
+	zp_hash m_descHash;
 
 	friend class zpRenderingEngine;
 };

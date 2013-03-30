@@ -137,6 +137,7 @@
     <ClCompile Include="zpRenderingFactory.cpp" />
     <ClCompile Include="zpRenderingManager.cpp" />
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
+    <ClCompile Include="zpSamplerState.cpp" />
     <ClCompile Include="zpShaderInstance.cpp" />
     <ClCompile Include="zpShaderResource.cpp" />
     <ClCompile Include="zpStaticMeshInstance.cpp" />

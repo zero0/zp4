@@ -4,6 +4,21 @@
 
 struct ID3D11SamplerState;
 
+class zpSamplerStateImpl
+{
+public:
+	zpSamplerStateImpl();
+	~zpSamplerStateImpl();
+
+private:
+	ID3D11SamplerState* m_sampler;
+	zpSamplerStateDesc m_desc;
+
+	friend class zpRenderingEngineImpl;
+	friend class zpRenderingContextImpl;
+};
+
+#if 0
 class zpDX11SamplerState : public zpSamplerState {
 public:
 	virtual ~zpDX11SamplerState();
@@ -16,5 +31,6 @@ private:
 	friend class zpDX11RenderingEngine;
 	friend class zpDX11RenderingContext;
 };
+#endif
 
 #endif

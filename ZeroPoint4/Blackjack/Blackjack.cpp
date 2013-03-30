@@ -61,7 +61,10 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	zpTexture* t = re->getBackBufferRenderTarget();
 	cxt->setRenderTarget( 0, 1, &t, ZP_NULL );
 	
-	
+	zpRasterStateDesc rs;
+	zpRasterState* r = re->createRasterState( rs );
+	cxt->setRasterState( r );
+
 	while( wnd.processMessages() )
 	{
 		cxt->clearRenderTarget( t, zpColor4f( 1.f, 1.f, 0, 1.f ) );

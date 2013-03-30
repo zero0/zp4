@@ -32,8 +32,10 @@ enum
 enum
 {
 	ZP_RENDERING_MAX_COMMNADS =					1024,
-	ZP_RENDERING_MAX_RENDERING_CONTEXTS =		8,
 	ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS	=	2,
+	ZP_RENDERING_MAX_RENDERING_CONTEXTS =		8,
+	ZP_RENDERING_MAX_RASTER_STATES =			16,
+	ZP_RENDERING_MAX_SAMPLER_STATES =			32,
 
 	ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE = ZP_MEMORY_MB( 0.5f ),
 	ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE =	ZP_MEMORY_MB( 0.25f ),
@@ -281,14 +283,14 @@ struct zpSamplerStateDesc
 {
 	struct
 	{
-		zpComparisonFunc cmpFunc :  8;
-		zpTextureFilter minFilter : 8;
-		zpTextureFilter magFilter : 8;
-		zpTextureFilter mipFilter : 8;
-		zpTextureWrap texWrapU :    8;
-		zpTextureWrap texWrapV :    8;
-		zpTextureWrap texWrapW :    8;
-		zp_byte maxAnisotrpy :      8;
+		zpComparisonFunc cmpFunc	: 8;
+		zpTextureFilter minFilter	: 8;
+		zpTextureFilter magFilter	: 8;
+		zpTextureFilter mipFilter	: 8;
+		zpTextureWrap texWrapU		: 8;
+		zpTextureWrap texWrapV		: 8;
+		zpTextureWrap texWrapW		: 8;
+		zp_byte maxAnisotrpy		: 8;
 	};
 
 	zp_float lodMin;
@@ -304,13 +306,13 @@ struct zpRasterStateDesc
 {
 	struct
 	{
-		zpCullMode cullMode :			2;
-		zpFillMode fillMode :			1;
-		zpFrontFace frontFace :			1;
-		zp_bool depthClipEnable :		1;
-		zp_bool scissorEnable :			1;
-		zp_bool multisampleEnable :		1;
-		zp_bool antialiasedLineEnable :	1;
+		zpCullMode cullMode				: 2;
+		zpFillMode fillMode				: 1;
+		zpFrontFace frontFace			: 1;
+		zp_bool depthClipEnable			: 1;
+		zp_bool scissorEnable			: 1;
+		zp_bool multisampleEnable		: 1;
+		zp_bool antialiasedLineEnable	: 1;
 	};
 
 	zp_int depthBias;
@@ -426,6 +428,7 @@ struct zpRenderingCommand
 		struct 
 		{
 			zp_uint samplerStateBind;
+			zp_uint samplerIndex;
 			zpSamplerState* samplerState;
 		};
 

@@ -117,7 +117,7 @@ void zpRenderingContext::setRasterState( zpRasterState* raster )
 
 	command.rasterState = raster;
 }
-void zpRenderingContext::setSamplerState( zp_uint bindSlots, zpSamplerState* sampler )
+void zpRenderingContext::setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 
@@ -125,6 +125,7 @@ void zpRenderingContext::setSamplerState( zp_uint bindSlots, zpSamplerState* sam
 	command.type = ZP_RENDERING_COMMNAD_SET_SAMPLER_STATE;
 
 	command.samplerStateBind = bindSlots;
+	command.samplerIndex = index;
 	command.samplerState = sampler;
 }
 
@@ -289,9 +290,6 @@ void zpRenderingContext::addLine( const zpVector4f& pos0, const zpColor4f& color
 void zpRenderingContext::endDrawImmediate()
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
-
-	zp_byte* vertex;
-	zp_byte* index;
 
 	zp_memcpy( m_immediateVertexData + m_immediateVertexSize, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE - m_immediateVertexSize, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
 	zp_memcpy( m_immediateIndexData + m_immediateIndexSize, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE - m_immediateIndexSize, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );

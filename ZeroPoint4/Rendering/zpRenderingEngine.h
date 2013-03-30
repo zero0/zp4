@@ -48,10 +48,10 @@ public:
 
 	//virtual zpVertexLayout* createVertexLayout( const zpString& desc ) = 0;
 
-	//virtual zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc ) = 0;
 	zpRasterState* createRasterState( const zpRasterStateDesc& desc );
+	zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc );
 
-protected:
+private:
 	zpRenderingEngineImpl* m_renderingEngine;
 	
 	zpRenderingEngineType m_renderingEngineType;
@@ -63,7 +63,10 @@ protected:
 	zpTexture* m_immediateRenderTarget;
 	zpFixedArrayList< zpRenderingContext*, ZP_RENDERING_MAX_RENDERING_CONTEXTS > m_renderingContexts;
 
-	zpHashMap< zp_hash, zpRasterState* > m_rasterStates;
+	//zpHashMap< zp_hash, zpRasterState* >  m_rasterStates;
+	//zpHashMap< zp_hash, zpSamplerState* > m_samplerStates;
+	zpFixedArrayList< zpRasterState*, ZP_RENDERING_MAX_RASTER_STATES > m_rasterStates;
+	zpFixedArrayList< zpSamplerState*, ZP_RENDERING_MAX_RASTER_STATES > m_samplerStates;
 };
 
 /*
