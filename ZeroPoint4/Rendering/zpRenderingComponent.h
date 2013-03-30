@@ -2,6 +2,7 @@
 #ifndef ZP_RENDERING_COMPONENT_H
 #define ZP_RENDERING_COMPONENT_H
 
+#if 0
 ZP_ABSTRACT_CLASS zpRenderingComponent : public zpComponent, public zpRenderable {
 public:
 	zpRenderingComponent();
@@ -24,5 +25,6 @@ protected:
 	zpRenderLayer m_renderLayers;
 	zpBoundingSphere m_boundingSphere;
 };
+#endif
 
 #endif

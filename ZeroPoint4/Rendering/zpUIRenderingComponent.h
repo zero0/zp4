@@ -2,6 +2,7 @@
 #ifndef ZP_UI_RENDERING_COMPONENT_H
 #define ZP_UI_RENDERING_COMPONENT_H
 
+#if 0
 class zpUIRenderingComponent : public zpRenderingComponent {
 public:
 	zpUIRenderingComponent();
@@ -36,7 +37,8 @@ private:
 
 	zpResourceInstance<zpShaderResource> m_uiShader;
 
-	zpImmediateBuffer<zpVertexPositionNormalTexture, zp_short> m_uiVertexBuffer;
+	zpImmediateBuffer<zpVertexPositionNormalUV, zp_short> m_uiVertexBuffer;
 };
+#endif
 
 #endif

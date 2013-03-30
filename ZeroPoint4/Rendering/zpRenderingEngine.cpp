@@ -9,33 +9,33 @@
 #endif
 
 zpRenderingEngine::zpRenderingEngine()
-	: m_rendingEngine( new zpRenderingEngineImpl )
+	: m_renderingEngine( new zpRenderingEngineImpl )
 {}
 zpRenderingEngine::~zpRenderingEngine()
 {
-	ZP_SAFE_DELETE( m_rendingEngine );
+	ZP_SAFE_DELETE( m_renderingEngine );
 }
 
 void zpRenderingEngine::initialize()
 {
-	m_rendingEngine->initialize();
+	m_renderingEngine->initialize();
 }
 void zpRenderingEngine::create()
 {
 	zpRenderingContextImpl* immediateContext;
 	zpTextureImpl* immediateRenderTarget;
-	m_rendingEngine->create( m_window, m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
+	m_renderingEngine->create( m_window, m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
 
 	m_immediateRenderTarget = new zpTexture( immediateRenderTarget );
 	m_renderingContexts.pushBack( new zpRenderingContext( this, immediateContext ) );
 }
 void zpRenderingEngine::destroy()
 {
-	m_rendingEngine->destroy();
+	m_renderingEngine->destroy();
 }
 void zpRenderingEngine::shutdown()
 {
-	m_rendingEngine->shutdown();
+	m_renderingEngine->shutdown();
 }
 
 zpRenderingEngineType zpRenderingEngine::getEngineType() const
@@ -81,7 +81,7 @@ zp_bool zpRenderingEngine::isVSyncEnabled() const
 
 void zpRenderingEngine::present()
 {
-	m_rendingEngine->present();
+	m_renderingEngine->present();
 }
 
 zpRenderingContext* zpRenderingEngine::getImmediateRenderingContext() const
@@ -108,9 +108,23 @@ zpRenderingContext* zpRenderingEngine::createRenderingContext()
 	return ZP_NULL;
 }
 
-zpTexture* zpRenderingEngine::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
+zpTexture* zpRenderingEngine::createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
 {
 	zpTextureImpl* texture;
-
+	texture = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, mipLevels );
 	return new zpTexture( texture );
+}
+
+zpRasterState* zpRenderingEngine::createRasterState( const zpRasterStateDesc& desc )
+{
+	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpRasterStateDesc ), 0 );
+
+	zpRasterState** raster;
+	if( !m_rasterStates.find( descHash, &raster ) )
+	{
+		*raster = new zpRasterState( m_renderingEngine->createRasterState( desc ) );
+		m_rasterStates[ descHash ] = *raster;
+	}
+
+	return *raster;
 }

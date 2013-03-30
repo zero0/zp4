@@ -65,7 +65,7 @@
 
 #define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
 
-#define ZP_NON_COPYABLE( t )		private: t( const t& ); t& operator=( const t& )
+#define ZP_NON_COPYABLE( t )		private: t( const t& ); t( t&& ); t& operator=( const t& ); t& operator=( t&& );
 
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
@@ -132,6 +132,9 @@ zp_bool zp_is_print( zp_char ch );
 
 zp_uint zp_near_pow2( zp_uint number );
 
+zp_hash zp_fnv1_32_data( const void* d, zp_uint l, zp_hash h );
+zp_hash zp_fnv1_32_string( const zp_char* c, zp_hash h );
+
 class zpLog;
 class zpLogOutput;
 
@@ -145,6 +148,7 @@ class zpRegisterSerializable;
 
 class zpString;
 class zpStringBuffer;
+class zpDataBuffer;
 template<typename T> class zpFlag;
 template<typename T> class zpLinkedList;
 template<typename T> class zpIntrusiveList;
@@ -189,6 +193,7 @@ ZP_ABSTRACT_CLASS zpComponent;
 
 #include "zpString.h"
 #include "zpStringBuffer.h"
+#include "zpDataBuffer.h"
 
 #include "zpFlag.h"
 #include "zpLinkedList.h"

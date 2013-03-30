@@ -14,11 +14,75 @@ public:
 
 	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
 	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
+	void clearState();
 
 	void setViewport( const zpViewport& viewport );
 	void setScissorRect( const zpRecti& rect );
 
 	void setRasterState( zpRasterState* raster );
+	void setSamplerState( zp_uint bindSlots, zpSamplerState* sampler );
+
+	void beginImmediateDraw( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat );
+
+	void addVertex( const zpVector4f& pos, const zpColor4f& color );
+	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );
+	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 );
+	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0, const zpVector2f& uv1 );
+
+	void addLineIndex( zp_short index0, zp_short index1 );
+	void addTriangleIndex( zp_short index0, zp_short index1, zp_short index2 );
+	void addQuadIndex( zp_short index0, zp_short index1, zp_short index2, zp_short index3 );
+
+	void addLine( const zpVector4f& pos0, const zpVector4f& pos1, const zpColor4f& color );
+	void addLine( const zpVector4f& pos0, const zpColor4f& color0, const zpVector4f& pos1, const zpColor4f& color1 );
+
+	void addTriangle( const zpVector4f& pos0, const zpVector4f& pos1, const zpVector4f& pos2, const zpColor4f& color );
+	void addTriangle( 
+		const zpVector4f& pos0, const zpColor4f& color0, 
+		const zpVector4f& pos1, const zpColor4f& color1, 
+		const zpVector4f& pos2, const zpColor4f& color2 );
+	void addTriangle( 
+		const zpVector4f& pos0, const zpVector2f& uv0, 
+		const zpVector4f& pos1, const zpVector2f& uv1, 
+		const zpVector4f& pos2, const zpVector2f& uv2 );
+	void addTriangle( 
+		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
+		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
+		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2 );
+	void addTriangle( 
+		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv00, const zpVector2f& uv10,
+		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv01, const zpVector2f& uv11,
+		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv02, const zpVector2f& uv12 );
+
+	void addQuad( const zpVector4f& pos0, const zpVector4f& pos1, const zpVector4f& pos2, const zpVector4f& pos3, const zpColor4f& color );
+	void addQuad( 
+		const zpVector4f& pos0, const zpColor4f& color0, 
+		const zpVector4f& pos1, const zpColor4f& color1, 
+		const zpVector4f& pos2, const zpColor4f& color2, 
+		const zpVector4f& pos3, const zpColor4f& color3 );
+	void addQuad( 
+		const zpVector4f& pos0, const zpVector2f& uv0, 
+		const zpVector4f& pos1, const zpVector2f& uv1, 
+		const zpVector4f& pos2, const zpVector2f& uv2,
+		const zpVector4f& pos3, const zpVector2f& uv3 );
+	void addQuad( 
+		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
+		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
+		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2,
+		const zpVector4f& pos3, const zpVector4f& normal3, const zpVector2f& uv3 );
+	void addQuad( 
+		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv00, const zpVector2f& uv10,
+		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv01, const zpVector2f& uv11,
+		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv02, const zpVector2f& uv12,
+		const zpVector4f& pos3, const zpVector4f& normal3, const zpVector2f& uv03, const zpVector2f& uv13 );
+
+	void endImmediateDraw();
+
+	void beginBufferedDraw();
+	void endBufferedDraw();
+
+	void beginInstancedDraw();
+	void endInstancedDraw();
 
 	void processCommands();
 
@@ -30,6 +94,8 @@ private:
 
 	zpRenderingCommand* m_currentCommnad;
 	zpFixedArrayList< zpRenderingCommand, ZP_RENDERING_MAX_COMMNADS > m_renderingCommands;
+	zpFixedDataBuffer< 1024 > m_scratchVertexBuffer;
+	zpFixedDataBuffer< 512 > m_scratchIndexBuffer;
 
 	friend class zpRenderingEngine;
 };

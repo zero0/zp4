@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 
+#if 0
 zpCameraComponent::zpCameraComponent()
 	: m_isLocalToGameObject( true )
 	, m_renderLayers()
@@ -41,3 +42,4 @@ void zpCameraComponent::onUpdate() {
 
 void zpCameraComponent::onEnabled() {}
 void zpCameraComponent::onDisabled() {}
+#endif

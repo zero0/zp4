@@ -4,21 +4,27 @@
 
 #include "Rendering/zpRendering.h"
 
-class zpDX11Texture;
+//class zpDX11Texture;
+//
+//class zpDX11ShaderResource;
+//class zpDX11TextureResource;
+//
+//class zpDX11Buffer;
+//class zpDX11DepthStencilBuffer;
+//class zpDX11VertexLayout;
+//class zpDX11SamplerState;
+//class zpDX11RasterState;
+//
+//class zpDX11RenderingContext;
+//class zpDX11RenderingEngine;
 
-class zpDX11ShaderResource;
-class zpDX11TextureResource;
+class zpTextureImpl;
 
-class zpDX11Buffer;
-class zpDX11DepthStencilBuffer;
-class zpDX11VertexLayout;
-class zpDX11SamplerState;
-class zpDX11RasterState;
-
-class zpDX11RenderingContext;
-class zpDX11RenderingEngine;
+class zpRasterStateImpl;
 
 class zpRenderingEngineImpl;
+class zpRenderingContextImpl;
+
 
 #include "zpDX11Texture.h"
 

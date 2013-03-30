@@ -16,6 +16,7 @@ enum zpTextAlignment {
 	ZP_TEXT_ALIGNMENT_BOTTOM_RIGHT,
 };
 
+#if 0
 class zpTextRenderingComponent : public zpRenderingComponent {
 public:
 	zpTextRenderingComponent();
@@ -57,7 +58,8 @@ private:
 	zpResourceInstance<zpFontResource> m_font;
 	zpResourceInstance<zpShaderResource> m_shader;
 
-	zpImmediateBuffer<zpVertexPositionNormalTexture, zp_ushort> m_buffer;
+	zpImmediateBuffer<zpVertexPositionNormalUV, zp_ushort> m_buffer;
 };
+#endif
 
 #endif

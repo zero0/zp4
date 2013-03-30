@@ -22,10 +22,8 @@ public:
 	void destroy();
 	void shutdown();
 
-	void setDisplayMode( const zpDisplayMode& mode );
-	void setScreenMode( zpScreenMode mode );
-	void setWindow( zpWindow* window );
-	void setVSyncEnabled( zp_bool enabled );
+	zpTextureImpl* createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
+	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 
 	void present();
 

@@ -38,6 +38,11 @@ void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingComm
 			}
 			break;
 
+		case ZP_RENDERING_COMMNAD_CLEAR_STATE:
+			{
+				m_context->ClearState();
+			}
+
 		case ZP_RENDERING_COMMNAD_SET_RT:
 			{
 				ID3D11RenderTargetView* rtvs[ ZP_RENDER_TARGET_MAX_COUNT ];
@@ -88,14 +93,45 @@ void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingComm
 
 		case ZP_RENDERING_COMMNAD_SET_RASTER_STATE:
 			{
+				zpRasterStateImpl* rasterState = command.rasterState->getRasterStateImpl();
 
+				m_context->RSSetState( rasterState->m_raster );
 			}
 			break;
 
-		case ZP_RENDERING_COMMNAD_DRAW:
+		case ZP_RENDERING_COMMNAD_SET_SAMPLER_STATE:
+			{
+				zpSamplerState* samplerState = command.samplerState;
+				
+				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
+				{
+					m_context->VSSetSamplers( 0, 1, ZP_NULL );
+				}
+				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
+				{
+					m_context->GSSetSamplers( 0, 1, ZP_NULL );
+				}
+				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER )
+				{
+					m_context->CSSetSamplers( 0, 1, ZP_NULL );
+				}
+				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
+				{
+					m_context->PSSetSamplers( 0, 1, ZP_NULL );
+				}
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
 			{
 				//m_context->IASetPrimitiveTopology( __zpToDX( command.topology ) );
-				//m_context->DrawIndexed( command.indexCount, command.indexOffset, command.vertexOffset );
+				m_context->DrawIndexed( command.indexCount, command.indexOffset, command.vertexOffset );
+			}
+			break;
+
+		case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
+			{
+				
 			}
 			break;
 

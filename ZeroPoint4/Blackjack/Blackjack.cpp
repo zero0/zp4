@@ -64,7 +64,11 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	
 	while( wnd.processMessages() )
 	{
-		cxt->clearRenderTarget( t, zpColor4f( 1.f, 0, 0, 1.f ) );
+		cxt->clearRenderTarget( t, zpColor4f( 1.f, 1.f, 0, 1.f ) );
+
+		cxt->beginImmediateDraw( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR );
+		cxt->addLine( zpVector4f( 2 ), zpColor4f(), zpVector4f( 1 ), zpColor4f() );
+		cxt->endImmediateDraw();
 
 		cxt->processCommands();
 		re->present();

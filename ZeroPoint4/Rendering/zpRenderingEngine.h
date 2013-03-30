@@ -43,17 +43,17 @@ public:
 
 
 	//zpBuffer* createBuffer();
-	zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 0 );
+	zpTexture* createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
 
 	//virtual zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) = 0;
 
 	//virtual zpVertexLayout* createVertexLayout( const zpString& desc ) = 0;
 
 	//virtual zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc ) = 0;
-	//virtual zpRasterState* createRasterState( const zpRasterStateDesc& desc ) = 0;
+	zpRasterState* createRasterState( const zpRasterStateDesc& desc );
 
 protected:
-	zpRenderingEngineImpl* m_rendingEngine;
+	zpRenderingEngineImpl* m_renderingEngine;
 	
 	zpRenderingEngineType m_renderingEngineType;
 	zpDisplayMode m_displayMode;
@@ -63,6 +63,8 @@ protected:
 
 	zpTexture* m_immediateRenderTarget;
 	zpFixedArrayList< zpRenderingContext*, ZP_RENDERING_MAX_CONTEXTS > m_renderingContexts;
+
+	zpHashMap< zp_hash, zpRasterState* > m_rasterStates;
 };
 
 /*

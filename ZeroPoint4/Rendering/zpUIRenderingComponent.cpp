@@ -1,6 +1,7 @@
 #include "zpRendering.h"
 #include "Awesomium\awesomium_capi.h"
 
+#if 0
 zpString& awe_string_to_std( const awe_string* aweString, zpString& outString ) {
 	int length = awe_string_to_wide( aweString, NULL, 0 );
 
@@ -151,3 +152,4 @@ void zpUIRenderingComponent::onDisabled() {}
 
 void zpUIRenderingComponent::onShow() {}
 void zpUIRenderingComponent::onHide() {}
+#endif

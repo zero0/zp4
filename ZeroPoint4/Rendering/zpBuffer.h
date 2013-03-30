@@ -2,6 +2,34 @@
 #ifndef ZP_BUFFER_H
 #define ZP_BUFFER_H
 
+class zpBufferImpl;
+
+class zpBuffer
+{
+public:
+	~zpBuffer();
+
+	void create( zpBufferType type, zpBufferBindType bind, zp_uint size, void* data, zp_uint stride );
+	void destroy();
+
+	void map( void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
+	void unmap( zp_uint subResource );
+
+	void update( zp_uint count, void* data );
+
+	zp_uint getSize() const;
+	zp_uint getStride() const;
+	zpBufferType getBufferType() const;
+	zpDisplayFormat getFormat() const;
+	zpBufferBindType getBufferBindType() const;
+
+private:
+	zpBuffer( zpBufferImpl* buffer );
+
+	zpBufferImpl* m_buffer;
+};
+
+#if 0
 ZP_PURE_INTERFACE zpBuffer {
 public:
 
@@ -49,5 +77,6 @@ public:
 	virtual zpDisplayFormat getFormat() const = 0;
 	virtual zpBufferBindType getBufferBindType() const = 0;
 };
+#endif
 
 #endif

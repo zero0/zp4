@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 
+#if 0
 zpStaticMeshRenderingComponent::zpStaticMeshRenderingComponent()
 	: m_manager( ZP_NULL )
 {}
@@ -85,3 +86,4 @@ void zpStaticMeshRenderingComponent::onDisabled() {}
 
 void zpStaticMeshRenderingComponent::onShow() {}
 void zpStaticMeshRenderingComponent::onHide() {}
+#endif

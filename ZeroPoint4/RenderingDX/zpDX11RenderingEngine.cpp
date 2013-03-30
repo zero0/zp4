@@ -147,10 +147,141 @@ void zpRenderingEngineImpl::shutdown()
 	ZP_SAFE_RELEASE( m_dxgiFactory );
 }
 
-void zpRenderingEngineImpl::setDisplayMode( const zpDisplayMode& mode ) {}
-void zpRenderingEngineImpl::setScreenMode( zpScreenMode mode ) {}
-void zpRenderingEngineImpl::setWindow( zpWindow* window ) {}
-void zpRenderingEngineImpl::setVSyncEnabled( zp_bool enabled ) {}
+zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
+{
+	HRESULT hr;
+	ID3D11Resource* texture = ZP_NULL;
+	ID3D11ShaderResourceView* srv = ZP_NULL;
+	ID3D11RenderTargetView* rtv = ZP_NULL;
+
+	D3D11_TEXTURE2D_DESC texDesc;
+	zp_zero_memory( &texDesc );
+	texDesc.ArraySize = 1;
+	switch( type )
+	{
+	case ZP_TEXTURE_TYPE_TEXTURE:
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		break;
+	case ZP_TEXTURE_TYPE_RENDER_TARGET:
+		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+		break;
+	case ZP_TEXTURE_TYPE_RENDER_TEXTURE:
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		break;
+	}
+
+	texDesc.CPUAccessFlags = __zpToDX( ZP_CPU_ACCESS_NONE );
+	texDesc.Format = __zpToDX( format );
+	texDesc.Width = width;
+	texDesc.Height = height;
+	texDesc.MipLevels = type == ZP_TEXTURE_TYPE_TEXTURE ? mipLevels : 1;
+	texDesc.MiscFlags = 0;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	
+	// create the texture with or without data
+	if( data )
+	{
+		D3D11_SUBRESOURCE_DATA subData;
+		zp_zero_memory( &subData );
+		subData.pSysMem = data;
+
+		hr = m_d3dDevice->CreateTexture2D( &texDesc, &subData, (ID3D11Texture2D**)&texture );
+	}
+	else
+	{
+		hr = m_d3dDevice->CreateTexture2D( &texDesc, ZP_NULL, (ID3D11Texture2D**)&texture );
+	}
+
+	if( FAILED( hr ) )
+	{
+		ZP_ASSERT( false, "Unable to create texture." );
+		return ZP_NULL;
+	}
+
+
+	// create the shader resource view if the texture is a normal texture or a render texture
+	if( type == ZP_TEXTURE_TYPE_TEXTURE || type == ZP_TEXTURE_TYPE_RENDER_TEXTURE )
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+		zp_zero_memory( &srvDesc );
+		srvDesc.Format = texDesc.Format;
+		switch( type )
+		{
+		case ZP_TEXTURE_DIMENSION_1D:
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+			srvDesc.Texture1D.MipLevels = texDesc.MipLevels;
+			break;
+		case ZP_TEXTURE_DIMENSION_2D:
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+			break;
+		case ZP_TEXTURE_DIMENSION_CUBE_MAP:
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+			srvDesc.TextureCube.MipLevels = texDesc.MipLevels;
+			break;
+		}
+
+		hr = m_d3dDevice->CreateShaderResourceView( texture, &srvDesc, &srv );
+		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to creat shader resouce view for texture" );
+	}
+
+	// create the render target view if the texture is a render target or a render texture
+	if( type == ZP_TEXTURE_TYPE_RENDER_TARGET || type == ZP_TEXTURE_TYPE_RENDER_TEXTURE )
+	{
+		// TODO: assert if trying to create a 1D or cube map render target
+		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+		zp_zero_memory( &rtvDesc );
+		rtvDesc.Format = texDesc.Format;
+		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+		hr = m_d3dDevice->CreateRenderTargetView( texture, &rtvDesc, &rtv );
+		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create render target view for texture" );
+	}
+
+	// remove references so texture now owns pointers
+	ZP_SAFE_RELEASE( texture );
+	ZP_SAFE_RELEASE( srv );
+	ZP_SAFE_RELEASE( rtv );
+
+	zpTextureImpl* tex = new zpTextureImpl;
+	tex->m_width = width;
+	tex->m_height = height;
+	tex->m_dimension = dimension;
+	tex->m_type = type;
+	tex->m_texture = texture;
+	tex->m_textureResourceView = srv;
+	tex->m_textureRenderTarget = rtv;
+
+	return tex;
+}
+zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterStateDesc& desc )
+{
+	HRESULT hr;
+	D3D11_RASTERIZER_DESC rasterDesc;
+	zp_zero_memory( &rasterDesc );
+	rasterDesc.FillMode = __zpToDX( desc.fillMode );
+	rasterDesc.CullMode = __zpToDX( desc.cullMode );
+	rasterDesc.FrontCounterClockwise = desc.frontFace == ZP_FRONT_FACE_CCW;
+	rasterDesc.DepthBias = desc.depthBias;
+	rasterDesc.DepthBiasClamp = desc.depthBiasClamp;
+	rasterDesc.SlopeScaledDepthBias = desc.slopeScaledDepthBias;
+	rasterDesc.DepthClipEnable = desc.depthClipEnable;
+	rasterDesc.ScissorEnable = desc.scissorEnable;
+	rasterDesc.MultisampleEnable = desc.multisampleEnable;
+	rasterDesc.AntialiasedLineEnable = desc.antialiasedLineEnable;
+
+	ID3D11RasterizerState* state;
+	hr = m_d3dDevice->CreateRasterizerState( &rasterDesc, &state );
+	ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Raster State" );
+
+	zpRasterStateImpl* impl = new zpRasterStateImpl;
+	impl->m_raster = state;
+	impl->m_desc = desc;
+
+	return impl;
+}
 
 void zpRenderingEngineImpl::present()
 {

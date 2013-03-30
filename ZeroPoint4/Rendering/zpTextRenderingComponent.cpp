@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 
+#if 0
 zpTextRenderingComponent::zpTextRenderingComponent()
 	: m_isLocalToGameObject( true )
 	, m_isTextDirty( false )
@@ -93,3 +94,4 @@ void zpTextRenderingComponent::onDisabled() {}
 
 void zpTextRenderingComponent::onShow() {}
 void zpTextRenderingComponent::onHide() {}
+#endif

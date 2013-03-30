@@ -2,6 +2,7 @@
 #ifndef ZP_CAMERA_COMPONENT_H
 #define ZP_CAMERA_COMPONENT_H
 
+#if 0
 class zpCameraComponent : public zpComponent {
 public:
 	zpCameraComponent();
@@ -35,5 +36,6 @@ private:
 
 	zpCamera m_camera;
 };
+#endif 
 
 #endif

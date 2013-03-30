@@ -20,11 +20,6 @@
 #define ZP_RENDERING_TYPE				ZP_DX11
 #define ZP_RENDERING_INCLUDE			ZP_DX11_INC
 
-
-#define ZP_RENDERING_LAYER_TYPE			zp_byte
-#define ZP_RENDERING_LAYER_Count		( sizeof( ZP_RENDERING_LAYER_TYPE ) * 8 )
-typedef zpFlag<ZP_RENDERING_LAYER_TYPE>	zpRenderLayer;
-
 enum
 {
 	ZP_RENDERING_GLOBAL_BUFFER_WORLD,
@@ -44,6 +39,19 @@ enum
 #else
 #error( "No rendering engine selected!" )
 #endif
+
+enum zpRenderingLayer
+{
+	ZP_RENDERING_LAYER_NONE,
+
+	ZP_RENDERING_LAYER_OPAQUE,
+	ZP_RENDERING_LAYER_TRANSPARENT,
+
+	ZP_RENDERING_LAYER_UI_OPAQUE,
+	ZP_RENDERING_LAYER_UI_TRANSPARENT,
+
+	zpRenderingLayer_Count,
+};
 
 enum zpRenderingEngineType
 {
@@ -120,10 +128,10 @@ enum zpDisplayFormat
 
 enum zpVertexFormat
 {
-	ZP_VERTEX_FORMAT_POSITION_COLOR,
-	ZP_VERTEX_FORMAT_POSITION_UV,
-	ZP_VERTEX_FORMAT_POSITION_NORMAL_UV,
-	ZP_VERTEX_FORMAT_POSITION_NORMAL_UV2,
+	ZP_VERTEX_FORMAT_VERTEX_COLOR,
+	ZP_VERTEX_FORMAT_VERTEX_UV,
+	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV,
+	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2,
 };
 
 enum zpScreenMode
@@ -170,7 +178,7 @@ enum zpMapType
 
 enum zpTopology
 {
-	ZP_TOPOLOGY_UNKNOWN,
+	ZP_TOPOLOGY_UNKNOWN =		0,
 
 	ZP_TOPOLOGY_POINT_LIST,
 
@@ -183,10 +191,10 @@ enum zpTopology
 
 enum zpResourceBindSlot
 {
-	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER,
-	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER,
-	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER,
-	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER,
+	ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER =	0x01,
+	ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER =	0x02,
+	ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER =	0x04,
+	ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER =	0x08,
 };
 
 enum zpMaterialTextureSlot
@@ -348,13 +356,16 @@ enum zpRenderingCommandType
 
 	ZP_RENDERING_COMMNAD_CLEAR_RT,
 	ZP_RENDERING_COMMNAD_CLEAR_DEPTH_STENCIL,
+	ZP_RENDERING_COMMNAD_CLEAR_STATE,
 
 	ZP_RENDERING_COMMNAD_SET_RT,
 	ZP_RENDERING_COMMNAD_SET_VIEWPORT,
 	ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT,
 	ZP_RENDERING_COMMNAD_SET_RASTER_STATE,
+	ZP_RENDERING_COMMNAD_SET_SAMPLER_STATE,
 
-	ZP_RENDERING_COMMNAD_DRAW,
+	ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE,
+	ZP_RENDERING_COMMNAD_DRAW_BUFFERED,
 	ZP_RENDERING_COMMNAD_DRAW_INSTANCED,
 
 	zpRenderingCommandType_Count,
@@ -400,15 +411,22 @@ struct zpRenderingCommand
 			zpRasterState* rasterState;
 		};
 
+		struct 
+		{
+			zp_uint samplerStateBind;
+			zpSamplerState* samplerState;
+		};
+
 		struct
 		{
+			zpRenderingLayer layer;
 			zpTopology topology;
-			zpResourceInstance< zpMaterialResource >* material;
+			//zpResourceInstance< zpMaterialResource >* material;
 			zpVertexFormat vertexFormat;
-			zp_uint vertexOffset;
 			zp_uint vertexCount;
-			zp_uint indexOffset;
 			zp_uint indexCount;
+			zp_uint vertexOffset;
+			zp_uint indexOffset;
 			zpBoundingSphere sphere;
 		};
 	};

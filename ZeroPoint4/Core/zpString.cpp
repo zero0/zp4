@@ -3,19 +3,6 @@
 #define IS_STRING_PACKED( end )	( ( (end)->m_length ) < ZP_STRING_MAX_SMALL_SIZE)
 #define NOT_STRING_PACKED( end )	( !IS_STRING_PACKED( end ) )
 
-zp_hash zp_fnv1_32( const zp_char* c, zp_hash h )
-{
-	zp_byte* s = (zp_byte*)c;
-
-	while( *s )
-	{
-		h *= (zp_hash)0x01000193;
-		h ^= (zp_hash)*s++;
-	}
-
-	return h;
-}
-
 zpString::zpString()
 	: m_length( 0 )
 	, m_hash( 0 )
@@ -236,7 +223,7 @@ zpString::operator zp_hash() const
 {
 	if( m_hash == 0 )
 	{
-		m_hash = zp_fnv1_32( getChars(), m_hash );
+		m_hash = zp_fnv1_32_string( getChars(), m_hash );
 	}
 
 	return m_hash;

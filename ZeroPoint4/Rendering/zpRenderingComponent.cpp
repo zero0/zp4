@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 
+#if 0
 zpRenderingComponent::zpRenderingComponent() 
 	: m_isVisible( true )
 	, m_renderLayers( 0 )
@@ -33,3 +34,4 @@ void zpRenderingComponent::setRenderLayers( const zpRenderLayer& layers ) {
 void zpRenderingComponent::setBoundingSphere( const zpBoundingSphere& sphere ) {
 	m_boundingSphere = sphere;
 }
+#endif

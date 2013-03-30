@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 
+#if 0
 zpRenderingManager::zpRenderingManager()
 	: m_isFrustimCullingEnabled( true )
 	, m_engine( ZP_NULL )
@@ -165,3 +166,4 @@ void zpRenderingManager::onUpdate() {
 
 void zpRenderingManager::onEnabled() {}
 void zpRenderingManager::onDisabled() {}
+#endif

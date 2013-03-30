@@ -4,17 +4,17 @@
 
 struct ID3D11RasterizerState;
 
-class zpDX11RasterState : public zpRasterState {
+class zpRasterStateImpl {
 public:
-	virtual ~zpDX11RasterState();
+	zpRasterStateImpl();
+	~zpRasterStateImpl();
 
 private:
-	zpDX11RasterState( ID3D11RasterizerState* state = ZP_NULL );
-
 	ID3D11RasterizerState* m_raster;
+	zpRasterStateDesc m_desc;
 
-	friend class zpDX11RenderingEngine;
-	friend class zpDX11RenderingContext;
+	friend class zpRenderingEngineImpl;
+	friend class zpRenderingContextImpl;
 };
 
 #endif

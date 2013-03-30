@@ -255,10 +255,36 @@ zp_bool zp_is_print( zp_char ch ) {
 	return ch >= 0x20 && ch <= 0x7E;
 }
 
-zp_uint zp_near_pow2( zp_uint number ) {
+zp_uint zp_near_pow2( zp_uint number )
+{
 	zp_uint i = 1;
 	while( i < number ) i <<= 1;
 	return i;
+}
+
+zp_hash zp_fnv1_32_data( const void* d, zp_uint l, zp_hash h )
+{
+	const zp_byte* s = (const zp_byte*)d;
+	
+	while( l-- )
+	{
+		h *= (zp_hash)0x01000193;
+		h ^= (zp_hash)*s++;
+	}
+
+	return h;
+}
+zp_hash zp_fnv1_32_string( const zp_char* c, zp_hash h )
+{
+	const zp_byte* s = (const zp_byte*)c;
+	
+	while( *s )
+	{
+		h *= (zp_hash)0x01000193;
+		h ^= (zp_hash)*s++;
+	}
+
+	return h;
 }
 
 void zpCoreRegisterSerializables() {

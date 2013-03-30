@@ -191,6 +191,9 @@
     <ClCompile Include="zpTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpRasterState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpImmediateBuffer.inl">

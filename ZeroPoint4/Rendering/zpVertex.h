@@ -2,26 +2,30 @@
 #ifndef ZP_VERTEX_H
 #define ZP_VERTEX_H
 
-struct zpVertexPositionColor {
+struct zpVertexPositionColor
+{
 	zpVector4f position;
 	zpColor4f color;
 };
 
-struct zpVertexPositionTexture {
+struct zpVertexPositionUV
+{
 	zpVector4f position;
-	zpVector2f texCoord0;
+	zpVector2f uv0;
 };
 
-struct zpVertexPositionTexture2 {
+struct zpVertexPositionUV2
+{
 	zpVector4f position;
-	zpVector2f texCoord0;
-	zpVector2f texCoord1;
+	zpVector2f uv0;
+	zpVector2f uv1;
 };
 
-struct zpVertexPositionNormalTexture {
+struct zpVertexPositionNormalUV
+{
 	zpVector4f position;
 	zpVector4f normal;
-	zpVector2f texCoord0;
+	zpVector2f uv0;
 };
 
 #endif
