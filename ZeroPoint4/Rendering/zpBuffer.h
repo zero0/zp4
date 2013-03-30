@@ -6,16 +6,9 @@ class zpBufferImpl;
 
 class zpBuffer
 {
+	ZP_NON_COPYABLE( zpBuffer );
 public:
 	~zpBuffer();
-
-	void create( zpBufferType type, zpBufferBindType bind, zp_uint size, void* data, zp_uint stride );
-	void destroy();
-
-	void map( void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
-	void unmap( zp_uint subResource );
-
-	void update( zp_uint count, void* data );
 
 	zp_uint getSize() const;
 	zp_uint getStride() const;
@@ -27,6 +20,9 @@ private:
 	zpBuffer( zpBufferImpl* buffer );
 
 	zpBufferImpl* m_buffer;
+
+	friend class zpRenderingEngine;
+	friend class zpRenderingContext;
 };
 
 #if 0

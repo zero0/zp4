@@ -2,7 +2,7 @@
 
 zpBoundingSphere::zpBoundingSphere()
 	: m_center( 0 )
-	, m_radius( 0 )
+	, m_radius( ZP_FLT_MIN )
 {}
 zpBoundingSphere::zpBoundingSphere( const zpVector4f& center, const zpScalar& radius )
 	: m_center( center )

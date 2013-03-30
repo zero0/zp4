@@ -10,6 +10,11 @@ public:
 	zpRenderingContextImpl( ID3D11DeviceContext* context );
 	~zpRenderingContextImpl();
 
+	void map( zpBufferImpl* buffer, void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
+	void unmap( zpBufferImpl* buffer, zp_uint subResource = 0 );
+
+	void update( zpBufferImpl* buffer, void* data, zp_uint size );
+
 	void processCommands( const zpArrayList< zpRenderingCommand >& renderCommands );
 
 private:

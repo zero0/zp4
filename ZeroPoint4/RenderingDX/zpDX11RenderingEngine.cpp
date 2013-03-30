@@ -147,6 +147,56 @@ void zpRenderingEngineImpl::shutdown()
 	ZP_SAFE_RELEASE( m_dxgiFactory );
 }
 
+zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, void* data )
+{
+	HRESULT hr;
+	zpDisplayFormat format = ZP_DISPLAY_FORMAT_UNKNOWN;
+
+	if( type == ZP_BUFFER_TYPE_INDEX )
+	{
+		switch( stride )
+		{
+		case 1: format = ZP_DISPLAY_FORMAT_R8_UINT; break;
+		case 2: format = ZP_DISPLAY_FORMAT_R16_UINT; break;
+		case 4: format = ZP_DISPLAY_FORMAT_R32_UINT; break;
+		}
+	}
+
+	D3D11_BUFFER_DESC desc;
+	zp_zero_memory( &desc );
+	desc.Usage = __zpToDX( bind );
+	desc.ByteWidth = size;
+	desc.StructureByteStride = stride;
+	desc.BindFlags = __zpToDX( type );
+	desc.CPUAccessFlags = bind == ZP_BUFFER_BIND_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
+	desc.MiscFlags = 0;
+
+	ID3D11Buffer* buffer;
+	if( data )
+	{
+		D3D11_SUBRESOURCE_DATA sub;
+		zp_zero_memory( &sub );
+		sub.pSysMem = data;
+
+		hr = m_d3dDevice->CreateBuffer( &desc, &sub, &buffer );
+	}
+	else
+	{
+		hr = m_d3dDevice->CreateBuffer( &desc, ZP_NULL, &buffer );
+	}
+
+	ZP_ASSERT( SUCCEEDED( hr ), "Unable to create buffer." );
+
+	zpBufferImpl* bufferImpl = new zpBufferImpl;
+	bufferImpl->m_size = size;
+	bufferImpl->m_stride = stride;
+	bufferImpl->m_type = type;
+	bufferImpl->m_format = format;
+	bufferImpl->m_bind = bind;
+	bufferImpl->m_buffer = buffer;
+
+	return bufferImpl;
+}
 zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
 {
 	HRESULT hr;

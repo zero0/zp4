@@ -28,4 +28,12 @@ struct zpVertexPositionNormalUV
 	zpVector2f uv0;
 };
 
+struct zpVertexPositionNormalUV2
+{
+	zpVector4f position;
+	zpVector4f normal;
+	zpVector2f uv0;
+	zpVector2f uv1;
+};
+
 #endif

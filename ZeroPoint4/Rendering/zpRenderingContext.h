@@ -9,6 +9,7 @@ class zpRenderingContext
 {
 	ZP_NON_COPYABLE( zpRenderingContext );
 public:
+	~zpRenderingContext();
 
 	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
 
@@ -22,7 +23,7 @@ public:
 	void setRasterState( zpRasterState* raster );
 	void setSamplerState( zp_uint bindSlots, zpSamplerState* sampler );
 
-	void beginImmediateDraw( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat );
+	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat );
 
 	void addVertex( const zpVector4f& pos, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );
@@ -76,17 +77,21 @@ public:
 		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv02, const zpVector2f& uv12,
 		const zpVector4f& pos3, const zpVector4f& normal3, const zpVector2f& uv03, const zpVector2f& uv13 );
 
-	void endImmediateDraw();
+	void endDrawImmediate();
 
-	void beginBufferedDraw();
-	void endBufferedDraw();
+	void drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffe, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpBoundingAABB* boundingBox = 0 );
 
-	void beginInstancedDraw();
-	void endInstancedDraw();
+	void drawInstancedDraw( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat );
+
+	void map( zpBuffer* buffer, void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
+	void unmap( zpBuffer* buffer, zp_uint subResource = 0 );
+
+	void update( zpBuffer* buffer, void* data, zp_uint size );
 
 	void processCommands();
 
 private:
+	zpRenderingContext();
 	zpRenderingContext( zpRenderingEngine* engine, zpRenderingContextImpl* impl );
 
 	zpRenderingContextImpl* m_renderContextImpl;
@@ -94,8 +99,21 @@ private:
 
 	zpRenderingCommand* m_currentCommnad;
 	zpFixedArrayList< zpRenderingCommand, ZP_RENDERING_MAX_COMMNADS > m_renderingCommands;
-	zpFixedDataBuffer< 1024 > m_scratchVertexBuffer;
-	zpFixedDataBuffer< 512 > m_scratchIndexBuffer;
+	zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE > m_scratchVertexBuffer;
+	zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE > m_scratchIndexBuffer;
+
+	zp_byte* m_immediateVertexData;
+	zp_byte* m_immediateIndexData;
+
+	zp_uint m_immediateVertexSize;
+	zp_uint m_immediateIndexSize;
+
+	zp_uint m_currentBufferIndex;
+	zpBuffer* m_currentVertexBuffer;
+	zpBuffer* m_currentIndexBuffer;
+
+	zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
+	zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
 
 	friend class zpRenderingEngine;
 };

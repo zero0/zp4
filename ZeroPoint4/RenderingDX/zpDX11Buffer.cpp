@@ -2,6 +2,40 @@
 #include <D3D11.h>
 #include "zpDX11Util.h"
 
+zpBufferImpl::zpBufferImpl()
+	: m_size( 0 )
+	, m_stride( 0 )
+	, m_type( ZP_BUFFER_TYPE_UNKNOWN )
+	, m_format( ZP_DISPLAY_FORMAT_UNKNOWN )
+	, m_bind( ZP_BUFFER_BIND_DEFAULT )
+	, m_buffer( ZP_NULL )
+{}
+zpBufferImpl::~zpBufferImpl()
+{
+	ZP_SAFE_RELEASE( m_buffer );
+}
+
+zp_uint zpBufferImpl::getSize() const
+{
+	return m_size;
+}
+zp_uint zpBufferImpl::getStride() const
+{
+	return m_stride;
+}
+zpBufferType zpBufferImpl::getBufferType() const
+{
+	return m_type;
+}
+zpDisplayFormat zpBufferImpl::getFormat() const
+{
+	return m_format;
+}
+zpBufferBindType zpBufferImpl::getBufferBindType() const
+{
+	return m_bind;
+}
+
 #if 0
 zpDX11Buffer::zpDX11Buffer() :
 	m_count( 0 ),

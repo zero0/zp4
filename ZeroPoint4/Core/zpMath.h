@@ -8,6 +8,8 @@
 #define ZP_2PI		( 2.0f * ZP_PI )
 #define ZP_PIOVER2	( 0.5f * ZP_PI )
 #define ZP_PIOVER4	( 0.25f* ZP_PI ) 
+#define ZP_FLT_MAX	( 3.402823466e+38F )
+#define ZP_FLT_MIN	( 1.175494351e-38F )
 
 #define ZP_RAD_TO_DEG( r )	( ( (r) * 180.f ) * ZP_1OVERPI )
 #define ZP_DEG_TO_RAD( d )	( ( (d) * ZP_PI ) / 180.0f )
@@ -16,12 +18,14 @@
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
 
 template<typename T>
-ZP_FORCE_INLINE T zp_saturate( T& val ) {
+ZP_FORCE_INLINE T zp_saturate( T& val )
+{
 	return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val;
 }
 
 template<typename T>
-ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high ) {
+ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high )
+{
 	return val > high ? high : val < low ? low : val;
 }
 
@@ -40,7 +44,8 @@ zp_float zp_pow( zp_float b, zp_float p );
 zp_float zp_sqrt( zp_float v );
 
 template<typename T>
-ZP_FORCE_INLINE T zp_abs( T& value ) {
+ZP_FORCE_INLINE T zp_abs( T& value )
+{
 	return value > (T)0 ? value : -value;
 }
 

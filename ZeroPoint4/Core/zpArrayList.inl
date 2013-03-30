@@ -250,7 +250,7 @@ template<typename T>
 void zpArrayList<T>::ensureCapacity( zp_uint size )
 {
 	// if the array is already large enough, return
-	if( size < m_capacity ) return;
+	if( size <= m_capacity ) return;
 
 	ZP_ASSERT( !m_isFixed, "zpArrayList: Unable to resize fixed array" );
 

@@ -6,8 +6,8 @@ zpStaticMeshPart::zpStaticMeshPart()
 	, indexBuffer( ZP_NULL )
 {}
 zpStaticMeshPart::~zpStaticMeshPart() {
-	if( vertexBuffer ) vertexBuffer->destroy();
-	if( indexBuffer ) indexBuffer->destroy();
+	//if( vertexBuffer ) vertexBuffer->destroy();
+	//if( indexBuffer ) indexBuffer->destroy();
 }
 
 zpStaticMeshResource::zpStaticMeshResource()

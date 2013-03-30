@@ -22,6 +22,7 @@ public:
 	void destroy();
 	void shutdown();
 
+	zpBufferImpl* createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, void* data );
 	zpTextureImpl* createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
 	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 

@@ -1,8 +1,8 @@
 #include "zpCore.h"
 
 zpBoundingAABB::zpBoundingAABB()
-	: m_min( 0 )
-	, m_max( 0 )
+	: m_min( ZP_FLT_MAX )
+	, m_max( ZP_FLT_MIN )
 {}
 zpBoundingAABB::zpBoundingAABB( zp_float width, zp_float height, zp_float depth )
 	: m_min( width * -0.5f, height * -0.5f, depth * -0.5f )
@@ -98,7 +98,6 @@ zpBoundingSphere zpBoundingAABB::generateBoundingSphere( zp_bool isSphereContain
 	{
 		zpVector4f maxLength( m_max );
 		zpVector4f minLength( m_min );
-
 
 		zpMath::Sub( maxLength, maxLength, center );
 		zpMath::Sub( minLength, minLength, center );

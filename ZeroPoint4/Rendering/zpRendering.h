@@ -29,8 +29,18 @@ enum
 	ZP_RENDERING_GLOBAL_BUFFER_Count
 };
 
-#define ZP_RENDERING_MAX_COMMNADS		1024
-#define ZP_RENDERING_MAX_CONTEXTS		8
+enum
+{
+	ZP_RENDERING_MAX_COMMNADS =					1024,
+	ZP_RENDERING_MAX_RENDERING_CONTEXTS =		8,
+	ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS	=	2,
+
+	ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE = ZP_MEMORY_MB( 0.5f ),
+	ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE =	ZP_MEMORY_MB( 0.25f ),
+
+	ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE = ZP_MEMORY_MB( 2 ),
+	ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE =	ZP_MEMORY_MB( 1 ),
+};
 
 #if ZP_RENDERING_TYPE == ZP_DX11
 #include "RenderingDX\zpDX11Lib.inc"
@@ -151,6 +161,7 @@ struct zpDisplayMode
 
 enum zpBufferType
 {
+	ZP_BUFFER_TYPE_UNKNOWN =	0,
 	ZP_BUFFER_TYPE_VERTEX,
 	ZP_BUFFER_TYPE_INDEX,
 	ZP_BUFFER_TYPE_CONSTANT,
@@ -334,11 +345,12 @@ template<> class zpResourceInstance<zpUIResource>;
 
 class zpRenderingResourceCreator;
 
-ZP_PURE_INTERFACE zpBuffer;
+class zpBuffer;
+class zpBufferImpl;
 ZP_PURE_INTERFACE zpDepthStencilBuffer;
 ZP_PURE_INTERFACE zpVertexLayout;
-ZP_PURE_INTERFACE zpSamplerState;
-ZP_PURE_INTERFACE zpRasterState;
+class zpSamplerState;
+class zpRasterState;
 
 class zpMaterialResource;
 
@@ -421,13 +433,16 @@ struct zpRenderingCommand
 		{
 			zpRenderingLayer layer;
 			zpTopology topology;
+			zpBufferImpl* vertexBuffer;
+			zpBufferImpl* indexBuffer;
 			//zpResourceInstance< zpMaterialResource >* material;
 			zpVertexFormat vertexFormat;
+			zp_uint vertexStride;
 			zp_uint vertexCount;
 			zp_uint indexCount;
 			zp_uint vertexOffset;
 			zp_uint indexOffset;
-			zpBoundingSphere sphere;
+			zpBoundingAABB boundingBox;
 		};
 	};
 };

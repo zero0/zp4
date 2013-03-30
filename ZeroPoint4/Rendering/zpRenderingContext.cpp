@@ -12,7 +12,29 @@ zpRenderingContext::zpRenderingContext( zpRenderingEngine* engine, zpRenderingCo
 	: m_renderContextImpl( impl )
 	, m_renderingEngine( engine )
 	, m_currentCommnad( ZP_NULL )
-{}
+	, m_immediateVertexData( ZP_NULL )
+	, m_immediateIndexData( ZP_NULL )
+	, m_immediateVertexSize( 0 )
+	, m_immediateIndexSize( 0 )
+	, m_currentBufferIndex( 0 )
+	, m_currentVertexBuffer( ZP_NULL )
+	, m_currentIndexBuffer( ZP_NULL )
+{
+	for( zp_uint i = 0; i < ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS; ++i )
+	{
+		m_immediateVertexBuffers.pushBack( engine->createBuffer( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE ) );
+		m_immediateIndexBuffers.pushBack( engine->createBuffer( ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE, sizeof( zp_short ) ) );
+	}
+
+	m_currentVertexBuffer = m_immediateVertexBuffers[ m_currentBufferIndex ];
+	m_currentIndexBuffer = m_immediateIndexBuffers[ m_currentBufferIndex ];
+}
+zpRenderingContext::~zpRenderingContext()
+{
+	m_renderingCommands.clear();
+	m_immediateVertexBuffers.clear();
+	m_immediateIndexBuffers.clear();
+}
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
 {
@@ -106,7 +128,7 @@ void zpRenderingContext::setSamplerState( zp_uint bindSlots, zpSamplerState* sam
 	command.samplerState = sampler;
 }
 
-void zpRenderingContext::beginImmediateDraw( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat )
+void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 	m_currentCommnad = &m_renderingCommands.pushBackEmpty();
@@ -114,11 +136,35 @@ void zpRenderingContext::beginImmediateDraw( zpRenderingLayer layer, zpTopology 
 
 	m_currentCommnad->layer = layer;
 	m_currentCommnad->topology = topology;
+	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->m_buffer;
+	m_currentCommnad->indexBuffer = m_currentIndexBuffer->m_buffer;
 	m_currentCommnad->vertexFormat = vertexFormat;
 	m_currentCommnad->vertexCount = 0;
 	m_currentCommnad->indexCount = 0;
 	m_currentCommnad->vertexOffset = 0;
 	m_currentCommnad->indexOffset = 0;
+
+	switch( vertexFormat )
+	{
+	case ZP_VERTEX_FORMAT_VERTEX_COLOR:
+		m_currentCommnad->vertexStride = sizeof( zpVertexPositionColor );
+		break;
+	case ZP_VERTEX_FORMAT_VERTEX_UV:
+		m_currentCommnad->vertexStride = sizeof( zpVertexPositionUV );
+		break;
+	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV:
+		m_currentCommnad->vertexStride = sizeof( zpVertexPositionNormalUV );
+		break;
+	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2:
+		m_currentCommnad->vertexStride = sizeof( zpVertexPositionNormalUV2 );
+		break;
+	}
+
+	if( m_immediateVertexData == ZP_NULL )
+	{
+		map( m_currentVertexBuffer, (void**)&m_immediateVertexData );
+		map( m_currentIndexBuffer, (void**)&m_immediateIndexData );
+	}
 }
 
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpColor4f& color )
@@ -129,6 +175,8 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpColor4f& colo
 	m_scratchVertexBuffer.write( pos );
 	m_scratchVertexBuffer.write( color );
 	m_currentCommnad->vertexCount += 1;
+
+	m_currentCommnad->boundingBox.add( pos );
 }
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector2f& uv0 )
 {
@@ -138,6 +186,8 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector2f& uv0
 	m_scratchVertexBuffer.write( pos );
 	m_scratchVertexBuffer.write( uv0 );
 	m_currentCommnad->vertexCount += 1;
+
+	m_currentCommnad->boundingBox.add( pos );
 }
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 )
 {
@@ -148,6 +198,8 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& nor
 	m_scratchVertexBuffer.write( normal );
 	m_scratchVertexBuffer.write( uv0 );
 	m_currentCommnad->vertexCount += 1;
+
+	m_currentCommnad->boundingBox.add( pos );
 }
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0, const zpVector2f& uv1 )
 {
@@ -159,6 +211,8 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& nor
 	m_scratchVertexBuffer.write( uv0 );
 	m_scratchVertexBuffer.write( uv1 );
 	m_currentCommnad->vertexCount += 1;
+
+	m_currentCommnad->boundingBox.add( pos );
 }
 
 void zpRenderingContext::addLineIndex( zp_short index0, zp_short index1 )
@@ -207,6 +261,9 @@ void zpRenderingContext::addLine( const zpVector4f& pos0, const zpVector4f& pos1
 
 	m_currentCommnad->vertexCount += 2;
 	m_currentCommnad->indexCount += 2;
+
+	m_currentCommnad->boundingBox.add( pos0 );
+	m_currentCommnad->boundingBox.add( pos1 );
 }
 
 void zpRenderingContext::addLine( const zpVector4f& pos0, const zpColor4f& color0, const zpVector4f& pos1, const zpColor4f& color1 )
@@ -224,20 +281,88 @@ void zpRenderingContext::addLine( const zpVector4f& pos0, const zpColor4f& color
 	
 	m_currentCommnad->vertexCount += 2;
 	m_currentCommnad->indexCount += 2;
+
+	m_currentCommnad->boundingBox.add( pos0 );
+	m_currentCommnad->boundingBox.add( pos1 );
 }
 
-void zpRenderingContext::endImmediateDraw()
+void zpRenderingContext::endDrawImmediate()
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+
+	zp_byte* vertex;
+	zp_byte* index;
+
+	zp_memcpy( m_immediateVertexData + m_immediateVertexSize, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE - m_immediateVertexSize, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
+	zp_memcpy( m_immediateIndexData + m_immediateIndexSize, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE - m_immediateIndexSize, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
+
+	m_currentCommnad->vertexOffset = m_immediateVertexSize;
+	m_currentCommnad->indexOffset = m_immediateIndexSize;
+
+	m_immediateVertexSize += m_scratchVertexBuffer.size();
+	m_immediateIndexSize += m_scratchIndexBuffer.size();
 
 	m_currentCommnad = ZP_NULL;
 	m_scratchVertexBuffer.reset();
 	m_scratchIndexBuffer.reset();
 }
 
+void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffer, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpBoundingAABB* boundingBox )
+{
+	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
+
+	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
+	command.type = ZP_RENDERING_COMMNAD_DRAW_BUFFERED;
+
+	command.layer = layer;
+	command.topology = topology;
+	command.vertexBuffer = vertexBuffer->m_buffer;
+	command.indexBuffer = indexBuffer->m_buffer;
+	command.vertexFormat = vertexFormat;
+	command.vertexCount = vertexCount;
+	command.indexCount = indexCount;
+	command.vertexOffset = 0;
+	command.indexOffset = 0;
+
+	if( boundingBox )
+	{
+		command.boundingBox = *boundingBox;
+	}
+}
+
+void zpRenderingContext::map( zpBuffer* buffer, void** data, zpMapType mapType, zp_uint subResource )
+{
+	m_renderContextImpl->map( buffer->m_buffer, data, mapType, subResource );
+}
+void zpRenderingContext::unmap( zpBuffer* buffer, zp_uint subResource )
+{
+	m_renderContextImpl->unmap( buffer->m_buffer, subResource );
+}
+
+void zpRenderingContext::update( zpBuffer* buffer, void* data, zp_uint size )
+{
+	m_renderContextImpl->update( buffer->m_buffer, data, size );
+}
+
 void zpRenderingContext::processCommands()
 {
+	if( m_immediateVertexData )
+	{
+		unmap( m_currentVertexBuffer );
+		unmap( m_currentIndexBuffer );
+
+		m_immediateVertexData = ZP_NULL;
+		m_immediateIndexData = ZP_NULL;
+	}
+
 	m_renderContextImpl->processCommands( m_renderingCommands );
 
 	m_renderingCommands.reset();
+
+	m_currentBufferIndex = ( m_currentBufferIndex + 1 ) % ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS;
+	m_currentVertexBuffer = m_immediateVertexBuffers[ m_currentBufferIndex ];
+	m_currentIndexBuffer = m_immediateIndexBuffers[ m_currentBufferIndex ];
+
+	m_immediateVertexSize = 0;
+	m_immediateIndexSize = 0;
 }

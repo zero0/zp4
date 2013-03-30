@@ -13,6 +13,26 @@ zpRenderingContextImpl::~zpRenderingContextImpl()
 	ZP_SAFE_RELEASE( m_context );
 }
 
+void zpRenderingContextImpl::map( zpBufferImpl* buffer, void** data, zpMapType mapType, zp_uint subResource )
+{
+	HRESULT hr;
+	D3D11_MAPPED_SUBRESOURCE m;
+
+	hr = m_context->Map( buffer->m_buffer, subResource, __zpToDX( mapType ), 0, &m );
+	ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+	*data = m.pData;
+}
+void zpRenderingContextImpl::unmap( zpBufferImpl* buffer, zp_uint subResource )
+{
+	m_context->Unmap( buffer->m_buffer, subResource );
+}
+
+void zpRenderingContextImpl::update( zpBufferImpl* buffer, void* data, zp_uint size )
+{
+	m_context->UpdateSubresource( buffer->m_buffer, 0, ZP_NULL, data, size, 0 );
+}
+
 void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingCommand >& renderCommands )
 {
 	const zp_uint count = renderCommands.size();
@@ -123,19 +143,22 @@ void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingComm
 			break;
 
 		case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
-			{
-				//m_context->IASetPrimitiveTopology( __zpToDX( command.topology ) );
-				m_context->DrawIndexed( command.indexCount, command.indexOffset, command.vertexOffset );
-			}
-			break;
-
 		case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
 			{
+				ID3D11Buffer* buffer = command.vertexBuffer->m_buffer;
+				ID3D11Buffer* index = command.indexBuffer->m_buffer;
+
+				m_context->IASetPrimitiveTopology( __zpToDX( command.topology ) );
+				m_context->IASetIndexBuffer( index, __zpToDX( command.indexBuffer->getFormat() ), command.indexOffset );
+				m_context->IASetVertexBuffers( 0, 1, &buffer, &command.vertexStride, &command.vertexOffset );
 				
+				//m_context->DrawIndexed( command.indexCount, command.indexOffset, 0 );
 			}
 			break;
 
 		case ZP_RENDERING_COMMNAD_DRAW_INSTANCED:
+			{
+			}
 			break;
 		}
 	}

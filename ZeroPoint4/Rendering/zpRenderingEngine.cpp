@@ -108,6 +108,13 @@ zpRenderingContext* zpRenderingEngine::createRenderingContext()
 	return ZP_NULL;
 }
 
+zpBuffer* zpRenderingEngine::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, void* data )
+{
+	zpBufferImpl* buffer;
+	buffer = m_renderingEngine->createBuffer( type, bind, size, stride, data );
+	return new zpBuffer( buffer );
+}
+
 zpTexture* zpRenderingEngine::createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
 {
 	zpTextureImpl* texture;

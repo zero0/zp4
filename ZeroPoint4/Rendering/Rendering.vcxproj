@@ -118,6 +118,7 @@
     <ClInclude Include="zpViewport.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpBuffer.cpp" />
     <ClCompile Include="zpCamera.cpp" />
     <ClCompile Include="zpCameraComponent.cpp" />
     <ClCompile Include="zpDeferredRenderingComponent.cpp" />

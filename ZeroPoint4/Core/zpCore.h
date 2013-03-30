@@ -67,6 +67,9 @@
 
 #define ZP_NON_COPYABLE( t )		private: t( const t& ); t( t&& ); t& operator=( const t& ); t& operator=( t&& );
 
+#define ZP_MEMORY_KB( s )			(zp_int)( (s) * 1024 )
+#define ZP_MEMORY_MB( s )			(zp_int)( ZP_MEMORY_KB(s) * 1024 )
+
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
 #define ZP_USE_COLOR_CONSOLE	1
