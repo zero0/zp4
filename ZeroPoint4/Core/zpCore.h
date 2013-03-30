@@ -177,6 +177,7 @@ template<typename T, zp_uint Count> class zpPooledObject;
 class zpProperties;
 class zpMemorySystem;
 ZP_PURE_INTERFACE zpReferencedObject;
+class zpJson;
 
 class zpGame;
 class zpWorld;
@@ -213,6 +214,7 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"
 #include "zpReferencedPointer.h"
+#include "zpJSON.h"
 
 #include "zpRandom.h"
 #include "zpColor4f.h"
