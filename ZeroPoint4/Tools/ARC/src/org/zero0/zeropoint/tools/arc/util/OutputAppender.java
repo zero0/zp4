@@ -1,4 +1,4 @@
-package org.zero0.zeropoint.tools.arc.workspace;
+package org.zero0.zeropoint.tools.arc.util;
 
 public interface OutputAppender {
     public void printOut( String str );

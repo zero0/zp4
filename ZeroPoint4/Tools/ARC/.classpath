@@ -6,5 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT x86"/>
 	<classpathentry kind="lib" path="lib/swt-x64.jar" sourcepath="lib/swt-src.zip"/>
 	<classpathentry kind="lib" path="lib/swt-x86.jar" sourcepath="lib/swt-src.zip"/>
+	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
