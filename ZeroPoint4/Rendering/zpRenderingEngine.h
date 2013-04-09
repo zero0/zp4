@@ -51,6 +51,9 @@ public:
 	zpRasterState* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc );
 
+	zpShader* createShader( const zpString& shaderFile );
+	zp_bool reloadShader( zpShader* shader );
+
 private:
 	zpRenderingEngineImpl* m_renderingEngine;
 	

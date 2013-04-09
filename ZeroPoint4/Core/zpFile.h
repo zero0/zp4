@@ -54,6 +54,7 @@ public:
 	zp_int readLine( zpStringBuffer& buffer );
 
 	zp_int readFileBinary( zpArrayList<zp_byte>& buffer );
+	zp_int readFileBinary( zpDataBuffer& buffer );
 	
 	zp_bool readByte( zp_byte& value ) const;
 	zp_bool readChar( zp_char& value ) const;

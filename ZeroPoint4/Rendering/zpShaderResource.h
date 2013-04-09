@@ -9,19 +9,45 @@ enum zpShaderType {
 	ZP_SHADER_TYPE_COMPUTE =	0x08,
 };
 
-ZP_ABSTRACT_CLASS zpShaderResource : public zpResource {
-public:
-	virtual ~zpShaderResource();
+#define ZP_SHADER_FILE_HEADER	ZP_MAKE_UINT( 'Z', 'P', 'S', 'B' )
 
-	zp_bool isShaderType( zpShaderType type ) const;
+struct zpShaderFileHeader
+{
+	enum zpShaderFileHeaderTypes : zp_uint
+	{
+		VS,
+		PS,
+		GS,
+		CS,
 
-protected:
-	zpShaderResource();
+		zpShaderHeaderTypes_Count,
+		zpShaderHeaderTypes_Force32 = 0x7FFFFFFF,
+	};
 
-	zpFlag8 m_type;
+	zp_uint fileType;
+	zp_uint shaderType;
+	zp_uint shaderVersion;
+	zp_uint vertexLayout;
+
+	zp_uint shaderLengths[ zpShaderHeaderTypes_Count ];
 };
 
-ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpShaderResource )
+class zpShaderImpl;
+
+class zpShader : public zpResource
+{
+public:
+	~zpShader();
+
+	zpShaderImpl* getShaderImpl() const;
+
+protected:
+	zpShader();
+
+	zpShaderImpl* m_shaderResource;
+};
+
+ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpShader )
 ZP_RESOURCE_INSTANCE_TEMPLATE_END
 
 #endif

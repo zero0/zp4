@@ -1,6 +1,5 @@
 #include "zpDX11.h"
-#include <D3DX11.h>
-#include <D3Dcompiler.h>
+#include <D3D11.h>
 
 #define VERSION_2_0	"2_0"
 #define VERSION_2_1	"2_1"
@@ -15,6 +14,31 @@
 #define GS_SHADER	"gs_"
 #define CS_SHADER	"cs_"
 
+zpShaderImpl::zpShaderImpl()
+	: m_vertexShader( ZP_NULL )
+	, m_pixelShader( ZP_NULL )
+	, m_geometryShader( ZP_NULL )
+	, m_computeShader( ZP_NULL )
+	, m_vertexLayout( ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR )
+{}
+zpShaderImpl::~zpShaderImpl()
+{
+	unload();
+}
+
+zp_bool zpShaderImpl::load( zpRenderingEngineImpl* engine )
+{
+	return engine->loadShader( this );
+}
+void zpShaderImpl::unload()
+{
+	ZP_SAFE_RELEASE( m_vertexShader );
+	ZP_SAFE_RELEASE( m_pixelShader );
+	ZP_SAFE_RELEASE( m_geometryShader );
+	ZP_SAFE_RELEASE( m_computeShader );
+}
+
+#if 0
 zpDX11ShaderResource::zpDX11ShaderResource() :
 	m_vertexShader( ZP_NULL ),
 	m_pixelShader( ZP_NULL ),
@@ -28,16 +52,16 @@ zpDX11ShaderResource::~zpDX11ShaderResource() {
 zp_bool zpDX11ShaderResource::load() {
 	zpProperties shaderProperties( getFilename() );
 	if( shaderProperties.isEmpty() ) return false;
-#if 0
+
 	zpDX11RenderingEngine* engine = (zpDX11RenderingEngine*)zpRenderingFactory::getRenderingEngine();
 	ID3DBlob* blob = ZP_NULL;
 	ID3DBlob* errors = ZP_NULL;
 	HRESULT hr;
 
 	zp_dword shaderFlags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#if ZP_DEBUG
-	shaderFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
+//if ZP_DEBUG
+//	shaderFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_SKIP_OPTIMIZATION;
+//endif
 
 	const zp_char* ps_version;
 	const zp_char* gs_version;
@@ -226,7 +250,7 @@ zp_bool zpDX11ShaderResource::load() {
 
 		m_type.mark( ZP_SHADER_TYPE_COMPUTE );
 	}
-#endif
+
 	return m_pixelShader || m_vertexShader || m_geometryShader || m_computeShader;
 }
 void zpDX11ShaderResource::unload() {
@@ -253,3 +277,4 @@ ID3D11GeometryShader* zpDX11ShaderResource::getGeometryShader() {
 ID3D11ComputeShader* zpDX11ShaderResource::getComputeShader() {
 	return m_computeShader;
 }
+#endif

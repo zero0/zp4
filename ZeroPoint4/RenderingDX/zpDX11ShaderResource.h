@@ -7,6 +7,30 @@ struct ID3D11PixelShader;
 struct ID3D11GeometryShader;
 struct ID3D11ComputeShader;
 
+class zpShaderImpl
+{
+public:
+	zpShaderImpl();
+	~zpShaderImpl();
+
+	zp_bool load( zpRenderingEngineImpl* engine );
+	void unload();
+
+private:
+	ID3D11VertexShader* m_vertexShader;
+	ID3D11PixelShader* m_pixelShader;
+	ID3D11GeometryShader* m_geometryShader;
+	ID3D11ComputeShader* m_computeShader;
+
+	zpVertexFormatDesc m_vertexLayout;
+
+	zpString m_shaderFileName;
+
+	friend class zpRenderingEngineImpl;
+	friend class zpRenderingContextImpl;
+};
+
+#if 0
 class zpDX11ShaderResource : public zpShaderResource {
 public:
 	virtual ~zpDX11ShaderResource();
@@ -34,5 +58,6 @@ private:
 	friend class zpDX11RenderingEngine;
 	friend class zpDX11RenderingContext;
 };
+#endif
 
 #endif

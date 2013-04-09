@@ -26,13 +26,16 @@ public:
 	template<typename T>
 	void write( const T& in );
 
+	template<typename T>
+	void writeBulk( const T* in, zp_uint count );
+
 protected:
 	zpDataBuffer( void* data, zp_uint capacity );
 
 private:
 	void* m_data;
 	zp_uint m_capacity;
-	zp_uint m_offset;
+	mutable zp_uint m_offset;
 	zp_bool m_isFixed;
 };
 
@@ -42,7 +45,7 @@ void zpDataBuffer::read( T& out ) const
 	zp_uint newOffset = m_offset + sizeof( T );
 	ZP_ASSERT( newOffset < m_capacity, "Buffer overrun" );
 
-	T* t = (T*)( ( (zp_byte*)m_data ) + m_offset );
+	const T* t = (const T*)( ( (const zp_byte*)m_data ) + m_offset );
 	out = *t;
 
 	m_offset = newOffset;
@@ -56,6 +59,20 @@ void zpDataBuffer::write( const T& in )
 
 	T* t = (T*)( ( (zp_byte*)m_data ) + m_offset );
 	*t = in;
+
+	m_offset = newOffset;
+}
+template<typename T>
+void zpDataBuffer::writeBulk( const T* in, zp_uint count )
+{
+	zp_uint newOffset = m_offset + ( sizeof( T ) * count );
+	ensureCapacity( newOffset );
+
+	T* t = (T*)( ( (zp_byte*)m_data ) + m_offset );
+	for( zp_uint i = 0; i < count; ++i, ++t, ++in )
+	{
+		*t = *in;
+	}
 
 	m_offset = newOffset;
 }

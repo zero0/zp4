@@ -227,6 +227,35 @@ zp_int zpFile::readFileBinary( zpArrayList<zp_byte>& buffer )
 	return count;
 }
 
+zp_int zpFile::readFileBinary( zpDataBuffer& buffer )
+{
+	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
+	ZP_ASSERT( isBinaryFile(), "zpFile: Trying to read ascii file as binary" );
+
+	zp_int count = 0;
+	zp_byte buff[ ZP_FILE_BUFFER_SIZE ];
+	FILE* f = (FILE*)m_file;
+
+	buffer.reset();
+	buffer.ensureCapacity( (zp_uint)getFileSize() );
+
+	zp_uint s;
+	while(
+		feof( f ) == 0 && 
+#if ZP_USE_SAFE_FUNCTIONS
+		( s = fread_s( buff, sizeof( buff ), sizeof( zp_char ), sizeof( buff ), f ) ) >= 0
+#else
+		( s = fread( buff, sizeof( zp_char ), sizeof( buff ), f ) ) >= 0
+#endif
+		)
+	{
+		buffer.writeBulk( buff, s );
+		count += s;
+	}
+
+	return count;
+}
+
 zp_bool zpFile::readByte( zp_byte& value ) const
 {
 	if( !m_file ) return false;

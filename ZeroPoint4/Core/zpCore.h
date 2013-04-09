@@ -70,6 +70,9 @@
 #define ZP_MEMORY_KB( s )			(zp_int)( (s) * 1024 )
 #define ZP_MEMORY_MB( s )			(zp_int)( ZP_MEMORY_KB(s) * 1024 )
 
+#define ZP_MAKE_UINT( a, b, c, d )					(zp_uint)( ( (a) & 0xFF ) << 24 | ( (b) & 0xFF ) << 16 | ( (c) & 0xFF ) << 8 | ( (d) & 0xFF ) )
+#define ZP_MAKE_ULONG( a, b, c, d, e, f, g, h )		(zp_ulong)( ZP_MAKE_UINT( a, b, c, d ) ) << 32 | (zp_ulong)( ZP_MAKE_UINT( e, f, g, h ) )
+
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
 #define ZP_USE_COLOR_CONSOLE	1

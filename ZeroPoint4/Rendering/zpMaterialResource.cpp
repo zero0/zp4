@@ -7,7 +7,7 @@ zp_bool zpMaterialResource::load() {
 	zpProperties material( getFilename() );
 
 	if( !material.hasProperty( "material.shader" ) ) return false;
-	m_material.shader = getContentManager()->createInstanceOfResource<zpShaderResource>( material[ "material.shader" ] );
+	m_material.shader = getContentManager()->createInstanceOfResource<zpShader>( material[ "material.shader" ] );
 
 	zpProperties textures = material.getSubProperties( "material.texture" );
 	if( !textures.isEmpty() ) {
@@ -29,7 +29,7 @@ zp_bool zpMaterialResource::load() {
 	return true;
 }
 void zpMaterialResource::unload() {
-	m_material.shader = zpResourceInstance<zpShaderResource>();
+	m_material.shader = zpResourceInstance<zpShader>();
 	m_material.textures.map( []( const zpResourceInstance<zpTextureResource>& ) {
 		return zpResourceInstance<zpTextureResource>();
 	} );

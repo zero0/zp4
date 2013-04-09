@@ -140,10 +140,19 @@ enum zpDisplayFormat
 
 enum zpVertexFormat
 {
-	ZP_VERTEX_FORMAT_VERTEX_COLOR,
-	ZP_VERTEX_FORMAT_VERTEX_UV,
-	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV,
+	ZP_VERTEX_FORMAT_VERTEX_COLOR,			
+	ZP_VERTEX_FORMAT_VERTEX_UV,	
+	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV,		
 	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2,
+
+	zpVertexFormat_Count,
+};
+enum zpVertexFormatDesc : zp_uint
+{
+	ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR =		ZP_MAKE_UINT( '\0', '\0', 'V', 'C' ),
+	ZP_VERTEX_FORMAT_DESC_VERTEX_UV =			ZP_MAKE_UINT( '\0', '\0', 'V', 'U' ),
+	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV =	ZP_MAKE_UINT( '\0', 'V', 'N', 'U' ),
+	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2 =	ZP_MAKE_UINT( '\0', 'V', 'N', 'W' ),
 };
 
 enum zpScreenMode
@@ -336,8 +345,8 @@ struct zpViewport
 
 ZP_PURE_INTERFACE zpTexture;
 
-ZP_PURE_INTERFACE zpShaderResource;
-template<> class zpResourceInstance<zpShaderResource>;
+ZP_PURE_INTERFACE zpShader;
+template<> class zpResourceInstance<zpShader>;
 
 ZP_PURE_INTERFACE zpTextureResource;
 template<> class zpResourceInstance<zpTextureResource>;

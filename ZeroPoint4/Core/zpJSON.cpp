@@ -446,7 +446,7 @@ const zpJson& zpJson::operator[]( const zpString& key ) const
 	switch( m_type )
 	{
 	case ZP_JSON_TYPE_OBJECT:
-		return m_array->at( key );
+		return m_object->get( key );
 	default:
 		return null;
 	}

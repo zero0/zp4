@@ -40,7 +40,7 @@ zp_uint zpDataBuffer::capacity() const
 
 void zpDataBuffer::ensureCapacity( zp_uint capacity )
 {
-	if( capacity > m_capacity )
+	if( capacity && capacity > m_capacity )
 	{
 		ZP_ASSERT( !m_isFixed, "Attempting to grow fixed size data buffer" );
 

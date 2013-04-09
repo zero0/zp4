@@ -172,3 +172,14 @@ zpSamplerState* zpRenderingEngine::createSamplerState( const zpSamplerStateDesc&
 
 	return sampler;
 }
+
+zpShader* zpRenderingEngine::createShader( const zpString& shaderFile )
+{
+	zpShaderImpl* shader = m_renderingEngine->createShader( shaderFile );
+
+	return ZP_NULL;
+}
+zp_bool zpRenderingEngine::reloadShader( zpShader* shader )
+{
+	return m_renderingEngine->loadShader( shader->getShaderImpl() );
+}

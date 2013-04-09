@@ -26,14 +26,20 @@ public:
 	zpTextureImpl* createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
 	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerStateImpl* createSamplerState( const zpSamplerStateDesc& desc );
+	zpShaderImpl* createShader( const zpString& shaderFile );
+	zp_bool loadShader( zpShaderImpl* shader );
 
 	void present();
 
 private:
+	//void createVertexLayout( zpVertexFormat format );
+
 	IDXGIFactory* m_dxgiFactory;
 	IDXGIAdapter* m_dxgiAdapter;
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_d3dDevice;
+
+	zpFixedArrayList< ID3D11InputLayout*, zpVertexFormat_Count > m_inputLayouts;
 };
 
 #if 0
