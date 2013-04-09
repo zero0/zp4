@@ -31,22 +31,23 @@ public class ShaderCompiler extends ArcCompiler
 	{
 		VERTEX( "vs" ), PIXEL( "ps" ), GEOMETRY( "gs" ), COMPUTE( "cs" );
 
-		private String type;
+		private final String type;
 
 		private ShaderType( String type )
 		{
 			this.type = type;
 		}
 
-		final public String getType()
+		public final String getType()
 		{
 			return type;
 		}
 	}
 
-	static final byte[] ZSD4_HEADER = "ZSD4".getBytes();
-	static final byte[] ZSD5_HEADER = "ZSD5".getBytes();
-	static final byte[] ZSG2_HEADER = "ZSG2".getBytes();
+	static final String ZPSD_HEADER = "ZPSD";
+	static final String DX10_HEADER = "DX10";
+	static final String DX11_HEADER = "DX11";
+	static final String GL20_HEADER = "GL20";
 
 	static final List<ShaderType> shaderTypes = new ArrayList<ShaderType>();
 
@@ -60,6 +61,7 @@ public class ShaderCompiler extends ArcCompiler
 	static final String OPTION_OPTIMIZATION_DEBUG = "debug";
 	static final String OPTION_OPTIMIZATION_LOW = "low";
 	static final String OPTION_OPTIMIZATION_HIGH = "high";
+	static final String OPTION_HEADER = "header";
 
 	static final String DX_OPTION_OPTIMIZATION_DEBUG = " /Od /Zi";
 	static final String DX_OPTION_OPTIMIZATION_LOW = " /O1";
@@ -90,12 +92,14 @@ public class ShaderCompiler extends ArcCompiler
 		renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_DEBUG, DX_OPTION_OPTIMIZATION_DEBUG );
 		renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
 		renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
-
+		renderingOptions.get( Rendering.DX10 ).put( OPTION_HEADER, DX10_HEADER );
+		
 		renderingOptions.put( Rendering.DX11, new HashMap<String, String>() );
 		renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_DEBUG, DX_OPTION_OPTIMIZATION_DEBUG );
 		renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
 		renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
-
+		renderingOptions.get( Rendering.DX11 ).put( OPTION_HEADER, DX11_HEADER );
+		
 		shaderTypes.addAll( Arrays.asList( ShaderType.values() ) );
 
 		dxProfiles.put( Rendering.DX10, DX10_TYPE );
@@ -234,7 +238,13 @@ public class ShaderCompiler extends ArcCompiler
 		DataOutputStream dos = new DataOutputStream( data );
 		try
 		{
-			dos.write( ZSD5_HEADER );
+			// write header
+			dos.write( ZPSD_HEADER.getBytes() );
+			dos.write( renderingOptions.get( getRendering() ).get( OPTION_HEADER ).getBytes() );
+			dos.writeInt( 0 ); // shader file version
+			dos.writeInt( 0 ); // vertex shader input
+			
+			// write each shader type's size
 			for( ShaderType shaderType : shaderTypes )
 			{
 				if( outCompiledFiles.containsKey( shaderType ) )
@@ -247,6 +257,7 @@ public class ShaderCompiler extends ArcCompiler
 				}
 			}
 			
+			// write each shader type's compiled content
 			byte[] buff = new byte[ 128 ];
 			int numRead = -1;
 			for( ShaderType shaderType : shaderTypes )
@@ -261,7 +272,8 @@ public class ShaderCompiler extends ArcCompiler
 				}
 			}
 			
-			String shaderFile = getOutputDirectory() + File.separatorChar + getFileToCompile().replace( ".shader", ".zsb" );
+			// output final file
+			String shaderFile = getOutputDirectory() + File.separatorChar + getFileToCompile().replace( ".shader", ".zpsb" );
 			BufferedOutputStream fos = new BufferedOutputStream( new FileOutputStream( shaderFile ) );
 			BufferedInputStream bis = new BufferedInputStream( new ByteArrayInputStream( data.toByteArray() ) );
 			while( ( numRead = bis.read( buff ) ) != -1 )
