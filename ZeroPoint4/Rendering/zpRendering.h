@@ -416,7 +416,7 @@ struct zpRenderingCommand
 		struct
 		{
 			zpTexture* renderTargets[ ZP_RENDER_TARGET_MAX_COUNT ];
-			zpDepthStencilBuffer* depthStencilBuffer;	
+			zpDepthStencilBuffer* depthStencilBuffer;
 		};
 
 		struct
@@ -448,6 +448,7 @@ struct zpRenderingCommand
 			zpBufferImpl* vertexBuffer;
 			zpBufferImpl* indexBuffer;
 			//zpResourceInstance< zpMaterialResource >* material;
+			zpShader* shader;
 			zpVertexFormat vertexFormat;
 			zp_uint vertexStride;
 			zp_uint vertexCount;

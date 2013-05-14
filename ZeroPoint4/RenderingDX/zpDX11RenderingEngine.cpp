@@ -139,7 +139,7 @@ void zpRenderingEngineImpl::create( zpWindow* window, zpDisplayMode& displayMode
 	//m_immediateContext->setDepthStencilBuffer( m_immediateDepthStencilBuffer );
 	while( m_inputLayouts.size() < zpVertexFormat_Count )
 	{
-		m_inputLayouts.pushBackEmpty();
+		m_inputLayouts.pushBack( ZP_NULL );
 	}
 }
 void zpRenderingEngineImpl::destroy()
@@ -317,6 +317,43 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 
 	return tex;
 }
+zpDepthStencilBufferImpl* zpRenderingEngineImpl::createDepthStencilBuffer( zp_uint width, zp_uint height, zpDisplayFormat format )
+{
+	HRESULT hr;
+	ID3D11Texture2D* texture;
+	ID3D11DepthStencilView* view;
+
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+	zp_zero_memory( &depthStencilDesc );
+	depthStencilDesc.Width = width;
+	depthStencilDesc.Height = height;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = __zpToDX( format );
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+	zp_zero_memory( &depthStencilViewDesc );
+	depthStencilViewDesc.Format = depthStencilDesc.Format;
+	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+	hr = m_d3dDevice->CreateTexture2D( &depthStencilDesc, ZP_NULL, &texture );
+	ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+	hr = m_d3dDevice->CreateDepthStencilView( texture, ZP_NULL, &view );
+	ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+	// remove reference to texture so view now owns pointer
+	texture->Release();
+
+	return new zpDepthStencilBufferImpl( format, texture, view, width, height );
+}
 zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterStateDesc& desc )
 {
 	HRESULT hr;
@@ -412,7 +449,8 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 				{
 					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_COLOR ] )
 					{
-						D3D11_INPUT_ELEMENT_DESC desc[] = {
+						D3D11_INPUT_ELEMENT_DESC desc[] =
+						{
 							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 							{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 						};
@@ -429,7 +467,8 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 				{
 					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_UV ] )
 					{
-						D3D11_INPUT_ELEMENT_DESC desc[] = {
+						D3D11_INPUT_ELEMENT_DESC desc[] =
+						{
 							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 							{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 						};
@@ -446,7 +485,8 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 				{
 					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ] )
 					{
-						D3D11_INPUT_ELEMENT_DESC desc[] = {
+						D3D11_INPUT_ELEMENT_DESC desc[] =
+						{
 							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 							{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 							{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
@@ -464,7 +504,8 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 				{
 					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ] )
 					{
-						D3D11_INPUT_ELEMENT_DESC desc[] = {
+						D3D11_INPUT_ELEMENT_DESC desc[] =
+						{
 							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 							{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 							{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -511,6 +552,8 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 			hr = m_d3dDevice->CreateComputeShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_computeShader );
 			ZP_ASSERT( SUCCEEDED( hr ), "" );
 		}
+
+		shaderFile.close();
 	}
 
 	return false;
@@ -524,11 +567,11 @@ void zpRenderingEngineImpl::present()
 #if 0
 #define HR( r )						if( FAILED( (r) ) ) { return false; }
 #define HR_( r )					if( FAILED( (r) ) ) { return; }
-#define HR_V( r, v )				if( FAILED( (r) ) ) { return (v); }
+#define HR_V( r,   )				if( FAILED( (r) ) ) { return ( ); }
 
 #define HR_MSG( r, msg, ... )		if( FAILED( (r) ) ) { zp_printfln( (msg), __VA_ARGS__ ); return false; }
 #define HR_MSG_( r, msg, ... )		if( FAILED( (r) ) ) { zp_printfln( (msg), __VA_ARGS__ ); return; }
-#define HR_MSG_V( r, v, msg, ... )	if( FAILED( (r) ) ) { zp_printfln( (msg), __VA_ARGS__ ); return (v); }
+#define HR_MSG_V( r,  , msg, ... )	if( FAILED( (r) ) ) { zp_printfln( (msg), __VA_ARGS__ ); return ( ); }
 
 zpDX11RenderingEngine::zpDX11RenderingEngine() : 
 	m_vsyncEnabled( false ),
@@ -1056,7 +1099,7 @@ zpDepthStencilBuffer* zpDX11RenderingEngine::createDepthBuffer( zpDisplayFormat 
 	// remove reference to texture so view now owns pointer
 	texture->Release();
 	
-	return new zpDX11DepthStencilBuffer( format, texture, view, width, height );
+	return new zpDepthStencilBufferImpl( format, texture, view, width, height );
 }
 
 zpVertexLayout* zpDX11RenderingEngine::createVertexLayout( const zpString& desc ) {

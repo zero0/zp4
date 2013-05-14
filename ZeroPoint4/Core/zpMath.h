@@ -18,15 +18,15 @@
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
 
 template<typename T>
-ZP_FORCE_INLINE T zp_saturate( T& val )
+ZP_FORCE_INLINE void zp_saturate( T& s, const T& val )
 {
-	return val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val;
+	s = val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val;
 }
 
 template<typename T>
-ZP_FORCE_INLINE T zp_clamp( T& val, T& low, T& high )
+ZP_FORCE_INLINE void zp_clamp( T& s, const T& val, const T& low, const T& high )
 {
-	return val > high ? high : val < low ? low : val;
+	s = val > high ? high : val < low ? low : val;
 }
 
 zp_float zp_cos( zp_float v );
@@ -44,15 +44,14 @@ zp_float zp_pow( zp_float b, zp_float p );
 zp_float zp_sqrt( zp_float v );
 
 template<typename T>
-ZP_FORCE_INLINE T zp_abs( T& value )
+ZP_FORCE_INLINE void zp_abs( T& a, const T& value )
 {
-	return value > (T)0 ? value : -value;
+	a = value > (T)0 ? value : -value;
 }
 
 struct zpScalar;
 struct zp_vec4;
 class zpVector4f;
-class zpInteger;
 class zpMatrix4f;
 class zpPlane;
 class zpFrustum;

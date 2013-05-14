@@ -48,7 +48,7 @@ void zpBoundingSphere::setRadius( const zpScalar& radius )
 	m_radius = radius;
 }
 
-zpBoundingAABB zpBoundingSphere::generateBoundingAABB() const
+void zpBoundingSphere::generateBoundingAABB( zpBoundingAABB& box ) const
 {
 	zpScalar nr;
 	zpMath::Neg( nr, m_radius );
@@ -59,7 +59,8 @@ zpBoundingAABB zpBoundingSphere::generateBoundingAABB() const
 	zpMath::Add( min, min, m_center );
 	zpMath::Add( max, max, m_center );
 
-	return zpBoundingAABB( min, max );
+	box.setMin( min );
+	box.setMax( max );
 }
 
 void zpBoundingSphere::translate( const zpVector4f& translate )

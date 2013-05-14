@@ -21,7 +21,7 @@ struct zpShaderFileHeader
 		CS,
 
 		zpShaderHeaderTypes_Count,
-		zpShaderHeaderTypes_Force32 = 0x7FFFFFFF,
+		zpShaderHeaderTypes_Force32 = ZP_FORECE_32BIT,
 	};
 
 	zp_uint fileType;
@@ -34,7 +34,7 @@ struct zpShaderFileHeader
 
 class zpShaderImpl;
 
-class zpShader : public zpResource
+class zpShader
 {
 public:
 	~zpShader();
@@ -42,12 +42,19 @@ public:
 	zpShaderImpl* getShaderImpl() const;
 
 protected:
-	zpShader();
+	zpShader( zpShaderImpl* impl );
 
-	zpShaderImpl* m_shaderResource;
+	zpShaderImpl* m_shader;
+
+	friend class zpRenderingEngine;
 };
 
-ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpShader )
+class zpShaderResource : public zpResource
+{
+
+};
+
+ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpShaderResource )
 ZP_RESOURCE_INSTANCE_TEMPLATE_END
 
 #endif

@@ -6,16 +6,13 @@ class zpSamplerStateImpl;
 
 class zpSamplerState
 {
-	ZP_NON_COPYABLE( zpSamplerState );
 public:
+	zpSamplerState();
 	~zpSamplerState();
 
 	zpSamplerStateImpl* getSamplerStateImpl() const;
 
 private:
-	zpSamplerState();
-	zpSamplerState( zpSamplerStateImpl* samplerState, zp_hash descHash );
-
 	zpSamplerStateImpl* m_samplerState;
 	zp_hash m_descHash;
 

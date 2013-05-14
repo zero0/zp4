@@ -1,62 +1,45 @@
 #include "zpDX11.h"
 #include <D3DX11.h>
 
-zpDX11DepthStencilBuffer::zpDX11DepthStencilBuffer() :
-	m_depthStencilView( ZP_NULL ),
-	m_depthTexture( ZP_NULL ),
-	m_format( ZP_DISPLAY_FORMAT_UNKNOWN ),
-	m_referenceCount( 1 ),
-	m_width( 0 ),
-	m_height( 0 )
+zpDepthStencilBufferImpl::zpDepthStencilBufferImpl()
+	: m_depthStencilView( ZP_NULL )
+	, m_depthTexture( ZP_NULL )
+	, m_format( ZP_DISPLAY_FORMAT_UNKNOWN )
+	, m_width( 0 )
+	, m_height( 0 )
 {}
-zpDX11DepthStencilBuffer::zpDX11DepthStencilBuffer( zpDisplayFormat format, ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height ) :
-	m_depthStencilView( view ),
-	m_depthTexture( texture ),
-	m_format( format ),
-	m_referenceCount( 1 ),
-	m_width( width ),
-	m_height( height )
+zpDepthStencilBufferImpl::zpDepthStencilBufferImpl( zpDisplayFormat format, ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height )
+	: m_depthStencilView( view )
+	, m_depthTexture( texture )
+	, m_format( format )
+	, m_width( width )
+	, m_height( height )
 {}
-zpDX11DepthStencilBuffer::~zpDX11DepthStencilBuffer() {
-	m_depthStencilView->Release();
-	m_depthTexture->Release();
+zpDepthStencilBufferImpl::~zpDepthStencilBufferImpl()
+{
+	ZP_SAFE_RELEASE( m_depthStencilView );
+	ZP_SAFE_RELEASE( m_depthTexture );
 }
 
-zp_uint zpDX11DepthStencilBuffer::getWidth() const {
+zp_uint zpDepthStencilBufferImpl::getWidth() const
+{
 	return m_width;
 }
-zp_uint zpDX11DepthStencilBuffer::getHeight() const {
+zp_uint zpDepthStencilBufferImpl::getHeight() const
+{
 	return m_height;
 }
 
-zpDisplayFormat zpDX11DepthStencilBuffer::getDisplayFormat() const {
+zpDisplayFormat zpDepthStencilBufferImpl::getDisplayFormat() const
+{
 	return m_format;
 }
 
-void zpDX11DepthStencilBuffer::addReference() const {
-	++m_referenceCount;
-	m_depthTexture->AddRef();
-	m_depthStencilView->AddRef();
-}
-zp_bool zpDX11DepthStencilBuffer::removeReference() const {
-	--m_referenceCount;
-	m_depthTexture->Release();
-	m_depthStencilView->Release();
-	return m_referenceCount == 0;
-}
-
-zp_uint zpDX11DepthStencilBuffer::getReferenceCount() const {
-	return m_referenceCount;
-}
-
-void zpDX11DepthStencilBuffer::markForAutoDelete( zp_bool marked ) const {}
-zp_bool zpDX11DepthStencilBuffer::isMarkedForAutoDelete() const {
-	return false;
-}
-
-ID3D11DepthStencilView* zpDX11DepthStencilBuffer::getDepthStencilView() {
+ID3D11DepthStencilView* zpDepthStencilBufferImpl::getDepthStencilView()
+{
 	return m_depthStencilView;
 }
-ID3D11Texture2D* zpDX11DepthStencilBuffer::getDepthTexture() {
+ID3D11Texture2D* zpDepthStencilBufferImpl::getDepthTexture()
+{
 	return m_depthTexture;
 }

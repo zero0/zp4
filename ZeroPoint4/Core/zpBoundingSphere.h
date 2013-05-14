@@ -21,7 +21,7 @@ public:
 	const zpScalar& getRadius() const;
 	void setRadius( const zpScalar& radius );
 
-	zpBoundingAABB generateBoundingAABB() const;
+	void generateBoundingAABB( zpBoundingAABB& box ) const;
 
 	void translate( const zpVector4f& translate );
 	void scale( const zpScalar& scale );

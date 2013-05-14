@@ -141,7 +141,7 @@ void zpWindow::create()
 	
 	if( !RegisterClassEx( &wc ) )
 	{
-		ZP_ON_DEBUG_MSG( "Unable to register window class" );
+		ZP_ASSERT( false, "Unable to register window class" );
 		return;
 	}
 
@@ -164,7 +164,7 @@ void zpWindow::create()
 
 	if( !m_hWnd )
 	{
-		ZP_ON_DEBUG_MSG( "Unable to create window. Error #%X", GetLastError() );
+		ZP_ASSERT( false, "Unable to create window. Error #%X", GetLastError() );
 		return;
 	}
 

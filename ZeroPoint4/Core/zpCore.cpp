@@ -10,89 +10,84 @@
 #if ZP_WIN_32 || ZP_WIN_64
 #include <Windows.h>
 
-void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... )
+void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... )
 {
-	if( !test )
-	{
-		zp_char message[256];
-		zp_char text[256];
-		zp_char title[256];
+	zp_char message[256];
+	zp_char text[256];
+	zp_char title[256];
 
-		va_list vl;
-		va_start( vl, msg );
+	va_list vl;
+	va_start( vl, msg );
 #if ZP_USE_SAFE_FUNCTIONS
-		vsnprintf_s( message, sizeof( message ), sizeof( message ), msg, vl );
+	vsnprintf_s( message, sizeof( message ), sizeof( message ), msg, vl );
 #else
-		vsnprintf( message, sizeof( message ), msg, vl );
+	vsnprintf( message, sizeof( message ), msg, vl );
 #endif
-		va_end( vl );
+	va_end( vl );
 
-		zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
+	zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
 		
-		zpString filename( file );
-		zpFile::convertToFilePath( filename );
-		zp_int s = filename.lastIndexOf( zpFile::sep );
-		if( s != zpString::npos )
-		{
-			filename = filename.substring( s + 1 );
-		}
-
-		zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", filename.getChars(), line );
-
-		zp_int result = MessageBox( ZP_NULL, text, title, MB_YESNOCANCEL | MB_ICONEXCLAMATION );
-	
-		switch( result ) {
-		case IDOK:
-		case IDYES:
-			__debugbreak();
-			break;
-		case IDNO:
-			exit( 0 );
-			break;
-		case IDCANCEL:
-			// ignore
-			break;
-		}
-	}
-}
-
-void zp_assert_warning( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... )
-{
-	if( !test )
+	zpString filename( file );
+	zpFile::convertToFilePath( filename );
+	zp_int s = filename.lastIndexOf( zpFile::sep );
+	if( s != zpString::npos )
 	{
-		zp_char message[256];
-		zp_char text[256];
-		zp_char title[256];
-
-		va_list vl;
-		va_start( vl, msg );
-#if ZP_USE_SAFE_FUNCTIONS
-		vsnprintf_s( message, sizeof( message ), sizeof( message ), msg, vl );
-#else
-		vsnprintf( message, sizeof( message ), msg, vl );
-#endif
-		va_end( vl );
-
-		zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
-
-		zpString filename( file );
-		zpFile::convertToFilePath( filename );
-		zp_int s = filename.lastIndexOf( zpFile::sep );
-		if( s != zpString::npos )
-		{
-			filename = filename.substring( s + 1 );
-		}
-
-		zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Warning at %s:%d", filename.getChars(), line );
-
-		MessageBox( ZP_NULL, text, title, MB_OK | MB_ICONWARNING );
+		filename = filename.substring( s + 1 );
 	}
+
+	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", filename.getChars(), line );
+
+	zp_int result = MessageBox( ZP_NULL, text, title, MB_YESNOCANCEL | MB_ICONEXCLAMATION );
+	
+	switch( result ) {
+	case IDOK:
+	case IDYES:
+		__debugbreak();
+		break;
+	case IDNO:
+		exit( 0 );
+		break;
+	case IDCANCEL:
+		// ignore
+		break;
+	}
+}
+
+void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ... )
+{
+	zp_char message[256];
+	zp_char text[256];
+	zp_char title[256];
+
+	va_list vl;
+	va_start( vl, msg );
+#if ZP_USE_SAFE_FUNCTIONS
+	vsnprintf_s( message, sizeof( message ), sizeof( message ), msg, vl );
+#else
+	vsnprintf( message, sizeof( message ), msg, vl );
+#endif
+	va_end( vl );
+
+	zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
+
+	zpString filename( file );
+	zpFile::convertToFilePath( filename );
+	zp_int s = filename.lastIndexOf( zpFile::sep );
+	if( s != zpString::npos )
+	{
+		filename = filename.substring( s + 1 );
+	}
+
+	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Warning at %s:%d", filename.getChars(), line );
+
+	MessageBox( ZP_NULL, text, title, MB_OK | MB_ICONWARNING );
 }
 
 #endif
 
 #endif
 
+#if ZP_USE_PRINT
 void zp_printf( const zp_char* text, ... ) {
 	va_list vl;
 	va_start( vl, text );
@@ -115,6 +110,8 @@ void zp_printfln( const zp_char* text, ... ) {
 #endif
 	va_end( vl );
 }
+#endif
+
 void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... ) {
 	va_list vl;
 	va_start( vl, format );
@@ -260,6 +257,13 @@ zp_uint zp_near_pow2( zp_uint number )
 	zp_uint i = 1;
 	while( i < number ) i <<= 1;
 	return i;
+}
+
+void zp_sleep( zp_int milliseconds )
+{
+#if ZP_WIN_32 || ZP_WIN_64
+	Sleep( milliseconds );
+#endif
 }
 
 zp_hash zp_fnv1_32_data( const void* d, zp_uint l, zp_hash h )

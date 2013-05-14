@@ -23,6 +23,7 @@ class zpJson
 {
 public:
 	zpJson();
+	explicit zpJson( zpJsonType type );
 	explicit zpJson( zp_bool value );
 	explicit zpJson( zp_int value );
 	explicit zpJson( zp_uint value );
@@ -97,6 +98,74 @@ private:
 
 		zp_lptr m_data;
 	};
+};
+
+class zpJsonParser
+{
+	ZP_NON_COPYABLE( zpJsonParser );
+public:
+	zpJsonParser();
+	~zpJsonParser();
+
+	zp_bool parseFile( const zpString& filename, zpJson& outJson );
+
+	zp_bool writeToFile( const zpJson& json, const zpString& filename );
+	zp_bool writeToBuffer( const zpJson& json, const zpStringBuffer& buffer );
+
+private:
+
+	struct zpJsonToken
+	{
+		enum zpJsonTokenType
+		{
+			ZP_JSON_TOKEN_EOF = 0,
+			ZP_JSON_TOKEN_OBJECT_OPEN,
+			ZP_JSON_TOKEN_OBJECT_CLOSE,
+			ZP_JSON_TOKEN_ARRAY_OPEN,
+			ZP_JSON_TOKEN_ARRAY_CLOSE,
+			ZP_JSON_TOKEN_STRING,
+			ZP_JSON_TOKEN_NUMBER,
+			ZP_JSON_TOKEN_TRUE,
+			ZP_JSON_TOKEN_FALSE,
+			ZP_JSON_TOKEN_NULL,
+			ZP_JSON_TOKEN_MEMBER_SEP,
+			ZP_JSON_TOKEN_ARRAY_SEP,
+			ZP_JSON_TOKEN_COMMENT,
+			ZP_JSON_TOKEN_ERROR,
+		};
+
+		zpJsonTokenType type;
+		const zp_char* start;
+		const zp_char* end;
+	};
+
+	zp_bool readToken( zpJsonToken& token );
+	zp_bool readValue();
+	zp_bool readObject();
+	zp_bool readArray();
+	zp_bool readString();
+	zp_bool readNumber();
+	zp_bool readBool();
+
+	void skipWhitespace();
+	void skipComments();
+
+	template< zp_uint Size >
+	zp_bool matches( const zp_char (&str)[Size] )
+	{
+		return matches( str, Size - 1 );
+	}
+	zp_bool matches( const zp_char* pattern, zp_int length );
+
+	void tokenToString( const zpJsonToken& token, zpString& str );
+
+	zpJson& currentValue();
+	zp_char nextChar();
+
+	const zp_char* m_current;
+	const zp_char* m_start;
+	const zp_char* m_end;
+	zpArrayList< zpJson* > m_nodes;
 };
 
 #endif

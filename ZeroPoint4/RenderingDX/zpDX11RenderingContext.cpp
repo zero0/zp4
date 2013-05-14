@@ -33,7 +33,7 @@ void zpRenderingContextImpl::update( zpBufferImpl* buffer, void* data, zp_uint s
 	m_context->UpdateSubresource( buffer->m_buffer, 0, ZP_NULL, data, size, 0 );
 }
 
-void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingCommand >& renderCommands )
+void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand >& renderCommands )
 {
 	const zp_uint count = renderCommands.size();
 	for( zp_uint i = 0; i < count; ++i )
@@ -74,7 +74,8 @@ void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingComm
 					rtvs[ i ] = t == ZP_NULL ? ZP_NULL : t->getTextureImpl()->m_textureRenderTarget;
 				}
 
-				m_context->OMSetRenderTargets( ZP_RENDER_TARGET_MAX_COUNT, rtvs, ZP_NULL );
+				zpDepthStencilBuffer* d = command.depthStencilBuffer;
+				m_context->OMSetRenderTargets( ZP_RENDER_TARGET_MAX_COUNT, rtvs, d == ZP_NULL ? ZP_NULL : d->getDepthStencilBufferImpl()->m_depthStencilView );
 			}
 			break;
 
@@ -147,11 +148,13 @@ void zpRenderingContextImpl::processCommands( const zpArrayList< zpRenderingComm
 			{
 				ID3D11Buffer* buffer = command.vertexBuffer->m_buffer;
 				ID3D11Buffer* index = command.indexBuffer->m_buffer;
+				ID3D11InputLayout* inputLayout = engine->getInputLayout( command.vertexFormat );
 
 				m_context->IASetPrimitiveTopology( __zpToDX( command.topology ) );
 				m_context->IASetIndexBuffer( index, __zpToDX( command.indexBuffer->getFormat() ), command.indexOffset );
 				m_context->IASetVertexBuffers( 0, 1, &buffer, &command.vertexStride, &command.vertexOffset );
-				
+				m_context->IASetInputLayout( inputLayout );
+
 				//m_context->DrawIndexed( command.indexCount, command.indexOffset, 0 );
 			}
 			break;

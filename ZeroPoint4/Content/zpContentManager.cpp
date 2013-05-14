@@ -8,8 +8,9 @@ zpContentManager::zpContentManager()
 {}
 zpContentManager::~zpContentManager()
 {}
-	
-void zpContentManager::registerFileExtension( const zpString& extension, zpResourceCreator* creator ) {
+
+void zpContentManager::registerFileExtension( const zpString& extension, zpResourceCreator* creator )
+{
 	m_creators.put( extension, creator );
 }
 #if 0	
@@ -24,7 +25,7 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 		zpString fullFilePath = filepath.toString();
 
 		zpResource* resource = (*creator)->createResource( fullFilePath );
-		ZP_ASSERT( resource != ZP_NULL, "Unable to create resource %s => %s", alias.c_str(), filename.c_str() );
+		ZP_ASSERT( resource != ZP_NULL, "Unable to create resource %s => %s", alias.getChars(), filename.getChars() );
 		
 		resource->setContentManager( this );
 		resource->setFilename( fullFilePath );
@@ -45,7 +46,7 @@ zp_bool zpContentManager::loadResource( const zpString& filename, const zpString
 		return loaded;
 	}
 
-	ZP_ON_DEBUG_MSG( "No resource creator registered for file extension '%s'", extension.c_str() );
+	ZP_ON_DEBUG_MSG( "No resource creator registered for file extension '%s'", extension.getChars() );
 	return false;
 }
 zp_uint zpContentManager::loadResources( const zpProperties& aliasToFilenames ) {
@@ -89,17 +90,21 @@ void zpContentManager::unloadAllResources() {
 	} );
 }
 #endif
-zp_bool zpContentManager::reloadResource( const zpString& filename ) {
-	zpResourceElement* found = ZP_NULL;
-	if( m_elements.findIf( [ &filename, this ]( zpResourceElement& element ) {
+zp_bool zpContentManager::reloadResource( const zpString& filename )
+{
+	zpResourceElement* element = ZP_NULL;
+	zp_bool found = m_elements.findIf( [ &filename ]( zpResourceElement& element ) {
 		return filename == element.filename;
-	}, &found ) ) {
-		found->resource->unload();
-		found->resource->setIsLoaded( false );
-		m_resourcesToLoad.pushBack( found->resource );
-		return true;
+	}, &element );
+
+	if( found )
+	{
+		element->resource->unload();
+		element->resource->setIsLoaded( false );
+		m_resourcesToLoad.pushBack( element->resource );
 	}
-	return false;
+
+	return found;
 }
 zp_uint zpContentManager::reloadResources( const zpArrayList<zpString>& aliases ) {
 	zp_uint count = 0;
@@ -136,7 +141,7 @@ zpResource* zpContentManager::getResource( const zpString& filename ) {
 		resource = found->resource;
 	} else {
 		zpString extension = filename.substring( filename.lastIndexOf( '.' ) + 1 );
-		extension.toLower();
+		zpString::toLower( extension );
 
 		zpResourceCreator** creator;
 		if( m_creators.find( extension, &creator ) ) {
@@ -145,7 +150,7 @@ zpResource* zpContentManager::getResource( const zpString& filename ) {
 			zpString fullFilePath = filepath.toString();
 
 			zpResource* resource = (*creator)->createResource( fullFilePath );
-			ZP_ASSERT( resource != ZP_NULL, "Unable to create resource %s", filename.c_str() );
+			ZP_ASSERT( resource != ZP_NULL, "Unable to create resource %s", filename.getChars() );
 
 			resource->setContentManager( this );
 			resource->setFilename( fullFilePath );
@@ -163,7 +168,7 @@ zpResource* zpContentManager::getResource( const zpString& filename ) {
 			//}
 			m_resourcesToLoad.pushBack( resource );
 		} else {
-			ZP_ASSERT( false, "No resource creator set for extension %s", extension.c_str() );
+			ZP_ASSERT( false, "No resource creator set for extension %s", extension.getChars() );
 		}
 	}
 	return resource;

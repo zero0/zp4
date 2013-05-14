@@ -90,6 +90,8 @@ public:
 
 	void processCommands();
 
+	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }
+
 private:
 	zpRenderingContext();
 	zpRenderingContext( zpRenderingEngine* engine, zpRenderingContextImpl* impl );

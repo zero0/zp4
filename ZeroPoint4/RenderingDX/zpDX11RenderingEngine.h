@@ -23,13 +23,16 @@ public:
 	void shutdown();
 
 	zpBufferImpl* createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, void* data );
-	zpTextureImpl* createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
+	zpTextureImpl* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
+	zpDepthStencilBufferImpl* createDepthStencilBuffer( zp_uint width, zp_uint height, zpDisplayFormat format );
 	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerStateImpl* createSamplerState( const zpSamplerStateDesc& desc );
 	zpShaderImpl* createShader( const zpString& shaderFile );
 	zp_bool loadShader( zpShaderImpl* shader );
 
 	void present();
+
+	ID3D11InputLayout* getInputLayout( zpVertexFormat format ) const { return m_inputLayouts[ format ]; }
 
 private:
 	//void createVertexLayout( zpVertexFormat format );

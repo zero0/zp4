@@ -2,12 +2,26 @@
 #ifndef ZP_DEPTH_STENCIL_BUFFER_H
 #define ZP_DEPTH_STENCIL_BUFFER_H
 
-ZP_PURE_INTERFACE zpDepthStencilBuffer : public zpReferencedObject {
-public:
-	virtual zp_uint getWidth() const = 0;
-	virtual zp_uint getHeight() const = 0;
+class zpDepthStencilBufferImpl;
 
-	virtual zpDisplayFormat getDisplayFormat() const = 0;
+class zpDepthStencilBuffer
+{
+public:
+	~zpDepthStencilBuffer();
+
+	zp_uint getWidth() const;
+	zp_uint getHeight() const;
+
+	zpDisplayFormat getDisplayFormat() const;
+
+	zpDepthStencilBufferImpl* getDepthStencilBufferImpl() const;
+
+private:
+	zpDepthStencilBuffer( zpDepthStencilBufferImpl* impl );
+
+	zpDepthStencilBufferImpl* m_impl;
+
+	friend class zpRenderingEngine;
 };
 
 #endif

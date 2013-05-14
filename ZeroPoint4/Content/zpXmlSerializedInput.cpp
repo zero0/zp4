@@ -21,7 +21,7 @@ zp_bool zpXmlSerializedInput::readBoolean( zp_bool* value, const zp_char* name )
 	readValueOrProperty( name, out );
 
 	if( out.isEmpty() ) return false;
-	*value = out.compareTo( "true" ) == 0;
+	//*value = out.compareTo( "true" ) == 0;
 	return true;
 }
 
@@ -31,7 +31,7 @@ zp_bool zpXmlSerializedInput::readByte( zp_byte* value, const zp_char* name ) {
 	readValueOrProperty( name, out );
 
 	if( out.isEmpty() ) return false;
-	*value = (zp_byte)atoi( out.c_str() );
+	*value = (zp_byte)atoi( out.getChars() );
 	return true;
 }
 zp_bool zpXmlSerializedInput::readChar( zp_char* value, const zp_char* name ) {
@@ -49,7 +49,7 @@ zp_bool zpXmlSerializedInput::readShort( zp_short* value, const zp_char* name ) 
 	readValueOrProperty( name, out );
 
 	if( out.isEmpty() ) return false;
-	*value = (zp_short)atoi( out.c_str() );
+	*value = (zp_short)atoi( out.getChars() );
 	return true;
 }
 zp_bool zpXmlSerializedInput::readInt( zp_int* value, const zp_char* name ) {
@@ -58,7 +58,7 @@ zp_bool zpXmlSerializedInput::readInt( zp_int* value, const zp_char* name ) {
 	readValueOrProperty( name, out );
 
 	if( out.isEmpty() ) return false;
-	*value = (zp_int)atoi( out.c_str() );
+	*value = (zp_int)atoi( out.getChars() );
 	return true;
 }
 zp_bool zpXmlSerializedInput::readLong( zp_long* value, const zp_char* name ) {
@@ -67,7 +67,7 @@ zp_bool zpXmlSerializedInput::readLong( zp_long* value, const zp_char* name ) {
 	readValueOrProperty( name, out );
 
 	if( out.isEmpty() ) return false;
-	*value = (zp_long)atol( out.c_str() );
+	*value = (zp_long)atol( out.getChars() );
 	return true;
 }
 
@@ -77,7 +77,7 @@ zp_bool zpXmlSerializedInput::readFloat( zp_float* value, const zp_char* name ) 
 	readValueOrProperty( name, out );
 
 	if( out.isEmpty() ) return false;
-	*value = (zp_float)atof( out.c_str() );
+	*value = (zp_float)atof( out.getChars() );
 	return true;
 }
 zp_bool zpXmlSerializedInput::readDouble(  zp_double* value, const zp_char* name ) {
@@ -86,7 +86,7 @@ zp_bool zpXmlSerializedInput::readDouble(  zp_double* value, const zp_char* name
 	readValueOrProperty( name, out );
 
 	if( out.isEmpty() ) return false;
-	*value = (zp_double)atof( out.c_str() );
+	*value = (zp_double)atof( out.getChars() );
 	return true;
 }
 
@@ -103,7 +103,7 @@ zp_bool zpXmlSerializedInput::readString( zpString* value, const zp_char* name )
 zp_bool zpXmlSerializedInput::readSerializable( zpSerializable** value, const zp_char* name ) {
 	zpSerializable* obj = ZP_NULL;
 	if( name ) {
-		obj = zpRegisterSerializable::createSerializable( name );
+		//obj = zpRegisterSerializable::createSerializable( name );
 	} else {
 		zpString n;
 		zp_bool usePrefab = false;
@@ -155,7 +155,7 @@ zp_bool zpXmlSerializedInput::readBlock( const zp_char* name ) {
 		}
 
 		m_nodeStack.pushBack( m_currentNode );
-		m_siblingStack.pushBack( name );
+		m_siblingStack.pushBack( zpString( name ) );
 		
 		m_currentNode = *node;
 	} else {
@@ -179,9 +179,9 @@ void zpXmlSerializedInput::readValueOrProperty( const zp_char* name, zpString& o
 	if( name == ZP_NULL ) {
 		outString = m_currentNode->value;
 	} else if( name[ 0 ] == '@' ) {
-		if( m_currentNode->attributes.find( &name[ 1 ], &outStr ) ) {
-			outString = *outStr;
-		}
+		//if( m_currentNode->attributes.find( &name[ 1 ], &outStr ) ) {
+		//	outString = *outStr;
+		//}
 	} else {
 		zpXmlNode** node = ZP_NULL;
 		zpXmlNode* current = m_currentNode;

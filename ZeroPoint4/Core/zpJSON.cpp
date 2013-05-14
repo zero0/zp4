@@ -1,8 +1,38 @@
 #include "zpCore.h"
 
+enum ops
+{
+	json_null = '\0',
+	json_obj_open = '{',
+	json_obj_close = '}',
+	json_arr_open = '[',
+	json_arr_close = ']',
+	json_fslash = '/',
+	json_bslash = '\\',
+	json_true_open = 't',
+	json_false_open = 'f',
+	json_null_open = 'n',
+	json_member_sep = ':',
+	json_arr_sep = ',',
+
+
+	json_dash = '-',
+	json_space = ' ',
+	json_quote = '\'',
+	json_dquote = '"',
+	json_newline = '\n',
+	json_cret = '\r',
+	json_tab = '\t',
+};
+
 const zpJson zpJson::null;
 zpJson::zpJson()
 	: m_type( ZP_JSON_TYPE_NULL )
+	, m_data( 0 )
+{}
+zpJson::zpJson( zpJsonType type )
+	: m_type( type )
+	, m_data( 0 )
 {}
 zpJson::zpJson( zp_bool value )
 	: m_type( ZP_JSON_TYPE_BOOL )
@@ -221,9 +251,9 @@ zp_bool zpJson::asBool() const
 	case ZP_JSON_TYPE_STRING:
 		return m_string && !m_string->isEmpty();
 	case ZP_JSON_TYPE_ARRAY:
-		return !m_array->isEmpty();
+		return m_array && !m_array->isEmpty();
 	case ZP_JSON_TYPE_OBJECT:
-		return !m_object->isEmpty();
+		return m_object && !m_object->isEmpty();
 	default:
 		return false;
 	}
@@ -450,4 +480,367 @@ const zpJson& zpJson::operator[]( const zpString& key ) const
 	default:
 		return null;
 	}
+}
+
+#define JSON_IS_NULL( j, i )	( \
+	(j)[ (i) + 1 ] == 'u' &&	\
+	(j)[ (i) + 2 ] == 'l' &&	\
+	(j)[ (i) + 3 ] == 'l' )
+#define JSON_IS_TRUE( j, i )	( \
+	(j)[ (i) + 1 ] == 'r' &&	\
+	(j)[ (i) + 2 ] == 'u' &&	\
+	(j)[ (i) + 3 ] == 'e' )
+#define JSON_IS_FALSE( j, i )	( \
+	(j)[ (i) + 1 ] == 'a' &&	\
+	(j)[ (i) + 2 ] == 'l' &&	\
+	(j)[ (i) + 3 ] == 's' &&	\
+	(j)[ (i) + 4 ] == 'e' )
+
+zpJsonParser::zpJsonParser() {}
+zpJsonParser::~zpJsonParser() {}
+
+zp_bool zpJsonParser::parseFile( const zpString& filename, zpJson& outJson )
+{
+	zp_bool success = false;
+	zpFile jsonFile( filename );
+	zpStringBuffer jsonBuffer;
+	if( jsonFile.open( ZP_FILE_MODE_READ ) )
+	{
+		jsonFile.readFile( jsonBuffer );
+		jsonFile.close();
+
+		if( !jsonBuffer.isEmpty() )
+		{
+			const zp_char* json = jsonBuffer.getChars();
+			const zp_uint length = jsonBuffer.length();
+
+			
+
+			m_start = json;
+			m_current = m_start;
+			m_end = m_start + jsonBuffer.size();
+
+			m_nodes.clear();
+			m_nodes.pushBack( &outJson );
+			
+			
+			readValue();
+
+
+
+
+
+
+			success = true;
+		}
+
+	}
+	
+	if( !success )
+	{
+		outJson = zpJson::null;
+	}
+
+	return success;
+}
+
+zp_bool zpJsonParser::writeToFile( const zpJson& json, const zpString& filename )
+{
+	return false;
+}
+zp_bool zpJsonParser::writeToBuffer( const zpJson& json, const zpStringBuffer& buffer )
+{
+	return false;
+}
+
+zp_bool zpJsonParser::readToken( zpJsonToken& token )
+{
+	skipWhitespace();
+	token.start = m_current;
+	zp_bool ok = true;
+
+	zp_char c = nextChar();
+	switch( c )
+	{
+	case json_obj_open:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_OBJECT_OPEN;
+		break;
+	case json_obj_close:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_OBJECT_CLOSE;
+		break;
+	case json_arr_open:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_ARRAY_OPEN;
+		break;
+	case json_arr_close:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_ARRAY_CLOSE;
+		break;
+	case json_dquote:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_STRING;
+		ok = readString();
+		break;
+	case json_fslash:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_COMMENT;
+		break;
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+	case '8':
+	case '9':
+	case '-':
+		token.type = zpJsonToken::ZP_JSON_TOKEN_NUMBER;
+		ok = readNumber();
+		break;
+	case json_true_open:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_TRUE;
+		ok = matches( "rue" );
+		break;
+	case json_false_open:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_FALSE;
+		ok = matches( "alse" );
+		break;
+	case json_null_open:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_NULL;
+		ok = matches( "ull" );
+		break;
+	case json_member_sep:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_MEMBER_SEP;
+		break;
+	case json_arr_sep:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_ARRAY_SEP;
+		break;
+	case '\0':
+		token.type = zpJsonToken::ZP_JSON_TOKEN_EOF;
+		break;
+	default:
+		break;
+	}
+
+	token.end = m_current;
+
+	return true;
+}
+zp_bool zpJsonParser::readValue()
+{
+	zpJsonToken token;
+	readToken( token );
+
+	zp_bool ok = false;
+	switch( token.type )
+	{
+	case zpJsonToken::ZP_JSON_TOKEN_OBJECT_OPEN:
+		ok = readObject();
+		break;
+	case zpJsonToken::ZP_JSON_TOKEN_ARRAY_OPEN:
+		ok = readArray();
+		break;
+	case zpJsonToken::ZP_JSON_TOKEN_STRING:
+		ok = readString();
+		break;
+	case zpJsonToken::ZP_JSON_TOKEN_NUMBER:
+		ok = readNumber();
+		break;
+	case zpJsonToken::ZP_JSON_TOKEN_TRUE:
+		currentValue() = zpJson( true );
+		break;
+	case zpJsonToken::ZP_JSON_TOKEN_FALSE:
+		currentValue() = zpJson( false );
+		break;
+	case zpJsonToken::ZP_JSON_TOKEN_NULL:
+		currentValue() = zpJson();
+		break;
+	}
+
+	return true;
+}
+zp_bool zpJsonParser::readObject()
+{
+	currentValue() = zpJson( ZP_JSON_TYPE_OBJECT );
+
+	zpJsonToken token;
+	zpString name;
+
+	while( readToken( token ) )
+	{
+		if( token.type == zpJsonToken::ZP_JSON_TOKEN_OBJECT_CLOSE && name.isEmpty() )
+		{
+			return true;
+		}
+
+		if( token.type != zpJsonToken::ZP_JSON_TOKEN_STRING )
+		{
+			break;
+		}
+
+		name = "";
+		tokenToString( token, name );
+
+		zpJsonToken colon;
+		if( !readToken( colon ) || colon.type != zpJsonToken::ZP_JSON_TOKEN_MEMBER_SEP )
+		{
+			// missing : in member name
+			return false;
+		}
+
+		zpJson& value = currentValue()[ name ];
+		m_nodes.pushBack( &value );
+
+		zp_bool ok = readValue();
+
+		m_nodes.popBack();
+		if( !ok )
+		{
+			// error from value
+			return false;
+		}
+
+		zpJsonToken comma;
+		if( !readToken( comma ) || (
+			comma.type != zpJsonToken::ZP_JSON_TOKEN_OBJECT_CLOSE &&
+			comma.type != zpJsonToken::ZP_JSON_TOKEN_ARRAY_SEP
+			) )
+		{
+			// missing , or }
+			return false;
+		}
+
+		if( comma.type == zpJsonToken::ZP_JSON_TOKEN_ARRAY_SEP )
+		{
+			readToken( comma );
+		}
+
+		if( comma.type == zpJsonToken::ZP_JSON_TOKEN_OBJECT_CLOSE )
+		{
+			return true;
+		}
+
+	}
+
+	// failed to parse object
+	return false;
+}
+zp_bool zpJsonParser::readArray()
+{
+	return true;
+}
+zp_bool zpJsonParser::readString()
+{
+	zp_char c = '\0';
+	while( m_current != m_end )
+	{
+		c = nextChar();
+		if( c == json_bslash )
+		{
+			nextChar();
+		}
+		else if( c == json_dquote )
+		{
+			break;
+		}
+	}
+
+	return c == json_dquote;
+}
+zp_bool __jsonIn( zp_char value, zp_char a, zp_char b, zp_char c, zp_char d, zp_char e )
+{
+	return value == a || value == b || value == c || value == d || value == e;
+}
+
+zp_bool zpJsonParser::readNumber()
+{
+	for( ; m_current != m_end && 
+		( zp_is_digit( *m_current ) || 
+		  __jsonIn( *m_current, '.', 'e', 'E', '+', '-' ) ); ++m_current );
+	return true;
+}
+zp_bool zpJsonParser::readBool()
+{
+	return true;
+}
+
+void zpJsonParser::skipWhitespace()
+{
+	for( ; m_current != m_end && zp_is_whitespace( *m_current ); ++m_current );
+}
+void zpJsonParser::skipComments()
+{
+
+}
+
+zp_bool zpJsonParser::matches( const zp_char* pattern, zp_int length )
+{
+	if( m_end - m_current < length )
+	{
+		return false;
+	}
+
+	zp_int index = length;
+	while( index-- )
+	{
+		if( m_current[ index ] != pattern[ index ] )
+		{
+			return false;
+		}
+	}
+
+	m_current += length;
+	return true;
+}
+
+void zpJsonParser::tokenToString( const zpJsonToken& token, zpString& str )
+{
+	const zp_char* s = token.start + 1;
+	const zp_char* e = token.end - 1;
+	str.reserve( e - s );
+
+	while( s != e )
+	{
+		zp_char c = *s++;
+		if( c == json_dquote )
+		{
+			break;
+		}
+		else if( c == json_bslash )
+		{
+			if( s == e )
+			{
+
+			}
+			else
+			{
+				zp_char esc = *s++;
+				switch( esc )
+				{
+				case json_dquote: str.append( json_dquote ); break;
+				case json_fslash: str.append( json_fslash ); break;
+				case json_bslash: str.append( json_bslash ); break;
+				case 'b': str.append( '\b' ); break;
+				case 'f': str.append( '\f' ); break;
+				case 'n': str.append( '\n' ); break;
+				case 'r': str.append( '\r' ); break;
+				case 't': str.append( '\t' ); break;
+				case 'u':
+					ZP_ASSERT( false, "" );
+					break;
+				}
+			}
+		}
+		else
+		{
+			str.append( c );
+		}
+	}
+}
+
+zpJson& zpJsonParser::currentValue()
+{
+	return *m_nodes.back();
+}
+zp_char zpJsonParser::nextChar()
+{
+	return m_current == m_end ? '\0' : *m_current++;
 }

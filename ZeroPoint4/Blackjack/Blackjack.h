@@ -3,7 +3,7 @@
 #define BLACKJACK_H
 
 #include "Core\zpCore.h"
-#include "Rendering\zpRendering.h"
+//#include "Rendering\zpRendering.h"
 //#include "Content\zpContent.h"
 //#include "Scripting\zpScripting.h"
 //#include "Audio\zpAudio.h"

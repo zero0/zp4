@@ -1,11 +1,11 @@
 
 ZP_FORCE_INLINE void zpMath::DegToRad( zpScalar& s, const zpScalar& a )
 {
-	s.m_x = ( a.m_x * ZP_PI ) / 180.0f;
+	s.m_x = ZP_DEG_TO_RAD( a.m_x );
 }
 ZP_FORCE_INLINE void zpMath::RadToDeg( zpScalar& s, const zpScalar& a )
 {
-	s.m_x = ( a.m_x * 180.0f ) / ZP_PI;
+	s.m_x = ZP_RAD_TO_DEG( a.m_x );
 }
 
 ZP_FORCE_INLINE void zpMath::Sin( zpScalar& s, const zpScalar& a )
@@ -250,14 +250,14 @@ ZP_FORCE_INLINE void zpMath::Mul( zpMatrix4f& s, const zpScalar& a, const zpMatr
 
 ZP_FORCE_INLINE void zpMath::Abs( zpScalar& s, const zpScalar& a )
 {
-	s.m_x = zp_abs( a.m_x );
+	zp_abs( s.m_x, a.m_x );
 }
 ZP_FORCE_INLINE void zpMath::Abs( zpVector4f& s, const zpVector4f& a )
 {
-	s.m_xyzw.x = zp_abs( a.m_xyzw.x );
-	s.m_xyzw.y = zp_abs( a.m_xyzw.y );
-	s.m_xyzw.z = zp_abs( a.m_xyzw.z );
-	s.m_xyzw.w = zp_abs( a.m_xyzw.w );
+	zp_abs( s.m_xyzw.x, a.m_xyzw.x );
+	zp_abs( s.m_xyzw.y, a.m_xyzw.y );
+	zp_abs( s.m_xyzw.z, a.m_xyzw.z );
+	zp_abs( s.m_xyzw.w, a.m_xyzw.w );
 }
 
 ZP_FORCE_INLINE void zpMath::Neg( zpScalar& s, const zpScalar& a )

@@ -38,6 +38,10 @@ void ProcessConfig( zpGame& game )
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
+	return 0;
+}
+#if 0
+{
 	zpWindow wnd;
 	wnd.setPosition( zpVector2i( 20, 20 ) );
 	wnd.setScreenSize( zpVector2i( 640, 360 ) );
@@ -87,3 +91,4 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	return 0;
 }
+#endif

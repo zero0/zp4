@@ -169,6 +169,7 @@
     <ClInclude Include="zpVector4.h" />
     <ClInclude Include="zpWindow.h" />
     <ClInclude Include="zpWorld.h" />
+    <ClInclude Include="zpXML.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="zpAllComponents.inl" />
@@ -237,6 +238,7 @@
     <ClCompile Include="zpTime.cpp" />
     <ClCompile Include="zpWindow.cpp" />
     <ClCompile Include="zpWorld.cpp" />
+    <ClCompile Include="zpXML.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

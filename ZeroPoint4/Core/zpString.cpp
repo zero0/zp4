@@ -246,12 +246,12 @@ zp_char zpString::operator[]( zp_uint index ) const
 zp_char& zpString::operator[]( zp_uint index )
 {
 	ZP_ASSERT( index < m_length, "zpString: Index %d out of range %d", index, m_length );
-	return ( IS_STRING_PACKED( this ) ? m_chars : m_string )[ index ];
+	return getCharsInternal()[ index ];
 }
 void zpString::setCharAt( zp_uint index, zp_char ch )
 {
 	ZP_ASSERT( index < m_length, "zpString: Index %d out of range %d", index, m_length );
-	( IS_STRING_PACKED( this ) ? m_chars : m_string )[ index ] = ch;
+	getCharsInternal()[ index ] = ch;
 }
 zp_char zpString::charAt( zp_uint index ) const
 {
@@ -767,6 +767,15 @@ void zpString::ensureCapacity( zp_uint size )
 			m_string = buff;
 		}
 	}
+}
+
+void zpString::reserve( zp_uint size )
+{
+	ensureCapacity( size );
+}
+void zpString::clear()
+{
+	erase( 0, m_length );
 }
 
 zp_bool operator==( const zpString& string1, const zpString& string2 )

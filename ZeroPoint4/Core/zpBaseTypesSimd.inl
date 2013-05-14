@@ -8,13 +8,13 @@ struct zp_vec4 {
 	ZP_FORCE_INLINE zp_vec4()
 	{}
 	ZP_FORCE_INLINE zp_vec4( zp_float _x, zp_float _y, zp_float _z, zp_float _w )
-		: v( _mm_set_ps( _w, _z, _y, _x ) )
+		:  ( _mm_set_ps( _w, _z, _y, _x ) )
 	{}
 
 	template<int I>
 	ZP_FORCE_INLINE zpScalar get() const
 	{
-		return _mm_shuffle_ps( v, v, _MM_SHUFFLE( I, I, I, I ) );
+		return _mm_shuffle_ps(  ,  , _MM_SHUFFLE( I, I, I, I ) );
 	}
 	ZP_FORCE_INLINE zpScalar getX() const
 	{
@@ -36,7 +36,7 @@ struct zp_vec4 {
 	template<int I>
 	ZP_FORCE_INLINE zpScalar set( const zpScalar& s )
 	{
-		v = _mm_shuffle_ps( s.m_x, s.m_x, _MM_SHUFFLE( I, I, I, I ) );
+		  = _mm_shuffle_ps( s.m_x, s.m_x, _MM_SHUFFLE( I, I, I, I ) );
 	}
 	ZP_FORCE_INLINE zpScalar setX( const zpScalar& s )
 	{
@@ -56,7 +56,7 @@ struct zp_vec4 {
 	}
 
 private:
-	__m128 v;
+	__m128  ;
 };
 
 struct zpScalar

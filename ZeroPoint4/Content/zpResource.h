@@ -2,7 +2,8 @@
 #ifndef ZP_RESOURCE_H
 #define ZP_RESOURCE_H
 
-ZP_ABSTRACT_CLASS zpResource {
+ZP_ABSTRACT_CLASS zpResource
+{
 public:
 	zpResource();
 	virtual ~zpResource();
@@ -25,6 +26,7 @@ private:
 	
 	friend class zpContentManager;
 };
+
 /*
 template<typename R>
 class zpResourceInstance {
@@ -72,6 +74,7 @@ private:
 	friend class zpContentManager;
 };
 */
+
 #define ZP_RESOURCE_INSTANCE_TEMPLATE_START( T )	\
 template<>	\
 class zpResourceInstance<T> {	\
@@ -87,7 +90,7 @@ public:	\
 	T* getResource() const { return m_resource;	}\
 private:	\
 	T* m_resource;	\
-	friend class zpContentManager;
+	//friend class zpContentManager;
 
 #define ZP_RESOURCE_INSTANCE_TEMPLATE_START_COPY( T, Copy )	\
 	template<>	\

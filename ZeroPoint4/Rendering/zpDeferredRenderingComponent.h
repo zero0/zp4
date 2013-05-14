@@ -45,7 +45,7 @@ private:
 	zpSamplerState* m_pointSampler;
 	zpSamplerState* m_linearSampler;
 
-	zpResourceInstance<zpShader> m_fullscreenShader;
+	zpResourceInstance<zpShaderResource> m_fullscreenShader;
 	zpResourceInstance<zpTextureResource> m_texture;
 
 	zpViewport m_viewport;

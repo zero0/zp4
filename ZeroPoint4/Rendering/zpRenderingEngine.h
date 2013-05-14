@@ -44,7 +44,7 @@ public:
 	zpBuffer* createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride = 0, void* data = 0 );
 	zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
 
-	//virtual zpDepthStencilBuffer* createDepthBuffer( zpDisplayFormat format, zp_uint width, zp_uint height ) = 0;
+	zpDepthStencilBuffer* createDepthBuffer( zp_uint width, zp_uint height, zpDisplayFormat format );
 
 	//virtual zpVertexLayout* createVertexLayout( const zpString& desc ) = 0;
 
@@ -53,6 +53,8 @@ public:
 
 	zpShader* createShader( const zpString& shaderFile );
 	zp_bool reloadShader( zpShader* shader );
+
+	zpRenderingEngineImpl* getRenderingEngineImpl() const { return m_renderingEngine; }
 
 private:
 	zpRenderingEngineImpl* m_renderingEngine;
@@ -68,8 +70,8 @@ private:
 
 	//zpHashMap< zp_hash, zpRasterState* >  m_rasterStates;
 	//zpHashMap< zp_hash, zpSamplerState* > m_samplerStates;
-	zpFixedArrayList< zpRasterState*, ZP_RENDERING_MAX_RASTER_STATES > m_rasterStates;
-	zpFixedArrayList< zpSamplerState*, ZP_RENDERING_MAX_RASTER_STATES > m_samplerStates;
+	zpFixedArrayList< zpRasterState, ZP_RENDERING_MAX_RASTER_STATES > m_rasterStates;
+	zpFixedArrayList< zpSamplerState, ZP_RENDERING_MAX_SAMPLER_STATES > m_samplerStates;
 };
 
 /*

@@ -1,13 +1,14 @@
 #include "zpRendering.h"
 
-zpShader::zpShader()
+zpShader::zpShader( zpShaderImpl* impl )
+	: m_shader( impl )
 {}
 zpShader::~zpShader()
 {}
 
 zpShaderImpl* zpShader::getShaderImpl() const
 {
-	return m_shaderResource;
+	return m_shader;
 }
 
 #if 0

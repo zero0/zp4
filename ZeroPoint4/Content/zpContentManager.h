@@ -1,14 +1,39 @@
 #pragma once
 #ifndef ZP_CONTENT_MANAGER_H
 #define ZP_CONTENT_MANAGER_H
+/*
+template<typename Resource, zp_uint Count>
+class zpContentManager
+{
+	ZP_NON_COPYABLE( zpContentManager< Resource, count > );
 
-struct zpResourceElement {
+public:
+	struct ResourceElement
+	{
+		zp_uint m_refCount;
+		zpString m_filename;
+		Resource m_resource;
+	};
+
+	zpContentManager();
+	~zpContentManager();
+
+	
+
+private:
+	zpFixedArrayList< ResourceElement, Count > m_resources;
+};
+*/
+#if 1
+struct zpResourceElement
+{
 	zpResource* resource;
 	zp_uint refCount;
 	zpString filename;
 };
 
-class zpContentManager : public zpGameManager {
+class zpContentManager : public zpGameManager
+{
 public:
 	zpContentManager();
 	virtual ~zpContentManager();
@@ -64,10 +89,11 @@ private:
 	zpDelegateEvent<void( const zpString& filename, zp_bool loaded, zp_uint numLeft )> m_onResourceLoaded;
 	zpDelegateEvent<void()> m_onAllResourcesLoaded;
 
-	zpHashMap<zpString, zpResourceCreator*> m_creators;
+	zpHashMap< zpString, zpResourceCreator* > m_creators;
 
-	zpArrayList<zpResource*> m_resourcesToLoad;
-	zpArrayList<zpResourceElement> m_elements;
+	zpArrayList< zpResource* > m_resourcesToLoad;
+	zpArrayList< zpResourceElement > m_elements;
 };
+#endif
 
 #endif

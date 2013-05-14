@@ -126,6 +126,13 @@ zpTexture* zpRenderingEngine::createTexture(  zp_uint width, zp_uint height, zpT
 	return new zpTexture( texture );
 }
 
+zpDepthStencilBuffer* zpRenderingEngine::createDepthBuffer( zp_uint width, zp_uint height, zpDisplayFormat format )
+{
+	zpDepthStencilBufferImpl* buffer;
+	buffer = m_renderingEngine->createDepthStencilBuffer( width, height, format );
+	return new zpDepthStencilBuffer( buffer );
+}
+
 zpRasterState* zpRenderingEngine::createRasterState( const zpRasterStateDesc& desc )
 {
 	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpRasterStateDesc ), 0 );
@@ -133,7 +140,7 @@ zpRasterState* zpRenderingEngine::createRasterState( const zpRasterStateDesc& de
 	zpRasterState* raster = ZP_NULL;
 	for( zp_uint i = 0; i < m_rasterStates.size(); ++i )
 	{
-		zpRasterState* r = m_rasterStates[ i ];
+		zpRasterState* r = &m_rasterStates[ i ];
 		if( r->m_descHash == descHash )
 		{
 			raster = r;
@@ -143,8 +150,9 @@ zpRasterState* zpRenderingEngine::createRasterState( const zpRasterStateDesc& de
 
 	if( raster == ZP_NULL )
 	{
-		raster = new zpRasterState( m_renderingEngine->createRasterState( desc ), descHash );
-		m_rasterStates.pushBack( raster );
+		raster = &m_rasterStates.pushBackEmpty();
+		raster->m_rasterState = m_renderingEngine->createRasterState( desc );
+		raster->m_descHash = descHash;
 	}
 
 	return raster;
@@ -156,7 +164,7 @@ zpSamplerState* zpRenderingEngine::createSamplerState( const zpSamplerStateDesc&
 	zpSamplerState* sampler = ZP_NULL;
 	for( zp_uint i = 0; i < m_samplerStates.size(); ++i )
 	{
-		zpSamplerState* s = m_samplerStates[ i ];
+		zpSamplerState* s = &m_samplerStates[ i ];
 		if( s->m_descHash == descHash )
 		{
 			sampler = s;
@@ -166,8 +174,9 @@ zpSamplerState* zpRenderingEngine::createSamplerState( const zpSamplerStateDesc&
 
 	if( sampler == ZP_NULL )
 	{
-		sampler = new zpSamplerState( m_renderingEngine->createSamplerState( desc ), descHash );
-		m_samplerStates.pushBack( sampler );
+		sampler = &m_samplerStates.pushBackEmpty();
+		sampler->m_samplerState = m_renderingEngine->createSamplerState( desc );
+		sampler->m_descHash = descHash;
 	}
 
 	return sampler;
@@ -177,7 +186,7 @@ zpShader* zpRenderingEngine::createShader( const zpString& shaderFile )
 {
 	zpShaderImpl* shader = m_renderingEngine->createShader( shaderFile );
 
-	return ZP_NULL;
+	return new zpShader( shader );
 }
 zp_bool zpRenderingEngine::reloadShader( zpShader* shader )
 {

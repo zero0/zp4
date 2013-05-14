@@ -122,6 +122,7 @@
     <ClCompile Include="zpCamera.cpp" />
     <ClCompile Include="zpCameraComponent.cpp" />
     <ClCompile Include="zpDeferredRenderingComponent.cpp" />
+    <ClCompile Include="zpDepthStencilBuffer.cpp" />
     <ClCompile Include="zpFontResource.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpMaterialResource.cpp" />

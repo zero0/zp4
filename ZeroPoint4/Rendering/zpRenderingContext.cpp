@@ -353,7 +353,7 @@ void zpRenderingContext::processCommands()
 		m_immediateIndexData = ZP_NULL;
 	}
 
-	m_renderContextImpl->processCommands( m_renderingCommands );
+	m_renderContextImpl->processCommands( m_renderingEngine->getRenderingEngineImpl(), m_renderingCommands );
 
 	m_renderingCommands.reset();
 

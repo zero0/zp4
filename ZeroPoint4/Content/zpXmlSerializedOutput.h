@@ -7,7 +7,7 @@ public:
 	zpXmlSerializedOutput( zpXmlNode* root );
 	virtual ~zpXmlSerializedOutput();
 
-	void writeBoolean( bool value, const char* name );
+	void writeBoolean( bool value, const zp_char* name );
 
 	void writeByte( zp_byte value, const zp_char* name );
 	void writeChar( zp_char value, const zp_char* name );

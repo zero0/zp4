@@ -33,7 +33,7 @@ ZP_FORCE_INLINE zpVector4f::zpVector4f( const zpVector4f& vector )
 	: m_xyzw( vector.m_xyzw ) 
 {}
 ZP_FORCE_INLINE zpVector4f::zpVector4f( zpVector4f&& vector )
-	: m_xyzw( vector.m_xyzw ) 
+	: m_xyzw( zp_move( vector.m_xyzw ) ) 
 {}
 ZP_FORCE_INLINE zpVector4f::~zpVector4f() {}
 
@@ -43,7 +43,7 @@ ZP_FORCE_INLINE void zpVector4f::operator=( const zpVector4f& vector )
 }
 ZP_FORCE_INLINE void zpVector4f::operator=( zpVector4f&& vector )
 {
-	m_xyzw = vector.m_xyzw;
+	m_xyzw = zp_move( vector.m_xyzw );
 }
 
 ZP_FORCE_INLINE zpScalar zpVector4f::getX() const

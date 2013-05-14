@@ -95,6 +95,9 @@ public:
 		}
 	}
 
+	void reserve( zp_uint size );
+	void clear();
+
 private:
 	void ensureCapacity( zp_uint size );
 	zp_char* getCharsInternal();

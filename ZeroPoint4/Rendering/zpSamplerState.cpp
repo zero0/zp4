@@ -8,9 +8,9 @@
 #error( "No rendering engine selected!" )
 #endif
 
-zpSamplerState::zpSamplerState( zpSamplerStateImpl* samplerState, zp_hash descHash )
-	: m_samplerState( samplerState )
-	, m_descHash( descHash )
+zpSamplerState::zpSamplerState()
+	: m_samplerState( ZP_NULL )
+	, m_descHash( 0 )
 {}
 zpSamplerState::~zpSamplerState()
 {

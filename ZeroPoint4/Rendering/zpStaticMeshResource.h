@@ -8,7 +8,7 @@ struct zpStaticMeshPart {
 	zpTopology topology;
 	zpBuffer* vertexBuffer;
 	zpBuffer* indexBuffer;
-	zpResourceInstance<zpShader> shader;
+	zpResourceInstance<zpShaderResource> shader;
 	zpResourceInstance<zpTextureResource> textures[ ZP_STATIC_MESH_PART_NUM_TEXTURES ];
 
 	zpStaticMeshPart();

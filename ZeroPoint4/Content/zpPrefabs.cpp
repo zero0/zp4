@@ -119,7 +119,7 @@ zp_bool zpPrefabs::saveAsPrefab( const zpString& prefabName, zpSerializable* obj
 
 void zpPrefabs::setContentManager( zpContentManager* content ) {
 	m_contentManager = content;
-	m_contentManager->registerFileExtension( "prefab", &m_prefabCreator );
+	m_contentManager->registerFileExtension( zpString( "prefab" ), &m_prefabCreator );
 }
 void zpPrefabs::update() {
 	if( !m_prefabsToLoad.isEmpty() ) {

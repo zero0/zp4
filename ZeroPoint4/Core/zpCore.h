@@ -24,6 +24,8 @@
 #define ZP_MALLOC_ALIGNMENT		16
 #endif
 
+#define ZP_FORECE_32BIT			0x7FFFFFFF
+
 #define ZP_USE_ASSERTIONS		1
 #define ZP_USE_MEMORY_SYSTEM	0
 
@@ -31,15 +33,13 @@
 
 #if ZP_DEBUG
 #define ZP_ON_DEBUG( code )			do { code ; } while( 0 )
-#define ZP_ON_DEBUG_MSG( msg, ... )	zp_printfln( msg, __VA_ARGS__ )
 #else
 #define ZP_ON_DEBUG( code )			(void)0
-#define ZP_ON_DEBUG_MSG( msg, ... )	(void)0
 #endif
 
 #if ZP_USE_ASSERTIONS
-#define ZP_ASSERT( test, msg, ... )			zp_assert( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
-#define ZP_ASSERT_WARN( test, msg, ... )	zp_assert_warning( (test), __FILE__, __LINE__, msg, __VA_ARGS__ )
+#define ZP_ASSERT( test, msg, ... )			if( !(test) ) { zp_assert( __FILE__, __LINE__, msg, __VA_ARGS__ ); }
+#define ZP_ASSERT_WARN( test, msg, ... )	if( !(test) ) { zp_assert_warning( __FILE__, __LINE__, msg, __VA_ARGS__ ); }
 #else
 #define ZP_ASSERT( test, msg, ... )			(void)0
 #define ZP_ASSERT_WARN( test, msg, ... )	(void)0
@@ -65,29 +65,39 @@
 
 #define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
 
-#define ZP_NON_COPYABLE( t )		private: t( const t& ); t( t&& ); t& operator=( const t& ); t& operator=( t&& );
+#define ZP_NON_COPYABLE( t )		private: t( const t& ); t& operator=( const t& );
 
 #define ZP_MEMORY_KB( s )			(zp_int)( (s) * 1024 )
 #define ZP_MEMORY_MB( s )			(zp_int)( ZP_MEMORY_KB(s) * 1024 )
 
 #define ZP_MAKE_UINT( a, b, c, d )					(zp_uint)( ( (a) & 0xFF ) << 24 | ( (b) & 0xFF ) << 16 | ( (c) & 0xFF ) << 8 | ( (d) & 0xFF ) )
 #define ZP_MAKE_ULONG( a, b, c, d, e, f, g, h )		(zp_ulong)( ZP_MAKE_UINT( a, b, c, d ) ) << 32 | (zp_ulong)( ZP_MAKE_UINT( e, f, g, h ) )
+#define ZP_MAKE_CHAR4( a, b, c, d )					{ (a), (b), (c), (d) }
 
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
 #define ZP_USE_COLOR_CONSOLE	1
 #define ZP_USE_FAST_MATH		0
 #define ZP_USE_SAFE_FUNCTIONS	1
+#define ZP_USE_CONSOLE_PRINT	1
+#define ZP_USE_DEBUG_PRINT		1
+#define ZP_USE_PRINT			1
 
 #include "zpBaseTypes.h"
 
 #if ZP_USE_ASSERTIONS
-void zp_assert( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... );
-void zp_assert_warning( zp_bool test, const zp_char* file, zp_int line, const zp_char* msg, ... );
+void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... );
+void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ... );
 #endif
 
+#if ZP_USE_PRINT
 void zp_printf( const zp_char* text, ... );
 void zp_printfln( const zp_char* text, ... );
+#else
+#define zp_printf( text, ... ) (void)0
+#define zp_printfln( text, ... ) (void)0
+#endif
+
 void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... );
 
 void* zp_malloc( zp_uint size );
@@ -138,8 +148,36 @@ zp_bool zp_is_print( zp_char ch );
 
 zp_uint zp_near_pow2( zp_uint number );
 
+void zp_sleep( zp_int milliseconds );
+
+template<typename T>
+ZP_FORCE_INLINE zp_hash zp_fnv1_32( const T& d, zp_hash h = 0 )
+{
+	return zp_fnv1_32_data( (const void*)&d, sizeof( T ), h );
+}
 zp_hash zp_fnv1_32_data( const void* d, zp_uint l, zp_hash h );
 zp_hash zp_fnv1_32_string( const zp_char* c, zp_hash h );
+
+template<typename T>
+ZP_FORCE_INLINE T&& zp_move( T& v )
+{
+	return (T&&)v;
+}
+
+template<typename T>
+ZP_FORCE_INLINE void zp_swap( T& a, T& b )
+{
+	T temp( a );
+	a = b;
+	b = temp;
+}
+template<typename T>
+ZP_FORCE_INLINE void zp_move_swap( T& a, T& b )
+{
+	T temp( zp_move( a ) );
+	a = zp_move( b );
+	b = zp_move( temp );
+}
 
 class zpLog;
 class zpLogOutput;
@@ -181,6 +219,7 @@ class zpProperties;
 class zpMemorySystem;
 ZP_PURE_INTERFACE zpReferencedObject;
 class zpJson;
+class zpXmlParser;
 
 class zpGame;
 class zpWorld;
@@ -218,6 +257,7 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpReferencedObject.h"
 #include "zpReferencedPointer.h"
 #include "zpJSON.h"
+#include "zpXML.h"
 
 #include "zpRandom.h"
 #include "zpColor4f.h"
@@ -240,12 +280,6 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpGameObject.h"
 #include "zpComponent.h"
 
-template<typename T, typename A>
-ZP_FORCE_INLINE T& zp_as( A& a )
-{
-	return (T)a;
-}
-
 template<typename T>
 void zp_zero_memory( T* ptr )
 {
@@ -255,19 +289,6 @@ template<typename T, zp_uint Size>
 void zp_zero_memory_array( T (&arr)[Size] )
 {
 	zp_memset( arr, 0, Size * sizeof( T ) );
-}
-
-template<typename T>
-ZP_FORCE_INLINE T&& zp_move( T& v )
-{
-	return (T&&)v;
-}
-
-template<typename T>
-void zp_move_swap( T& a, T& b ) {
-	T temp = (T&&)a;
-	a = (T&&)b;
-	b = (T&&)temp;
 }
 
 template<typename T>

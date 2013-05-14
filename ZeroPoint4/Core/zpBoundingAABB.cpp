@@ -77,7 +77,7 @@ zpVector4f zpBoundingAABB::getExtents() const
 	return extents;
 }
 
-zpBoundingSphere zpBoundingAABB::generateBoundingSphere( zp_bool isSphereContained ) const
+void zpBoundingAABB::generateBoundingSphere( zpBoundingSphere& sphere, zp_bool isSphereContained ) const
 {
 	zpScalar r, a, b;
 	zpVector4f center( getCenter() );
@@ -108,7 +108,8 @@ zpBoundingSphere zpBoundingAABB::generateBoundingSphere( zp_bool isSphereContain
 		zpMath::Max( r, a, b );
 	}
 
-	return zpBoundingSphere( center, r );
+	sphere.setCenter( center );
+	sphere.setRadius( r );
 }
 
 zpScalar zpBoundingAABB::getWidth() const

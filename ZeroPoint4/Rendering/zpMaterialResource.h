@@ -2,12 +2,14 @@
 #ifndef ZP_MATERIAL_RESOURCE_H
 #define ZP_MATERIAL_RESOURCE_H
 
-struct zpMaterial {
-	zpResourceInstance< zpShader > shader;
-	zpArray< zpResourceInstance< zpTextureResource >, ZP_MATERIAL_TEXTURE_SLOT_Count > textures;
+struct zpMaterial
+{
+	zpResourceInstance< zpShaderResource > shader;
+	zpFixedArrayList< zpResourceInstance< zpTextureResource >, ZP_MATERIAL_TEXTURE_SLOT_Count > textures;
 };
 
-class zpMaterialResource : public zpResource {
+class zpMaterialResource : public zpResource
+{
 public:
 	zpMaterialResource();
 	virtual ~zpMaterialResource();
@@ -17,11 +19,13 @@ public:
 
 	const zpMaterial& getMaterial() const;
 
+	void setTexture( zpMaterialTextureSlot slot, zpResourceInstance< zpTextureResource > texture );
+
 private:
 	zpMaterial m_material;
 };
 
-ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpMaterialResource )
-ZP_RESOURCE_INSTANCE_TEMPLATE_END
+//ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpMaterialResource )
+//ZP_RESOURCE_INSTANCE_TEMPLATE_END
 
 #endif

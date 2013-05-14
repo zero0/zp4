@@ -1,10 +1,10 @@
 #include "zpCore.h"
-#include "Audio/zpAudio.h"
-#include "Content/zpContent.h"
-#include "Physics/zpPhysics.h"
-#include "Rendering/zpRendering.h"
-#include "Input/zpInput.h"
-#include "Scripting/zpScripting.h"
+//#include "Audio/zpAudio.h"
+//#include "Content/zpContent.h"
+//#include "Physics/zpPhysics.h"
+//#include "Rendering/zpRendering.h"
+//#include "Input/zpInput.h"
+//#include "Scripting/zpScripting.h"
 
 zpAllGameManagers::zpAllGameManagers()
 	: zpSerializable()

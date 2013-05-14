@@ -8,9 +8,9 @@
 #error( "No rendering engine selected!" )
 #endif
 
-zpRasterState::zpRasterState( zpRasterStateImpl* rasterState, zp_hash descHash )
-	: m_rasterState( rasterState )
-	, m_descHash( descHash )
+zpRasterState::zpRasterState()
+	: m_rasterState( ZP_NULL )
+	, m_descHash( 0 )
 {}
 zpRasterState::~zpRasterState()
 {
