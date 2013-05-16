@@ -126,6 +126,9 @@ const zp_char* zp_strstr(  const zp_char* str, const zp_char* subStr );
 
 zp_int zp_atoi( const zp_char* str );
 zp_float zp_atof( const zp_char* str );
+zp_float zp_atof( const zp_char* str, zp_char** end );
+zp_long zp_atol( const zp_char* str );
+zp_long zp_atol( const zp_char* str, zp_char** end, zp_int base );
 
 zp_int zp_rand();
 zp_float zp_randf();
@@ -284,6 +287,11 @@ template<typename T>
 void zp_zero_memory( T* ptr )
 {
 	zp_memset( ptr, 0, sizeof( T ) );
+}
+template<typename T>
+void zp_zero_memory_array( T* ptr, zp_uint count )
+{
+	zp_memset( ptr, 0, count * sizeof( T ) );
 }
 template<typename T, zp_uint Size>
 void zp_zero_memory_array( T (&arr)[Size] )

@@ -135,11 +135,12 @@ zp_bool zpFile::open( zpFileMode mode )
 	ZP_ASSERT( m_file == ZP_NULL, "zpFile: File already open" );
 	ZP_ASSERT( !m_filename.isEmpty(), "zpFile: Filename not set" );
 	zp_uint err = 0;
+	const zp_char* fopenMode = g_zpFileModeToString[ mode ];
 
 #if ZP_USE_SAFE_FUNCTIONS
-	err = fopen_s( (FILE**)&m_file, m_filename.getChars(), g_zpFileModeToString[ m_mode ] );
+	err = fopen_s( (FILE**)&m_file, m_filename.getChars(), fopenMode );
 #else
-	m_file = (zp_handle)fopen( m_filename.getChars(), g_zpFileModeToString[ m_mode ] );
+	m_file = (zp_handle)fopen( m_filename.getChars(), fopenMode );
 #endif
 	return err == 0;
 }
@@ -157,6 +158,9 @@ zp_int zpFile::readFile( zpStringBuffer& buffer )
 {
 	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
 	ZP_ASSERT( !isBinaryFile(), "zpFile: Trying to read binary file as ascii" );
+
+	buffer.clear();
+	buffer.reserve( getFileSize() );
 
 	zp_int count = 0;
 	zp_char buff[ ZP_FILE_BUFFER_SIZE ];

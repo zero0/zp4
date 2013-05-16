@@ -4,7 +4,7 @@
 
 class zpStringBuffer {
 public:
-	static const zp_uint npos = -1;
+	static const zp_int npos = -1;
 
 	zpStringBuffer();
 	zpStringBuffer( const zpString& str );
@@ -41,7 +41,7 @@ public:
 	zp_uint size() const;
 
 	void append( zp_char value );
-	void append( const zp_char* value, zp_uint length = npos );
+	void append( const zp_char* value, zp_int length = npos );
 	void append( const zpString& value );
 
 	void append( zp_sbyte value );
@@ -76,11 +76,13 @@ public:
 	void erase( zp_uint start, zp_uint end = npos );
 	void clear();
 
-	zp_uint indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
-	zp_uint indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
+	zp_int indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
+	zp_int indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
 
 	zpString toString() const;
 	const zp_char* getChars() const;
+
+	void reserve( zp_uint size );
 
 private:
 	void ensureCapacity( zp_uint size );

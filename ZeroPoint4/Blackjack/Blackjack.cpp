@@ -38,6 +38,10 @@ void ProcessConfig( zpGame& game )
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
+	zpJson outJson;
+	zpJsonParser parser;
+	parser.parseFile( zpString( "test.txt" ), outJson );
+
 	return 0;
 }
 #if 0

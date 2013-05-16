@@ -120,6 +120,7 @@ zpString& zpString::operator=( const zp_char* string )
 {
 	if( m_string != string && m_chars != string )
 	{
+		m_hash = 0;
 		if( m_length > 0 )
 		{
 			if( IS_STRING_PACKED( this ) )

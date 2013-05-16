@@ -193,11 +193,25 @@ const zp_char* zp_strstr(  const zp_char* str, const zp_char* subStr ) {
 	return strstr( str, subStr );
 }
 
-zp_int zp_atoi( const zp_char* str ) {
+zp_int zp_atoi( const zp_char* str )
+{
 	return atoi( str );
 }
-zp_float zp_atof( const zp_char* str ) {
+zp_float zp_atof( const zp_char* str )
+{
 	return (zp_float)atof( str );
+}
+zp_float zp_atof( const zp_char* str, zp_char** end )
+{
+	return (zp_float)strtod( str, end );
+}
+zp_long zp_atol( const zp_char* str )
+{
+	return atol( str );
+}
+zp_long zp_atol( const zp_char* str, zp_char** end, zp_int base )
+{
+	return strtol( str, end, base );
 }
 
 zp_int zp_rand() {

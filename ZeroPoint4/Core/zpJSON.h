@@ -158,6 +158,8 @@ private:
 	zp_bool matches( const zp_char* pattern, zp_int length );
 
 	void tokenToString( const zpJsonToken& token, zpString& str );
+	void tokenToNumber( const zpJsonToken& token );
+	void tokenToDouble( const zpJsonToken& token );
 
 	zpJson& currentValue();
 	zp_char nextChar();
