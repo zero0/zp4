@@ -41,11 +41,10 @@ public:
 
 	void clear();
 	void reset();
+	void reserve( zp_uint size );
 
 	zp_int indexOf( const T& val ) const;
 	zp_int lastIndexOf( const T& val ) const;
-
-	void ensureCapacity( zp_uint size );
 
 	T& front();
 	T& back();
@@ -85,6 +84,8 @@ protected:
 	zpArrayList( T* fixedArray, zp_uint count );
 
 private:
+	void ensureCapacity( zp_uint size );
+
 	T* m_array;
 	zp_uint m_size;
 	zp_uint m_capacity;

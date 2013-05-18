@@ -56,6 +56,11 @@ void zpDataBuffer::ensureCapacity( zp_uint capacity )
 	}
 }
 
+void zpDataBuffer::reserve( zp_uint size )
+{
+	ensureCapacity( size );
+}
+
 void zpDataBuffer::clear()
 {
 	m_offset = 0;

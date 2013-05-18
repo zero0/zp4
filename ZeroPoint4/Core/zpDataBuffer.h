@@ -15,7 +15,7 @@ public:
 	zp_uint size() const;
 	zp_uint capacity() const;
 
-	void ensureCapacity( zp_uint capacity );
+	void reserve( zp_uint size );
 
 	void clear();
 	void reset();
@@ -33,6 +33,8 @@ protected:
 	zpDataBuffer( void* data, zp_uint capacity );
 
 private:
+	void ensureCapacity( zp_uint capacity );
+
 	void* m_data;
 	zp_uint m_capacity;
 	mutable zp_uint m_offset;

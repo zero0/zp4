@@ -107,6 +107,7 @@ public:
 	zpJsonParser();
 	~zpJsonParser();
 
+	zp_bool parseBuffer( const zpStringBuffer& buffer, zpJson& outJson );
 	zp_bool parseFile( const zpString& filename, zpJson& outJson );
 
 	zp_bool writeToFile( const zpJson& json, const zpString& filename );

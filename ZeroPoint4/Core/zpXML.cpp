@@ -176,7 +176,7 @@ zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSibling
 	zpStringBuffer xmlBuffer;
 	zpFile file( filename );
 
-	if( file.open( ZP_FILE_MODE_READ ) )
+	if( file.open( ZP_FILE_MODE_ASCII_READ ) )
 	{
 		file.readFile( xmlBuffer );
 		file.close();
@@ -457,7 +457,7 @@ zp_bool zpXmlParser::writeToFile( zpXmlNode* root, const zpString& filename )
 {
 	zp_int count = 0;
 	zpFile file( filename );
-	if( file.open( ZP_FILE_MODE_TRUNCATE_WRITE ) )
+	if( file.open( ZP_FILE_MODE_ASCII_TRUNCATE_WRITE ) )
 	{
 		zpStringBuffer buffer;
 		__xmlNodeToString( root, 0, buffer );

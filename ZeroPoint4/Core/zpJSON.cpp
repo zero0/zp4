@@ -482,47 +482,42 @@ const zpJson& zpJson::operator[]( const zpString& key ) const
 	}
 }
 
-#define JSON_IS_NULL( j, i )	( \
-	(j)[ (i) + 1 ] == 'u' &&	\
-	(j)[ (i) + 2 ] == 'l' &&	\
-	(j)[ (i) + 3 ] == 'l' )
-#define JSON_IS_TRUE( j, i )	( \
-	(j)[ (i) + 1 ] == 'r' &&	\
-	(j)[ (i) + 2 ] == 'u' &&	\
-	(j)[ (i) + 3 ] == 'e' )
-#define JSON_IS_FALSE( j, i )	( \
-	(j)[ (i) + 1 ] == 'a' &&	\
-	(j)[ (i) + 2 ] == 'l' &&	\
-	(j)[ (i) + 3 ] == 's' &&	\
-	(j)[ (i) + 4 ] == 'e' )
-
 zpJsonParser::zpJsonParser() {}
 zpJsonParser::~zpJsonParser() {}
 
+zp_bool zpJsonParser::parseBuffer( const zpStringBuffer& buffer, zpJson& outJson )
+{
+	zp_bool success = false;
+
+	if( !buffer.isEmpty() )
+	{
+		const zp_char* json = buffer.getChars();
+		const zp_uint length = buffer.length();
+
+		m_start = json;
+		m_current = m_start;
+		m_end = m_start + buffer.size();
+
+		m_nodes.clear();
+		m_nodes.reserve( 10 );
+		m_nodes.pushBack( &outJson );
+
+		success = readValue();
+	}
+
+	return success;
+}
 zp_bool zpJsonParser::parseFile( const zpString& filename, zpJson& outJson )
 {
 	zp_bool success = false;
 	zpFile jsonFile( filename );
-	zpStringBuffer jsonBuffer;
-	if( jsonFile.open( ZP_FILE_MODE_READ ) )
+	if( jsonFile.open( ZP_FILE_MODE_ASCII_READ ) )
 	{
+		zpStringBuffer jsonBuffer;
 		jsonFile.readFile( jsonBuffer );
 		jsonFile.close();
 
-		if( !jsonBuffer.isEmpty() )
-		{
-			const zp_char* json = jsonBuffer.getChars();
-			const zp_uint length = jsonBuffer.length();
-
-			m_start = json;
-			m_current = m_start;
-			m_end = m_start + jsonBuffer.size();
-
-			m_nodes.clear();
-			m_nodes.pushBack( &outJson );
-			
-			success = readValue();
-		}
+		success = parseBuffer( jsonBuffer, outJson );
 	}
 	
 	if( !success )

@@ -212,7 +212,8 @@ zp_int zpFile::readFileBinary( zpArrayList<zp_byte>& buffer )
 	zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 	FILE* f = (FILE*)m_file;
 
-	buffer.ensureCapacity( (zp_uint)getFileSize() );
+	buffer.reset();
+	buffer.reserve( (zp_uint)getFileSize() );
 
 	zp_uint s;
 	while(
@@ -241,7 +242,7 @@ zp_int zpFile::readFileBinary( zpDataBuffer& buffer )
 	FILE* f = (FILE*)m_file;
 
 	buffer.reset();
-	buffer.ensureCapacity( (zp_uint)getFileSize() );
+	buffer.reserve( (zp_uint)getFileSize() );
 
 	zp_uint s;
 	while(

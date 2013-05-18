@@ -118,7 +118,7 @@ zp_bool zpProperties::find( const zpString& key, const zpString** outValue ) con
 void zpProperties::load( const zpString& file )
 {
 	zpFile f( file );
-	if( f.open( ZP_FILE_MODE_READ ) )
+	if( f.open( ZP_FILE_MODE_ASCII_READ ) )
 	{
 		zp_uint pos;
 
@@ -151,7 +151,7 @@ void zpProperties::save( const zpString& file ) const
 	if( m_properties.isEmpty() ) return;
 	
 	zpFile f( file );
-	if( f.open( ZP_FILE_MODE_TRUNCATE_WRITE ) )
+	if( f.open( ZP_FILE_MODE_ASCII_TRUNCATE_WRITE ) )
 	{
 		
 		zpStringBuffer buffer;
