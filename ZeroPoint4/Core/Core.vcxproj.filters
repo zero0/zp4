@@ -191,9 +191,6 @@
     <None Include="zpBaseTypesSimd.inl">
       <Filter>Source Files\Simd</Filter>
     </None>
-    <None Include="zpRealSimd.inl">
-      <Filter>Source Files\Simd</Filter>
-    </None>
     <None Include="zpVector4Fpu.inl">
       <Filter>Source Files\Fpu</Filter>
     </None>
@@ -265,6 +262,9 @@
     </None>
     <None Include="zpRect.inl">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpMathSimd.inl">
+      <Filter>Source Files\Simd</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

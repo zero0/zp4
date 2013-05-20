@@ -51,36 +51,32 @@ void zpBoundingAABB::setMax( const zpVector4f& max )
 	m_max = max;
 }
 
-zpVector4f zpBoundingAABB::getCenter() const
+void zpBoundingAABB::getCenter( zpVector4f& outCenter ) const
 {
-	zpVector4f center;
-	zpMath::Add( center, m_min, m_max );
-	zpMath::Mul( center, center, zpScalar( 0.5f ) );
-
-	return center;
+	zpMath::Add( outCenter, m_min, m_max );
+	zpMath::Mul( outCenter, outCenter, zpScalar( 0.5f ) );
 }
 void zpBoundingAABB::setCenter( const zpVector4f& center )
 {
 	zpVector4f t;
-	zpVector4f c( getCenter() );
+	zpVector4f c;
+	getCenter( c );
 
 	zpMath::Sub( t, center, c );
 
 	translate( t );
 }
-zpVector4f zpBoundingAABB::getExtents() const
+void zpBoundingAABB::getExtents( zpVector4f& outExtense ) const
 {
-	zpVector4f extents;
-	zpMath::Sub( extents, m_max, m_min );
-	zpMath::Mul( extents, extents, zpScalar( 0.5f ) );
-
-	return extents;
+	zpMath::Sub( outExtense, m_max, m_min );
+	zpMath::Mul( outExtense, outExtense, zpScalar( 0.5f ) );
 }
 
 void zpBoundingAABB::generateBoundingSphere( zpBoundingSphere& sphere, zp_bool isSphereContained ) const
 {
 	zpScalar r, a, b;
-	zpVector4f center( getCenter() );
+	zpVector4f center;
+	getCenter( center );
 
 	if( isSphereContained )
 	{

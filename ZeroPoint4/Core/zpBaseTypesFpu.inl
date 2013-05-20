@@ -53,10 +53,12 @@ struct zpScalar
 
 	friend void zpMath::Abs( zpScalar& s, const zpScalar& a );
 	friend void zpMath::Neg( zpScalar& s, const zpScalar& a );
+	friend void zpMath::Sqrt( zpScalar& s, const zpScalar& a );
 	friend void zpMath::Rcp( zpScalar& s, const zpScalar& a );
 	friend void zpMath::Max( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	friend void zpMath::Min( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	friend void zpMath::Cmp( zp_int& s, const zpScalar& a, const zpScalar& b );
+	friend void zpMath::Cmp0( zp_int& s, const zpScalar& a );
 
 	friend void zpMath::Determinant( zpScalar& s, const zpMatrix4f& a );
 

@@ -101,8 +101,8 @@ public:
 	void rewind();
 
 	const zpString& getFilename() const;
-	zpString getFileExtension() const;
-	zpString getFileDirectory() const;	
+	void getFileExtension( zpString& out ) const;
+	void getFileDirectory( zpString& out ) const;	
 
 private:
 	zpFile( const zpFile& file );

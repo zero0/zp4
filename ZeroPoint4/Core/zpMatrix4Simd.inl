@@ -9,7 +9,7 @@ ZP_FORCE_INLINE void zpMatrix4f::operator delete( void* ptr ) {
 	_aligned_free( ptr );
 }
 */
-
+#if 0
 ZP_FORCE_INLINE void zpMatrix4f::translate( const zpVector4f& position ) {
 	zp_vec4 col;
 
@@ -273,3 +273,5 @@ ZP_FORCE_INLINE zp_bool zpMatrix4f::operator!=( const zpMatrix4f& matrix ) const
 }
 #undef MM_
 #undef MM
+
+#endif

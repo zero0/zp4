@@ -21,9 +21,9 @@ public:
 	void setMin( const zpVector4f& min );
 	void setMax( const zpVector4f& max );
 
-	zpVector4f getCenter() const;
+	void getCenter( zpVector4f& outCenter ) const;
 	void setCenter( const zpVector4f& center );
-	zpVector4f getExtents() const;
+	void getExtents( zpVector4f& outExtents ) const;
 
 	void generateBoundingSphere( zpBoundingSphere& sphere, zp_bool isSphereContained = false ) const;
 

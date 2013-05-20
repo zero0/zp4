@@ -11,15 +11,15 @@ public:
 
 	zpString();
 	explicit zpString( const zp_char* string );
-	zpString( const zp_char* string, zp_uint length, zp_uint offset = 0 );
+	zpString( const zp_char* string, zp_uint length );
 	zpString( const zpString& string );
-	zpString( const zpString& string, zp_uint length, zp_uint offset = 0 );
+	zpString( const zpString& string, zp_uint length );
 	zpString( zpString&& string );
 	~zpString();
 
-	zpString& operator=( const zp_char* string );
-	zpString& operator=( const zpString& string );
-	zpString& operator=( zpString&& string );
+	void operator=( const zp_char* string );
+	void operator=( const zpString& string );
+	void operator=( zpString&& string );
 
 	operator zp_hash() const;
 	const zp_char* getChars() const;
@@ -28,6 +28,7 @@ public:
 	zp_char& operator[]( zp_uint index );
 	void setCharAt( zp_uint index, zp_char ch );
 	zp_char charAt( zp_uint index ) const;
+	void set( const zp_char* str, zp_uint length );
 
 	zp_bool startsWith( const zp_char* string ) const;
 	zp_bool startsWith( const zpString& string ) const;
@@ -58,8 +59,8 @@ public:
 	zp_int compareTo( const zpString& string ) const;
 	zp_int compareToIgnoreCase( const zpString& string ) const;
 	
-	zpString substring( zp_uint startIndex ) const;
-	zpString substring( zp_uint startIndex, zp_int endIndex ) const;
+	void substring( zpString& out, zp_uint startIndex ) const;
+	void substring( zpString& out, zp_uint startIndex, zp_int endIndex ) const;
 
 	void erase( zp_int startIndex, zp_uint count );
 	void append( zp_char ch );
@@ -70,9 +71,9 @@ public:
 
 	void toCamelCase( zpString& outString, zp_bool capitalFirstLetter = true ) const;
 	
-	zpString ltrim() const;
-	zpString rtrim() const;
-	zpString trim() const;
+	void ltrim( zpString& out ) const;
+	void rtrim( zpString& out ) const;
+	void trim( zpString& out ) const;
 	
 	template<typename Func>
 	void foreach( Func func )

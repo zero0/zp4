@@ -9,7 +9,7 @@ ZP_FORCE_INLINE void zpVector4f::operator delete( void* ptr ) {
 	_aligned_free( ptr );
 }
 */
-
+#if 0
 ZP_FORCE_INLINE zpVector4f::zpVector4f( zp_float x, zp_float y, zp_float z, zp_float w ) :
 	m_xyzw( x, y, z, w )
 {}
@@ -231,3 +231,4 @@ ZP_FORCE_INLINE zp_bool zpVector4f::operator!=( const zpVector4f& vector ) const
 	zpScalar cmp = _mm_cmpneq_ps( m_xyzw, vector.m_xyzw );
 	return cmp.m128_i32[0] && cmp.m128_i32[1] && cmp.m128_i32[2] && cmp.m128_i32[3];
 }
+#endif

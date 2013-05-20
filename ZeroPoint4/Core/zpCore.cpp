@@ -30,12 +30,10 @@ void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... )
 	zpString filename( file );
 	zpFile::convertToFilePath( filename );
 	zp_int s = filename.lastIndexOf( zpFile::sep );
-	if( s != zpString::npos )
-	{
-		filename = filename.substring( s + 1 );
-	}
+	s = s == zpString::npos ? 0 : s;
 
-	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", filename.getChars(), line );
+	const zp_char* f = filename.getChars() + s;
+	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", f, line );
 
 	zp_int result = MessageBox( ZP_NULL, text, title, MB_YESNOCANCEL | MB_ICONEXCLAMATION );
 	
@@ -73,12 +71,10 @@ void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ..
 	zpString filename( file );
 	zpFile::convertToFilePath( filename );
 	zp_int s = filename.lastIndexOf( zpFile::sep );
-	if( s != zpString::npos )
-	{
-		filename = filename.substring( s + 1 );
-	}
+	s = s == zpString::npos ? 0 : s;
 
-	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Warning at %s:%d", filename.getChars(), line );
+	const zp_char* f = filename.getChars() + s;
+	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Warning at %s:%d", f, line );
 
 	MessageBox( ZP_NULL, text, title, MB_OK | MB_ICONWARNING );
 }
@@ -181,7 +177,7 @@ zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* src
 #endif
 }
 zp_uint zp_strlen( const zp_char* srcString ) {
-	return strlen( srcString );
+	return srcString ? strlen( srcString ) : 0;
 }
 zp_int zp_strcmp( const zp_char* str1, const zp_char* str2 ) {
 	return strcmp( str1, str2 );

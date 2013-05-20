@@ -160,7 +160,7 @@ zp_int zpFile::readFile( zpStringBuffer& buffer )
 	ZP_ASSERT( !isBinaryFile(), "zpFile: Trying to read binary file as ascii" );
 
 	buffer.clear();
-	buffer.reserve( getFileSize() );
+	buffer.reserve( (zp_uint)getFileSize() );
 
 	zp_int count = 0;
 	zp_char buff[ ZP_FILE_BUFFER_SIZE ];
@@ -572,21 +572,25 @@ const zpString& zpFile::getFilename() const
 {
 	return m_filename;
 }
-zpString zpFile::getFileExtension() const
+void zpFile::getFileExtension( zpString& out ) const
 {
-	if( m_filename.isEmpty() ) return zpString();
-
-	zp_int pos = m_filename.lastIndexOf( '.' );
-	if( pos == zpString::npos ) return zpString();
-
-	return m_filename.substring( pos + 1 );
+	if( !m_filename.isEmpty() )
+	{
+		zp_int pos = m_filename.lastIndexOf( '.' );
+		if( pos != zpString::npos )
+		{
+			m_filename.substring( out, pos + 1 );
+		}
+	}
 }
-zpString zpFile::getFileDirectory() const
+void zpFile::getFileDirectory( zpString& out ) const
 {
-	if( m_filename.isEmpty() ) return zpString();
-
-	zp_int pos = m_filename.lastIndexOf( zpFile::sep );
-	if( pos == zpString::npos ) return zpString();
-
-	return m_filename.substring( 0, pos );
+	if( !m_filename.isEmpty() )
+	{
+		zp_int pos = m_filename.lastIndexOf( zpFile::sep );
+		if( pos != zpString::npos )
+		{
+			m_filename.substring( out, 0, pos );
+		}
+	}
 }

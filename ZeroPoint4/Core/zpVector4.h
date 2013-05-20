@@ -782,6 +782,7 @@ public:
 
 	friend void zpMath::Abs( zpVector4f& s, const zpVector4f& a );
 	friend void zpMath::Neg( zpVector4f& s, const zpVector4f& a );
+	friend void zpMath::Sqrt( zpVector4f& s, const zpVector4f& a );
 	friend void zpMath::Rcp( zpVector4f& s, const zpVector4f& a );
 	friend void zpMath::Max( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 	friend void zpMath::Min( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );

@@ -121,6 +121,9 @@ namespace zpMath
 	ZP_FORCE_INLINE void Rcp( zpScalar& s, const zpScalar& a );
 	ZP_FORCE_INLINE void Rcp( zpVector4f& s, const zpVector4f& a );
 
+	ZP_FORCE_INLINE void Sqrt( zpScalar& s, const zpScalar& a );
+	ZP_FORCE_INLINE void Sqrt( zpVector4f& s, const zpVector4f& a );
+
 	ZP_FORCE_INLINE void Max( zpScalar& s, const zpScalar& a, const zpScalar& b );
 	ZP_FORCE_INLINE void Max( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 
@@ -128,6 +131,8 @@ namespace zpMath
 	ZP_FORCE_INLINE void Min( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 
 	ZP_FORCE_INLINE void Cmp( zp_int& s, const zpScalar& a, const zpScalar& b );
+	ZP_FORCE_INLINE void Cmp0( zp_int& s, const zpScalar& a );
+
 	ZP_FORCE_INLINE void Cmp( zp_int& s, const zpVector4f& a, const zpVector4f& b );
 
 	ZP_FORCE_INLINE zp_int Cmp( const zpScalar& a, const zpScalar& b )
@@ -136,6 +141,13 @@ namespace zpMath
 		Cmp( s, a, b );
 		return s;
 	}
+	ZP_FORCE_INLINE zp_int Cmp0( const zpScalar& a )
+	{
+		zp_int s;
+		Cmp0( s, a );
+		return s;
+	}
+
 	ZP_FORCE_INLINE zp_int Cmp( const zpVector4f& a, const zpVector4f& b )
 	{
 		zp_int s;
@@ -174,7 +186,7 @@ namespace zpMath
 #include "zpCollision.h"
 
 #if ZP_USE_SIMD
-#include "zpRealSimd.inl"
+#include "zpMathSimd.inl"
 #include "zpVector4Simd.inl"
 //#include "zpIntegerSimd.inl"
 #include "zpMatrix4Simd.inl"

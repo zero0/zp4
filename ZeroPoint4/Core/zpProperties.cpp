@@ -123,20 +123,22 @@ void zpProperties::load( const zpString& file )
 		zp_uint pos;
 
 		zpStringBuffer buff;
-		zpString str;
+		zpString str, line, key, value;
 
 		while( f.readLine( buff ) > 0 )
 		{
-			str = buff.toString();
+			if( buff.isEmpty() ) continue;
+
+			str = buff.getChars();
+			str.trim( line );
+
+			if( line.isEmpty() || line.charAt( 0 ) == '#' || ( pos = line.indexOf( '=' ) ) == zpString::npos ) continue;
+
+			line.substring( key, 0, pos );
+			line.substring( value, pos + 1 );
+			m_properties[ key ] = value;
+
 			buff.clear();
-
-			if( str.isEmpty() ) continue;
-
-			str.trim();
-
-			if( str.isEmpty() || str.charAt( 0 ) == '#' || ( pos = str.indexOf( '=' ) ) == zpString::npos ) continue;
-
-			m_properties[ str.substring( 0, pos ).trim() ] = str.substring( pos + 1 ).trim();
 		}
 		f.close();
 	}
@@ -196,7 +198,7 @@ zpProperties zpProperties::getSubProperties( const zpString& subPropertyName ) c
 		zp_uint pos = key.indexOf( subPropertyName );
 		if( pos != zpString::npos )
 		{
-			prop = key.substring( pos + subPropertyName.length() );
+			key.substring( prop, pos + subPropertyName.length() );
 			if( !prop.isEmpty() )
 			{
 				sub[ prop ] = value;
