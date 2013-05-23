@@ -5,12 +5,12 @@
 class zpDataBuffer
 {
 	ZP_NON_COPYABLE( zpDataBuffer );
-
 public:
+	zpDataBuffer();
 	explicit zpDataBuffer( zp_uint capacity );
 	~zpDataBuffer();
 
-	const void* getData() const;
+	const zp_byte* getData() const;
 
 	zp_uint size() const;
 	zp_uint capacity() const;
@@ -29,54 +29,84 @@ public:
 	template<typename T>
 	void writeBulk( const T* in, zp_uint count );
 
-protected:
-	zpDataBuffer( void* data, zp_uint capacity );
+	template<typename T>
+	void writeFill( const T& in, zp_uint count );
 
-private:
+	template<typename T>
+	void writeAt( const T& in, zp_uint offset );
+
+	void read( const zpDataBuffer& buffer );
+	void write( zpDataBuffer& buffer ) const;
+
+protected:
 	void ensureCapacity( zp_uint capacity );
 
-	void* m_data;
+	zpDataBuffer( zp_byte* data, zp_uint capacity );
+
+private:
+	zp_byte* m_data;
+
 	zp_uint m_capacity;
-	mutable zp_uint m_offset;
+	mutable zp_uint m_size;
 	zp_bool m_isFixed;
 };
 
 template<typename T>
 void zpDataBuffer::read( T& out ) const
 {
-	zp_uint newOffset = m_offset + sizeof( T );
-	ZP_ASSERT( newOffset < m_capacity, "Buffer overrun" );
+	zp_uint newSize = m_size + sizeof( T );
+	ZP_ASSERT( newSize < m_capacity, "Buffer overrun" );
 
-	const T* t = (const T*)( ( (const zp_byte*)m_data ) + m_offset );
+	const T* t = (const T*)( m_data + m_size );
 	out = *t;
 
-	m_offset = newOffset;
+	m_size = newSize;
 }
 
 template<typename T>
 void zpDataBuffer::write( const T& in )
 {
-	zp_uint newOffset = m_offset + sizeof( T );
-	ensureCapacity( newOffset );
+	zp_uint newSize = m_size + sizeof( T );
+	ensureCapacity( newSize );
 
-	T* t = (T*)( ( (zp_byte*)m_data ) + m_offset );
+	T* t = (T*)( m_data + m_size );
 	*t = in;
 
-	m_offset = newOffset;
+	m_size = newSize;
 }
 template<typename T>
 void zpDataBuffer::writeBulk( const T* in, zp_uint count )
 {
-	zp_uint newOffset = m_offset + ( sizeof( T ) * count );
-	ensureCapacity( newOffset );
+	zp_uint newSize = m_size + ( sizeof( T ) * count );
+	ensureCapacity( newSize );
 
-	T* t = (T*)( ( (zp_byte*)m_data ) + m_offset );
+	T* t = (T*)( m_data + m_size );
 	for( zp_uint i = 0; i < count; ++i, ++t, ++in )
 	{
 		*t = *in;
 	}
 
-	m_offset = newOffset;
+	m_size = newSize;
+}
+template<typename T>
+void zpDataBuffer::writeFill( const T& in, zp_uint count )
+{
+	zp_uint newSize = m_size + ( sizeof( T ) * count );
+	ensureCapacity( newSize );
+
+	T* t = (T*)( m_data + m_size );
+	for( zp_uint i = 0; i < count; ++i, ++t )
+	{
+		*t = in;
+	}
+
+	m_size = newSize;
+}
+template<typename T>
+void zpDataBuffer::writeAt( const T& in, zp_uint offset )
+{
+	T* t = (T*)( m_data + offset );
+	*t = in;
 }
 
 
@@ -100,8 +130,6 @@ zpFixedDataBuffer<Size>::zpFixedDataBuffer()
 {}
 template< zp_uint Size >
 zpFixedDataBuffer<Size>::~zpFixedDataBuffer()
-{
-	clear();
-}
+{}
 
 #endif

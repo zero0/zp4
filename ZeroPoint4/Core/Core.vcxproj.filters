@@ -177,10 +177,13 @@
     <ClInclude Include="zpDataBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpJSON.h">
+    <ClInclude Include="zpXML.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpXML.h">
+    <ClInclude Include="zpJson.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpBison.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -364,10 +367,13 @@
     <ClCompile Include="zpDataBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpJSON.cpp">
+    <ClCompile Include="zpXML.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpXML.cpp">
+    <ClCompile Include="zpJson.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpBison.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -86,6 +86,7 @@ public:
 	zp_bool writeDouble( zp_double value );
 	zp_int writeFormat( const zp_char* format, ... );
 	zp_int writeBuffer( const zpStringBuffer& buffer );
+	zp_int writeBuffer( const zpDataBuffer& buffer );
 
 	template<typename T>
 	zp_int writeData( const T& value )

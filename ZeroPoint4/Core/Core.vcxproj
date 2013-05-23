@@ -122,6 +122,7 @@
     <ClInclude Include="zpArray.h" />
     <ClInclude Include="zpArrayList.h" />
     <ClInclude Include="zpBaseTypes.h" />
+    <ClInclude Include="zpBison.h" />
     <ClInclude Include="zpBoundingAABB.h" />
     <ClInclude Include="zpBoundingSphere.h" />
     <ClInclude Include="zpCollision.h" />
@@ -138,7 +139,7 @@
     <ClInclude Include="zpGameObject.h" />
     <ClInclude Include="zpComponent.h" />
     <ClInclude Include="zpIntrusiveList.h" />
-    <ClInclude Include="zpJSON.h" />
+    <ClInclude Include="zpJson.h" />
     <ClInclude Include="zpLinkedList.h" />
     <ClInclude Include="zpHashMap.h" />
     <ClInclude Include="zpLog.h" />
@@ -203,6 +204,7 @@
   <ItemGroup>
     <ClCompile Include="zpAllComponents.cpp" />
     <ClCompile Include="zpAllGameManagers.cpp" />
+    <ClCompile Include="zpBison.cpp" />
     <ClCompile Include="zpBoundingAABB.cpp" />
     <ClCompile Include="zpBoundingSphere.cpp" />
     <ClCompile Include="zpCollision.cpp" />
@@ -220,7 +222,7 @@
     <ClCompile Include="zpGameManager.cpp" />
     <ClCompile Include="zpGameObject.cpp" />
     <ClCompile Include="zpComponent.cpp" />
-    <ClCompile Include="zpJSON.cpp" />
+    <ClCompile Include="zpJson.cpp" />
     <ClCompile Include="zpLog.cpp" />
     <ClCompile Include="zpMath.cpp" />
     <ClCompile Include="zpMatrix4f.cpp" />

@@ -39,6 +39,9 @@ public:
 	zp_bool find( const Key& key, const Value** outValue ) const;
 	zp_bool find( const Key& key, Value** outValue );
 
+	void keys( zpArrayList< Key >& keys ) const;
+	void values( zpArrayList< Value >& values ) const;
+
 	void clear();
 
 	template<typename Func>

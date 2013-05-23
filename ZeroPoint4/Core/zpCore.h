@@ -65,12 +65,12 @@
 
 #define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
 
-#define ZP_NON_COPYABLE( t )		private: t( const t& ); t& operator=( const t& );
+#define ZP_NON_COPYABLE( t )		private: t( const t& ){} t& operator=( const t& ){}
 
 #define ZP_MEMORY_KB( s )			(zp_int)( (s) * 1024 )
 #define ZP_MEMORY_MB( s )			(zp_int)( ZP_MEMORY_KB(s) * 1024 )
 
-#define ZP_MAKE_UINT( a, b, c, d )					(zp_uint)( ( (a) & 0xFF ) << 24 | ( (b) & 0xFF ) << 16 | ( (c) & 0xFF ) << 8 | ( (d) & 0xFF ) )
+#define ZP_MAKE_UINT( a, b, c, d )					(zp_uint)( ( (d) & 0xFF ) << 24 | ( (c) & 0xFF ) << 16 | ( (b) & 0xFF ) << 8 | ( (a) & 0xFF ) )
 #define ZP_MAKE_ULONG( a, b, c, d, e, f, g, h )		(zp_ulong)( ZP_MAKE_UINT( a, b, c, d ) ) << 32 | (zp_ulong)( ZP_MAKE_UINT( e, f, g, h ) )
 #define ZP_MAKE_CHAR4( a, b, c, d )					{ (a), (b), (c), (d) }
 
@@ -259,8 +259,9 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"
 #include "zpReferencedPointer.h"
-#include "zpJSON.h"
+#include "zpJson.h"
 #include "zpXML.h"
+#include "zpBison.h"
 
 #include "zpRandom.h"
 #include "zpColor4f.h"

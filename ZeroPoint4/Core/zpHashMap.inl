@@ -288,6 +288,31 @@ zp_bool zpHashMap<Key, Value>::find( const Key& key, Value** outValue )
 }
 
 template<typename Key, typename Value>
+void zpHashMap<Key, Value>::keys( zpArrayList< Key >& keys ) const
+{
+	keys.reserve( m_size );
+	for( zp_uint i = 0; i < m_capacity; ++i )
+	{
+		for( zpMapEntity* e = m_map[ i ]; e != ZP_NULL; e = e->next )
+		{
+			keys.pushBack( e->key );
+		}
+	}
+}
+template<typename Key, typename Value>
+void zpHashMap<Key, Value>::values( zpArrayList< Value >& values ) const
+{
+	values.reserve( m_size );
+	for( zp_uint i = 0; i < m_capacity; ++i )
+	{
+		for( zpMapEntity* e = m_map[ i ]; e != ZP_NULL; e = e->next )
+		{
+			func( e->key, e->value );
+		}
+	}
+}
+
+template<typename Key, typename Value>
 void zpHashMap<Key, Value>::clear()
 {
 	if( m_map && m_size > 0 )

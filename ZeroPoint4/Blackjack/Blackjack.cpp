@@ -38,10 +38,37 @@ void ProcessConfig( zpGame& game )
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
+	zpConsole::getInstance()->create();
+
 	zpJson outJson;
 	zpJsonParser parser;
-	parser.parseFile( zpString( "test.txt" ), outJson );
 
+	zp_long s = zpTime::getInstance()->getTime();
+	parser.parseFile( zpString( "test.txt" ), outJson );
+	zp_long e = zpTime::getInstance()->getTime();
+
+	zp_printfln( "JSON Parse + File IO %d", e - s );
+
+	zpDataBuffer buff;
+
+	s = zpTime::getInstance()->getTime();
+	zpBison::compileToBuffer( buff, outJson );
+	e = zpTime::getInstance()->getTime();
+	zp_printfln( "Bison Compile %d", e - s );
+	//zpBison::compileToFile( zpString( "bison.txt" ), outJson );
+
+	zpBison bison;
+	s = zpTime::getInstance()->getTime();
+	//bison.readFromBuffer( buff );
+	bison.readFromFile( zpString( "bison.txt" ) );
+	e = zpTime::getInstance()->getTime();
+	zp_printfln( "Bison Parse + File IO %d", e - s );
+
+	ZP_ASSERT( outJson[ "a" ].asInt() == bison.root()[ "a" ].asInt(), "" );
+
+	zp_printfln( "JSON:\n%s", zpJsonWriter().styleWrite( outJson ) );
+
+	zp_printfln( "BISON:\n%s", zpBisonWriter().styleWrite( bison ) );
 	return 0;
 }
 #if 0

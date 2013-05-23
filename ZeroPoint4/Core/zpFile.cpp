@@ -137,6 +137,8 @@ zp_bool zpFile::open( zpFileMode mode )
 	zp_uint err = 0;
 	const zp_char* fopenMode = g_zpFileModeToString[ mode ];
 
+	m_mode = mode;
+
 #if ZP_USE_SAFE_FUNCTIONS
 	err = fopen_s( (FILE**)&m_file, m_filename.getChars(), fopenMode );
 #else
@@ -536,6 +538,18 @@ zp_int zpFile::writeBuffer( const zpStringBuffer& buffer )
 	if( m_file )
 	{
 		count = fputs( buffer.getChars(), (FILE*)m_file );
+	}
+
+	return count;
+}
+
+zp_int zpFile::writeBuffer( const zpDataBuffer& buffer )
+{
+	zp_int count = 0;
+
+	if( m_file )
+	{
+		count = fwrite( buffer.getData(), sizeof( zp_byte ), buffer.size(), (FILE*)m_file );
 	}
 
 	return count;
