@@ -4,35 +4,6 @@
 
 #include "Core\zpCore.h"
 
-class zpXmlParser;
-
-class zpContentManager;
-template<typename R> class zpResourceInstance;
-ZP_ABSTRACT_CLASS zpResource;
-ZP_ABSTRACT_CLASS zpResourceCreator;
-class zpPrefabs;
-
-class zpXmlSerializedInput;
-class zpXmlSerializedOutput;
-
-class zpWorldResource;
-class zpGameObjectResource;
-//class zpLoadContentComponent;
-
-#include "zpXmlParser.h"
-
 #include "zpContentManager.h"
-#include "zpResource.h"
-#include "zpResourceCreator.h"
-#include "zpPrefabs.h"
-
-#include "zpXmlSerializedInput.h"
-#include "zpXmlSerializedOutput.h"
-
-#include "zpWorldResource.h"
-#include "zpGameObjectResource.h"
-//#include "zpLoadContentComponent.h"
-
-void zpContentRegisterSerializables();
 
 #endif

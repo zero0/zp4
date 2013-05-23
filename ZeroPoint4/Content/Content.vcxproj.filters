@@ -21,75 +21,13 @@
     <ClInclude Include="zpContentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpResourceCreator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpPrefabs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpSerializedFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpXmlParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpXmlSerializedInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpXmlSerializedOutput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpLoadContentComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpWorldResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpGameObjectResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpResourceCreator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpContentManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpPrefabs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpXmlParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpXmlSerializedInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpXmlSerializedOutput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpLoadContentComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpWorldResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpGameObjectResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="zpContentManagers.inl">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

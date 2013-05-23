@@ -69,16 +69,6 @@
   <ItemGroup>
     <ClInclude Include="zpContent.h" />
     <ClInclude Include="zpContentManager.h" />
-    <ClInclude Include="zpGameObjectResource.h" />
-    <ClInclude Include="zpLoadContentComponent.h" />
-    <ClInclude Include="zpPrefabs.h" />
-    <ClInclude Include="zpResource.h" />
-    <ClInclude Include="zpResourceCreator.h" />
-    <ClInclude Include="zpSerializedFactory.h" />
-    <ClInclude Include="zpWorldResource.h" />
-    <ClInclude Include="zpXmlParser.h" />
-    <ClInclude Include="zpXmlSerializedInput.h" />
-    <ClInclude Include="zpXmlSerializedOutput.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
@@ -86,23 +76,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpContentManager.cpp" />
-    <ClCompile Include="zpGameObjectResource.cpp" />
-    <ClCompile Include="zpLoadContentComponent.cpp" />
-    <ClCompile Include="zpPrefabs.cpp" />
-    <ClCompile Include="zpResource.cpp" />
-    <ClCompile Include="zpResourceCreator.cpp" />
-    <ClCompile Include="zpWorldResource.cpp" />
-    <ClCompile Include="zpXmlParser.cpp" />
-    <ClCompile Include="zpXmlSerializedInput.cpp" />
-    <ClCompile Include="zpXmlSerializedOutput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="zpContentManagers.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
