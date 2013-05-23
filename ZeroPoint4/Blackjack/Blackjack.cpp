@@ -38,6 +38,11 @@ void ProcessConfig( zpGame& game )
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
+
+	return 0;
+}
+#if 0
+{
 	zpConsole::getInstance()->create();
 
 	zpJson outJson;
@@ -64,13 +69,14 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	e = zpTime::getInstance()->getTime();
 	zp_printfln( "Bison Parse + File IO %d", e - s );
 
-	ZP_ASSERT( outJson[ "a" ].asInt() == bison.root()[ "a" ].asInt(), "" );
+	ZP_ASSERT( outJson[ "a" ].asInt() != bison.root()[ "a" ].asInt(), "" );
 
 	zp_printfln( "JSON:\n%s", zpJsonWriter().styleWrite( outJson ) );
 
 	zp_printfln( "BISON:\n%s", zpBisonWriter().styleWrite( bison ) );
 	return 0;
 }
+#endif
 #if 0
 {
 	zpWindow wnd;

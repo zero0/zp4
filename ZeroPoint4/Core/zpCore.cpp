@@ -12,7 +12,7 @@
 
 void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... )
 {
-	zp_char message[256];
+	zp_char message[1024];
 	zp_char text[256];
 	zp_char title[256];
 
@@ -25,7 +25,7 @@ void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... )
 #endif
 	va_end( vl );
 
-	zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
+	zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break (Abort)  Continue (Retry)  Ignore", message );
 		
 	zpString filename( file );
 	zpFile::convertToFilePath( filename );
@@ -35,17 +35,20 @@ void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... )
 	const zp_char* f = filename.getChars() + s;
 	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", f, line );
 
-	zp_int result = MessageBox( ZP_NULL, text, title, MB_YESNOCANCEL | MB_ICONEXCLAMATION );
+	zp_int result = MessageBox( ZP_NULL, text, title, MB_ABORTRETRYIGNORE | MB_ICONERROR );
 	
 	switch( result ) {
 	case IDOK:
 	case IDYES:
+	case IDABORT:
 		__debugbreak();
 		break;
 	case IDNO:
-		exit( 0 );
+	case IDRETRY:
+		// continue
 		break;
 	case IDCANCEL:
+	case IDIGNORE:
 		// ignore
 		break;
 	}
@@ -53,7 +56,7 @@ void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... )
 
 void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ... )
 {
-	zp_char message[256];
+	zp_char message[1024];
 	zp_char text[256];
 	zp_char title[256];
 
@@ -66,7 +69,7 @@ void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ..
 #endif
 	va_end( vl );
 
-	zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break?", message );
+	zp_snprintf( text, sizeof( text ), sizeof( text ), "%s\n\nDebug Break (Retry)  Continue (Cancel)", message );
 
 	zpString filename( file );
 	zpFile::convertToFilePath( filename );
@@ -76,7 +79,18 @@ void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ..
 	const zp_char* f = filename.getChars() + s;
 	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Warning at %s:%d", f, line );
 
-	MessageBox( ZP_NULL, text, title, MB_OK | MB_ICONWARNING );
+	zp_int result = MessageBox( ZP_NULL, text, title, MB_RETRYCANCEL | MB_ICONWARNING );
+
+	switch( result )
+	{
+	case IDRETRY:
+		__debugbreak();
+		break;
+	case IDCANCEL:
+		// ignore
+		break;
+	}
+
 }
 
 #endif
