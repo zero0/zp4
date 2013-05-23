@@ -204,6 +204,7 @@ private:
 	void writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int indent );
 	void writeIndent( zpStringBuffer& buffer, zp_int indent );
 	void writeNewLine( zpStringBuffer& buffer, zp_int indent );
+	void writeObjectSeperator( zpStringBuffer& buffer, zp_int ind );
 
 	zpStringBuffer m_string;
 };

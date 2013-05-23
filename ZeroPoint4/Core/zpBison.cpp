@@ -61,7 +61,7 @@ void zpBison::parseData()
 
 
 zpBison::Value::Value( const zp_byte* data, zp_uint offset )
-	: m_type( (zpBisonType)*(zp_uint*)( data + offset ) )
+	: m_type( (zpBisonType)*(zpBisonType*)( data + offset ) )
 	, m_data( data )
 	, m_offset( offset )
 {}
@@ -163,7 +163,7 @@ zp_bool zpBison::Value::asBool() const
 		return false;
 	case ZP_BISON_TYPE_BOOL:
 	case ZP_BISON_TYPE_INT:
-		return *(zp_int*)val != 0;
+		return *val != 0;
 	case ZP_BISON_TYPE_FLOAT:
 		return *(zp_float*)val != 0.0f;
 	case ZP_BISON_TYPE_STRING:
@@ -182,7 +182,7 @@ zp_int zpBison::Value::asInt() const
 	case ZP_BISON_TYPE_NULL:
 		return 0;
 	case ZP_BISON_TYPE_BOOL:
-		return *(zp_int*)val != 0 ? 1 : 0;
+		return *val != 0 ? 1 : 0;
 	case ZP_BISON_TYPE_INT:
 		return *(zp_int*)val;
 	case ZP_BISON_TYPE_FLOAT:
@@ -200,7 +200,7 @@ zp_float zpBison::Value::asFloat() const
 	case ZP_BISON_TYPE_NULL:
 		return 0.0f;
 	case ZP_BISON_TYPE_BOOL:
-		return *(zp_int*)val != 0 ? 1.0f : 0.0f;
+		return *val != 0 ? 1.0f : 0.0f;
 	case ZP_BISON_TYPE_INT:
 		return (zp_float)*(zp_int*)val;
 	case ZP_BISON_TYPE_FLOAT:
@@ -222,7 +222,7 @@ const zp_char* zpBison::Value::asCString() const
 	case ZP_BISON_TYPE_NULL:
 		return "";
 	case ZP_BISON_TYPE_BOOL:
-		return *(zp_int*)val != 0 ? "true" : "false";
+		return *val != 0 ? "true" : "false";
 	case ZP_BISON_TYPE_STRING:
 		return (const zp_char*)( val + sizeof( zp_uint ) );
 	default:
@@ -329,27 +329,27 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& js
 	switch( json.type() )
 	{
 	case ZP_JSON_TYPE_NULL:
-		buffer.write< zp_uint >( ZP_BISON_TYPE_NULL );
+		buffer.write< zpBisonType >( ZP_BISON_TYPE_NULL );
 		break;
 	case ZP_JSON_TYPE_BOOL:
-		buffer.write< zp_uint >( ZP_BISON_TYPE_BOOL );
-		buffer.write< zp_int >( json.asBool() ? 1 : 0 );
+		buffer.write< zpBisonType >( ZP_BISON_TYPE_BOOL );
+		buffer.write< zp_byte >( json.asBool() ? 1 : 0 );
 		break;
 	case ZP_JSON_TYPE_INT:
 	case ZP_JSON_TYPE_UINT:
 	case ZP_JSON_TYPE_LONG:
 	case ZP_JSON_TYPE_ULONG:
-		buffer.write< zp_uint >( ZP_BISON_TYPE_INT );
+		buffer.write< zpBisonType >( ZP_BISON_TYPE_INT );
 		buffer.write< zp_int >( json.asInt() );
 		break;
 	case ZP_JSON_TYPE_FLOAT:
 	case ZP_JSON_TYPE_DOUBLE:
-		buffer.write< zp_uint >( ZP_BISON_TYPE_FLOAT );
+		buffer.write< zpBisonType >( ZP_BISON_TYPE_FLOAT );
 		buffer.write< zp_float >( json.asFloat() );
 		break;
 	case ZP_JSON_TYPE_STRING:
 		{
-			buffer.write< zp_uint >( ZP_BISON_TYPE_STRING );
+			buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
 			const zp_char* str = json.asCString();
 			zp_uint size = zp_strlen( str );
 			buffer.write< zp_uint >( size );
@@ -359,7 +359,7 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& js
 		break;
 	case ZP_JSON_TYPE_ARRAY:
 		{
-			buffer.write< zp_uint >( ZP_BISON_TYPE_ARRAY );
+			buffer.write< zpBisonType >( ZP_BISON_TYPE_ARRAY );
 			zp_uint size = json.size();
 			buffer.write< zp_uint >( size );
 			zp_uint arrayStart = buffer.size();
@@ -375,7 +375,7 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& js
 		break;
 	case ZP_JSON_TYPE_OBJECT:
 		{
-			buffer.write< zp_uint >( ZP_BISON_TYPE_OBJECT );
+			buffer.write< zpBisonType >( ZP_BISON_TYPE_OBJECT );
 			zp_uint size = json.size();
 			buffer.write< zp_uint >( size );
 			zp_uint objectStart = buffer.size();
@@ -385,7 +385,7 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& js
 			json.foreachObject( [ &buffer, &objectStart ]( const zpString& key, const zpJson& value )
 			{
 				buffer.writeAt< zp_uint >( buffer.size(), objectStart );
-				buffer.write< zp_uint >( ZP_BISON_TYPE_STRING );
+				buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
 				buffer.write< zp_uint >( key.length() );
 				buffer.writeBulk( key.getChars(), key.length() );
 				buffer.write< zp_char >( '\0' );
@@ -484,7 +484,7 @@ void zpBisonWriter::writeBison( zpStringBuffer& buffer, const zpBison::Value& bi
 				buffer.append( members[ 0 ].asCString() );
 				buffer.append( '"' );
 
-				buffer.append( ':' );
+				writeObjectSeperator( buffer, ind );
 
 				writeBison( buffer, bison[ members[ 0 ].asCString() ], ind );
 
@@ -498,7 +498,7 @@ void zpBisonWriter::writeBison( zpStringBuffer& buffer, const zpBison::Value& bi
 					buffer.append( members[ i ].asCString() );
 					buffer.append( '"' );
 
-					buffer.append( ':' );
+					writeObjectSeperator( buffer, ind );
 
 					writeBison( buffer, bison[ members[ i ].asCString() ], ind );
 				}
@@ -522,5 +522,16 @@ void zpBisonWriter::writeNewLine( zpStringBuffer& buffer, zp_int indent )
 	if( indent > -1 )
 	{
 		buffer.append( '\n' );
+	}
+}
+void zpBisonWriter::writeObjectSeperator( zpStringBuffer& buffer, zp_int indent )
+{
+	if( indent > -1 )
+	{
+		buffer.append( " : " );
+	}
+	else
+	{
+		buffer.append( ':' );
 	}
 }

@@ -53,14 +53,14 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 	s = zpTime::getInstance()->getTime();
 	zpBison::compileToBuffer( buff, outJson );
+	//zpBison::compileToFile( zpString( "bison.txt" ), outJson );	
 	e = zpTime::getInstance()->getTime();
 	zp_printfln( "Bison Compile %d", e - s );
-	//zpBison::compileToFile( zpString( "bison.txt" ), outJson );
 
 	zpBison bison;
 	s = zpTime::getInstance()->getTime();
-	//bison.readFromBuffer( buff );
-	bison.readFromFile( zpString( "bison.txt" ) );
+	bison.readFromBuffer( buff );
+	//bison.readFromFile( zpString( "bison.txt" ) );
 	e = zpTime::getInstance()->getTime();
 	zp_printfln( "Bison Parse + File IO %d", e - s );
 

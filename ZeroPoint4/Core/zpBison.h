@@ -2,7 +2,7 @@
 #ifndef ZP_BISON_H
 #define ZP_BISON_H
 
-enum zpBisonType
+enum zpBisonType : zp_byte
 {
 	ZP_BISON_TYPE_NULL =	0,
 	ZP_BISON_TYPE_BOOL,
@@ -13,7 +13,6 @@ enum zpBisonType
 	ZP_BISON_TYPE_OBJECT,
 
 	zpBisonType_Count,
-	zpBisonType_Force32 = ZP_FORECE_32BIT,
 };
 
 struct zpBisonHeader
@@ -105,6 +104,7 @@ private:
 	void writeBison( zpStringBuffer& buffer, const zpBison::Value& bison, zp_int indent );
 	void writeIndent( zpStringBuffer& buffer, zp_int indent );
 	void writeNewLine( zpStringBuffer& buffer, zp_int indent );
+	void writeObjectSeperator( zpStringBuffer& buffer, zp_int indent );
 
 	zpStringBuffer m_string;
 };

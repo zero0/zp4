@@ -189,7 +189,7 @@ void zpStringBuffer::append( const zp_char* value, zp_int length )
 }
 void zpStringBuffer::append( const zpString& value )
 {
-	append( (const zp_char*)value.getChars(), value.length() );
+	append( value.getChars(), value.length() );
 }
 
 void zpStringBuffer::append( zp_sbyte value )
@@ -200,57 +200,57 @@ void zpStringBuffer::append( zp_sbyte value )
 }
 void zpStringBuffer::append( zp_short value )
 {
-	zp_char buff[8];
+	zp_char buff[16];
 	sprintf_s( buff, "%d", value );
 	append( buff );
 }
 void zpStringBuffer::append( zp_int value )
 {
-	zp_char buff[16];
+	zp_char buff[32];
 	sprintf_s( buff, "%d", value );
 	append( buff );
 }
 void zpStringBuffer::append( zp_long value )
 {
-	zp_char buff[32];
+	zp_char buff[64];
 	sprintf_s( buff, "%d", value );
 	append( buff );
 }
 
 void zpStringBuffer::append( zp_byte value )
 {
-	zp_char buff[8];
+	zp_char buff[16];
 	sprintf_s( buff, "%u", value );
 	append( buff );
 }
 void zpStringBuffer::append( zp_ushort value )
 {
-	zp_char buff[8];
+	zp_char buff[16];
 	sprintf_s( buff, "%u", value );
 	append( buff );
 }
 void zpStringBuffer::append( zp_uint value )
 {
-	zp_char buff[16];
+	zp_char buff[32];
 	sprintf_s( buff, "%u", value );
 	append( buff );
 }
 void zpStringBuffer::append( zp_ulong value )
 {
-	zp_char buff[32];
+	zp_char buff[64];
 	sprintf_s( buff, "%u", value );
 	append( buff );
 }
 
 void zpStringBuffer::append( zp_float value )
 {
-	zp_char buff[32];
+	zp_char buff[64];
 	sprintf_s( buff, "%f", value );
 	append( buff );
 }
 void zpStringBuffer::append( zp_double value )
 {
-	zp_char buff[32];
+	zp_char buff[64];
 	sprintf_s( buff, "%f", value );
 	append( buff );
 }
@@ -353,7 +353,7 @@ void zpStringBuffer::ensureCapacity( zp_uint size )
 	{
 		if( m_capacity == 0 )
 		{
-			m_capacity = 1;
+			m_capacity = ZP_STRING_BUFFER_DEFAULT_SIZE;
 		}
 
 		while( m_capacity < size ) m_capacity *= 2;

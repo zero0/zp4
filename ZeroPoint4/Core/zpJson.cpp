@@ -1010,7 +1010,7 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 				buffer.append( members[ 0 ] );
 				buffer.append( '"' );
 			
-				buffer.append( ':' );
+				writeObjectSeperator( buffer, ind );
 				
 				writeJson( buffer, json[ members[ 0 ] ], ind );
 
@@ -1024,7 +1024,7 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 					buffer.append( members[ i ] );
 					buffer.append( '"' );
 
-					buffer.append( ':' );
+					writeObjectSeperator( buffer, ind );
 
 					writeJson( buffer, json[ members[ i ] ], ind );
 				}
@@ -1048,5 +1048,16 @@ void zpJsonWriter::writeNewLine( zpStringBuffer& buffer, zp_int indent )
 	if( indent > -1 )
 	{
 		buffer.append( '\n' );
+	}
+}
+void zpJsonWriter::writeObjectSeperator( zpStringBuffer& buffer, zp_int indent )
+{
+	if( indent > -1 )
+	{
+		buffer.append( " : " );
+	}
+	else
+	{
+		buffer.append( ':' );
 	}
 }
