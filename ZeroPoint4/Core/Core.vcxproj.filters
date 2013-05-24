@@ -27,9 +27,6 @@
     <ClInclude Include="zpCore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpGameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpTime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -61,15 +58,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpReferencedPointer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpWorld.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpGameManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpMessage.h">
@@ -106,9 +94,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpSerializable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpColor4f.h">
@@ -162,16 +147,7 @@
     <ClInclude Include="zpRandom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpAllComponents.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpPooledObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpAllGameManagers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpDataBuffer.h">
@@ -251,13 +227,7 @@
     <None Include="zpMessageTypes.inc">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="zpAllComponents.inl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="zpPooledObject.inl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="zpAllGameManagers.inl">
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpMathFpu.inl">
@@ -271,9 +241,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zpGameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpCore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -286,15 +253,6 @@
     <ClCompile Include="zpReferencedObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpWorld.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpGameManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpGame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -302,9 +260,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpColor4f.cpp">
@@ -356,12 +311,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpRandom.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpAllComponents.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpAllGameManagers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpDataBuffer.cpp">

@@ -116,9 +116,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="zpAllComponents.h" />
-    <ClInclude Include="zpAllGameManagers.h" />
-    <ClInclude Include="zpApplication.h" />
     <ClInclude Include="zpArray.h" />
     <ClInclude Include="zpArrayList.h" />
     <ClInclude Include="zpBaseTypes.h" />
@@ -134,10 +131,6 @@
     <ClInclude Include="zpFile.h" />
     <ClInclude Include="zpFlag.h" />
     <ClInclude Include="zpFrustum.h" />
-    <ClInclude Include="zpGame.h" />
-    <ClInclude Include="zpGameManager.h" />
-    <ClInclude Include="zpGameObject.h" />
-    <ClInclude Include="zpComponent.h" />
     <ClInclude Include="zpIntrusiveList.h" />
     <ClInclude Include="zpJson.h" />
     <ClInclude Include="zpLinkedList.h" />
@@ -169,12 +162,9 @@
     <ClInclude Include="zpVector2.h" />
     <ClInclude Include="zpVector4.h" />
     <ClInclude Include="zpWindow.h" />
-    <ClInclude Include="zpWorld.h" />
     <ClInclude Include="zpXML.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="zpAllComponents.inl" />
-    <None Include="zpAllGameManagers.inl" />
     <None Include="zpArray.inl" />
     <None Include="zpArrayList.inl" />
     <None Include="zpBaseTypesFpu.inl" />
@@ -202,8 +192,6 @@
     <None Include="zpVector4Simd.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zpAllComponents.cpp" />
-    <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpBison.cpp" />
     <ClCompile Include="zpBoundingAABB.cpp" />
     <ClCompile Include="zpBoundingSphere.cpp" />
@@ -218,10 +206,6 @@
     <ClCompile Include="zpDataBuffer.cpp" />
     <ClCompile Include="zpFile.cpp" />
     <ClCompile Include="zpFrustum.cpp" />
-    <ClCompile Include="zpGame.cpp" />
-    <ClCompile Include="zpGameManager.cpp" />
-    <ClCompile Include="zpGameObject.cpp" />
-    <ClCompile Include="zpComponent.cpp" />
     <ClCompile Include="zpJson.cpp" />
     <ClCompile Include="zpLog.cpp" />
     <ClCompile Include="zpMath.cpp" />
@@ -239,7 +223,6 @@
     <ClCompile Include="zpStringBuffer.cpp" />
     <ClCompile Include="zpTime.cpp" />
     <ClCompile Include="zpWindow.cpp" />
-    <ClCompile Include="zpWorld.cpp" />
     <ClCompile Include="zpXML.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

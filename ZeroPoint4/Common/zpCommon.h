@@ -3,13 +3,25 @@
 #define ZP_COMMON_H
 
 #include "Core\zpCore.h"
-#include "Input\zpInput.h"
-#include "Rendering\zpRendering.h"
+//#include "Input\zpInput.h"
+//#include "Rendering\zpRendering.h"
 
-class zpHealthComponent;
-class zpEditorCameraComponent;
+//class zpHealthComponent;
+//class zpEditorCameraComponent;
+//
+//#include "zpHealthComponent.h"
+//#include "zpEditorCameraComponent.h"
 
-#include "zpHealthComponent.h"
-#include "zpEditorCameraComponent.h"
+#include "zpAllComponents.h"
+#include "zpAllGameManagers.h"
+#include "zpComponent.h"
+#include "zpGame.h"
+#include "zpGameManager.h"
+#include "zpGameObject.h"
+#include "zpWorld.h"
+
+//#include "zpHealthComponent.h"
+//#include "zpEditorCameraComponent.h"
+
 
 #endif

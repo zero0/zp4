@@ -2,7 +2,8 @@
 #ifndef ZP_TWEEN_H
 #define ZP_TWEEN_H
 
-enum zpTweenEasing {
+enum zpTweenEasing
+{
 	ZP_TWEEN_EASING_LINEAR,
 
 	ZP_TWEEN_EASING_QUADRATIC_IN,
@@ -32,10 +33,14 @@ enum zpTweenEasing {
 	ZP_TWEEN_EASING_CIRCULAR_IN,
 	ZP_TWEEN_EASING_CIRCULAR_OUT,
 	ZP_TWEEN_EASING_CIRCULAR_IN_OUT,
+
+	zpTweenEasing_Count,
+	zpTweenEasing_Force32Bit = ZP_FORECE_32BIT,
 };
 
 template<typename T>
-class zpTween {
+class zpTween
+{
 public:
 	zpTween( const T& start = T() );
 	~zpTween();
@@ -51,7 +56,8 @@ public:
 	void setStartValue( const T& start );
 
 private:
-	struct zpTweenStep {
+	struct zpTweenStep
+	{
 		zpTweenEasing easing;
 		zp_float time;
 		T value;

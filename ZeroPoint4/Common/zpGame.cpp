@@ -1,5 +1,4 @@
-#include "zpCore.h"
-#include <typeinfo>
+#include "zpCommon.h"
 
 zpGame::zpGame()
 	: m_timer( zpTime::getInstance() )

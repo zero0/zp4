@@ -1,5 +1,6 @@
 #include "zpCommon.h"
 
+#if 0
 zpEditorCameraComponent::zpEditorCameraComponent()
 	: m_isActive( false )
 {}
@@ -84,3 +85,5 @@ void zpEditorCameraComponent::onUpdate() {
 
 void zpEditorCameraComponent::onEnabled() {}
 void zpEditorCameraComponent::onDisabled() {}
+
+#endif

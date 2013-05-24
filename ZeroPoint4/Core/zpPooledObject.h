@@ -20,8 +20,7 @@ private:
 	zp_bool isUsed( zp_uint index ) const;
 
 	zpFlag8 m_isUsed[ Count / 8 ];
-	zp_uint m_capacity;
-	void* m_pool;
+	zp_byte m_pool[ Count * sizeof( T ) ];
 };
 
 #include "zpPooledObject.inl"

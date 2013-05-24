@@ -24,6 +24,30 @@
     <ClInclude Include="zpEditorCameraComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpAllComponents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpAllGameManagers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpGame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpGameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpGameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpWorld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -35,5 +59,34 @@
     <ClCompile Include="zpEditorCameraComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpAllComponents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpAllGameManagers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpGameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpGameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpAllComponents.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="zpAllGameManagers.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

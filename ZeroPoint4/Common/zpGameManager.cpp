@@ -1,4 +1,4 @@
-#include "zpCore.h"
+#include "zpCommon.h"
 
 zpGameManager::zpGameManager() 
 	: m_flags( 0 )

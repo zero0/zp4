@@ -1,4 +1,4 @@
-#include "zpCore.h"
+#include "zpCommon.h"
 
 zpComponent::zpComponent()
 	: m_flags( 0 )

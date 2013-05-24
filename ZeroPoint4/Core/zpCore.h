@@ -275,15 +275,6 @@ ZP_ABSTRACT_CLASS zpComponent;
 #include "zpMessage.h"
 #include "zpMessageReceiver.h"
 
-#include "zpAllComponents.h"
-#include "zpAllGameManagers.h"
-
-#include "zpGame.h"
-#include "zpWorld.h"
-#include "zpGameManager.h"
-#include "zpGameObject.h"
-#include "zpComponent.h"
-
 template<typename T>
 void zp_zero_memory( T* ptr )
 {

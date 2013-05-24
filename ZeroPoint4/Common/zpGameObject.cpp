@@ -1,5 +1,4 @@
-#include "zpCore.h"
-#include <typeinfo>
+#include "zpCommon.h"
 
 zpGameObject::zpGameObject()
 	: m_transform()
@@ -35,8 +34,6 @@ zp_bool zpGameObject::isFlagSet( zpGameObjectFlag flag ) const
 
 void zpGameObject::setWorld( zpWorld* world )
 {
-	//if( world ) world->addReference();
-	//if( m_world ) m_world->removeReference();
 	m_world = world;
 }
 zpWorld* zpGameObject::getWorld() const
@@ -46,20 +43,20 @@ zpWorld* zpGameObject::getWorld() const
 
 void zpGameObject::update()
 {
-	
+	m_components.update();
 }
 void zpGameObject::simulate()
 {
-	
+	m_components.simulate();
 }
 
 void zpGameObject::create()
 {
-	
+	m_components.create();
 }
 void zpGameObject::destroy()
 {
-	
+	m_components.destroy();
 }
 
 const zpString& zpGameObject::getName() const
@@ -75,8 +72,6 @@ const zpMatrix4f& zpGameObject::getTransform() const
 {
 	return m_transform;
 }
-
-
 void zpGameObject::setTransform( const zpMatrix4f& transform )
 {
 	m_transform = transform;
@@ -85,42 +80,16 @@ void zpGameObject::setTransform( const zpMatrix4f& transform )
 void zpGameObject::receiveMessage( const zpMessage& message )
 {
 	sendMessageToComponents( message );
-	sendMessageToChildGameObjects( message );
+	//sendMessageToChildGameObjects( message );
 }
 void zpGameObject::sendMessageToComponents( const zpMessage& message )
 {
 	
 }
-void zpGameObject::sendMessageToChildGameObjects( const zpMessage& message )
-{
-	
-}
-void zpGameObject::sendMessageToParentGameObject( const zpMessage& message )
-{
-}
-
-void zpGameObject::serialize( zpSerializedOutput* out )
-{
-	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
-
-	out->writeString( m_name, "@name" );
-
-	zpSerializableObject<zpMatrix4f>::serializeFromBlock( out, "Transform", m_transform );
-
-	m_components.serialize( out );
-
-	out->endBlock();
-}
-void zpGameObject::deserialize( zpSerializedInput* in )
-{
-	if( in->readBlock( ZP_SERIALIZE_TYPE_THIS ) )
-	{
-		in->readString( &m_name, "@name" );
-
-		zpSerializableObject<zpMatrix4f>::deserializeToBlock( in, "Transform", m_transform );
-
-		m_components.deserialize( in );
-
-		in->endBlock();
-	}
-}
+//void zpGameObject::sendMessageToChildGameObjects( const zpMessage& message )
+//{
+//	
+//}
+//void zpGameObject::sendMessageToParentGameObject( const zpMessage& message )
+//{
+//}

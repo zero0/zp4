@@ -64,27 +64,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpAllComponents.h" />
+    <ClInclude Include="zpAllGameManagers.h" />
+    <ClInclude Include="zpApplication.h" />
     <ClInclude Include="zpCommon.h" />
+    <ClInclude Include="zpComponent.h" />
     <ClInclude Include="zpEditorCameraComponent.h" />
+    <ClInclude Include="zpGame.h" />
+    <ClInclude Include="zpGameManager.h" />
+    <ClInclude Include="zpGameObject.h" />
     <ClInclude Include="zpHealthComponent.h" />
+    <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpAllComponents.cpp" />
+    <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zpComponent.cpp" />
     <ClCompile Include="zpEditorCameraComponent.cpp" />
+    <ClCompile Include="zpGame.cpp" />
+    <ClCompile Include="zpGameManager.cpp" />
+    <ClCompile Include="zpGameObject.cpp" />
     <ClCompile Include="zpHealthComponent.cpp" />
+    <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Input\Input.vcxproj">
-      <Project>{eed15947-2655-4c7a-ad5f-83f51ae8f6ce}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Rendering\Rendering.vcxproj">
-      <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpAllComponents.inl" />
+    <None Include="zpAllGameManagers.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

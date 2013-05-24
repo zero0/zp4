@@ -1,5 +1,6 @@
 #include "zpCommon.h"
 
+#if 0
 zpHealthComponent::zpHealthComponent()
 	: m_health( 1.f )
 	, m_maxHealth( 1.f )
@@ -141,3 +142,5 @@ void zpHealthComponent::onUpdate() {}
 
 void zpHealthComponent::onEnabled() {}
 void zpHealthComponent::onDisabled() {}
+
+#endif

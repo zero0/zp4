@@ -2,19 +2,26 @@
 #ifndef ZP_GAME_OBJECT_H
 #define ZP_GAME_OBJECT_H
 
-enum zpGameObjectFlag
+enum zpGameObjectFlag : zp_byte
 {
 	ZP_GAME_OBJECT_FLAG_ENABLED,
 	ZP_GAME_OBJECT_FLAG_CREATED,
-
 	ZP_GAME_OBJECT_FLAG_SHOULD_DESTROY,
+
+	ZP_GAME_OBJECT_FLAG_USER_0,
+	ZP_GAME_OBJECT_FLAG_USER_1,
+	ZP_GAME_OBJECT_FLAG_USER_2,
+	ZP_GAME_OBJECT_FLAG_USER_3,
+	ZP_GAME_OBJECT_FLAG_USER_4,
+
+	zpGameObjectFlag_Count,
 };
 
-class zpGameObject : public zpMessageReceiver, public zpSerializable
+class zpGameObject : public zpMessageReceiver
 {
 public:
 	zpGameObject();
-	virtual ~zpGameObject();
+	~zpGameObject();
 
 	zpAllComponents* getComponents();
 
@@ -39,11 +46,8 @@ public:
 
 	void receiveMessage( const zpMessage& message );
 	void sendMessageToComponents( const zpMessage& message );
-	void sendMessageToChildGameObjects( const zpMessage& message );
-	void sendMessageToParentGameObject( const zpMessage& message );
-
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
+	//void sendMessageToChildGameObjects( const zpMessage& message );
+	//void sendMessageToParentGameObject( const zpMessage& message );
 
 private:
 	zpMatrix4f m_transform;
