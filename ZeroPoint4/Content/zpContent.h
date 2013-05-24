@@ -4,6 +4,9 @@
 
 #include "Core\zpCore.h"
 
+#include "zpResource.h"
 #include "zpContentManager.h"
+
+#include "zpTextContentManager.h"
 
 #endif

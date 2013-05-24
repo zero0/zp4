@@ -21,13 +21,27 @@
     <ClInclude Include="zpContentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpTextContentManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpContentManager.cpp">
+    <ClCompile Include="zpTextContentManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpResource.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpContentManager.inl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

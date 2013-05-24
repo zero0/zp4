@@ -38,9 +38,22 @@ void ProcessConfig( zpGame& game )
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
-
 	return 0;
 }
+#if 0
+{
+	zpTextContentManager fff;
+	zpTextResourceInstance rrr, ttt;
+
+	fff.getResource( "bison2.txt", rrr );
+	fff.getResource( "bison2.txt", ttt );
+
+	fff.releaseResource( ttt );
+	fff.releaseResource( rrr );
+	
+	return 0;
+}
+#endif
 #if 0
 {
 	zpConsole::getInstance()->create();

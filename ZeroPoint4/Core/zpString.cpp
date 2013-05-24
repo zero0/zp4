@@ -139,14 +139,14 @@ void zpString::operator=( const zp_char* string )
 		{
 			if( IS_STRING_PACKED( this ) )
 			{
-				zp_strcpy( m_chars, m_length, string );
+				zp_strcpy( m_chars, sizeof( m_chars ) * sizeof( zp_char ), string );
 			}
 			else
 			{
 				m_capacity = m_length + 1;
 
 				m_string = new zp_char[ m_capacity ];
-				zp_strcpy( m_string, m_length * sizeof( zp_char ), string );
+				zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string );
 			}
 		}
 	}
@@ -773,7 +773,8 @@ void zpString::reserve( zp_uint size )
 }
 void zpString::clear()
 {
-	erase( 0, m_length );
+	m_length = 0;
+	getCharsInternal()[ 0 ] = '\0';
 }
 
 zp_bool operator==( const zpString& string1, const zpString& string2 )

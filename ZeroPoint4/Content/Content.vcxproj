@@ -69,18 +69,24 @@
   <ItemGroup>
     <ClInclude Include="zpContent.h" />
     <ClInclude Include="zpContentManager.h" />
+    <ClInclude Include="zpResource.h" />
+    <ClInclude Include="zpTextContentManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="zpContentManager.cpp" />
+    <ClCompile Include="zpTextContentManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zpContentManager.inl" />
+    <None Include="zpResource.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
