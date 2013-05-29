@@ -54,7 +54,7 @@ void zpBison::parseData()
 		ZP_ASSERT( header.bison == ZP_BISON_HEADER_ID, "Invalid Bison header" );
 		if( header.bison == ZP_BISON_HEADER_ID )
 		{
-			m_root = zpBison::Value( data, sizeof( zpBisonHeader ) );
+			m_root = zpBison::Value( data, *(zp_uint*)( data + sizeof( zpBisonHeader ) ) );
 		}
 	}
 }
@@ -80,12 +80,14 @@ zpBisonType zpBison::Value::type() const
 }
 zp_uint zpBison::Value::size() const
 {
+	const zp_uint val = *(const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
 	switch( m_type )
 	{
 	case ZP_BISON_TYPE_STRING:
+		return *(const zp_uint*)( m_data + val + sizeof( zp_hash ) );
 	case ZP_BISON_TYPE_ARRAY:
 	case ZP_BISON_TYPE_OBJECT:
-		return *(zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
+		return val;
 	default:
 		return 0;
 	}
@@ -99,7 +101,7 @@ zp_bool zpBison::Value::isEmpty() const
 	case ZP_BISON_TYPE_STRING:
 	case ZP_BISON_TYPE_ARRAY:
 	case ZP_BISON_TYPE_OBJECT:
-		return *(zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) ) == 0;
+		return size() == 0;
 	default:
 		return false;
 	}
@@ -216,28 +218,41 @@ zpString zpBison::Value::asString() const
 }
 const zp_char* zpBison::Value::asCString() const
 {
-	const zp_byte* val = m_data + m_offset + sizeof( zpBisonType );
+	const zp_uint val = *(const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
 	switch( m_type )
 	{
 	case ZP_BISON_TYPE_NULL:
 		return "";
 	case ZP_BISON_TYPE_BOOL:
-		return *val != 0 ? "true" : "false";
+		return val != 0 ? "true" : "false";
 	case ZP_BISON_TYPE_STRING:
-		return (const zp_char*)( val + sizeof( zp_uint ) );
+		return (const zp_char*)( m_data + val + sizeof( zp_hash ) + sizeof( zp_uint ) );
 	default:
 		ZP_ASSERT( false, "" );
 		return "";
 	}
 }
+zp_hash zpBison::Value::asHash() const
+{
+	switch( m_type )
+	{
+	case ZP_BISON_TYPE_STRING:
+		{
+			const zp_uint val = *(const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
+			return *(const zp_hash*)( m_data + val );
+		}
+	default:
+		return 0;
+	}
+}
 
-const zpBison::Value zpBison::Value::operator[]( zp_uint index ) const
+const zpBison::Value zpBison::Value::operator[]( zp_int index ) const
 {
 	ZP_ASSERT( isArray(), "" );
 	if( isArray() )
 	{
 		const zp_uint* arr = (const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
-		zp_uint count = *arr;
+		zp_int count = (zp_int)*arr;
 		
 		ZP_ASSERT( index < count, "" );
 		if( index < count )
@@ -258,10 +273,15 @@ const zpBison::Value zpBison::Value::operator[]( const zp_char* key ) const
 		zp_uint count = *arr * 2;
 		++arr;
 
+		const zpBisonHeader* header = (const zpBisonHeader*)m_data;
+
+		zp_hash keyHash = zp_fnv1_32_string( key, header->stringHashSalt );
 		for( zp_uint i = 0; i < count; i += 2 )
 		{
 			zpBison::Value k( m_data, arr[ i ] );
-			if( zp_strcmp( k.asCString(), key ) == 0 )
+			const zp_char* ck = k.asCString();
+			zp_hash ch = k.asHash();
+			if( ch == keyHash && zp_strcmp( ck, key ) == 0 )
 			{
 				return zpBison::Value( m_data, arr[ i + 1 ] );
 			}
@@ -319,12 +339,66 @@ zp_bool zpBison::compileToBuffer( zpDataBuffer& buffer, const zpJson& json )
 	header.stringHashSalt = 0;
 
 	buffer.write( header );
+	buffer.write< zp_uint >( 0 );
 
-	compileToBufferInternal( buffer, json );
+	zpHashMap< zpString, zp_uint > stringTable;
+	compileStringTable( stringTable, json );
+
+	stringTable.foreach( [ &buffer, &header ]( zpString& key, zp_uint& value ) {
+		value = buffer.size();
+
+		const zp_char* str = key.getChars();
+		zp_uint size = key.length();
+		zp_hash hash = zp_fnv1_32_string( key.getChars(), header.stringHashSalt );
+
+		//buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
+		buffer.write< zp_hash >( hash );
+		buffer.write< zp_uint >( size );
+		buffer.writeBulk( str, size );
+		buffer.write< zp_char >( '\0' );
+	} );
+
+	buffer.writeAt( buffer.size(), sizeof( zpBisonHeader ) );
+
+	compileToBufferInternal( buffer, stringTable, json );
 
 	return true;
 }
-zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& json )
+void zpBison::compileStringTable( zpHashMap< zpString, zp_uint >& stringTable, const zpJson& json )
+{
+	switch( json.type() )
+	{
+	case ZP_JSON_TYPE_STRING:
+		stringTable[ json.asString() ] = 0;
+		break;
+	case ZP_JSON_TYPE_ARRAY:
+		{
+			zp_int size = json.size();
+			for( zp_int i = 0; i < size; ++i )
+			{
+				compileStringTable( stringTable, json[ i ] );
+			}
+		}
+		break;
+	case ZP_JSON_TYPE_OBJECT:
+		{
+			zpArrayList< zpString > members;
+			json.memberNames( members );
+
+			members.foreach( [ &stringTable ]( const zpString& member ) {
+				stringTable[ member ] = 0;
+			} );
+
+			members.foreach( [ &stringTable, &json ]( const zpString& member ) {
+				compileStringTable( stringTable, json[ member.getChars() ] );
+			} );
+		}
+		break;
+	default:
+		break;
+	}
+}
+zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpHashMap< zpString, zp_uint >& stringTable, const zpJson& json )
 {
 	switch( json.type() )
 	{
@@ -349,12 +423,14 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& js
 		break;
 	case ZP_JSON_TYPE_STRING:
 		{
+			zp_uint offset = stringTable.get( json.asString() );
 			buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
-			const zp_char* str = json.asCString();
-			zp_uint size = zp_strlen( str );
-			buffer.write< zp_uint >( size );
-			buffer.writeBulk( str, size );
-			buffer.write< zp_char >( '\0' );
+			buffer.write< zp_uint >( offset );
+			//const zp_char* str = json.asCString();
+			//zp_uint size = zp_strlen( str );
+			//buffer.write< zp_uint >( size );
+			//buffer.writeBulk( str, size );
+			//buffer.write< zp_char >( '\0' );
 		}
 		break;
 	case ZP_JSON_TYPE_ARRAY:
@@ -369,7 +445,7 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& js
 			for( zp_uint i = 0; i < size; ++i, arrayStart += sizeof( zp_uint ) )
 			{
 				buffer.writeAt( buffer.size(), arrayStart );
-				compileToBufferInternal( buffer, json[ i ] );
+				compileToBufferInternal( buffer, stringTable, json[ i ] );
 			}
 		}
 		break;
@@ -382,22 +458,20 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpJson& js
 
 			buffer.writeFill< zp_uint >( 0, size * 2 );
 
-			json.foreachObject( [ &buffer, &objectStart ]( const zpString& key, const zpJson& value )
+			json.foreachObject( [ &buffer, &objectStart, &stringTable ]( const zpString& key, const zpJson& value )
 			{
+				zp_int offset = stringTable.get( key );
+
 				buffer.writeAt< zp_uint >( buffer.size(), objectStart );
 				buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
-				buffer.write< zp_uint >( key.length() );
-				buffer.writeBulk( key.getChars(), key.length() );
-				buffer.write< zp_char >( '\0' );
+				buffer.write< zp_int >( offset );
 				objectStart += sizeof( zp_uint );
 
 				buffer.writeAt< zp_uint >( buffer.size(), objectStart );
-				compileToBufferInternal( buffer, value );
+				compileToBufferInternal( buffer, stringTable, value );
 				objectStart += sizeof( zp_uint );				
 			} );
 		}
-		
-		
 		break;
 	}
 
@@ -452,7 +526,7 @@ void zpBisonWriter::writeBison( zpStringBuffer& buffer, const zpBison::Value& bi
 			{
 				zp_int ind = indent > -1 ? indent + 1 : indent;
 				writeIndent( buffer, ind );
-				writeBison( buffer, bison[ (zp_uint)0 ], ind );
+				writeBison( buffer, bison[ 0 ], ind );
 
 				for( zp_uint i = 1; i < bison.size(); ++i )
 				{

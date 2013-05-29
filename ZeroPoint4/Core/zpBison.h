@@ -19,7 +19,7 @@ struct zpBisonHeader
 {
 	zp_uint bison;
 	zp_uint fileVersion;
-	zp_ulong stringHashSalt;
+	zp_uint stringHashSalt;
 };
 
 class zpBison
@@ -58,8 +58,9 @@ public:
 		zp_float asFloat() const;
 		zpString asString() const;
 		const zp_char* asCString() const;
+		zp_hash asHash() const;
 
-		const Value operator[]( zp_uint index ) const;
+		const Value operator[]( zp_int index ) const;
 		const Value operator[]( const zp_char* key ) const;
 		const Value operator[]( const zpString& key ) const;
 
@@ -83,7 +84,8 @@ public:
 	static zp_bool compileToBuffer( zpDataBuffer& buffer, const zpJson& json );
 
 private:
-	static zp_bool compileToBufferInternal( zpDataBuffer& buffer, const zpJson& json );
+	static void compileStringTable( zpHashMap< zpString, zp_uint >& stringTable, const zpJson& json );
+	static zp_bool compileToBufferInternal( zpDataBuffer& buffer, const zpHashMap< zpString, zp_uint >& stringTable, const zpJson& json );
 
 	void parseData();
 
