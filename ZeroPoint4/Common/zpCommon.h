@@ -16,8 +16,8 @@
 #include "zpAllGameManagers.h"
 #include "zpComponent.h"
 #include "zpGame.h"
-#include "zpGameManager.h"
-#include "zpGameObject.h"
+#include "zpComponentManager.h"
+#include "zpObject.h"
 #include "zpWorld.h"
 
 //#include "zpHealthComponent.h"

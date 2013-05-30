@@ -71,22 +71,22 @@
     <ClInclude Include="zpComponent.h" />
     <ClInclude Include="zpEditorCameraComponent.h" />
     <ClInclude Include="zpGame.h" />
-    <ClInclude Include="zpGameManager.h" />
-    <ClInclude Include="zpGameObject.h" />
+    <ClInclude Include="zpComponentManager.h" />
+    <ClInclude Include="zpObject.h" />
     <ClInclude Include="zpHealthComponent.h" />
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpAllComponents.cpp" />
     <ClCompile Include="zpAllGameManagers.cpp" />
+    <ClCompile Include="zpApplication.cpp" />
     <ClCompile Include="zpCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpComponent.cpp" />
     <ClCompile Include="zpEditorCameraComponent.cpp" />
     <ClCompile Include="zpGame.cpp" />
-    <ClCompile Include="zpGameManager.cpp" />
-    <ClCompile Include="zpGameObject.cpp" />
+    <ClCompile Include="zpObject.cpp" />
     <ClCompile Include="zpHealthComponent.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
@@ -98,6 +98,7 @@
   <ItemGroup>
     <None Include="zpAllComponents.inl" />
     <None Include="zpAllGameManagers.inl" />
+    <None Include="zpComponentManager.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

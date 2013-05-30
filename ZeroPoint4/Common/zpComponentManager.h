@@ -1,7 +1,29 @@
 #pragma once
-#ifndef ZP_GAME_MANAGER_H
-#define ZP_GAME_MANAGER_H
+#ifndef ZP_COMPONENT_MANAGER_H
+#define ZP_COMPONENT_MANAGER_H
 
+template< typename Component, typename ComponentManager, zp_uint Count >
+class zpComponentManager
+{
+public:
+	zpComponentManager();
+	~zpComponentManager();
+
+	void update();
+	void simlate();
+
+	Component* createComponent( const zpBison::Value& componentData );
+	void destroyComponent( Component* component );
+
+protected:
+	zp_uint m_firstFree;
+	zp_bool m_isUsed[ Count ];
+	zp_byte m_pool[ sizeof( Component ) * Count ];
+};
+
+#include "zpComponentManager.inl"
+
+#if 0
 enum zpGameManagerFlag
 {
 	ZP_GAME_MANAGER_FLAG_ENABLED,
@@ -41,5 +63,6 @@ private:
 
 	zpGame* m_game;
 };
+#endif
 
 #endif

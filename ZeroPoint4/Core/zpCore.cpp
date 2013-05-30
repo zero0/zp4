@@ -5,6 +5,11 @@
 #include <string.h>
 #include <memory.h>
 
+enum
+{
+	ZP_PRINT_BUFFER_SIZE = 1024,
+};
+
 #if ZP_USE_ASSERTIONS
 
 #if ZP_WIN_32 || ZP_WIN_64
@@ -98,31 +103,46 @@ void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ..
 #endif
 
 #if ZP_USE_PRINT
-void zp_printf( const zp_char* text, ... ) {
+void zp_printf( const zp_char* text, ... )
+{
+	zp_char buff[ ZP_PRINT_BUFFER_SIZE ];
+	
 	va_list vl;
 	va_start( vl, text );
 #if ZP_USE_SAFE_FUNCTIONS
-	vprintf_s( text, vl );
+	vsprintf_s( buff, text, vl );
+	printf_s( buff );
 #else
-	vprint( text, v1 );
+	vsprintf( buff, text, vl );
+	printf( buff );
 #endif
 	va_end( vl );
+
+	OutputDebugString( buff );
 }
-void zp_printfln( const zp_char* text, ... ) {
+void zp_printfln( const zp_char* text, ... )
+{
+	zp_char buff[ ZP_PRINT_BUFFER_SIZE ];
+
 	va_list vl;
 	va_start( vl, text );
 #if ZP_USE_SAFE_FUNCTIONS
-	vprintf_s( text, vl );
-	printf_s( "\n" );
+	zp_int end = vsprintf_s( buff, text, vl );
+	sprintf_s( buff + end, sizeof( buff ) - end, "\n" );
+	printf_s( buff );
 #else
-	vprintf( text, v1 );
-	printf( "\n" );
+	zp_int end = vsprintf( buff, text, vl );
+	sprintf( buff + end, "\n" );
+	printf( buff );
 #endif
 	va_end( vl );
+
+	OutputDebugString( buff );
 }
 #endif
 
-void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... ) {
+void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... )
+{
 	va_list vl;
 	va_start( vl, format );
 #if ZP_USE_SAFE_FUNCTIONS
@@ -133,26 +153,33 @@ void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_ch
 	va_end( vl );
 }
 
-void* zp_malloc( zp_uint size ) {
+void* zp_malloc( zp_uint size )
+{
 	return malloc( size );
 }
-void* zp_calloc( zp_uint num, zp_uint size ) {
+void* zp_calloc( zp_uint num, zp_uint size )
+{
 	return calloc( num, size );
 }
-void* zp_realloc( void* ptr, zp_uint size ) {
+void* zp_realloc( void* ptr, zp_uint size )
+{
 	return realloc( ptr, size );
 }
 
-void* zp_aligned_malloc( zp_uint size, zp_uint alignment ) {
+void* zp_aligned_malloc( zp_uint size, zp_uint alignment )
+{
 	return _aligned_malloc( size, alignment );
 }
-void* zp_aligned_calloc( zp_uint size, zp_uint count, zp_uint alignment ) {
+void* zp_aligned_calloc( zp_uint size, zp_uint count, zp_uint alignment )
+{
 	return _aligned_recalloc( ZP_NULL, count, size, alignment );
 }
-void* zp_aligned_realloc( void* ptr, zp_uint size, zp_uint alignment ) {
+void* zp_aligned_realloc( void* ptr, zp_uint size, zp_uint alignment )
+{
 	return _aligned_realloc( ptr, size, alignment );
 }
-zp_uint zp_aligned_memsize( void* ptr, zp_uint alignment ) {
+zp_uint zp_aligned_memsize( void* ptr, zp_uint alignment )
+{
 	return _aligned_msize( ptr, alignment, 0 );
 }
 
@@ -163,7 +190,8 @@ void zp_aligned_free( void* ptr ) {
 	_aligned_free( ptr );
 }
 
-void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size ) {
+void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size )
+{
 #if ZP_USE_SAFE_FUNCTIONS
 	memcpy_s( dest, destSize, src, size );
 	return dest;
@@ -171,7 +199,8 @@ void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size ) {
 	return memcpy( dest, src, size );
 #endif
 }
-void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size ) {
+void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size )
+{
 #if ZP_USE_SAFE_FUNCTIONS
 	memmove_s( dest, destSize, src, size );
 	return dest;
@@ -179,11 +208,13 @@ void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size ) 
 	return memmove( dest, src, size );
 #endif
 }
-void* zp_memset( void* dest, zp_int value, zp_uint size ) {
+void* zp_memset( void* dest, zp_int value, zp_uint size )
+{
 	return memset( dest, value, size );
 }
 
-zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* srcString ) {
+zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* srcString )
+{
 #if ZP_USE_SAFE_FUNCTIONS
 	return strcpy_s( destString, numElements, srcString ) == 0 ? destString : ZP_NULL;
 #else
@@ -193,13 +224,16 @@ zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* src
 zp_uint zp_strlen( const zp_char* srcString ) {
 	return srcString ? strlen( srcString ) : 0;
 }
-zp_int zp_strcmp( const zp_char* str1, const zp_char* str2 ) {
+zp_int zp_strcmp( const zp_char* str1, const zp_char* str2 )
+{
 	return strcmp( str1, str2 );
 }
-zp_char* zp_strstr( zp_char* str, const zp_char* subStr ) {
+zp_char* zp_strstr( zp_char* str, const zp_char* subStr )
+{
 	return strstr( str, subStr );
 }
-const zp_char* zp_strstr(  const zp_char* str, const zp_char* subStr ) {
+const zp_char* zp_strstr(  const zp_char* str, const zp_char* subStr )
+{
 	return strstr( str, subStr );
 }
 

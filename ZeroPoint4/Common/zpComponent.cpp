@@ -77,9 +77,9 @@ void zpComponent::sendMessageToSiblingComponents( const zpMessage& message )
 
 zpWorld* zpComponent::getWorld() const
 {
-	return m_parentGameObject->getWorld();
+	return ZP_NULL; //return m_parentGameObject->getWorld();
 }
 zpGame* zpComponent::getGame() const
 {
-	return m_parentGameObject->getWorld()->getGame();
+	return ZP_NULL; //return m_parentGameObject->getWorld()->getGame();
 }

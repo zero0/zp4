@@ -1,20 +1,14 @@
 #pragma once
-#ifndef ZP_GAME_OBJECT_H
-#define ZP_GAME_OBJECT_H
+#ifndef ZP_OBJECT_H
+#define ZP_OBJECT_H
 
-enum zpGameObjectFlag : zp_byte
+enum zpObjectFlag : zp_byte
 {
-	ZP_GAME_OBJECT_FLAG_ENABLED,
-	ZP_GAME_OBJECT_FLAG_CREATED,
-	ZP_GAME_OBJECT_FLAG_SHOULD_DESTROY,
+	ZP_OBJECT_FLAG_ENABLED,
+	ZP_OBJECT_FLAG_CREATED,
+	ZP_OBJECT_FLAG_SHOULD_DESTROY,
 
-	ZP_GAME_OBJECT_FLAG_USER_0,
-	ZP_GAME_OBJECT_FLAG_USER_1,
-	ZP_GAME_OBJECT_FLAG_USER_2,
-	ZP_GAME_OBJECT_FLAG_USER_3,
-	ZP_GAME_OBJECT_FLAG_USER_4,
-
-	zpGameObjectFlag_Count,
+	zpObjectFlag_Count,
 };
 
 class zpGameObject : public zpMessageReceiver
@@ -25,15 +19,9 @@ public:
 
 	zpAllComponents* getComponents();
 
-	void setFlag( zpGameObjectFlag flag );
-	void unsetFlag( zpGameObjectFlag flag );
-	zp_bool isFlagSet( zpGameObjectFlag flag ) const;
-
-	void setWorld( zpWorld* world );
-	zpWorld* getWorld() const;
-
-	void update();
-	void simulate();
+	void setFlag( zpObjectFlag flag );
+	void unsetFlag( zpObjectFlag flag );
+	zp_bool isFlagSet( zpObjectFlag flag ) const;
 
 	void create();
 	void destroy();
@@ -51,12 +39,9 @@ public:
 
 private:
 	zpMatrix4f m_transform;
-	
-	zpAllComponents m_components;
-	zpFlag8 m_flags;
-	zpWorld* m_world;
-
 	zpString m_name;
+	zpFlag8 m_flags;
+	zpAllComponents m_components;
 };
 
 #endif

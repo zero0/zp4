@@ -1,8 +1,9 @@
 #include "zpCommon.h"
 
+#if 0
 zpGameObject::zpGameObject()
 	: m_transform()
-	, m_world( ZP_NULL )
+	//, m_world( ZP_NULL )
 	, m_components()	
 	, m_flags( 0 )
 	, m_name()
@@ -17,17 +18,17 @@ zpAllComponents* zpGameObject::getComponents()
 	return &m_components;
 }
 
-void zpGameObject::setFlag( zpGameObjectFlag flag )
+void zpGameObject::setFlag( zpObjectFlag flag )
 {
 	m_flags.mark( (zp_uint)flag );
 }
 
-void zpGameObject::unsetFlag( zpGameObjectFlag flag )
+void zpGameObject::unsetFlag( zpObjectFlag flag )
 {
 	m_flags.unmark( (zp_uint)flag );
 }
 
-zp_bool zpGameObject::isFlagSet( zpGameObjectFlag flag ) const
+zp_bool zpGameObject::isFlagSet( zpObjectFlag flag ) const
 {
 	return m_flags.isMarked( (zp_uint)flag );
 }
@@ -93,3 +94,4 @@ void zpGameObject::sendMessageToComponents( const zpMessage& message )
 //void zpGameObject::sendMessageToParentGameObject( const zpMessage& message )
 //{
 //}
+#endif

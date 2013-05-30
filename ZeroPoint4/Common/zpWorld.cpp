@@ -1,5 +1,6 @@
 #include "zpCommon.h"
 
+#if 0
 zpWorld::zpWorld() :
 	m_isEnabled( true ),
 	m_isCreated( false ),
@@ -100,3 +101,4 @@ void zpWorld::deserialize( zpSerializedInput* in )
 		in->endBlock();
 	}
 }
+#endif
