@@ -4,11 +4,11 @@
 
 struct zpMaterial
 {
-	zpResourceInstance< zpShaderResource > shader;
-	zpFixedArrayList< zpResourceInstance< zpTextureResource >, ZP_MATERIAL_TEXTURE_SLOT_Count > textures;
+	//zpResourceInstance< zpShaderResource > shader;
+	//zpFixedArrayList< zpResourceInstance< zpTextureResource >, ZP_MATERIAL_TEXTURE_SLOT_Count > textures;
 };
 
-class zpMaterialResource : public zpResource
+class zpMaterialResource : public zpResource< int >
 {
 public:
 	zpMaterialResource();

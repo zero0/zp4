@@ -2,7 +2,8 @@
 #ifndef ZP_SHADER_RESOURCE_H
 #define ZP_SHADER_RESOURCE_H
 
-enum zpShaderType {
+enum zpShaderType
+{
 	ZP_SHADER_TYPE_VERTEX =		0x01,
 	ZP_SHADER_TYPE_PIXEL =		0x02,
 	ZP_SHADER_TYPE_GEOMETRY =	0x04,
@@ -49,12 +50,10 @@ protected:
 	friend class zpRenderingEngine;
 };
 
-class zpShaderResource : public zpResource
+class zpShaderResource : public zpResource< zpShader >
 {
 
 };
 
-ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpShaderResource )
-ZP_RESOURCE_INSTANCE_TEMPLATE_END
 
 #endif

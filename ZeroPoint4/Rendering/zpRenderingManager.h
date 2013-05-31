@@ -2,6 +2,7 @@
 #ifndef ZP_RENDERING_MANAGER_H
 #define ZP_RENDERING_MANAGER_H
 
+#if 0
 class zpRenderingManager : public zpGameManager {
 public:
 	zpRenderingManager();
@@ -51,5 +52,6 @@ private:
 	zpArray<zpArrayList<zpRenderingComponent*>, 4> m_renderingComponents;
 	zpArray<zpBuffer*, ZP_RENDERING_GLOBAL_BUFFER_Count> m_globalBuffers;
 };
+#endif
 
 #endif

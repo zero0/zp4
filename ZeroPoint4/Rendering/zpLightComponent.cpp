@@ -56,7 +56,7 @@ void zpLightComponent::setPosition( const zpVector4f& position )
 
 	if( m_isLocalToGameObject )
 	{
-		zpMath::Add( m_lightData.position, m_lightData.position, getParentGameObject()->getTransform().getRow( 3 ) );
+		zpMath::Add( m_lightData.position, m_lightData.position, zpVector4f( 0 )/*getParentGameObject()->getTransform().getRow( 3 )*/ );
 	}
 }
 void zpLightComponent::setDirection( const zpVector4f& direction )

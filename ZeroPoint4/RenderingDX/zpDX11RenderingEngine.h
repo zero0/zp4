@@ -29,8 +29,9 @@ public:
 	zpSamplerStateImpl* createSamplerState( const zpSamplerStateDesc& desc );
 	zpShaderImpl* createShader( const zpString& shaderFile );
 	zp_bool loadShader( zpShaderImpl* shader );
+	zp_bool destroyShader( zpShaderImpl* shader );
 
-	void present();
+	void present( zp_bool vsync );
 
 	ID3D11InputLayout* getInputLayout( zpVertexFormat format ) const { return m_inputLayouts[ format ]; }
 

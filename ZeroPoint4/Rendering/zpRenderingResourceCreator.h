@@ -2,12 +2,12 @@
 #ifndef ZP_RENDERING_RESOURCE_CREATOR_H
 #define ZP_RENDERING_RESOURCE_CREATOR_H
 
-class zpRenderingResourceCreator : public zpResourceCreator {
+class zpRenderingResourceCreator {
 public:
 	zpRenderingResourceCreator();
 	virtual ~zpRenderingResourceCreator();
 
-	zpResource* createResource( const zpString& filename );
+	//zpResource* createResource( const zpString& filename );
 };
 
 #endif

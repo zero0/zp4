@@ -4,7 +4,7 @@ zpMaterialResource::zpMaterialResource() {}
 zpMaterialResource::~zpMaterialResource() {}
 
 zp_bool zpMaterialResource::load() {
-	zpProperties material( getFilename() );
+	/*zpProperties material( getFilename() );
 
 	if( !material.hasProperty( "material.shader" ) ) return false;
 	m_material.shader = getContentManager()->createInstanceOfResource<zpShaderResource>( material[ "material.shader" ] );
@@ -24,15 +24,15 @@ zp_bool zpMaterialResource::load() {
 				m_material.textures[ ZP_MATERIAL_TEXTURE_SLOT_OTHER ] = getContentManager()->createInstanceOfResource<zpTextureResource>( value );
 			}
 		} );
-	}
+	}*/
 
 	return true;
 }
 void zpMaterialResource::unload() {
-	m_material.shader = zpResourceInstance<zpShaderResource>();
+	/*m_material.shader = zpResourceInstance<zpShaderResource>();
 	m_material.textures.map( []( const zpResourceInstance<zpTextureResource>& ) {
 		return zpResourceInstance<zpTextureResource>();
-	} );
+	} );*/
 }
 
 const zpMaterial& zpMaterialResource::getMaterial() const {

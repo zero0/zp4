@@ -508,6 +508,7 @@ class zpDeferredRenderingComponent;
 #include "zpRenderingContext.h"
 #include "zpRenderingEngine.h"
 #include "zpRenderingFactory.h"
+#include "zpRenderingPipeline.h"
 
 #include "zpCamera.h"
 #include "zpRenderingManager.h"

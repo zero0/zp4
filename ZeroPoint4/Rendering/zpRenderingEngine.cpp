@@ -1,12 +1,6 @@
 #include "zpRendering.h"
 
-#if ZP_RENDERING_TYPE == ZP_DX11
-#include "RenderingDX/zpDX11.h"
-#elif ZP_RENDERING_TYPE == ZP_GL2
-#include "RenderingOpenGL/zpOpenGL.h"
-#else
-#error( "No rendering engine selected!" )
-#endif
+#include "zpRenderingImpl.inl"
 
 zpRenderingEngine::zpRenderingEngine()
 	: m_renderingEngine( new zpRenderingEngineImpl )
@@ -31,6 +25,11 @@ void zpRenderingEngine::create()
 }
 void zpRenderingEngine::destroy()
 {
+	ZP_SAFE_DELETE( m_immediateRenderTarget );
+	m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
+		delete cxt;
+	} );
+
 	m_renderingContexts.clear();
 	m_rasterStates.clear();
 	m_samplerStates.clear();
@@ -85,7 +84,7 @@ zp_bool zpRenderingEngine::isVSyncEnabled() const
 
 void zpRenderingEngine::present()
 {
-	m_renderingEngine->present();
+	m_renderingEngine->present( m_isVSyncEnabled );
 }
 
 zpRenderingContext* zpRenderingEngine::getImmediateRenderingContext() const
@@ -184,11 +183,15 @@ zpSamplerState* zpRenderingEngine::createSamplerState( const zpSamplerStateDesc&
 
 zpShader* zpRenderingEngine::createShader( const zpString& shaderFile )
 {
-	zpShaderImpl* shader = m_renderingEngine->createShader( shaderFile );
-
+	zpShaderImpl* shader;
+	shader = m_renderingEngine->createShader( shaderFile );
 	return new zpShader( shader );
 }
 zp_bool zpRenderingEngine::reloadShader( zpShader* shader )
 {
 	return m_renderingEngine->loadShader( shader->getShaderImpl() );
+}
+zp_bool zpRenderingEngine::destroyShader( zpShader* shader )
+{
+	return m_renderingEngine->destroyShader( shader->getShaderImpl() );
 }

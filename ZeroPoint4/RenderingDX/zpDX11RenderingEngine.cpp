@@ -422,14 +422,24 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 	{	
 		HRESULT hr;
 	
-		zpDataBuffer shaderBuffer( 0 );
+		zpDataBuffer shaderBuffer;
 		shaderFile.readFileBinary( shaderBuffer );
+		shaderFile.close();
 
 		zpShaderFileHeader header;
 		shaderBuffer.read( header );
 
-		ZP_ASSERT( header.fileType == ZP_SHADER_FILE_HEADER, "" );
-		ZP_ASSERT( header.shaderType == ZP_SHADER_TYPE_DX11, "" );
+		ZP_ASSERT( header.fileType == ZP_SHADER_FILE_HEADER, "Invalid Shader header" );
+		if( header.fileType != ZP_SHADER_FILE_HEADER )
+		{
+			return false;
+		}
+
+		ZP_ASSERT( header.shaderType == ZP_SHADER_TYPE_DX11, "Incorrect Shader type, DX11 expected" );
+		if( header.shaderType != ZP_SHADER_TYPE_DX11 )
+		{
+			return false;
+		}
 
 		shader->m_vertexLayout = (zpVertexFormatDesc)header.vertexLayout;
 
@@ -440,7 +450,7 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 		if( shaderLength )
 		{
 			hr = m_d3dDevice->CreateVertexShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_vertexShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "" );
+			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Vertex Shader %x", hr );
 
 			ID3D11InputLayout *inputLayout;
 			switch( shader->m_vertexLayout )
@@ -532,7 +542,7 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 		if( shaderLength )
 		{
 			hr = m_d3dDevice->CreatePixelShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_pixelShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "" );
+			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Pixel Shader %x", hr );
 		}
 
 		offset += shaderLength;
@@ -541,7 +551,7 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 		if( shaderLength )
 		{
 			hr = m_d3dDevice->CreateGeometryShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_geometryShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "" );
+			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Geometry Shader %x", hr );
 		}
 
 		offset += shaderLength;
@@ -550,18 +560,25 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 		if( shaderLength )
 		{
 			hr = m_d3dDevice->CreateComputeShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_computeShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "" );
+			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Compute Shader %x", hr );
 		}
-
-		shaderFile.close();
 	}
 
 	return false;
 }
-
-void zpRenderingEngineImpl::present()
+zp_bool zpRenderingEngineImpl::destroyShader( zpShaderImpl* shader )
 {
-	m_swapChain->Present( 1, 0 );
+	ZP_SAFE_RELEASE( shader->m_vertexShader );
+	ZP_SAFE_RELEASE( shader->m_pixelShader );
+	ZP_SAFE_RELEASE( shader->m_geometryShader );
+	ZP_SAFE_RELEASE( shader->m_computeShader );
+
+	return true;
+}
+
+void zpRenderingEngineImpl::present( zp_bool vsync )
+{
+	m_swapChain->Present( vsync ? 1 : 0, 0 );
 }
 
 #if 0

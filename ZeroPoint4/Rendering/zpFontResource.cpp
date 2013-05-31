@@ -142,6 +142,6 @@ void zpFontResource::unload() {
 const zpFontSet& zpFontResource::getFontSet() const {
 	return m_fontSet;
 }
-const zpResourceInstance<zpTextureResource>& zpFontResource::getTexture() const {
-	return m_fontTexture;
-}
+//const zpResourceInstance<zpTextureResource>& zpFontResource::getTexture() const {
+//	return m_fontTexture;
+//}

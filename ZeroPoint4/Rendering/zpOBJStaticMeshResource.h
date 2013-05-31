@@ -2,7 +2,7 @@
 #ifndef ZP_OBJ_STATIC_MESH_RESOURCE_H
 #define ZP_OBJ_STATIC_MESH_RESOURCE_H
 
-class zpOBJStaticMeshResource : public zpStaticMeshResource {
+class zpOBJStaticMeshResource {
 public:
 	zpOBJStaticMeshResource();
 	~zpOBJStaticMeshResource();

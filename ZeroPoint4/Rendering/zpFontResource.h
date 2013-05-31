@@ -36,7 +36,7 @@ struct zpFontSet {
 	~zpFontSet();
 };
 
-class zpFontResource : public zpResource {
+class zpFontResource : public zpResource< int > {
 public:
 	zpFontResource();
 	virtual ~zpFontResource();
@@ -45,11 +45,11 @@ public:
 	void unload();
 
 	const zpFontSet& getFontSet() const;
-	const zpResourceInstance<zpTextureResource>& getTexture() const;
+	//const zpResourceInstance<zpTextureResource>& getTexture() const;
 
 private:
 	zpFontSet m_fontSet;
-	zpResourceInstance<zpTextureResource> m_fontTexture;
+	//zpResourceInstance<zpTextureResource> m_fontTexture;
 };
 
 //ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpFontResource )

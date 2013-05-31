@@ -2,6 +2,7 @@
 #ifndef ZP_DEFERRED_RENDERING_COMPONENT_H
 #define ZP_DEFERRED_RENDERING_COMPONENT_H
 
+#if 0
 enum zpGBufferTarget {
 	ZP_GBUFFER_TARGET_DIFFUSE,
 	ZP_GBUFFER_TARGET_NORMAL,
@@ -50,5 +51,6 @@ private:
 
 	zpViewport m_viewport;
 };
+#endif
 
 #endif

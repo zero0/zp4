@@ -83,6 +83,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpRenderingPipeline.h" />
     <ClInclude Include="zpUIManager.h" />
     <ClInclude Include="zpAnimatedMeshResource.h" />
     <ClInclude Include="zpBufferData.h" />
@@ -137,6 +138,7 @@
     <ClCompile Include="zpRenderingEngine.cpp" />
     <ClCompile Include="zpRenderingFactory.cpp" />
     <ClCompile Include="zpRenderingManager.cpp" />
+    <ClCompile Include="zpRenderingPipeline.cpp" />
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
     <ClCompile Include="zpSamplerState.cpp" />
     <ClCompile Include="zpShaderInstance.cpp" />
@@ -162,6 +164,7 @@
   <ItemGroup>
     <None Include="zpImmediateBuffer.inl" />
     <None Include="zpRenderingComponents.inl" />
+    <None Include="zpRenderingImpl.inl" />
     <None Include="zpRenderingManagers.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

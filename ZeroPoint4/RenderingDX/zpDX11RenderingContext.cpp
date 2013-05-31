@@ -144,6 +144,11 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 			break;
 
 		case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
+			{
+
+			}
+			break;
+
 		case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
 			{
 				ID3D11Buffer* buffer = command.vertexBuffer->m_buffer;

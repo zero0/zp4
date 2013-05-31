@@ -8,14 +8,14 @@ struct zpStaticMeshPart {
 	zpTopology topology;
 	zpBuffer* vertexBuffer;
 	zpBuffer* indexBuffer;
-	zpResourceInstance<zpShaderResource> shader;
-	zpResourceInstance<zpTextureResource> textures[ ZP_STATIC_MESH_PART_NUM_TEXTURES ];
+	//zpResourceInstance<zpShaderResource> shader;
+	//zpResourceInstance<zpTextureResource> textures[ ZP_STATIC_MESH_PART_NUM_TEXTURES ];
 
 	zpStaticMeshPart();
 	~zpStaticMeshPart();
 };
 
-ZP_ABSTRACT_CLASS zpStaticMeshResource : public zpResource {
+ZP_ABSTRACT_CLASS zpStaticMeshResource : public zpResource< int > {
 public:
 	zpStaticMeshResource();
 	virtual ~zpStaticMeshResource();
@@ -30,7 +30,7 @@ protected:
 };
 
 
-ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpStaticMeshResource )
-ZP_RESOURCE_INSTANCE_TEMPLATE_END
+//ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpStaticMeshResource )
+//ZP_RESOURCE_INSTANCE_TEMPLATE_END
 
 #endif

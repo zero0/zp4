@@ -656,23 +656,34 @@ void zpString::append( zp_char ch )
 {
 	ensureCapacity( m_length + 1 );
 
-	zp_char* c = IS_STRING_PACKED( this ) ? m_chars : m_string;
+	zp_char* c = getCharsInternal();
 	c[ m_length ] = ch;
 	++m_length;
 	c[ m_length ] = '\0';
 }
+void zpString::append( const zp_char* str, zp_int length )
+{
+	if( length < 0 )
+	{
+		length = zp_strlen( str );
+	}
+	if( length > 0 )
+	{
+		ensureCapacity( m_length + length );
+
+		zp_char* a = getCharsInternal();
+		const zp_char* b = str;
+		for( zp_uint i = 0; i < length; ++i, ++m_length )
+		{
+			a[ m_length ] = b[ i ];
+		}
+
+		a[ m_length ] = '\0';
+	}
+}
 void zpString::append( const zpString& string )
 {
-	ensureCapacity( m_length + string.m_length );
-
-	zp_char* a = IS_STRING_PACKED( this ) ? m_chars : m_string;
-	const zp_char* b = string.getChars();
-	for( zp_uint i = 0; i < string.m_length; ++i, ++m_length )
-	{
-		a[ m_length ] = b[ i ];
-	}
-
-	a[ m_length ] = '\0';
+	append( string.getChars(), string.length() );
 }
 
 void zpString::toLower( zpString& string )
@@ -682,6 +693,22 @@ void zpString::toLower( zpString& string )
 void zpString::toUpper( zpString& string )
 {
 	string.map( zp_to_upper );
+}
+void zpString::join( zpString& string, const zpArrayList< zpString >& parts, const zp_char* delim )
+{
+	if( parts.isEmpty() )
+	{
+		string = "";
+	}
+	else
+	{
+		string = parts[ 0 ];
+		for( zp_uint i = 1; i < parts.size(); ++i )
+		{
+			string.append( delim );
+			string.append( parts[ i ] );
+		}
+	}
 }
 
 void zpString::toCamelCase( zpString& outString, zp_bool capitalFirstLetter ) const

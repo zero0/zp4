@@ -114,6 +114,9 @@
     <ClInclude Include="zpUIManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -200,6 +203,9 @@
     <ClCompile Include="zpSamplerState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="zpDepthStencilBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -212,6 +218,9 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpRenderingComponents.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpRenderingImpl.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

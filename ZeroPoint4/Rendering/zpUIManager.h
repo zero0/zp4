@@ -2,7 +2,7 @@
 #ifndef ZP_UI_MANAGER_H
 #define ZP_UI_MANAGER_H
 
-class zpUIManager : public zpGameManager {
+class zpUIManager {
 public:
 	zpUIManager();
 	virtual ~zpUIManager();

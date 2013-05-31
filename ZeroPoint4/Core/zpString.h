@@ -64,10 +64,12 @@ public:
 
 	void erase( zp_int startIndex, zp_uint count );
 	void append( zp_char ch );
+	void append( const zp_char* str, zp_int length = -1 );
 	void append( const zpString& string );
 
 	static void toLower( zpString& string );
 	static void toUpper( zpString& string );
+	static void join( zpString& string, const zpArrayList< zpString >& parts, const zp_char* delim );
 
 	void toCamelCase( zpString& outString, zp_bool capitalFirstLetter = true ) const;
 	

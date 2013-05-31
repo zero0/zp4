@@ -34,6 +34,7 @@ private:
 
 	zpBison m_appOptions;
 
+	zpRenderingPipeline m_renderingPipeline;
 	//zpTextContentManager m_textContentManager;
 };
 

@@ -21,8 +21,7 @@ struct zpLightBufferData
 	zpLightType type;
 };
 
-
-class zpLightComponent : public zpComponent {
+class zpLightComponent {
 public:
 	zpLightComponent();
 	virtual ~zpLightComponent();

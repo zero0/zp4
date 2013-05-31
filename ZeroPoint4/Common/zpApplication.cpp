@@ -58,17 +58,32 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	}
 
 	const zpBison::Value window = m_appOptions.root()[ "Window" ];
-	if( !window.isNull() )
-	{
-		zpVector2i pos( window[ "X" ].asInt(), window[ "Y" ].asInt() );
-		zpVector2i size( window[ "Width" ].asInt(), window[ "Height" ].asInt() );
+	ZP_ASSERT( window.isObject(), "" );
 
-		m_window.setPosition( pos );
-		m_window.setScreenSize( size );
-		m_window.setTitle( window[ "Title" ].asCString() );
+	zpVector2i pos( window[ "X" ].asInt(), window[ "Y" ].asInt() );
+	zpVector2i size( window[ "Width" ].asInt(), window[ "Height" ].asInt() );
 
-		m_window.create();
-	}
+	m_window.setPosition( pos );
+	m_window.setScreenSize( size );
+	m_window.setTitle( window[ "Title" ].asCString() );
+
+	m_window.create();
+
+	const zpBison::Value render = m_appOptions.root()[ "Render" ];
+	ZP_ASSERT( render.isObject(), "" );
+
+	zpDisplayMode displayMode;
+	displayMode.width = size.getX();
+	displayMode.height = size.getY();
+	displayMode.refreshRate = render[ "Refresh" ].asInt();
+	displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
+
+	zpRenderingEngine* re = m_renderingPipeline.getRenderingEngine();
+	re->setWindow( &m_window );
+	re->setScreenMode( ZP_SCREEN_MODE_WINDOWED );
+	re->setDisplayMode( displayMode );
+	re->setVSyncEnabled( render[ "VSync" ].asBool() );
+	re->create();
 
 	m_isRunning = true;
 	m_lastTime = m_timer->getTime();
@@ -128,8 +143,8 @@ void zpApplication::processFrame()
 
 	// render
 	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
-	//if( m_renderable ) m_renderable->render();
-	zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );
+	zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );	
+	m_renderingPipeline.submitRendering();
 
 	// sleep for the remainder of the frame
 	m_timer->sleep( m_renderMsHz );

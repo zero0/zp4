@@ -91,8 +91,14 @@
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Content\Content.vcxproj">
+      <Project>{8f28bfad-31ec-42d1-9d92-c2a2bcb5db5f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Rendering\Rendering.vcxproj">
+      <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 
 #include "Core\zpCore.h"
 //#include "Input\zpInput.h"
-//#include "Rendering\zpRendering.h"
+#include "Rendering\zpRendering.h"
 
 //class zpHealthComponent;
 //class zpEditorCameraComponent;

@@ -53,6 +53,7 @@ public:
 
 	zpShader* createShader( const zpString& shaderFile );
 	zp_bool reloadShader( zpShader* shader );
+	zp_bool destroyShader( zpShader* shader );
 
 	zpRenderingEngineImpl* getRenderingEngineImpl() const { return m_renderingEngine; }
 
