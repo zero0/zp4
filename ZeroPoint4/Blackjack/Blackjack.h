@@ -9,6 +9,6 @@
 //#include "Audio\zpAudio.h"
 //#include "Input\zpInput.h"
 //#include "Physics\zpPhysics.h"
-//#include "Common\zpCommon.h"
+#include "Common\zpCommon.h"
 
 #endif

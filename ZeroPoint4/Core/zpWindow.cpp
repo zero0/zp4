@@ -64,6 +64,12 @@ void zpWindow::setTitle( const zpString& title )
 	m_title = title;
 	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.getChars() );
 }
+void zpWindow::setTitle( const zp_char* title )
+{
+	m_title = title;
+	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.getChars() );
+}
+
 const zpString& zpWindow::getTitle() const
 {
 	return m_title;

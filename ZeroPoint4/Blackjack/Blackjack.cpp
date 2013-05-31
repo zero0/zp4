@@ -3,40 +3,25 @@
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <Windows.h>
 
-#define DEFAULT_BLACKJACK_CONFIG	"blackjack.config"
-
-void ProcessConfig( zpGame& game )
-{
-#if 0
-	zpProperties properties( zpString( DEFAULT_BLACKJACK_CONFIG ) );
-	ZP_ASSERT( properties.hasProperty( "game.file" ), "Game file not defined" );
-	const zpString& gameFile = properties[ "game.file" ];
-
-	if( properties[ "console.enabled" ] == "true" ) {
-	//	zpConsole::getInstance()->create();
-	}
-
-	zpXmlParser gameParser;
-	gameParser.parseFile( gameFile, true );
-
-	zpProperties gameOverrides( properties.getSubProperties( "game.overrides" ) );
-
-	zpXmlSerializedInput gameIn( gameParser.getRootNode(), gameOverrides );
-	game.deserialize( &gameIn );
-	game.create();
-
-	const zpString& worldPrefab = properties[ "world.prefab" ];
-	
-	//zpSerializable* world = zpPrefabs::getInstance()->loadPrefab( worldPrefab );
-	//ZP_ASSERT( world != ZP_NULL, "Failed to load world prefab %s", worldPrefab.c_str() );
-	
-	//game.setNextWorld( (zpWorld*)world );
-
-	//return game;
-#endif
-}
+#define BLACKJACK_CONFIG	"blackjack.json"
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
+{
+	zpApplication app;
+
+	zpString cmdLine( lpCmdLine );
+	zpArrayList< zpString > args;
+	cmdLine.split( ' ', args );
+
+	app.setOptionsFilename( BLACKJACK_CONFIG );
+
+	app.initialize( args );
+	app.run();
+	app.shutdown();
+
+	return 0;
+}
+#if 0
 {
 	zpConsole::getInstance()->create();
 
@@ -79,6 +64,7 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	zp_printfln( "BISON:\n%s", zpBisonWriter().styleWrite( bison ) );
 	return 0;
 }
+#endif
 #if 0
 {
 	zpTextContentManager fff;

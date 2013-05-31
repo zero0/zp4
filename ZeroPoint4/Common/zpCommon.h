@@ -12,6 +12,7 @@
 //#include "zpHealthComponent.h"
 //#include "zpEditorCameraComponent.h"
 
+#include "zpApplication.h"
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"
 #include "zpComponent.h"

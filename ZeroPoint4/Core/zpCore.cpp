@@ -221,7 +221,18 @@ zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* src
 	return strcpy( destString, numElements, srcString );
 #endif
 }
-zp_uint zp_strlen( const zp_char* srcString ) {
+zp_char* zp_strncpy( zp_char* destString, zp_uint numElements, const zp_char* srcString, zp_uint maxCount )
+{
+#if ZP_USE_SAFE_FUNCTIONS
+	strncpy_s( destString, numElements, srcString, maxCount );
+	return destString;
+#else
+	ZP_UNUSED( numElements );
+	return strncpy( destString, srcString, maxCount );
+#endif
+}
+zp_uint zp_strlen( const zp_char* srcString )
+{
 	return srcString ? strlen( srcString ) : 0;
 }
 zp_int zp_strcmp( const zp_char* str1, const zp_char* str2 )
@@ -258,10 +269,12 @@ zp_long zp_atol( const zp_char* str, zp_char** end, zp_int base )
 	return strtol( str, end, base );
 }
 
-zp_int zp_rand() {
+zp_int zp_rand()
+{
 	return rand();
 }
-zp_float zp_randf() {
+zp_float zp_randf()
+{
 	zp_int base = zp_rand();
 	return (zp_float)( zp_rand() % base ) / (zp_float)base;
 }
@@ -269,44 +282,57 @@ void zp_srand( zp_uint seed ) {
 	srand( seed );
 }
 
-zp_char zp_to_lower( zp_char ch ) {
+zp_char zp_to_lower( zp_char ch )
+{
 	return ( 'A' <= ch && ch <= 'Z' ) ? ch -= 'A' - 'a' : ch;
 }
-zp_char zp_to_upper( zp_char ch ) {
+zp_char zp_to_upper( zp_char ch )
+{
 	return ( 'a' <= ch && ch <= 'z' ) ? ch -= 'a' - 'A' : ch;
 }
 
-zp_bool zp_is_ctrl( zp_char ch ) {
+zp_bool zp_is_ctrl( zp_char ch )
+{
 	return ch < 0x1F || ch == 0x7F;
 }
-zp_bool zp_is_whitespace( zp_char ch ) {
+zp_bool zp_is_whitespace( zp_char ch )
+{
 	return ( ch >= 0x09 && ch <= 0x0D ) || ch == 0x20;
 }
-zp_bool zp_is_upper( zp_char ch ) {
+zp_bool zp_is_upper( zp_char ch )
+{
 	return ch >= 0x41 && ch <= 0x5A;
 }
-zp_bool zp_is_lower( zp_char ch ) {
+zp_bool zp_is_lower( zp_char ch )
+{
 	return ch >= 0x61 && ch <= 0x7A;
 }
-zp_bool zp_is_alpha( zp_char ch ) {
+zp_bool zp_is_alpha( zp_char ch )
+{
 	return zp_is_upper( ch ) || zp_is_lower( ch );
 }
-zp_bool zp_is_digit( zp_char ch ) {
+zp_bool zp_is_digit( zp_char ch )
+{
 	return ch >= 0x30 && ch <= 0x39;
 }
-zp_bool zp_is_xdigit( zp_char ch ) {
+zp_bool zp_is_xdigit( zp_char ch )
+{
 	return zp_is_digit( ch ) || ( ch >= 0x41 && ch <= 0x46 ) || ( ch >= 0x61 && ch <= 0x66 );
 }
-zp_bool zp_is_alpha_numeric( zp_char ch ) {
+zp_bool zp_is_alpha_numeric( zp_char ch )
+{
 	return zp_is_alpha( ch ) || zp_is_digit( ch );
 }
-zp_bool zp_is_punctuation( zp_char ch ) {
+zp_bool zp_is_punctuation( zp_char ch )
+{
 	return ( ch >= 0x21 && ch <= 0x2F ) || ( ch >= 0x3A && ch <= 0x40 ) || ( ch >= 0x5B && ch <= 0x60 ) || ( ch >= 0x7B && ch <= 0x7E );
 }
-zp_bool zp_is_graphic( zp_char ch ) {
+zp_bool zp_is_graphic( zp_char ch )
+{
 	return ch >= 0x21 && ch <= 0x7E;
 }
-zp_bool zp_is_print( zp_char ch ) {
+zp_bool zp_is_print( zp_char ch )
+{
 	return ch >= 0x20 && ch <= 0x7E;
 }
 

@@ -35,6 +35,7 @@ public:
 	~zpWindow();
 
 	void setTitle( const zpString& title );
+	void setTitle( const zp_char* title );
 	const zpString& getTitle() const;
 
 	void setPosition( const zpVector2i& position );

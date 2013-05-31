@@ -17,7 +17,7 @@ zpString::zpString( const zp_char* string )
 	{
 		if( IS_STRING_PACKED( this ) )
 		{
-			zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string );
+			zp_strncpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string, m_length );
 		}
 		else
 		{
@@ -27,7 +27,7 @@ zpString::zpString( const zp_char* string )
 			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string );
 		}
 	}
-	
+	getCharsInternal()[ m_length ] = '\0';
 }
 zpString::zpString( const zp_char* string, zp_uint length )
 	: m_length( length )
@@ -37,7 +37,7 @@ zpString::zpString( const zp_char* string, zp_uint length )
 	{
 		if( IS_STRING_PACKED( this ) )
 		{
-			zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string );
+			zp_strncpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string, m_length );
 		}
 		else
 		{
@@ -47,6 +47,7 @@ zpString::zpString( const zp_char* string, zp_uint length )
 			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string );
 		}
 	}
+	getCharsInternal()[ m_length ] = '\0';
 }
 zpString::zpString( const zpString& string )
 	: m_length( string.m_length )
@@ -56,7 +57,7 @@ zpString::zpString( const zpString& string )
 	{
 		if( IS_STRING_PACKED( this ) )
 		{
-			zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars() );
+			zp_strncpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars(), m_length );
 		}
 		else
 		{
@@ -66,6 +67,7 @@ zpString::zpString( const zpString& string )
 			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.getChars() );
 		}
 	}
+	getCharsInternal()[ m_length ] = '\0';
 }
 zpString::zpString( const zpString& string, zp_uint length )
 	: m_length( length )
@@ -75,7 +77,7 @@ zpString::zpString( const zpString& string, zp_uint length )
 	{
 		if( IS_STRING_PACKED( this ) )
 		{
-			zp_strcpy( m_chars, string.getChars() );
+			zp_strncpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars(), m_length );
 		}
 		else
 		{
@@ -85,6 +87,7 @@ zpString::zpString( const zpString& string, zp_uint length )
 			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.getChars() );
 		}
 	}
+	getCharsInternal()[ m_length ] = '\0';
 }
 zpString::zpString( zpString&& string )
 	: m_length( string.m_length )
@@ -139,7 +142,7 @@ void zpString::operator=( const zp_char* string )
 		{
 			if( IS_STRING_PACKED( this ) )
 			{
-				zp_strcpy( m_chars, sizeof( m_chars ) * sizeof( zp_char ), string );
+				zp_strncpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string, m_length );
 			}
 			else
 			{
@@ -149,6 +152,7 @@ void zpString::operator=( const zp_char* string )
 				zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string );
 			}
 		}
+		getCharsInternal()[ m_length ] = '\0';
 	}
 }
 void zpString::operator=( const zpString& string ) {
@@ -173,7 +177,7 @@ void zpString::operator=( const zpString& string ) {
 		{
 			if( IS_STRING_PACKED( this ) )
 			{
-				zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars() );
+				zp_strncpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars(), m_length );
 			}
 			else
 			{
@@ -183,6 +187,7 @@ void zpString::operator=( const zpString& string ) {
 				zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string.getChars() );
 			}
 		}
+		getCharsInternal()[ m_length ] = '\0';
 	}
 }
 void zpString::operator=( zpString&& string )
@@ -205,7 +210,7 @@ void zpString::operator=( zpString&& string )
 		{
 			if( IS_STRING_PACKED( this ) )
 			{
-				zp_strcpy( m_chars, string.getChars() );
+				zp_strncpy( m_chars, ZP_STRING_MAX_SMALL_SIZE, string.getChars(), m_length );
 			}
 			else
 			{
@@ -733,6 +738,21 @@ void zpString::trim( zpString& out ) const
 
 	out = zpString( start, m_length - ( end - start ) );
 
+}
+void zpString::split( zp_char delim, zpArrayList< zpString >& slip ) const
+{
+	zp_int from = 0;
+	zp_int to = 0;
+
+	while( to != npos )
+	{
+		to = indexOf( delim, from );
+		if( from < m_length && from != to )
+		{
+			substring( slip.pushBackEmpty(), from, to );
+		}
+		from = to + 1;
+	}
 }
 
 void zpString::ensureCapacity( zp_uint size )

@@ -57,6 +57,8 @@
 #define ZP_PURE_INTERFACE			class ZP_NO_VTABLE
 #define ZP_ABSTRACT_CLASS			class ZP_NO_VTABLE
 
+#define ZP_UNUSED( v )				(void)v
+
 #define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }
 #define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
 #define ZP_SAFE_RELEASE( r )		{ if( (r) ) { (r)->Release(); (r) = ZP_NULL; } }
@@ -119,6 +121,7 @@ void* zp_memset( void* dest, zp_int value, zp_uint size );
 template<zp_uint Size>
 zp_char* zp_strcpy( zp_char (&destString)[Size], const zp_char* srcString ) { return zp_strcpy( destString, Size, srcString ); }
 zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* srcString );
+zp_char* zp_strncpy( zp_char* destString, zp_uint numElements, const zp_char* srcString, zp_uint maxCount );
 zp_uint zp_strlen( const zp_char* srcString );
 zp_int zp_strcmp( const zp_char* str1, const zp_char* str2 );
 zp_char* zp_strstr( zp_char* str, const zp_char* subStr );
