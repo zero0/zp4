@@ -1,0 +1,14 @@
+{
+    "Console" : true,
+    "Window" : {
+        "Title" : "Blackjack",
+        "X" : 10,
+        "Y" : 10,
+        "Width" : 640,
+        "Height" : 360
+    },
+    "Render" : {
+        "Refresh" : 60,
+        "VSync" : false
+    }
+}
