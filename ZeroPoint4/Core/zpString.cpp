@@ -673,7 +673,7 @@ void zpString::append( const zp_char* str, zp_int length )
 
 		zp_char* a = getCharsInternal();
 		const zp_char* b = str;
-		for( zp_uint i = 0; i < length; ++i, ++m_length )
+		for( zp_int i = 0; i < length; ++i, ++m_length )
 		{
 			a[ m_length ] = b[ i ];
 		}
@@ -768,8 +768,8 @@ void zpString::trim( zpString& out ) const
 }
 void zpString::split( zp_char delim, zpArrayList< zpString >& slip ) const
 {
-	zp_int from = 0;
-	zp_int to = 0;
+	zp_uint from = 0;
+	zp_uint to = 0;
 
 	while( to != npos )
 	{

@@ -87,6 +87,7 @@ zp_uint zpBison::Value::size() const
 		return *(const zp_uint*)( m_data + val + sizeof( zp_hash ) );
 	case ZP_BISON_TYPE_ARRAY:
 	case ZP_BISON_TYPE_OBJECT:
+	case ZP_BISON_TYPE_DATA:
 		return val;
 	default:
 		return 0;
@@ -101,6 +102,7 @@ zp_bool zpBison::Value::isEmpty() const
 	case ZP_BISON_TYPE_STRING:
 	case ZP_BISON_TYPE_ARRAY:
 	case ZP_BISON_TYPE_OBJECT:
+	case ZP_BISON_TYPE_DATA:
 		return size() == 0;
 	default:
 		return false;
@@ -113,7 +115,7 @@ zp_bool zpBison::Value::isNull() const
 }
 zp_bool zpBison::Value::isBool() const
 {
-	return m_type == ZP_BISON_TYPE_BOOL;
+	return m_type == ZP_BISON_TYPE_BOOL_TRUE || m_type == ZP_BISON_TYPE_BOOL_FALSE;
 }
 zp_bool zpBison::Value::isInt() const
 {
@@ -140,7 +142,8 @@ zp_bool zpBison::Value::isIntegral() const
 {
 	switch( m_type )
 	{
-	case ZP_BISON_TYPE_BOOL:
+	case ZP_BISON_TYPE_BOOL_TRUE:
+	case ZP_BISON_TYPE_BOOL_FALSE:
 	case ZP_BISON_TYPE_INT:
 		return true;
 	default:
@@ -163,15 +166,27 @@ zp_bool zpBison::Value::asBool() const
 	{
 	case ZP_BISON_TYPE_NULL:
 		return false;
-	case ZP_BISON_TYPE_BOOL:
-	case ZP_BISON_TYPE_INT:
+	case ZP_BISON_TYPE_BOOL_TRUE:
+		return true;
+	case ZP_BISON_TYPE_BOOL_FALSE:
+		return false;
+	case ZP_BISON_TYPE_SBYTE:
 		return *val != 0;
+	case ZP_BISON_TYPE_SHORT:
+		return *(zp_short*)val != 0;
+	case ZP_BISON_TYPE_INT:
+		return *(zp_int*)val != 0;
+	case ZP_BISON_TYPE_LONG:
+		return *(zp_long*)val != 0;
 	case ZP_BISON_TYPE_FLOAT:
 		return *(zp_float*)val != 0.0f;
+	case ZP_BISON_TYPE_DOUBLE:
+		return *(zp_double*)val != 0.0;
 	case ZP_BISON_TYPE_STRING:
 	case ZP_BISON_TYPE_ARRAY:
 	case ZP_BISON_TYPE_OBJECT:
-		return *(zp_uint*)val != 0;
+	case ZP_BISON_TYPE_DATA:
+		return size() != 0;
 	default:
 		return false;
 	}
@@ -183,12 +198,22 @@ zp_int zpBison::Value::asInt() const
 	{
 	case ZP_BISON_TYPE_NULL:
 		return 0;
-	case ZP_BISON_TYPE_BOOL:
-		return *val != 0 ? 1 : 0;
+	case ZP_BISON_TYPE_BOOL_TRUE:
+		return 1;
+	case ZP_BISON_TYPE_BOOL_FALSE:
+		return 0;
+	case ZP_BISON_TYPE_SBYTE:
+		return (zp_int)*val;
+	case ZP_BISON_TYPE_SHORT:
+		return (zp_int)*(zp_short*)val;
 	case ZP_BISON_TYPE_INT:
-		return *(zp_int*)val;
+		return (zp_int)*(zp_int*)val;
+	case ZP_BISON_TYPE_LONG:
+		return (zp_int)*(zp_long*)val;
 	case ZP_BISON_TYPE_FLOAT:
 		return (zp_int)*(zp_float*)val;
+	case ZP_BISON_TYPE_DOUBLE:
+		return (zp_int)*(zp_double*)val;
 	default:
 		ZP_ASSERT( false, "" );
 		return 0;
@@ -201,12 +226,22 @@ zp_float zpBison::Value::asFloat() const
 	{
 	case ZP_BISON_TYPE_NULL:
 		return 0.0f;
-	case ZP_BISON_TYPE_BOOL:
-		return *val != 0 ? 1.0f : 0.0f;
+	case ZP_BISON_TYPE_BOOL_TRUE:
+		return 1.0f;
+	case ZP_BISON_TYPE_BOOL_FALSE:
+		return 0.0f;
+	case ZP_BISON_TYPE_SBYTE:
+		return (zp_float)*val;
+	case ZP_BISON_TYPE_SHORT:
+		return (zp_float)*(zp_short*)val;
 	case ZP_BISON_TYPE_INT:
 		return (zp_float)*(zp_int*)val;
+	case ZP_BISON_TYPE_LONG:
+		return (zp_float)*(zp_long*)val;
 	case ZP_BISON_TYPE_FLOAT:
 		return *(zp_float*)val;
+	case ZP_BISON_TYPE_DOUBLE:
+		return (zp_float)*(zp_double*)val;
 	default:
 		ZP_ASSERT( false, "" );
 		return 0;
@@ -223,8 +258,10 @@ const zp_char* zpBison::Value::asCString() const
 	{
 	case ZP_BISON_TYPE_NULL:
 		return "";
-	case ZP_BISON_TYPE_BOOL:
-		return val != 0 ? "true" : "false";
+	case ZP_BISON_TYPE_BOOL_TRUE:
+		return "true";
+	case ZP_BISON_TYPE_BOOL_FALSE:
+		return "false";
 	case ZP_BISON_TYPE_STRING:
 		return (const zp_char*)( m_data + val + sizeof( zp_hash ) + sizeof( zp_uint ) );
 	default:
@@ -406,31 +443,50 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpHashMap<
 		buffer.write< zpBisonType >( ZP_BISON_TYPE_NULL );
 		break;
 	case ZP_JSON_TYPE_BOOL:
-		buffer.write< zpBisonType >( ZP_BISON_TYPE_BOOL );
-		buffer.write< zp_byte >( json.asBool() ? 1 : 0 );
+		buffer.write< zpBisonType >( json.asBool() ? ZP_BISON_TYPE_BOOL_TRUE : ZP_BISON_TYPE_BOOL_FALSE );
 		break;
 	case ZP_JSON_TYPE_INT:
 	case ZP_JSON_TYPE_UINT:
 	case ZP_JSON_TYPE_LONG:
 	case ZP_JSON_TYPE_ULONG:
-		buffer.write< zpBisonType >( ZP_BISON_TYPE_INT );
-		buffer.write< zp_int >( json.asInt() );
+		{
+			zp_long v = json.asLong();
+
+			if( v >= zp_limit_min<zp_sbyte>() && v <= zp_limit_max<zp_sbyte>() )
+			{
+				buffer.write< zpBisonType >( ZP_BISON_TYPE_SBYTE );
+				buffer.write< zp_sbyte >( (zp_sbyte)v );
+			}
+			else if( v >= zp_limit_min<zp_short>() && v <= zp_limit_max<zp_short>() )
+			{
+				buffer.write< zpBisonType >( ZP_BISON_TYPE_SHORT );
+				buffer.write< zp_short >( (zp_short)v );
+			}
+			else if( v >= zp_limit_min<zp_int>() && v <= zp_limit_max<zp_int>() )
+			{
+				buffer.write< zpBisonType >( ZP_BISON_TYPE_INT );
+				buffer.write< zp_int >( (zp_int)v );
+			}
+			else
+			{
+				buffer.write< zpBisonType >( ZP_BISON_TYPE_LONG );
+				buffer.write< zp_long >( (zp_long)v );
+			}
+		}
 		break;
 	case ZP_JSON_TYPE_FLOAT:
-	case ZP_JSON_TYPE_DOUBLE:
 		buffer.write< zpBisonType >( ZP_BISON_TYPE_FLOAT );
 		buffer.write< zp_float >( json.asFloat() );
+		break;
+	case ZP_JSON_TYPE_DOUBLE:
+		buffer.write< zpBisonType >( ZP_BISON_TYPE_DOUBLE );
+		buffer.write< zp_double >( json.asDouble() );
 		break;
 	case ZP_JSON_TYPE_STRING:
 		{
 			zp_uint offset = stringTable.get( json.asString() );
 			buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
 			buffer.write< zp_uint >( offset );
-			//const zp_char* str = json.asCString();
-			//zp_uint size = zp_strlen( str );
-			//buffer.write< zp_uint >( size );
-			//buffer.writeBulk( str, size );
-			//buffer.write< zp_char >( '\0' );
 		}
 		break;
 	case ZP_JSON_TYPE_ARRAY:
@@ -504,8 +560,11 @@ void zpBisonWriter::writeBison( zpStringBuffer& buffer, const zpBison::Value& bi
 	case ZP_BISON_TYPE_NULL:
 		buffer.append( "null" );
 		break;
-	case ZP_BISON_TYPE_BOOL:
-		buffer.append( bison.asBool() ? "true" : "false" );
+	case ZP_BISON_TYPE_BOOL_TRUE:
+		buffer.append( "true" );
+		break;
+	case ZP_BISON_TYPE_BOOL_FALSE:
+		buffer.append( "false" );
 		break;
 	case ZP_BISON_TYPE_INT:
 		buffer.append( bison.asInt() );
