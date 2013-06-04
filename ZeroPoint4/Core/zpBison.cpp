@@ -144,7 +144,10 @@ zp_bool zpBison::Value::isIntegral() const
 	{
 	case ZP_BISON_TYPE_BOOL_TRUE:
 	case ZP_BISON_TYPE_BOOL_FALSE:
+	case ZP_BISON_TYPE_SBYTE:
+	case ZP_BISON_TYPE_SHORT:
 	case ZP_BISON_TYPE_INT:
+	case ZP_BISON_TYPE_LONG:
 		return true;
 	default:
 		return false;
@@ -152,7 +155,7 @@ zp_bool zpBison::Value::isIntegral() const
 }
 zp_bool zpBison::Value::isReal() const
 {
-	return m_type == ZP_BISON_TYPE_FLOAT;
+	return m_type == ZP_BISON_TYPE_FLOAT || m_type == ZP_BISON_TYPE_DOUBLE;
 }
 zp_bool zpBison::Value::isNumeric() const
 {
@@ -388,7 +391,6 @@ zp_bool zpBison::compileToBuffer( zpDataBuffer& buffer, const zpJson& json )
 		zp_uint size = key.length();
 		zp_hash hash = zp_fnv1_32_string( key.getChars(), header.stringHashSalt );
 
-		//buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
 		buffer.write< zp_hash >( hash );
 		buffer.write< zp_uint >( size );
 		buffer.writeBulk( str, size );

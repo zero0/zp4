@@ -240,10 +240,13 @@ zp_bool zpJson::asBool() const
 	case ZP_JSON_TYPE_BOOL:
 		return m_bool;
 	case ZP_JSON_TYPE_INT:
+		return m_int != 0;
 	case ZP_JSON_TYPE_UINT:
+		return m_uint != 0;
 	case ZP_JSON_TYPE_LONG:
+		return m_long != 0L;
 	case ZP_JSON_TYPE_ULONG:
-		return m_data != 0;
+		return m_ulong != 0L;
 	case ZP_JSON_TYPE_FLOAT:
 		return m_float != 0.0f;
 	case ZP_JSON_TYPE_DOUBLE:
@@ -342,10 +345,13 @@ zp_ulong zpJson::asULong() const
 	case ZP_JSON_TYPE_BOOL:
 		return m_bool ? 1 : 0;
 	case ZP_JSON_TYPE_INT:
+		return (zp_ulong)m_int;
 	case ZP_JSON_TYPE_UINT:
+		return (zp_ulong)m_uint;
 	case ZP_JSON_TYPE_LONG:
+		return (zp_ulong)m_long;
 	case ZP_JSON_TYPE_ULONG:
-		return (zp_ulong)m_data;
+		return (zp_ulong)m_ulong;
 	case ZP_JSON_TYPE_FLOAT:
 		return (zp_ulong)m_float;
 	case ZP_JSON_TYPE_DOUBLE:
@@ -364,10 +370,13 @@ zp_float zpJson::asFloat() const
 	case ZP_JSON_TYPE_BOOL:
 		return m_bool ? 1.0f : 0.0f;
 	case ZP_JSON_TYPE_INT:
+		return (zp_float)m_int;
 	case ZP_JSON_TYPE_UINT:
+		return (zp_float)m_uint;
 	case ZP_JSON_TYPE_LONG:
+		return (zp_float)m_long;
 	case ZP_JSON_TYPE_ULONG:
-		return (zp_float)m_data;
+		return (zp_float)m_ulong;
 	case ZP_JSON_TYPE_FLOAT:
 		return m_float;
 	case ZP_JSON_TYPE_DOUBLE:
@@ -386,10 +395,13 @@ zp_double zpJson::asDouble() const
 	case ZP_JSON_TYPE_BOOL:
 		return m_bool ? 1.0 : 0.0;
 	case ZP_JSON_TYPE_INT:
+		return (zp_double)m_int;
 	case ZP_JSON_TYPE_UINT:
+		return (zp_double)m_uint;
 	case ZP_JSON_TYPE_LONG:
+		return (zp_double)m_long;
 	case ZP_JSON_TYPE_ULONG:
-		return (zp_double)m_data;
+		return (zp_double)m_ulong;
 	case ZP_JSON_TYPE_FLOAT:
 		return (zp_double)m_float;
 	case ZP_JSON_TYPE_DOUBLE:
