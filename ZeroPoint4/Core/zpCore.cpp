@@ -375,6 +375,120 @@ zp_hash zp_fnv1_32_string( const zp_char* c, zp_hash h )
 	return h;
 }
 
+const zp_char toBase64Chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const zp_byte fromBase64Chars[] = {
+	0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 40
+	0,0,62,0,0,0,63,52,53,54,55,56,57,58,59,60,61,0,0,0,0,0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15, // 80
+	16,17,18,19,20,21,22,23,24,25,0,0,0,0,0,0,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49, // 120
+	50,51,
+};
+const zp_char padCharacter = '=';
+
+zp_bool zp_base64_encode( const void* data, zp_uint length, zpStringBuffer& outEncode )
+{
+	const zp_byte* encode = (const zp_byte*)data;
+	zp_uint padding = length % 3;
+	zp_uint count = length / 3;
+	zp_dword n;
+
+	outEncode.clear();
+	outEncode.reserve( ( count + !!padding ) * 4 );
+
+	for( zp_uint i = 0; i < count; ++i )
+	{
+		n  = (*encode++) << 16;
+		n += (*encode++) << 8;
+		n += (*encode++) << 0;
+
+		outEncode.append( toBase64Chars[ ( n & 0x00FC0000 ) >> 18 ] );
+		outEncode.append( toBase64Chars[ ( n & 0x0003F000 ) >> 12 ] );
+		outEncode.append( toBase64Chars[ ( n & 0x00000FC0 ) >> 6  ] );
+		outEncode.append( toBase64Chars[ ( n & 0x0000003F ) >> 0  ] );
+	}
+
+	switch( padding )
+	{
+	case 1:
+		{
+			n  = (*encode++) << 16;
+			outEncode.append( toBase64Chars[ ( n & 0x00FC0000 ) >> 18 ] );
+			outEncode.append( toBase64Chars[ ( n & 0x0003F000 ) >> 12 ] );
+			outEncode.append( padCharacter );
+			outEncode.append( padCharacter );
+		}
+		break;
+	case 2:
+		{
+			n  = (*encode++) << 16;
+			n += (*encode++) << 8;
+			outEncode.append( toBase64Chars[ ( n & 0x00FC0000 ) >> 18 ] );
+			outEncode.append( toBase64Chars[ ( n & 0x0003F000 ) >> 12 ] );
+			outEncode.append( toBase64Chars[ ( n & 0x00000FC0 ) >> 6  ] );
+			outEncode.append( padCharacter );
+		}
+		break;
+	default:
+		break;
+	}
+
+	return true;
+}
+zp_bool zp_base64_decode( const zp_char* data, zp_uint length, zpDataBuffer& outDecode )
+{
+	if( ( length % 4 ) != 0 || length == 0 )
+	{
+		return false;
+	}
+
+	zp_uint padding = 0;
+	padding += data[ length - 1 ] == padCharacter ? 1 : 0;
+	padding += data[ length - 2 ] == padCharacter ? 1 : 0;
+
+	outDecode.reset();
+	outDecode.reserve( ( ( length / 4 ) * 3 ) - padding );
+
+	zp_uint count = length - 4;
+	zp_dword n;
+	for( zp_uint i = 0; i < count; i += 4 )
+	{
+		n  = fromBase64Chars[ data[ i + 0 ] ] << 18;
+		n += fromBase64Chars[ data[ i + 1 ] ] << 12;
+		n += fromBase64Chars[ data[ i + 2 ] ] << 6;
+		n += fromBase64Chars[ data[ i + 3 ] ] << 0;
+
+		outDecode.write< zp_char >( ( n >> 16 ) & 0xFF );
+		outDecode.write< zp_char >( ( n >> 8  ) & 0xFF );
+		outDecode.write< zp_char >( ( n >> 0  ) & 0xFF );
+	}
+
+	switch( padding )
+	{
+	case 1:
+		{
+			n  = fromBase64Chars[ data[ count + 0 ] ] << 18;
+			n += fromBase64Chars[ data[ count + 1 ] ] << 12;
+			n += fromBase64Chars[ data[ count + 2 ] ] << 6;
+
+			outDecode.write< zp_char >( ( n >> 16 ) & 0xFF );
+			outDecode.write< zp_char >( ( n >> 8  ) & 0xFF );
+		}
+		break;
+	case 2:
+		{
+			n  = fromBase64Chars[ data[ count + 0 ] ] << 18;
+			n += fromBase64Chars[ data[ count + 1 ] ] << 12;
+
+			outDecode.write< zp_char >( ( n >> 16 ) & 0xFF );
+		}
+		break;
+	default:
+		break;
+	}
+
+	return true;
+}
+
 void zpCoreRegisterSerializables() {
 	//zpRegisterSerializable::registerSerializable<zpGame>();
 	//zpRegisterSerializable::registerSerializable<zpWindow>();

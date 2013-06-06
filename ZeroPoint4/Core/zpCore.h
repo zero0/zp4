@@ -333,6 +333,9 @@ void zp_qsort( T* arr, zp_uint count ) {
 	zp_qsort( arr, 0, count - 1 );
 }
 
+zp_bool zp_base64_encode( const void* data, zp_uint length, zpStringBuffer& outEncode );
+zp_bool zp_base64_decode( const zp_char* data, zp_uint length, zpDataBuffer& outDecode );
+
 void zpCoreRegisterSerializables();
 
 #endif
