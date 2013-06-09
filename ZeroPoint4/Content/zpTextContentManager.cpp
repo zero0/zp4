@@ -10,8 +10,8 @@ zp_bool zpTextResource::load( const zp_char* filename )
 
 		if( m_filename.endsWith( ".json" ) )
 		{
+			zpJson json;			
 			zpJsonParser parser;
-			zpJson json;
 			if( parser.parseFile( m_filename, json ) )
 			{
 				zpDataBuffer bisonData;

@@ -1,12 +1,5 @@
 #include "zpRendering.h"
-
-#if ZP_RENDERING_TYPE == ZP_DX11
-#include "RenderingDX/zpDX11.h"
-#elif ZP_RENDERING_TYPE == ZP_GL2
-#include "RenderingOpenGL/zpOpenGL.h"
-#else
-#error( "No rendering engine selected!" )
-#endif
+#include "zpRenderingImpl.inl"
 
 zpBuffer::zpBuffer( zpBufferImpl* buffer )
 	: m_buffer( buffer )
@@ -34,4 +27,9 @@ zpDisplayFormat zpBuffer::getFormat() const
 zpBufferBindType zpBuffer::getBufferBindType() const
 {
 	return m_buffer->getBufferBindType();
+}
+
+zpBufferImpl* zpBuffer::getBufferImpl() const
+{
+	return m_buffer;
 }

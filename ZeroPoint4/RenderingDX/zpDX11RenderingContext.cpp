@@ -62,6 +62,7 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 			{
 				m_context->ClearState();
 			}
+			break;
 
 		case ZP_RENDERING_COMMNAD_SET_RT:
 			{

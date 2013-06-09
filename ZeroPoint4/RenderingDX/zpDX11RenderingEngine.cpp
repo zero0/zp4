@@ -401,23 +401,124 @@ zpSamplerStateImpl* zpRenderingEngineImpl::createSamplerState( const zpSamplerSt
 	ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Sampler State" );
 
 	zpSamplerStateImpl* impl = new zpSamplerStateImpl;
-	impl->m_sampler = 0;
+	impl->m_sampler = state;
 	impl->m_desc = desc;
 
 	return impl;
 }
-zpShaderImpl* zpRenderingEngineImpl::createShader( const zpString& shaderFile )
+zpShaderImpl* zpRenderingEngineImpl::createShader()
 {
 	zpShaderImpl* shader = new zpShaderImpl;
-	shader->m_shaderFileName = shaderFile;
 
-	loadShader( shader );
+	//loadShader( shader, shaderfileName );
 
 	return shader;
 }
-zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
+zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& shaderfile )
 {
-	zpFile shaderFile( shader->m_shaderFileName );
+	const zpBison::Value& root = shaderfile.root();
+
+	const zpBison::Value vs = root[ "VS" ];
+	const zpBison::Value ps = root[ "PS" ];
+	const zpBison::Value gs = root[ "GS" ];
+	const zpBison::Value gsso = root[ "GSSO" ];
+	const zpBison::Value cs = root[ "CS" ];
+	
+	zpDataBuffer data;
+	HRESULT hr;
+
+	const zp_char* encodedShader;
+	zp_uint encodedLength;
+
+	if( !vs.isNull() )
+	{
+		encodedShader = vs[ "Data" ].asCString();
+		encodedLength = zp_strlen( encodedShader );
+
+		zp_base64_decode( encodedShader, encodedLength, data );
+
+		hr = m_d3dDevice->CreateVertexShader( data.getData(), data.size(), ZP_NULL, &shader->m_vertexShader );
+		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Vertex Shader %x", hr );
+
+		const zpBison::Value format = vs[ "Format" ];
+
+		shader->m_vertexLayout = ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR;
+
+		createVertexLayout( shader->m_vertexLayout, data );
+	}
+
+	if( !ps.isNull() )
+	{
+		encodedShader = ps[ "Data" ].asCString();
+		encodedLength = zp_strlen( encodedShader );
+
+		zp_base64_decode( encodedShader, encodedLength, data );
+
+		hr = m_d3dDevice->CreatePixelShader( data.getData(), data.size(), ZP_NULL, &shader->m_pixelShader );
+		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Pixel Shader %x", hr );
+	}
+
+	if( !gs.isNull() )
+	{
+		encodedShader = gs[ "Data" ].asCString();
+		encodedLength = zp_strlen( encodedShader );
+
+		zp_base64_decode( encodedShader, encodedLength, data );
+
+		hr = m_d3dDevice->CreateGeometryShader( data.getData(), data.size(), ZP_NULL, &shader->m_geometryShader );
+		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Geometry Shader %x", hr );
+	}
+
+	if( !gsso.isNull() )
+	{
+		encodedShader = gsso[ "Data" ].asCString();
+		encodedLength = zp_strlen( encodedShader );
+
+		zp_base64_decode( encodedShader, encodedLength, data );
+
+		const zpBison::Value& stridesValue = gsso[ "Strides" ];
+		const zpBison::Value& entriesValue = gsso[ "Entries" ];
+
+		zpArrayList< zp_uint > strides;
+		strides.reserve( stridesValue.size() );
+		for( zp_uint i = 0; i < strides.size(); ++i )
+		{
+			strides.pushBackEmpty() = stridesValue[ i ].asInt();
+		}
+
+		zpArrayList< D3D11_SO_DECLARATION_ENTRY > entries;
+		entries.reserve( entriesValue.size() );
+		for( zp_uint i = 0; i < entries.size(); ++i )
+		{
+			const zpBison::Value& entryValue = entriesValue[ i ];
+
+			D3D11_SO_DECLARATION_ENTRY& entry = entries.pushBackEmpty();
+			entry.Stream =			entryValue[ "Stream" ].asInt();
+			entry.SemanticIndex =	entryValue[ "SemanticIndex" ].asInt();
+			entry.StartComponent =	entryValue[ "StartComponent" ].asInt();
+			entry.ComponentCount =	entryValue[ "ComponentCount" ].asInt();
+			entry.OutputSlot =		entryValue[ "OutputSlot" ].asInt();
+			entry.SemanticName =	entryValue[ "SemanticName" ].asCString();
+		}
+
+		hr = m_d3dDevice->CreateGeometryShaderWithStreamOutput( data.getData(), data.size(), entries.begin(), entries.size(), strides.begin(), strides.size(), D3D11_SO_NO_RASTERIZED_STREAM, ZP_NULL, &shader->m_geometryShader );
+		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Geometry Shader %x", hr );
+	}
+
+	if( !cs.isNull() )
+	{
+		encodedShader = cs[ "Data" ].asCString();
+		encodedLength = zp_strlen( encodedShader );
+
+		zp_base64_decode( encodedShader, encodedLength, data );
+
+		hr = m_d3dDevice->CreateComputeShader( data.getData(), data.size(), ZP_NULL, &shader->m_computeShader );
+		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Compute Shader %x", hr );
+	}
+
+
+#if 0
+	zpFile shaderFile( shaderfileName );
 	if( shaderFile.open( ZP_FILE_MODE_BINARY_READ ) )
 	{	
 		HRESULT hr;
@@ -563,6 +664,7 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader )
 			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Compute Shader %x", hr );
 		}
 	}
+#endif
 
 	return false;
 }
@@ -579,6 +681,94 @@ zp_bool zpRenderingEngineImpl::destroyShader( zpShaderImpl* shader )
 void zpRenderingEngineImpl::present( zp_bool vsync )
 {
 	m_swapChain->Present( vsync ? 1 : 0, 0 );
+}
+
+void zpRenderingEngineImpl::createVertexLayout( zpVertexFormatDesc format, const zpDataBuffer& data )
+{
+	ID3D11InputLayout* inputLayout;
+	HRESULT hr;
+
+	switch( format )
+	{
+	case ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR:
+		{
+			if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_COLOR ] )
+			{
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
+
+				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), data.getData(), data.size(), &inputLayout );
+				ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+				m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_COLOR ] = inputLayout;
+			}
+		}
+		break;
+
+	case ZP_VERTEX_FORMAT_DESC_VERTEX_UV:
+		{
+			if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_UV ] )
+			{
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
+
+				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ),data.getData(), data.size(), &inputLayout );
+				ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+				m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_UV ] = inputLayout;
+			}
+		}
+		break;
+
+	case ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV:
+		{
+			if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ] )
+			{
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
+
+				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), data.getData(), data.size(), &inputLayout );
+				ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+				m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ] = inputLayout;
+			}
+		}
+		break;
+
+	case ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2:
+		{
+			if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ] )
+			{
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD1",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
+
+				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), data.getData(), data.size(), &inputLayout );
+				ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+				m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ] = inputLayout;
+			}
+		}
+		break;
+
+	default:
+		ZP_ASSERT( false, "" );
+		break;
+	}
 }
 
 #if 0

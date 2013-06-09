@@ -323,7 +323,7 @@ ZP_FORCE_INLINE void zpMath::LookAtLH( zpMatrix4f& s, const zpVector4f& eye, con
 ZP_FORCE_INLINE void zpMath::PerspectiveLH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar )
 {
 	zpScalar f, fa, z( 0.0f ), o( 1.0f ), fn, nf, r22, r23;
-	zpMath::DegToRad( f, f );
+	zpMath::DegToRad( f, fovy );
 	zpMath::Mul( f, f, zpScalar( 0.5f ) );
 	zpMath::Tan( f, f );
 	zpMath::Rcp( f, f );

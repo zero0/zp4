@@ -26,10 +26,10 @@ zpShaderImpl::~zpShaderImpl()
 	unload();
 }
 
-zp_bool zpShaderImpl::load( zpRenderingEngineImpl* engine )
+zp_bool zpShaderImpl::load( zpRenderingEngineImpl* engine, const zpBison& shaderFile )
 {
-	return engine->loadShader( this );
-}
+	return engine->loadShader( this, shaderFile );
+} 
 void zpShaderImpl::unload()
 {
 	ZP_SAFE_RELEASE( m_vertexShader );

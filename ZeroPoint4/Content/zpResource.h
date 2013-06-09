@@ -20,8 +20,10 @@ public:
 	zp_bool isLoaded() const;
 
 protected:
+	zp_bool m_isLoaded;
 	zp_uint m_refCount;
 	zpString m_filename;
+
 	Resource* m_resource;
 };
 

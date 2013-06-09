@@ -1,6 +1,6 @@
 #pragma once
-#ifndef ZP_MATERIAL_RESOURCE_H
-#define ZP_MATERIAL_RESOURCE_H
+#ifndef ZP_MATERIAL_H
+#define ZP_MATERIAL_H
 
 struct zpMaterial
 {
@@ -8,7 +8,7 @@ struct zpMaterial
 	//zpFixedArrayList< zpResourceInstance< zpTextureResource >, ZP_MATERIAL_TEXTURE_SLOT_Count > textures;
 };
 
-class zpMaterialResource : public zpResource< int >
+class zpMaterialResource : public zpResource< zpMaterial >
 {
 public:
 	zpMaterialResource();

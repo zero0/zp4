@@ -62,6 +62,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 	if( empty->isLoaded() )
 	{
 		impl->destroyResource( empty );
+		empty->m_isLoaded = false;
 	}
 
 	// create the resource
@@ -72,6 +73,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		{
 			outInstance.m_resource = empty;
 			empty->addRef();
+			empty->m_isLoaded = true;
 
 			return true;
 		}
@@ -107,6 +109,7 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 
 			instance.m_resource = ZP_NULL;
 			found->releaseRef();
+			found->m_isLoaded = false;
 		}
 	}
 }

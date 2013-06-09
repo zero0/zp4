@@ -43,7 +43,7 @@ public:
 	zp_bool isDirty() const;
 	void unmarkDirty();
 
-	zpRay generateRay( const zpVector2i& windowPosition ) const;
+	void generateRay( const zpVector2i& windowPosition, zpRay& outRay ) const;
 
 private:
 	zpCameraProjection m_projectionType;

@@ -149,10 +149,10 @@ enum zpVertexFormat
 };
 enum zpVertexFormatDesc : zp_uint
 {
-	ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR =		ZP_MAKE_UINT( '\0', '\0', 'V', 'C' ),
-	ZP_VERTEX_FORMAT_DESC_VERTEX_UV =			ZP_MAKE_UINT( '\0', '\0', 'V', 'U' ),
-	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV =	ZP_MAKE_UINT( '\0', 'V', 'N', 'U' ),
-	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2 =	ZP_MAKE_UINT( '\0', 'V', 'N', 'W' ),
+	ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR =		ZP_MAKE_UINT( 'V', 'C', '\0', '\0' ),
+	ZP_VERTEX_FORMAT_DESC_VERTEX_UV =			ZP_MAKE_UINT( 'V', 'U', '\0', '\0' ),
+	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV =	ZP_MAKE_UINT( 'V', 'N', 'U', '\0' ),
+	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2 =	ZP_MAKE_UINT( 'V', 'N', 'W', '\0' ),
 };
 
 enum zpScreenMode
@@ -486,7 +486,7 @@ class zpDeferredRenderingComponent;
 #include "zpViewport.h"
 #include "zpTexture.h"
 
-#include "zpShaderResource.h"
+#include "zpShader.h"
 
 #include "zpTextureResource.h"
 
@@ -500,7 +500,7 @@ class zpDeferredRenderingComponent;
 #include "zpSamplerState.h"
 #include "zpRasterState.h"
 
-#include "zpMaterialResource.h"
+#include "zpMaterial.h"
 #include "zpFontResource.h"
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"

@@ -15,12 +15,15 @@ public:
 	void run();
 	zp_int shutdown();
 
+	void exit( zp_int exitCode = 0 );
+
 	const zpBison::Value& getOptions() const;
 
 private:
 	void processFrame();
 	
 	zp_bool m_isRunning;
+	zp_int m_exitCode;
 	zpString m_optionsFilename;
 
 	zpConsole* m_console;

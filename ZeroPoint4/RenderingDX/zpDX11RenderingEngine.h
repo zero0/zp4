@@ -27,8 +27,8 @@ public:
 	zpDepthStencilBufferImpl* createDepthStencilBuffer( zp_uint width, zp_uint height, zpDisplayFormat format );
 	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerStateImpl* createSamplerState( const zpSamplerStateDesc& desc );
-	zpShaderImpl* createShader( const zpString& shaderFile );
-	zp_bool loadShader( zpShaderImpl* shader );
+	zpShaderImpl* createShader();
+	zp_bool loadShader( zpShaderImpl* shader, const zpBison& shaderFile );
 	zp_bool destroyShader( zpShaderImpl* shader );
 
 	void present( zp_bool vsync );
@@ -36,7 +36,7 @@ public:
 	ID3D11InputLayout* getInputLayout( zpVertexFormat format ) const { return m_inputLayouts[ format ]; }
 
 private:
-	//void createVertexLayout( zpVertexFormat format );
+	void createVertexLayout( zpVertexFormatDesc format, const zpDataBuffer& data );
 
 	IDXGIFactory* m_dxgiFactory;
 	IDXGIAdapter* m_dxgiAdapter;

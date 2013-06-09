@@ -95,7 +95,7 @@
     <ClInclude Include="zpFontResource.h" />
     <ClInclude Include="zpImmediateBuffer.h" />
     <ClInclude Include="zpLightComponent.h" />
-    <ClInclude Include="zpMaterialResource.h" />
+    <ClInclude Include="zpMaterial.h" />
     <ClInclude Include="zpOBJStaticMeshResource.h" />
     <ClInclude Include="zpRasterState.h" />
     <ClInclude Include="zpRendering.h" />
@@ -106,7 +106,7 @@
     <ClInclude Include="zpRenderingManager.h" />
     <ClInclude Include="zpRenderingResourceCreator.h" />
     <ClInclude Include="zpSamplerState.h" />
-    <ClInclude Include="zpShaderResource.h" />
+    <ClInclude Include="zpShader.h" />
     <ClInclude Include="zpStaticMeshRenderingComponent.h" />
     <ClInclude Include="zpStaticMeshResource.h" />
     <ClInclude Include="zpTextRenderingComponent.h" />
@@ -126,7 +126,7 @@
     <ClCompile Include="zpDepthStencilBuffer.cpp" />
     <ClCompile Include="zpFontResource.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
-    <ClCompile Include="zpMaterialResource.cpp" />
+    <ClCompile Include="zpMaterial.cpp" />
     <ClCompile Include="zpOBJStaticMeshResource.cpp" />
     <ClCompile Include="zpRasterState.cpp" />
     <ClCompile Include="zpRendering.cpp">
@@ -141,8 +141,7 @@
     <ClCompile Include="zpRenderingPipeline.cpp" />
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
     <ClCompile Include="zpSamplerState.cpp" />
-    <ClCompile Include="zpShaderInstance.cpp" />
-    <ClCompile Include="zpShaderResource.cpp" />
+    <ClCompile Include="zpShader.cpp" />
     <ClCompile Include="zpStaticMeshInstance.cpp" />
     <ClCompile Include="zpStaticMeshRenderingComponent.cpp" />
     <ClCompile Include="zpStaticMeshResource.cpp" />

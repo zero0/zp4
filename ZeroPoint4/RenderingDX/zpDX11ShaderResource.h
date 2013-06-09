@@ -13,7 +13,7 @@ public:
 	zpShaderImpl();
 	~zpShaderImpl();
 
-	zp_bool load( zpRenderingEngineImpl* engine );
+	zp_bool load( zpRenderingEngineImpl* engine, const zpBison& shaderFile );
 	void unload();
 
 private:
@@ -23,8 +23,6 @@ private:
 	ID3D11ComputeShader* m_computeShader;
 
 	zpVertexFormatDesc m_vertexLayout;
-
-	zpString m_shaderFileName;
 
 	friend class zpRenderingEngineImpl;
 	friend class zpRenderingContextImpl;

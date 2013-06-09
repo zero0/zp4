@@ -1,7 +1,8 @@
 
 template<typename Resource>
 zpResource<Resource>::zpResource()
-	: m_refCount( 0 )
+	: m_isLoaded( false )
+	, m_refCount( 0 )
 	, m_filename()
 	, m_resource( ZP_NULL )
 {}
@@ -43,5 +44,5 @@ zp_uint zpResource<Resource>::getRefCount() const
 template<typename Resource>
 zp_bool zpResource<Resource>::isLoaded() const
 {
-	return m_resource != ZP_NULL;
+	return m_isLoaded;
 }

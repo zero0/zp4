@@ -16,13 +16,14 @@ public:
 	zpDisplayFormat getFormat() const;
 	zpBufferBindType getBufferBindType() const;
 
+	zpBufferImpl* getBufferImpl() const;
+
 private:
 	zpBuffer( zpBufferImpl* buffer );
 
 	zpBufferImpl* m_buffer;
 
 	friend class zpRenderingEngine;
-	friend class zpRenderingContext;
 };
 
 #if 0

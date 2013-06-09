@@ -6,6 +6,7 @@
 
 zpApplication::zpApplication()
 	: m_isRunning( false )
+	, m_exitCode( 0 )
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
 	, m_console( ZP_NULL )
 	, m_timer( zpTime::getInstance() )
@@ -16,9 +17,7 @@ zpApplication::zpApplication()
 
 }
 zpApplication::~zpApplication()
-{
-
-}
+{}
 
 void zpApplication::setOptionsFilename( const zp_char* filename )
 {
@@ -105,7 +104,13 @@ zp_int zpApplication::shutdown()
 
 	m_window.destroy();
 
-	return 0;
+	return m_exitCode;
+}
+
+void zpApplication::exit( zp_int exitCode )
+{
+	m_isRunning = false;
+	m_exitCode = exitCode;
 }
 
 const zpBison::Value& zpApplication::getOptions() const

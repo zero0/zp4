@@ -169,7 +169,7 @@ void zpCamera::unmarkDirty()
 	m_isDirty = false;
 }
 
-zpRay zpCamera::generateRay( const zpVector2i& windowPosition ) const
+void zpCamera::generateRay( const zpVector2i& windowPosition, zpRay& outRay ) const
 {
 	const zpVector2i& screenSize = zpRenderingFactory::getRenderingEngine()->getWindow()->getScreenSize();
 
@@ -184,5 +184,6 @@ zpRay zpCamera::generateRay( const zpVector2i& windowPosition ) const
 	
 	zpMath::Sub( farZ, farZ, nearZ );
 
-	return zpRay( nearZ, farZ );
+	outRay.setOrigin( nearZ );
+	outRay.setDirection( farZ );
 }

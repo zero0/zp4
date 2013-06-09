@@ -137,8 +137,8 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 
 	m_currentCommnad->layer = layer;
 	m_currentCommnad->topology = topology;
-	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->m_buffer;
-	m_currentCommnad->indexBuffer = m_currentIndexBuffer->m_buffer;
+	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->getBufferImpl();
+	m_currentCommnad->indexBuffer = m_currentIndexBuffer->getBufferImpl();
 	m_currentCommnad->vertexFormat = vertexFormat;
 	m_currentCommnad->vertexCount = 0;
 	m_currentCommnad->indexCount = 0;
@@ -314,8 +314,8 @@ void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topolo
 
 	command.layer = layer;
 	command.topology = topology;
-	command.vertexBuffer = vertexBuffer->m_buffer;
-	command.indexBuffer = indexBuffer->m_buffer;
+	command.vertexBuffer = vertexBuffer->getBufferImpl();
+	command.indexBuffer = indexBuffer->getBufferImpl();
 	command.vertexFormat = vertexFormat;
 	command.vertexCount = vertexCount;
 	command.indexCount = indexCount;
@@ -324,22 +324,22 @@ void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topolo
 
 	if( boundingBox )
 	{
-		command.boundingBox = *boundingBox;
+		command.boundingBox.add( *boundingBox );
 	}
 }
 
 void zpRenderingContext::map( zpBuffer* buffer, void** data, zpMapType mapType, zp_uint subResource )
 {
-	m_renderContextImpl->map( buffer->m_buffer, data, mapType, subResource );
+	m_renderContextImpl->map( buffer->getBufferImpl(), data, mapType, subResource );
 }
 void zpRenderingContext::unmap( zpBuffer* buffer, zp_uint subResource )
 {
-	m_renderContextImpl->unmap( buffer->m_buffer, subResource );
+	m_renderContextImpl->unmap( buffer->getBufferImpl(), subResource );
 }
 
 void zpRenderingContext::update( zpBuffer* buffer, void* data, zp_uint size )
 {
-	m_renderContextImpl->update( buffer->m_buffer, data, size );
+	m_renderContextImpl->update( buffer->getBufferImpl(), data, size );
 }
 
 void zpRenderingContext::processCommands()

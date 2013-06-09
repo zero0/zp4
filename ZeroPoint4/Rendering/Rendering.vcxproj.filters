@@ -42,9 +42,6 @@
     <ClInclude Include="zpTextureResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpShaderResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpDepthStencilBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -105,9 +102,6 @@
     <ClInclude Include="zpAnimatedMeshResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpMaterialResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpDeferredRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -115,6 +109,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -146,12 +146,6 @@
     <ClCompile Include="zpCameraComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpShaderResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpShaderInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpStaticMeshRenderingComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -174,9 +168,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpUIRenderingComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpMaterialResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpDeferredRenderingComponent.cpp">
@@ -207,6 +198,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpDepthStencilBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

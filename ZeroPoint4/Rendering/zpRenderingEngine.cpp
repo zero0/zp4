@@ -118,7 +118,7 @@ zpBuffer* zpRenderingEngine::createBuffer( zpBufferType type, zpBufferBindType b
 	return new zpBuffer( buffer );
 }
 
-zpTexture* zpRenderingEngine::createTexture(  zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
+zpTexture* zpRenderingEngine::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
 {
 	zpTextureImpl* texture;
 	texture = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, mipLevels );
@@ -181,15 +181,15 @@ zpSamplerState* zpRenderingEngine::createSamplerState( const zpSamplerStateDesc&
 	return sampler;
 }
 
-zpShader* zpRenderingEngine::createShader( const zpString& shaderFile )
+zpShader* zpRenderingEngine::createShader()
 {
 	zpShaderImpl* shader;
-	shader = m_renderingEngine->createShader( shaderFile );
+	shader = m_renderingEngine->createShader();
 	return new zpShader( shader );
 }
-zp_bool zpRenderingEngine::reloadShader( zpShader* shader )
+zp_bool zpRenderingEngine::loadShader( zpShader* shader, const zpBison& shaderfile )
 {
-	return m_renderingEngine->loadShader( shader->getShaderImpl() );
+	return m_renderingEngine->loadShader( shader->getShaderImpl(), shaderfile );
 }
 zp_bool zpRenderingEngine::destroyShader( zpShader* shader )
 {
