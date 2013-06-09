@@ -19,6 +19,7 @@ public abstract class ArcCompiler implements Runnable
 	private String fileToCompile = "";
 	private String inputDir = "";
 	private String outputDir = "";
+	private String tempDir = "";
 	private ArcCompilerListener listener = null;
 	private Platform platform = Platform.Win32;
 	private Rendering rendering = Rendering.DX11;
@@ -66,12 +67,27 @@ public abstract class ArcCompiler implements Runnable
 	{
 		return this.inputDir;
 	}
+	
+	public final void setTempDirectory( String tempDir )
+	{
+		this.tempDir = tempDir;
+	}
+	
+	public final String getTempDirectory()
+	{
+		return this.tempDir;
+	}
 
 	public final void setListener( ArcCompilerListener listener )
 	{
 		this.listener = listener;
 	}
 
+	public final ArcCompilerListener getListener()
+	{
+		return this.listener;	
+	}
+	
 	public final Platform getPlatform()
 	{
 		return platform;

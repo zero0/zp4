@@ -36,6 +36,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	private static String arcOutputLevel = "arc.output-level";
 	private static String arcAutoCompile = "arc.auto-compile";
 	private static String arcExeLevel = "arc.exe-mode";
+	private static String arcTempRoot = "arc.temp-root";
 
 	private final Map<Class<? extends ArcCompiler>, Properties> compilerProperties = new HashMap<Class<? extends ArcCompiler>, Properties>();
 
@@ -59,6 +60,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 
 	String inRootDir;
 	String outRootDir;
+	String tmpRootDir;
 	
 	Platform platform;
 	Rendering rendering;
@@ -111,36 +113,17 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		out( OutputLevel.Verbos, "Loading properties..." );
 
 		inRootDir = properties.getProperty( arcInRoot );
-		try
-		{
-			inRootDir = new File( inRootDir ).getCanonicalPath();
-		}
-		catch( IOException e2 )
-		{
-		}
-		fileWatcher = new FileWatcher( inRootDir );
+		inRootDir = getFullDirectoryPath( inRootDir );
 		
-		outRootDir = properties.getProperty( arcOutRoot );
-		outRootDir = outRootDir.replace( "{Platform}", platform.name() );
-		outRootDir = outRootDir.replace( "{ExeMode}", executableMode.name() );
+		outRootDir = properties.getProperty( arcOutRoot );		
+		outRootDir = getFullDirectoryPath( outRootDir );
 		
-		try
-		{
-			File outDir = new File( outRootDir );
-			outDir.mkdirs();
-			
-			if( !outDir.exists() )
-			{
-				System.out.println( "Did not create directories for " + outDir.getCanonicalPath() );
-			}
-			
-			outRootDir = outDir.getCanonicalPath();
-		}
-		catch( IOException e2 )
-		{
-		}
+		tmpRootDir = properties.getProperty( arcTempRoot );
+		tmpRootDir = getFullDirectoryPath( tmpRootDir );
 		
 		autoCompile = Boolean.parseBoolean( properties.getProperty( arcAutoCompile, "false" ) );
+		
+		fileWatcher = new FileWatcher( inRootDir );
 		fileWatcher.setIsEnabled( autoCompile );
 
 		int numThreads = Integer.parseInt( properties.getProperty( arcThreads, "10" ) );
@@ -190,6 +173,28 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		}
 	}
 
+	public final String getFullDirectoryPath( String path )
+	{
+		String fullPath = null;
+		try
+		{
+			File outDir = new File( path );
+			outDir.mkdirs();
+			
+			fullPath = outDir.getCanonicalPath()
+			.replace( "{Platform}", platform.name() )      
+			.replace( "{ExeMode}", executableMode.name() )
+			.replace( "{Rendering}", rendering.name() )
+			;		
+		}
+		catch( IOException e )
+		{
+			err( "Unable to create directory structure: " + path );
+		}
+		
+		return fullPath;
+	}
+	
 	private final void saveProperties()
 	{
 		OutputStream out = null;
@@ -206,7 +211,10 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		{
 			try
 			{
-				if( out != null ) out.close();
+				if( out != null )
+				{
+					out.close();
+				}
 			}
 			catch( Exception e )
 			{
@@ -241,6 +249,11 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		return outRootDir;
 	}
 
+	public final String getTempDirectory()
+	{
+		return tmpRootDir;
+	}
+	
 	public final ArcDatabase getArcDatabase()
 	{
 		return database;
@@ -307,6 +320,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 					arcCompiler.setExectuableMode( getExecutableMode() );
 					arcCompiler.setInputDirectory( getRootDirectory() );
 					arcCompiler.setOutputDirectory( getOutputRootDirectory() );
+					arcCompiler.setTempDirectory( getTempDirectory() );
 					arcCompiler.setListener( this );
 
 					// arcCompiler.run();

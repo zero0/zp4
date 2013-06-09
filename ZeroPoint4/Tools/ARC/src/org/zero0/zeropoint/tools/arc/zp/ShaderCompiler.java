@@ -1,9 +1,7 @@
 package org.zero0.zeropoint.tools.arc.zp;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -25,11 +23,14 @@ import org.zero0.zeropoint.tools.arc.Platform;
 import org.zero0.zeropoint.tools.arc.Rendering;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+
 public class ShaderCompiler extends ArcCompiler
 {
 	enum ShaderType
 	{
-		VERTEX( "vs" ), PIXEL( "ps" ), GEOMETRY( "gs" ), COMPUTE( "cs" );
+		VERTEX( "vs" ), PIXEL( "ps" ), GEOMETRY( "gs" ), GEOMETRY_STREAMOUT( "gsso" ), COMPUTE( "cs" );
 
 		private final String type;
 
@@ -93,13 +94,13 @@ public class ShaderCompiler extends ArcCompiler
 		renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
 		renderingOptions.get( Rendering.DX10 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
 		renderingOptions.get( Rendering.DX10 ).put( OPTION_HEADER, DX10_HEADER );
-		
+
 		renderingOptions.put( Rendering.DX11, new HashMap<String, String>() );
 		renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_DEBUG, DX_OPTION_OPTIMIZATION_DEBUG );
 		renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_LOW, DX_OPTION_OPTIMIZATION_LOW );
 		renderingOptions.get( Rendering.DX11 ).put( OPTION_OPTIMIZATION_HIGH, DX_OPTION_OPTIMIZATION_HIGH );
 		renderingOptions.get( Rendering.DX11 ).put( OPTION_HEADER, DX11_HEADER );
-		
+
 		shaderTypes.addAll( Arrays.asList( ShaderType.values() ) );
 
 		dxProfiles.put( Rendering.DX10, DX10_TYPE );
@@ -146,7 +147,10 @@ public class ShaderCompiler extends ArcCompiler
 		}
 
 		// output file
-		String outFile = getOutputDirectory() + File.separatorChar + getFileToCompile().replace( ".shader", "." + type.getType() + "_shaderb" );
+		String outDir = getTempDirectory() + File.separatorChar + getFileToCompile().substring( 0, getFileToCompile().lastIndexOf( File.separatorChar ) );
+		Arc.getInstance().getFullDirectoryPath( outDir );
+
+		String outFile = getTempDirectory() + File.separatorChar + getFileToCompile().replace( ".shader", "." + type.getType() + "_shader" );
 		options.append( " /Fo " ).append( '"' ).append( outFile ).append( '"' );
 		outCompiledFiles.put( type, outFile );
 
@@ -182,7 +186,7 @@ public class ShaderCompiler extends ArcCompiler
 			{
 				String exec = getCompilerExecString( type );
 				if( exec == null ) continue;
-				Arc.getInstance().out( OutputLevel.Verbos, "Executing: " + exec );
+				Arc.getInstance().out( OutputLevel.Verbos, "ShaderCompiler Executing: " + exec );
 
 				ProcessBuilder pb = new ProcessBuilder();
 				pb.redirectErrorStream( true );
@@ -218,7 +222,6 @@ public class ShaderCompiler extends ArcCompiler
 				{
 					Arc.getInstance().err( sb.toString() );
 				}
-
 			}
 			catch( Exception e )
 			{
@@ -233,58 +236,90 @@ public class ShaderCompiler extends ArcCompiler
 			}
 		}
 
-		// combine all files into one...
-		ByteArrayOutputStream data = new ByteArrayOutputStream( 4096 );
-		DataOutputStream dos = new DataOutputStream( data );
+		// compile to json
 		try
 		{
-			// write header
-			dos.write( ZPSD_HEADER.getBytes() );
-			dos.write( renderingOptions.get( getRendering() ).get( OPTION_HEADER ).getBytes() );
-			dos.writeInt( 0 ); // shader file version
-			dos.writeInt( 0 ); // vertex shader input
-			
-			// write each shader type's size
-			for( ShaderType shaderType : shaderTypes )
+			String shaderFile = getOutputDirectory() + File.separatorChar + getFileToCompile().replace( ".shader", ".json" );
+
+			JsonFactory j = new JsonFactory();
+			JsonGenerator g = j.createGenerator( new FileOutputStream( shaderFile ) );
+
+			g.writeStartObject();
 			{
-				if( outCompiledFiles.containsKey( shaderType ) )
+				// write each shader type's compiled content
+				byte[] buff = new byte[ 128 ];
+				int numRead = -1;
+				for( ShaderType shaderType : outCompiledFiles.keySet() )
 				{
-					dos.writeInt( (int)new File( outCompiledFiles.get( shaderType ) ).length() );
-				}
-				else
-				{
-					dos.writeInt( 0 );
-				}
-			}
-			
-			// write each shader type's compiled content
-			byte[] buff = new byte[ 128 ];
-			int numRead = -1;
-			for( ShaderType shaderType : shaderTypes )
-			{
-				if( outCompiledFiles.containsKey( shaderType ) )
-				{
-					BufferedInputStream bis = new BufferedInputStream( new FileInputStream( outCompiledFiles.get( shaderType ) ) );
+					g.writeObjectFieldStart( shaderType.getType().toUpperCase() );
+
+					File inFile = new File( outCompiledFiles.get( shaderType ) );
+
+					ByteArrayOutputStream data = new ByteArrayOutputStream( 4096 );
+					DataOutputStream dos = new DataOutputStream( data );
+					BufferedInputStream bis = new BufferedInputStream( new FileInputStream( inFile ) );
 					while( ( numRead = bis.read( buff ) ) != -1 )
 					{
 						dos.write( buff, 0, numRead );
 					}
+					bis.close();
+
+					inFile.delete();
+
+					g.writeBinaryField( "Data", data.toByteArray() );
+
+					switch( shaderType )
+					{
+					case VERTEX:
+						g.writeStringField( "Format", shaderFileDesc.getProperty( "shader.vs.layout" ) );
+						break;
+					case GEOMETRY_STREAMOUT:
+						{							
+							String stridesProp = shaderFileDesc.getProperty( "shader.gsso.strides" );
+							String[] strides = stridesProp.split( "," );
+							g.writeArrayFieldStart( "Strides" );
+							{
+								for( String s : strides )
+								{
+									g.writeNumber( Integer.parseInt( s.trim() ) );
+								}
+							}
+							g.writeEndArray();
+	
+							Properties decl = Arc.getSubProperties( shaderFileDesc, "shader.gsso.decl" );
+							g.writeArrayFieldStart( "Entries" );
+							{
+								for( Object k : decl.keySet() )
+								{
+									String entity = decl.get( k ).toString();
+									String[] entityParts = entity.split( "," );
+									
+									g.writeStartObject();
+									{
+										g.writeObjectField( "Stream", 			Integer.parseInt( entityParts[ 0 ].trim() ) );
+										g.writeObjectField( "SemanticIndex", 	Integer.parseInt( entityParts[ 1 ].trim() ) );
+										g.writeObjectField( "StartComponent", 	Integer.parseInt( entityParts[ 2 ].trim() ) );
+										g.writeObjectField( "ComponentCount", 	Integer.parseInt( entityParts[ 3 ].trim() ) );
+										g.writeObjectField( "OutputSlot", 		Integer.parseInt( entityParts[ 4 ].trim() ) );
+										g.writeObjectField( "SemanticName", 	k.toString() );
+									}
+									g.writeEndObject();
+								}
+							}
+							g.writeEndArray();
+						}
+						break;
+					}
+
+					g.writeEndObject();
 				}
 			}
-			
-			// output final file
-			String shaderFile = getOutputDirectory() + File.separatorChar + getFileToCompile().replace( ".shader", ".zpsb" );
-			BufferedOutputStream fos = new BufferedOutputStream( new FileOutputStream( shaderFile ) );
-			BufferedInputStream bis = new BufferedInputStream( new ByteArrayInputStream( data.toByteArray() ) );
-			while( ( numRead = bis.read( buff ) ) != -1 )
-			{
-				fos.write( buff, 0, numRead );
-			}
-			fos.close();
+			g.writeEndObject();
+
+			g.close();
 		}
 		catch( IOException e )
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
