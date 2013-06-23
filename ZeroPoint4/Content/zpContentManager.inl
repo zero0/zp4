@@ -13,7 +13,7 @@ zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::~zpCon
 	for( zp_uint i = 0; i < ResourceCount; ++i )
 	{
 		Resource* r = &m_resources[ i ];
-		ZP_ASSERT( r->getRefCount() == 0, "Resource %s still loaded", r->getFilename().getChars() );
+		ZP_ASSERT( r->getRefCount() == 0, "Resource %s still loaded", r->getFilename().str() );
 	}
 	m_resources.clear();
 }

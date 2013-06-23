@@ -80,7 +80,7 @@ public:
 	zp_int indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
 
 	zpString toString() const;
-	const zp_char* getChars() const;
+	const zp_char* str() const;
 
 	void reserve( zp_uint size );
 

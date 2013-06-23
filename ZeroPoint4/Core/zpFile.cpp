@@ -148,9 +148,9 @@ zp_bool zpFile::open( zpFileMode mode )
 	m_mode = mode;
 
 #if ZP_USE_SAFE_FUNCTIONS
-	err = fopen_s( (FILE**)&m_file, m_filename.getChars(), fopenMode );
+	err = fopen_s( (FILE**)&m_file, m_filename.str(), fopenMode );
 #else
-	m_file = (zp_handle)fopen( m_filename.getChars(), fopenMode );
+	m_file = (zp_handle)fopen( m_filename.str(), fopenMode );
 #endif
 	return err == 0;
 }
@@ -545,7 +545,7 @@ zp_int zpFile::writeBuffer( const zpStringBuffer& buffer )
 
 	if( m_file )
 	{
-		count = fputs( buffer.getChars(), (FILE*)m_file );
+		count = fputs( buffer.str(), (FILE*)m_file );
 	}
 
 	return count;

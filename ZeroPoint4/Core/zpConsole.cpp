@@ -29,7 +29,7 @@ const zpString& zpConsole::getTitle() const {
 void zpConsole::setTitle( const zpString& title ) {
 	m_title = title;
 	if( m_isCreated ) {
-		SetConsoleTitle( m_title.getChars() );
+		SetConsoleTitle( m_title.str() );
 	}
 }
 
@@ -43,7 +43,7 @@ void zpConsole::create( zp_ushort bufferSize ) {
 
 	// allocate a console for this app
 	AllocConsole();
-	SetConsoleTitle( m_title.getChars() );
+	SetConsoleTitle( m_title.str() );
 
 	// grab STD handles
 	HANDLE m_hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );

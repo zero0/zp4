@@ -74,7 +74,7 @@ zpLogOutput& zpLogOutput::operator<<( const zp_char* c ) {
 }
 zpLogOutput& zpLogOutput::operator<<( const zpString& c ) {
 #if ZP_LOG_ENABLED
-	zp_printf( "%s", c.getChars() );
+	zp_printf( "%s", c.str() );
 #endif
 	return (*this);
 }

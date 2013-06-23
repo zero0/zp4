@@ -62,12 +62,12 @@ zpWindow::~zpWindow()
 void zpWindow::setTitle( const zpString& title )
 {
 	m_title = title;
-	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.getChars() );
+	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.str() );
 }
 void zpWindow::setTitle( const zp_char* title )
 {
 	m_title = title;
-	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.getChars() );
+	if( m_hWnd ) SetWindowText( (HWND)m_hWnd, m_title.str() );
 }
 
 const zpString& zpWindow::getTitle() const
@@ -156,7 +156,7 @@ void zpWindow::create()
 	m_hWnd = (zp_handle)CreateWindowEx(
 		0,
 		WINDOW_CLASS_NAME,
-		m_title.getChars(),
+		m_title.str(),
 		__zpStyleToWS( m_style ),
 		m_position.getX(),
 		m_position.getY(),

@@ -36,14 +36,14 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	zpJson json;
 	zpDataBuffer buffer;
 	ok = parser.parseFile( m_optionsFilename, json );
-	ZP_ASSERT( ok, "Failed to parse Options '%s'", m_optionsFilename.getChars() );
+	ZP_ASSERT( ok, "Failed to parse Options '%s'", m_optionsFilename.str() );
 
 	ok = zpBison::compileToBuffer( buffer, json );
-	ZP_ASSERT( ok, "Failed to compile Options '%s'", m_optionsFilename.getChars() );
+	ZP_ASSERT( ok, "Failed to compile Options '%s'", m_optionsFilename.str() );
 
 	ok = m_appOptions.readFromBuffer( buffer );
 	//ok = m_appOptions.readFromFile( zpString( ZP_APPLICATION_OPTIONS_FILE ) );
-	ZP_ASSERT( ok, "Failed to load Options '%s'", m_optionsFilename.getChars() );
+	ZP_ASSERT( ok, "Failed to load Options '%s'", m_optionsFilename.str() );
 	if( !ok )
 	{
 		return;

@@ -22,7 +22,7 @@ public:
 	void operator=( zpString&& string );
 
 	operator zp_hash() const;
-	const zp_char* getChars() const;
+	const zp_char* str() const;
 
 	zp_char operator[]( zp_uint index ) const;
 	zp_char& operator[]( zp_uint index );
@@ -82,7 +82,7 @@ public:
 	template<typename Func>
 	void foreach( Func func )
 	{
-		const zp_char* p = getChars();
+		const zp_char* p = str();
 		while( *p )
 		{
 			func( *p );

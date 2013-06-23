@@ -332,7 +332,7 @@ const zpBison::Value zpBison::Value::operator[]( const zp_char* key ) const
 }
 const zpBison::Value zpBison::Value::operator[]( const zpString& key ) const
 {
-	return (*this)[ key.getChars() ];
+	return (*this)[ key.str() ];
 }
 
 void zpBison::Value::memberNames( zpArrayList< zpBison::Value >& names ) const
@@ -387,9 +387,9 @@ zp_bool zpBison::compileToBuffer( zpDataBuffer& buffer, const zpJson& json )
 	stringTable.foreach( [ &buffer, &header ]( zpString& key, zp_uint& value ) {
 		value = buffer.size();
 
-		const zp_char* str = key.getChars();
+		const zp_char* str = key.str();
 		zp_uint size = key.length();
-		zp_hash hash = zp_fnv1_32_string( key.getChars(), header.stringHashSalt );
+		zp_hash hash = zp_fnv1_32_string( key.str(), header.stringHashSalt );
 
 		buffer.write< zp_hash >( hash );
 		buffer.write< zp_uint >( size );
@@ -429,7 +429,7 @@ void zpBison::compileStringTable( zpHashMap< zpString, zp_uint >& stringTable, c
 			} );
 
 			members.foreach( [ &stringTable, &json ]( const zpString& member ) {
-				compileStringTable( stringTable, json[ member.getChars() ] );
+				compileStringTable( stringTable, json[ member.str() ] );
 			} );
 		}
 		break;
@@ -546,13 +546,13 @@ const zp_char* zpBisonWriter::fastWrite( const zpBison& bison )
 {
 	m_string.clear();
 	writeBison( m_string, bison.root(), -1 );
-	return m_string.getChars();
+	return m_string.str();
 }
 const zp_char* zpBisonWriter::styleWrite( const zpBison& bison )
 {
 	m_string.clear();
 	writeBison( m_string, bison.root(), 0 );
-	return m_string.getChars();
+	return m_string.str();
 }
 
 void zpBisonWriter::writeBison( zpStringBuffer& buffer, const zpBison::Value& bison, zp_int indent )

@@ -34,21 +34,21 @@ zp_bool zpOBJStaticMeshResource::load() {
 			if( line[0] == 'v' ) {
 				if( line[1] == 'n' ) {
 					zp_float x, y, z;
-					sscanf_s( line.getChars(),"vn %f %f %f", &x, &y, &z  );
+					sscanf_s( line.str(),"vn %f %f %f", &x, &y, &z  );
 
 					//zpLog::debug() << "vn " << x << ' ' << y << ' ' << z << zpLog::endl;
 					
 					normals.pushBack( zpVector4f( x, y, z, 1 ) );
 				} else if( line[1] == 't' ) {
 					zp_float x, y;
-					sscanf_s( line.getChars(),"vt %f %f", &x, &y  );
+					sscanf_s( line.str(),"vt %f %f", &x, &y  );
 
 					//zpLog::debug() << "vt " << x << ' ' << y << ' ' << zpLog::endl;
 
 					texCoords.pushBack( zpVector2f( x, y ) );
 				} else {
 					zp_float x, y, z;
-					sscanf_s( line.getChars(),"v %f %f %f", &x, &y, &z  );
+					sscanf_s( line.str(),"v %f %f %f", &x, &y, &z  );
 
 					//zpLog::debug() << "v  " << x << ' ' << y << ' ' << z << zpLog::endl;
 
@@ -66,7 +66,7 @@ zp_bool zpOBJStaticMeshResource::load() {
 					zpString face = line.substring( pos + 1, end );
 
 					zp_uint v, t, n;
-					sscanf_s( face.getChars(), "%d/%d/%d", &v, &t, &n );
+					sscanf_s( face.str(), "%d/%d/%d", &v, &t, &n );
 
 					vnt[i].position = verticies[v - 1];
 					vnt[i].normal = normals[n - 1];

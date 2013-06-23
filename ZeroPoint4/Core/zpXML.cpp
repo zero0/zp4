@@ -73,7 +73,7 @@ void __xmlNodeToString( zpXmlNode* node, zp_int i, zpStringBuffer& buffer )
 #if XML_FANCY_PRINT
 	zpStringBuffer t;
 	for( zp_int count = i; count > 0; --count ) t << XML_OUTPUT_TAB;
-	const zp_char* tabs = t.getChars();
+	const zp_char* tabs = t.str();
 	const zp_char endl = '\n';
 #else
 	const zp_char* tabs = "";
@@ -187,7 +187,7 @@ zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSibling
 		return ZP_NULL;
 	}
 
-	const zp_char* xml = xmlBuffer.getChars();
+	const zp_char* xml = xmlBuffer.str();
 	const zp_uint length = xmlBuffer.length();
 
 	enum ops

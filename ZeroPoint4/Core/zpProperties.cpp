@@ -44,11 +44,11 @@ zpString& zpProperties::operator[]( zpString&& key )
 
 zp_int zpProperties::getInt( const zpString& key ) const
 {
-	return zp_atoi( m_properties.get( key ).getChars() );
+	return zp_atoi( m_properties.get( key ).str() );
 }
 zp_float zpProperties::getFloat( const zpString& key ) const
 {
-	return zp_atof( m_properties.get( key ).getChars() );
+	return zp_atof( m_properties.get( key ).str() );
 }
 const zpString& zpProperties::getString( const zpString& key ) const
 {
@@ -57,11 +57,11 @@ const zpString& zpProperties::getString( const zpString& key ) const
 
 zp_int zpProperties::getInt( const zp_char* key ) const
 {
-	return zp_atoi( m_properties.get( zpString( key ) ).getChars() );
+	return zp_atoi( m_properties.get( zpString( key ) ).str() );
 }
 zp_float zpProperties::getFloat( const zp_char* key ) const
 {
-	return zp_atof( m_properties.get( zpString( key ) ).getChars() );
+	return zp_atof( m_properties.get( zpString( key ) ).str() );
 }
 const zpString& zpProperties::getString( const zp_char* key ) const
 {
@@ -129,7 +129,7 @@ void zpProperties::load( const zpString& file )
 		{
 			if( buff.isEmpty() ) continue;
 
-			str = buff.getChars();
+			str = buff.str();
 			str.trim( line );
 
 			if( line.isEmpty() || line.charAt( 0 ) == '#' || ( pos = line.indexOf( '=' ) ) == zpString::npos ) continue;
@@ -161,7 +161,7 @@ void zpProperties::save( const zpString& file ) const
 		{
 			buffer << key << " = " << value << '\n';
 
-			f.writeFormat( "%s", buffer.getChars() );
+			f.writeFormat( "%s", buffer.str() );
 			f.flush();
 
 			buffer.clear();

@@ -189,7 +189,7 @@ void zpStringBuffer::append( const zp_char* value, zp_int length )
 }
 void zpStringBuffer::append( const zpString& value )
 {
-	append( value.getChars(), value.length() );
+	append( value.str(), value.length() );
 }
 
 void zpStringBuffer::append( zp_sbyte value )
@@ -337,7 +337,7 @@ zpString zpStringBuffer::toString() const
 {
 	return zpString( m_buffer, m_length );
 }
-const zp_char* zpStringBuffer::getChars() const
+const zp_char* zpStringBuffer::str() const
 {
 	return m_buffer;
 }

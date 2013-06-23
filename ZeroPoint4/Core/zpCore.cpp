@@ -37,7 +37,7 @@ void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... )
 	zp_int s = filename.lastIndexOf( zpFile::sep );
 	s = s == zpString::npos ? 0 : s;
 
-	const zp_char* f = filename.getChars() + s;
+	const zp_char* f = filename.str() + s;
 	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Failed at %s:%d", f, line );
 
 	zp_int result = MessageBox( ZP_NULL, text, title, MB_ABORTRETRYIGNORE | MB_ICONERROR );
@@ -81,7 +81,7 @@ void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ..
 	zp_int s = filename.lastIndexOf( zpFile::sep );
 	s = s == zpString::npos ? 0 : s;
 
-	const zp_char* f = filename.getChars() + s;
+	const zp_char* f = filename.str() + s;
 	zp_snprintf( title, sizeof( title ), sizeof( title ), "ZeroPoint Assert Warning at %s:%d", f, line );
 
 	zp_int result = MessageBox( ZP_NULL, text, title, MB_RETRYCANCEL | MB_ICONWARNING );

@@ -30,7 +30,7 @@ public:
 	}
 	AweString( const zpString& str ) : m_aweString( ZP_NULL ) {
 		m_zpString = str;
-		m_aweString = awe_string_create_from_ascii( m_zpString.getChars(), m_zpString.length() );
+		m_aweString = awe_string_create_from_ascii( m_zpString.str(), m_zpString.length() );
 	}
 	~AweString() {
 		if( m_aweString ) {
@@ -64,12 +64,12 @@ void __jsout( awe_webview* caller, const awe_string* message, int line_number, c
 	zpString src;
 	awe_string_to_std( source, src );
 
-	//zp_printfcln( zp_console_color( CC_CYAN, CC_GRAY ), "%s[%d]: %s", src.getChars(), line_number, msg.getChars() );
+	//zp_printfcln( zp_console_color( CC_CYAN, CC_GRAY ), "%s[%d]: %s", src.str(), line_number, msg.str() );
 }
 awe_resource_response* __jsrequestresource( awe_webview* caller, awe_resource_request* request ) {
 	AweString url( awe_resource_request_get_url( request ) );
 
-	//zp_printfln( "Request: %s", ( (const std::string&)url ).getChars() );
+	//zp_printfln( "Request: %s", ( (const std::string&)url ).str() );
 
 	return awe_resource_response_create_from_file( url );
 }

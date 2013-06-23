@@ -435,7 +435,7 @@ const zp_char* zpJson::asCString() const
 	case ZP_JSON_TYPE_BOOL:
 		return m_bool ? "true" : "false";
 	case ZP_JSON_TYPE_STRING:
-		return m_string->getChars();
+		return m_string->str();
 	default:
 		ZP_ASSERT( false, "" );
 		return "";
@@ -542,7 +542,7 @@ zp_bool zpJsonParser::parseFile( const zpString& filename, zpJson& outJson )
 
 		if( !jsonBuffer.isEmpty() )
 		{
-			const zp_char* json = jsonBuffer.getChars();
+			const zp_char* json = jsonBuffer.str();
 			const zp_uint length = jsonBuffer.length();
 
 			m_start = json;
@@ -949,13 +949,13 @@ const zp_char* zpJsonWriter::fastWrite( const zpJson& json )
 {
 	m_string.clear();
 	writeJson( m_string, json, -1 );
-	return m_string.getChars();
+	return m_string.str();
 }
 const zp_char* zpJsonWriter::styleWrite( const zpJson& json )
 {
 	m_string.clear();
 	writeJson( m_string, json, 0 );
-	return m_string.getChars();
+	return m_string.str();
 }
 
 void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int indent )

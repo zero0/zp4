@@ -319,7 +319,7 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 zpTextureImpl* zpRenderingEngineImpl::createTextureFromFile( const zpString& filename )
 {
 	ID3D11Resource* texture;
-	D3DX11CreateTextureFromFile( m_d3dDevice, filename.getChars(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
+	D3DX11CreateTextureFromFile( m_d3dDevice, filename.str(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
 
 	return 0;
 }

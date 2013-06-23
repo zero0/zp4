@@ -26,7 +26,7 @@ public:
 
 private:
 	void processFrame();
-	
+
 	zp_bool m_isRunning;
 	zp_int m_exitCode;
 	zpString m_optionsFilename;
