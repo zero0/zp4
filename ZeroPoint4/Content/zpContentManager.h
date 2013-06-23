@@ -33,6 +33,7 @@ public:
 	~zpContentManager();
 
 	zp_bool getResource( const zp_char* filename, ResourceInstance& outInstance );
+	zp_bool reloadResource( const zp_char* filename );
 	void releaseResource( ResourceInstance& instance );
 
 	void garbageCollect();

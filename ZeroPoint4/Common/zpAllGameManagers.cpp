@@ -61,10 +61,11 @@ void zpAllGameManagers::destroy()
 #define ZP_GAME_MANAGER_DEF( mng ) m_##mng->destroy();
 #include "zpAllGameManagers.inl"
 }
-
+/*
 void zpAllGameManagers::setGame( zpGame* game )
 {
 #undef ZP_GAME_MANAGER_DEF
 #define ZP_GAME_MANAGER_DEF( mng ) m_##mng->setGame( game );
 #include "zpAllGameManagers.inl"
 }
+*/

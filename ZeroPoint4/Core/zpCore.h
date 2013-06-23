@@ -88,6 +88,10 @@
 
 #include "zpBaseTypes.h"
 
+// extending placement new and delete to include parameters
+inline void* operator new( zp_uint sz, void* here ) throw() { return here; }
+inline void operator delete( void*, void* ) throw() {}
+
 #if ZP_USE_ASSERTIONS
 void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... );
 void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ... );
@@ -228,12 +232,6 @@ class zpMemorySystem;
 ZP_PURE_INTERFACE zpReferencedObject;
 class zpJson;
 class zpXmlParser;
-
-class zpGame;
-class zpWorld;
-ZP_ABSTRACT_CLASS zpGameManager;
-class zpGameObject;
-ZP_ABSTRACT_CLASS zpComponent;
 
 #include "zpLog.h"
 #include "zpMath.h"

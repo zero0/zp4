@@ -2,46 +2,42 @@
 #ifndef ZP_WORLD_H
 #define ZP_WORLD_H
 
-class zpWorld : public zpMessageReceiver, public zpSerializable {
+class zpWorldPooledContent;
+
+class zpWorld
+{
 public:
-	zpWorld();
-	virtual ~zpWorld();
+	zpWorld( const zp_char* filename );
+	~zpWorld();
 
-	void addGameObject( zpGameObject* go );
-	void removeGameObject( zp_uint index );
-	zpGameObject* getGameObject( zp_uint index ) const;
-	zp_uint getNumGameObjects() const;
-
-	void update();
-	void simulate();
+	void addObject( zpObject* go );
+	void removeObject( zpObject* go );
+	void removeObjectAtIndex( zp_uint index );
+	zpObject* getObject( zp_uint index ) const;
+	zp_uint getNumObjects() const;
 
 	void create();
 	void destroy();
-	
-	zp_bool isCreated() const;
-
-	void setEnabled( zp_bool enabled );
-	zp_bool isEnabled() const;
 
 	const zpString& getName() const;
-	void setName( const zpString& name );
 
-	void setGame( zpGame* game );
-	zpGame* getGame() const;
-
-	void receiveMessage( const zpMessage& message );
-
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
+	void setApplication( zpApplication* application );
+	zpApplication* getApplication() const;
 
 private:
-	zp_bool m_isEnabled;
-	zp_bool m_isCreated;
-
-	zpArrayList<zpGameObject*> m_gameObjects;
-	zpGame* m_game;
+	zpArrayList<zpObject*> m_objects;
+	zpApplication* m_application;
 
 	zpString m_name;
+};
+
+class zpWorldPooledContent : public zpContentPool< zpWorld, 8 >
+{
+public:
+	zpWorldPooledContent();
+	~zpWorldPooledContent();
+
+private:
 };
 
 #endif

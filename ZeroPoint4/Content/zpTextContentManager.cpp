@@ -3,28 +3,28 @@
 zp_bool zpTextResource::load( const zp_char* filename )
 {
 	zp_bool loaded = false;
-	if( !m_resource )
+	if( m_resource == ZP_NULL )
 	{
 		m_resource = new zpBison;
-		m_filename = filename;
+	}
 
-		if( m_filename.endsWith( ".json" ) )
+	m_filename = filename;
+	if( m_filename.endsWith( ".json" ) )
+	{
+		zpJson json;			
+		zpJsonParser parser;
+		if( parser.parseFile( m_filename, json ) )
 		{
-			zpJson json;			
-			zpJsonParser parser;
-			if( parser.parseFile( m_filename, json ) )
+			zpDataBuffer bisonData;
+			if( zpBison::compileToBuffer( bisonData, json ) )
 			{
-				zpDataBuffer bisonData;
-				if( zpBison::compileToBuffer( bisonData, json ) )
-				{
-					loaded = m_resource->readFromBuffer( bisonData );
-				}
+				loaded = m_resource->readFromBuffer( bisonData );
 			}
 		}
-		else
-		{
-			loaded = m_resource->readFromFile( m_filename );
-		}
+	}
+	else
+	{
+		loaded = m_resource->readFromFile( m_filename );
 	}
 
 	return loaded;

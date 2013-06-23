@@ -69,6 +69,7 @@
   <ItemGroup>
     <ClInclude Include="zpContent.h" />
     <ClInclude Include="zpContentManager.h" />
+    <ClInclude Include="zpContentPool.h" />
     <ClInclude Include="zpResource.h" />
     <ClInclude Include="zpTextContentManager.h" />
   </ItemGroup>
@@ -86,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="zpContentManager.inl" />
+    <None Include="zpContentPool.inl" />
     <None Include="zpResource.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

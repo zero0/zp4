@@ -10,6 +10,7 @@ zpApplication::zpApplication()
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
 	, m_console( ZP_NULL )
 	, m_timer( zpTime::getInstance() )
+	, m_currentWorld( ZP_NULL )
 	, m_lastTime( 0 )
 	, m_simulateHz( 10000000 / 60 )
 	, m_renderMsHz( 1000 / 120 )
@@ -65,6 +66,8 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_window.setPosition( pos );
 	m_window.setScreenSize( size );
 	m_window.setTitle( window[ "Title" ].asCString() );
+	m_window.addProcListener( this );
+	m_window.addFocusListener( this );
 
 	m_window.create();
 
@@ -98,7 +101,7 @@ zp_int zpApplication::shutdown()
 {
 	m_renderingPipeline.getRenderingEngine()->destroy();
 
-	m_textContentManager.garbageCollect();
+	m_textContent.garbageCollect();
 
 	if( m_console )
 	{
@@ -113,6 +116,22 @@ zp_int zpApplication::shutdown()
 
 void zpApplication::update()
 {
+	if( m_hasNextWorld )
+	{
+		if( m_currentWorld )
+		{
+			m_currentWorld->destroy();
+			m_worldContent.destroy( m_currentWorld );
+		}
+
+		m_currentWorld = m_worldContent.create( m_nextWorldFilename.str() );
+		m_currentWorld->create();
+
+		m_hasNextWorld = false;
+	}
+
+	// update object, delete any etc
+	m_objectContent.update();
 
 }
 void zpApplication::simulate()
@@ -122,7 +141,7 @@ void zpApplication::simulate()
 
 void zpApplication::garbageCollect()
 {
-	m_textContentManager.garbageCollect();
+	m_textContent.garbageCollect();
 }
 
 void zpApplication::exit( zp_int exitCode )
@@ -134,6 +153,53 @@ void zpApplication::exit( zp_int exitCode )
 const zpBison::Value& zpApplication::getOptions() const
 {
 	return m_appOptions.root();
+}
+
+void zpApplication::onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam )
+{
+
+}
+void zpApplication::onFocusGained()
+{
+	zp_printfcln( ZP_CC_LIGHT_BLUE, "focused" );
+}
+void zpApplication::onFocusLost()
+{
+	zp_printfcln( ZP_CC_LIGHT_RED, "unfocused" );
+}
+
+zp_bool zpApplication::loadFile( const zp_char* filename )
+{
+	return handleDragAndDrop( filename, 0, 0 );
+}
+zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_int y )
+{
+	zpString strFilename( filename );
+	zp_bool loaded = false;
+
+	if( strFilename.endsWith( ".json" ) || strFilename.endsWith( ".jsonb" ) )
+	{
+		loaded = m_textContent.reloadResource( filename );
+	}
+	else if( strFilename.endsWith( ".zpo" ) )
+	{
+		if( m_currentWorld )
+		{
+			zpObject* o = m_objectContent.create( filename );
+			if( o )
+			{
+				m_currentWorld->addObject( o );
+				loaded = true;
+			}
+		}
+	}
+	else if( strFilename.endsWith( ".zpw" ) )
+	{
+		m_nextWorldFilename = filename;
+		m_hasNextWorld = true;
+	}
+
+	return loaded;
 }
 
 void zpApplication::processFrame()
@@ -148,7 +214,7 @@ void zpApplication::processFrame()
 	// update
 	ZP_PROFILE_START( UPDATE );
 	update();
-	zp_printfcln( ZP_CC_LIGHT_GREEN, "update" );
+	//zp_printfcln( ZP_CC_LIGHT_GREEN, "update" );
 	ZP_PROFILE_END( UPDATE );
 
 
@@ -157,7 +223,7 @@ void zpApplication::processFrame()
 	while( ( now - m_lastTime ) > m_simulateHz && numUpdates < 5 )
 	{
 		simulate();
-		zp_printfcln( ZP_CC_LIGHT_BLUE, "simulate" );
+		//zp_printfcln( ZP_CC_LIGHT_BLUE, "simulate" );
 		m_lastTime += m_simulateHz;
 		++numUpdates;
 	}
@@ -172,11 +238,22 @@ void zpApplication::processFrame()
 	// render
 	ZP_PROFILE_START( RENDER );
 	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
-	zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );	
+	//zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );	
 	m_renderingPipeline.submitRendering();
 	ZP_PROFILE_END( RENDER );
 
+	ZP_PROFILE_START( DEBUG_RENDER );
+	//zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );	
+	m_renderingPipeline.submitDebugRendering();
+	ZP_PROFILE_END( DEBUG_RENDER );
+
+	ZP_PROFILE_START( RENDER_PRESENT );
+	m_renderingPipeline.finalize();
+	ZP_PROFILE_END( RENDER_PRESENT );
+
 	ZP_PROFILE_END( FRAME );
+
+	ZP_PROFILE_FINALIZE();
 
 	// sleep for the remainder of the frame
 	m_timer->sleep( m_renderMsHz );

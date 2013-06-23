@@ -2,20 +2,24 @@
 #ifndef ZP_OBJECT_H
 #define ZP_OBJECT_H
 
-enum zpObjectFlag : zp_byte
+enum zpObjectFlag : zp_ulong
 {
-	ZP_OBJECT_FLAG_ENABLED,
-	ZP_OBJECT_FLAG_CREATED,
-	ZP_OBJECT_FLAG_SHOULD_DESTROY,
+	ZP_OBJECT_FLAG_ENABLED =		( 0 << 1 ),
+	ZP_OBJECT_FLAG_CREATED =		( 1 << 1 ),
+	ZP_OBJECT_FLAG_SHOULD_DESTROY =	( 2 << 1 ),
+
+	ZP_OBJECT_FLAG_USER0 =			( 3 << 1 ),
 
 	zpObjectFlag_Count,
 };
 
-class zpGameObject : public zpMessageReceiver
+class zpObjectPooledContent;
+
+class zpObject
 {
 public:
-	zpGameObject();
-	~zpGameObject();
+	zpObject( const zp_char* filename );
+	~zpObject();
 
 	zpAllComponents* getComponents();
 
@@ -23,25 +27,37 @@ public:
 	void unsetFlag( zpObjectFlag flag );
 	zp_bool isFlagSet( zpObjectFlag flag ) const;
 
-	void create();
-	void destroy();
-
 	const zpString& getName() const;
 	void setName( const zpString& name );
 
 	const zpMatrix4f& getTransform() const;
 	void setTransform( const zpMatrix4f& transform );
 
-	void receiveMessage( const zpMessage& message );
-	void sendMessageToComponents( const zpMessage& message );
-	//void sendMessageToChildGameObjects( const zpMessage& message );
-	//void sendMessageToParentGameObject( const zpMessage& message );
+	zpWorld* getWorld() const;
+	void setWorld( zpWorld* world );
+
+	zpApplication* getApplication() const;
+	void setApplication( zpApplication* application );
 
 private:
 	zpMatrix4f m_transform;
 	zpString m_name;
-	zpFlag8 m_flags;
+	zpFlag64 m_flags;
 	zpAllComponents m_components;
+
+	zpWorld* m_world;
+	zpApplication* m_application;
+};
+
+class zpObjectPooledContent : public zpContentPool< zpObject, 256 >
+{
+public:
+	zpObjectPooledContent();
+	~zpObjectPooledContent();
+
+	void update();
+
+private:
 };
 
 #endif

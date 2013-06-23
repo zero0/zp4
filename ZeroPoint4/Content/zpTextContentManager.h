@@ -12,7 +12,9 @@ private:
 };
 
 class zpTextResourceInstance : public zpResourceInstance< zpTextResource >
-{};
+{
+	friend class zpTextContentManager;
+};
 
 class zpTextContentManager : public zpContentManager< zpTextResource, zpTextResourceInstance, zpTextContentManager, 16 >
 {

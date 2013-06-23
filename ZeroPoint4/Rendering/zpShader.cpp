@@ -25,10 +25,12 @@ zp_bool zpShaderResource::load( const zp_char* filename )
 
 	zp_bool ok;
 	m_filename = filename;
-	ok = m_shaderData.readFromFile( m_filename );
+
+	zpBison shaderData;
+	ok = shaderData.readFromFile( m_filename );
 	ZP_ASSERT( ok, "" );
 
-	ok = engine->loadShader( m_resource, m_shaderData );
+	ok = engine->loadShader( m_resource, shaderData );
 	ZP_ASSERT( ok, "" );
 
 	return ok;

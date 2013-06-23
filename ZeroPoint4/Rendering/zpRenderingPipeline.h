@@ -11,9 +11,15 @@ public:
 	zpRenderingEngine* getRenderingEngine() const;
 
 	void submitRendering();
+	void submitDebugRendering();
+
+	void finalize();
 
 private:
 	zpRenderingEngine* m_engine;
+
+	zpShaderContentManager m_shaderContent;
+	zpTextureContentManager m_textureContent;
 };
 
 #endif

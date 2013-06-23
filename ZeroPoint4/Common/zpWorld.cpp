@@ -1,104 +1,54 @@
 #include "zpCommon.h"
 
-#if 0
-zpWorld::zpWorld() :
-	m_isEnabled( true ),
-	m_isCreated( false ),
-	m_game( ZP_NULL )
+zpWorld::zpWorld( const zp_char* filename )
 {}
-zpWorld::~zpWorld() {}
+zpWorld::~zpWorld()
+{}
 
-void zpWorld::update() {
-	if( m_isEnabled )
-	{
-		m_gameObjects.foreach( []( zpGameObject* go ) {
-			go->update();
-		} );
-	}
+void zpWorld::addObject( zpObject* go )
+{
+	m_objects.pushBack( go );
 }
-void zpWorld::simulate() {
-	if( m_isEnabled )
-	{
-		m_gameObjects.foreach( []( zpGameObject* go ) {
-			go->simulate();
-		} );
-	}
+void zpWorld::removeObject( zpObject* go )
+{
+	m_objects.eraseAll( go );
 }
-
-
-void zpWorld::create() {
-	if( m_isCreated ) return;
-	m_isCreated = true;
-
-	m_gameObjects.foreach( []( zpGameObject* go ) {
-		go->create();
-	} );
+void zpWorld::removeObjectAtIndex( zp_uint index )
+{
+	m_objects.erase( index );
 }
-void zpWorld::destroy() {
-	if( !m_isCreated ) return;
-	m_isCreated = false;
-
-	m_gameObjects.foreach( []( zpGameObject* go ) {
-		go->destroy();
-	} );
+zpObject* zpWorld::getObject( zp_uint index ) const
+{
+	return m_objects[ index ];
+}
+zp_uint zpWorld::getNumObjects() const
+{
+	return m_objects.size();
 }
 
-zp_bool zpWorld::isCreated() const {
-	return m_isCreated;
+void zpWorld::create()
+{
+
+}
+void zpWorld::destroy()
+{
+
 }
 
-void zpWorld::setEnabled( zp_bool enabled ) {
-	m_isEnabled = enabled;
-}
-zp_bool zpWorld::isEnabled() const {
-	return m_isEnabled;
-}
-
-const zpString& zpWorld::getName() const {
+const zpString& zpWorld::getName() const
+{
 	return m_name;
 }
-void zpWorld::setName( const zpString& name ) {
-	m_name = name;
-}
 
-void zpWorld::setGame( zpGame* game ) {
-	m_game = game;
-}
-zpGame* zpWorld::getGame() const {
-	return m_game;
-}
-
-void zpWorld::receiveMessage( const zpMessage& message ) {
-	//if( m_root ) m_root->receiveMessage( message );
-}
-
-void zpWorld::serialize( zpSerializedOutput* out )
+void zpWorld::setApplication( zpApplication* application )
 {
-	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
-
-	out->writeString( m_name, "@name" );
-
-	//out->writeSerializable( m_root );
-
-	out->endBlock();
+	m_application = application;
 }
-void zpWorld::deserialize( zpSerializedInput* in )
+zpApplication* zpWorld::getApplication() const
 {
-	if( in->readBlock( ZP_SERIALIZE_TYPE_THIS ) )
-	{
-		in->readString( &m_name, "@name" );
-
-		in->readEachBlock( "GameObject", [ this ]( zpSerializedInput* in ) {
-			zpString goFile;
-			in->readString( &goFile, "@file" );
-
-			zpMatrix4f transform;
-			zpSerializableObject<zpMatrix4f>::deserializeToBlock( in, "Transform", transform );
-
-
-		} );
-
-		in->endBlock();
-	}
+	return m_application;
 }
-#endif
+
+
+zpWorldPooledContent::zpWorldPooledContent() {}
+zpWorldPooledContent::~zpWorldPooledContent() {}

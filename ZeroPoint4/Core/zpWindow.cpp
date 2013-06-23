@@ -188,6 +188,9 @@ void zpWindow::destroy()
 
 	m_hInstance = ZP_NULL;
 	m_hWnd = ZP_NULL;
+
+	removeAllFocusListeners();
+	removeAllProcListeners();
 }
 
 zp_bool zpWindow::isCreated() const

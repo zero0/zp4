@@ -2,20 +2,20 @@
 
 zpComponent::zpComponent()
 	: m_flags( 0 )
-	, m_parentGameObject( ZP_NULL )
+	, m_parentObject( ZP_NULL )
 {}
 zpComponent::~zpComponent()
 {
 	destroy();
 }
 
-void zpComponent::setParentGameObject( zpGameObject* parent )
+void zpComponent::setParentObject( zpObject* parent )
 {
-	m_parentGameObject = parent;
+	m_parentObject = parent;
 }
-zpGameObject* zpComponent::getParentGameObject() const
+zpObject* zpComponent::getParentObject() const
 {
-	return m_parentGameObject;
+	return m_parentObject;
 }
 
 void zpComponent::setEnabled( zp_bool enabled )
@@ -68,18 +68,18 @@ void zpComponent::destroy()
 
 void zpComponent::sendMessageToParentGameObject( const zpMessage& message )
 {
-	m_parentGameObject->receiveMessage( message );
+	//m_parentGameObject->receiveMessage( message );
 }
 void zpComponent::sendMessageToSiblingComponents( const zpMessage& message )
 {
-	m_parentGameObject->getComponents()->receiveMessage( message );
+	m_parentObject->getComponents()->receiveMessage( message );
 }
 
 zpWorld* zpComponent::getWorld() const
 {
 	return ZP_NULL; //return m_parentGameObject->getWorld();
 }
-zpGame* zpComponent::getGame() const
+zpApplication* zpComponent::getApplication() const
 {
 	return ZP_NULL; //return m_parentGameObject->getWorld()->getGame();
 }

@@ -81,6 +81,41 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 
 	return false;
 }
+
+template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::reloadResource( const zp_char* filename )
+{
+	Resource* found = ZP_NULL;
+	for( zp_uint i = 0; i < ResourceCount; ++i )
+	{
+		Resource* r = &m_resources[ i ];
+		if( r->getFilename() == filename )
+		{
+			found = r;
+			break;
+		}
+	}
+
+	if( found )
+	{
+		ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
+
+		if( found->isLoaded() )
+		{
+			impl->destroyResource( found );
+			found->m_isLoaded = false;
+		}
+
+		if( impl->createResource( found, filename ) )
+		{
+			found->m_isLoaded = true;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::releaseResource( ResourceInstance& instance )
 {

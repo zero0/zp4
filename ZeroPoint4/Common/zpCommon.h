@@ -4,6 +4,7 @@
 
 #include "Core\zpCore.h"
 //#include "Input\zpInput.h"
+#include "Content\zpContent.h"
 #include "Rendering\zpRendering.h"
 
 //class zpHealthComponent;
@@ -12,14 +13,17 @@
 //#include "zpHealthComponent.h"
 //#include "zpEditorCameraComponent.h"
 
-#include "zpApplication.h"
+class zpApplication;
+class zpComponent;
+class zpWorld;
+class zpObject;
+
 #include "zpAllComponents.h"
-#include "zpAllGameManagers.h"
-#include "zpComponent.h"
-#include "zpGame.h"
-#include "zpComponentManager.h"
 #include "zpObject.h"
 #include "zpWorld.h"
+#include "zpApplication.h"
+#include "zpAllGameManagers.h"
+#include "zpComponent.h"
 
 //#include "zpHealthComponent.h"
 //#include "zpEditorCameraComponent.h"

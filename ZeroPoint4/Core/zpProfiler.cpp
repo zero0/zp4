@@ -5,9 +5,9 @@ zpProfiler::zpProfiler()
 {
 	for( zp_uint i = 0; i < zpProfilerSteps_Count; ++i )
 	{
-		m_startTimes.pushBackEmpty();
-		m_endTimes.pushBackEmpty();
+		m_profiles.pushBackEmpty();
 	}
+	reset();
 }
 zpProfiler::~zpProfiler()
 {
@@ -22,26 +22,54 @@ zpProfiler* zpProfiler::getInstance()
 
 void zpProfiler::start( zpProfilerSteps step )
 {
-	m_startTimes[ step ] = m_time->getTime();
-	m_endTimes[ step ] = 0;
+	m_profiles[ step ].currentStartTime = m_time->getTime();
 }
 void zpProfiler::end( zpProfilerSteps step )
 {
-	m_endTimes[ step ] = m_time->getTime();
+	m_profiles[ step ].currentEndTime = m_time->getTime();
 }
 
 void zpProfiler::reset()
 {
 	for( zp_uint i = 0; i < zpProfilerSteps_Count; ++i )
 	{
-		m_startTimes[ i ] = 0;
-		m_endTimes[ i ] = 0;
+		zpProfilerPart& part = m_profiles[ i ];
+		zp_zero_memory( &part );
+
+		part.maxTime = zp_limit_min<zp_long>();
+	}
+}
+void zpProfiler::finalize()
+{
+	for( zp_uint i = 0; i < zpProfilerSteps_Count; ++i )
+	{
+		zpProfilerPart& part = m_profiles[ i ];
+		part.samples++;
+
+		part.prevStartTime = part.currentStartTime;
+		part.prevEndTime = part.currentEndTime;
+
+		zp_long t = part.currentEndTime - part.currentStartTime;
+		part.maxTime = ZP_MAX( t, part.maxTime );
+		part.averageTime = ( part.averageTime + t ) / part.samples;
+
+		part.currentStartTime = 0;
+		part.currentEndTime = 0;
 	}
 }
 
-zp_long zpProfiler::getTime( zpProfilerSteps step )
+zp_long zpProfiler::getPreviousTime( zpProfilerSteps step )
 {
-	zp_long s = m_startTimes[ step ];
-	zp_long e = m_endTimes[ step ];
-	return e - s;
+	zpProfilerPart& part = m_profiles[ step ];
+
+	return part.prevEndTime - part.prevStartTime;
+}
+zp_long zpProfiler::getAverageTime( zpProfilerSteps step )
+{
+	return m_profiles[ step ].averageTime;
+}
+zp_long zpProfiler::getMaxTime( zpProfilerSteps step )
+{
+	return m_profiles[ step ].maxTime;
+
 }

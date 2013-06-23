@@ -36,18 +36,11 @@ zpTextureImpl* zpTexture::getTextureImpl() const
 zp_bool zpTextureResource::load( const zp_char* filename )
 {
 	zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
-	if( m_resource == ZP_NULL )
-	{
-	}
 
 	return false;
 }
 void zpTextureResource::unload()
 {
-	if( m_resource != ZP_NULL )
-	{
-
-	}
 }
 
 

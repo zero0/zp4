@@ -25,7 +25,7 @@ public:
 	void create();
 	void destroy();
 
-	void setGame( zpGame* game );
+	//void setGame( zpGame* game );
 
 private:
 #undef ZP_GAME_MANAGER_DEF

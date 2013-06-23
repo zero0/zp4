@@ -6,6 +6,7 @@
 
 #include "zpResource.h"
 #include "zpContentManager.h"
+#include "zpContentPool.h"
 
 #include "zpTextContentManager.h"
 

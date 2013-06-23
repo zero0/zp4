@@ -1,97 +1,90 @@
 #include "zpCommon.h"
 
-#if 0
-zpGameObject::zpGameObject()
+zpObject::zpObject( const zp_char* filename )
 	: m_transform()
-	//, m_world( ZP_NULL )
-	, m_components()	
-	, m_flags( 0 )
 	, m_name()
+	, m_flags( ZP_OBJECT_FLAG_ENABLED )
+	, m_components()
+	, m_world( ZP_NULL )
+	, m_application( ZP_NULL )
 {}
-zpGameObject::~zpGameObject()
-{
-	destroy();
-}
+zpObject::~zpObject()
+{}
 
-zpAllComponents* zpGameObject::getComponents()
+zpAllComponents* zpObject::getComponents()
 {
 	return &m_components;
 }
 
-void zpGameObject::setFlag( zpObjectFlag flag )
+void zpObject::setFlag( zpObjectFlag flag )
 {
-	m_flags.mark( (zp_uint)flag );
+	m_flags.mark( flag );
+	if( flag == ZP_OBJECT_FLAG_SHOULD_DESTROY )
+	{
+		m_flags.unmark( ZP_OBJECT_FLAG_ENABLED );
+	}
+}
+void zpObject::unsetFlag( zpObjectFlag flag )
+{
+	m_flags.unmark( flag );
+}
+zp_bool zpObject::isFlagSet( zpObjectFlag flag ) const
+{
+	return m_flags.isMarked( flag );
 }
 
-void zpGameObject::unsetFlag( zpObjectFlag flag )
-{
-	m_flags.unmark( (zp_uint)flag );
-}
-
-zp_bool zpGameObject::isFlagSet( zpObjectFlag flag ) const
-{
-	return m_flags.isMarked( (zp_uint)flag );
-}
-
-void zpGameObject::setWorld( zpWorld* world )
-{
-	m_world = world;
-}
-zpWorld* zpGameObject::getWorld() const
-{
-	return m_world;
-}
-
-void zpGameObject::update()
-{
-	m_components.update();
-}
-void zpGameObject::simulate()
-{
-	m_components.simulate();
-}
-
-void zpGameObject::create()
-{
-	m_components.create();
-}
-void zpGameObject::destroy()
-{
-	m_components.destroy();
-}
-
-const zpString& zpGameObject::getName() const
+const zpString& zpObject::getName() const
 {
 	return m_name;
 }
-void zpGameObject::setName( const zpString& name )
+void zpObject::setName( const zpString& name )
 {
 	m_name = name;
 }
 
-const zpMatrix4f& zpGameObject::getTransform() const
+const zpMatrix4f& zpObject::getTransform() const
 {
 	return m_transform;
 }
-void zpGameObject::setTransform( const zpMatrix4f& transform )
+void zpObject::setTransform( const zpMatrix4f& transform )
 {
 	m_transform = transform;
 }
 
-void zpGameObject::receiveMessage( const zpMessage& message )
+zpWorld* zpObject::getWorld() const
 {
-	sendMessageToComponents( message );
-	//sendMessageToChildGameObjects( message );
+	return m_world;
 }
-void zpGameObject::sendMessageToComponents( const zpMessage& message )
+
+void zpObject::setWorld( zpWorld* world )
 {
-	
+	m_world = world;
 }
-//void zpGameObject::sendMessageToChildGameObjects( const zpMessage& message )
-//{
-//	
-//}
-//void zpGameObject::sendMessageToParentGameObject( const zpMessage& message )
-//{
-//}
-#endif
+
+zpApplication* zpObject::getApplication() const
+{
+	return m_application;
+}
+void zpObject::setApplication( zpApplication* application )
+{
+	m_application = application;
+}
+
+
+zpObjectPooledContent::zpObjectPooledContent() {}
+zpObjectPooledContent::~zpObjectPooledContent() {}
+
+void zpObjectPooledContent::update()
+{
+	for( zp_uint i = 0; i < size(); ++i )
+	{
+		if( isUsed( i ) )
+		{
+			zpObject* o = at( i );
+			if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
+			{
+				destroy( o );
+			}
+		}
+	}
+}

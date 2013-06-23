@@ -2,6 +2,9 @@
 #ifndef ZP_RESOURCE_H
 #define ZP_RESOURCE_H
 
+template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+class zpContentManager;
+
 template<typename Resource>
 class zpResource
 {
@@ -25,6 +28,9 @@ protected:
 	zpString m_filename;
 
 	Resource* m_resource;
+
+	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+	friend class zpContentManager;
 };
 
 #include "zpResource.inl"

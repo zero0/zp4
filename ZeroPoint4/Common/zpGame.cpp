@@ -1,5 +1,5 @@
 #include "zpCommon.h"
-
+/*
 zpGame::zpGame()
 	: m_timer( zpTime::getInstance() )
 	, m_currentWorld( ZP_NULL )
@@ -15,15 +15,15 @@ zpGame::~zpGame()
 
 void zpGame::create()
 {
-	if( m_window ) m_window->create();
-	m_managers.setGame( this );
-	m_managers.create();
+	//if( m_window ) m_window->create();
+	//m_managers.setGame( this );
+	//m_managers.create();
 }
 void zpGame::destroy()
 {
 	if( m_window ) m_window->destroy();
 	m_managers.destroy();
-	m_managers.setGame( ZP_NULL );
+	//m_managers.setGame( ZP_NULL );
 }
 
 void zpGame::setNextWorld( zpWorld* world )
@@ -62,6 +62,7 @@ zpRenderable* zpGame::getRenderable() const
 
 void zpGame::process()
 {
+#if 0
 	while( m_window->processMessages() )
 	{
 		m_timer->tick();
@@ -112,6 +113,7 @@ void zpGame::process()
 			m_nextWorld = ZP_NULL;
 		}
 	}
+#endif
 }
 
 void zpGame::setWindow( zpWindow* window )
@@ -169,3 +171,4 @@ void zpGame::deserialize( zpSerializedInput* in )
 		in->endBlock();
 	}
 }
+*/

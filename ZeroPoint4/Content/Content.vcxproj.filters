@@ -27,6 +27,9 @@
     <ClInclude Include="zpTextContentManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpContentPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
@@ -41,6 +44,9 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpContentManager.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpContentPool.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

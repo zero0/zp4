@@ -36,7 +36,6 @@ private:
 	friend class zpShaderContentManager;
 
 private:
-	zpBison m_shaderData;
 };
 
 class zpShaderResourceInstance : public zpResourceInstance< zpShaderResource >

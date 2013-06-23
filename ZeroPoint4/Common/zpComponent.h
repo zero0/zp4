@@ -10,14 +10,14 @@ enum zpComponentFlag
 	ZP_COMPONENT_FLAG_SHOULD_DESTROY
 };
 
-ZP_ABSTRACT_CLASS zpComponent : public zpMessageReceiver, public zpSerializable
+ZP_ABSTRACT_CLASS zpComponent
 {
 public:
 	zpComponent();
 	virtual ~zpComponent();
 
-	void setParentGameObject( zpGameObject* parent );
-	zpGameObject* getParentGameObject() const;
+	void setParentObject( zpObject* parent );
+	zpObject* getParentObject() const;
 
 	void setEnabled( zp_bool enabled );
 	zp_bool isEnabled() const;
@@ -33,7 +33,7 @@ public:
 	void sendMessageToSiblingComponents( const zpMessage& message );
 
 	zpWorld* getWorld() const;
-	zpGame* getGame() const;
+	zpApplication* getApplication() const;
 
 protected:
 	virtual void onCreate() = 0;
@@ -48,7 +48,7 @@ protected:
 private:
 	zpFlag8 m_flags;
 
-	zpGameObject* m_parentGameObject;
+	zpObject* m_parentObject;
 };
 
 #endif
