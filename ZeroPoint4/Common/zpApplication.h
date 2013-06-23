@@ -15,6 +15,11 @@ public:
 	void run();
 	zp_int shutdown();
 
+	void update();
+	void simulate();
+
+	void garbageCollect();
+
 	void exit( zp_int exitCode = 0 );
 
 	const zpBison::Value& getOptions() const;
@@ -38,7 +43,8 @@ private:
 	zpBison m_appOptions;
 
 	zpRenderingPipeline m_renderingPipeline;
-	//zpTextContentManager m_textContentManager;
+	
+	zpTextContentManager m_textContentManager;
 };
 
 #endif

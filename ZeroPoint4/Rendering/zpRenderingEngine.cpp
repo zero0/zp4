@@ -125,6 +125,13 @@ zpTexture* zpRenderingEngine::createTexture( zp_uint width, zp_uint height, zpTe
 	return new zpTexture( texture );
 }
 
+zpTexture* zpRenderingEngine::createTextureFromFile( const zpString& filename )
+{
+	zpTextureImpl* texture;
+	texture = m_renderingEngine->createTextureFromFile( filename );
+	return new zpTexture( texture );
+}
+
 zpDepthStencilBuffer* zpRenderingEngine::createDepthBuffer( zp_uint width, zp_uint height, zpDisplayFormat format )
 {
 	zpDepthStencilBufferImpl* buffer;

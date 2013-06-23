@@ -1,9 +1,7 @@
 #include "zpRendering.h"
 
-zpMaterialResource::zpMaterialResource() {}
-zpMaterialResource::~zpMaterialResource() {}
-
-zp_bool zpMaterialResource::load() {
+zp_bool zpMaterialResource::load( const zp_char* filename )
+{
 	/*zpProperties material( getFilename() );
 
 	if( !material.hasProperty( "material.shader" ) ) return false;
@@ -28,13 +26,10 @@ zp_bool zpMaterialResource::load() {
 
 	return true;
 }
-void zpMaterialResource::unload() {
+void zpMaterialResource::unload()
+{
 	/*m_material.shader = zpResourceInstance<zpShaderResource>();
 	m_material.textures.map( []( const zpResourceInstance<zpTextureResource>& ) {
 		return zpResourceInstance<zpTextureResource>();
 	} );*/
-}
-
-const zpMaterial& zpMaterialResource::getMaterial() const {
-	return m_material;
 }

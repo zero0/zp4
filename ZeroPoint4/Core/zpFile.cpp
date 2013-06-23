@@ -28,25 +28,33 @@ const zp_char* g_zpFileModeToString[] =
 	"wb+"
 };
 
-zpFile::zpFile() :
-	m_file( ZP_NULL ),
-	m_mode( ZP_FILE_MODE_NONE ),
-	m_size( -1 ),
-	m_filename()
+zpFile::zpFile()
+	: m_file( ZP_NULL )
+	, m_mode( ZP_FILE_MODE_NONE )
+	, m_size( -1 )
+	, m_filename()
 {}
-zpFile::zpFile( const zpString& filename ) :
-	m_file( ZP_NULL ),
-	m_mode( ZP_FILE_MODE_NONE ),
-	m_size( -1 ),
-	m_filename( filename )
+zpFile::zpFile( const zp_char* filename )
+	: m_file( ZP_NULL )
+	, m_mode( ZP_FILE_MODE_NONE )
+	, m_size( -1 )
+	, m_filename( filename )
 {
 	convertToFilePath( m_filename );
 }
-zpFile::zpFile( zpFile&& file ) :
-	m_file( file.m_file ),
-	m_mode( file.m_mode ),
-	m_size( file.m_size ),
-	m_filename( zp_move( file.m_filename ) )
+zpFile::zpFile( const zpString& filename )
+	: m_file( ZP_NULL )
+	, m_mode( ZP_FILE_MODE_NONE )
+	, m_size( -1 )
+	, m_filename( filename )
+{
+	convertToFilePath( m_filename );
+}
+zpFile::zpFile( zpFile&& file )
+	: m_file( file.m_file )
+	, m_mode( file.m_mode )
+	, m_size( file.m_size )
+	, m_filename( zp_move( file.m_filename ) )
 {
 	convertToFilePath( m_filename );
 	file.m_file = ZP_NULL;

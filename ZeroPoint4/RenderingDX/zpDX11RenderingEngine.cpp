@@ -1,9 +1,8 @@
 #include "zpDX11.h"
 #include <D3D11.h>
+#include <D3DX11.h>
 #include "zpDX11Util.h"
 #include "Core/zpCore.h"
-
-#define ZP_SHADER_TYPE_DX11		ZP_MAKE_UINT( 'D', 'X', '1', '1' )
 
 zpRenderingEngineImpl::zpRenderingEngineImpl()
 	: m_dxgiFactory( ZP_NULL )
@@ -317,6 +316,13 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 
 	return tex;
 }
+zpTextureImpl* zpRenderingEngineImpl::createTextureFromFile( const zpString& filename )
+{
+	ID3D11Resource* texture;
+	D3DX11CreateTextureFromFile( m_d3dDevice, filename.getChars(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
+
+	return 0;
+}
 zpDepthStencilBufferImpl* zpRenderingEngineImpl::createDepthStencilBuffer( zp_uint width, zp_uint height, zpDisplayFormat format )
 {
 	HRESULT hr;
@@ -418,11 +424,11 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 {
 	const zpBison::Value& root = shaderfile.root();
 
-	const zpBison::Value vs = root[ "VS" ];
-	const zpBison::Value ps = root[ "PS" ];
-	const zpBison::Value gs = root[ "GS" ];
-	const zpBison::Value gsso = root[ "GSSO" ];
-	const zpBison::Value cs = root[ "CS" ];
+	const zpBison::Value& vs = root[ "VS" ];
+	const zpBison::Value& ps = root[ "PS" ];
+	const zpBison::Value& gs = root[ "GS" ];
+	const zpBison::Value& gsso = root[ "GSSO" ];
+	const zpBison::Value& cs = root[ "CS" ];
 	
 	zpDataBuffer data;
 	HRESULT hr;
@@ -432,8 +438,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !vs.isNull() )
 	{
-		encodedShader = vs[ "Data" ].asCString();
-		encodedLength = zp_strlen( encodedShader );
+		const zpBison::Value& d = vs[ "Data" ];
+		encodedShader = d.asCString();
+		encodedLength = d.size();
 
 		zp_base64_decode( encodedShader, encodedLength, data );
 
@@ -441,16 +448,30 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Vertex Shader %x", hr );
 
 		const zpBison::Value format = vs[ "Format" ];
+		const zp_char* formatStr = format.asCString();
+		const zp_uint formatStrLen = format.size();
 
-		shader->m_vertexLayout = ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR;
+		zp_char formatDesc[ 4 ];
+		zp_uint i = 0;
+		for( ; i < formatStrLen; ++i )
+		{
+			formatDesc[ i ] = formatStr[ i ];
+		}
+		for( ; i < 4; ++i )
+		{
+			formatDesc[ i ] = '\0';
+		}
+
+		shader->m_vertexLayout = (zpVertexFormatDesc)ZP_MAKE_UINT( formatDesc[0], formatDesc[1], formatDesc[2], formatDesc[3] );
 
 		createVertexLayout( shader->m_vertexLayout, data );
 	}
 
 	if( !ps.isNull() )
 	{
-		encodedShader = ps[ "Data" ].asCString();
-		encodedLength = zp_strlen( encodedShader );
+		const zpBison::Value& d = ps[ "Data" ];
+		encodedShader = d.asCString();
+		encodedLength = d.size();
 
 		zp_base64_decode( encodedShader, encodedLength, data );
 
@@ -460,8 +481,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !gs.isNull() )
 	{
-		encodedShader = gs[ "Data" ].asCString();
-		encodedLength = zp_strlen( encodedShader );
+		const zpBison::Value& d = gs[ "Data" ];
+		encodedShader = d.asCString();
+		encodedLength = d.size();
 
 		zp_base64_decode( encodedShader, encodedLength, data );
 
@@ -471,8 +493,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !gsso.isNull() )
 	{
-		encodedShader = gsso[ "Data" ].asCString();
-		encodedLength = zp_strlen( encodedShader );
+		const zpBison::Value& d = gsso[ "Data" ];
+		encodedShader = d.asCString();
+		encodedLength = d.size();
 
 		zp_base64_decode( encodedShader, encodedLength, data );
 
@@ -507,8 +530,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !cs.isNull() )
 	{
-		encodedShader = cs[ "Data" ].asCString();
-		encodedLength = zp_strlen( encodedShader );
+		const zpBison::Value& d = cs[ "Data" ];
+		encodedShader = d.asCString();
+		encodedLength = d.size();
 
 		zp_base64_decode( encodedShader, encodedLength, data );
 

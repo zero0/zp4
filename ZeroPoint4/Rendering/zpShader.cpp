@@ -1,4 +1,5 @@
 #include "zpRendering.h"
+#include "zpRenderingImpl.inl"
 
 zpShader::zpShader( zpShaderImpl* impl )
 	: m_shader( impl )

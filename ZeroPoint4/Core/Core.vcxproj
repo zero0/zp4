@@ -145,6 +145,7 @@
     <ClInclude Include="zpPair.h" />
     <ClInclude Include="zpPlane.h" />
     <ClInclude Include="zpPooledObject.h" />
+    <ClInclude Include="zpProfiler.h" />
     <ClInclude Include="zpProperties.h" />
     <ClInclude Include="zpRandom.h" />
     <ClInclude Include="zpRay.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="zpMemorySystem.cpp" />
     <ClCompile Include="zpMessage.cpp" />
     <ClCompile Include="zpPlane.cpp" />
+    <ClCompile Include="zpProfiler.cpp" />
     <ClCompile Include="zpProperties.cpp" />
     <ClCompile Include="zpRandom.cpp" />
     <ClCompile Include="zpRay.cpp" />

@@ -1,12 +1,5 @@
 #include "zpRendering.h"
-
-#if ZP_RENDERING_TYPE == ZP_DX11
-#include "RenderingDX/zpDX11.h"
-#elif ZP_RENDERING_TYPE == ZP_GL2
-#include "RenderingOpenGL/zpOpenGL.h"
-#else
-#error( "No rendering engine selected!" )
-#endif
+#include "zpRenderingImpl.inl"
 
 zpTexture::zpTexture( zpTextureImpl* textureImpl )
 	: m_textureImpl( textureImpl )
@@ -37,4 +30,32 @@ zp_uint zpTexture::getHeight() const
 zpTextureImpl* zpTexture::getTextureImpl() const
 {
 	return m_textureImpl;
+}
+
+
+zp_bool zpTextureResource::load( const zp_char* filename )
+{
+	zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
+	if( m_resource == ZP_NULL )
+	{
+	}
+
+	return false;
+}
+void zpTextureResource::unload()
+{
+	if( m_resource != ZP_NULL )
+	{
+
+	}
+}
+
+
+zp_bool zpTextureContentManager::createResource( zpTextureResource* res, const zp_char* filename )
+{
+	return res->load( filename );
+}
+void zpTextureContentManager::destroyResource( zpTextureResource* res )
+{
+	res->unload();
 }

@@ -84,7 +84,7 @@ enum zpRenderingEngineType
 	ZP_RENDERING_ENGINE_DX11,
 };
 
-enum zpDisplayFormat
+enum zpDisplayFormat : zp_uint
 {
 	ZP_DISPLAY_FORMAT_UNKNOWN	=		0,
 
@@ -136,6 +136,17 @@ enum zpDisplayFormat
 	// Depth Buffer
 	ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT,
 	ZP_DISPLAY_FORMAT_D32_FLOAT,
+
+	// Compressed
+	ZP_DISPLAY_FORMAT_DXT1,
+	ZP_DISPLAY_FORMAT_DXT3,
+	ZP_DISPLAY_FORMAT_DXT5,
+	ZP_DISPLAY_FORMAT_ATI1N,
+	ZP_DISPLAY_FORMAT_ATI2N,
+
+	zpDisplayFormat_Count,
+	zpDisplayFormat_Force32 = ZP_FORECE_32BIT,
+
 };
 
 enum zpVertexFormat
@@ -343,26 +354,17 @@ struct zpViewport
 	zpViewport();
 };
 
-ZP_PURE_INTERFACE zpTexture;
-
-ZP_PURE_INTERFACE zpShader;
-template<> class zpResourceInstance<zpShader>;
-
-ZP_PURE_INTERFACE zpTextureResource;
-template<> class zpResourceInstance<zpTextureResource>;
-
-class zpUIResource;
-template<> class zpResourceInstance<zpUIResource>;
-
 class zpRenderingResourceCreator;
 
 class zpBuffer;
 class zpBufferImpl;
-ZP_PURE_INTERFACE zpDepthStencilBuffer;
+class zpDepthStencilBuffer;
 ZP_PURE_INTERFACE zpVertexLayout;
 class zpSamplerState;
 class zpRasterState;
 
+class zpShader;
+class zpTexture;
 class zpMaterialResource;
 
 class zpFontResource;
@@ -479,7 +481,7 @@ class zpUIRenderingComponent;
 
 class zpDeferredRenderingComponent;
 
-
+#include "zpImage.h"
 #include "zpBufferData.h"
 
 #include "zpVertex.h"
@@ -487,8 +489,6 @@ class zpDeferredRenderingComponent;
 #include "zpTexture.h"
 
 #include "zpShader.h"
-
-#include "zpTextureResource.h"
 
 #include "zpUIResource.h"
 

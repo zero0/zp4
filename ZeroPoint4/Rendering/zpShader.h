@@ -1,6 +1,6 @@
 #pragma once
-#ifndef ZP_SHADER_RESOURCE_H
-#define ZP_SHADER_RESOURCE_H
+#ifndef ZP_SHADER_H
+#define ZP_SHADER_H
 
 enum zpShaderType
 {

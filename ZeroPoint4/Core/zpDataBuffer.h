@@ -35,6 +35,9 @@ public:
 	template<typename T>
 	void writeAt( const T& in, zp_uint offset );
 
+	template<typename T>
+	void readAt( T& out, zp_uint offset );
+
 	void read( const zpDataBuffer& buffer );
 	void write( zpDataBuffer& buffer ) const;
 
@@ -105,10 +108,13 @@ void zpDataBuffer::writeFill( const T& in, zp_uint count )
 template<typename T>
 void zpDataBuffer::writeAt( const T& in, zp_uint offset )
 {
-	T* t = (T*)( m_data + offset );
-	*t = in;
+	*(T*)( m_data + offset ) = in;
 }
-
+template<typename T>
+void zpDataBuffer::readAt( T& out, zp_uint offset )
+{
+	out = *(T*)( m_data + offset );
+}
 
 
 template< zp_uint Size >

@@ -4,28 +4,28 @@
 
 struct zpMaterial
 {
-	//zpResourceInstance< zpShaderResource > shader;
+	zpShaderResourceInstance shader;
 	//zpFixedArrayList< zpResourceInstance< zpTextureResource >, ZP_MATERIAL_TEXTURE_SLOT_Count > textures;
 };
 
 class zpMaterialResource : public zpResource< zpMaterial >
 {
-public:
-	zpMaterialResource();
-	virtual ~zpMaterialResource();
-
-	zp_bool load();
-	void unload();
-
-	const zpMaterial& getMaterial() const;
-
-	void setTexture( zpMaterialTextureSlot slot, zpResourceInstance< zpTextureResource > texture );
-
 private:
-	zpMaterial m_material;
+	zp_bool load( const zp_char* filename );
+	void unload();
 };
 
-//ZP_RESOURCE_INSTANCE_TEMPLATE_START( zpMaterialResource )
-//ZP_RESOURCE_INSTANCE_TEMPLATE_END
+class zpMaterialResourceInstance : public zpResourceInstance< zpMaterialResource >
+{};
+
+class zpMaterialContentManager : public zpContentManager< zpMaterialResource, zpMaterialResourceInstance, zpMaterialContentManager, 128 >
+{
+private:
+	zp_bool createResource( zpMaterialResource* res, const zp_char* filename );
+	void destroyResource( zpMaterialResource* res );
+
+	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+	friend class zpContentManager;
+};
 
 #endif

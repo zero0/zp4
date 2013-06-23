@@ -31,7 +31,8 @@ enum zpFileSeek {
 class zpFile {
 public:
 	zpFile();
-	explicit zpFile( const zpString& filename);
+	explicit zpFile( const zp_char* filename );
+	explicit zpFile( const zpString& filename );
 	zpFile( zpFile&& file );
 	~zpFile();
 

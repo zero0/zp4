@@ -96,6 +96,10 @@ void zpApplication::run()
 }
 zp_int zpApplication::shutdown()
 {
+	m_renderingPipeline.getRenderingEngine()->destroy();
+
+	m_textContentManager.garbageCollect();
+
 	if( m_console )
 	{
 		m_console->destroy();
@@ -105,6 +109,20 @@ zp_int zpApplication::shutdown()
 	m_window.destroy();
 
 	return m_exitCode;
+}
+
+void zpApplication::update()
+{
+
+}
+void zpApplication::simulate()
+{
+
+}
+
+void zpApplication::garbageCollect()
+{
+	m_textContentManager.garbageCollect();
 }
 
 void zpApplication::exit( zp_int exitCode )
@@ -121,24 +139,29 @@ const zpBison::Value& zpApplication::getOptions() const
 void zpApplication::processFrame()
 {
 	m_timer->tick();
+
+	ZP_PROFILE_START( FRAME );
+
 	zp_long now = m_timer->getTime();
 	zp_uint numUpdates = 0;
 
 	// update
-	//m_managers.update();
-	//if( m_currentWorld ) m_currentWorld->update();
+	ZP_PROFILE_START( UPDATE );
+	update();
 	zp_printfcln( ZP_CC_LIGHT_GREEN, "update" );
+	ZP_PROFILE_END( UPDATE );
 
 
 	// simulate
+	ZP_PROFILE_START( SIMULATE );
 	while( ( now - m_lastTime ) > m_simulateHz && numUpdates < 5 )
 	{
-		//m_managers.simulate();
-		//if( m_currentWorld ) m_currentWorld->simulate();
+		simulate();
 		zp_printfcln( ZP_CC_LIGHT_BLUE, "simulate" );
 		m_lastTime += m_simulateHz;
 		++numUpdates;
 	}
+	ZP_PROFILE_END( SIMULATE );
 
 	// adjust timer
 	if( ( now - m_lastTime ) > m_simulateHz )
@@ -147,27 +170,14 @@ void zpApplication::processFrame()
 	}
 
 	// render
+	ZP_PROFILE_START( RENDER );
 	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
 	zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );	
 	m_renderingPipeline.submitRendering();
+	ZP_PROFILE_END( RENDER );
+
+	ZP_PROFILE_END( FRAME );
 
 	// sleep for the remainder of the frame
 	m_timer->sleep( m_renderMsHz );
-
-	//// if there is a next world to set, do it now for the next frame
-	//if( m_nextWorld )
-	//{
-	//	if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::LEAVE_WORLD );
-	//	if( m_nextWorld ) m_nextWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
-	//
-	//	m_currentWorld = m_nextWorld;
-	//	if( !m_currentWorld->isCreated() )
-	//	{
-	//		m_currentWorld->create();
-	//	}
-	//
-	//	if( m_currentWorld ) m_currentWorld->receiveMessage( zpMessageTypes::ENTER_WORLD );
-	//
-	//	m_nextWorld = ZP_NULL;
-	//}
 }

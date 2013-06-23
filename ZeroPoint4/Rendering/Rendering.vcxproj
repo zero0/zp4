@@ -83,6 +83,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpImage.h" />
     <ClInclude Include="zpRenderingPipeline.h" />
     <ClInclude Include="zpUIManager.h" />
     <ClInclude Include="zpAnimatedMeshResource.h" />
@@ -111,7 +112,6 @@
     <ClInclude Include="zpStaticMeshResource.h" />
     <ClInclude Include="zpTextRenderingComponent.h" />
     <ClInclude Include="zpTexture.h" />
-    <ClInclude Include="zpTextureResource.h" />
     <ClInclude Include="zpUIRenderingComponent.h" />
     <ClInclude Include="zpUIResource.h" />
     <ClInclude Include="zpVertex.h" />
@@ -125,6 +125,7 @@
     <ClCompile Include="zpDeferredRenderingComponent.cpp" />
     <ClCompile Include="zpDepthStencilBuffer.cpp" />
     <ClCompile Include="zpFontResource.cpp" />
+    <ClCompile Include="zpImage.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpMaterial.cpp" />
     <ClCompile Include="zpOBJStaticMeshResource.cpp" />
@@ -147,7 +148,6 @@
     <ClCompile Include="zpStaticMeshResource.cpp" />
     <ClCompile Include="zpTextRenderingComponent.cpp" />
     <ClCompile Include="zpTexture.cpp" />
-    <ClCompile Include="zpTextureInstance.cpp" />
     <ClCompile Include="zpUIManager.cpp" />
     <ClCompile Include="zpUIRenderingComponent.cpp" />
     <ClCompile Include="zpViewport.cpp" />

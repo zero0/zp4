@@ -43,4 +43,27 @@ private:
 	friend class zpRenderingEngine;
 };
 
+
+class zpTextureResource : public zpResource< zpTexture >
+{
+private:
+	zp_bool load( const zp_char* filename );
+	void unload();
+
+	friend class zpTextureContentManager;
+};
+
+class zpTextureResourceInstance : public zpResourceInstance< zpTextureResource >
+{};
+
+class zpTextureContentManager : public zpContentManager< zpTextureResource, zpTextureResourceInstance, zpTextureContentManager, 128 >
+{
+private:
+	zp_bool createResource( zpTextureResource* res, const zp_char* filename );
+	void destroyResource( zpTextureResource* res );
+
+	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+	friend class zpContentManager;
+};
+
 #endif
