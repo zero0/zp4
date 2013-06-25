@@ -54,6 +54,7 @@ public:
 		zp_bool isString() const;
 		zp_bool isArray() const;
 		zp_bool isObject() const;
+		zp_bool isData() const;
 
 		zp_bool isIntegral() const;
 		zp_bool isReal() const;
@@ -65,6 +66,7 @@ public:
 		zpString asString() const;
 		const zp_char* asCString() const;
 		zp_hash asHash() const;
+		const void* asData() const;
 
 		const Value operator[]( zp_int index ) const;
 		const Value operator[]( const zp_char* key ) const;

@@ -450,7 +450,7 @@ zp_bool zp_base64_decode( const zp_char* data, zp_uint length, zpDataBuffer& out
 
 	zp_uint count = length - 4;
 	zp_dword n;
-	for( zp_uint i = 0; i < count; i += 4 )
+	for( zp_uint i = 0; i <= count; i += 4 )
 	{
 		n  = fromBase64Chars[ data[ i + 0 ] ] << 18;
 		n += fromBase64Chars[ data[ i + 1 ] ] << 12;

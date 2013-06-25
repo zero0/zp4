@@ -15,6 +15,7 @@ enum zpJsonType
 	ZP_JSON_TYPE_STRING,
 	ZP_JSON_TYPE_ARRAY,
 	ZP_JSON_TYPE_OBJECT,
+	ZP_JSON_TYPE_DATA,
 
 	zpJsonType_Count,
 	zpJsonType_Force32 = ZP_FORECE_32BIT,
@@ -32,8 +33,9 @@ public:
 	explicit zpJson( zp_ulong value );
 	explicit zpJson( zp_float value );
 	explicit zpJson( zp_double value );
-	explicit zpJson( const zp_char* value );
-	explicit zpJson( const zpString& value );
+	explicit zpJson( const zp_char* value, zp_bool isData = false );
+	explicit zpJson( const zpString& value, zp_bool isData = false );
+	explicit zpJson( const void* data, zp_uint size );
 	zpJson( const zpJson& json );
 	zpJson( zpJson&& json );
 	~zpJson();
@@ -56,6 +58,7 @@ public:
 	zp_bool isString() const;
 	zp_bool isArray() const;
 	zp_bool isObject() const;
+	zp_bool isData() const;
 
 	zp_bool isIntegral() const;
 	zp_bool isReal() const;
@@ -69,6 +72,7 @@ public:
 	zp_float asFloat() const;
 	zp_double asDouble() const;
 	zpString asString() const;
+	zpString asData() const;
 	const zp_char* asCString() const;
 
 	zpJson& operator[]( zp_uint index );
@@ -144,6 +148,8 @@ private:
 			ZP_JSON_TOKEN_OBJECT_CLOSE,
 			ZP_JSON_TOKEN_ARRAY_OPEN,
 			ZP_JSON_TOKEN_ARRAY_CLOSE,
+			ZP_JSON_TOKEN_DATA_OPEN,
+			ZP_JSON_TOKEN_DATA_CLOSE,
 			ZP_JSON_TOKEN_STRING,
 			ZP_JSON_TOKEN_NUMBER,
 			ZP_JSON_TOKEN_TRUE,
@@ -167,6 +173,7 @@ private:
 	zp_bool readString();
 	zp_bool readNumber();
 	zp_bool readBool();
+	zp_bool readData();
 
 	void skipWhitespace();
 	void skipComments();
@@ -178,7 +185,7 @@ private:
 	}
 	zp_bool matches( const zp_char* pattern, zp_int length );
 
-	void tokenToString( const zpJsonToken& token, zpString& str );
+	void tokenToString( const zpJsonToken& token, zpStringBuffer& str );
 	void tokenToNumber( const zpJsonToken& token );
 	void tokenToDouble( const zpJsonToken& token );
 

@@ -1,6 +1,6 @@
 #include "zpCore.h"
 
-#define ZP_BISON_HEADER_ID	ZP_MAKE_UINT( 'B', 'I', 'S', 'N' )
+#define ZP_BISON_HEADER_ID	ZP_MAKE_FOURCC( 'B', 'I', 'S', 'N' )
 
 const zpBison::Value zpBison::null;
 zpBison::zpBison()
@@ -51,6 +51,7 @@ void zpBison::parseData()
 		const zp_byte* data = m_buffer.getData();
 		zpBisonHeader header;
 		header = *(const zpBisonHeader*)data;
+		
 		ZP_ASSERT( header.bison == ZP_BISON_HEADER_ID, "Invalid Bison header" );
 		if( header.bison == ZP_BISON_HEADER_ID )
 		{
@@ -136,6 +137,10 @@ zp_bool zpBison::Value::isArray() const
 zp_bool zpBison::Value::isObject() const
 {
 	return m_type == ZP_BISON_TYPE_OBJECT;
+}
+zp_bool zpBison::Value::isData() const
+{
+	return m_type == ZP_BISON_TYPE_DATA;
 }
 
 zp_bool zpBison::Value::isIntegral() const
@@ -283,6 +288,18 @@ zp_hash zpBison::Value::asHash() const
 		}
 	default:
 		return 0;
+	}
+}
+const void* zpBison::Value::asData() const
+{
+	switch( m_type )
+	{
+	case ZP_BISON_TYPE_DATA:
+		{
+			return (const void*)( m_data + m_offset + sizeof( zpBisonType ) + sizeof( zp_uint ) );
+		}
+	default:
+		return ZP_NULL;
 	}
 }
 
@@ -489,6 +506,20 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpHashMap<
 			zp_uint offset = stringTable.get( json.asString() );
 			buffer.write< zpBisonType >( ZP_BISON_TYPE_STRING );
 			buffer.write< zp_uint >( offset );
+		}
+		break;
+	case ZP_JSON_TYPE_DATA:
+		{
+			zpDataBuffer data;
+			const zp_char* dataStr = json.asCString();
+			zp_uint length = zp_strlen( dataStr );
+
+			zp_base64_decode( dataStr, length, data );
+			zp_printfln( "data: %s length: %d size: %d", dataStr, length, data.size() );
+
+			buffer.write< zpBisonType >( ZP_BISON_TYPE_DATA );
+			buffer.write< zp_uint >( data.size() );
+			buffer.writeBulk< zp_byte >( data.getData(), data.size() );
 		}
 		break;
 	case ZP_JSON_TYPE_ARRAY:

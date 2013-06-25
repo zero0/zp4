@@ -1,12 +1,14 @@
 #include "zpCore.h"
 
-enum ops
+enum ops : zp_char
 {
 	json_null = '\0',
 	json_obj_open = '{',
 	json_obj_close = '}',
 	json_arr_open = '[',
 	json_arr_close = ']',
+	json_data_open = '<',
+	json_data_close = '>',
 	json_fslash = '/',
 	json_bslash = '\\',
 	json_true_open = 't',
@@ -62,20 +64,29 @@ zpJson::zpJson( zp_double value )
 	: m_type( ZP_JSON_TYPE_DOUBLE )
 	, m_double( value )
 {}
-zpJson::zpJson( const zp_char* value )
-	: m_type( ZP_JSON_TYPE_STRING )
+zpJson::zpJson( const zp_char* value, zp_bool isData )
+	: m_type( isData ? ZP_JSON_TYPE_DATA : ZP_JSON_TYPE_STRING )
 	, m_string( new zpString( value ) )
 {}
-zpJson::zpJson( const zpString& value )
-	: m_type( ZP_JSON_TYPE_STRING )
+zpJson::zpJson( const zpString& value, zp_bool isData )
+	: m_type( isData ? ZP_JSON_TYPE_DATA : ZP_JSON_TYPE_STRING )
 	, m_string( new zpString( value ) )
 {}
+zpJson::zpJson( const void* data, zp_uint size )
+	: m_type( ZP_JSON_TYPE_DATA )
+	, m_string( new zpString() )
+{
+	zpStringBuffer buff;
+	zp_base64_encode( data, size, buff );
+	*m_string = buff.toString();
+}
 zpJson::zpJson( const zpJson& json )
 	: m_type( json.m_type )
 {
 	switch( m_type )
 	{
 	case ZP_JSON_TYPE_STRING:
+	case ZP_JSON_TYPE_DATA:
 		m_string = new zpString( *json.m_string );
 		break;
 	case ZP_JSON_TYPE_ARRAY:
@@ -101,6 +112,7 @@ zpJson::~zpJson()
 	switch( m_type )
 	{
 	case ZP_JSON_TYPE_STRING:
+	case ZP_JSON_TYPE_DATA:
 		ZP_SAFE_DELETE( m_string );
 		break;
 	case ZP_JSON_TYPE_ARRAY:
@@ -120,6 +132,7 @@ void zpJson::operator=( const zpJson& json )
 	switch( m_type )
 	{
 	case ZP_JSON_TYPE_STRING:
+	case ZP_JSON_TYPE_DATA:
 		m_string = new zpString( *json.m_string );
 		break;
 	case ZP_JSON_TYPE_ARRAY:
@@ -217,6 +230,10 @@ zp_bool zpJson::isObject() const
 {
 	return m_type == ZP_JSON_TYPE_NULL || m_type == ZP_JSON_TYPE_OBJECT;
 }
+zp_bool zpJson::isData() const
+{
+	return m_type == ZP_JSON_TYPE_DATA;
+}
 
 zp_bool zpJson::isIntegral() const
 {
@@ -252,6 +269,7 @@ zp_bool zpJson::asBool() const
 	case ZP_JSON_TYPE_DOUBLE:
 		return m_double != 0.0;
 	case ZP_JSON_TYPE_STRING:
+	case ZP_JSON_TYPE_DATA:
 		return m_string && !m_string->isEmpty();
 	case ZP_JSON_TYPE_ARRAY:
 		return m_array && !m_array->isEmpty();
@@ -420,6 +438,20 @@ zpString zpJson::asString() const
 	case ZP_JSON_TYPE_BOOL:
 		return zpString( m_bool ? "true" : "false" );
 	case ZP_JSON_TYPE_STRING:
+	case ZP_JSON_TYPE_DATA:
+		return *m_string;
+	default:
+		ZP_ASSERT( false, "" );
+		return zpString( "" );
+	}
+}
+zpString zpJson::asData() const
+{
+	switch( m_type )
+	{
+	case ZP_JSON_TYPE_NULL:
+		return zpString( "" );
+	case ZP_JSON_TYPE_DATA:
 		return *m_string;
 	default:
 		ZP_ASSERT( false, "" );
@@ -435,6 +467,7 @@ const zp_char* zpJson::asCString() const
 	case ZP_JSON_TYPE_BOOL:
 		return m_bool ? "true" : "false";
 	case ZP_JSON_TYPE_STRING:
+	case ZP_JSON_TYPE_DATA:
 		return m_string->str();
 	default:
 		ZP_ASSERT( false, "" );
@@ -594,6 +627,10 @@ zp_bool zpJsonParser::readToken( zpJsonToken& token )
 	case json_arr_close:
 		token.type = zpJsonToken::ZP_JSON_TOKEN_ARRAY_CLOSE;
 		break;
+	case json_data_open:
+		token.type = zpJsonToken::ZP_JSON_TOKEN_DATA_OPEN;
+		ok = readData();
+		break;
 	case json_dquote:
 		token.type = zpJsonToken::ZP_JSON_TOKEN_STRING;
 		ok = readString();
@@ -664,9 +701,16 @@ zp_bool zpJsonParser::readValue()
 		break;
 	case zpJsonToken::ZP_JSON_TOKEN_STRING:
 		{
-			zpString str;
+			zpStringBuffer str;
 			tokenToString( token, str );
-			currentValue() = zpJson( str );
+			currentValue() = zpJson( str.str() );
+		}
+		break;
+	case zpJsonToken::ZP_JSON_TOKEN_DATA_OPEN:
+		{
+			zpStringBuffer str;
+			tokenToString( token, str );
+			currentValue() = zpJson( str.str(), true );
 		}
 		break;
 	case zpJsonToken::ZP_JSON_TOKEN_NUMBER:
@@ -690,7 +734,7 @@ zp_bool zpJsonParser::readObject()
 	currentValue() = zpJson();
 
 	zpJsonToken token;
-	zpString name;
+	zpStringBuffer name;
 
 	while( readToken( token ) )
 	{
@@ -704,7 +748,6 @@ zp_bool zpJsonParser::readObject()
 			break;
 		}
 
-		name = "";
 		tokenToString( token, name );
 
 		zpJsonToken colon;
@@ -714,7 +757,7 @@ zp_bool zpJsonParser::readObject()
 			return false;
 		}
 
-		zpJson& value = currentValue()[ name ];
+		zpJson& value = currentValue()[ name.str() ];
 
 		m_nodes.pushBack( &value );
 		zp_bool ok = readValue();
@@ -822,6 +865,20 @@ zp_bool zpJsonParser::readBool()
 {
 	return true;
 }
+zp_bool zpJsonParser::readData()
+{
+	zp_char c = '\0';
+	while( m_current != m_end )
+	{
+		c = nextChar();
+		if( c == json_data_close )
+		{
+			break;
+		}
+	}
+
+	return c == json_data_close;
+}
 
 void zpJsonParser::skipWhitespace()
 {
@@ -852,10 +909,11 @@ zp_bool zpJsonParser::matches( const zp_char* pattern, zp_int length )
 	return true;
 }
 
-void zpJsonParser::tokenToString( const zpJsonToken& token, zpString& str )
+void zpJsonParser::tokenToString( const zpJsonToken& token, zpStringBuffer& str )
 {
 	const zp_char* s = token.start + 1;
 	const zp_char* e = token.end - 1;
+	str.clear();
 	str.reserve( e - s );
 
 	while( s != e )
@@ -877,14 +935,14 @@ void zpJsonParser::tokenToString( const zpJsonToken& token, zpString& str )
 				zp_char esc = *s++;
 				switch( esc )
 				{
-				case json_dquote: str.append( json_dquote ); break;
-				case json_fslash: str.append( json_fslash ); break;
-				case json_bslash: str.append( json_bslash ); break;
-				case 'b': str.append( '\b' ); break;
-				case 'f': str.append( '\f' ); break;
-				case 'n': str.append( '\n' ); break;
-				case 'r': str.append( '\r' ); break;
-				case 't': str.append( '\t' ); break;
+				case json_dquote: str.append( (zp_char)json_dquote ); break;
+				case json_fslash: str.append( (zp_char)json_fslash ); break;
+				case json_bslash: str.append( (zp_char)json_bslash ); break;
+				case 'b': str.append( (zp_char)'\b' ); break;
+				case 'f': str.append( (zp_char)'\f' ); break;
+				case 'n': str.append( (zp_char)'\n' ); break;
+				case 'r': str.append( (zp_char)'\r' ); break;
+				case 't': str.append( (zp_char)'\t' ); break;
 				case 'u':
 					ZP_ASSERT( false, "todo implement utf8" );
 					break;
@@ -987,13 +1045,18 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 		buffer.append( json.asDouble() );
 		break;
 	case ZP_JSON_TYPE_STRING:
-		buffer.append( '"' );
+		buffer.append( (zp_char)json_dquote );
 		buffer.append( json.asCString() );
-		buffer.append( '"' );
+		buffer.append( (zp_char)json_dquote );
+		break;
+	case ZP_JSON_TYPE_DATA:
+		buffer.append( (zp_char)json_data_open );
+		buffer.append( json.asCString() );
+		buffer.append( (zp_char)json_data_close );
 		break;
 	case ZP_JSON_TYPE_ARRAY:
 		{
-			buffer.append( '[' );
+			buffer.append( (zp_char)json_arr_open );
 			writeNewLine( buffer, indent );
 			if( json.size() > 0 )
 			{
@@ -1003,7 +1066,7 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 
 				for( zp_uint i = 1; i < json.size(); ++i )
 				{
-					buffer.append( ',' );
+					buffer.append( (zp_char)json_arr_sep  );
 					writeNewLine( buffer, ind );
 					writeIndent( buffer, ind );
 					writeJson( buffer, json[ i ], ind );
@@ -1011,12 +1074,12 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 			}
 			writeNewLine( buffer, indent );
 			writeIndent( buffer, indent );
-			buffer.append( ']' );
+			buffer.append( (zp_char)json_arr_close  );
 		}
 		break;
 	case ZP_JSON_TYPE_OBJECT:
 		{
-			buffer.append( '{' );
+			buffer.append( (zp_char)json_obj_open );
 			writeNewLine( buffer, indent );
 			if( json.size() > 0 )
 			{
@@ -1027,9 +1090,9 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 
 				writeIndent( buffer, ind );
 
-				buffer.append( '"' );
+				buffer.append( (zp_char)json_dquote );
 				buffer.append( members[ 0 ] );
-				buffer.append( '"' );
+				buffer.append( (zp_char)json_dquote );
 			
 				writeObjectSeperator( buffer, ind );
 				
@@ -1037,13 +1100,13 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 
 				for( zp_uint i = 1; i < members.size(); ++i )
 				{
-					buffer.append( ',' );
+					buffer.append( (zp_char)json_arr_sep );
 					writeNewLine( buffer, ind );
 					writeIndent( buffer, ind );
 
-					buffer.append( '"' );
+					buffer.append( (zp_char)json_dquote );
 					buffer.append( members[ i ] );
-					buffer.append( '"' );
+					buffer.append( (zp_char)json_dquote );
 
 					writeObjectSeperator( buffer, ind );
 
@@ -1052,7 +1115,7 @@ void zpJsonWriter::writeJson( zpStringBuffer& buffer, const zpJson& json, zp_int
 			}
 			writeNewLine( buffer, indent );
 			writeIndent( buffer, indent );
-			buffer.append( '}' );
+			buffer.append( (zp_char)json_obj_close );
 		}
 		break;
 	}

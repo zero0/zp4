@@ -75,6 +75,7 @@
 #define ZP_MAKE_UINT( a, b, c, d )					(zp_uint)( ( (a) & 0xFF ) << 24 | ( (b) & 0xFF ) << 16 | ( (c) & 0xFF ) << 8 | ( (d) & 0xFF ) )
 #define ZP_MAKE_ULONG( a, b, c, d, e, f, g, h )		(zp_ulong)( ZP_MAKE_UINT( a, b, c, d ) ) << 32 | (zp_ulong)( ZP_MAKE_UINT( e, f, g, h ) )
 #define ZP_MAKE_CHAR4( a, b, c, d )					{ (a), (b), (c), (d) }
+#define ZP_MAKE_FOURCC( a, b, c, d )				(zp_uint)( ( (a) & 0xFF ) << 0 | ( (b) & 0xFF ) << 8 | ( (c) & 0xFF ) << 16 | ( (d) & 0xFF ) << 24 )
 
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
