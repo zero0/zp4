@@ -4,11 +4,13 @@
         "Title" : "Blackjack",
         "X" : 10,
         "Y" : 10,
-        "Width" : 640,
-        "Height" : 360
+        "Width" : 960,
+        "Height" : 640
     },
     "Render" : {
         "Refresh" : 60,
         "VSync" : false
-    }
+    },
+	"Data" : <ZW50ZXIgdGV4dCBoZXJl>,
+	"Integer" : 0
 }

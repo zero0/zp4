@@ -1,6 +1,6 @@
 <zpGame>
 	<zpWindow title="test">
-		<Position x="800" y="50" />
+		<Position x="80" y="50" />
 		<ScreenSize x="960" y="540" />
 	</zpWindow>
 	<Managers>
