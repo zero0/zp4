@@ -2,7 +2,8 @@
 #ifndef ZP_KEYBOARD_H
 #define ZP_KEYBOARD_H
 
-enum zpKeyCode : zp_ushort {
+enum zpKeyCode : zp_ushort
+{
 	ZP_KEY_CODE_NULL =			0x0000,
 
 	ZP_KEY_CODE_MOD_SHIFT =		0x1000,
@@ -156,7 +157,13 @@ public:
 	virtual void onKeyUp( zpKeyCode key ) {};
 };
 
-class zpKeyboard : public zpWindowFocusListener, public zpWindowProcListener {
+enum
+{
+	ZP_INPUT_MAX_KEYS = 256,
+};
+
+class zpKeyboard
+{
 public:
 	~zpKeyboard();
 
@@ -164,7 +171,12 @@ public:
 	void create();
 	void destroy();
 
+	zp_bool isCreated() const;
+
 	zp_bool isKeyDown( zpKeyCode key ) const;
+	zp_bool isKeyUp( zpKeyCode key ) const;
+
+	zp_char keyToChar( zpKeyCode key ) const;
 
 	void addListener( zpKeyboardListener* listener );
 	void removeListener( zpKeyboardListener* listener );
@@ -177,11 +189,13 @@ public:
 
 private:
 	zpKeyboard();
-	
+
+	zp_bool m_isCreated;
 	zp_bool m_hasFocus;
+
 	zpArrayList<zpKeyboardListener*> m_listeners;
-	zp_byte m_keyBuffer[ 256 ];
-	zp_byte m_keyDownBuffer[ 256 ];
+	zp_byte m_keyBuffer[ ZP_INPUT_MAX_KEYS ];
+	zp_byte m_keyDownBuffer[ ZP_INPUT_MAX_KEYS ];
 
 	friend class zpInputManager;
 };

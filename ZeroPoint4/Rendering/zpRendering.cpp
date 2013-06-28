@@ -45,3 +45,12 @@ void zpRenderingRegisterSerializables() {
 	//
 	//zpRegisterSerializable::registerSerializable<zpDeferredRenderingComponent>();
 }
+
+#define LAYER_TO_SORT_KEY( layer )	( ( 1 << ( layer ) ) << 16 )
+
+zp_uint zpRenderingCommand::generateSortKey() const
+{
+	
+
+	return 0;
+}

@@ -95,6 +95,10 @@ zpTexture* zpRenderingEngine::getBackBufferRenderTarget() const
 {
 	return m_immediateRenderTarget;
 }
+zpDepthStencilBuffer* zpRenderingEngine::getBackBufferDepthStencilBuffer() const
+{
+	return ZP_NULL;
+}
 
 zp_uint zpRenderingEngine::getNumRenderingContexts() const
 {

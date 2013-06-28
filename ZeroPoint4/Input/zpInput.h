@@ -3,6 +3,7 @@
 #define ZP_INPUT_H
 
 #include "Core\zpCore.h"
+//#include "Common\zpCommon.h"
 
 class zpMouse;
 class zpKeyboard;

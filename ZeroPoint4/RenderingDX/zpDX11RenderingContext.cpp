@@ -33,12 +33,12 @@ void zpRenderingContextImpl::update( zpBufferImpl* buffer, void* data, zp_uint s
 	m_context->UpdateSubresource( buffer->m_buffer, 0, ZP_NULL, data, size, 0 );
 }
 
-void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand >& renderCommands )
+void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands )
 {
 	const zp_uint count = renderCommands.size();
 	for( zp_uint i = 0; i < count; ++i )
 	{
-		const zpRenderingCommand& command = renderCommands[ i ];
+		const zpRenderingCommand& command = *renderCommands[ i ];
 
 		switch( command.type )
 		{

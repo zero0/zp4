@@ -32,7 +32,7 @@ const zpString& zpApplication::getOptionsFilename() const
 void zpApplication::initialize( const zpArrayList< zpString >& args )
 {
 	zp_bool ok;
-	
+
 	zpJsonParser parser;
 	zpJson json;
 	zpDataBuffer buffer;
@@ -89,6 +89,10 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_isRunning = true;
 	m_lastTime = m_timer->getTime();
+
+	// register input with window
+	m_window.addFocusListener( &m_inputManager );
+	m_window.addProcListener( &m_inputManager );
 }
 void zpApplication::run()
 {
@@ -108,6 +112,9 @@ zp_int zpApplication::shutdown()
 		m_console->destroy();
 		m_console = ZP_NULL;
 	}
+
+	m_window.removeFocusListener( &m_inputManager );
+	m_window.removeProcListener( &m_inputManager );
 
 	m_window.destroy();
 
@@ -131,7 +138,14 @@ void zpApplication::update()
 	}
 
 	// update object, delete any etc
+	ZP_PROFILE_START( OBJECT_UPDATE );
 	m_objectContent.update();
+	ZP_PROFILE_END( OBJECT_UPDATE );
+
+	// update input
+	ZP_PROFILE_START( INPUT_UPDATE );
+	m_inputManager.update();
+	ZP_PROFILE_END( INPUT_UPDATE );
 
 }
 void zpApplication::simulate()
@@ -142,6 +156,10 @@ void zpApplication::simulate()
 void zpApplication::garbageCollect()
 {
 	m_textContent.garbageCollect();
+	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
+	m_renderingPipeline.getShaderContentManager()->garbageCollect();
+	m_renderingPipeline.getTextureContentManager()->garbageCollect();
+
 }
 
 void zpApplication::exit( zp_int exitCode )
@@ -197,6 +215,14 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	{
 		m_nextWorldFilename = filename;
 		m_hasNextWorld = true;
+	}
+	else if( strFilename.endsWith( ".zps" ) )
+	{
+		loaded = m_renderingPipeline.getShaderContentManager()->reloadResource( filename );
+	}
+	else if( strFilename.endsWith( ".png" ) )
+	{
+		loaded = m_renderingPipeline.getTextureContentManager()->reloadResource( filename );
 	}
 
 	return loaded;

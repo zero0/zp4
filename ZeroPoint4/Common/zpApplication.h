@@ -31,9 +31,12 @@ public:
 	zp_bool loadFile( const zp_char* filename );
 	zp_bool handleDragAndDrop( const zp_char* filename, zp_int x, zp_int y );
 
-private:
 	void processFrame();
 
+	zpWindow* getWindow() { return &m_window; }
+	zpRenderingPipeline* getRenderPipeline() { return &m_renderingPipeline; }
+
+private:
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
 	zp_int m_exitCode;
@@ -52,6 +55,7 @@ private:
 
 	zpBison m_appOptions;
 
+	zpInputManager m_inputManager;
 	zpRenderingPipeline m_renderingPipeline;
 	
 	zpObjectPooledContent m_objectContent;

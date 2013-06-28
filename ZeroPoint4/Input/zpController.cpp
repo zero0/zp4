@@ -18,8 +18,9 @@
 #define FIRE_CONTROLLER_EVENT_TO_LISTENERS( e )	\
 	m_listeners.foreach( []( zpControllerListener* listener ) {	listener->e(); } )
 
-zpController::zpController( zpControllerNumber number )
-	: m_controller( number )
+zpController::zpController()
+	: m_isCreated( false )
+	, m_controller( ZP_CONTROLLER_1 )
 	, m_leftThumbDeadZone( XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE )
 	, m_rightThumbDeadZone( XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
 	, m_isConnected( false )
@@ -38,11 +39,15 @@ zpController::zpController( zpControllerNumber number )
 	, m_rightRumbleAmount( 0 )
 	, m_maxRightRumbleAmount( 0 )
 {}
-zpController::~zpController() {
+zpController::~zpController()
+{
 	destroy();
 }
 
-void zpController::poll() {
+void zpController::poll()
+{
+	if( !m_isCreated ) return;
+
 	// Get the state of the controller
 	bool wasConnected = m_isConnected;
 	XINPUT_STATE state;
@@ -54,7 +59,8 @@ void zpController::poll() {
 	//XInputControllerEventListenerList::iterator end = m_listeners.end();
 
 	// If the controller is connected, update the values
-	if( m_isConnected ) {
+	if( m_isConnected )
+	{
 		zp_short x, y;
 		zp_short px, py;
 		// Left Thumb Stick
@@ -64,16 +70,20 @@ void zpController::poll() {
 		py = (zp_short)m_leftThumb.getY();
 
 		// Left thumb stick deadzone calculations
-		if( x < m_leftThumbDeadZone && x > -m_leftThumbDeadZone && y < m_leftThumbDeadZone && y > -m_leftThumbDeadZone  ) {
+		if( x < m_leftThumbDeadZone && x > -m_leftThumbDeadZone && y < m_leftThumbDeadZone && y > -m_leftThumbDeadZone )
+		{
 			x = 0;
 			y = 0;
 		}
 
 		m_leftThumb.set( x, y );
 		zpVector2i lt( m_leftThumb );
-		if( x != px || y != py ) {
+		if( x != px || y != py )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onLeftStickMove, lt );
-		} else if( ( x || y ) && ( x == px && y == py ) ) {
+		}
+		else if( ( x || y ) && ( x == px && y == py ) )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onLeftStickRepeat, lt );
 		}
 		
@@ -85,16 +95,20 @@ void zpController::poll() {
 		py = (zp_short)m_rightThumb.getY();
 
 		// Right thumb stick deadzone calculations
-		if( x < m_rightThumbDeadZone && x > -m_rightThumbDeadZone && y < m_rightThumbDeadZone && y > -m_rightThumbDeadZone ) {
+		if( x < m_rightThumbDeadZone && x > -m_rightThumbDeadZone && y < m_rightThumbDeadZone && y > -m_rightThumbDeadZone )
+		{
 			x = 0;
 			y = 0;
 		}
 
 		m_rightThumb.set( x, y );
-		zpVector2i rt( m_leftThumb );
-		if( x != px || y != py ) {
+		zpVector2i rt( m_rightThumb );
+		if( x != px || y != py )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onRightStickMove, rt );
-		} else if( ( x || y ) && ( x == px && y == py ) ) {
+		}
+		else if( ( x || y ) && ( x == px && y == py ) )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onRightStickRepeat, rt );
 		}
 		
@@ -102,7 +116,8 @@ void zpController::poll() {
 		zp_ushort currentButtons = state.Gamepad.wButtons;
 		zp_ushort previousButtons = m_buttons;///*m_state.Gamepad.wButtons*/m_buttons;
 
-		const zpControllerButton buttons[] = {
+		const zpControllerButton buttons[] =
+		{
 			ZP_CONTROLLER_BUTTON_A,
 			ZP_CONTROLLER_BUTTON_B,
 			ZP_CONTROLLER_BUTTON_X,
@@ -121,13 +136,19 @@ void zpController::poll() {
 
 		//if( currentButtons != previousButtons ) {
 			// Something changed with the buttons, check each button
-			for( int i = 14; i --> 0; ) {
+			for( int i = 0; i < 14; ++i )
+			{
 				zpControllerButton button = buttons[i];
-				if( IS_BUTTON_UP_DOWN( previousButtons, currentButtons, button ) ) {
+				if( IS_BUTTON_UP_DOWN( previousButtons, currentButtons, button ) )
+				{
 					FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onButtonDown, button );
-				} else if( IS_BUTTON_DOWN_UP( previousButtons, currentButtons, button ) ) {
+				}
+				else if( IS_BUTTON_DOWN_UP( previousButtons, currentButtons, button ) )
+				{
 					FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onButtonUp, button );
-				} else if( IS_BUTTON_DOWN_DOWN( previousButtons, currentButtons, button ) ) {
+				}
+				else if( IS_BUTTON_DOWN_DOWN( previousButtons, currentButtons, button ) )
+				{
 					FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onButtonRepeat, button );
 				}
 			}
@@ -142,7 +163,8 @@ void zpController::poll() {
 		pt = m_leftTrigger;
 
 		// Left Trigger Threshold
-		if( t <= m_leftTriggerThreshold ) {
+		if( t <= m_leftTriggerThreshold )
+		{
 			t = 0;
 		}
 
@@ -150,9 +172,12 @@ void zpController::poll() {
 		m_leftTrigger = t;
 
 		// Check for pull/repeat
-		if( t != pt ) {
+		if( t != pt )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onLeftTriggerPull, t );
-		} else if( t != 0 && t == pt ) {
+		}
+		else if( t != 0 && t == pt )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onLeftTriggerRepeat, t );
 		}
 
@@ -161,7 +186,8 @@ void zpController::poll() {
 		pt = m_rightTrigger;
 
 		// Right Trigger Threshold
-		if( t <= m_rightTriggerThreshold ) {
+		if( t <= m_rightTriggerThreshold )
+		{
 			t = 0;
 		}
 
@@ -169,9 +195,12 @@ void zpController::poll() {
 		m_rightTrigger = t;
 
 		// Check for pull/repeat.
-		if( t != pt ) {
+		if( t != pt )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onRightTriggerPull, t );
-		} else if( t != 0 && t == pt ) {
+		}
+		else if( t != 0 && t == pt )
+		{
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS_( onRightTriggerRepeat, t );
 		}
 		/*
@@ -211,182 +240,255 @@ void zpController::poll() {
 		*/
 	}
 
-	if( wasConnected != m_isConnected ) {
-		if( wasConnected ) {
+	if( wasConnected != m_isConnected )
+	{
+		if( wasConnected )
+		{
 			//was connected now not
 			clear();
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS( onControllerDisconnected );
-		} else {
+		}
+		else
+		{
 			//was disconnected now not
 			FIRE_CONTROLLER_EVENT_TO_LISTENERS( onControllerReconnected );
 		}
 	}
 }
-void zpController::create() {}
-void zpController::destroy() {}
+void zpController::create()
+{
+	m_isCreated = true;
+	clear();
+}
+void zpController::destroy()
+{
+	m_isCreated = false;
+	removeAllListeners();
+}
 
-void zpController::onFocusGained() {
+zp_bool zpController::isCreated() const
+{
+	return m_isCreated;
+}
+
+void zpController::onFocusGained()
+{
 	XInputEnable( true );
 }
-void zpController::onFocusLost() {
+void zpController::onFocusLost()
+{
 	XInputEnable( false );
 }
 
-zp_bool zpController::isConnected() const {
+zp_bool zpController::isConnected() const
+{
 	return m_isConnected;
 }
 
-void zpController::setTriggerThreshold( zp_byte threshold ) {
+void zpController::setTriggerThreshold( zp_byte threshold )
+{
 	m_leftTriggerThreshold = threshold;
 	m_rightTriggerThreshold = threshold;
 }
-void zpController::setLeftTriggerThreshold( zp_byte threshold ) {
+void zpController::setLeftTriggerThreshold( zp_byte threshold )
+{
 	m_leftTriggerThreshold = threshold;
 }
-void zpController::setRightTriggerThreshold( zp_byte threshold ) {
+void zpController::setRightTriggerThreshold( zp_byte threshold )
+{
 	m_rightTriggerThreshold = threshold;
 }
-zp_byte zpController::getLeftTriggerThreshold() const {
+zp_byte zpController::getLeftTriggerThreshold() const
+{
 	return m_leftTriggerThreshold;
 }
-zp_byte zpController::getRightTriggerThreshold() const {
+zp_byte zpController::getRightTriggerThreshold() const
+{
 	return m_rightTriggerThreshold;
 }
 
-void zpController::setLeftThumbDeadZone( zp_short deadzone ) {
+void zpController::setLeftThumbDeadZone( zp_short deadzone )
+{
 	m_leftThumbDeadZone = deadzone;
 }
-zp_short zpController::getLeftThumbDeadZone() const {
+zp_short zpController::getLeftThumbDeadZone() const
+{
 	return m_leftThumbDeadZone;
 }
 
-void zpController::setRightThumbDeadZone( zp_short deadzone ) {
+void zpController::setRightThumbDeadZone( zp_short deadzone )
+{
 	m_rightThumbDeadZone = deadzone;
 }
-zp_short zpController::getRightThumbDeadZone() const {
+zp_short zpController::getRightThumbDeadZone() const
+{
 	return m_rightThumbDeadZone;
 }
 
-void zpController::vibrate( zp_ushort left, zp_ushort right ) const {
+void zpController::vibrate( zp_ushort left, zp_ushort right ) const
+{
 	XINPUT_VIBRATION vibrate = { left, right };
 	XInputSetState( m_controller, &vibrate );
 }
-void zpController::stopVibrate() const {
-	XInputSetState( m_controller, 0 );
+void zpController::stopVibrate() const
+{
+	XInputSetState( m_controller, ZP_NULL );
 }
 
-zp_bool zpController::isAPressed() const {
+zp_bool zpController::isButtonDown( zpControllerButton button ) const
+{
+	return ( m_buttons & button ) == button;
+}
+zp_bool zpController::isButtonUp( zpControllerButton button ) const
+{
+	return ( m_buttons & button ) != button;
+}
+
+zp_bool zpController::isAPressed() const
+{
 	return IS_BUTTON_PRESSED( A );
 }
-zp_bool zpController::isBPressed() const {
+zp_bool zpController::isBPressed() const
+{
 	return IS_BUTTON_PRESSED( B );
 }
-zp_bool zpController::isXPressed() const {
+zp_bool zpController::isXPressed() const
+{
 	return IS_BUTTON_PRESSED( X );
 }
-zp_bool zpController::isYPressed() const {
+zp_bool zpController::isYPressed() const
+{
 	return IS_BUTTON_PRESSED( Y );
 }
 
-zp_bool zpController::isBackPressed() const {
+zp_bool zpController::isBackPressed() const
+{
 	return IS_BUTTON_PRESSED( BACK );
 }
-zp_bool zpController::isStartPressed() const {
+zp_bool zpController::isStartPressed() const
+{
 	return IS_BUTTON_PRESSED( START );
 }
 
-zp_bool zpController::isDPadUpPressed() const {
+zp_bool zpController::isDPadUpPressed() const
+{
 	return IS_BUTTON_PRESSED( DPAD_UP );
 }
-zp_bool zpController::isDPadDownPressed() const {
+zp_bool zpController::isDPadDownPressed() const
+{
 	return IS_BUTTON_PRESSED( DPAD_DOWN );
 }
-zp_bool zpController::isDPadLeftPressed() const {
+zp_bool zpController::isDPadLeftPressed() const
+{
 	return IS_BUTTON_PRESSED( DPAD_LEFT );
 }
-zp_bool zpController::isDPadRightPressed() const {
+zp_bool zpController::isDPadRightPressed() const
+{
 	return IS_BUTTON_PRESSED( DPAD_RIGHT );
 }
 
-zp_bool zpController::isLeftBumperPressed() const {
+zp_bool zpController::isLeftBumperPressed() const
+{
 	return IS_BUTTON_PRESSED( LEFT_SHOULDER );
 }
-zp_bool zpController::isRightBumperPressed() const {
+zp_bool zpController::isRightBumperPressed() const
+{
 	return IS_BUTTON_PRESSED( RIGHT_SHOULDER );
 }
 
-zp_bool zpController::isLeftThumbPressed() const {
+zp_bool zpController::isLeftThumbPressed() const
+{
 	return IS_BUTTON_PRESSED( LEFT_THUMB );
 }
-zp_bool zpController::isRightThumbPressed() const {
+zp_bool zpController::isRightThumbPressed() const
+{
 	return IS_BUTTON_PRESSED( RIGHT_THUMB );
 }
 
-zp_bool zpController::isLeftThumbMoved() const {
+zp_bool zpController::isLeftThumbMoved() const
+{
 	return !m_leftThumb.isZero();
 }
-zp_bool zpController::isRightThumbMoved() const {
+zp_bool zpController::isRightThumbMoved() const
+{
 	return !m_rightThumb.isZero();
 }
 
-zp_bool zpController::isLeftTriggerPressed() const {
+zp_bool zpController::isLeftTriggerPressed() const
+{
 	return m_leftTrigger != 0;
 }
-zp_bool zpController::isRightTriggerPressed() const {
+zp_bool zpController::isRightTriggerPressed() const
+{
 	return m_rightTrigger != 0;
 }
 
-zp_byte zpController::getLeftTrigger() const {
+zp_byte zpController::getLeftTrigger() const
+{
 	return m_leftTrigger;
 }
-zp_byte zpController::getRightTrigger() const {
+zp_byte zpController::getRightTrigger() const
+{
 	return m_rightTrigger;
 }
 
-const zpVector2i& zpController::getLeftThumb() const {
+const zpVector2i& zpController::getLeftThumb() const
+{
 	return m_leftThumb;
 }
-const zpVector2i& zpController::getRightThumb() const {
+const zpVector2i& zpController::getRightThumb() const
+{
 	return m_rightThumb;
 }
 
-zpControllerNumber zpController::getController() const {
+zpControllerNumber zpController::getController() const
+{
 	return m_controller;
 }
 
-void zpController::addListener( zpControllerListener* listener ) {
+void zpController::addListener( zpControllerListener* listener )
+{
 	m_listeners.pushBack( listener );
 }
-void zpController::removeListener( zpControllerListener* listener ) {
-	m_listeners.removeFirst( listener );
+void zpController::removeListener( zpControllerListener* listener )
+{
+	m_listeners.eraseAll( listener );
 }
-void zpController::removeAllListeners() {
+void zpController::removeAllListeners()
+{
 	m_listeners.clear();
 }
 
-zpControllerBatterLevel zpController::getBatteryLevel() const {
+zpControllerBatterLevel zpController::getBatteryLevel() const
+{
 	XINPUT_BATTERY_INFORMATION battery;
 	XInputGetBatteryInformation( m_controller, 0, &battery );
 	return (zpControllerBatterLevel)battery.BatteryLevel;
 }
-zpControllerBatterType zpController::getBatteryType() const {
+zpControllerBatterType zpController::getBatteryType() const
+{
 	XINPUT_BATTERY_INFORMATION battery;
 	XInputGetBatteryInformation( m_controller, 0, &battery );
 	return (zpControllerBatterType)battery.BatteryType;
 }
 
-void zpController::setVibrationEnabled( zp_bool enabled ) {
+void zpController::setVibrationEnabled( zp_bool enabled )
+{
 	zp_bool wasEnabled = m_isRumbleEnabled;
 	m_isRumbleEnabled = enabled;
 	if( wasEnabled ) stopVibrate();
 }
-zp_bool zpController::isVibrationEnabled() const {
+zp_bool zpController::isVibrationEnabled() const
+{
 	return m_isRumbleEnabled;
 }
 
-void zpController::addRightVibration( zp_float duration, zp_ushort amount ) {}
-void zpController::addLeftVibration( zp_float duration, zp_ushort amount ) {}
+void zpController::addRightVibration( zp_float duration, zp_ushort amount )
+{}
+void zpController::addLeftVibration( zp_float duration, zp_ushort amount )
+{}
 
-void zpController::clear() {
+void zpController::clear()
+{
 
 }

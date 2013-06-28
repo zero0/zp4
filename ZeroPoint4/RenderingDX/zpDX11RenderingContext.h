@@ -15,7 +15,7 @@ public:
 
 	void update( zpBufferImpl* buffer, void* data, zp_uint size );
 
-	void processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand >& renderCommands );
+	void processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands );
 
 private:
 	ID3D11DeviceContext* m_context;

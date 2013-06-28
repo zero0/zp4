@@ -33,3 +33,17 @@ void zpMaterialResource::unload()
 		return zpResourceInstance<zpTextureResource>();
 	} );*/
 }
+
+void zpMaterialResourceInstance::setTextureOverride( zpMaterialTextureSlot slot, const zpTextureResourceInstance& texture )
+{
+
+}
+void zpMaterialResourceInstance::resetTexture( zpMaterialTextureSlot slot )
+{
+
+}
+
+void zpMaterialResourceInstance::setBuffer( zpResourceBindSlot slot, zp_uint index, zpBuffer* buffer )
+{
+
+}

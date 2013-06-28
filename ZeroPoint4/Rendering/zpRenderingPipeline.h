@@ -15,9 +15,14 @@ public:
 
 	void finalize();
 
+	zpMaterialContentManager* getMaterialContentManager();
+	zpShaderContentManager* getShaderContentManager();
+	zpTextureContentManager* getTextureContentManager();
+
 private:
 	zpRenderingEngine* m_engine;
 
+	zpMaterialContentManager m_materialContent;
 	zpShaderContentManager m_shaderContent;
 	zpTextureContentManager m_textureContent;
 };

@@ -2,33 +2,31 @@
 #ifndef ZP_INPUT_MANAGER_H
 #define ZP_INPUT_MANAGER_H
 
-class zpInputManager : public zpGameManager {
+enum
+{
+	ZP_INPUT_MAX_CONTROLLERS = zpControllerNumber_Count,
+};
+
+class zpInputManager : public zpWindowProcListener, public zpWindowFocusListener
+{
 public:
 	zpInputManager();
-	virtual ~zpInputManager();
+	~zpInputManager();
 
-	zpKeyboard* getKeyboard();
-	zpController* getController( zpControllerNumber controller );
-	zpMouse* getMouse();
+	const zpKeyboard* getKeyboard();
+	const zpMouse* getMouse();
+	const zpController* getController( zpControllerNumber controller );
 
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
+	void update();
 
-	void receiveMessage( const zpMessage& message );
-
-protected:
-	void onCreate();
-	void onDestroy();
-
-	void onUpdate();
-
-	void onEnabled();
-	void onDisabled();
+	void onFocusGained();
+	void onFocusLost();
+	void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam );
 
 private:
-	zpKeyboard* m_keyboard;
-	zpMouse* m_mouse;
-	zpController* m_controllers[4];
+	zpKeyboard m_keyboard;
+	zpMouse m_mouse;
+	zpFixedArrayList< zpController, ZP_INPUT_MAX_CONTROLLERS > m_controllers;
 };
 
 #endif

@@ -296,43 +296,88 @@ void zp_zero_memory_array( T (&arr)[Size] )
 	zp_memset( arr, 0, Size * sizeof( T ) );
 }
 
-template<typename T>
-void zp_qsort( T* arr, zp_uint l, zp_uint r ) {
+template<typename T, typename LessFunc>
+void zp_qsort( T* arr, zp_int l, zp_int r, LessFunc cmp )
+{
+	zp_int i = l, j = r;
+	zp_int p = ( l + r ) / 2;
+
+	while( i <= j )
+	{
+		while( cmp( arr[ i ], arr[ p ] ) )
+		{
+			i++;
+		}
+		while( cmp( arr[ p ], arr[ j ] ) )
+		{
+			j--;
+		}
+		if( i <= j )
+		{
+			zp_move_swap( arr[ i ], arr[ j ] );
+			i++;
+			j--;
+		}
+	}
+
+	if( l < j )
+	{
+		zp_qsort( arr, l, j, cmp );
+	}
+	if( i < r )
+	{
+		zp_qsort( arr, i, r, cmp );
+	}
+
+#if 0
 	if( r <= l ) return;
-	zp_uint i = l - 1, j = r;
-	zp_uint p - l - 1, q = r;
-	zp_uint k;
+	zp_int i = l - 1, j = r;
+	zp_int p = l - 1, q = r;
+	zp_int k;
 
 	while( true ) {
-		while( arr[ ++i ] < a[ r ] );
-		while( arr[ r ] < arr[ --j ] ) if( j == l ) break;
+		while( cmp( arr[ ++i ], arr[ r ] ) )
+		{}
+		while( cmp( arr[ r ], arr[ --j ] ) )
+		{
+			if( j == l ) break;
+		}
 		if( i >= j ) break;
 
 		zp_move_swap( arr[ i ], arr[ j ] );
 
-		if( a[ i ] == a[ r ] ) zp_move_swap( a[ ++p ], a[ i ] );
-		if( a[ j ] == a[ r ] ) zp_move_swap( a[ --q ], a[ j ] );
+		if( arr[ i ] == arr[ r ] ) zp_move_swap( arr[ ++p ], arr[ i ] );
+		if( arr[ j ] == arr[ r ] ) zp_move_swap( arr[ --q ], arr[ j ] );
 	}
 
-	zp_move_swap( a[ i ], a[ r ] );
+	zp_move_swap( arr[ i ], arr[ r ] );
 	j = i - 1;
 	i = i + 1;
 	
-	for( k = l; k <= p; k++ ) zp_move_swap( a[ k ], a[ j-- ] );
-	for( k = r - 1; k >= q; k-- ) zp_move_swap( a[ k ], a[ i++ ] );
+	for( k = l; k <= p; k++ )
+	{
+		zp_move_swap( arr[ k ], arr[ j-- ] );
+	}
+	for( k = r - 1; k >= q; k-- )
+	{
+		zp_move_swap( arr[ k ], arr[ i++ ] );
+	}
 
-	zp_qsort( a, l, j );
-	zp_qsort( a, i, r );
+	zp_qsort( arr, l, j, cmp );
+	zp_qsort( arr, i, r, cmp );
+#endif
 }
 
-template<typename T, zp_uint Size>
-void zp_qsort( T (&arr)[Size] ) {
-	zp_qsort( arr, 0, Size - 1 );
+template<typename T, zp_uint Size, typename LessFunc>
+void zp_qsort( T (&arr)[Size], LessFunc cmp )
+{
+	zp_qsort( arr, 0, Size - 1, cmp );
 }
 
-template<typename T>
-void zp_qsort( T* arr, zp_uint count ) {
-	zp_qsort( arr, 0, count - 1 );
+template<typename T, typename LessFunc>
+void zp_qsort( T* arr, zp_uint count, LessFunc cmp )
+{
+	zp_qsort( arr, 0, count - 1, cmp );
 }
 
 zp_bool zp_base64_encode( const void* data, zp_uint length, zpStringBuffer& outEncode );

@@ -2,7 +2,8 @@
 #ifndef ZP_MOUSE_H
 #define ZP_MOUSE_H
 
-enum zpMouseButton {
+enum zpMouseButton
+{
 	ZP_MOUSE_BUTTON_0 = 0,
 	ZP_MOUSE_BUTTON_1,
 	ZP_MOUSE_BUTTON_2,
@@ -12,7 +13,9 @@ enum zpMouseButton {
 	ZP_MOUSE_BUTTON_6,
 	ZP_MOUSE_BUTTON_7,
 
-	//Alias buttons
+	zpMouseButton_Count,
+
+	// Button alias
 	ZP_MOUSE_BUTTON_LEFT = ZP_MOUSE_BUTTON_0,
 	ZP_MOUSE_BUTTON_RIGHT = ZP_MOUSE_BUTTON_1,
 	ZP_MOUSE_BUTTON_MIDDLE = ZP_MOUSE_BUTTON_2,
@@ -20,7 +23,8 @@ enum zpMouseButton {
 	ZP_MOUSE_BUTTON_SIDE_2 = ZP_MOUSE_BUTTON_4,
 };
 
-ZP_PURE_INTERFACE zpMouseListener {
+ZP_PURE_INTERFACE zpMouseListener
+{
 public:
 	virtual void onMouseButtonDown( zpMouseButton button ) {};
 	virtual void onMouseButtonRepeat( zpMouseButton button ) {};
@@ -32,7 +36,8 @@ public:
 	virtual void onMouseChange( const zpVector2i& delta ) {};
 };
 
-class zpMouse : public zpWindowFocusListener, public zpWindowProcListener {
+class zpMouse
+{
 public:
 	~zpMouse();
 
@@ -40,7 +45,10 @@ public:
 	void create();
 	void destroy();
 
+	zp_bool isCreated() const;
+
 	zp_bool isButtonDown( zpMouseButton button ) const;
+	zp_bool isButtonUp( zpMouseButton button ) const;
 	const zpVector2i& getLocation() const;
 	const zpVector2i& getDelta() const;
 	zp_int getScrollWheel() const;
@@ -60,6 +68,7 @@ public:
 private:
 	zpMouse();
 
+	zp_bool m_isCreated;
 	zp_bool m_hasFocus;
 
 	zp_int m_scrollWheel;

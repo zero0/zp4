@@ -52,7 +52,7 @@ enum
 #error( "No rendering engine selected!" )
 #endif
 
-enum zpRenderingLayer
+enum zpRenderingLayer : zp_byte
 {
 	ZP_RENDERING_LAYER_NONE,
 
@@ -238,7 +238,7 @@ enum zpMaterialTextureSlot
 	ZP_MATERIAL_TEXTURE_SLOT_OPACITY,
 	ZP_MATERIAL_TEXTURE_SLOT_OTHER,
 
-	ZP_MATERIAL_TEXTURE_SLOT_Count
+	zpMaterialTextureSlot_Count
 };
 
 enum zpTextureWrap
@@ -396,9 +396,32 @@ enum zpRenderingCommandType
 	zpRenderingCommandType_Count,
 };
 
+class zpRenderingContext;
+class zpRenderingEngine;
+class zpRenderingFactory;
+
+class zpCamera;
+class zpRenderingManager;
+class zpUIManager;
+
+template<typename V, typename I> class zpImmediateBuffer;
+
+ZP_ABSTRACT_CLASS zpRenderingComponent;
+class zpCameraComponent;
+class zpLightComponent;
+class zpStaticMeshRenderingComponent;
+class zpTextRenderingComponent;
+class zpUIRenderingComponent;
+
+class zpDeferredRenderingComponent;
+
+class zpMaterialResourceInstance;
+
 struct zpRenderingCommand
 {
 	zpRenderingCommandType type;
+	zpRenderingLayer layer;
+	zp_uint sortKey;
 
 	union
 	{
@@ -445,12 +468,10 @@ struct zpRenderingCommand
 
 		struct
 		{
-			zpRenderingLayer layer;
 			zpTopology topology;
 			zpBufferImpl* vertexBuffer;
 			zpBufferImpl* indexBuffer;
-			//zpResourceInstance< zpMaterialResource >* material;
-			zpShader* shader;
+			zpMaterialResourceInstance* material;
 			zpVertexFormat vertexFormat;
 			zp_uint vertexStride;
 			zp_uint vertexCount;
@@ -460,26 +481,9 @@ struct zpRenderingCommand
 			zpBoundingAABB boundingBox;
 		};
 	};
+
+	zp_uint generateSortKey() const;
 };
-
-class zpRenderingContext;
-class zpRenderingEngine;
-class zpRenderingFactory;
-
-class zpCamera;
-class zpRenderingManager;
-class zpUIManager;
-
-template<typename V, typename I> class zpImmediateBuffer;
-
-ZP_ABSTRACT_CLASS zpRenderingComponent;
-class zpCameraComponent;
-class zpLightComponent;
-class zpStaticMeshRenderingComponent;
-class zpTextRenderingComponent;
-class zpUIRenderingComponent;
-
-class zpDeferredRenderingComponent;
 
 #include "zpImage.h"
 #include "zpBufferData.h"

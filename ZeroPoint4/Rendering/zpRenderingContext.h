@@ -11,19 +11,19 @@ class zpRenderingContext
 public:
 	~zpRenderingContext();
 
-	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
+	void setRenderTarget( zpRenderingLayer layer, zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
 
-	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
-	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
-	void clearState();
+	void clearRenderTarget( zpRenderingLayer layer, zpTexture* renderTarget, const zpColor4f& clearColor );
+	void clearDepthStencilBuffer( zpRenderingLayer layer, zp_float clearDepth, zp_uint clearStencil );
+	void clearState( zpRenderingLayer layer );
 
-	void setViewport( const zpViewport& viewport );
-	void setScissorRect( const zpRecti& rect );
+	void setViewport( zpRenderingLayer layer, const zpViewport& viewport );
+	void setScissorRect( zpRenderingLayer layer, const zpRecti& rect );
 
-	void setRasterState( zpRasterState* raster );
-	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
+	void setRasterState( zpRenderingLayer layer, zpRasterState* raster );
+	void setSamplerState( zpRenderingLayer layer, zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
 
-	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat );
+	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
 	void addVertex( const zpVector4f& pos, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );
@@ -79,9 +79,9 @@ public:
 
 	void endDrawImmediate();
 
-	void drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffe, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpBoundingAABB* boundingBox = 0 );
+	void drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffe, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpMaterialResourceInstance* material, zpBoundingAABB* boundingBox = 0 );
 
-	void drawInstancedDraw( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat );
+	//void drawInstanced( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
 	void map( zpBuffer* buffer, void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
 	void unmap( zpBuffer* buffer, zp_uint subResource = 0 );

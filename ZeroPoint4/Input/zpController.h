@@ -2,26 +2,32 @@
 #ifndef ZP_CONTROLLER_H
 #define ZP_CONTROLLER_H
 
-enum zpControllerNumber : zp_ushort {
+enum zpControllerNumber : zp_ushort
+{
 	ZP_CONTROLLER_1 = 0,
 	ZP_CONTROLLER_2,
 	ZP_CONTROLLER_3,
-	ZP_CONTROLLER_4
+	ZP_CONTROLLER_4,
+
+	zpControllerNumber_Count,
 };
-enum zpControllerBatterLevel : zp_byte {
+enum zpControllerBatterLevel : zp_byte
+{
 	ZP_CONTROLLER_BATTERY_LEVEL_EMPTY =		0,
 	ZP_CONTROLLER_BATTERY_LEVEL_LOW,
 	ZP_CONTROLLER_BATTERY_LEVEL_MEDIUM,
 	ZP_CONTROLLER_BATTERY_LEVEL_FULL,
 };
-enum zpControllerBatterType : zp_byte {
+enum zpControllerBatterType : zp_byte
+{
 	ZP_CONTROLLER_BATTERY_TYPE_DISCONNECTED =		0,
 	ZP_CONTROLLER_BATTERY_TYPE_WIRED,
 	ZP_CONTROLLER_BATTERY_TYPE_ALKALINE,
 	ZP_CONTROLLER_BATTERY_TYPE_NIMH,
 	ZP_CONTROLLER_BATTERY_TYPE_UNKNOWN =			0xFF,
 };
-enum zpControllerButton : zp_ushort {
+enum zpControllerButton : zp_ushort
+{
 	ZP_CONTROLLER_BUTTON_DPAD_UP =			0x0001,
 	ZP_CONTROLLER_BUTTON_DPAD_DOWN =		0x0002,
 	ZP_CONTROLLER_BUTTON_DPAD_LEFT =		0x0004,
@@ -38,7 +44,8 @@ enum zpControllerButton : zp_ushort {
 	ZP_CONTROLLER_BUTTON_Y =				0x8000,
 };
 
-ZP_PURE_INTERFACE zpControllerListener {
+ZP_PURE_INTERFACE zpControllerListener
+{
 public:
 	virtual void onButtonDown( zpControllerButton button ) {};
 	virtual void onButtonRepeat( zpControllerButton button ) {};
@@ -60,13 +67,17 @@ public:
 	virtual void onControllerReconnected() = 0;
 };
 
-class zpController : public zpWindowFocusListener {
+class zpController
+{
 public:
+	zpController();
 	~zpController();
 
 	void poll();
 	void create();
 	void destroy();
+
+	zp_bool isCreated() const;
 
 	void onFocusGained();
 	void onFocusLost();
@@ -88,6 +99,8 @@ public:
 	void vibrate( zp_ushort left, zp_ushort right ) const;
 	void stopVibrate() const;
 
+	zp_bool isButtonDown( zpControllerButton button ) const;
+	zp_bool isButtonUp( zpControllerButton button ) const;
 	zp_bool isAPressed() const;
 	zp_bool isBPressed() const;
 	zp_bool isXPressed() const;
@@ -135,9 +148,10 @@ public:
 	void addLeftVibration( zp_float duration, zp_ushort amount );
 
 private:
-	zpController( zpControllerNumber number = ZP_CONTROLLER_1 );
 	
 	void clear();
+
+	zp_bool m_isCreated;
 
 	zpControllerNumber m_controller;
 
