@@ -1,12 +1,12 @@
 #include "zpRendering.h"
 #include "zpRenderingImpl.inl"
 
-zpShader::zpShader( zpShaderImpl* impl )
-	: m_shader( impl )
+zpShader::zpShader()
+	: m_shader( ZP_NULL )
 {}
 zpShader::~zpShader()
 {
-	ZP_SAFE_DELETE( m_shader );
+	m_shader = ZP_NULL;
 }
 
 zpShaderImpl* zpShader::getShaderImpl() const
@@ -18,9 +18,9 @@ zpShaderImpl* zpShader::getShaderImpl() const
 zp_bool zpShaderResource::load( const zp_char* filename )
 {
 	zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
-	if( m_resource == ZP_NULL )
+	if( m_resource.getShaderImpl() == ZP_NULL )
 	{
-		m_resource = engine->createShader();
+		engine->createShader( &m_resource );
 	}
 
 	zp_bool ok;
@@ -30,17 +30,17 @@ zp_bool zpShaderResource::load( const zp_char* filename )
 	ok = shaderData.readFromFile( m_filename );
 	ZP_ASSERT( ok, "" );
 
-	ok = engine->loadShader( m_resource, shaderData );
+	ok = engine->loadShader( &m_resource, shaderData );
 	ZP_ASSERT( ok, "" );
 
 	return ok;
 }
 void zpShaderResource::unload()
 {
-	if( m_resource != ZP_NULL )
+	//if( m_resource )
 	{
 		zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
-		engine->destroyShader( m_resource );
+		engine->destroyShader( &m_resource );
 	}
 }
 

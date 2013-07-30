@@ -27,7 +27,7 @@ protected:
 	zp_uint m_refCount;
 	zpString m_filename;
 
-	Resource* m_resource;
+	Resource m_resource;
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

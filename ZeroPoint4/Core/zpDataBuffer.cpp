@@ -16,6 +16,14 @@ zpDataBuffer::zpDataBuffer( zp_uint capacity )
 {
 	ensureCapacity( capacity );
 }
+zpDataBuffer::zpDataBuffer( const zpDataBuffer& other )
+	: m_data( ZP_NULL )
+	, m_capacity( 0 )
+	, m_size( 0 )
+	, m_isFixed( false )
+{
+	readIn( other );
+}
 zpDataBuffer::zpDataBuffer( zp_byte* data, zp_uint capacity )
 	: m_data( data )
 	, m_capacity( capacity )
@@ -29,6 +37,12 @@ zpDataBuffer::~zpDataBuffer()
 	{
 		ZP_SAFE_FREE( m_data );
 	}
+}
+
+void zpDataBuffer::operator=( const zpDataBuffer& other )
+{
+	reset();
+	readIn( other );
 }
 
 const zp_byte* zpDataBuffer::getData() const
@@ -89,20 +103,17 @@ void zpDataBuffer::reset()
 	m_size = 0;
 }
 
-void zpDataBuffer::read( const zpDataBuffer& buffer )
+void zpDataBuffer::readIn( const zpDataBuffer& buffer )
 {
 	if( buffer.size() > 0 )
 	{
-		reserve( buffer.size() );
-
+		writeBulk( buffer.getData(), buffer.size() );
 	}
 }
-void zpDataBuffer::write( zpDataBuffer& buffer ) const
+void zpDataBuffer::writeOut( zpDataBuffer& buffer ) const
 {
 	if( m_size > 0 )
 	{
-		buffer.reserve( m_size + buffer.m_size );
-		zp_memcpy( buffer.m_data + buffer.m_size, buffer.m_capacity - buffer.m_size, m_data, m_size );
-		buffer.m_size += m_size;
+		buffer.readIn( *this );
 	}
 }

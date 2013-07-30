@@ -36,105 +36,49 @@ zpRenderingContext::~zpRenderingContext()
 	m_immediateIndexBuffers.clear();
 }
 
-void zpRenderingContext::setRenderTarget( zpRenderingLayer layer, zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
+void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
 {
 	ZP_ASSERT( ( startIndex + count ) < ZP_RENDER_TARGET_MAX_COUNT, "Too many render targets set, max of %d", ZP_RENDER_TARGET_MAX_COUNT );
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_SET_RT;
-	command.layer = layer;
-
-	zp_uint i;
-	for( i = 0; i < startIndex; ++i )
-	{
-		command.renderTargets[ i ] = ZP_NULL;
-	}
-	for( ; i < count; ++i )
-	{
-		command.renderTargets[ i ] = targets[ i ];
-	}
-	for( ; i < ZP_RENDER_TARGET_MAX_COUNT; ++i )
-	{
-		command.renderTargets[ i ] = ZP_NULL;
-	}
-	
-	command.depthStencilBuffer = depthStencilBuffer;
+	m_renderContextImpl->setRenderTarget( startIndex, count, targets, depthStencilBuffer );
 }
 	 
-void zpRenderingContext::clearRenderTarget( zpRenderingLayer layer, zpTexture* renderTarget, const zpColor4f& clearColor )
+void zpRenderingContext::clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor )
 {
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
-
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_CLEAR_RT;
-	command.layer = layer;
-
-	command.clearColor = clearColor;
-	command.clearRenderTarget = renderTarget;
+	m_renderContextImpl->clearRenderTarget( renderTarget, clearColor );
 }
-void zpRenderingContext::clearDepthStencilBuffer( zpRenderingLayer layer, zp_float clearDepth, zp_uint clearStencil )
+void zpRenderingContext::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil )
 {
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
-
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_CLEAR_DEPTH_STENCIL;
-	command.layer = layer;
-
-	command.clearDepth = clearDepth;
-	command.clearStencil = clearStencil;
+	m_renderContextImpl->clearDepthStencilBuffer( clearDepth, clearStencil );
 }
-void zpRenderingContext::clearState(zpRenderingLayer layer )
+void zpRenderingContext::clearState()
 {
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
-
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_CLEAR_STATE;
-	command.layer = layer;
+	m_renderContextImpl->clearState();
 }
 
-void zpRenderingContext::setViewport( zpRenderingLayer layer, const zpViewport& viewport )
+void zpRenderingContext::setViewport( const zpViewport& viewport )
 {
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
-
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_SET_VIEWPORT;
-	command.layer = layer;
-
-	command.viewport = viewport;
+	m_renderContextImpl->setViewport( viewport );
 }
-void zpRenderingContext::setScissorRect( zpRenderingLayer layer, const zpRecti& rect )
+void zpRenderingContext::setScissorRect( const zpRecti& rect )
 {
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
-
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT;
-	command.layer = layer;
-
-	command.scissor = rect;
+	m_renderContextImpl->setScissorRect( rect );
+	m_scissorRectQueue.pushBack( rect );
+}
+void zpRenderingContext::resetScissorRect()
+{
+	const zpRecti& rect = m_scissorRectQueue.back();
+	m_renderContextImpl->setScissorRect( rect );
+	m_scissorRectQueue.popBack();
 }
 
-void zpRenderingContext::setRasterState( zpRenderingLayer layer, zpRasterState* raster )
+void zpRenderingContext::setRasterState( zpRasterState* raster )
 {
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
-
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_SET_RASTER_STATE;
-	command.layer = layer;
-
-	command.rasterState = raster;
+	m_renderContextImpl->setRasterState( raster );
 }
-void zpRenderingContext::setSamplerState( zpRenderingLayer layer, zp_uint bindSlots, zp_uint index, zpSamplerState* sampler )
+void zpRenderingContext::setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler )
 {
-	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
-
-	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
-	command.type = ZP_RENDERING_COMMNAD_SET_SAMPLER_STATE;
-	command.layer = layer;
-
-	command.samplerStateBind = bindSlots;
-	command.samplerIndex = index;
-	command.samplerState = sampler;
+	m_renderContextImpl->setSamplerState( bindSlots, index, sampler );
 }
 
 void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material )
@@ -352,8 +296,9 @@ void zpRenderingContext::update( zpBuffer* buffer, void* data, zp_uint size )
 	m_renderContextImpl->update( buffer->getBufferImpl(), data, size );
 }
 
-void zpRenderingContext::processCommands()
+void zpRenderingContext::beginCommands()
 {
+	// unmap scratch buffers
 	if( m_immediateVertexData )
 	{
 		unmap( m_currentVertexBuffer );
@@ -363,26 +308,35 @@ void zpRenderingContext::processCommands()
 		m_immediateIndexData = ZP_NULL;
 	}
 
-	zpFixedArrayList< zpRenderingCommand*, ZP_RENDERING_MAX_COMMNADS > sortedCommands;
+	// clear filtered commands
+	for( zp_uint i = 0; i < zpRenderingLayer_Count; ++i )
+	{
+		m_filteredCommands[ i ].reset();
+	}
+
+	// filter all commands into layer buckets
 	for( zp_uint i = 0; i < m_renderingCommands.size(); ++i )
 	{
 		zpRenderingCommand* cmd = &m_renderingCommands[ i ];
-		cmd->sortKey = ( 0xF & ( 1 << ( cmd->layer ) ) );
-
-		sortedCommands.pushBack( cmd );
+		m_filteredCommands[ cmd->layer ].pushBack( cmd );
 	}
 
-	// sort commands
-	//if( !sortedCommands.isEmpty() )
-	//{
-	//	zp_qsort( sortedCommands.begin(), sortedCommands.size(), []( zpRenderingCommand* a, zpRenderingCommand* b )
-	//	{
-	//		return a->sortKey <= b->sortKey;
-	//	} );
-	//}
+	// sort layer buckets
+	for( zp_uint i = 0; i < zpRenderingLayer_Count; ++i )
+	{
+		m_filteredCommands[ i ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+			return cmd0->sortKey < cmd1->sortKey;
+		} );
+	}
+}
 
-	m_renderContextImpl->processCommands( m_renderingEngine->getRenderingEngineImpl(), sortedCommands );
+void zpRenderingContext::processCommands( zpRenderingLayer layer )
+{
+	m_renderContextImpl->processCommands( m_renderingEngine->getRenderingEngineImpl(), m_filteredCommands[ layer ] );
+}
 
+void zpRenderingContext::finalizeCommands()
+{
 	m_renderingCommands.reset();
 
 	m_currentBufferIndex = ( m_currentBufferIndex + 1 ) % ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS;

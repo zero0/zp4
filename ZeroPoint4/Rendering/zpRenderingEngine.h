@@ -34,7 +34,7 @@ public:
 	void present();
 
 	zpRenderingContext* getImmediateRenderingContext() const;
-	zpTexture* getBackBufferRenderTarget() const;
+	zpTexture* getBackBufferRenderTarget();
 	zpDepthStencilBuffer* getBackBufferDepthStencilBuffer() const;
 
 	zp_uint getNumRenderingContexts() const;
@@ -42,8 +42,10 @@ public:
 	zpRenderingContext* createRenderingContext();
 
 	zpBuffer* createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride = 0, void* data = 0 );
-	zpTexture* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
-	zpTexture* createTextureFromFile( const zpString& filename );
+	
+	zp_bool createTexture( zpTexture* texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
+	zp_bool createTextureFromFile( zpTexture* texture, const zpString& filename );
+	zp_bool destroyTexture( zpTexture* texture );
 
 	zpDepthStencilBuffer* createDepthBuffer( zp_uint width, zp_uint height, zpDisplayFormat format );
 
@@ -52,7 +54,7 @@ public:
 	zpRasterState* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc );
 
-	zpShader* createShader();
+	zp_bool createShader( zpShader* shader );
 	zp_bool loadShader( zpShader* shader, const zpBison& shaderfile );
 	zp_bool destroyShader( zpShader* shader );
 
@@ -67,7 +69,7 @@ private:
 	zpWindow* m_window;
 	zp_bool m_isVSyncEnabled;
 
-	zpTexture* m_immediateRenderTarget;
+	zpTexture m_immediateRenderTarget;
 	zpFixedArrayList< zpRenderingContext*, ZP_RENDERING_MAX_RENDERING_CONTEXTS > m_renderingContexts;
 
 	//zpHashMap< zp_hash, zpRasterState* >  m_rasterStates;

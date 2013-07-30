@@ -10,6 +10,18 @@ public:
 	zpRenderingContextImpl( ID3D11DeviceContext* context );
 	~zpRenderingContextImpl();
 
+	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
+
+	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
+	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
+	void clearState();
+
+	void setViewport( const zpViewport& viewport );
+	void setScissorRect( const zpRecti& rect );
+
+	void setRasterState( zpRasterState* raster );
+	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
+
 	void map( zpBufferImpl* buffer, void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
 	void unmap( zpBufferImpl* buffer, zp_uint subResource = 0 );
 

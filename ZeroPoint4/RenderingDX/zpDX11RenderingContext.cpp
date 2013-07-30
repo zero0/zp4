@@ -13,6 +13,86 @@ zpRenderingContextImpl::~zpRenderingContextImpl()
 	ZP_SAFE_RELEASE( m_context );
 }
 
+void zpRenderingContextImpl::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
+{
+	ID3D11RenderTargetView* rtvs[ ZP_RENDER_TARGET_MAX_COUNT ];
+	ID3D11DepthStencilView* d = depthStencilBuffer == ZP_NULL ? ZP_NULL : depthStencilBuffer->getDepthStencilBufferImpl()->m_depthStencilView;
+
+	zpTexture* t;
+	for( zp_uint i = 0; i < count; ++i )
+	{
+		t = targets[ i ];
+		rtvs[ i ] = t == ZP_NULL ? ZP_NULL : t->getTextureImpl()->m_textureRenderTarget;
+	}
+
+	m_context->OMSetRenderTargets( count, rtvs, d );
+}
+
+void zpRenderingContextImpl::clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor )
+{
+	zpTextureImpl* t = renderTarget->getTextureImpl();
+	m_context->ClearRenderTargetView( t->m_textureRenderTarget, clearColor.asFloat4() );
+}
+void zpRenderingContextImpl::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil )
+{
+	m_context->ClearDepthStencilView( ZP_NULL, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil );
+}
+void zpRenderingContextImpl::clearState()
+{
+	m_context->ClearState();
+}
+
+void zpRenderingContextImpl::setViewport( const zpViewport& viewport )
+{
+	D3D11_VIEWPORT vp;
+	vp.TopLeftX = viewport.topX;
+	vp.TopLeftY = viewport.topY;
+	vp.Width    = viewport.width;
+	vp.Height   = viewport.height;
+	vp.MinDepth = viewport.minDepth;
+	vp.MaxDepth = viewport.maxDepth;
+
+	m_context->RSSetViewports( 1, &vp );
+}
+void zpRenderingContextImpl::setScissorRect( const zpRecti& rect )
+{
+	D3D11_RECT r;
+	r.left   = rect.getPosition().getX();
+	r.top    = rect.getPosition().getY();
+	r.right  = rect.getSize().getX();
+	r.bottom = rect.getSize().getY();
+
+	m_context->RSSetScissorRects( 1, &r );
+}
+
+void zpRenderingContextImpl::setRasterState( zpRasterState* raster )
+{
+	ID3D11RasterizerState* state = raster == ZP_NULL ? ZP_NULL : raster->getRasterStateImpl()->m_raster;
+
+	m_context->RSSetState( state );
+}
+void zpRenderingContextImpl::setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler )
+{
+	ID3D11SamplerState* state = sampler == ZP_NULL ? ZP_NULL : sampler->getSamplerStateImpl()->m_sampler;;
+
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
+	{
+		m_context->VSSetSamplers( index, 1, &state );
+	}
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
+	{
+		m_context->GSSetSamplers( index, 1, &state );
+	}
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER )
+	{
+		m_context->CSSetSamplers( index, 1, &state );
+	}
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
+	{
+		m_context->PSSetSamplers( index, 1, &state );
+	}
+}
+
 void zpRenderingContextImpl::map( zpBufferImpl* buffer, void** data, zpMapType mapType, zp_uint subResource )
 {
 	HRESULT hr;
@@ -36,132 +116,50 @@ void zpRenderingContextImpl::update( zpBufferImpl* buffer, void* data, zp_uint s
 void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands )
 {
 	const zp_uint count = renderCommands.size();
-	for( zp_uint i = 0; i < count; ++i )
+	zpRenderingCommand* const* cmd = renderCommands.begin();
+	zpRenderingCommand* const* end = renderCommands.end();
+	for( ; cmd != end; ++cmd )
 	{
-		const zpRenderingCommand& command = *renderCommands[ i ];
+		const zpRenderingCommand* command = *cmd;
 
-		switch( command.type )
+		switch( command->type )
 		{
 		case ZP_RENDERING_COMMNAD_NOOP:
 			break;
 
-		case ZP_RENDERING_COMMNAD_CLEAR_RT:
-			{
-				zpTextureImpl* t = command.clearRenderTarget->getTextureImpl();
-				m_context->ClearRenderTargetView( t->m_textureRenderTarget, command.clearColor.asFloat4() );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_CLEAR_DEPTH_STENCIL:
-			{
-				m_context->ClearDepthStencilView( ZP_NULL, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, command.clearDepth, command.clearStencil );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_CLEAR_STATE:
-			{
-				m_context->ClearState();
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_SET_RT:
-			{
-				ID3D11RenderTargetView* rtvs[ ZP_RENDER_TARGET_MAX_COUNT ];
-				
-				zpTexture* t;
-				for( zp_uint i = 0; i < ZP_RENDER_TARGET_MAX_COUNT; ++i )
-				{
-					t = command.renderTargets[ i ];
-					rtvs[ i ] = t == ZP_NULL ? ZP_NULL : t->getTextureImpl()->m_textureRenderTarget;
-				}
-
-				zpDepthStencilBuffer* d = command.depthStencilBuffer;
-				m_context->OMSetRenderTargets( ZP_RENDER_TARGET_MAX_COUNT, rtvs, d == ZP_NULL ? ZP_NULL : d->getDepthStencilBufferImpl()->m_depthStencilView );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_SET_VIEWPORT:
-			{
-				D3D11_VIEWPORT viewport;
-				viewport.TopLeftX = command.viewport.topX;
-				viewport.TopLeftY = command.viewport.topY;
-				viewport.Width    = command.viewport.width;
-				viewport.Height   = command.viewport.height;
-				viewport.MinDepth = command.viewport.minDepth;
-				viewport.MaxDepth = command.viewport.maxDepth;
-
-				D3D11_RECT rect;
-				rect.left   = (LONG)command.viewport.topX;
-				rect.top    = (LONG)command.viewport.topY;
-				rect.right  = (LONG)command.viewport.width;
-				rect.bottom = (LONG)command.viewport.height;
-
-				m_context->RSSetViewports( 1, &viewport );
-				m_context->RSSetScissorRects( 1, &rect );
-			}
-			break;
-
 		case ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT:
 			{
-				D3D11_RECT rect;
-				rect.left   = command.scissor.getPosition().getX();
-				rect.top    = command.scissor.getPosition().getY();
-				rect.right  = command.scissor.getSize().getX();
-				rect.bottom = command.scissor.getSize().getY();
-
-				m_context->RSSetScissorRects( 1, &rect );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_SET_RASTER_STATE:
-			{
-				zpRasterStateImpl* rasterState = command.rasterState->getRasterStateImpl();
-
-				m_context->RSSetState( rasterState->m_raster );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_SET_SAMPLER_STATE:
-			{
-				zpSamplerState* samplerState = command.samplerState;
-				
-				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
-				{
-					m_context->VSSetSamplers( command.samplerIndex, 1, ZP_NULL );
-				}
-				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
-				{
-					m_context->GSSetSamplers( command.samplerIndex, 1, ZP_NULL );
-				}
-				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER )
-				{
-					m_context->CSSetSamplers( command.samplerIndex, 1, ZP_NULL );
-				}
-				if( command.samplerStateBind & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
-				{
-					m_context->PSSetSamplers( command.samplerIndex, 1, ZP_NULL );
-				}
+				setScissorRect( command->scissor );
 			}
 			break;
 
 		case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
 			{
+				ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
+				ID3D11Buffer* index = command->indexBuffer->m_buffer;
+				ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
 
+				m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
+				m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
+				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &command->vertexOffset );
+				m_context->IASetInputLayout( inputLayout );
+
+				//m_context->DrawIndexed( command.indexCount, command.indexOffset, 0 );
 			}
 			break;
 
 		case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
 			{
-				ID3D11Buffer* buffer = command.vertexBuffer->m_buffer;
-				ID3D11Buffer* index = command.indexBuffer->m_buffer;
-				ID3D11InputLayout* inputLayout = engine->getInputLayout( command.vertexFormat );
+				ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
+				ID3D11Buffer* index = command->indexBuffer->m_buffer;
+				ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
 
-				m_context->IASetPrimitiveTopology( __zpToDX( command.topology ) );
-				m_context->IASetIndexBuffer( index, __zpToDX( command.indexBuffer->getFormat() ), command.indexOffset );
-				m_context->IASetVertexBuffers( 0, 1, &buffer, &command.vertexStride, &command.vertexOffset );
+				m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
+				m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
+				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &command->vertexOffset );
 				m_context->IASetInputLayout( inputLayout );
 
-				//m_context->DrawIndexed( command.indexCount, command.indexOffset, 0 );
+				//m_context->DrawIndexed( command->indexCount, command->indexOffset, 0 );
 			}
 			break;
 

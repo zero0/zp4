@@ -30,7 +30,7 @@ zp_bool zpBison::readFromFile( const zpString& filename )
 zp_bool zpBison::readFromBuffer( const zpDataBuffer& buffer )
 {
 	m_buffer.reset();
-	buffer.write( m_buffer );
+	m_buffer.readIn( buffer );
 
 	parseData();
 

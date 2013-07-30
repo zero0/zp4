@@ -54,8 +54,6 @@ enum
 
 enum zpRenderingLayer : zp_byte
 {
-	ZP_RENDERING_LAYER_NONE,
-
 	ZP_RENDERING_LAYER_OPAQUE,
 	ZP_RENDERING_LAYER_TRANSPARENT,
 
@@ -375,25 +373,19 @@ class zpOBJStaticMeshResource;
 template<> class zpResourceInstance<zpStaticMeshResource>;
 
 
-enum zpRenderingCommandType
+enum zpRenderingCommandType : zp_uint
 {
 	ZP_RENDERING_COMMNAD_NOOP,
 
-	ZP_RENDERING_COMMNAD_CLEAR_RT,
-	ZP_RENDERING_COMMNAD_CLEAR_DEPTH_STENCIL,
-	ZP_RENDERING_COMMNAD_CLEAR_STATE,
-
-	ZP_RENDERING_COMMNAD_SET_RT,
-	ZP_RENDERING_COMMNAD_SET_VIEWPORT,
 	ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT,
-	ZP_RENDERING_COMMNAD_SET_RASTER_STATE,
-	ZP_RENDERING_COMMNAD_SET_SAMPLER_STATE,
+	ZP_RENDERING_COMMNAD_RESET_SCISSOR_RECT,
 
 	ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE,
 	ZP_RENDERING_COMMNAD_DRAW_BUFFERED,
 	ZP_RENDERING_COMMNAD_DRAW_INSTANCED,
 
 	zpRenderingCommandType_Count,
+	zpRenderingCommandType_Force32 = ZP_FORECE_32BIT,
 };
 
 class zpRenderingContext;
@@ -423,64 +415,18 @@ struct zpRenderingCommand
 	zpRenderingLayer layer;
 	zp_uint sortKey;
 
-	union
-	{
-		struct
-		{
-			zpColor4f clearColor;
-			zpTexture* clearRenderTarget;
-		};
-
-		struct 
-		{
-			zp_float clearDepth;
-			zp_uint clearStencil;
-			zpDepthStencilBuffer* clearDepthStencilBuffer;
-		};
-
-		struct
-		{
-			zpTexture* renderTargets[ ZP_RENDER_TARGET_MAX_COUNT ];
-			zpDepthStencilBuffer* depthStencilBuffer;
-		};
-
-		struct
-		{
-			zpViewport viewport;
-		};
-
-		struct
-		{
-			zpRecti scissor;
-		};
-
-		struct
-		{
-			zpRasterState* rasterState;
-		};
-
-		struct 
-		{
-			zp_uint samplerStateBind;
-			zp_uint samplerIndex;
-			zpSamplerState* samplerState;
-		};
-
-		struct
-		{
-			zpTopology topology;
-			zpBufferImpl* vertexBuffer;
-			zpBufferImpl* indexBuffer;
-			zpMaterialResourceInstance* material;
-			zpVertexFormat vertexFormat;
-			zp_uint vertexStride;
-			zp_uint vertexCount;
-			zp_uint indexCount;
-			zp_uint vertexOffset;
-			zp_uint indexOffset;
-			zpBoundingAABB boundingBox;
-		};
-	};
+	zpTopology topology;
+	zpBufferImpl* vertexBuffer;
+	zpBufferImpl* indexBuffer;
+	zpMaterialResourceInstance* material;
+	zpVertexFormat vertexFormat;
+	zp_uint vertexStride;
+	zp_uint vertexCount;
+	zp_uint indexCount;
+	zp_uint vertexOffset;
+	zp_uint indexOffset;
+	zpRecti scissor;
+	zpBoundingAABB boundingBox;
 
 	zp_uint generateSortKey() const;
 };

@@ -2,6 +2,11 @@
 
 zp_bool zpMaterialResource::load( const zp_char* filename )
 {
+	m_filename = filename;
+
+	zpBison material;
+	material.readFromFile( m_filename );
+
 	/*zpProperties material( getFilename() );
 
 	if( !material.hasProperty( "material.shader" ) ) return false;
@@ -34,9 +39,21 @@ void zpMaterialResource::unload()
 	} );*/
 }
 
+zpMaterialResourceInstance::zpMaterialResourceInstance()
+{
+	while( m_textureOverides.size() != zpMaterialTextureSlot_Count )
+	{
+		m_textureOverides.pushBackEmpty();
+	}
+}
+zpMaterialResourceInstance::~zpMaterialResourceInstance()
+{
+	m_textureOverides.clear();
+}
+
 void zpMaterialResourceInstance::setTextureOverride( zpMaterialTextureSlot slot, const zpTextureResourceInstance& texture )
 {
-
+	m_textureOverides[ slot ] = texture;
 }
 void zpMaterialResourceInstance::resetTexture( zpMaterialTextureSlot slot )
 {
@@ -46,4 +63,13 @@ void zpMaterialResourceInstance::resetTexture( zpMaterialTextureSlot slot )
 void zpMaterialResourceInstance::setBuffer( zpResourceBindSlot slot, zp_uint index, zpBuffer* buffer )
 {
 
+}
+
+zp_bool zpMaterialContentManager::createResource( zpMaterialResource* res, const zp_char* filename )
+{
+	return res->load( filename );
+}
+void zpMaterialContentManager::destroyResource( zpMaterialResource* res )
+{
+	res->unload();
 }

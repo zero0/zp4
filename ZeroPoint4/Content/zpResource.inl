@@ -4,18 +4,16 @@ zpResource<Resource>::zpResource()
 	: m_isLoaded( false )
 	, m_refCount( 0 )
 	, m_filename()
-	, m_resource( ZP_NULL )
+	, m_resource()
 {}
 template<typename Resource>
 zpResource<Resource>::~zpResource()
-{
-	ZP_SAFE_DELETE( m_resource );
-}
+{}
 
 template<typename Resource>
 const Resource* zpResource<Resource>::getData() const
 {
-	return m_resource;
+	return &m_resource;
 }
 
 template<typename Resource>

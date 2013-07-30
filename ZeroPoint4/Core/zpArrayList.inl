@@ -415,6 +415,15 @@ void zpArrayList<T>::map( Func func )
 	}
 }
 
+template<typename T> template<typename Func>
+void zpArrayList<T>::sort( Func func )
+{
+	if( m_size > 1 )
+	{
+		zp_qsort( m_array, m_size, func );
+	}
+}
+
 
 template<typename T, zp_uint Size>
 zpFixedArrayList<T, Size>::zpFixedArrayList()

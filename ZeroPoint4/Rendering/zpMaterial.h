@@ -2,6 +2,8 @@
 #ifndef ZP_MATERIAL_H
 #define ZP_MATERIAL_H
 
+class zpMaterialContentManager;
+
 struct zpMaterial
 {
 	zpShaderResourceInstance shader;
@@ -13,15 +15,22 @@ class zpMaterialResource : public zpResource< zpMaterial >
 private:
 	zp_bool load( const zp_char* filename );
 	void unload();
+
+	friend class zpMaterialContentManager;
 };
 
 class zpMaterialResourceInstance : public zpResourceInstance< zpMaterialResource >
 {
 public:
+	zpMaterialResourceInstance();
+	~zpMaterialResourceInstance();
+
 	void setTextureOverride( zpMaterialTextureSlot slot, const zpTextureResourceInstance& texture );
 	void resetTexture( zpMaterialTextureSlot slot );
 
 	void setBuffer( zpResourceBindSlot slot, zp_uint index, zpBuffer* buffer );
+
+	const zpTextureResourceInstance* getTexture( zpMaterialTextureSlot slot ) const;
 
 private:
 	zpFixedArrayList< zpTextureResourceInstance, zpMaterialTextureSlot_Count > m_textureOverides;

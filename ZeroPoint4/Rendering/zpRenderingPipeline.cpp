@@ -15,6 +15,14 @@ zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 	return m_engine;
 }
 
+void zpRenderingPipeline::beginFrame()
+{
+	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
+	i->clearState();
+
+	i->beginCommands();
+}
+
 void zpRenderingPipeline::submitRendering()
 {
 	zpTexture* t = m_engine->getBackBufferRenderTarget();
@@ -22,23 +30,20 @@ void zpRenderingPipeline::submitRendering()
 
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 
-	i->setRenderTarget( ZP_RENDERING_LAYER_OPAQUE, 0, 1, &t, d );
-	i->clearRenderTarget( ZP_RENDERING_LAYER_OPAQUE, t, zpColor4f( 1, 0, 0, 1 ) );
-
-
-
-	i->setRenderTarget( ZP_RENDERING_LAYER_UI_OPAQUE, 0, 1, &t, d );
-	i->clearRenderTarget( ZP_RENDERING_LAYER_UI_OPAQUE, t, zpColor4f( 0, 1, 0, 1 ) );
-
-	i->processCommands();
+	i->setRenderTarget( 0, 1, &t, d );
+	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
+	//i->clearDepthStencilBuffer( 1.0f, 0 );
 }
 void zpRenderingPipeline::submitDebugRendering()
 {
 
 }
 
-void zpRenderingPipeline::finalize()
+void zpRenderingPipeline::endFrame()
 {
+	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
+	i->finalizeCommands();
+
 	m_engine->present();
 }
 
@@ -54,4 +59,13 @@ zpShaderContentManager* zpRenderingPipeline::getShaderContentManager()
 zpTextureContentManager* zpRenderingPipeline::getTextureContentManager()
 {
 	return &m_textureContent;
+}
+
+void zpRenderingPipeline::onFocusGained()
+{
+
+}
+void zpRenderingPipeline::onFocusLost()
+{
+
 }

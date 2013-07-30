@@ -22,9 +22,8 @@ enum zpTextureType
 
 class zpTexture
 {
-	ZP_NON_COPYABLE( zpTexture );
-
 public:
+	zpTexture();
 	~zpTexture();
 
 	zpTextureDimension getTextureDimension() const;
@@ -36,8 +35,6 @@ public:
 	zpTextureImpl* getTextureImpl() const;
 
 private:
-	zpTexture( zpTextureImpl* textureImpl );
-
 	zpTextureImpl* m_textureImpl;
 
 	friend class zpRenderingEngine;

@@ -11,17 +11,18 @@ class zpRenderingContext
 public:
 	~zpRenderingContext();
 
-	void setRenderTarget( zpRenderingLayer layer, zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
+	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
 
-	void clearRenderTarget( zpRenderingLayer layer, zpTexture* renderTarget, const zpColor4f& clearColor );
-	void clearDepthStencilBuffer( zpRenderingLayer layer, zp_float clearDepth, zp_uint clearStencil );
-	void clearState( zpRenderingLayer layer );
+	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
+	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
+	void clearState();
 
-	void setViewport( zpRenderingLayer layer, const zpViewport& viewport );
-	void setScissorRect( zpRenderingLayer layer, const zpRecti& rect );
+	void setViewport( const zpViewport& viewport );
+	void setScissorRect( const zpRecti& rect );
+	void resetScissorRect();
 
-	void setRasterState( zpRenderingLayer layer, zpRasterState* raster );
-	void setSamplerState( zpRenderingLayer layer, zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
+	void setRasterState( zpRasterState* raster );
+	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
 
 	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
@@ -88,7 +89,11 @@ public:
 
 	void update( zpBuffer* buffer, void* data, zp_uint size );
 
-	void processCommands();
+	void beginCommands();
+
+	void processCommands( zpRenderingLayer layer );
+
+	void finalizeCommands();
 
 	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }
 
@@ -116,6 +121,9 @@ private:
 
 	zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
 	zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
+	zpFixedArrayList< zpRecti, 8 > m_scissorRectQueue;
+
+	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingLayer_Count ];
 
 	friend class zpRenderingEngine;
 };

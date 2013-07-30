@@ -20,12 +20,12 @@ void zpRenderingEngine::create()
 	zpTextureImpl* immediateRenderTarget;
 	m_renderingEngine->create( m_window, m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
 
-	m_immediateRenderTarget = new zpTexture( immediateRenderTarget );
+	m_immediateRenderTarget.m_textureImpl = immediateRenderTarget;
 	m_renderingContexts.pushBack( new zpRenderingContext( this, immediateContext ) );
 }
 void zpRenderingEngine::destroy()
 {
-	ZP_SAFE_DELETE( m_immediateRenderTarget );
+	ZP_SAFE_DELETE( m_immediateRenderTarget.m_textureImpl );
 	m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
 		delete cxt;
 	} );
@@ -91,9 +91,9 @@ zpRenderingContext* zpRenderingEngine::getImmediateRenderingContext() const
 {
 	return m_renderingContexts[ 0 ];
 }
-zpTexture* zpRenderingEngine::getBackBufferRenderTarget() const
+zpTexture* zpRenderingEngine::getBackBufferRenderTarget()
 {
-	return m_immediateRenderTarget;
+	return &m_immediateRenderTarget;
 }
 zpDepthStencilBuffer* zpRenderingEngine::getBackBufferDepthStencilBuffer() const
 {
@@ -122,18 +122,40 @@ zpBuffer* zpRenderingEngine::createBuffer( zpBufferType type, zpBufferBindType b
 	return new zpBuffer( buffer );
 }
 
-zpTexture* zpRenderingEngine::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
+zp_bool zpRenderingEngine::createTexture( zpTexture* texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
 {
-	zpTextureImpl* texture;
-	texture = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, mipLevels );
-	return new zpTexture( texture );
-}
+	if( texture )
+	{
+		if( texture->m_textureImpl )
+		{
+			destroyTexture( texture );
+		}
 
-zpTexture* zpRenderingEngine::createTextureFromFile( const zpString& filename )
+		texture->m_textureImpl = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, mipLevels );;
+	}
+	return texture && texture->m_textureImpl;
+}
+zp_bool zpRenderingEngine::createTextureFromFile( zpTexture* texture, const zpString& filename )
 {
-	zpTextureImpl* texture;
-	texture = m_renderingEngine->createTextureFromFile( filename );
-	return new zpTexture( texture );
+	if( texture )
+	{
+		if( texture->m_textureImpl )
+		{
+			destroyTexture( texture );
+		}
+
+		texture->m_textureImpl = m_renderingEngine->createTextureFromFile( filename );
+	}
+	return texture && texture->m_textureImpl;
+}
+zp_bool zpRenderingEngine::destroyTexture( zpTexture* texture )
+{
+	if( texture && m_renderingEngine->destroyTexture( texture->m_textureImpl ) )
+	{
+		texture->m_textureImpl = ZP_NULL;
+	}
+
+	return texture && texture->m_textureImpl == ZP_NULL;
 }
 
 zpDepthStencilBuffer* zpRenderingEngine::createDepthBuffer( zp_uint width, zp_uint height, zpDisplayFormat format )
@@ -192,11 +214,13 @@ zpSamplerState* zpRenderingEngine::createSamplerState( const zpSamplerStateDesc&
 	return sampler;
 }
 
-zpShader* zpRenderingEngine::createShader()
+zp_bool zpRenderingEngine::createShader( zpShader* shader )
 {
-	zpShaderImpl* shader;
-	shader = m_renderingEngine->createShader();
-	return new zpShader( shader );
+	if( shader )
+	{
+		shader->m_shader = m_renderingEngine->createShader();
+	}
+	return shader && shader->m_shader != ZP_NULL;
 }
 zp_bool zpRenderingEngine::loadShader( zpShader* shader, const zpBison& shaderfile )
 {
@@ -204,5 +228,9 @@ zp_bool zpRenderingEngine::loadShader( zpShader* shader, const zpBison& shaderfi
 }
 zp_bool zpRenderingEngine::destroyShader( zpShader* shader )
 {
-	return m_renderingEngine->destroyShader( shader->getShaderImpl() );
+	if( shader && m_renderingEngine->destroyShader( shader->getShaderImpl() ) )
+	{
+		shader->m_shader = ZP_NULL;
+	}
+	return shader && shader->m_shader == ZP_NULL;
 }

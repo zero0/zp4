@@ -15,13 +15,12 @@ class zpShaderImpl;
 class zpShader
 {
 public:
+	zpShader();
 	~zpShader();
 
 	zpShaderImpl* getShaderImpl() const;
 
 protected:
-	zpShader( zpShaderImpl* impl );
-
 	zpShaderImpl* m_shader;
 
 	friend class zpRenderingEngine;

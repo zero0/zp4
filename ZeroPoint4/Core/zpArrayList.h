@@ -79,7 +79,10 @@ public:
 
 	template<typename Func>
 	void map( Func func );
-	
+
+	template<typename Func>
+	void sort( Func func );
+
 protected:
 	zpArrayList( T* fixedArray, zp_uint count );
 

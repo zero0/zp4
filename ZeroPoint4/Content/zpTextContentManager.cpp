@@ -3,10 +3,6 @@
 zp_bool zpTextResource::load( const zp_char* filename )
 {
 	zp_bool loaded = false;
-	if( m_resource == ZP_NULL )
-	{
-		m_resource = new zpBison;
-	}
 
 	m_filename = filename;
 	if( m_filename.endsWith( ".json" ) )
@@ -18,20 +14,19 @@ zp_bool zpTextResource::load( const zp_char* filename )
 			zpDataBuffer bisonData;
 			if( zpBison::compileToBuffer( bisonData, json ) )
 			{
-				loaded = m_resource->readFromBuffer( bisonData );
+				loaded = m_resource.readFromBuffer( bisonData );
 			}
 		}
 	}
 	else
 	{
-		loaded = m_resource->readFromFile( m_filename );
+		loaded = m_resource.readFromFile( m_filename );
 	}
 
 	return loaded;
 }
 void zpTextResource::unload()
 {
-	ZP_SAFE_DELETE( m_resource );
 	m_filename.clear();
 }
 

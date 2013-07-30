@@ -10,14 +10,19 @@ public:
 
 	zpRenderingEngine* getRenderingEngine() const;
 
+	void beginFrame();
+
 	void submitRendering();
 	void submitDebugRendering();
 
-	void finalize();
+	void endFrame();
 
 	zpMaterialContentManager* getMaterialContentManager();
 	zpShaderContentManager* getShaderContentManager();
 	zpTextureContentManager* getTextureContentManager();
+
+	void onFocusGained();
+	void onFocusLost();
 
 private:
 	zpRenderingEngine* m_engine;

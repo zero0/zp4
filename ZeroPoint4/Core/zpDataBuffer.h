@@ -4,11 +4,13 @@
 
 class zpDataBuffer
 {
-	ZP_NON_COPYABLE( zpDataBuffer );
 public:
 	zpDataBuffer();
 	explicit zpDataBuffer( zp_uint capacity );
+	zpDataBuffer( const zpDataBuffer& other );
 	~zpDataBuffer();
+
+	void operator=( const zpDataBuffer& other );
 
 	const zp_byte* getData() const;
 
@@ -38,8 +40,8 @@ public:
 	template<typename T>
 	void readAt( T& out, zp_uint offset );
 
-	void read( const zpDataBuffer& buffer );
-	void write( zpDataBuffer& buffer ) const;
+	void readIn( const zpDataBuffer& buffer );
+	void writeOut( zpDataBuffer& buffer ) const;
 
 protected:
 	void ensureCapacity( zp_uint capacity );
@@ -108,11 +110,13 @@ void zpDataBuffer::writeFill( const T& in, zp_uint count )
 template<typename T>
 void zpDataBuffer::writeAt( const T& in, zp_uint offset )
 {
+	ZP_ASSERT( offset < m_size, "Buffer overrun" );
 	*(T*)( m_data + offset ) = in;
 }
 template<typename T>
 void zpDataBuffer::readAt( T& out, zp_uint offset )
 {
+	ZP_ASSERT( offset < m_size, "Buffer overrun" );
 	out = *(T*)( m_data + offset );
 }
 
@@ -121,7 +125,6 @@ template< zp_uint Size >
 class zpFixedDataBuffer : public zpDataBuffer
 {
 	ZP_NON_COPYABLE( zpFixedDataBuffer );
-
 public:
 	zpFixedDataBuffer();
 	~zpFixedDataBuffer();

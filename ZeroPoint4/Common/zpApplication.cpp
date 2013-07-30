@@ -175,15 +175,19 @@ const zpBison::Value& zpApplication::getOptions() const
 
 void zpApplication::onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam )
 {
-
+	m_inputManager.onWindowProc( uMessage, wParam, lParam );
 }
 void zpApplication::onFocusGained()
 {
 	zp_printfcln( ZP_CC_LIGHT_BLUE, "focused" );
+	m_inputManager.onFocusGained();
+	m_renderingPipeline.onFocusGained();
 }
 void zpApplication::onFocusLost()
 {
 	zp_printfcln( ZP_CC_LIGHT_RED, "unfocused" );
+	m_inputManager.onFocusLost();
+	m_renderingPipeline.onFocusLost();
 }
 
 zp_bool zpApplication::loadFile( const zp_char* filename )
@@ -240,16 +244,13 @@ void zpApplication::processFrame()
 	// update
 	ZP_PROFILE_START( UPDATE );
 	update();
-	//zp_printfcln( ZP_CC_LIGHT_GREEN, "update" );
 	ZP_PROFILE_END( UPDATE );
-
 
 	// simulate
 	ZP_PROFILE_START( SIMULATE );
 	while( ( now - m_lastTime ) > m_simulateHz && numUpdates < 5 )
 	{
 		simulate();
-		//zp_printfcln( ZP_CC_LIGHT_BLUE, "simulate" );
 		m_lastTime += m_simulateHz;
 		++numUpdates;
 	}
@@ -261,20 +262,26 @@ void zpApplication::processFrame()
 		m_lastTime = now - m_simulateHz;
 	}
 
+	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
+
+	// render begin
+	ZP_PROFILE_START( RENDER_BEGIN );
+	m_renderingPipeline.beginFrame();
+	ZP_PROFILE_END( RENDER_BEGIN );
+
 	// render
 	ZP_PROFILE_START( RENDER );
-	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
-	//zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );	
 	m_renderingPipeline.submitRendering();
 	ZP_PROFILE_END( RENDER );
 
+#if ZP_DEBUG
 	ZP_PROFILE_START( DEBUG_RENDER );
-	//zp_printfcln( ZP_CC_LIGHT_YELLOW, "render" );	
 	m_renderingPipeline.submitDebugRendering();
 	ZP_PROFILE_END( DEBUG_RENDER );
+#endif
 
 	ZP_PROFILE_START( RENDER_PRESENT );
-	m_renderingPipeline.finalize();
+	m_renderingPipeline.endFrame();
 	ZP_PROFILE_END( RENDER_PRESENT );
 
 	ZP_PROFILE_END( FRAME );
