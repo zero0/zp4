@@ -1,50 +1,32 @@
 #include "zpRendering.h"
+#include "Common/zpCommon.h"
 
-zp_bool zpMaterialResource::load( const zp_char* filename )
+zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* pipeline )
 {
+	zp_bool ok;
 	m_filename = filename;
 
 	zpBison material;
-	material.readFromFile( m_filename );
+	ok = material.readFromFile( m_filename );
 
-	/*zpProperties material( getFilename() );
+	if( ok )
+	{
+		const zpBison::Value& root = material.root();
 
-	if( !material.hasProperty( "material.shader" ) ) return false;
-	m_material.shader = getContentManager()->createInstanceOfResource<zpShaderResource>( material[ "material.shader" ] );
+		const zp_char* shaderFile = root[ "Shader" ].asCString();
+		pipeline->getShaderContentManager()->getResource( shaderFile, m_resource.shader );
+	}
 
-	zpProperties textures = material.getSubProperties( "material.texture" );
-	if( !textures.isEmpty() ) {
-		textures.foreach( [ this ]( const zpString& key, const zpString& value ) {
-			if( key == "diffuse" ) {
-				m_material.textures[ ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE ] = getContentManager()->createInstanceOfResource<zpTextureResource>( value );
-			} else if( key == "normal" ) {
-				m_material.textures[ ZP_MATERIAL_TEXTURE_SLOT_NORMAL ] = getContentManager()->createInstanceOfResource<zpTextureResource>( value );
-			} else if( key == "specular" ) {
-				m_material.textures[ ZP_MATERIAL_TEXTURE_SLOT_SPECULAR ] = getContentManager()->createInstanceOfResource<zpTextureResource>( value );
-			} else if( key == "opacity" ) {
-				m_material.textures[ ZP_MATERIAL_TEXTURE_SLOT_OPACITY ] = getContentManager()->createInstanceOfResource<zpTextureResource>( value );
-			} else if( key == "other" ) {
-				m_material.textures[ ZP_MATERIAL_TEXTURE_SLOT_OTHER ] = getContentManager()->createInstanceOfResource<zpTextureResource>( value );
-			}
-		} );
-	}*/
-
-	return true;
+	return ok;
 }
 void zpMaterialResource::unload()
 {
-	/*m_material.shader = zpResourceInstance<zpShaderResource>();
-	m_material.textures.map( []( const zpResourceInstance<zpTextureResource>& ) {
-		return zpResourceInstance<zpTextureResource>();
-	} );*/
+	m_resource.shader.release();
 }
 
 zpMaterialResourceInstance::zpMaterialResourceInstance()
 {
-	while( m_textureOverides.size() != zpMaterialTextureSlot_Count )
-	{
-		m_textureOverides.pushBackEmpty();
-	}
+	m_textureOverides.resize( zpMaterialTextureSlot_Count );
 }
 zpMaterialResourceInstance::~zpMaterialResourceInstance()
 {
@@ -57,7 +39,7 @@ void zpMaterialResourceInstance::setTextureOverride( zpMaterialTextureSlot slot,
 }
 void zpMaterialResourceInstance::resetTexture( zpMaterialTextureSlot slot )
 {
-
+	m_textureOverides[ slot ].release();
 }
 
 void zpMaterialResourceInstance::setBuffer( zpResourceBindSlot slot, zp_uint index, zpBuffer* buffer )
@@ -67,7 +49,7 @@ void zpMaterialResourceInstance::setBuffer( zpResourceBindSlot slot, zp_uint ind
 
 zp_bool zpMaterialContentManager::createResource( zpMaterialResource* res, const zp_char* filename )
 {
-	return res->load( filename );
+	return res->load( filename, getApplication()->getRenderPipeline() );
 }
 void zpMaterialContentManager::destroyResource( zpMaterialResource* res )
 {

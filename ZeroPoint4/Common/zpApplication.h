@@ -36,6 +36,8 @@ public:
 	zpWindow* getWindow() { return &m_window; }
 	zpRenderingPipeline* getRenderPipeline() { return &m_renderingPipeline; }
 
+	zpTextContentManager* getTextContentManager() { return &m_textContent; }
+
 private:
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
@@ -53,7 +55,7 @@ private:
 
 	zpWindow m_window;
 
-	zpBison m_appOptions;
+	zpTextResourceInstance m_appOptions;
 
 	zpInputManager m_inputManager;
 	zpRenderingPipeline m_renderingPipeline;

@@ -31,33 +31,31 @@ const zpString& zpApplication::getOptionsFilename() const
 
 void zpApplication::initialize( const zpArrayList< zpString >& args )
 {
+	m_textContent.setApplication( this );
+	m_renderingPipeline.getMaterialContentManager()->setApplication( this );
+	m_renderingPipeline.getShaderContentManager()->setApplication( this );
+	m_renderingPipeline.getTextureContentManager()->setApplication( this );
+
+
 	zp_bool ok;
 
-	zpJsonParser parser;
-	zpJson json;
-	zpDataBuffer buffer;
-	ok = parser.parseFile( m_optionsFilename, json );
-	ZP_ASSERT( ok, "Failed to parse Options '%s'", m_optionsFilename.str() );
-
-	ok = zpBison::compileToBuffer( buffer, json );
-	ZP_ASSERT( ok, "Failed to compile Options '%s'", m_optionsFilename.str() );
-
-	ok = m_appOptions.readFromBuffer( buffer );
-	//ok = m_appOptions.readFromFile( zpString( ZP_APPLICATION_OPTIONS_FILE ) );
+	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
 	ZP_ASSERT( ok, "Failed to load Options '%s'", m_optionsFilename.str() );
 	if( !ok )
 	{
 		return;
 	}
 
-	const zpBison::Value console = m_appOptions.root()[ "Console" ];
+	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
+
+	const zpBison::Value console = appOptions[ "Console" ];
 	if( !console.isNull() )
 	{
 		m_console = zpConsole::getInstance();
 		m_console->create();
 	}
 
-	const zpBison::Value window = m_appOptions.root()[ "Window" ];
+	const zpBison::Value window = appOptions[ "Window" ];
 	ZP_ASSERT( window.isObject(), "" );
 
 	zpVector2i pos( window[ "X" ].asInt(), window[ "Y" ].asInt() );
@@ -71,7 +69,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_window.create();
 
-	const zpBison::Value render = m_appOptions.root()[ "Render" ];
+	const zpBison::Value render = appOptions[ "Render" ];
 	ZP_ASSERT( render.isObject(), "" );
 
 	zpDisplayMode displayMode;
@@ -103,6 +101,8 @@ void zpApplication::run()
 }
 zp_int zpApplication::shutdown()
 {
+	m_appOptions.release();
+
 	m_renderingPipeline.getRenderingEngine()->destroy();
 
 	m_textContent.garbageCollect();
@@ -156,10 +156,10 @@ void zpApplication::simulate()
 void zpApplication::garbageCollect()
 {
 	m_textContent.garbageCollect();
+
 	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
 	m_renderingPipeline.getShaderContentManager()->garbageCollect();
 	m_renderingPipeline.getTextureContentManager()->garbageCollect();
-
 }
 
 void zpApplication::exit( zp_int exitCode )
@@ -170,7 +170,7 @@ void zpApplication::exit( zp_int exitCode )
 
 const zpBison::Value& zpApplication::getOptions() const
 {
-	return m_appOptions.root();
+	return m_appOptions.getResource()->getData()->root();
 }
 
 void zpApplication::onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam )

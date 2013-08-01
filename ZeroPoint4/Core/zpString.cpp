@@ -295,7 +295,7 @@ zp_bool zpString::endsWith( const zp_char* string ) const
 	if( len > m_length ) return false;
 
 	const zp_char* a = str();
-	for( zp_uint i = m_length - 1, j = len - 1; i >= 0 && j >= 0; )
+	for( zp_int i = m_length - 1, j = len - 1; i >= 0 && j >= 0; --i, --j )
 	{
 		if( a[ i ] != string[ j ] ) return false;
 	}
@@ -308,7 +308,7 @@ zp_bool zpString::endsWith( const zpString& string ) const
 	
 	const zp_char* a = str();
 	const zp_char* b = string.str();
-	for( zp_uint i = m_length - 1, j = string.m_length - 1; i >= 0 && j >= 0; )
+	for( zp_int i = m_length - 1, j = string.m_length - 1; i >= 0 && j >= 0; --i, --j )
 	{
 		if( a[ i ] != b[ j ] ) return false;
 	}

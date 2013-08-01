@@ -1,21 +1,28 @@
 
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::zpContentManager()
+	: m_application( ZP_NULL )
 {
-	while( m_resources.size() < ResourceCount )
-	{
-		m_resources.pushBackEmpty();
-	}
+	m_resources.resize( ResourceCount );
 }
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::~zpContentManager()
 {
-	for( zp_uint i = 0; i < ResourceCount; ++i )
+	Resource* res = m_resources.begin();
+	Resource* end = m_resources.end();
+
+	for( ; res != end; ++res )
 	{
-		Resource* r = &m_resources[ i ];
-		ZP_ASSERT( r->getRefCount() == 0, "Resource %s still loaded", r->getFilename().str() );
+		ZP_ASSERT( res->getRefCount() == 0, "Resource %s still loaded", res->getFilename().str() );
 	}
 	m_resources.clear();
+	m_application = ZP_NULL;
+}
+
+template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::getResource( const zpString& filename, ResourceInstance& outInstance )
+{
+	return getResource( filename.str(), outInstance );
 }
 
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
@@ -23,19 +30,21 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 {
 	Resource* empty = ZP_NULL;
 	Resource* found = ZP_NULL;
-	for( zp_uint i = 0; i < ResourceCount; ++i )
+	Resource* res = m_resources.begin();
+	Resource* end = m_resources.end();
+
+	for( ; res != end; ++res )
 	{
-		Resource* r = &m_resources[ i ];
-		if( r->getRefCount() == 0 )
+		if( res->getRefCount() == 0 )
 		{
 			if( empty == ZP_NULL )
 			{
-				empty = r;
+				empty = res;
 			}
 		}
-		else if( r->getFilename() == filename )
+		else if( res->getFilename() == filename )
 		{
-			found = r;
+			found = res;
 			break;
 		}
 	}
@@ -43,6 +52,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 	// if the resource was already loaded, add a ref and return
 	if( found )
 	{
+		outInstance.release();
 		outInstance.m_resource = found;
 		found->addRef();
 
@@ -71,6 +81,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		// if the resource was able to create, add ref and return
 		if( impl->createResource( empty, filename ) )
 		{
+			outInstance.release();
 			outInstance.m_resource = empty;
 			empty->addRef();
 			empty->m_isLoaded = true;
@@ -86,12 +97,14 @@ template<typename Resource, typename ResourceInstance, typename ImplManager, zp_
 zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::reloadResource( const zp_char* filename )
 {
 	Resource* found = ZP_NULL;
-	for( zp_uint i = 0; i < ResourceCount; ++i )
+	Resource* res = m_resources.begin();
+	Resource* end = m_resources.end();
+
+	for( ; res != end; ++res )
 	{
-		Resource* r = &m_resources[ i ];
-		if( r->getFilename() == filename )
+		if( res->getFilename() == filename )
 		{
-			found = r;
+			found = res;
 			break;
 		}
 	}
@@ -117,34 +130,28 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 }
 
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
-void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::releaseResource( ResourceInstance& instance )
+void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::reloadAllResources()
 {
-	if( instance.getResource() == ZP_NULL )
-	{
-		return;
-	}
-
 	Resource* found = ZP_NULL;
-	for( zp_uint i = 0; i < ResourceCount; ++i )
-	{
-		if( &m_resources[ i ] == instance.getResource() )
-		{
-			found = &m_resources[ i ];
-			break;
-		}
-	}
+	Resource* res = m_resources.begin();
+	Resource* end = m_resources.end();
 
-	ZP_ASSERT( found != ZP_NULL, "" );
-	if( found != ZP_NULL )
-	{
-		ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
-		if( impl != ZP_NULL )
-		{
-			impl->destroyResource( found );
+	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
 
-			instance.m_resource = ZP_NULL;
-			found->releaseRef();
-			found->m_isLoaded = false;
+	for( ; res != end; ++res )
+	{
+		if( res->getRefCount() > 0 )
+		{
+			if( res->isLoaded() )
+			{
+				impl->destroyResource( res );
+				res->m_isLoaded = false;
+			}
+
+			if( impl->createResource( res, res->getFilename().str() ) )
+			{
+				res->m_isLoaded = true;
+			}
 		}
 	}
 }
@@ -152,14 +159,15 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::garbageCollect()
 {
-	Resource* r;
 	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
-	for( zp_uint i = 0; i < ResourceCount; ++i )
+	Resource* res = m_resources.begin();
+	Resource* end = m_resources.end();
+
+	for( ; res != end; ++res )
 	{
-		r = &m_resources[ i ];
-		if( r->getRefCount() == 0 && r->isLoaded() )
+		if( res->getRefCount() == 0 && res->isLoaded() )
 		{
-			impl->destroyResource( r );
+			impl->destroyResource( res );
 		}
 	}
 }

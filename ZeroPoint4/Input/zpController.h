@@ -74,7 +74,7 @@ public:
 	~zpController();
 
 	void poll();
-	void create();
+	void create( zpControllerNumber controller );
 	void destroy();
 
 	zp_bool isCreated() const;

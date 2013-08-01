@@ -13,7 +13,7 @@ struct zpMaterial
 class zpMaterialResource : public zpResource< zpMaterial >
 {
 private:
-	zp_bool load( const zp_char* filename );
+	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline );
 	void unload();
 
 	friend class zpMaterialContentManager;

@@ -296,7 +296,7 @@ void zpRenderingContext::update( zpBuffer* buffer, void* data, zp_uint size )
 	m_renderContextImpl->update( buffer->getBufferImpl(), data, size );
 }
 
-void zpRenderingContext::beginCommands()
+void zpRenderingContext::preprocessCommands()
 {
 	// unmap scratch buffers
 	if( m_immediateVertexData )

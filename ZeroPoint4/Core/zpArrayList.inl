@@ -234,6 +234,13 @@ void zpArrayList<T>::reserve( zp_uint size )
 }
 
 template<typename T>
+void zpArrayList<T>::resize( zp_uint size )
+{
+	ensureCapacity( size );
+	m_size = size;
+}
+
+template<typename T>
 zp_int zpArrayList<T>::indexOf( const T& val ) const
 {
 	for( zp_uint i = 0; i < m_size; ++i )

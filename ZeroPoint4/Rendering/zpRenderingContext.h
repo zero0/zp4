@@ -89,7 +89,7 @@ public:
 
 	void update( zpBuffer* buffer, void* data, zp_uint size );
 
-	void beginCommands();
+	void preprocessCommands();
 
 	void processCommands( zpRenderingLayer layer );
 

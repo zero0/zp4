@@ -391,6 +391,7 @@ enum zpRenderingCommandType : zp_uint
 class zpRenderingContext;
 class zpRenderingEngine;
 class zpRenderingFactory;
+class zpRenderingPipeline;
 
 class zpCamera;
 class zpRenderingManager;

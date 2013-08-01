@@ -13,13 +13,15 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	zpArrayList< zpString > args;
 	cmdLine.split( ' ', args );
 
+	zp_int exitCode;
+
 	app.setOptionsFilename( BLACKJACK_CONFIG );
 
 	app.initialize( args );
 	app.run();
-	app.shutdown();
+	exitCode = app.shutdown();
 
-	return 0;
+	return exitCode;
 }
 #if 0
 {

@@ -2,10 +2,7 @@
 
 zpInputManager::zpInputManager()
 {
-	for( zp_uint i = 0; i < ZP_INPUT_MAX_CONTROLLERS; ++i )
-	{
-		m_controllers.pushBackEmpty();
-	}
+	m_controllers.resize( ZP_INPUT_MAX_CONTROLLERS );
 }
 zpInputManager::~zpInputManager()
 {}
@@ -31,8 +28,7 @@ const zpController* zpInputManager::getController( zpControllerNumber controller
 	zpController& c = m_controllers[ controller ];
 	if( !c.isCreated() )
 	{
-		c.m_controller = controller;
-		c.create();
+		c.create( controller );
 	}
 	return &c;
 }
@@ -43,9 +39,11 @@ void zpInputManager::update()
 
 	m_mouse.poll();
 
-	for( zp_uint i = 0; i < ZP_INPUT_MAX_CONTROLLERS; ++i )
+	zpController* c = m_controllers.begin();
+	zpController* end = m_controllers.end();
+	for( ; c != end; ++c )
 	{
-		m_controllers[ i ].poll();
+		c->poll();
 	}
 }
 
@@ -55,9 +53,11 @@ void zpInputManager::onFocusGained()
 
 	m_mouse.onFocusGained();
 
-	for( zp_uint i = 0; i < ZP_INPUT_MAX_CONTROLLERS; ++i )
+	zpController* c = m_controllers.begin();
+	zpController* end = m_controllers.end();
+	for( ; c != end; ++c )
 	{
-		m_controllers[ i ].onFocusGained();
+		c->onFocusGained();
 	}
 }
 void zpInputManager::onFocusLost()
@@ -66,9 +66,11 @@ void zpInputManager::onFocusLost()
 
 	m_mouse.onFocusLost();
 
-	for( zp_uint i = 0; i < ZP_INPUT_MAX_CONTROLLERS; ++i )
+	zpController* c = m_controllers.begin();
+	zpController* end = m_controllers.end();
+	for( ; c != end; ++c )
 	{
-		m_controllers[ i ].onFocusLost();
+		c->onFocusLost();
 	}
 }
 void zpInputManager::onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam )

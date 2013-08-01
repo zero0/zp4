@@ -7,7 +7,7 @@ zp_bool zpTextResource::load( const zp_char* filename )
 	m_filename = filename;
 	if( m_filename.endsWith( ".json" ) )
 	{
-		zpJson json;			
+		zpJson json;
 		zpJsonParser parser;
 		if( parser.parseFile( m_filename, json ) )
 		{

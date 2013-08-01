@@ -20,7 +20,7 @@ void zpRenderingPipeline::beginFrame()
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 	i->clearState();
 
-	i->beginCommands();
+	i->preprocessCommands();
 }
 
 void zpRenderingPipeline::submitRendering()

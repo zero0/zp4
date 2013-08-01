@@ -255,8 +255,9 @@ void zpController::poll()
 		}
 	}
 }
-void zpController::create()
+void zpController::create( zpControllerNumber controller )
 {
+	m_controller = controller;
 	m_isCreated = true;
 	clear();
 }

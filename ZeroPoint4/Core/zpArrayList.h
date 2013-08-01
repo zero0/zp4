@@ -42,6 +42,7 @@ public:
 	void clear();
 	void reset();
 	void reserve( zp_uint size );
+	void resize( zp_uint size );
 
 	zp_int indexOf( const T& val ) const;
 	zp_int lastIndexOf( const T& val ) const;
