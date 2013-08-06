@@ -24,6 +24,9 @@ public:
 	void onFocusGained();
 	void onFocusLost();
 
+	void generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc );
+	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
+
 private:
 	zpRenderingEngine* m_engine;
 

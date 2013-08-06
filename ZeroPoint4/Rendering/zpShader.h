@@ -29,8 +29,8 @@ protected:
 class zpShaderResource : public zpResource< zpShader >
 {
 private:
-	zp_bool load( const zp_char* filename );
-	void unload();
+	zp_bool load( const zp_char* filename, zpRenderingEngine* engine );
+	void unload( zpRenderingEngine* engine );
 
 	friend class zpShaderContentManager;
 

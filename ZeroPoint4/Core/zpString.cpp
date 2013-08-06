@@ -262,6 +262,12 @@ zp_char zpString::charAt( zp_uint index ) const
 	return str()[ index ];
 }
 
+zp_bool zpString::startsWith( zp_char ch ) const
+{
+	if( m_length == 0 ) return false;
+
+	return str()[ 0 ] == ch;
+}
 zp_bool zpString::startsWith( const zp_char* string ) const
 {
 	zp_uint len = zp_strlen( string );
@@ -289,6 +295,12 @@ zp_bool zpString::startsWith( const zpString& string ) const
 	return true;
 }
 
+zp_bool zpString::endsWith( zp_char ch ) const
+{
+	if( m_length == 0 ) return false;
+
+	return str()[ m_length - 1 ] == ch;
+}
 zp_bool zpString::endsWith( const zp_char* string ) const
 {
 	zp_uint len = zp_strlen( string );

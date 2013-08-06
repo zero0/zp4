@@ -6,8 +6,14 @@ class zpMaterialContentManager;
 
 struct zpMaterial
 {
+	struct zpMaterialTextureSampler
+	{
+		zpTextureResourceInstance texture;
+		zpSamplerState* sampler;
+	};
+
 	zpShaderResourceInstance shader;
-	zpFixedArrayList< zpTextureResourceInstance, zpMaterialTextureSlot_Count > textures;
+	zpFixedArrayList< zpMaterialTextureSampler, zpMaterialTextureSlot_Count > textures;
 };
 
 class zpMaterialResource : public zpResource< zpMaterial >
@@ -28,9 +34,8 @@ public:
 	void setTextureOverride( zpMaterialTextureSlot slot, const zpTextureResourceInstance& texture );
 	void resetTexture( zpMaterialTextureSlot slot );
 
-	void setBuffer( zpResourceBindSlot slot, zp_uint index, zpBuffer* buffer );
-
-	const zpTextureResourceInstance* getTexture( zpMaterialTextureSlot slot ) const;
+	const zpTexture* getTexture( zpMaterialTextureSlot slot ) const;
+	const zpSamplerState* getSampler( zpMaterialTextureSlot slot ) const;
 
 private:
 	zpFixedArrayList< zpTextureResourceInstance, zpMaterialTextureSlot_Count > m_textureOverides;

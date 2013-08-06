@@ -12,24 +12,30 @@
 #define ZP_WIN_64				1
 #endif
 
+#define ZP_USE_COLOR_CONSOLE	1
+#define ZP_USE_FAST_MATH		0
+#define ZP_USE_SAFE_FUNCTIONS	1
+#define ZP_USE_CONSOLE_PRINT	1
+#define ZP_USE_DEBUG_PRINT		1
+#define ZP_USE_PRINT			1
+#define ZP_USE_PROFILER			1
+#define ZP_USE_ALIGNMENT		0
+#define ZP_USE_LOGGING			1
+#define ZP_USE_ASSERTIONS		1
+#define ZP_USE_MEMORY_SYSTEM	0
+
 //#ifdef _WIN32
 //#define ZP_USE_SIMD			0
 //#elif defined(_WIN64)
 #define ZP_USE_SIMD				1
 //#endif
 
-#define ZP_USE_ALIGNMENT		0
 
 #if ZP_USE_ALIGNMENT
 #define ZP_MALLOC_ALIGNMENT		16
 #endif
 
 #define ZP_FORECE_32BIT			0x7FFFFFFF
-
-#define ZP_USE_ASSERTIONS		1
-#define ZP_USE_MEMORY_SYSTEM	0
-
-#define ZP_LOG_ENABLED			1
 
 #if ZP_DEBUG
 #define ZP_ON_DEBUG( code )			do { code ; } while( 0 )
@@ -79,13 +85,6 @@
 
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
-#define ZP_USE_COLOR_CONSOLE	1
-#define ZP_USE_FAST_MATH		0
-#define ZP_USE_SAFE_FUNCTIONS	1
-#define ZP_USE_CONSOLE_PRINT	1
-#define ZP_USE_DEBUG_PRINT		1
-#define ZP_USE_PRINT			1
-#define ZP_USE_PROFILER			1
 
 #include "zpBaseTypes.h"
 

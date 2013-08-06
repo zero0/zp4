@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 #include "zpRenderingImpl.inl"
+#include "Common/zpCommon.h"
 
 zpTexture::zpTexture()
 	: m_textureImpl( ZP_NULL )
@@ -33,12 +34,11 @@ zpTextureImpl* zpTexture::getTextureImpl() const
 }
 
 
-zp_bool zpTextureResource::load( const zp_char* filename )
+zp_bool zpTextureResource::load( const zp_char* filename, zpRenderingEngine* engine )
 {
 	m_filename = filename;
-	zp_bool loaded = false;
+	zp_bool loaded;
 
-	zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
 	loaded = engine->createTextureFromFile( &m_resource, m_filename );
 
 	return loaded;
@@ -52,7 +52,7 @@ void zpTextureResource::unload()
 
 zp_bool zpTextureContentManager::createResource( zpTextureResource* res, const zp_char* filename )
 {
-	return res->load( filename );
+	return res->load( filename, getApplication()->getRenderPipeline()->getRenderingEngine() );
 }
 void zpTextureContentManager::destroyResource( zpTextureResource* res )
 {

@@ -44,7 +44,7 @@ private:
 class zpTextureResource : public zpResource< zpTexture >
 {
 private:
-	zp_bool load( const zp_char* filename );
+	zp_bool load( const zp_char* filename, zpRenderingEngine* engine );
 	void unload();
 
 	friend class zpTextureContentManager;

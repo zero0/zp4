@@ -74,6 +74,57 @@ public:
 
 		void memberNames( zpArrayList< zpBison::Value >& names ) const;
 
+		template<typename Func>
+		void foreachArray( Func func ) const
+		{
+			if( isArray() && !isNull() )
+			{
+				const zp_uint* arr = (const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
+				zp_uint count = (zp_uint)*arr;
+				++arr;
+
+				for( zp_uint i = 0; i < count; ++i )
+				{
+					func( zpBison::Value( m_data, arr[ i ] ) );
+				}
+			}
+		}
+
+		template<typename Func>
+		void foreachArrayIndexed( Func func ) const
+		{
+			if( isArray() && !isNull() )
+			{
+				const zp_uint* arr = (const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
+				zp_uint count = (zp_uint)*arr;
+				++arr;
+
+				for( zp_uint i = 0; i < count; ++i )
+				{
+					func( i, zpBison::Value( m_data, arr[ i ] ) );
+				}
+			}
+		}
+
+		template<typename Func>
+		void foreachObject( Func func ) const
+		{
+			if( isObject() && !isNull() )
+			{
+				const zp_uint* arr = (const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );
+				zp_uint count = *arr * 2;
+				++arr;
+
+				for( zp_uint i = 0; i < count; i += 2 )
+				{
+					zpBison::Value k( m_data, arr[ i ] );
+					zpBison::Value v( m_data, arr[ i + 1 ] );
+
+					func( k, v );
+				}
+			}
+		}
+
 	private:
 		Value( const zp_byte* data, zp_uint offset );
 

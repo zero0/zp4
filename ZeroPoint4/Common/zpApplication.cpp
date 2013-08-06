@@ -49,7 +49,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
 
 	const zpBison::Value console = appOptions[ "Console" ];
-	if( !console.isNull() )
+	if( console.isBool() && console.asBool() )
 	{
 		m_console = zpConsole::getInstance();
 		m_console->create();

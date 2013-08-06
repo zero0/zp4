@@ -60,10 +60,6 @@ public:
 			m_resource->releaseRef();
 		}
 		m_resource = other.m_resource;
-		if( m_resource )
-		{
-			m_resource->addRef();
-		}
 		other.m_resource = ZP_NULL;
 	}
 

@@ -30,9 +30,11 @@ public:
 	zp_char charAt( zp_uint index ) const;
 	void set( const zp_char* str, zp_uint length );
 
+	zp_bool startsWith( zp_char ch ) const;
 	zp_bool startsWith( const zp_char* string ) const;
 	zp_bool startsWith( const zpString& string ) const;
 
+	zp_bool endsWith( zp_char ch ) const;
 	zp_bool endsWith( const zp_char* string ) const;
 	zp_bool endsWith( const zpString& string ) const;
 

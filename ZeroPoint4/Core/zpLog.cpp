@@ -28,7 +28,7 @@ zpLogOutput& zpLog::fatal() {
 	return log<zpLogLevel::Fatal>();
 }
 
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 zpLogOutput& zpLog::getOutput() {
 	static zpLogOutput output;
 	return output;
@@ -43,43 +43,43 @@ zpLogOutput::zpLogOutput() : m_base( 10 ) {}
 zpLogOutput::~zpLogOutput() {}
 
 zpLogOutput& zpLogOutput::operator<<( zp_char c ) {
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 	zp_printf( "%c", c );
 #endif
 	return (*this);
 }
 zpLogOutput& zpLogOutput::operator<<( zp_int c ) {
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 	zp_printf( m_base == 10 ? "%d" : m_base == 8 ? "%o" : "%x", c );
 #endif
 	return (*this);
 }
 zpLogOutput& zpLogOutput::operator<<( zp_long c ) {
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 	zp_printf( m_base == 10 ? "%ld" : m_base == 8 ? "%lo" : "%lx", c );
 #endif
 	return (*this);
 }
 zpLogOutput& zpLogOutput::operator<<( zp_float c ) {
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 	zp_printf( "%f", c );
 #endif
 	return (*this);
 }
 zpLogOutput& zpLogOutput::operator<<( const zp_char* c ) {
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 	zp_printf( "%s", c );
 #endif
 	return (*this);
 }
 zpLogOutput& zpLogOutput::operator<<( const zpString& c ) {
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 	zp_printf( "%s", c.str() );
 #endif
 	return (*this);
 }
 zpLogOutput& zpLogOutput::operator<<( zpLog::Options c ) {
-#if ZP_LOG_ENABLED
+#if ZP_USE_LOGGING
 	switch( c ) {
 	case zpLog::endl:
 		zpConsole::getInstance()->resetColor();

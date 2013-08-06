@@ -1,5 +1,39 @@
 #include "zpRendering.h"
 
+const zp_char* g_cmpFuns[] =
+{
+	"None",
+	"Less",
+	"LessEqual",
+	"Equal",
+	"NotEqual",
+	"GreaterEqual",
+	"Greater",
+	"Always",
+};
+const zp_char* g_textureFilter[] =
+{
+	"Point",
+	"Linear",
+	"Anisotropic",
+	"ComparisonPoint",
+	"ComparisonLinear",
+	"ComparisonAnisotropic",
+};
+const zp_char* g_textureWrap[] =
+{
+	"Repeat",
+	"Mirror",
+	"Clamp",
+	"Border",
+};
+const zp_char* g_cullMode[] =
+{
+	"None",
+	"Front",
+	"Back",
+};
+
 zpRenderingPipeline::zpRenderingPipeline()
 	: m_engine( zpRenderingFactory::getRenderingEngine() )
 {
@@ -68,4 +102,246 @@ void zpRenderingPipeline::onFocusGained()
 void zpRenderingPipeline::onFocusLost()
 {
 
+}
+
+void zpRenderingPipeline::generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc )
+{
+	// start with default sampler state
+	outSamplerDesc = zpSamplerStateDesc();
+
+	if( sampler.isEmpty() )
+	{
+		const zpBison::Value cmpFuncValue = sampler[ "CmpFunc" ];
+		const zpBison::Value minFilterValue = sampler[ "MinFilter" ];
+		const zpBison::Value magFilterValue = sampler[ "MagFilter" ];
+		const zpBison::Value mipFilterValue = sampler[ "MipFilter" ];
+		const zpBison::Value texWrapUValue = sampler[ "TextureWrapU" ];
+		const zpBison::Value texWrapVValue = sampler[ "TextureWrapV" ];
+		const zpBison::Value texWrapWValue = sampler[ "TextureWrapW" ];
+		const zpBison::Value maxAnisotrpyValue = sampler[ "MaxAnisotrpy" ];
+		const zpBison::Value lodMinValue = sampler[ "LodMin" ];
+		const zpBison::Value lodMaxValue = sampler[ "LodMax" ];
+		const zpBison::Value lodBiasValue = sampler[ "LodBias" ];
+		const zpBison::Value borderColorValue = sampler[ "BorderColor" ];
+
+		if( cmpFuncValue.isString() )
+		{
+			const zp_char* cmpFunc = cmpFuncValue.asCString();
+			for( zp_uint i = 0; i < zpComparisonFunc_Count; ++i )
+			{
+				if( zp_strcmp( cmpFunc, g_cmpFuns[ i ] ) )
+				{
+					outSamplerDesc.cmpFunc = (zpComparisonFunc)i;
+					break;
+				}
+			}
+		}
+
+		if( minFilterValue.isString() )
+		{
+			const zp_char* minFilter = minFilterValue.asCString();
+			for( zp_uint i = 0; i < zpTextureFilter_Count; ++i )
+			{
+				if( zp_strcmp( minFilter, g_textureFilter[ i ] ) == 0 )
+				{
+					outSamplerDesc.minFilter = (zpTextureFilter)i;
+					break;
+				}
+			}
+		}
+
+		if( magFilterValue.isString() )
+		{
+			const zp_char* magFilter = magFilterValue.asCString();
+			for( zp_uint i = 0; i < zpTextureFilter_Count; ++i )
+			{
+				if( zp_strcmp( magFilter, g_textureFilter[ i ] ) == 0 )
+				{
+					outSamplerDesc.magFilter = (zpTextureFilter)i;
+					break;
+				}
+			}
+		}
+
+		if( mipFilterValue.isString() )
+		{
+			const zp_char* mipFilter = mipFilterValue.asCString();
+			for( zp_uint i = 0; i < zpTextureFilter_Count; ++i )
+			{
+				if( zp_strcmp( mipFilter, g_textureFilter[ i ] ) == 0 )
+				{
+					outSamplerDesc.mipFilter = (zpTextureFilter)i;
+					break;
+				}
+			}
+		}
+
+		if( texWrapUValue.isString() )
+		{
+			const zp_char* texWrapU = texWrapUValue.asCString();
+			for( zp_uint i = 0; i < zpTextureWrap_Count; ++i )
+			{
+				if( zp_strcmp( texWrapU, g_textureWrap[ i ] ) == 0 )
+				{
+					outSamplerDesc.texWrapU = (zpTextureWrap)i;
+					break;
+				}
+			}
+		}
+
+		if( texWrapUValue.isString() )
+		{
+			const zp_char* texWrapV = texWrapVValue.asCString();
+			for( zp_uint i = 0; i < zpTextureWrap_Count; ++i )
+			{
+				if( zp_strcmp( texWrapV, g_textureWrap[ i ] ) == 0 )
+				{
+					outSamplerDesc.texWrapV = (zpTextureWrap)i;
+					break;
+				}
+			}
+		}
+
+		if( texWrapWValue.isString() )
+		{
+			const zp_char* texWrapW = texWrapWValue.asCString();
+			for( zp_uint i = 0; i < zpTextureWrap_Count; ++i )
+			{
+				if( zp_strcmp( texWrapW, g_textureWrap[ i ] ) == 0 )
+				{
+					outSamplerDesc.texWrapU = (zpTextureWrap)i;
+					break;
+				}
+			}
+		}
+
+		if( maxAnisotrpyValue.isIntegral() )
+		{
+			outSamplerDesc.maxAnisotrpy = (zp_byte)maxAnisotrpyValue.asInt();
+		}
+
+		if( lodMinValue.isFloat() )
+		{
+			outSamplerDesc.lodMin = lodMinValue.asFloat();
+		}
+
+		if( lodMaxValue.isFloat() )
+		{
+			outSamplerDesc.lodMax = lodMaxValue.asFloat();
+		}
+
+		if( lodBiasValue.isFloat() )
+		{
+			outSamplerDesc.lodBias = lodBiasValue.asFloat();
+		}
+
+		zpColor4f c;
+		if( borderColorValue.isObject() )
+		{
+			switch( borderColorValue.size() )
+			{
+			case 4:
+				c.setAlpha( borderColorValue[ "a" ].asFloat() );
+			case 3:
+				c.setRed( borderColorValue[ "r" ].asFloat() );
+				c.setGreen( borderColorValue[ "g" ].asFloat() );
+				c.setBlue( borderColorValue[ "b" ].asFloat() );
+				break;
+			default:
+				break;
+			}
+		}
+		else if( borderColorValue.isArray() )
+		{
+			switch( borderColorValue.size() )
+			{
+			case 4:
+				c.setAlpha( borderColorValue[ 3 ].asFloat() );
+			case 3:
+				c.setRed( borderColorValue[ 0 ].asFloat() );
+				c.setGreen( borderColorValue[ 1 ].asFloat() );
+				c.setBlue( borderColorValue[ 2 ].asFloat() );
+				break;
+			default:
+				break;
+			}
+		}
+		outSamplerDesc.borderColor = c;
+	}
+}
+void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc )
+{
+	outRasterDesc = zpRasterStateDesc();
+
+	if( raster.isEmpty() )
+	{
+		const zpBison::Value cullModeValue = raster[ "CullMode" ];
+		const zpBison::Value fillModeSolidValue = raster[ "FillModeSolid" ];
+		const zpBison::Value frontFaceCWValue = raster[ "FrontFaceCW" ];
+		const zpBison::Value depthClipEnabledValue = raster[ "DepthClipEnabled" ];
+		const zpBison::Value scissorEnabledValue = raster[ "ScissorEnabled" ];
+		const zpBison::Value multisampleEnabledValue = raster[ "MultiSampleEnabled" ];
+		const zpBison::Value antialiasedLinedEnabledValue = raster[ "AntialiasedLinedEnabled" ];
+		const zpBison::Value depthBiasValue = raster[ "DepthBias" ];
+		const zpBison::Value depthBiasClampValue = raster[ "DepthBiasClamp" ];
+		const zpBison::Value slopeScaledDepthBiasValue = raster[ "SlopeScaledDepthBias" ];
+
+		if( cullModeValue.isString() )
+		{
+			const zp_char* cullMode = cullModeValue.asCString();
+			for( zp_uint i = 0; i < zpCullMode_Count; ++i )
+			{
+				if( zp_strcmp( cullMode, g_cullMode[ i ] ) == 0 )
+				{
+					outRasterDesc.cullMode = (zpCullMode)i;
+					break;
+				}
+			}
+		}
+
+		if( fillModeSolidValue.isBool() )
+		{
+			outRasterDesc.fillMode = fillModeSolidValue.asBool() ? ZP_FILL_MODE_SOLID : ZP_FILL_MODE_WIREFRAME;
+		}
+
+		if( frontFaceCWValue.isBool() )
+		{
+			outRasterDesc.frontFace = frontFaceCWValue.asBool() ? ZP_FRONT_FACE_CW : ZP_FRONT_FACE_CCW;
+		}
+
+		if( depthClipEnabledValue.isBool() )
+		{
+			outRasterDesc.depthClipEnable = depthClipEnabledValue.asBool();
+		}
+
+		if( scissorEnabledValue.isBool() )
+		{
+			outRasterDesc.scissorEnable = scissorEnabledValue.asBool();
+		}
+
+		if( multisampleEnabledValue.isBool() )
+		{
+			outRasterDesc.multisampleEnable = multisampleEnabledValue.asBool();
+		}
+
+		if( antialiasedLinedEnabledValue.isBool() )
+		{
+			outRasterDesc.antialiasedLineEnable = antialiasedLinedEnabledValue.asBool();
+		}
+
+		if( depthBiasValue.isIntegral() )
+		{
+			outRasterDesc.depthBias = depthBiasValue.asInt();
+		}
+
+		if( depthBiasClampValue.isFloat() )
+		{
+			outRasterDesc.depthBiasClamp = depthBiasClampValue.asFloat();
+		}
+
+		if( slopeScaledDepthBiasValue.isFloat() )
+		{
+			outRasterDesc.slopeScaledDepthBias = slopeScaledDepthBiasValue.asFloat();
+		}
+	}
 }

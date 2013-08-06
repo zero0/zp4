@@ -457,11 +457,11 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 {
 	const zpBison::Value& root = shaderfile.root();
 
-	const zpBison::Value& vs = root[ "VS" ];
-	const zpBison::Value& ps = root[ "PS" ];
-	const zpBison::Value& gs = root[ "GS" ];
-	const zpBison::Value& gsso = root[ "GSSO" ];
-	const zpBison::Value& cs = root[ "CS" ];
+	const zpBison::Value vs = root[ "VS" ];
+	const zpBison::Value ps = root[ "PS" ];
+	const zpBison::Value gs = root[ "GS" ];
+	const zpBison::Value gsso = root[ "GSSO" ];
+	const zpBison::Value cs = root[ "CS" ];
 	
 	zpDataBuffer data;
 	HRESULT hr;
@@ -471,11 +471,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !vs.isNull() )
 	{
-		const zpBison::Value& d = vs[ "Data" ];
+		const zpBison::Value d = vs[ "Data" ];
 		encodedShader = d.asData();
 		encodedLength = d.size();
-
-		//zp_base64_decode( encodedShader, encodedLength, data );
 
 		hr = m_d3dDevice->CreateVertexShader( encodedShader, encodedLength, ZP_NULL, &shader->m_vertexShader );
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Vertex Shader %x", hr );
@@ -502,11 +500,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !ps.isNull() )
 	{
-		const zpBison::Value& d = ps[ "Data" ];
+		const zpBison::Value d = ps[ "Data" ];
 		encodedShader = d.asData();
 		encodedLength = d.size();
-
-		//zp_base64_decode( encodedShader, encodedLength, data );
 
 		hr = m_d3dDevice->CreatePixelShader( encodedShader, encodedLength, ZP_NULL, &shader->m_pixelShader );
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Pixel Shader %x", hr );
@@ -514,11 +510,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !gs.isNull() )
 	{
-		const zpBison::Value& d = gs[ "Data" ];
+		const zpBison::Value d = gs[ "Data" ];
 		encodedShader = d.asData();
 		encodedLength = d.size();
-
-		//zp_base64_decode( encodedShader, encodedLength, data );
 
 		hr = m_d3dDevice->CreateGeometryShader( encodedShader, encodedLength, ZP_NULL, &shader->m_geometryShader );
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Geometry Shader %x", hr );
@@ -526,14 +520,12 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !gsso.isNull() )
 	{
-		const zpBison::Value& d = gsso[ "Data" ];
+		const zpBison::Value d = gsso[ "Data" ];
 		encodedShader = d.asData();
 		encodedLength = d.size();
 
-		//zp_base64_decode( encodedShader, encodedLength, data );
-
-		const zpBison::Value& stridesValue = gsso[ "Strides" ];
-		const zpBison::Value& entriesValue = gsso[ "Entries" ];
+		const zpBison::Value stridesValue = gsso[ "Strides" ];
+		const zpBison::Value entriesValue = gsso[ "Entries" ];
 
 		zpArrayList< zp_uint > strides;
 		strides.reserve( stridesValue.size() );
@@ -546,7 +538,7 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 		entries.reserve( entriesValue.size() );
 		for( zp_uint i = 0; i < entries.size(); ++i )
 		{
-			const zpBison::Value& entryValue = entriesValue[ i ];
+			const zpBison::Value entryValue = entriesValue[ i ];
 
 			D3D11_SO_DECLARATION_ENTRY& entry = entries.pushBackEmpty();
 			entry.Stream =			entryValue[ "Stream" ].asInt();
@@ -563,165 +555,13 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison& 
 
 	if( !cs.isNull() )
 	{
-		const zpBison::Value& d = cs[ "Data" ];
+		const zpBison::Value d = cs[ "Data" ];
 		encodedShader = d.asData();
 		encodedLength = d.size();
-
-		//zp_base64_decode( encodedShader, encodedLength, data );
 
 		hr = m_d3dDevice->CreateComputeShader( encodedShader, encodedLength, ZP_NULL, &shader->m_computeShader );
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Compute Shader %x", hr );
 	}
-
-
-#if 0
-	zpFile shaderFile( shaderfileName );
-	if( shaderFile.open( ZP_FILE_MODE_BINARY_READ ) )
-	{	
-		HRESULT hr;
-	
-		zpDataBuffer shaderBuffer;
-		shaderFile.readFileBinary( shaderBuffer );
-		shaderFile.close();
-
-		zpShaderFileHeader header;
-		shaderBuffer.read( header );
-
-		ZP_ASSERT( header.fileType == ZP_SHADER_FILE_HEADER, "Invalid Shader header" );
-		if( header.fileType != ZP_SHADER_FILE_HEADER )
-		{
-			return false;
-		}
-
-		ZP_ASSERT( header.shaderType == ZP_SHADER_TYPE_DX11, "Incorrect Shader type, DX11 expected" );
-		if( header.shaderType != ZP_SHADER_TYPE_DX11 )
-		{
-			return false;
-		}
-
-		shader->m_vertexLayout = (zpVertexFormatDesc)header.vertexLayout;
-
-		const zp_byte* shaderBlockStart = (const zp_byte*)shaderBuffer.getData();
-		zp_uint offset = shaderBuffer.size();
-		zp_uint shaderLength = header.shaderLengths[ zpShaderFileHeader::VS ];
-
-		if( shaderLength )
-		{
-			hr = m_d3dDevice->CreateVertexShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_vertexShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Vertex Shader %x", hr );
-
-			ID3D11InputLayout *inputLayout;
-			switch( shader->m_vertexLayout )
-			{
-			case ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR:
-				{
-					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_COLOR ] )
-					{
-						D3D11_INPUT_ELEMENT_DESC desc[] =
-						{
-							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-							{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-						};
-
-						hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), (const void*)( shaderBlockStart + offset ), shaderLength, &inputLayout );
-						ZP_ASSERT( SUCCEEDED( hr ), "" );
-
-						m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_COLOR ] = inputLayout;
-					}
-				}
-				break;
-
-			case ZP_VERTEX_FORMAT_DESC_VERTEX_UV:
-				{
-					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_UV ] )
-					{
-						D3D11_INPUT_ELEMENT_DESC desc[] =
-						{
-							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-							{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-						};
-
-						hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), (const void*)( shaderBlockStart + offset ), shaderLength, &inputLayout );
-						ZP_ASSERT( SUCCEEDED( hr ), "" );
-
-						m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_UV ] = inputLayout;
-					}
-				}
-				break;
-
-			case ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV:
-				{
-					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ] )
-					{
-						D3D11_INPUT_ELEMENT_DESC desc[] =
-						{
-							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-							{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-							{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-						};
-
-						hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), (const void*)( shaderBlockStart + offset ), shaderLength, &inputLayout );
-						ZP_ASSERT( SUCCEEDED( hr ), "" );
-
-						m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ] = inputLayout;
-					}
-				}
-				break;
-
-			case ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2:
-				{
-					if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ] )
-					{
-						D3D11_INPUT_ELEMENT_DESC desc[] =
-						{
-							{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-							{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-							{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-							{ "TEXCOORD1",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-						};
-
-						hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), (const void*)( shaderBlockStart + offset ), shaderLength, &inputLayout );
-						ZP_ASSERT( SUCCEEDED( hr ), "" );
-
-						m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ] = inputLayout;
-					}
-				}
-				break;
-
-			default:
-				ZP_ASSERT( false, "" );
-				break;
-			}
-		}
-
-		offset += shaderLength;
-		shaderLength = header.shaderLengths[ zpShaderFileHeader::PS ];
-
-		if( shaderLength )
-		{
-			hr = m_d3dDevice->CreatePixelShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_pixelShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Pixel Shader %x", hr );
-		}
-
-		offset += shaderLength;
-		shaderLength = header.shaderLengths[ zpShaderFileHeader::GS ];
-
-		if( shaderLength )
-		{
-			hr = m_d3dDevice->CreateGeometryShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_geometryShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Geometry Shader %x", hr );
-		}
-
-		offset += shaderLength;
-		shaderLength = header.shaderLengths[ zpShaderFileHeader::CS ];
-
-		if( shaderLength )
-		{
-			hr = m_d3dDevice->CreateComputeShader( (const void*)( shaderBlockStart + offset ), shaderLength, ZP_NULL, &shader->m_computeShader );
-			ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Compute Shader %x", hr );
-		}
-	}
-#endif
 
 	return false;
 }
