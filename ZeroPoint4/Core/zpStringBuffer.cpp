@@ -361,7 +361,7 @@ void zpStringBuffer::ensureCapacity( zp_uint size )
 		zp_char* buff = new zp_char[ m_capacity ];
 		if( m_buffer && m_length > 0 )
 		{
-			zp_strcpy( buff, m_capacity * sizeof( zp_char ), m_buffer );
+			zp_strcpy( buff, m_length * sizeof( zp_char ), m_buffer );
 		}
 		ZP_SAFE_DELETE_ARRAY( m_buffer );
 		

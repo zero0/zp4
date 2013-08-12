@@ -36,6 +36,7 @@ public:
 	explicit zpJson( const zp_char* value, zp_bool isData = false );
 	explicit zpJson( const zpString& value, zp_bool isData = false );
 	explicit zpJson( const void* data, zp_uint size );
+	explicit zpJson( const zpDataBuffer& data );
 	zpJson( const zpJson& json );
 	zpJson( zpJson&& json );
 	~zpJson();

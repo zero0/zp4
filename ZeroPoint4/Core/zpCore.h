@@ -233,7 +233,6 @@ ZP_PURE_INTERFACE zpReferencedObject;
 class zpJson;
 class zpXmlParser;
 
-#include "zpLog.h"
 #include "zpMath.h"
 #include "zpTween.h"
 
@@ -272,6 +271,7 @@ class zpXmlParser;
 
 #include "zpConsole.h"
 #include "zpWindow.h"
+#include "zpLog.h"
 
 #include "zpTime.h"
 #include "zpProfiler.h"

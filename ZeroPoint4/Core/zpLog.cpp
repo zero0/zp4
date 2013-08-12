@@ -3,82 +3,102 @@
 zpLog::zpLog() {}
 zpLog::~zpLog() {}
 
-zpLogOutput& zpLog::message() {
+zpLogOutput& zpLog::message()
+{
 	return log<zpLogLevel::Message>();
 }
-zpLogOutput& zpLog::debug() {
+zpLogOutput& zpLog::debug()
+{
 	return log<zpLogLevel::Debug>();
 }
-zpLogOutput& zpLog::notify() {
+zpLogOutput& zpLog::notify()
+{
 	return log<zpLogLevel::Notify>();
 }
-zpLogOutput& zpLog::warning() {
+zpLogOutput& zpLog::warning()
+{
 	return log<zpLogLevel::Warning>();
 }
-zpLogOutput& zpLog::exception() {
+zpLogOutput& zpLog::exception()
+{
 	return log<zpLogLevel::Exception>();
 }
-zpLogOutput& zpLog::error() {
+zpLogOutput& zpLog::error()
+{
 	return log<zpLogLevel::Error>();
 }
-zpLogOutput& zpLog::critical() {
+zpLogOutput& zpLog::critical()
+{
 	return log<zpLogLevel::Critical>();
 }
-zpLogOutput& zpLog::fatal() {
+zpLogOutput& zpLog::fatal()
+{
 	return log<zpLogLevel::Fatal>();
 }
 
 #if ZP_USE_LOGGING
-zpLogOutput& zpLog::getOutput() {
+zpLogOutput& zpLog::getOutput()
+{
 	static zpLogOutput output;
 	return output;
 }
 #else
-zpLogOutput& zpLog::getOutput() {
+zpLogOutput& zpLog::getOutput()
+{
 	return *reinterpret_cast<zpLogOutput*>( 0 );
 }
 #endif
 
-zpLogOutput::zpLogOutput() : m_base( 10 ) {}
-zpLogOutput::~zpLogOutput() {}
+zpLogOutput::zpLogOutput()
+	: m_base( 10 )
+{}
+zpLogOutput::~zpLogOutput()
+{}
 
-zpLogOutput& zpLogOutput::operator<<( zp_char c ) {
+zpLogOutput& zpLogOutput::operator<<( zp_char c )
+{
 #if ZP_USE_LOGGING
 	zp_printf( "%c", c );
 #endif
 	return (*this);
 }
-zpLogOutput& zpLogOutput::operator<<( zp_int c ) {
+zpLogOutput& zpLogOutput::operator<<( zp_int c )
+{
 #if ZP_USE_LOGGING
 	zp_printf( m_base == 10 ? "%d" : m_base == 8 ? "%o" : "%x", c );
 #endif
 	return (*this);
 }
-zpLogOutput& zpLogOutput::operator<<( zp_long c ) {
+zpLogOutput& zpLogOutput::operator<<( zp_long c )
+{
 #if ZP_USE_LOGGING
 	zp_printf( m_base == 10 ? "%ld" : m_base == 8 ? "%lo" : "%lx", c );
 #endif
 	return (*this);
 }
-zpLogOutput& zpLogOutput::operator<<( zp_float c ) {
+zpLogOutput& zpLogOutput::operator<<( zp_float c )
+{
 #if ZP_USE_LOGGING
 	zp_printf( "%f", c );
 #endif
 	return (*this);
 }
-zpLogOutput& zpLogOutput::operator<<( const zp_char* c ) {
+zpLogOutput& zpLogOutput::operator<<( const zp_char* c )
+{
 #if ZP_USE_LOGGING
 	zp_printf( "%s", c );
 #endif
 	return (*this);
 }
-zpLogOutput& zpLogOutput::operator<<( const zpString& c ) {
+zpLogOutput& zpLogOutput::operator<<( const zpString& c )
+{
 #if ZP_USE_LOGGING
 	zp_printf( "%s", c.str() );
 #endif
 	return (*this);
 }
-zpLogOutput& zpLogOutput::operator<<( zpLog::Options c ) {
+zpLogOutput& zpLogOutput::operator<<( zpLog::Options c )
+{
 #if ZP_USE_LOGGING
 	switch( c ) {
 	case zpLog::endl:

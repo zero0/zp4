@@ -2,7 +2,8 @@
 #ifndef ZP_LOG_H
 #define ZP_LOG_H
 
-enum zpLogLevelType {
+enum zpLogLevelType
+{
 	ZP_LOG_LEVEL_MESSAGE =	0x01,
 	ZP_LOG_LEVEL_DEBUG =	0x02,
 	ZP_LOG_LEVEL_NOTIFY =	0x04,
@@ -10,55 +11,61 @@ enum zpLogLevelType {
 	ZP_LOG_LEVEL_EXCEPTION =0x10,
 	ZP_LOG_LEVEL_ERROR =	0x20,
 	ZP_LOG_LEVEL_CRITICAL =	0x40,
-	ZP_LOG_LEVEL_FATAL =	0x80
+	ZP_LOG_LEVEL_FATAL =	0x80,
 };
 
-enum zpLogOutputType {
+enum zpLogOutputType
+{
 	ZP_LOG_OUTPUT_NONE,
 	ZP_LOG_OUTPUT_STD,
 	ZP_LOG_OUTPUT_FILE,
 	ZP_LOG_OUTPUT_BUFFER,
 };
 
-#define ZP_LOG_LEVEL_GENERATE( NAME, TXT )					\
-struct NAME {												\
-	static ZP_FORCE_INLINE zpLogLevelType getLogLevelType() {		\
-		enum LowerLogLevel {								\
-			ZP_LOG_LEVEL_Message =	ZP_LOG_LEVEL_MESSAGE,	\
-			ZP_LOG_LEVEL_Debug =	ZP_LOG_LEVEL_DEBUG,		\
-			ZP_LOG_LEVEL_Notify =	ZP_LOG_LEVEL_NOTIFY,	\
-			ZP_LOG_LEVEL_Warning =	ZP_LOG_LEVEL_WARNING,	\
-			ZP_LOG_LEVEL_Exception =ZP_LOG_LEVEL_EXCEPTION,	\
-			ZP_LOG_LEVEL_Error =	ZP_LOG_LEVEL_ERROR,		\
-			ZP_LOG_LEVEL_Critical =	ZP_LOG_LEVEL_CRITICAL,	\
-			ZP_LOG_LEVEL_Fatal =	ZP_LOG_LEVEL_FATAL		\
-		};													\
-		return (zpLogLevelType)ZP_LOG_LEVEL_ ## NAME;		\
-	}														\
-															\
-	static ZP_FORCE_INLINE const zp_char* getLogLevelText() {		\
-		return TXT;											\
-	}														\
+#define ZP_LOG_LEVEL_GENERATE( NAME, TXT, COLOR )				\
+struct NAME {													\
+	static ZP_FORCE_INLINE zpLogLevelType getLogLevelType() {	\
+		enum LowerLogLevel {									\
+			ZP_LOG_LEVEL_Message =	ZP_LOG_LEVEL_MESSAGE,		\
+			ZP_LOG_LEVEL_Debug =	ZP_LOG_LEVEL_DEBUG,			\
+			ZP_LOG_LEVEL_Notify =	ZP_LOG_LEVEL_NOTIFY,		\
+			ZP_LOG_LEVEL_Warning =	ZP_LOG_LEVEL_WARNING,		\
+			ZP_LOG_LEVEL_Exception =ZP_LOG_LEVEL_EXCEPTION,		\
+			ZP_LOG_LEVEL_Error =	ZP_LOG_LEVEL_ERROR,			\
+			ZP_LOG_LEVEL_Critical =	ZP_LOG_LEVEL_CRITICAL,		\
+			ZP_LOG_LEVEL_Fatal =	ZP_LOG_LEVEL_FATAL			\
+		};														\
+		return (zpLogLevelType)ZP_LOG_LEVEL_ ## NAME;			\
+	}															\
+	static ZP_FORCE_INLINE const zp_char* getLogLevelText() {	\
+		return TXT;												\
+	}															\
+	static ZP_FORCE_INLINE zpConsoleColorType getLogLevelColor() {	\
+		return COLOR;											\
+	}															\
 };
 
 
 
-struct zpLogLevel {
-	ZP_LOG_LEVEL_GENERATE( Message,		"[ MSG ]   " );
-	ZP_LOG_LEVEL_GENERATE( Debug,		"[ DEBUG ] " );
-	ZP_LOG_LEVEL_GENERATE( Notify,		"[ NOTIF ] " );
-	ZP_LOG_LEVEL_GENERATE( Warning,		"[ WARN ]  " );
-	ZP_LOG_LEVEL_GENERATE( Exception,	"[ EXCEP ] " );
-	ZP_LOG_LEVEL_GENERATE( Error,		"[ ERR ]   " );
-	ZP_LOG_LEVEL_GENERATE( Critical,	"[ CRIT ]  " );
-	ZP_LOG_LEVEL_GENERATE( Fatal,		"[ FATAL ] " );
+struct zpLogLevel
+{
+	ZP_LOG_LEVEL_GENERATE( Message,		"[ MSG ]   ", ZP_CC( ZP_CC_WHITE, ZP_CC_BLACK ) );
+	ZP_LOG_LEVEL_GENERATE( Debug,		"[ DEBUG ] ", ZP_CC( ZP_CC_LIGHT_BLUE, ZP_CC_BLACK ) );
+	ZP_LOG_LEVEL_GENERATE( Notify,		"[ NOTIF ] ", ZP_CC( ZP_CC_LIGHT_YELLOW, ZP_CC_BLACK ) );
+	ZP_LOG_LEVEL_GENERATE( Warning,		"[ WARN ]  ", ZP_CC( ZP_CC_YELLOW, ZP_CC_BLACK ) );
+	ZP_LOG_LEVEL_GENERATE( Exception,	"[ EXCEP ] ", ZP_CC( ZP_CC_MAGENTA, ZP_CC_BLACK ) );
+	ZP_LOG_LEVEL_GENERATE( Error,		"[ ERROR ] ", ZP_CC( ZP_CC_RED, ZP_CC_BLACK ) );
+	ZP_LOG_LEVEL_GENERATE( Critical,	"[ CRIT ]  ", ZP_CC( ZP_CC_RED, ZP_CC_GRAY ) );
+	ZP_LOG_LEVEL_GENERATE( Fatal,		"[ FATAL ] ", ZP_CC( ZP_CC_WHITE, ZP_CC_RED ) );
 };
 
 class zpLogOutput;
 
-class zpLog {
+class zpLog
+{
 public:
-	enum Options {
+	enum Options
+	{
 		endl =	'\n',
 		tab =	'\t',
 
@@ -76,7 +83,11 @@ public:
 	~zpLog();
 	
 	template<typename L>
-	static zpLogOutput& log() {
+	static zpLogOutput& log()
+	{
+#if ZP_USE_LOGGING
+		zpConsole::getInstance()->setColor( L::getLogLevelColor() );
+#endif
 		return getOutput() << L::getLogLevelText();
 	}
 
@@ -96,11 +107,11 @@ private:
 };
 
 template<typename L, typename R>
-class zpLogger {
+class zpLogger
+{};
 
-};
-
-class zpLogOutput {
+class zpLogOutput
+{
 public:
 	zpLogOutput();
 	~zpLogOutput();

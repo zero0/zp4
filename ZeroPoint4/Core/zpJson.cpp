@@ -78,7 +78,15 @@ zpJson::zpJson( const void* data, zp_uint size )
 {
 	zpStringBuffer buff;
 	zp_base64_encode( data, size, buff );
-	*m_string = buff.toString();
+	*m_string = zp_move( buff.toString() );
+}
+zpJson::zpJson( const zpDataBuffer& data )
+	: m_type( ZP_JSON_TYPE_DATA )
+	, m_string( new zpString() )
+{
+	zpStringBuffer buff;
+	zp_base64_encode( data.getData(), data.size(), buff );
+	*m_string = zp_move( buff.toString() );
 }
 zpJson::zpJson( const zpJson& json )
 	: m_type( json.m_type )
@@ -530,7 +538,10 @@ const zpJson& zpJson::operator[]( const zpString& key ) const
 	switch( m_type )
 	{
 	case ZP_JSON_TYPE_OBJECT:
-		return m_object->get( key );
+		if( m_object->containsKey( key ) )
+		{
+			return m_object->get( key );
+		}
 	default:
 		return null;
 	}
@@ -913,8 +924,9 @@ void zpJsonParser::tokenToString( const zpJsonToken& token, zpStringBuffer& str 
 {
 	const zp_char* s = token.start + 1;
 	const zp_char* e = token.end - 1;
-	str.clear();
+
 	str.reserve( e - s );
+	str.clear();
 
 	while( s != e )
 	{
