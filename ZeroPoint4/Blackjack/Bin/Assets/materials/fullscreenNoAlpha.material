@@ -1,0 +1,28 @@
+{
+    "Shader" : "shaders/fullscreenNoAlpha.shaderb",
+    "Textures" :
+    [
+        null
+    ],
+    "Constants" :
+    {
+        "alpha" : 1.0
+    },
+    "Samplers" :
+    [
+        {
+            "CmpFunc" : "None",
+            "MinFilter" : "Point",
+            "MagFilter" : "Point",
+            "MipFilter" : "Point",
+            "TextureWrapU" : "Repeat",
+            "TextureWrapV" : "Repeat",
+            "TextureWrapW" : "Repeat",
+            "MaxAnisotrpy" : 16,
+            "LodMin" : 0.0,
+            "LodMax" : 1.0,
+            "LodBias" : 0.0,
+            "BorderColor" : [ 0, 0, 0, 1 ]
+        }
+    ]
+}

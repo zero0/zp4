@@ -1,5 +1,5 @@
 {
-    "Console" : true,
+    "Console" : false,
     "Window" : {
         "Title" : "Blackjack",
         "X" : 10,
@@ -11,6 +11,6 @@
         "Refresh" : 60,
         "VSync" : false
     },
-	"Data" : <ZW50ZXIgdGV4dCBoZXJl>,
-	"Integer" : 0
+    "Data" : <ZW50ZXIgdGV4dCBoZXJl>,
+    "Integer" : 0
 }
