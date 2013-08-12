@@ -222,7 +222,7 @@ zp_bool zpRenderingEngine::createShader( zpShader* shader )
 	}
 	return shader && shader->m_shader != ZP_NULL;
 }
-zp_bool zpRenderingEngine::loadShader( zpShader* shader, const zpBison& shaderfile )
+zp_bool zpRenderingEngine::loadShader( zpShader* shader, const zpBison::Value& shaderfile )
 {
 	return m_renderingEngine->loadShader( shader->getShaderImpl(), shaderfile );
 }

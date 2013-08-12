@@ -14,9 +14,7 @@ zpApplication::zpApplication()
 	, m_lastTime( 0 )
 	, m_simulateHz( 10000000 / 60 )
 	, m_renderMsHz( 1000 / 120 )
-{
-
-}
+{}
 zpApplication::~zpApplication()
 {}
 
@@ -36,9 +34,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_renderingPipeline.getShaderContentManager()->setApplication( this );
 	m_renderingPipeline.getTextureContentManager()->setApplication( this );
 
-
 	zp_bool ok;
-
 	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
 	ZP_ASSERT( ok, "Failed to load Options '%s'", m_optionsFilename.str() );
 	if( !ok )
@@ -147,6 +143,7 @@ void zpApplication::update()
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
 
+	handleInput();
 }
 void zpApplication::simulate()
 {
@@ -230,6 +227,19 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	}
 
 	return loaded;
+}
+void zpApplication::handleInput()
+{
+	const zpKeyboard* keyboard = m_inputManager.getKeyboard();
+
+	if( keyboard->isKeyDown( ZP_KEY_CODE_ESC ) )
+	{
+		exit( 0 );
+	}
+	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyDown( ZP_KEY_CODE_G ) )
+	{
+		garbageCollect();
+	}
 }
 
 void zpApplication::processFrame()

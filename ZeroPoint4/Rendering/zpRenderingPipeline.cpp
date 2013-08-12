@@ -271,6 +271,7 @@ void zpRenderingPipeline::generateSamplerStateDesc( const zpBison::Value& sample
 }
 void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc )
 {
+	// start with default raster state
 	outRasterDesc = zpRasterStateDesc();
 
 	if( raster.isEmpty() )

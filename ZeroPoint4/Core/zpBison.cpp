@@ -515,7 +515,6 @@ zp_bool zpBison::compileToBufferInternal( zpDataBuffer& buffer, const zpHashMap<
 			zp_uint length = zp_strlen( dataStr );
 
 			zp_base64_decode( dataStr, length, data );
-			zp_printfln( "data: %s length: %d size: %d", dataStr, length, data.size() );
 
 			buffer.write< zpBisonType >( ZP_BISON_TYPE_DATA );
 			buffer.write< zp_uint >( data.size() );

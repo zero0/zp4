@@ -26,7 +26,7 @@ zpShaderImpl::~zpShaderImpl()
 	unload();
 }
 
-zp_bool zpShaderImpl::load( zpRenderingEngineImpl* engine, const zpBison& shaderFile )
+zp_bool zpShaderImpl::load( zpRenderingEngineImpl* engine, const zpBison::Value& shaderFile )
 {
 	return engine->loadShader( this, shaderFile );
 } 

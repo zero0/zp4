@@ -22,10 +22,26 @@ zp_bool zpShaderResource::load( const zp_char* filename, zpRenderingEngine* engi
 	m_filename = filename;
 
 	zpBison shaderData;
-	ok = shaderData.readFromFile( m_filename );
+	if( m_filename.endsWith( ".json" ) )
+	{
+		zpJson json;
+		zpJsonParser parser;
+		ok = parser.parseFile( m_filename, json );
+		ZP_ASSERT( ok, "" );
+
+		zpDataBuffer data;
+		zpBison::compileToBuffer( data, json );
+
+		ok = shaderData.readFromBuffer( data );
+	}
+	else
+	{
+		ok = shaderData.readFromFile( m_filename );
+	}
+
 	ZP_ASSERT( ok, "Failed to read shader '%s'", getFilename().str() );
 
-	ok = engine->loadShader( &m_resource, shaderData );
+	ok = engine->loadShader( &m_resource, shaderData.root() );
 	ZP_ASSERT( ok, "Failed to build shader '%s'", getFilename().str() );
 
 	return ok;

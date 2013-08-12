@@ -13,7 +13,7 @@ public:
 	zpShaderImpl();
 	~zpShaderImpl();
 
-	zp_bool load( zpRenderingEngineImpl* engine, const zpBison& shaderFile );
+	zp_bool load( zpRenderingEngineImpl* engine, const zpBison::Value& shaderFile );
 	void unload();
 
 private:

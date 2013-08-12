@@ -32,7 +32,7 @@ public:
 	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerStateImpl* createSamplerState( const zpSamplerStateDesc& desc );
 	zpShaderImpl* createShader();
-	zp_bool loadShader( zpShaderImpl* shader, const zpBison& shaderFile );
+	zp_bool loadShader( zpShaderImpl* shader, const zpBison::Value& shaderFile );
 	zp_bool destroyShader( zpShaderImpl* shader );
 
 	void present( zp_bool vsync );
@@ -41,6 +41,8 @@ public:
 
 private:
 	void createVertexLayout( zpVertexFormatDesc format, const void* data, zp_uint size );
+
+	zp_bool compileShaderFromDesc( ID3D11Device* device, zpShaderType type, zpShaderImpl* shader, const zpBison::Value& shaderDesc );
 
 	IDXGIFactory* m_dxgiFactory;
 	IDXGIAdapter* m_dxgiAdapter;

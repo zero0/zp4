@@ -16,7 +16,7 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 	if( arguments.size() < 2 )
 	{
 		zpLog::message()
-			<< "Usage: BisonCompiler.exe path/to/inputfile.json path/to/outputfile.bison" << zpLog::endl
+			<< "Usage: BisonCompiler.exe " << zpLog::blue << "path/to/inputfile.json " << zpLog::green << "path/to/outputfile.bison" << zpLog::endl
 			;
 	}
 	else

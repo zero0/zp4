@@ -40,13 +40,18 @@ zp_bool zpTextureResource::load( const zp_char* filename, zpRenderingEngine* eng
 	zp_bool loaded;
 
 	loaded = engine->createTextureFromFile( &m_resource, m_filename );
+	ZP_ASSERT( loaded, "Failed to load texture '%s'", m_filename.str() );
 
 	return loaded;
 }
 void zpTextureResource::unload()
 {
+	zp_bool ok;
+	ZP_UNUSED( ok );
+
 	zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
-	engine->destroyTexture( &m_resource );
+	ok = engine->destroyTexture( &m_resource );
+	ZP_ASSERT( ok, "Failed to unload texture '%s'", m_filename.str() );
 }
 
 

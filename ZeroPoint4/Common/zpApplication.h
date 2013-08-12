@@ -30,6 +30,7 @@ public:
 
 	zp_bool loadFile( const zp_char* filename );
 	zp_bool handleDragAndDrop( const zp_char* filename, zp_int x, zp_int y );
+	void handleInput();
 
 	void processFrame();
 

@@ -55,7 +55,7 @@ public:
 	zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc );
 
 	zp_bool createShader( zpShader* shader );
-	zp_bool loadShader( zpShader* shader, const zpBison& shaderfile );
+	zp_bool loadShader( zpShader* shader, const zpBison::Value& shaderfile );
 	zp_bool destroyShader( zpShader* shader );
 
 	zpRenderingEngineImpl* getRenderingEngineImpl() const { return m_renderingEngine; }
