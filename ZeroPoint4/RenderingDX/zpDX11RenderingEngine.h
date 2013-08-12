@@ -42,8 +42,6 @@ public:
 private:
 	void createVertexLayout( zpVertexFormatDesc format, const void* data, zp_uint size );
 
-	zp_bool compileShaderFromDesc( ID3D11Device* device, zpShaderType type, zpShaderImpl* shader, const zpBison::Value& shaderDesc );
-
 	IDXGIFactory* m_dxgiFactory;
 	IDXGIAdapter* m_dxgiAdapter;
 	IDXGISwapChain* m_swapChain;

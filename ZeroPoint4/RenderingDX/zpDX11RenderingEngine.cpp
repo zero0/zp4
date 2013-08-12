@@ -1,7 +1,6 @@
 #include "zpDX11.h"
 #include <D3D11.h>
 #include <D3DX11.h>
-#include <D3Dcompiler.h>
 #include "zpDX11Util.h"
 #include "Core/zpCore.h"
 
@@ -454,102 +453,6 @@ zpShaderImpl* zpRenderingEngineImpl::createShader()
 
 	return shader;
 }
-zp_bool zpRenderingEngineImpl::compileShaderFromDesc( ID3D11Device* device, zpShaderType type, zpShaderImpl* shader, const zpBison::Value& shaderDesc )
-{
-	HRESULT hr;
-	ID3D10Blob* shaderBlob = ZP_NULL;
-	ID3D10Blob* errors = ZP_NULL;
-
-	const zpBison::Value t = shaderDesc[ "Code" ];
-	const zp_char* shaderText = t.asCString();
-	zp_uint shaderTextSize = t.size();
-
-	const zp_char* mainFunc = shaderDesc[ "Main" ].asCString();
-
-	const zp_char* filename = shaderDesc[ "Filename" ].asCString();
-
-	zpArrayList< D3D10_SHADER_MACRO > macros;
-	const zpBison::Value m = shaderDesc[ "Macros" ];
-	if( m.isObject() && !macros.isEmpty() )
-	{
-		macros.reserve( macros.size() + 1 );
-		m.foreachObject( [ &macros ]( const zpBison::Value& key, const zpBison::Value& value )
-		{
-			D3D10_SHADER_MACRO& shaderMacro = macros.pushBackEmpty();
-			shaderMacro.Name = key.asCString();
-			shaderMacro.Definition = value.asCString();
-		} );
-		macros.pushBackEmpty();
-	}
-
-	zp_uint flags = 0;
-#if ZP_DEBUG
-	flags |= D3DCOMPILE_DEBUG;
-	flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-	const zpBison::Value o = shaderDesc[ "Optimize" ];
-	if( o.isIntegral() )
-	{
-		switch( o.asInt() )
-		{
-		case 0:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0; break;
-		case 1:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL1; break;
-		case 2:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL2; break;
-		case 3:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3; break;
-		default: flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0; break;
-		}
-	}
-#endif
-
-	const zp_char* profile = ZP_NULL;
-	switch( type )
-	{
-	case ZP_SHADER_TYPE_VERTEX:
-		profile = "vs_5_0";
-		break;
-	case ZP_SHADER_TYPE_PIXEL:
-		profile = "ps_5_0";
-		break;
-	case ZP_SHADER_TYPE_GEOMETRY:
-		profile = "gs_5_0";
-		break;
-	case ZP_SHADER_TYPE_COMPUTE:
-		profile = "cs_5_0";
-		break;
-	}
-
-	hr = D3DX11CompileFromMemory( shaderText, shaderTextSize, filename, macros.begin(), ZP_NULL, mainFunc, profile, flags, 0, ZP_NULL, &shaderBlob, &errors, ZP_NULL );
-
-	const void* encodedShader = shaderBlob->GetBufferPointer();
-	zp_uint encodedLength = shaderBlob->GetBufferSize();
-
-	switch( type )
-	{
-	case ZP_SHADER_TYPE_VERTEX:
-		hr = device->CreateVertexShader( encodedShader, encodedLength, ZP_NULL, &shader->m_vertexShader );
-		break;
-	case ZP_SHADER_TYPE_PIXEL:
-		hr = device->CreatePixelShader( encodedShader, encodedLength, ZP_NULL, &shader->m_pixelShader );
-		break;
-	case ZP_SHADER_TYPE_GEOMETRY:
-		hr = device->CreateGeometryShader( encodedShader, encodedLength, ZP_NULL, &shader->m_geometryShader );
-		break;
-	case ZP_SHADER_TYPE_COMPUTE:
-		hr = device->CreateComputeShader( encodedShader, encodedLength, ZP_NULL, &shader->m_computeShader );
-		break;
-	}
-
-	if( errors )
-	{
-		const zp_char* errorText = (const zp_char*)errors->GetBufferPointer();
-		zpLog::warning() << errorText << zpLog::endl;
-	}
-
-	ZP_SAFE_RELEASE( shaderBlob );
-	ZP_SAFE_RELEASE( errors );
-
-	return true;
-}
 zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison::Value& shaderfile )
 {
 	const zpBison::Value vs = shaderfile[ "VS" ];
@@ -567,74 +470,10 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison::
 	if( !vs.isNull() )
 	{
 		const zpBison::Value d = vs[ "Shader" ];
-		if( d.isData() )
-		{
-			encodedShader = d.asData();
-			encodedLength = d.size();
+		encodedShader = vs.asData();
+		encodedLength = vs.size();
 
-			hr = m_d3dDevice->CreateVertexShader( encodedShader, encodedLength, ZP_NULL, &shader->m_vertexShader );
-		}
-		else
-		{
-			ID3D10Blob* shaderBlob = ZP_NULL;
-			ID3D10Blob* errors = ZP_NULL;
-
-			const zpBison::Value t = d[ "Code" ];
-			const zp_char* shaderText = t.asCString();
-			zp_uint shaderTextSize = t.size();
-
-			const zp_char* mainFunc = d[ "Main" ].asCString();
-
-			const zp_char* filename = d[ "Filename" ].asCString();
-
-			zpArrayList< D3D10_SHADER_MACRO > macros;
-			const zpBison::Value m = d[ "Macros" ];
-			if( m.isObject() && !macros.isEmpty() )
-			{
-				macros.reserve( macros.size() + 1 );
-				m.foreachObject( [ &macros ]( const zpBison::Value& key, const zpBison::Value& value )
-				{
-					D3D10_SHADER_MACRO& shaderMacro = macros.pushBackEmpty();
-					shaderMacro.Name = key.asCString();
-					shaderMacro.Definition = value.asCString();
-				} );
-				macros.pushBackEmpty();
-			}
-
-			zp_uint flags = 0;
-#if ZP_DEBUG
-			flags |= D3DCOMPILE_DEBUG;
-			flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-			const zpBison::Value o = d[ "Optimize" ];
-			if( o.isIntegral() )
-			{
-				switch( o.asInt() )
-				{
-				case 0: flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0; break;
-				case 1: flags |= D3DCOMPILE_OPTIMIZATION_LEVEL1; break;
-				case 2: flags |= D3DCOMPILE_OPTIMIZATION_LEVEL2; break;
-				case 3: flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3; break;
-				default: flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0; break;
-				}
-			}
-#endif
-			hr = D3DX11CompileFromMemory( shaderText, shaderTextSize, filename, macros.begin(), ZP_NULL, mainFunc, "vs_5_0", flags, 0, ZP_NULL, &shaderBlob, &errors, ZP_NULL );
-
-			encodedShader = shaderBlob->GetBufferPointer();
-			encodedLength = shaderBlob->GetBufferSize();
-			hr = m_d3dDevice->CreateVertexShader( encodedShader, encodedLength, ZP_NULL, &shader->m_vertexShader );
-
-			if( errors )
-			{
-				const zp_char* errorText = (const zp_char*)errors->GetBufferPointer();
-				zpLog::warning() << errorText << zpLog::endl;
-			}
-
-			ZP_SAFE_RELEASE( shaderBlob );
-			ZP_SAFE_RELEASE( errors );
-		}
-
+		hr = m_d3dDevice->CreateVertexShader( encodedShader, encodedLength, ZP_NULL, &shader->m_vertexShader );
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Vertex Shader %x", hr );
 
 		const zpBison::Value format = vs[ "Format" ];

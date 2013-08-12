@@ -98,8 +98,9 @@ void BaseShaderCompiler::compileShaderVS()
 		zpDataBuffer data;
 		if( compileShaderVSPlatform( vs, localMacros, data ) )
 		{
-			m_compiledShaderDesc[ "VS" ] = zpJson( data );
-			m_compiledShaderDesc[ "Format" ] = vs[ "Format" ];
+			zpJson& vs = m_compiledShaderDesc[ "VS" ];
+			vs[ "Shader" ] = zpJson( data );
+			vs[ "Format" ] = vs[ "Format" ];
 		}
 	}
 }
@@ -122,7 +123,8 @@ void BaseShaderCompiler::compileShaderPS()
 		zpDataBuffer data;
 		if( compileShaderPSPlatform( ps, localMacros, data ) )
 		{
-			m_compiledShaderDesc[ "PS" ] = zpJson( data );
+			zpJson& ps = m_compiledShaderDesc[ "PS" ];
+			ps[ "Shader" ] = zpJson( data );
 		}
 	}
 }
@@ -162,7 +164,7 @@ zp_bool DX11ShaderCompiler::compileShaderPlatform( const zpJson& shader, const z
 
 	// process flags
 	zp_uint flags = 0;
-	const zpJson& o = m_shaderDesc[ "Optimize" ];
+	const zpJson& o = m_shaderDesc[ "Optimization" ];
 	switch( o.asInt() )
 	{
 	case -1: flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION; break;
