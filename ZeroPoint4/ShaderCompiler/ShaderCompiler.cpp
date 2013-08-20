@@ -10,10 +10,37 @@
 #define SHADER_COMPILE_GS	"COMPILE_GS"
 #define SHADER_COMPILE_CS	"COMPILE_CS"
 
-zp_bool BaseShaderCompiler::initialize( const zpString& input, const zpString& output )
+BaseShaderCompiler::BaseShaderCompiler()
+	: m_optimizationLevel( -1 )
+{}
+BaseShaderCompiler::~BaseShaderCompiler()
+{}
+
+zp_bool BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 {
-	m_inputFile = input;
-	m_outputFile = output;
+	// process args for optional params
+	if( args.size() > 3 )
+	{
+		args.foreach( [ this ]( const zpString& arg )
+		{
+			if( arg.startsWith( "-O" ) )
+			{
+				zp_char level = arg.charAt( arg.length() - 1 );
+				if( zp_is_digit( level ) )
+				{
+					m_optimizationLevel = level - '0';
+				}
+				else if( level == 'd' || level == 'D' )
+				{
+					m_optimizationLevel = -1;
+				}
+			}
+		} );
+	}
+
+	// use last two args as input and output files
+	m_inputFile = args[ args.size() - 2 ];
+	m_outputFile = args[ args.size() - 1 ];
 
 	zpJsonParser parser;
 	zp_bool success = false;
@@ -63,7 +90,7 @@ void BaseShaderCompiler::shutdown()
 	}
 	else
 	{
-		zpLog::warning() << "Output file empty. Unable to compile." << zpLog::endl;
+		zpLog::warning() << "Output JSON empty. Unable to compile." << zpLog::endl;
 	}
 }
 
@@ -164,14 +191,15 @@ zp_bool DX11ShaderCompiler::compileShaderPlatform( const zpJson& shader, const z
 
 	// process flags
 	zp_uint flags = 0;
-	const zpJson& o = m_shaderDesc[ "Optimization" ];
-	switch( o.asInt() )
+	switch( m_optimizationLevel )
 	{
 	case -1: flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION; break;
 	case 0:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0; break;
 	case 1:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL1; break;
 	case 2:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL2; break;
 	case 3:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3; break;
+	case 4:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS; break;
+	case 5:  flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS; break;
 	default: flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0; break;
 	}
 
@@ -219,7 +247,12 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 	if( arguments.size() < 3 )
 	{
 		zpLog::message()
-			<< "Usage: ShaderCompiler.exe " << zpLog::red << "DX11/GL2 " << zpLog::blue << "path/to/inputfile.shader " << zpLog::green << "path/to/outputfile.shaderb" << zpLog::endl
+			<< "Usage: ShaderCompiler.exe "
+			<< zpLog::gray << "DX11/GL2 "
+			<< zpLog::dark_gray << "[-O#] "
+			<< zpLog::gray << "path/to/inputfile.shader path/to/outputfile.shaderb"
+			<< zpLog::endl
+			<< "    -O# - Optimization Level  [dD]012345"
 			;
 	}
 	else
@@ -227,8 +260,6 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		BaseShaderCompiler* compiler = ZP_NULL;
 
 		const zpString& type = arguments[ 0 ];
-		const zpString& input = arguments[ 1 ];
-		const zpString& output = arguments[ 2 ];
 
 		if( type == SHADER_DX11 )
 		{
@@ -238,10 +269,10 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		{
 			
 		}
-		
+
 		if( compiler != ZP_NULL )
 		{
-			if( compiler->initialize( input, output ) )
+			if( compiler->initialize( arguments ) )
 			{
 				compiler->compile();
 				compiler->shutdown();
@@ -253,10 +284,10 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		}
 		else
 		{
-			zpLog::error()
-				<< "Shader type '" << type << "' undefined." << zpLog::endl
-				;
+			zpLog::error() << "Shader type '" << type << "' undefined." << zpLog::endl;
 		}
+
+		ZP_SAFE_DELETE( compiler );
 	}
 
 	return 0;

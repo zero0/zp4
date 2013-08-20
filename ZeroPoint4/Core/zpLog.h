@@ -64,7 +64,7 @@ class zpLogOutput;
 class zpLog
 {
 public:
-	enum Options
+	enum Options : zp_char
 	{
 		endl =	'\n',
 		tab =	'\t',
@@ -77,7 +77,19 @@ public:
 		reset =	'A',
 		red,
 		green,
-		blue
+		blue,
+		yellow,
+		magenta,
+		cyan,
+		light_red,
+		light_green,
+		light_blue,
+		light_yellow,
+		light_magenta,
+		light_cyan,
+		gray,
+		dark_gray,
+		white,
 	};
 
 	~zpLog();

@@ -100,9 +100,11 @@ zpLogOutput& zpLogOutput::operator<<( const zpString& c )
 zpLogOutput& zpLogOutput::operator<<( zpLog::Options c )
 {
 #if ZP_USE_LOGGING
+	zpConsole* console = zpConsole::getInstance();
+
 	switch( c ) {
 	case zpLog::endl:
-		zpConsole::getInstance()->resetColor();
+		console->resetColor();
 		m_base = 10;
 	case zpLog::tab:
 		zp_printf( "%c", c );
@@ -120,16 +122,52 @@ zpLogOutput& zpLogOutput::operator<<( zpLog::Options c )
 		m_base = 16;
 		break;
 	case zpLog::reset:
-		zpConsole::getInstance()->resetColor();
+		console->resetColor();
 		break;
 	case zpLog::red:
-		zpConsole::getInstance()->setColor( ZP_CC_RED );
+		console->setColor( ZP_CC_RED );
 		break;
 	case zpLog::green:
-		zpConsole::getInstance()->setColor( ZP_CC_GREEN );
+		console->setColor( ZP_CC_GREEN );
 		break;
 	case zpLog::blue:
-		zpConsole::getInstance()->setColor( ZP_CC_BLUE );
+		console->setColor( ZP_CC_BLUE );
+		break;
+	case zpLog::yellow:
+		console->setColor( ZP_CC_YELLOW );
+		break;
+	case zpLog::magenta:
+		console->setColor( ZP_CC_MAGENTA );
+		break;
+	case zpLog::cyan:
+		console->setColor( ZP_CC_CYAN );
+		break;
+	case zpLog::light_red:
+		console->setColor( ZP_CC_LIGHT_RED );
+		break;
+	case zpLog::light_green:
+		console->setColor( ZP_CC_LIGHT_GREEN );
+		break;
+	case zpLog::light_blue:
+		console->setColor( ZP_CC_LIGHT_BLUE );
+		break;
+	case zpLog::light_yellow:
+		console->setColor( ZP_CC_LIGHT_YELLOW );
+		break;
+	case zpLog::light_magenta:
+		console->setColor( ZP_CC_LIGHT_MAGENTA );
+		break;
+	case zpLog::light_cyan:
+		console->setColor( ZP_CC_LIGHT_CYAN );
+		break;
+	case zpLog::gray:
+		console->setColor( ZP_CC_GRAY);
+		break;
+	case zpLog::dark_gray:
+		console->setColor( ZP_CC_DARK_GRAY );
+		break;
+	case zpLog::white:
+		console->setColor( ZP_CC_WHITE );
 		break;
 	}
 #endif

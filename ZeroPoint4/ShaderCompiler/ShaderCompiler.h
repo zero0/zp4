@@ -16,7 +16,10 @@ typedef zpArrayList< ShaderMacro > ShaderMacros;
 class BaseShaderCompiler
 {
 public:
-	zp_bool initialize( const zpString& input, const zpString& output );
+	BaseShaderCompiler();
+	virtual ~BaseShaderCompiler();
+
+	zp_bool initialize( const zpArrayList< zpString >& args );
 	void compile();
 	void shutdown();
 
@@ -32,6 +35,7 @@ protected:
 protected:
 	zpString m_inputFile;
 	zpString m_outputFile;
+	zp_int m_optimizationLevel;
 
 	zpStringBuffer m_shaderText;
 	zpJson m_shaderDesc;
