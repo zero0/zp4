@@ -1,0 +1,9 @@
+{
+    "Shader" : "shaders/simple.shaderb",
+    "Textures" :
+    [],
+    "Constants" :
+    {},
+    "Samplers" :
+    []
+}
