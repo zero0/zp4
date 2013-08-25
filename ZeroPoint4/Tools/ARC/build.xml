@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Aug 19, 2013 11:33:47 PM                                                        
+
+     ARC    
+     ZeroPoint4 Compiler
+                   
+     Justin                                                                
+     ====================================================================== -->
+<project name="Blackjack" basedir="../.." default="usage">
+	<description>
+            ZeroPoint4 Compiler
+    </description>
+
+	<!-- <property file="" /> -->
+	<property name="vc.dir" location="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC" />
+	<property name="vc.sln" value="ZeroPoint4.sln" />
+
+	<property name="platform" value="x86" />
+	<property name="rendering" value="DX11" />
+	<property name="mode" value="Debug" />
+
+	<property name="base.dir" location="." />
+	<property name="bin.dir" location="${ant.project.name}/Bin" />
+	<property name="assets.dir" location="${bin.dir}/Assets" />
+	<property name="out.dir" location="${bin.dir}/Platform_${platform}" />
+	<property name="exe.dir" location="${mode}" />
+	<property name="exe-tools.dir" location="${mode}_Tools" />
+	
+	<property name="shader-compiler.exe" value="${exe.dir}/ShaderCompiler.exe" />
+	<property name="bison-compiler.exe" value="${exe-tools.dir}/BisonCompiler.exe" />
+	
+	<mapper id="shader.map" type="glob" from="*.shader" to="*.shaderb" />
+	<mapper id="material.map" type="glob" from="*.material" to="*.materialb" />
+	
+	<fileset id="shader.files" dir="${assets.dir}" includes="**/*.shader" casesensitive="true"/>
+	<fileset id="material.files" dir="${assets.dir}" includes="**/*.material" casesensitive="true"/>
+	
+	<target name="usage">
+		<echo message="base = ${base.dir}" />
+	</target>
+			
+	<target name="clean-tools">
+		<exec executable="cmd">
+			<arg value="/c" />
+			<arg value="${vc.dir}/vcvarsall.bat" />
+			<arg value="${platform}" />
+			<arg value="&amp;&amp;" />
+			<arg value="devenv" />
+			<arg value="${vc.sln}" />
+			<arg value="/Clean" />
+			<arg value="${mode}_Tools" />
+		</exec>
+	</target>
+
+	<target name="clean-game">
+		<exec executable="devenv">
+			<arg value="${vc.dir}/vcvarsall.bat" />
+			<arg value="${platform}" />
+			<arg value="&amp;&amp;" />
+			<arg value="devenv" />
+			<arg value="${vc.sln}" />
+			<arg value="/Clean" />
+			<arg value="${mode}" />
+		</exec>
+	</target>
+
+	<target name="clean-bin">
+		<delete includeemptydirs="true">
+			<fileset dir="${out.dir}" includes="**/*" />
+		</delete>
+	</target>
+
+	<target name="clean-all" depends="clean-tools, clean-game, clean-bin">
+	</target>
+
+	<target name="compile-tools">
+		<exec executable="cmd">
+			<arg value="/c" />
+			<arg value="${vc.dir}/vcvarsall.bat" />
+			<arg value="${platform}" />
+			<arg value="&amp;&amp;" />
+			<arg value="devenv" />
+			<arg value="${vc.sln}" />
+			<arg value="/Build" />
+			<arg value="${mode}_Tools" />
+		</exec>
+	</target>
+
+	<target name="compile-game">
+		<exec executable="cmd">
+			<arg value="/c" />
+			<arg value="${vc.dir}/vcvarsall.bat" />
+			<arg value="${platform}" />
+			<arg value="&amp;&amp;" />
+			<arg value="devenv" />
+			<arg value="${vc.sln}" />
+			<arg value="/Build" />
+			<arg value="${mode}" />
+		</exec>
+	</target>
+	
+	<target name="make-out-dir">
+		<mkdir dir="${out.dir}" />
+		<mkdir dir="${out.dir}/shaders" />
+		<mkdir dir="${out.dir}/materials" />
+		<mkdir dir="${out.dir}/textures" />
+	</target>
+	
+	<target name="compile-shaders" depends="make-out-dir" >
+		<!--<touch mkdirs="true">
+			<fileset refid="shader.files" />
+			<mapper refid="shader.map" />
+		</touch>-->
+		<apply executable="${shader-compiler.exe}" dir="${bin.dir}" dest="${out.dir}" force="true">
+			<arg value="${rendering}" />
+			<arg value="-O0" />
+			<srcfile />
+			<targetfile />
+			<fileset refid="shader.files" />
+			<mapper refid="shader.map" />
+		</apply>
+	</target>
+	
+	<target name="compile-materials" depends="make-out-dir" >
+		<!--<touch mkdirs="true">
+			<fileset refid="shader.files" />
+			<mapper refid="shader.map" />
+		</touch>-->
+		<apply executable="${bison-compiler.exe}" dir="${bin.dir}" dest="${out.dir}" force="true">
+			<srcfile />
+			<targetfile />
+			<fileset refid="material.files" />
+			<mapper refid="material.map" />
+		</apply>
+	</target>
+	
+	<target name="compile-assets" depends="compile-materials, compile-shaders">
+	</target>
+	
+</project>
