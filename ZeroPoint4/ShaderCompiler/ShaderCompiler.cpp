@@ -62,7 +62,7 @@ zp_bool BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 		}
 		else
 		{
-			zpLog::error() << "Failed to read file '" << m_inputFile << "'" << zpLog::endl;
+			zpLog::error() << "Failed to read file '" << filename << "'" << zpLog::endl;
 		}
 	}
 	else
@@ -125,9 +125,9 @@ void BaseShaderCompiler::compileShaderVS()
 		zpDataBuffer data;
 		if( compileShaderVSPlatform( vs, localMacros, data ) )
 		{
-			zpJson& vs = m_compiledShaderDesc[ "VS" ];
-			vs[ "Shader" ] = zpJson( data );
-			vs[ "Format" ] = vs[ "Format" ];
+			zpJson& cvs = m_compiledShaderDesc[ "VS" ];
+			cvs[ "Shader" ] = zpJson( data );
+			cvs[ "Format" ] = vs[ "Format" ];
 		}
 	}
 }

@@ -37,7 +37,6 @@ const zp_char* g_cullMode[] =
 zpRenderingPipeline::zpRenderingPipeline()
 	: m_engine( zpRenderingFactory::getRenderingEngine() )
 {
-
 }
 zpRenderingPipeline::~zpRenderingPipeline()
 {
@@ -49,12 +48,23 @@ zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 	return m_engine;
 }
 
+void zpRenderingPipeline::initialize()
+{
+	m_materialContent.getResource( "materials/simple.materialb", m_mat );
+	const zpVector2i& size = m_engine->getWindow()->getScreenSize();
+
+	m_viewport.width = size.getX();
+	m_viewport.height = size.getY();
+}
+void zpRenderingPipeline::destroy()
+{
+	m_mat.release();
+}
+
 void zpRenderingPipeline::beginFrame()
 {
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 	i->clearState();
-
-	i->preprocessCommands();
 }
 
 void zpRenderingPipeline::submitRendering()
@@ -66,7 +76,22 @@ void zpRenderingPipeline::submitRendering()
 
 	i->setRenderTarget( 0, 1, &t, d );
 	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
+	i->setViewport( m_viewport );
+
 	//i->clearDepthStencilBuffer( 1.0f, 0 );
+
+	i->beginDrawImmediate( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_mat );
+	
+	i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) );
+	i->addVertex( zpVector4f( 1, 0, 0, 1 ), zpColor4f( 0, 0, 0, 1 ) );
+	i->addVertex( zpVector4f( 0, 1, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) );
+	i->addTriangleIndex( 0, 2, 1 );
+	//i->addVertex( zpVector4f( 0, 1, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) );
+
+	i->endDrawImmediate();
+
+	i->preprocessCommands();
+	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
 }
 void zpRenderingPipeline::submitDebugRendering()
 {

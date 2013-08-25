@@ -470,8 +470,8 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison::
 	if( !vs.isNull() )
 	{
 		const zpBison::Value d = vs[ "Shader" ];
-		encodedShader = vs.asData();
-		encodedLength = vs.size();
+		encodedShader = d.asData();
+		encodedLength = d.size();
 
 		hr = m_d3dDevice->CreateVertexShader( encodedShader, encodedLength, ZP_NULL, &shader->m_vertexShader );
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Vertex Shader %x", hr );
@@ -561,7 +561,7 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison::
 		ZP_ASSERT( SUCCEEDED( hr ), "Failed to create Compute Shader %x", hr );
 	}
 
-	return false;
+	return shader->m_vertexShader || shader->m_vertexShader || shader->m_geometryShader || shader->m_computeShader;
 }
 zp_bool zpRenderingEngineImpl::destroyShader( zpShaderImpl* shader )
 {

@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 
+#if 0
 enum zpScreenQuad {
 	ZP_SCREEN_QUAD_FULLSCREEN =			0,
 	ZP_SCREEN_QUAD_FULLSCREEN_FRONT =	4,
@@ -10,7 +11,6 @@ enum zpScreenQuad {
 	ZP_SCREEN_QUAD_UPPER_RIGHT =		20,
 };
 
-#if 0
 zpDeferredRenderingComponent::zpDeferredRenderingComponent() 
 	: m_renderingManager( ZP_NULL )
 	, m_renderingEngine( ZP_NULL )

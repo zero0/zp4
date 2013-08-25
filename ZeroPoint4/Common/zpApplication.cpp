@@ -84,6 +84,8 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_isRunning = true;
 	m_lastTime = m_timer->getTime();
 
+	m_renderingPipeline.initialize();
+
 	// register input with window
 	m_window.addFocusListener( &m_inputManager );
 	m_window.addProcListener( &m_inputManager );
@@ -97,11 +99,13 @@ void zpApplication::run()
 }
 zp_int zpApplication::shutdown()
 {
+	m_renderingPipeline.destroy();
+
 	m_appOptions.release();
 
 	m_renderingPipeline.getRenderingEngine()->destroy();
 
-	m_textContent.garbageCollect();
+	garbageCollect();
 
 	if( m_console )
 	{

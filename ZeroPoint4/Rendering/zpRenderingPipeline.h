@@ -2,6 +2,15 @@
 #ifndef ZP_RENDERING_PIPELINE_H
 #define ZP_RENDERING_PIPELINE_H
 
+enum zpScreenQuad
+{
+	ZP_SCREEN_QUAD_FULL,
+	ZP_SCREEN_QUAD_UPPER_LEFT,
+	ZP_SCREEN_QUAD_UPPER_RIGHT,
+	ZP_SCREEN_QUAD_LOWER_RIGHT,
+	ZP_SCREEN_QUAD_LOWER_LEFT,
+};
+
 class zpRenderingPipeline
 {
 public:
@@ -9,6 +18,9 @@ public:
 	~zpRenderingPipeline();
 
 	zpRenderingEngine* getRenderingEngine() const;
+
+	void initialize();
+	void destroy();
 
 	void beginFrame();
 
@@ -33,6 +45,10 @@ private:
 	zpMaterialContentManager m_materialContent;
 	zpShaderContentManager m_shaderContent;
 	zpTextureContentManager m_textureContent;
+
+	zpViewport m_viewport;
+
+	zpMaterialResourceInstance m_mat;
 };
 
 #endif
