@@ -44,8 +44,21 @@ protected:
 	ShaderMacros m_globalMacros;
 };
 
-class DX11ShaderCompiler : public BaseShaderCompiler
+class DXShaderCompiler : public BaseShaderCompiler
 {
+	ZP_NON_COPYABLE( DXShaderCompiler );
+
+public:
+	enum DXShaderCompilerPlatform
+	{
+		DX_SHADER_COMPILER_PLATFORM_DX9,
+		DX_SHADER_COMPILER_PLATFORM_DX10,
+		DX_SHADER_COMPILER_PLATFORM_DX11,
+	};
+
+	DXShaderCompiler( DXShaderCompilerPlatform platform );
+	virtual ~DXShaderCompiler();
+
 protected:
 	zp_bool compileShaderVSPlatform( const zpJson& vs, const ShaderMacros& macros, zpDataBuffer& data ) const;
 	zp_bool compileShaderPSPlatform( const zpJson& ps, const ShaderMacros& macros, zpDataBuffer& data ) const;
@@ -53,4 +66,5 @@ protected:
 private:
 	zp_bool compileShaderPlatform( const zpJson& shader, const zp_char* profile, const ShaderMacros& macros, zpDataBuffer& data ) const;
 
+	DXShaderCompilerPlatform m_platform;
 };

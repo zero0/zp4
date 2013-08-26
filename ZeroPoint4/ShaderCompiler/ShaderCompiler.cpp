@@ -2,6 +2,8 @@
 #include <D3DX11.h>
 #include <D3Dcompiler.h>
 
+#define SHADER_DX9			"DX9"
+#define SHADER_DX10			"DX10"
 #define SHADER_DX11			"DX11"
 #define SHADER_GL2			"GL2"
 
@@ -157,16 +159,50 @@ void BaseShaderCompiler::compileShaderPS()
 }
 
 
-zp_bool DX11ShaderCompiler::compileShaderVSPlatform( const zpJson& vs, const ShaderMacros& vsMacros, zpDataBuffer& data ) const
+DXShaderCompiler::DXShaderCompiler( DXShaderCompilerPlatform platform )
+	: m_platform( platform )
+{}
+DXShaderCompiler::~DXShaderCompiler()
+{}
+
+zp_bool DXShaderCompiler::compileShaderVSPlatform( const zpJson& vs, const ShaderMacros& vsMacros, zpDataBuffer& data ) const
 {
-	return compileShaderPlatform( vs, "vs_5_0", vsMacros, data );
+	const zp_char* profile;
+	switch( m_platform )
+	{
+	case DX_SHADER_COMPILER_PLATFORM_DX9:
+		profile = "vs_3_0";
+		break;
+	case DX_SHADER_COMPILER_PLATFORM_DX10:
+		profile = "vs_4_0";
+		break;
+	case DX_SHADER_COMPILER_PLATFORM_DX11:
+		profile = "vs_5_0";
+		break;
+	}
+
+	return compileShaderPlatform( vs, profile, vsMacros, data );
 }
-zp_bool DX11ShaderCompiler::compileShaderPSPlatform( const zpJson& ps, const ShaderMacros& vsMacros, zpDataBuffer& data ) const
+zp_bool DXShaderCompiler::compileShaderPSPlatform( const zpJson& ps, const ShaderMacros& vsMacros, zpDataBuffer& data ) const
 {
-	return compileShaderPlatform( ps, "ps_5_0", vsMacros, data );
+	const zp_char* profile;
+	switch( m_platform )
+	{
+	case DX_SHADER_COMPILER_PLATFORM_DX9:
+		profile = "ps_3_0";
+		break;
+	case DX_SHADER_COMPILER_PLATFORM_DX10:
+		profile = "ps_4_0";
+		break;
+	case DX_SHADER_COMPILER_PLATFORM_DX11:
+		profile = "ps_5_0";
+		break;
+	}
+
+	return compileShaderPlatform( ps, profile, vsMacros, data );
 }
 
-zp_bool DX11ShaderCompiler::compileShaderPlatform( const zpJson& shader, const zp_char* profile, const ShaderMacros& shaderMacros, zpDataBuffer& data ) const
+zp_bool DXShaderCompiler::compileShaderPlatform( const zpJson& shader, const zp_char* profile, const ShaderMacros& shaderMacros, zpDataBuffer& data ) const
 {
 	// get the main function name
 	const zp_char* mainFunc = shader[ "Main" ].asCString();
@@ -248,7 +284,7 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 	{
 		zpLog::message()
 			<< "Usage: ShaderCompiler.exe "
-			<< zpLog::gray << "DX11/GL2 "
+			<< zpLog::gray << "DX9/DX10/DX11/GL2 "
 			<< zpLog::dark_gray << "[-O#] "
 			<< zpLog::gray << "path/to/inputfile.shader path/to/outputfile.shaderb"
 			<< zpLog::endl
@@ -261,9 +297,17 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 
 		const zpString& type = arguments[ 0 ];
 
-		if( type == SHADER_DX11 )
+		if( type == SHADER_DX9 )
 		{
-			compiler = new DX11ShaderCompiler;
+			compiler = new DXShaderCompiler( DXShaderCompiler::DX_SHADER_COMPILER_PLATFORM_DX9 );
+		}
+		else if( type == SHADER_DX10 )
+		{
+			compiler = new DXShaderCompiler( DXShaderCompiler::DX_SHADER_COMPILER_PLATFORM_DX10 );
+		}
+		else if( type == SHADER_DX11 )
+		{
+			compiler = new DXShaderCompiler( DXShaderCompiler::DX_SHADER_COMPILER_PLATFORM_DX11 );
 		}
 		else if( type == SHADER_GL2 )
 		{

@@ -17,7 +17,7 @@
 	<property name="vc.sln" value="ZeroPoint4.sln" />
 
 	<property name="platform" value="x86" />
-	<property name="rendering" value="DX11" />
+	<property name="rendering" value="DX10" />
 	<property name="mode" value="Debug" />
 
 	<property name="base.dir" location="." />
@@ -28,7 +28,7 @@
 	<property name="exe-tools.dir" location="${mode}_Tools" />
 	
 	<property name="shader-compiler.exe" value="${exe.dir}/ShaderCompiler.exe" />
-	<property name="bison-compiler.exe" value="${exe-tools.dir}/BisonCompiler.exe" />
+	<property name="bison-compiler.exe" value="${exe.dir}/BisonCompiler.exe" />
 	
 	<mapper id="shader.map" type="glob" from="*.shader" to="*.shaderb" />
 	<mapper id="material.map" type="glob" from="*.material" to="*.materialb" />
@@ -54,7 +54,8 @@
 	</target>
 
 	<target name="clean-game">
-		<exec executable="devenv">
+		<exec executable="cmd">
+			<arg value="/c" />
 			<arg value="${vc.dir}/vcvarsall.bat" />
 			<arg value="${platform}" />
 			<arg value="&amp;&amp;" />
