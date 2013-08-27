@@ -142,12 +142,13 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 				m_context->PSSetShader( command->material->getResource()->getData()->shader.getResource()->getData()->getShaderImpl()->m_pixelShader, 0, 0 );
 				m_context->VSSetShader( command->material->getResource()->getData()->shader.getResource()->getData()->getShaderImpl()->m_vertexShader, 0, 0 );
 
+				zp_uint offset = 0;
 				m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
 				m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
-				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &command->vertexOffset );
+				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &offset );
 				m_context->IASetInputLayout( inputLayout );
 
-				m_context->DrawIndexed( command->indexCount, command->indexOffset, 0 );
+				m_context->DrawIndexed( command->indexCount, 0, 0 );
 			}
 			break;
 
@@ -159,7 +160,7 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 
 				m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
 				m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
-				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &command->vertexOffset );
+				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, 0 );
 				m_context->IASetInputLayout( inputLayout );
 
 				//m_context->DrawIndexed( command->indexCount, command->indexOffset, 0 );

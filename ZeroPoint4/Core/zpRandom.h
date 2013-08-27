@@ -18,6 +18,10 @@ public:
 
 	zp_float noise( zp_float x, zp_float y, zp_float z );
 
+	void randomUnitSphere( zpVector4f& sphere, zp_float w = 1.0f );
+	void randomUnitCircle( zpVector4f& sphere, zp_float z = 0.0f, zp_float w = 1.0f );
+	void randomColor( zpColor4f& color, zp_float alpha = 1.0f );
+
 	template<typename T, zp_uint Size>
 	T& randomElement( const zpArray<T, Size>& arr ) {
 		return arr[ randomInt( 0, Size ) ];

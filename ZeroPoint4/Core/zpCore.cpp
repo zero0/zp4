@@ -275,7 +275,7 @@ zp_int zp_rand()
 }
 zp_float zp_randf()
 {
-	zp_int base = zp_rand();
+	zp_int base = zp_rand() + 1;
 	return (zp_float)( zp_rand() % base ) / (zp_float)base;
 }
 void zp_srand( zp_uint seed ) {

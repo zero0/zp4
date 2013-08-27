@@ -80,16 +80,37 @@ void zpRenderingPipeline::submitRendering()
 
 	//i->clearDepthStencilBuffer( 1.0f, 0 );
 
-	i->beginDrawImmediate( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_mat );
+	zpRandom* r = zpRandom::getInstance();
+	const zp_int numDrawCalls = 10; //r->randomInt( 1, 10 );
+	const zp_int numTris = 1000; //r->randomInt( 1, 10 ) * 3;
+
+	zpVector4f p0, p1, p2;
+	zpColor4f c0, c1, c2;
+	zp_int index = 0;
+	for( zp_int d = 0; d < numDrawCalls; ++d )
+	{
+		i->beginDrawImmediate( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_mat );
+
+		for( zp_int n = 0; n < numTris; ++n )
+		{
+			r->randomUnitCircle( p0 );
+			r->randomUnitCircle( p1 );
+			r->randomUnitCircle( p2 );
+
+			r->randomColor( c0 );
+			r->randomColor( c1 );
+			r->randomColor( c2 );
+
+			i->addVertex( p0, c0 );
+			i->addVertex( p1, c1 );
+			i->addVertex( p2, c2 );
+			i->addTriangleIndex( index + 0, index + 2, index + 1 );
+			index += 3;
+		}
+
+		i->endDrawImmediate();
+	}
 	
-	i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) );
-	i->addVertex( zpVector4f( 1, 0, 0, 1 ), zpColor4f( 0, 0, 0, 1 ) );
-	i->addVertex( zpVector4f( 0, 1, 0, 1 ), zpColor4f( 0, 0, 1, 1 ) );
-	i->addTriangleIndex( 0, 2, 1 );
-	//i->addVertex( zpVector4f( 0, 1, 0, 1 ), zpColor4f( 1, 0, 0, 1 ) );
-
-	i->endDrawImmediate();
-
 	i->preprocessCommands();
 	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
 }

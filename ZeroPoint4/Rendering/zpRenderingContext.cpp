@@ -23,7 +23,7 @@ zpRenderingContext::zpRenderingContext( zpRenderingEngine* engine, zpRenderingCo
 	for( zp_uint i = 0; i < ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS; ++i )
 	{
 		m_immediateVertexBuffers.pushBack( engine->createBuffer( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE ) );
-		m_immediateIndexBuffers.pushBack( engine->createBuffer( ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE, sizeof( zp_short ) ) );
+		m_immediateIndexBuffers.pushBack( engine->createBuffer( ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, sizeof( zp_short ) ) );
 	}
 
 	m_currentVertexBuffer = m_immediateVertexBuffers[ m_currentBufferIndex ];

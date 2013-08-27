@@ -21,7 +21,32 @@ zp_float zpRandom::randomFloat() {
 	return zp_randf();
 }
 zp_float zpRandom::randomFloat( zp_float low, zp_float high ) {
-	return ( randomFloat() * high ) + low; 
+	return ( randomFloat() * ( high - low ) ) + low; 
+}
+
+void zpRandom::randomUnitSphere( zpVector4f& sphere, zp_float w )
+{
+	sphere = zpVector4f(
+		randomFloat( -1.f, 1.f ),
+		randomFloat( -1.f, 1.f ),
+		randomFloat( -1.f, 1.f ),
+		w );
+}
+void zpRandom::randomUnitCircle( zpVector4f& circle, zp_float z, zp_float w )
+{
+	circle = zpVector4f(
+		randomFloat( -1.f, 1.f ),
+		randomFloat( -1.f, 1.f ),
+		z,
+		w );
+}
+void zpRandom::randomColor( zpColor4f& color, zp_float alpha )
+{
+	color = zpColor4f(
+		randomFloat( 0.f, 1.f ),
+		randomFloat( 0.f, 1.f ),
+		randomFloat( 0.f, 1.f ),
+		alpha );
 }
 
 zp_bool zpRandom::randomBoolean() {
