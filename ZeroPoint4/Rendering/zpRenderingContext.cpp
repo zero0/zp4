@@ -63,13 +63,13 @@ void zpRenderingContext::setViewport( const zpViewport& viewport )
 void zpRenderingContext::setScissorRect( const zpRecti& rect )
 {
 	m_renderContextImpl->setScissorRect( rect );
-	m_scissorRectQueue.pushBack( rect );
+	//m_scissorRectQueue.pushBack( rect );
 }
 void zpRenderingContext::resetScissorRect()
 {
-	const zpRecti& rect = m_scissorRectQueue.back();
-	m_renderContextImpl->setScissorRect( rect );
-	m_scissorRectQueue.popBack();
+	//const zpRecti& rect = m_scissorRectQueue.back();
+	//m_renderContextImpl->setScissorRect( rect );
+	//m_scissorRectQueue.popBack();
 }
 
 void zpRenderingContext::setRasterState( zpRasterState* raster )
@@ -112,12 +112,6 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2:
 		m_currentCommnad->vertexStride = sizeof( zpVertexPositionNormalUV2 );
 		break;
-	}
-
-	if( m_immediateVertexData == ZP_NULL )
-	{
-		map( m_currentVertexBuffer, (void**)&m_immediateVertexData );
-		map( m_currentIndexBuffer, (void**)&m_immediateIndexData );
 	}
 }
 
@@ -244,18 +238,26 @@ void zpRenderingContext::endDrawImmediate()
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 
-	zp_memcpy( m_immediateVertexData + m_immediateVertexSize, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE - m_immediateVertexSize, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
-	zp_memcpy( m_immediateIndexData + m_immediateIndexSize, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE - m_immediateIndexSize, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
-
 	m_currentCommnad->vertexOffset = m_immediateVertexSize;
 	m_currentCommnad->indexOffset = m_immediateIndexSize;
 
-	m_immediateVertexSize += m_scratchVertexBuffer.size();
-	m_immediateIndexSize += m_scratchIndexBuffer.size();
-
 	m_currentCommnad = ZP_NULL;
-	m_scratchVertexBuffer.reset();
-	m_scratchIndexBuffer.reset();
+	//m_scratchVertexBuffer.reset();
+	//m_scratchIndexBuffer.reset();
+
+	//map( m_currentVertexBuffer, (void**)&m_immediateVertexData );
+	//zp_memcpy( m_immediateVertexData + m_immediateVertexSize, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE - m_immediateVertexSize, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
+	//unmap( m_currentVertexBuffer );
+	//
+	//map( m_currentIndexBuffer, (void**)&m_immediateIndexData );
+	//zp_memcpy( m_immediateIndexData + m_immediateIndexSize, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE - m_immediateIndexSize, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
+	//unmap( m_currentIndexBuffer );
+
+	m_immediateVertexSize = m_scratchVertexBuffer.size();
+	m_immediateIndexSize = m_scratchIndexBuffer.size();
+
+	//m_scratchVertexBuffer.reset();
+	//m_scratchIndexBuffer.reset();
 }
 
 void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffer, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpMaterialResourceInstance* material, zpBoundingAABB* boundingBox )
@@ -278,7 +280,7 @@ void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topolo
 
 	if( boundingBox )
 	{
-		command.boundingBox.add( *boundingBox );
+		command.boundingBox = *boundingBox;
 	}
 }
 
@@ -298,15 +300,17 @@ void zpRenderingContext::update( zpBuffer* buffer, void* data, zp_uint size )
 
 void zpRenderingContext::preprocessCommands()
 {
-	// unmap scratch buffers
-	if( m_immediateVertexData )
-	{
-		unmap( m_currentVertexBuffer );
-		unmap( m_currentIndexBuffer );
+	map( m_currentVertexBuffer, (void**)&m_immediateVertexData );
+	map( m_currentIndexBuffer, (void**)&m_immediateIndexData );
+	
+	zp_memcpy( m_immediateVertexData, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
+	zp_memcpy( m_immediateIndexData, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
 
-		m_immediateVertexData = ZP_NULL;
-		m_immediateIndexData = ZP_NULL;
-	}
+	unmap( m_currentVertexBuffer );
+	unmap( m_currentIndexBuffer );
+
+	m_scratchVertexBuffer.reset();
+	m_scratchIndexBuffer.reset();
 
 	// clear filtered commands
 	for( zp_uint i = 0; i < zpRenderingLayer_Count; ++i )

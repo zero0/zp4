@@ -6,6 +6,7 @@ enum zpProfilerSteps
 	ZP_PROFILER_STEP_FRAME,
 	ZP_PROFILER_STEP_UPDATE,
 	ZP_PROFILER_STEP_SIMULATE,
+	ZP_PROFILER_STEP_RENDER_FRAME,
 	ZP_PROFILER_STEP_RENDER_BEGIN,
 	ZP_PROFILER_STEP_RENDER,
 	ZP_PROFILER_STEP_DEBUG_RENDER,
@@ -43,6 +44,8 @@ public:
 	zp_long getPreviousTime( zpProfilerSteps step );
 	zp_long getAverageTime( zpProfilerSteps step );
 	zp_long getMaxTime( zpProfilerSteps step );
+
+	void printProfile( zpProfilerSteps step );
 
 private:
 	zpProfiler();

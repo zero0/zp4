@@ -71,5 +71,11 @@ zp_long zpProfiler::getAverageTime( zpProfilerSteps step )
 zp_long zpProfiler::getMaxTime( zpProfilerSteps step )
 {
 	return m_profiles[ step ].maxTime;
+}
 
+void zpProfiler::printProfile( zpProfilerSteps step )
+{
+	zpProfilerPart& part = m_profiles[ step ];
+
+	zp_printfln( "step duration max_time avg_time\n%4d %8d %8d %8d", step, ( part.prevEndTime - part.prevStartTime ), part.maxTime, part.averageTime );
 }

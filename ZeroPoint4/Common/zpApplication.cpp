@@ -244,6 +244,10 @@ void zpApplication::handleInput()
 	{
 		garbageCollect();
 	}
+	else if( keyboard->isKeyDown( ZP_KEY_CODE_P ) )
+	{
+		zpProfiler::getInstance()->printProfile( ZP_PROFILER_STEP_FRAME );
+	}
 }
 
 void zpApplication::processFrame()
@@ -278,6 +282,8 @@ void zpApplication::processFrame()
 
 	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
 
+	ZP_PROFILE_START( RENDER_FRAME );
+
 	// render begin
 	ZP_PROFILE_START( RENDER_BEGIN );
 	m_renderingPipeline.beginFrame();
@@ -297,6 +303,8 @@ void zpApplication::processFrame()
 	ZP_PROFILE_START( RENDER_PRESENT );
 	m_renderingPipeline.endFrame();
 	ZP_PROFILE_END( RENDER_PRESENT );
+
+	ZP_PROFILE_END( RENDER_FRAME );
 
 	ZP_PROFILE_END( FRAME );
 

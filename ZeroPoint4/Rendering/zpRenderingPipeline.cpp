@@ -77,6 +77,7 @@ void zpRenderingPipeline::submitRendering()
 	i->setRenderTarget( 0, 1, &t, d );
 	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
 	i->setViewport( m_viewport );
+	i->setScissorRect( zpRecti( zpVector2i( 0, 0 ), zpVector2i( m_viewport.width, m_viewport.height ) ) );
 
 	//i->clearDepthStencilBuffer( 1.0f, 0 );
 

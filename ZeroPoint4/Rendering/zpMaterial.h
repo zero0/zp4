@@ -9,6 +9,7 @@ struct zpMaterial
 	struct zpMaterialTextureSampler
 	{
 		zpTextureResourceInstance texture;
+		zpResourceBindSlotType bindSlots;
 		zpSamplerState* sampler;
 	};
 
@@ -33,9 +34,12 @@ public:
 
 	void setTextureOverride( zpMaterialTextureSlot slot, const zpTextureResourceInstance& texture );
 	void resetTexture( zpMaterialTextureSlot slot );
+	zp_bool hasTextureOverride() const;
 
+	zp_uint getNumTextures() const;
 	const zpTexture* getTexture( zpMaterialTextureSlot slot ) const;
 	const zpSamplerState* getSampler( zpMaterialTextureSlot slot ) const;
+	zpResourceBindSlotType getBindSlot( zpMaterialTextureSlot slot ) const;
 
 private:
 	zpFixedArrayList< zpTextureResourceInstance, zpMaterialTextureSlot_Count > m_textureOverides;

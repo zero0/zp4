@@ -118,6 +118,9 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 	const zp_uint count = renderCommands.size();
 	zpRenderingCommand* const* cmd = renderCommands.begin();
 	zpRenderingCommand* const* end = renderCommands.end();
+
+	const zpMaterial* prevMaterial = ZP_NULL;
+
 	for( ; cmd != end; ++cmd )
 	{
 		const zpRenderingCommand* command = *cmd;
@@ -134,13 +137,47 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 			break;
 
 		case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
+		case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
 			{
 				ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
 				ID3D11Buffer* index = command->indexBuffer->m_buffer;
 				ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
 
-				m_context->PSSetShader( command->material->getResource()->getData()->shader.getResource()->getData()->getShaderImpl()->m_pixelShader, 0, 0 );
-				m_context->VSSetShader( command->material->getResource()->getData()->shader.getResource()->getData()->getShaderImpl()->m_vertexShader, 0, 0 );
+				const zpMaterial* mat = command->material->getResource()->getData();
+				if( prevMaterial != mat || command->material->hasTextureOverride() )
+				{
+					prevMaterial = mat;
+
+					const zpShaderImpl* shader = mat->shader.getResource()->getData()->getShaderImpl();
+					if( shader->m_vertexShader )   m_context->VSSetShader( shader->m_vertexShader, 0, 0 );
+					if( shader->m_geometryShader ) m_context->GSSetShader( shader->m_geometryShader, 0, 0 );
+					if( shader->m_pixelShader )    m_context->PSSetShader( shader->m_pixelShader, 0, 0 );
+
+					zp_uint numTextures = command->material->getNumTextures();
+					for( zp_uint i = 0; i < numTextures; ++i )
+					{
+						zpMaterialTextureSlot slot = (zpMaterialTextureSlot)i;
+						const zpTexture* t = command->material->getTexture( slot );
+						const zpSamplerState* s = command->material->getSampler( slot );
+						zpResourceBindSlotType b = command->material->getBindSlot( slot );
+
+						if( b & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
+						{
+							m_context->VSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+							m_context->VSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
+						}
+						if( b & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
+						{
+							m_context->GSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+							m_context->GSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
+						}
+						if( b & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
+						{
+							m_context->PSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+							m_context->PSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
+						}
+					}
+				}
 
 				zp_uint offset = 0;
 				m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
@@ -149,21 +186,6 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 				m_context->IASetInputLayout( inputLayout );
 
 				m_context->DrawIndexed( command->indexCount, 0, 0 );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
-			{
-				ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
-				ID3D11Buffer* index = command->indexBuffer->m_buffer;
-				ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
-
-				m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
-				m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
-				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, 0 );
-				m_context->IASetInputLayout( inputLayout );
-
-				//m_context->DrawIndexed( command->indexCount, command->indexOffset, 0 );
 			}
 			break;
 
