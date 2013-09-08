@@ -5,13 +5,13 @@ SamplerState pointSampler : register( s0 );
 struct VS_Input
 {
     float4 position : POSITION;
-    float2 tex0 : TEXCOORD;
+    float2 tex0 : TEXCOORD0;
 };
 
 struct PS_Input
 {
     float4 position : SV_POSITION;
-    float2 tex0 : TEXCOORD;
+    float2 tex0 : TEXCOORD0;
 };
 
 PS_Input main_vs( VS_Input input )

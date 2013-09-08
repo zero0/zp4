@@ -4,7 +4,6 @@
     {
         "ZP_MACRO" : "value"
     },
-    "Optimization" : 0,
     "VS" : 
     {
         "Main" : "main_vs",
