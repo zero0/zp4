@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ====================================================================== 
-     Aug 19, 2013 11:33:47 PM                                                        
 
-     ARC    
-     ZeroPoint4 Compiler
-                   
-     Justin                                                                
-     ====================================================================== -->
 <project name="Blackjack" basedir="../.." default="usage">
 	<description>
-            ZeroPoint4 Compiler
-    </description>
+		ZeroPoint4 Compiler
+	</description>
 
 	<!-- <property file="" /> -->
 	<property name="vc.dir" location="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC" />
@@ -32,12 +25,15 @@
 	
 	<mapper id="shader.map" type="glob" from="*.shader" to="*.shaderb" />
 	<mapper id="material.map" type="glob" from="*.material" to="*.materialb" />
+	<mapper id="texture.map" type="glob" from="*.png" to="*.png" />
 	
 	<fileset id="shader.files" dir="${assets.dir}" includes="**/*.shader" casesensitive="true"/>
 	<fileset id="material.files" dir="${assets.dir}" includes="**/*.material" casesensitive="true"/>
+	<fileset id="texture.files" dir="${assets.dir}" includes="**/*.png" casesensitive="true"/>
 	
 	<target name="usage">
 		<echo message="base = ${base.dir}" />
+		<echoproperties />
 	</target>
 			
 	<target name="clean-tools">
@@ -115,7 +111,7 @@
 		</touch>-->
 		<apply executable="${shader-compiler.exe}" dir="${bin.dir}" dest="${out.dir}" force="true">
 			<arg value="${rendering}" />
-			<arg value="-O0" />
+			<arg value="-Od" />
 			<srcfile />
 			<targetfile />
 			<fileset refid="shader.files" />
@@ -123,7 +119,7 @@
 		</apply>
 	</target>
 	
-	<target name="compile-materials" depends="make-out-dir" >
+	<target name="compile-materials" depends="make-out-dir">
 		<!--<touch mkdirs="true">
 			<fileset refid="shader.files" />
 			<mapper refid="shader.map" />
@@ -136,7 +132,35 @@
 		</apply>
 	</target>
 	
-	<target name="compile-assets" depends="compile-materials, compile-shaders">
+	<target name="compile-textures" depends="make-out-dir">
+		<copy todir="${out.dir}">
+			<fileset refid="texture.files" />
+			<mapper refid="texture.map" />
+		</copy>
+	</target>
+	
+	<target name="compile-assets" depends="compile-textures, compile-materials, compile-shaders">
+	</target>
+	
+	<target name="find-shader-dep">
+		<loadfile srcfile="${assets.dir}/materials/simple.material" property="shader-str">
+			<filterchain>
+				<stripjavacomments />
+				<tokenfilter>
+					<containsregex pattern='.*(".*?\.(:?shaderb|png)").*' replace="\1" flags="is" />
+					<uniqfilter />
+				</tokenfilter>
+			</filterchain>
+		</loadfile>
+		<echo>${shader-str}</echo>
+	</target>
+	
+	<target name="run">
+		<exec executable="${out.dir}/${ant.project.name}.exe" dir="${out.dir}" spawn="true" />
+	</target>
+	
+	<target name="run-d">
+		<exec executable="${out.dir}/${ant.project.name}_d.exe" dir="${out.dir}" spawn="true" />
 	</target>
 	
 </project>
