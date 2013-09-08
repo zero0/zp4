@@ -3,7 +3,7 @@
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <Windows.h>
 
-#define BLACKJACK_CONFIG	"blackjack.json"
+#define BLACKJACK_CONFIG	"Blackjack.jsonb"
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {

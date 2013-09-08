@@ -307,22 +307,9 @@ void zpRenderingContext::endDrawImmediate()
 	m_currentCommnad->indexOffset = m_immediateIndexSize;
 
 	m_currentCommnad = ZP_NULL;
-	//m_scratchVertexBuffer.reset();
-	//m_scratchIndexBuffer.reset();
-
-	//map( m_currentVertexBuffer, (void**)&m_immediateVertexData );
-	//zp_memcpy( m_immediateVertexData + m_immediateVertexSize, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE - m_immediateVertexSize, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
-	//unmap( m_currentVertexBuffer );
-	//
-	//map( m_currentIndexBuffer, (void**)&m_immediateIndexData );
-	//zp_memcpy( m_immediateIndexData + m_immediateIndexSize, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE - m_immediateIndexSize, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
-	//unmap( m_currentIndexBuffer );
 
 	m_immediateVertexSize = m_scratchVertexBuffer.size();
 	m_immediateIndexSize = m_scratchIndexBuffer.size();
-
-	//m_scratchVertexBuffer.reset();
-	//m_scratchIndexBuffer.reset();
 }
 
 void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffer, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpMaterialResourceInstance* material, zpBoundingAABB* boundingBox )
@@ -366,12 +353,11 @@ void zpRenderingContext::update( zpBuffer* buffer, void* data, zp_uint size )
 void zpRenderingContext::preprocessCommands()
 {
 	map( m_currentVertexBuffer, (void**)&m_immediateVertexData );
-	map( m_currentIndexBuffer, (void**)&m_immediateIndexData );
-	
 	zp_memcpy( m_immediateVertexData, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
-	zp_memcpy( m_immediateIndexData, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
-
 	unmap( m_currentVertexBuffer );
+
+	map( m_currentIndexBuffer, (void**)&m_immediateIndexData );
+	zp_memcpy( m_immediateIndexData, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
 	unmap( m_currentIndexBuffer );
 
 	m_scratchVertexBuffer.reset();

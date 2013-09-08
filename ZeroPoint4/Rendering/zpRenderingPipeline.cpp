@@ -53,12 +53,14 @@ void zpRenderingPipeline::initialize()
 	m_materialContent.getResource( "materials/fullscreenNoAlpha.materialb", m_mat );
 	
 	zpTextureResourceInstance t;
-	m_textureContent.getResource( "textures/test.png", t );
+	m_textureContent.getResource( "textures/uv_checker_large.png", t );
+
+	m_mat.setTextureOverride( ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE, t );
 
 	const zpVector2i& size = m_engine->getWindow()->getScreenSize();
 
-	m_viewport.width = size.getX();
-	m_viewport.height = size.getY();
+	m_viewport.width = (zp_float)size.getX();
+	m_viewport.height = (zp_float)size.getY();
 }
 void zpRenderingPipeline::destroy()
 {
@@ -81,9 +83,8 @@ void zpRenderingPipeline::submitRendering()
 	i->setRenderTarget( 0, 1, &t, d );
 	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
 	i->setViewport( m_viewport );
-	i->setScissorRect( zpRecti( zpVector2i( 0, 0 ), zpVector2i( m_viewport.width, m_viewport.height ) ) );
+	i->setScissorRect( zpRecti( zpVector2i( 0, 0 ), zpVector2i( (zp_int)m_viewport.width, (zp_int)m_viewport.height ) ) );
 
-	zp_float f = 0.5f;
 	i->beginDrawImmediate( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
 	//i->addQuad(
 		i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 ) );
