@@ -27,7 +27,7 @@
 //#ifdef _WIN32
 //#define ZP_USE_SIMD			0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD				1
+#define ZP_USE_SIMD				0
 //#endif
 
 
@@ -122,6 +122,7 @@ void zp_aligned_free( void* ptr );
 void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size );
 void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size );
 void* zp_memset( void* dest, zp_int value, zp_uint size );
+zp_int zp_memcmp( const void* ptr1, const void* ptr2, zp_uint size );
 
 template<zp_uint Size>
 zp_char* zp_strcpy( zp_char (&destString)[Size], const zp_char* srcString ) { return zp_strcpy( destString, Size, srcString ); }

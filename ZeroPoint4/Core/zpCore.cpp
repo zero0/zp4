@@ -212,6 +212,10 @@ void* zp_memset( void* dest, zp_int value, zp_uint size )
 {
 	return memset( dest, value, size );
 }
+zp_int zp_memcmp( const void* ptr1, const void* ptr2, zp_uint size )
+{
+	return memcmp( ptr1, ptr2, size );
+}
 
 zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* srcString )
 {
@@ -464,6 +468,18 @@ zp_bool zp_base64_decode( const zp_char* data, zp_uint length, zpDataBuffer& out
 
 	switch( padding )
 	{
+	case 0:
+		{
+			n  = fromBase64Chars[ data[ count + 0 ] ] << 18;
+			n += fromBase64Chars[ data[ count + 1 ] ] << 12;
+			n += fromBase64Chars[ data[ count + 2 ] ] << 6;
+			n += fromBase64Chars[ data[ count + 3 ] ] << 0;
+
+			outDecode.write< zp_char >( ( n >> 16 ) & 0xFF );
+			outDecode.write< zp_char >( ( n >> 8  ) & 0xFF );
+			outDecode.write< zp_char >( ( n >> 0  ) & 0xFF );
+		}
+		break;
 	case 1:
 		{
 			n  = fromBase64Chars[ data[ count + 0 ] ] << 18;

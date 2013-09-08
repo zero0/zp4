@@ -79,8 +79,9 @@ struct zp_vec4
 	ZP_FORCE_INLINE zp_vec4()
 	{}
 	ZP_FORCE_INLINE zp_vec4( zp_float _x, zp_float _y, zp_float _z, zp_float _w )
-		: m_xyxw( _mm_set_ps( _w, _z, _y, _x ) )
-	{}
+	{
+		m_xyxw = _mm_setr_ps( _x, _y, _z, _w );
+	}
 	ZP_FORCE_INLINE zp_vec4( const __m128& v )
 		: m_xyxw( v )
 	{}

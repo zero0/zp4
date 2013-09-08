@@ -7,10 +7,10 @@ ZP_FORCE_INLINE zpVector4f::zpVector4f( zp_float xyzw )
 	: m_xyzw( xyzw, xyzw, xyzw, xyzw )
 {}
 ZP_FORCE_INLINE zpVector4f::zpVector4f( zp_float x, zp_float y )
-	: m_xyzw( x, y, 0, 0 )
+	: m_xyzw( x, y, 0.0f, 0.0f )
 {}
 ZP_FORCE_INLINE zpVector4f::zpVector4f( zp_float x, zp_float y, zp_float z )
-	: m_xyzw( x, y, z, 0 )
+	: m_xyzw( x, y, z, 0.0f )
 {}
 ZP_FORCE_INLINE zpVector4f::zpVector4f( zp_float x, zp_float y, zp_float z, zp_float w )
 	: m_xyzw( x, y, z, w )
@@ -20,10 +20,10 @@ ZP_FORCE_INLINE zpVector4f::zpVector4f( const zpScalar& xyzw )
 	: m_xyzw( xyzw.getFloat(), xyzw.getFloat(), xyzw.getFloat(), xyzw.getFloat() )
 {}
 ZP_FORCE_INLINE zpVector4f::zpVector4f( const zpScalar& x, const zpScalar& y )
-	: m_xyzw( x.getFloat(), y.getFloat(), 0, 0 )
+	: m_xyzw( x.getFloat(), y.getFloat(), 0.0f, 0.0f )
 {}
 ZP_FORCE_INLINE zpVector4f::zpVector4f( const zpScalar& x, const zpScalar& y, const zpScalar& z )
-	: m_xyzw( x.getFloat(), y.getFloat(), z.getFloat(), 0 )
+	: m_xyzw( x.getFloat(), y.getFloat(), z.getFloat(), 0.0f )
 {}
 ZP_FORCE_INLINE zpVector4f::zpVector4f( const zpScalar& x, const zpScalar& y, const zpScalar& z, const zpScalar& w )
 	: m_xyzw( x.getFloat(), y.getFloat(), z.getFloat(), w.getFloat() )

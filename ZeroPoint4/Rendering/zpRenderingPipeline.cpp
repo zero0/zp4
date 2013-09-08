@@ -50,7 +50,11 @@ zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 
 void zpRenderingPipeline::initialize()
 {
-	m_materialContent.getResource( "materials/simple.materialb", m_mat );
+	m_materialContent.getResource( "materials/fullscreenNoAlpha.materialb", m_mat );
+	
+	zpTextureResourceInstance t;
+	m_textureContent.getResource( "textures/test.png", t );
+
 	const zpVector2i& size = m_engine->getWindow()->getScreenSize();
 
 	m_viewport.width = size.getX();
@@ -79,39 +83,23 @@ void zpRenderingPipeline::submitRendering()
 	i->setViewport( m_viewport );
 	i->setScissorRect( zpRecti( zpVector2i( 0, 0 ), zpVector2i( m_viewport.width, m_viewport.height ) ) );
 
-	//i->clearDepthStencilBuffer( 1.0f, 0 );
+	zp_float f = 0.5f;
+	i->beginDrawImmediate( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
+	//i->addQuad(
+		i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 ) );
+		i->addVertex( zpVector4f( 0, 1, 0, 1 ), zpVector2f( 0, 0 ) );
+		i->addVertex( zpVector4f( 1, 1, 0, 1 ), zpVector2f( 1, 0 ) );
+		i->addVertex( zpVector4f( 1, 0, 0, 1 ), zpVector2f( 1, 1 ) );
+		i->addQuadIndex( 0, 1, 2, 3 );
 
-	zpRandom* r = zpRandom::getInstance();
-	const zp_int numDrawCalls = 10; //r->randomInt( 1, 10 );
-	const zp_int numTris = 1000; //r->randomInt( 1, 10 ) * 3;
+		i->addVertex( zpVector4f( -1, -1, 0, 1 ), zpVector2f( 0, 1 ) );
+		i->addVertex( zpVector4f( -1, 0, 0, 1 ), zpVector2f( 0, 0 ) );
+		i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpVector2f( 1, 0 ) );
+		i->addVertex( zpVector4f( 0, -1, 0, 1 ), zpVector2f( 1, 1 ) );
+		i->addQuadIndex( 4, 5, 6, 7 );
+	//	);
+	i->endDrawImmediate();
 
-	zpVector4f p0, p1, p2;
-	zpColor4f c0, c1, c2;
-	zp_int index = 0;
-	for( zp_int d = 0; d < numDrawCalls; ++d )
-	{
-		i->beginDrawImmediate( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_mat );
-
-		for( zp_int n = 0; n < numTris; ++n )
-		{
-			r->randomUnitCircle( p0 );
-			r->randomUnitCircle( p1 );
-			r->randomUnitCircle( p2 );
-
-			r->randomColor( c0 );
-			r->randomColor( c1 );
-			r->randomColor( c2 );
-
-			i->addVertex( p0, c0 );
-			i->addVertex( p1, c1 );
-			i->addVertex( p2, c2 );
-			i->addTriangleIndex( index + 0, index + 2, index + 1 );
-			index += 3;
-		}
-
-		i->endDrawImmediate();
-	}
-	
 	i->preprocessCommands();
 	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
 }

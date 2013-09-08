@@ -101,16 +101,16 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	switch( vertexFormat )
 	{
 	case ZP_VERTEX_FORMAT_VERTEX_COLOR:
-		m_currentCommnad->vertexStride = sizeof( zpVertexPositionColor );
+		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpColor4f );
 		break;
 	case ZP_VERTEX_FORMAT_VERTEX_UV:
-		m_currentCommnad->vertexStride = sizeof( zpVertexPositionUV );
+		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpVector2f );
 		break;
 	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV:
-		m_currentCommnad->vertexStride = sizeof( zpVertexPositionNormalUV );
+		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f );
 		break;
 	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2:
-		m_currentCommnad->vertexStride = sizeof( zpVertexPositionNormalUV2 );
+		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ) + sizeof( zpVector2f );
 		break;
 	}
 }
@@ -190,7 +190,7 @@ void zpRenderingContext::addQuadIndex( zp_short index0, zp_short index1, zp_shor
 
 	m_scratchIndexBuffer.write( index2 );
 	m_scratchIndexBuffer.write( index3 );
-	m_scratchIndexBuffer.write( index1 );
+	m_scratchIndexBuffer.write( index0 );
 	m_currentCommnad->indexCount += 6;
 }
 
@@ -233,6 +233,71 @@ void zpRenderingContext::addLine( const zpVector4f& pos0, const zpColor4f& color
 	m_currentCommnad->boundingBox.add( pos0 );
 	m_currentCommnad->boundingBox.add( pos1 );
 }
+
+void zpRenderingContext::addQuad( const zpVector4f& pos0, const zpVector4f& pos1, const zpVector4f& pos2, const zpVector4f& pos3, const zpColor4f& color )
+{
+
+}
+void zpRenderingContext::addQuad( 
+	const zpVector4f& pos0, const zpColor4f& color0, 
+	const zpVector4f& pos1, const zpColor4f& color1, 
+	const zpVector4f& pos2, const zpColor4f& color2, 
+	const zpVector4f& pos3, const zpColor4f& color3 )
+{
+
+}
+void zpRenderingContext::addQuad( 
+	const zpVector4f& pos0, const zpVector2f& uv0, 
+	const zpVector4f& pos1, const zpVector2f& uv1, 
+	const zpVector4f& pos2, const zpVector2f& uv2,
+	const zpVector4f& pos3, const zpVector2f& uv3 )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_UV, "" );
+
+	m_scratchVertexBuffer.write( pos0 );
+	m_scratchVertexBuffer.write(  uv0 );
+	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.write(  uv1 );
+	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.write(  uv2 );
+	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.write(  uv3 );
+
+	m_scratchIndexBuffer.write< zp_short >( m_currentCommnad->vertexCount + 0 );
+	m_scratchIndexBuffer.write< zp_short >( m_currentCommnad->vertexCount + 1 );
+	m_scratchIndexBuffer.write< zp_short >( m_currentCommnad->vertexCount + 2 );
+
+	m_scratchIndexBuffer.write< zp_short >( m_currentCommnad->vertexCount + 2 );
+	m_scratchIndexBuffer.write< zp_short >( m_currentCommnad->vertexCount + 3 );
+	m_scratchIndexBuffer.write< zp_short >( m_currentCommnad->vertexCount + 0 );
+
+	m_currentCommnad->vertexCount += 4;
+	m_currentCommnad->indexCount += 6;
+
+	m_currentCommnad->boundingBox.add( pos0 );
+	m_currentCommnad->boundingBox.add( pos1 );
+	m_currentCommnad->boundingBox.add( pos2 );
+	m_currentCommnad->boundingBox.add( pos3 );
+}
+void zpRenderingContext::addQuad( 
+	const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
+	const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
+	const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2,
+	const zpVector4f& pos3, const zpVector4f& normal3, const zpVector2f& uv3 )
+{
+
+}
+void zpRenderingContext::addQuad( 
+	const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv00, const zpVector2f& uv10,
+	const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv01, const zpVector2f& uv11,
+	const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv02, const zpVector2f& uv12,
+	const zpVector4f& pos3, const zpVector4f& normal3, const zpVector2f& uv03, const zpVector2f& uv13 )
+
+{
+
+}
+
 
 void zpRenderingContext::endDrawImmediate()
 {

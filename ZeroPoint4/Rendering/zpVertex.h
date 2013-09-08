@@ -1,7 +1,7 @@
 #pragma once
 #ifndef ZP_VERTEX_H
 #define ZP_VERTEX_H
-
+/*
 struct zpVertexPositionColor
 {
 	zpVector4f position;
@@ -35,5 +35,5 @@ struct zpVertexPositionNormalUV2
 	zpVector2f uv0;
 	zpVector2f uv1;
 };
-
+*/
 #endif
