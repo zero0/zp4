@@ -10,7 +10,7 @@
 	<property name="vc.sln" value="ZeroPoint4.sln" />
 
 	<property name="platform" value="x86" />
-	<property name="rendering" value="DX10" />
+	<property name="rendering" value="DX11" />
 	<property name="mode" value="Debug" />
 
 	<property name="base.dir" location="." />
@@ -23,13 +23,17 @@
 	<property name="shader-compiler.exe" value="${exe.dir}/ShaderCompiler.exe" />
 	<property name="bison-compiler.exe" value="${exe.dir}/BisonCompiler.exe" />
 	
+	<property name="build-number.file" value="${ant.project.name}.buildnumber" />
+	
 	<mapper id="shader.map" type="glob" from="*.shader" to="*.shaderb" />
 	<mapper id="material.map" type="glob" from="*.material" to="*.materialb" />
 	<mapper id="texture.map" type="glob" from="*.png" to="*.png" />
+	<mapper id="json.map" type="glob" from="*.json" to="*.jsonb" />
 	
 	<fileset id="shader.files" dir="${assets.dir}" includes="**/*.shader" casesensitive="true"/>
 	<fileset id="material.files" dir="${assets.dir}" includes="**/*.material" casesensitive="true"/>
 	<fileset id="texture.files" dir="${assets.dir}" includes="**/*.png" casesensitive="true"/>
+	<fileset id="json.files" dir="${assets.dir}" includes="**/*.json" casesensitive="true"/>
 	
 	<target name="usage">
 		<echo message="base = ${base.dir}" />
@@ -97,11 +101,24 @@
 		</exec>
 	</target>
 	
+	<target name="up-build-number">
+		<buildnumber file="${build-number.file}" />
+	</target>
+	
 	<target name="make-out-dir">
 		<mkdir dir="${out.dir}" />
 		<mkdir dir="${out.dir}/shaders" />
 		<mkdir dir="${out.dir}/materials" />
 		<mkdir dir="${out.dir}/textures" />
+	</target>
+	
+	<target name="compile-json" depends="make-out-dir">
+		<apply executable="${bison-compiler.exe}" dir="${bin.dir}" dest="${out.dir}" force="true">
+			<srcfile />
+			<targetfile />
+			<fileset refid="json.files" />
+			<mapper refid="json.map" />
+		</apply>
 	</target>
 	
 	<target name="compile-shaders" depends="make-out-dir" >
@@ -111,7 +128,7 @@
 		</touch>-->
 		<apply executable="${shader-compiler.exe}" dir="${bin.dir}" dest="${out.dir}" force="true">
 			<arg value="${rendering}" />
-			<arg value="-Od" />
+			<arg value="-O5" />
 			<srcfile />
 			<targetfile />
 			<fileset refid="shader.files" />
@@ -133,13 +150,14 @@
 	</target>
 	
 	<target name="compile-textures" depends="make-out-dir">
+		<!-- for now just copy -->
 		<copy todir="${out.dir}">
 			<fileset refid="texture.files" />
 			<mapper refid="texture.map" />
 		</copy>
 	</target>
 	
-	<target name="compile-assets" depends="compile-textures, compile-materials, compile-shaders">
+	<target name="compile-assets" depends="compile-json, compile-textures, compile-materials, compile-shaders">
 	</target>
 	
 	<target name="find-shader-dep">
