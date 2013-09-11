@@ -196,6 +196,8 @@ zp_int zpFile::readLine( zpStringBuffer& buffer )
 	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
 	ZP_ASSERT( !isBinaryFile(), "zpFile: Trying to read binary file as ascii" );
 
+	buffer.clear();
+
 	zp_int count = 0;
 	zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 	FILE* f = (FILE*)m_file;
@@ -212,6 +214,14 @@ zp_int zpFile::readLine( zpStringBuffer& buffer )
 
 	return count;
 }
+zp_bool zpFile::isEOF() const
+{
+	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
+	FILE* f = (FILE*)m_file;
+
+	return feof( f ) != 0;
+}
+
 
 zp_int zpFile::readFileBinary( zpArrayList<zp_byte>& buffer )
 {
