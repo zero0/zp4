@@ -163,6 +163,13 @@ enum zpVertexFormatDesc : zp_uint
 	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV =	ZP_MAKE_UINT( 'V', 'N', 'U', '\0' ),
 	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2 =	ZP_MAKE_UINT( 'V', 'N', 'W', '\0' ),
 };
+enum zpVertexFormatStride : zp_uint
+{
+	ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR =		sizeof( zpVector4f ) + sizeof( zpColor4f ),
+	ZP_VERTEX_FORMAT_STRIDE_VERTEX_UV =			sizeof( zpVector4f ) + sizeof( zpVector2f ),
+	ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV =	sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ),
+	ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV2 =	sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ) + sizeof( zpVector2f ),
+};
 
 enum zpScreenMode
 {
@@ -380,6 +387,7 @@ class zpRasterState;
 class zpShader;
 class zpTexture;
 class zpMaterialResource;
+class zpMeshResource;
 
 class zpFontResource;
 template<> class zpResourceInstance<zpFontResource>;
@@ -425,6 +433,7 @@ class zpUIRenderingComponent;
 class zpDeferredRenderingComponent;
 
 class zpMaterialResourceInstance;
+class zpMeshResourceInstance;
 
 struct zpRenderingCommand
 {
@@ -433,9 +442,9 @@ struct zpRenderingCommand
 	zp_uint sortKey;
 
 	zpTopology topology;
-	zpBufferImpl* vertexBuffer;
-	zpBufferImpl* indexBuffer;
-	zpMaterialResourceInstance* material;
+	const zpBufferImpl* vertexBuffer;
+	const zpBufferImpl* indexBuffer;
+	const zpMaterialResourceInstance* material;
 	zpVertexFormat vertexFormat;
 	zp_uint vertexStride;
 	zp_uint vertexCount;
@@ -468,6 +477,7 @@ struct zpRenderingCommand
 #include "zpRasterState.h"
 
 #include "zpMaterial.h"
+#include "zpMesh.h"
 #include "zpFontResource.h"
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"

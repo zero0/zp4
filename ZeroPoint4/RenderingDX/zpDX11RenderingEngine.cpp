@@ -158,7 +158,7 @@ void zpRenderingEngineImpl::shutdown()
 	ZP_SAFE_RELEASE( m_dxgiFactory );
 }
 
-zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, void* data )
+zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, const void* data )
 {
 	HRESULT hr;
 	zpDisplayFormat format = ZP_DISPLAY_FORMAT_UNKNOWN;
@@ -206,6 +206,16 @@ zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBi
 	bufferImpl->m_buffer = buffer;
 
 	return bufferImpl;
+}
+zp_bool zpRenderingEngineImpl::destroyBuffer( zpBufferImpl* buffer )
+{
+	if( buffer )
+	{
+		ZP_SAFE_RELEASE( buffer->m_buffer );
+		ZP_SAFE_DELETE( buffer );
+		return true;
+	}
+	return false;
 }
 
 zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
@@ -629,7 +639,7 @@ void zpRenderingEngineImpl::createVertexLayout( zpVertexFormatDesc format, const
 				{
 					{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 					{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+					{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				};
 
 				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), data, size, &inputLayout );
@@ -648,8 +658,8 @@ void zpRenderingEngineImpl::createVertexLayout( zpVertexFormatDesc format, const
 				{
 					{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 					{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD0",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD1",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+					{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				};
 
 				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), data, size, &inputLayout );

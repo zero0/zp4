@@ -89,6 +89,10 @@ void BaseShaderCompiler::shutdown()
 		{
 			zpLog::error() << "Unable to compile output file '" << m_outputFile << "'" << zpLog::endl;
 		}
+		else
+		{
+			zpLog::message() << "Successfully compiled '" << m_outputFile << "'" << zpLog::endl;
+		}
 	}
 	else
 	{

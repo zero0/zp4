@@ -115,11 +115,23 @@ zpRenderingContext* zpRenderingEngine::createRenderingContext()
 	return ZP_NULL;
 }
 
-zpBuffer* zpRenderingEngine::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, void* data )
+zpBuffer* zpRenderingEngine::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, const void* data )
 {
 	zpBufferImpl* buffer;
 	buffer = m_renderingEngine->createBuffer( type, bind, size, stride, data );
 	return new zpBuffer( buffer );
+}
+zp_bool zpRenderingEngine::destroyBuffer( zpBuffer* buffer )
+{
+	if( buffer )
+	{
+		if( m_renderingEngine->destroyBuffer( buffer->m_buffer ) )
+		{
+			ZP_SAFE_DELETE( buffer );
+			return true;
+		}
+	}
+	return false;
 }
 
 zp_bool zpRenderingEngine::createTexture( zpTexture* texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )

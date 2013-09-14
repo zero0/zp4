@@ -4,8 +4,11 @@
 struct MeshDataPart
 {
 	zpString material;
-	zp_int startIndex;
-	zp_int count;
+	zp_int indexOffset;
+	zp_int indexCount;
+	zp_int vertexOffset;
+	zp_int vertexCount;
+	zpBoundingAABB boundingBox;
 };
 
 struct MeshData

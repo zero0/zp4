@@ -32,6 +32,7 @@ public:
 	zpMaterialContentManager* getMaterialContentManager();
 	zpShaderContentManager* getShaderContentManager();
 	zpTextureContentManager* getTextureContentManager();
+	zpMeshContentManager* getMeshContentManager();
 
 	void onFocusGained();
 	void onFocusLost();
@@ -45,10 +46,14 @@ private:
 	zpMaterialContentManager m_materialContent;
 	zpShaderContentManager m_shaderContent;
 	zpTextureContentManager m_textureContent;
+	zpMeshContentManager m_meshContent;
 
 	zpViewport m_viewport;
 
 	zpMaterialResourceInstance m_mat;
+	zpMeshResourceInstance m_mesh;
+
+	zpRasterState* m_raster;
 };
 
 #endif

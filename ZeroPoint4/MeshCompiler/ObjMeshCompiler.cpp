@@ -149,18 +149,12 @@ zp_bool ObjMessCompiler::compileMesh()
 			//}
 			else if( zp_strstr( l, "g " ) == l )
 			{
-				zp_char name[64];
-				sscanf_s( l, "g %s", name );
-
-				groups.pushBackEmpty().name = name;
+				groups.pushBackEmpty().name =  ( l + 1 );
 				groups.back().material = "default";
 			}
 			else if( zp_strstr( l, "usemtl " ) == l )
 			{
-				zp_char name[64];
-				sscanf_s( l, "usemtl %s", name );
-
-				groups.back().material = name;
+				groups.back().material = ( l + 7 );
 			}
 			//else if( zp_strstr( l, "mtllib " ) == l )
 			//{
@@ -187,7 +181,8 @@ zp_bool ObjMessCompiler::compileMesh()
 		}
 
 		// push all ordered verts to single buffer and create mesh parts from full buffer
-		zp_int count = 0;
+		zp_int indexCount = 0;
+		zp_int vertexCount = 0;
 		m_data.parts.reserve( materialVertices.size() );
 
 		zpArrayList< zpString > keys;
@@ -199,7 +194,8 @@ zp_bool ObjMessCompiler::compileMesh()
 
 			MeshDataPart& part = m_data.parts.pushBackEmpty();
 			part.material = *kb;
-			part.startIndex = count;
+			part.indexOffset = indexCount;
+			part.vertexOffset = vertexCount;
 
 			// write verts and indexes in order
 			for( const Vertex* const* start = mv.begin(), * const* end = mv.end(); start != end; ++start )
@@ -208,12 +204,16 @@ zp_bool ObjMessCompiler::compileMesh()
 				m_data.vertex.write( v->v );
 				m_data.vertex.write( v->n );
 				m_data.vertex.write( v->t );
-		
-				m_data.index.write< zp_short >( count );
-				++count;
+				++vertexCount;
+
+				m_data.index.write< zp_short >( indexCount );
+				++indexCount;
+
+				part.boundingBox.add( v->v );
 			}
 		
-			part.count = verts.size();
+			part.vertexCount = mv.size();
+			part.indexCount = mv.size();
 		}
 
 		// select vertex format

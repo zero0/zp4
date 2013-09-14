@@ -6,7 +6,7 @@ zpBuffer::zpBuffer( zpBufferImpl* buffer )
 {}
 zpBuffer::~zpBuffer()
 {
-	ZP_SAFE_DELETE( m_buffer );
+	//ZP_SAFE_DELETE( m_buffer );
 }
 zp_uint zpBuffer::getSize() const
 {

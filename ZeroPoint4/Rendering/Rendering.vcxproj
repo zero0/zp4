@@ -84,6 +84,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="zpImage.h" />
+    <ClInclude Include="zpMesh.h" />
     <ClInclude Include="zpRenderingPipeline.h" />
     <ClInclude Include="zpUIManager.h" />
     <ClInclude Include="zpAnimatedMeshResource.h" />
@@ -128,6 +129,7 @@
     <ClCompile Include="zpImage.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpMaterial.cpp" />
+    <ClCompile Include="zpMesh.cpp" />
     <ClCompile Include="zpOBJStaticMeshResource.cpp" />
     <ClCompile Include="zpRasterState.cpp" />
     <ClCompile Include="zpRendering.cpp">

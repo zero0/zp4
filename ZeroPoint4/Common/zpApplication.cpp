@@ -33,6 +33,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_renderingPipeline.getMaterialContentManager()->setApplication( this );
 	m_renderingPipeline.getShaderContentManager()->setApplication( this );
 	m_renderingPipeline.getTextureContentManager()->setApplication( this );
+	m_renderingPipeline.getMeshContentManager()->setApplication( this );
 
 	zp_bool ok;
 	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
@@ -158,6 +159,7 @@ void zpApplication::garbageCollect()
 {
 	m_textContent.garbageCollect();
 
+	m_renderingPipeline.getMeshContentManager()->garbageCollect();
 	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
 	m_renderingPipeline.getShaderContentManager()->garbageCollect();
 	m_renderingPipeline.getTextureContentManager()->garbageCollect();

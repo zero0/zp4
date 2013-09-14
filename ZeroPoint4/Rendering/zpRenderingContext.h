@@ -82,6 +82,8 @@ public:
 
 	void drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffe, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpMaterialResourceInstance* material, zpBoundingAABB* boundingBox = 0 );
 
+	void drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, zpMaterialResourceInstance* material = 0 );
+
 	//void drawInstanced( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
 	void map( zpBuffer* buffer, void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );

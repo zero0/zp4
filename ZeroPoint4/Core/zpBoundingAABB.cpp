@@ -1,8 +1,8 @@
 #include "zpCore.h"
 
 zpBoundingAABB::zpBoundingAABB()
-	: m_min( ZP_FLT_MAX )
-	, m_max( ZP_FLT_MIN )
+	: m_min( ZP_FLT_MAX, ZP_FLT_MAX, ZP_FLT_MAX, 1.0f )
+	, m_max( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN, 1.0f )
 {}
 zpBoundingAABB::zpBoundingAABB( zp_float width, zp_float height, zp_float depth )
 	: m_min( width * -0.5f, height * -0.5f, depth * -0.5f )
@@ -155,36 +155,41 @@ void zpBoundingAABB::pad( const zpVector4f& padding )
 
 void zpBoundingAABB::add( zp_float x, zp_float y, zp_float z )
 {
-	add( zpScalar( x ), zpScalar( y ), zpScalar( z ) );
+	//add( zpScalar( x ), zpScalar( y ), zpScalar( z ) );
+	add( zpVector4f( x, y, z, 1.0f ) );
 }
 void zpBoundingAABB::add( const zpScalar& x, const zpScalar& y, const zpScalar& z )
 {
-	zpScalar r;
-
-	// x
-	zpMath::Max( r, x, m_max.getX() );
-	m_max.setX( r );
-
-	zpMath::Min( r, x, m_min.getX() );
-	m_min.setX( r );
-
-	// y
-	zpMath::Max( r, y, m_max.getY() );
-	m_max.setY( r );
-
-	zpMath::Min( r, y, m_min.getY() );
-	m_min.setY( r );
-
-	// z
-	zpMath::Max( r, z, m_max.getZ() );
-	m_max.setZ( r );
-
-	zpMath::Min( r, z, m_min.getZ() );
-	m_min.setZ( r );
+	//zpScalar r;
+	//
+	//// x
+	//zpMath::Max( r, x, m_max.getX() );
+	//m_max.setX( r );
+	//
+	//zpMath::Min( r, x, m_min.getX() );
+	//m_min.setX( r );
+	//
+	//// y
+	//zpMath::Max( r, y, m_max.getY() );
+	//m_max.setY( r );
+	//
+	//zpMath::Min( r, y, m_min.getY() );
+	//m_min.setY( r );
+	//
+	//// z
+	//zpMath::Max( r, z, m_max.getZ() );
+	//m_max.setZ( r );
+	//
+	//zpMath::Min( r, z, m_min.getZ() );
+	//m_min.setZ( r );
+	add( zpVector4f( x, y, z, zpScalar( 1.0f ) ) );
 }
 void zpBoundingAABB::add( const zpVector4f& point )
 {
-	add( point.getX(), point.getY(), point.getZ() );
+	zpMath::Max( m_max, point, m_max );
+	zpMath::Min( m_min, point, m_min );
+
+	//add( point.getX(), point.getY(), point.getZ() );
 }
 void zpBoundingAABB::add( const zpBoundingAABB& box )
 {

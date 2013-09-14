@@ -50,10 +50,14 @@ zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 
 void zpRenderingPipeline::initialize()
 {
+	zp_bool ok;
 	m_materialContent.getResource( "materials/fullscreenNoAlpha.materialb", m_mat );
 	
 	zpTextureResourceInstance t;
 	m_textureContent.getResource( "textures/uv_checker_large.png", t );
+
+	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
+	ZP_ASSERT( ok, "" );
 
 	m_mat.setTextureOverride( ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE, t );
 
@@ -61,16 +65,23 @@ void zpRenderingPipeline::initialize()
 
 	m_viewport.width = (zp_float)size.getX();
 	m_viewport.height = (zp_float)size.getY();
+
+	zpRasterStateDesc raster;
+	raster.cullMode = ZP_CULL_MODE_NONE;
+	
+	m_raster = m_engine->createRasterState( raster );
 }
 void zpRenderingPipeline::destroy()
 {
 	m_mat.release();
+	m_mesh.release();
 }
 
 void zpRenderingPipeline::beginFrame()
 {
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 	i->clearState();
+	i->setRasterState( m_raster );
 }
 
 void zpRenderingPipeline::submitRendering()
@@ -101,6 +112,8 @@ void zpRenderingPipeline::submitRendering()
 	//	);
 	i->endDrawImmediate();
 
+	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh );
+
 	i->preprocessCommands();
 	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
 }
@@ -129,6 +142,10 @@ zpShaderContentManager* zpRenderingPipeline::getShaderContentManager()
 zpTextureContentManager* zpRenderingPipeline::getTextureContentManager()
 {
 	return &m_textureContent;
+}
+zpMeshContentManager* zpRenderingPipeline::getMeshContentManager()
+{
+	return &m_meshContent;
 }
 
 void zpRenderingPipeline::onFocusGained()

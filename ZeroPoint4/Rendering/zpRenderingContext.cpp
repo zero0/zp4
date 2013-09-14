@@ -87,6 +87,7 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	m_currentCommnad = &m_renderingCommands.pushBackEmpty();
 	m_currentCommnad->type = ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE;
 	m_currentCommnad->layer = layer;
+	m_currentCommnad->sortKey = 0;
 
 	m_currentCommnad->topology = topology;
 	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->getBufferImpl();
@@ -101,16 +102,16 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	switch( vertexFormat )
 	{
 	case ZP_VERTEX_FORMAT_VERTEX_COLOR:
-		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpColor4f );
+		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR;
 		break;
 	case ZP_VERTEX_FORMAT_VERTEX_UV:
-		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpVector2f );
+		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_UV;
 		break;
 	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV:
-		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f );
+		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV;
 		break;
 	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2:
-		m_currentCommnad->vertexStride = sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ) + sizeof( zpVector2f );
+		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV2;
 		break;
 	}
 }
@@ -319,6 +320,7 @@ void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topolo
 	zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
 	command.type = ZP_RENDERING_COMMNAD_DRAW_BUFFERED;
 	command.layer = layer;
+	command.sortKey = 0;
 	
 	command.topology = topology;
 	command.vertexBuffer = vertexBuffer->getBufferImpl();
@@ -333,6 +335,48 @@ void zpRenderingContext::drawBuffered( zpRenderingLayer layer, zpTopology topolo
 	if( boundingBox )
 	{
 		command.boundingBox = *boundingBox;
+	}
+}
+
+void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, zpMaterialResourceInstance* material )
+{
+	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
+
+	const zpMesh* m = mesh->getResource()->getData();
+	const zpMeshPart* b = m->m_parts.begin();
+	const zpMeshPart* e = m->m_parts.end();
+	for( ; b != e; ++b )
+	{
+		zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
+		command.type = ZP_RENDERING_COMMNAD_DRAW_BUFFERED;
+		command.layer = layer;
+		command.sortKey = 0;
+
+		command.topology = ZP_TOPOLOGY_TRIANGLE_LIST;
+		command.vertexBuffer = m->m_vertex->getBufferImpl();
+		command.indexBuffer = m->m_index->getBufferImpl();
+		command.material = material == ZP_NULL ? &b->m_material : material;
+		command.vertexFormat = m->m_format;
+		command.vertexCount = b->m_vertexCount;
+		command.indexCount = b->m_vertexCount;
+		command.vertexOffset = b->m_vertexOffset;
+		command.indexOffset = b->m_indexOffset;
+		
+		switch( command.vertexFormat )
+		{
+		case ZP_VERTEX_FORMAT_VERTEX_COLOR:
+			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR;
+			break;
+		case ZP_VERTEX_FORMAT_VERTEX_UV:
+			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_UV;
+			break;
+		case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV:
+			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV;
+			break;
+		case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2:
+			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV2;
+			break;
+		}
 	}
 }
 

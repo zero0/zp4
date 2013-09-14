@@ -1,6 +1,6 @@
 #include "zpRendering.h"
 
-#pragma comment( lib, "Awesomium" )
+//#pragma comment( lib, "Awesomium" )
 
 zpSamplerStateDesc::zpSamplerStateDesc()
 	: cmpFunc( ZP_COMPARISON_FUNC_NONE )

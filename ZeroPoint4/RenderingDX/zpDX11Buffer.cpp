@@ -12,7 +12,7 @@ zpBufferImpl::zpBufferImpl()
 {}
 zpBufferImpl::~zpBufferImpl()
 {
-	ZP_SAFE_RELEASE( m_buffer );
+	//ZP_SAFE_RELEASE( m_buffer );
 }
 
 zp_uint zpBufferImpl::getSize() const
