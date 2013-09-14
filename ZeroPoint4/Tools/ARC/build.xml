@@ -173,7 +173,7 @@
 		</copy>
 	</target>
 	
-	<target name="compile-assets" depends="compile-json, compile-textures, compile-materials, compile-shaders">
+	<target name="compile-assets" depends="compile-json, compile-textures, compile-materials, compile-shaders, compile-meshes">
 	</target>
 	
 	<target name="find-shader-dep">

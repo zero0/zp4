@@ -1,0 +1,11 @@
+{
+    "Shader" : "shaders/LitNormalTextured.shaderb",
+    "Textures" :
+    [
+		"textures/test.png"
+	],
+    "Constants" :
+    {},
+    "Samplers" :
+    []
+}
