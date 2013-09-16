@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/swt-x86.jar" sourcepath="lib/swt-src.zip"/>
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-2.2.0.jar"/>
+	<classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

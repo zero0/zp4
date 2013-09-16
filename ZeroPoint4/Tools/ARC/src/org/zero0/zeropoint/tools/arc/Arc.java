@@ -16,6 +16,9 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.helper.ProjectHelper2;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompilerListener;
 import org.zero0.zeropoint.tools.arc.util.FileWatcher;

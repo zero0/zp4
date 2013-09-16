@@ -13,8 +13,7 @@ import java.util.Set;
 
 public class FileWatcher implements Runnable, FilenameFilter
 {
-
-	Object lock = new Object();
+	final Object lock = new Object();
 
 	Map<String, Long> filesToWatch;
 	List<FileWatcherListener> listeners;
@@ -68,18 +67,21 @@ public class FileWatcher implements Runnable, FilenameFilter
 		return Collections.unmodifiableSet( filesToWatch.keySet() );
 	}
 
-	public synchronized void addFile( File file )
+	public void addFile( File file )
 	{
-		if( file.isDirectory() )
+		synchronized( lock )
 		{
-			for( File f : file.listFiles( this ) )
+			if( file.isDirectory() )
 			{
-				addFile( f );
+				for( File f : file.listFiles( this ) )
+				{
+					addFile( f );
+				}
 			}
-		}
-		else
-		{
-			filesToWatch.put( getStandardPathForFile( file ), file.lastModified() );
+			else
+			{
+				filesToWatch.put( getStandardPathForFile( file ), file.lastModified() );
+			}
 		}
 	}
 

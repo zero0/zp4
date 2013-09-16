@@ -1,9 +1,12 @@
 package org.zero0.zeropoint.tools.arc.workspace;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,6 +73,8 @@ import org.zero0.zeropoint.tools.arc.util.PrintErrWrapper;
 import org.zero0.zeropoint.tools.arc.util.PrintOutAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintOutWrapper;
 
+import com.fasterxml.jackson.core.util.TextBuffer;
+
 public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender
 {
 
@@ -133,7 +138,10 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	Text search;
 	ToolBar bar;
 	Tree tree;
-	StyledText text;
+
+	TabFolder textTabs;
+	StyledText console;
+	StyledText fileContent;
 
 	Composite top;
 	Composite middle;
@@ -576,7 +584,8 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 						}
 					} );
 
-					MenuItem item = new MenuItem( clickMenu, SWT.PUSH );
+					MenuItem item;
+					item = new MenuItem( clickMenu, SWT.PUSH );
 					item.setText( "Compile" + ( t.getSelectionCount() > 1 ? "..." : "" ) );
 					item.addListener( SWT.Selection, new Listener()
 					{
@@ -591,6 +600,46 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 							Arc.getInstance().addCompilerTasks( (String[]) files.toArray() );
 						}
 					} );
+
+					if( t.getSelectionCount() == 1 )
+					{
+						item = new MenuItem( clickMenu, SWT.PUSH );
+						item.setText( "View..." );
+						item.addSelectionListener( new SelectionListener()
+						{
+
+							@Override
+							public void widgetSelected( SelectionEvent event )
+							{
+								File viewFile = (File) ( t.getSelection()[0] ).getData();
+								System.out.print( viewFile.getName() );
+								StringBuilder contents = new StringBuilder();
+								try
+								{
+									String line = null;
+									BufferedReader br = new BufferedReader( new InputStreamReader( new FileInputStream( viewFile ) ) );
+									while( ( line = br.readLine() ) != null )
+									{
+										contents.append( line );
+									}
+								}
+								catch( Exception e )
+								{
+									e.printStackTrace();
+								}
+								fileContent.setText( contents.toString() );
+
+								textTabs.setSelection( 1 );
+							}
+
+							@Override
+							public void widgetDefaultSelected( SelectionEvent e )
+							{
+								widgetSelected( e );
+							}
+						} );
+					}
+
 				}
 			}
 		} );
@@ -719,7 +768,18 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 
 	void createText()
 	{
-		text = new StyledText( textComposite, SWT.VERTICAL | SWT.BORDER | SWT.READ_ONLY );
+		textTabs = new TabFolder( textComposite, SWT.NONE | SWT.BOTTOM );
+
+		TabItem i;
+		i = new TabItem( textTabs, SWT.NONE );
+		i.setText( "Console" );
+		console = new StyledText( textTabs, SWT.VERTICAL | SWT.READ_ONLY );
+		i.setControl( console );
+
+		i = new TabItem( textTabs, SWT.NONE );
+		i.setText( "File" );
+		fileContent = new StyledText( textTabs, SWT.VERTICAL | SWT.READ_ONLY );
+		i.setControl( fileContent );
 	}
 
 	void createMenu()
@@ -930,8 +990,8 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		{
 			public void handleEvent( Event event )
 			{
-				text.setText( "" );
-				text.setStyleRange( null );
+				console.setText( "" );
+				console.setStyleRange( null );
 			}
 		} );
 
@@ -1038,16 +1098,16 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	@Override
 	public void appendFromPrintOut( String text )
 	{
-		this.text.append( text );
+		this.console.append( text );
 	}
 
 	@Override
 	public void appendFromPrintErr( String text )
 	{
-		int offset = this.text.getText().length();
+		int offset = this.console.getText().length();
 
-		this.text.append( text );
-		this.text.setStyleRange( new StyleRange( offset, text.length(), new Color( getDisplay(), 255, 0, 0 ), null ) );
+		this.console.append( text );
+		this.console.setStyleRange( new StyleRange( offset, text.length(), new Color( getDisplay(), 255, 0, 0 ), null ) );
 	}
 
 	void filterTree( String filter )
