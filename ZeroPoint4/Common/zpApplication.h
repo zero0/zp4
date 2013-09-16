@@ -40,8 +40,11 @@ public:
 	zpTextContentManager* getTextContentManager() { return &m_textContent; }
 
 private:
+	void runGarbageCollect();
+
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
+	zp_bool m_shouldGarbageCollect;
 	zp_int m_exitCode;
 	zpString m_optionsFilename;
 	zpString m_nextWorldFilename;

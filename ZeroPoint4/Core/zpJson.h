@@ -76,6 +76,9 @@ public:
 	zpString asData() const;
 	const zp_char* asCString() const;
 
+	void merge( const zpJson& json );
+	static void mergeJson( zpJson& a, const zpJson& b );
+
 	zpJson& operator[]( zp_uint index );
 	const zpJson& operator[]( zp_uint index ) const;
 	

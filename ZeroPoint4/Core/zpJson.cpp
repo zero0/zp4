@@ -483,6 +483,48 @@ const zp_char* zpJson::asCString() const
 	}
 }
 
+void zpJson::merge( const zpJson& json )
+{
+	mergeJson( *this, json );
+}
+
+void zpJson::mergeJson( zpJson& target, const zpJson& options )
+{
+	switch( options.m_type )
+	{
+	case ZP_JSON_TYPE_NULL:
+		break;
+	case ZP_JSON_TYPE_ARRAY:
+		{
+			options.m_array->foreachIndexed( [ &target, &options ]( zp_uint index, const zpJson& value )
+			{
+				zpJson& src = target[ index ];
+				const zpJson& copy = options[ index ];
+
+				mergeJson( src, copy );
+			} );
+		}
+		break;
+	case ZP_JSON_TYPE_OBJECT:
+		{
+			zpArrayList< zpString > keys;
+			options.m_object->keys( keys );
+
+			keys.foreach( [ &target, &options ]( const zpString& key )
+			{
+				zpJson& src = target[ key ];
+				const zpJson& copy = options[ key ];
+
+				mergeJson( src, copy );
+			} );
+		}
+		break;
+	default:
+		target = options;
+		break;
+	}
+}
+
 zpJson& zpJson::operator[]( zp_uint index )
 {
 	ZP_ASSERT( isArray(), "" );

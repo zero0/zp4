@@ -26,7 +26,19 @@ void zpProfiler::start( zpProfilerSteps step )
 }
 void zpProfiler::end( zpProfilerSteps step )
 {
-	m_profiles[ step ].currentEndTime = m_time->getTime();
+	zpProfilerPart& part = m_profiles[ step ];
+	part.currentEndTime = m_time->getTime();
+	part.samples++;
+
+	part.prevStartTime = part.currentStartTime;
+	part.prevEndTime = part.currentEndTime;
+
+	zp_long t = part.currentEndTime - part.currentStartTime;
+	part.maxTime = ZP_MAX( t, part.maxTime );
+	part.averageTime = ( part.averageTime + t ) / part.samples;
+
+	part.currentStartTime = 0;
+	part.currentEndTime = 0;
 }
 
 void zpProfiler::reset()
@@ -41,21 +53,6 @@ void zpProfiler::reset()
 }
 void zpProfiler::finalize()
 {
-	for( zp_uint i = 0; i < zpProfilerSteps_Count; ++i )
-	{
-		zpProfilerPart& part = m_profiles[ i ];
-		part.samples++;
-
-		part.prevStartTime = part.currentStartTime;
-		part.prevEndTime = part.currentEndTime;
-
-		zp_long t = part.currentEndTime - part.currentStartTime;
-		part.maxTime = ZP_MAX( t, part.maxTime );
-		part.averageTime = ( part.averageTime + t ) / part.samples;
-
-		part.currentStartTime = 0;
-		part.currentEndTime = 0;
-	}
 }
 
 zp_long zpProfiler::getPreviousTime( zpProfilerSteps step )

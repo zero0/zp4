@@ -6,6 +6,8 @@
 
 zpApplication::zpApplication()
 	: m_isRunning( false )
+	, m_hasNextWorld( false )
+	, m_shouldGarbageCollect( false )
 	, m_exitCode( 0 )
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
 	, m_console( ZP_NULL )
@@ -100,13 +102,13 @@ void zpApplication::run()
 }
 zp_int zpApplication::shutdown()
 {
+	garbageCollect();
+
 	m_renderingPipeline.destroy();
 
 	m_appOptions.release();
 
 	m_renderingPipeline.getRenderingEngine()->destroy();
-
-	garbageCollect();
 
 	if( m_console )
 	{
@@ -157,12 +159,7 @@ void zpApplication::simulate()
 
 void zpApplication::garbageCollect()
 {
-	m_textContent.garbageCollect();
-
-	m_renderingPipeline.getMeshContentManager()->garbageCollect();
-	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
-	m_renderingPipeline.getShaderContentManager()->garbageCollect();
-	m_renderingPipeline.getTextureContentManager()->garbageCollect();
+	m_shouldGarbageCollect = true;
 }
 
 void zpApplication::exit( zp_int exitCode )
@@ -258,6 +255,14 @@ void zpApplication::processFrame()
 
 	ZP_PROFILE_START( FRAME );
 
+	if( m_shouldGarbageCollect )
+	{
+		m_shouldGarbageCollect = false;
+
+		ZP_PROFILE_START( GARBAGE_COLLECT );
+		runGarbageCollect();
+		ZP_PROFILE_END( GARBAGE_COLLECT );
+	}
 	zp_long now = m_timer->getTime();
 	zp_uint numUpdates = 0;
 
@@ -310,8 +315,16 @@ void zpApplication::processFrame()
 
 	ZP_PROFILE_END( FRAME );
 
-	ZP_PROFILE_FINALIZE();
-
 	// sleep for the remainder of the frame
 	m_timer->sleep( m_renderMsHz );
+}
+
+void zpApplication::runGarbageCollect()
+{
+	m_textContent.garbageCollect();
+
+	m_renderingPipeline.getMeshContentManager()->garbageCollect();
+	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
+	m_renderingPipeline.getShaderContentManager()->garbageCollect();
+	m_renderingPipeline.getTextureContentManager()->garbageCollect();
 }
