@@ -1,0 +1,11 @@
+{
+	"Name" : "player",
+	"_Extends" : [ "Assets/objects/base.object" ],
+	"Transform" : {},
+	"Components" :
+	{
+		"Render" : 
+		{
+		}
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"Name" : "base",
+	"Transform" : { "x" : 10 },
+	"Components" :
+	{
+		"Script" : 
+		{
+		}
+	}
+}
