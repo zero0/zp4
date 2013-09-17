@@ -14,21 +14,15 @@ class zpResourceInstance
 {
 public:
 	zpResourceInstance() : m_resource( ZP_NULL ) {}
-	~zpResourceInstance()
+	virtual ~zpResourceInstance()
 	{
-		if( m_resource )
-		{
-			m_resource->releaseRef();
-		}
-		m_resource = ZP_NULL;
+		release();
 	}
 
 	zpResourceInstance( const zpResourceInstance< Resource >& other )
 	{
-		if( m_resource )
-		{
-			m_resource->releaseRef();
-		}
+		release();
+
 		m_resource = other.m_resource;
 		if( m_resource )
 		{
@@ -43,10 +37,8 @@ public:
 
 	void operator=( const zpResourceInstance< Resource >& other )
 	{
-		if( m_resource )
-		{
-			m_resource->releaseRef();
-		}
+		release();
+
 		m_resource = other.m_resource;
 		if( m_resource )
 		{
@@ -55,10 +47,8 @@ public:
 	}
 	void operator=( zpResourceInstance< Resource >&& other )
 	{
-		if( m_resource )
-		{
-			m_resource->releaseRef();
-		}
+		release();
+
 		m_resource = other.m_resource;
 		other.m_resource = ZP_NULL;
 	}

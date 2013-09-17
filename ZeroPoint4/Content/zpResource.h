@@ -22,9 +22,12 @@ public:
 
 	zp_bool isLoaded() const;
 
+	zp_long getLastTimeLoaded() const;
+
 protected:
 	zp_bool m_isLoaded;
 	zp_uint m_refCount;
+	zp_long m_lastTimeLoaded;
 	zpString m_filename;
 
 	Resource m_resource;

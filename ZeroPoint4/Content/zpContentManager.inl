@@ -85,6 +85,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 			outInstance.m_resource = empty;
 			empty->addRef();
 			empty->m_isLoaded = true;
+			empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
 
 			return true;
 		}
@@ -122,6 +123,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		if( impl->createResource( found, filename ) )
 		{
 			found->m_isLoaded = true;
+			found->m_lastTimeLoaded = zpTime::getInstance()->getTime();
 			return true;
 		}
 	}
@@ -151,6 +153,7 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 			if( impl->createResource( res, res->getFilename().str() ) )
 			{
 				res->m_isLoaded = true;
+				res->m_lastTimeLoaded = zpTime::getInstance()->getTime();
 			}
 		}
 	}

@@ -3,6 +3,7 @@ template<typename Resource>
 zpResource<Resource>::zpResource()
 	: m_isLoaded( false )
 	, m_refCount( 0 )
+	, m_lastTimeLoaded( 0 )
 	, m_filename()
 	, m_resource()
 {}
@@ -43,4 +44,10 @@ template<typename Resource>
 zp_bool zpResource<Resource>::isLoaded() const
 {
 	return m_isLoaded;
+}
+
+template<typename Resource>
+zp_long zpResource<Resource>::getLastTimeLoaded() const
+{
+	return m_lastTimeLoaded;
 }

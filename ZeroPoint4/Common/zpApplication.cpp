@@ -102,13 +102,13 @@ void zpApplication::run()
 }
 zp_int zpApplication::shutdown()
 {
-	garbageCollect();
-
 	m_renderingPipeline.destroy();
 
 	m_appOptions.release();
 
 	m_renderingPipeline.getRenderingEngine()->destroy();
+
+	runGarbageCollect();
 
 	if( m_console )
 	{
