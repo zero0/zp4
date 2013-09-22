@@ -57,12 +57,16 @@ public:
 	zpApplication* getApplication() const;
 	void setApplication( zpApplication* application );
 
+	void update();
+
 private:
 	void loadObject();
+	void unloadObject();
 
 	zpMatrix4f m_transform;
 	zpString m_name;
 	zpFlag64 m_flags;
+	zp_long m_lastLoadTime;
 	zpAllComponents m_components;
 
 	zpWorld* m_world;

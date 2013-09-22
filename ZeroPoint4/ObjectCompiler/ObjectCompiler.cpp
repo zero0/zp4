@@ -14,6 +14,7 @@ zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedF
 		zpJson extends = inputObject[ RESERVED_EXTENDS ];
 		inputObject[ RESERVED_EXTENDS ] = zpJson::null;
 
+		// process extends
 		if( extends.isArray() && !extends.isEmpty() )
 		{
 			//extends.foreachArray( [ &ok, &parser, &processedFiles, &outObject ]( const zpJson& v )
@@ -44,6 +45,44 @@ zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedF
 				}
 			};
 		}
+
+		// process transform
+		zpMatrix4f outTransform;
+		outTransform.setIdentity();
+
+		zpJson& transform = inputObject[ "Transform" ];
+		if( transform.isObject() && !transform.isEmpty() )
+		{
+			zpJson& translate = transform[ "Position" ];
+			zpJson& rotation = transform[ "Rotation" ];
+			zpJson& scale = transform[ "Scale" ];
+
+			if( !translate.isEmpty() )
+			{
+				zpVector4f pos( translate[ (zp_uint)0 ].asFloat(), translate[ (zp_uint)1 ].asFloat(), translate[ (zp_uint)2 ].asFloat(), 1.0f );
+				outTransform.setRow( 3, pos );
+			}
+			if( !rotation.isEmpty() )
+			{
+
+			}
+			if( !scale.isEmpty() )
+			{
+				zpMatrix4f mat;
+				mat.setIdentity();
+
+				zpVector4f rot;
+				for( zp_uint i = 0; i < 3; ++i )
+				{
+					zpMath::Mul( rot, mat.getRow( i ), zpScalar( scale[ i ].asFloat() ) );
+					mat.setRow( i, rot );
+				}
+
+				zpMath::Mul( outTransform, outTransform, mat );
+			}
+		}
+
+		transform = zpJson( &outTransform, sizeof( zpMatrix4f ) );
 
 		zpJson::mergeJson( outObject, inputObject );
 	}
