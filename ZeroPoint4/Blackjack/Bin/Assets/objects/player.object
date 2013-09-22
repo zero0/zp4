@@ -1,10 +1,17 @@
 {
 	"Name" : "player",
 	"_Extends" : [ "Assets/objects/base.object" ],
-	"Transform" : {},
+	"Tags" : [
+		"Player"
+	],
+	"Layer" : "Default",
+	"Transform" :
+	{
+		"Position" : [ 0, 1, 2 ]
+	},
 	"Components" :
 	{
-		"Render" : 
+		"CameraComponent" :
 		{
 		}
 	}
