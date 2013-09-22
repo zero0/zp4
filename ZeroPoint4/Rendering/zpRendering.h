@@ -237,7 +237,7 @@ enum zpResourceBindSlot : zp_byte
 };
 typedef zp_byte zpResourceBindSlotType;
 
-enum zpMaterialTextureSlot
+enum zpMaterialTextureSlot : zp_byte
 {
 	ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE =		0,
 	ZP_MATERIAL_TEXTURE_SLOT_NORMAL,
@@ -248,7 +248,7 @@ enum zpMaterialTextureSlot
 	zpMaterialTextureSlot_Count
 };
 
-enum zpTextureWrap
+enum zpTextureWrap : zp_byte
 {
 	ZP_TEXTURE_WRAP_REPEAT =		0,
 	ZP_TEXTURE_WRAP_MIRROR,
@@ -258,7 +258,7 @@ enum zpTextureWrap
 	zpTextureWrap_Count,
 };
 
-enum zpTextureFilter
+enum zpTextureFilter : zp_byte
 {
 	ZP_TEXTURE_FILTER_POINT =					0,
 	ZP_TEXTURE_FILTER_LINEAR,
@@ -271,7 +271,7 @@ enum zpTextureFilter
 	zpTextureFilter_Count,
 };
 
-enum zpComparisonFunc
+enum zpComparisonFunc : zp_byte
 {
 	ZP_COMPARISON_FUNC_NONE =		0,
 	ZP_COMPARISON_FUNC_LESS,
@@ -285,7 +285,7 @@ enum zpComparisonFunc
 	zpComparisonFunc_Count,
 };
 
-enum zpCullMode
+enum zpCullMode : zp_byte
 {
 	ZP_CULL_MODE_NONE =		0,
 	ZP_CULL_MODE_FRONT,
@@ -294,7 +294,7 @@ enum zpCullMode
 	zpCullMode_Count,
 };
 
-enum zpFillMode
+enum zpFillMode : zp_byte
 {
 	ZP_FILL_MODE_SOLID =	0,
 	ZP_FILL_MODE_WIREFRAME,
@@ -302,7 +302,7 @@ enum zpFillMode
 	zpFillMode_Count,
 };
 
-enum zpFrontFace
+enum zpFrontFace : zp_byte
 {
 	ZP_FRONT_FACE_CW =		0,
 	ZP_FRONT_FACE_CCW,
@@ -310,7 +310,7 @@ enum zpFrontFace
 	zpFrontFace_Count,
 };
 
-enum zpCpuAccess
+enum zpCpuAccess : zp_byte
 {
 	ZP_CPU_ACCESS_NONE =	0,
 	ZP_CPU_ACCESS_READ,
@@ -345,16 +345,13 @@ struct zpSamplerStateDesc
 
 struct zpRasterStateDesc
 {
-	struct
-	{
-		zpCullMode cullMode				: 2;
-		zpFillMode fillMode				: 1;
-		zpFrontFace frontFace			: 1;
-		zp_bool depthClipEnable			: 1;
-		zp_bool scissorEnable			: 1;
-		zp_bool multisampleEnable		: 1;
-		zp_bool antialiasedLineEnable	: 1;
-	};
+	zpCullMode cullMode;
+	zpFillMode fillMode;
+	zpFrontFace frontFace;
+	zp_bool depthClipEnable;
+	zp_bool scissorEnable;
+	zp_bool multisampleEnable;
+	zp_bool antialiasedLineEnable;
 
 	zp_int depthBias;
 	zp_float depthBiasClamp;

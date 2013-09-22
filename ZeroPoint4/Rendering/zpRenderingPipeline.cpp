@@ -67,7 +67,9 @@ void zpRenderingPipeline::initialize()
 	m_viewport.height = (zp_float)size.getY();
 
 	zpRasterStateDesc raster;
-	raster.cullMode = ZP_CULL_MODE_NONE;
+	raster.cullMode = ZP_CULL_MODE_BACK;
+	raster.frontFace = ZP_FRONT_FACE_CW;
+	raster.depthClipEnable = false;
 	
 	m_raster = m_engine->createRasterState( raster );
 }
@@ -105,9 +107,9 @@ void zpRenderingPipeline::submitRendering()
 		i->addQuadIndex( 0, 1, 2, 3 );
 
 		i->addVertex( zpVector4f( -1, -1, 0, 1 ), zpVector2f( 0, 1 ) );
-		i->addVertex( zpVector4f( -1, 0, 0, 1 ), zpVector2f( 0, 0 ) );
-		i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpVector2f( 1, 0 ) );
-		i->addVertex( zpVector4f( 0, -1, 0, 1 ), zpVector2f( 1, 1 ) );
+		i->addVertex( zpVector4f( -1,  0, 0, 1 ), zpVector2f( 0, 0 ) );
+		i->addVertex( zpVector4f(  0,  0, 0, 1 ), zpVector2f( 1, 0 ) );
+		i->addVertex( zpVector4f(  0, -1, 0, 1 ), zpVector2f( 1, 1 ) );
 		i->addQuadIndex( 4, 5, 6, 7 );
 	//	);
 	i->endDrawImmediate();
