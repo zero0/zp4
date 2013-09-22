@@ -2,6 +2,10 @@
 #ifndef ZP_OBJECT_H
 #define ZP_OBJECT_H
 
+class zpObject;
+class zpObjectContentManager;
+class zpObjectResource;
+
 enum zpObjectFlag : zp_ulong
 {
 	ZP_OBJECT_FLAG_ENABLED =		( 0 << 1 ),
@@ -13,12 +17,26 @@ enum zpObjectFlag : zp_ulong
 	zpObjectFlag_Count,
 };
 
-class zpObjectPooledContent;
+
+class zpObjectResource : public zpResource< zpBison >
+{
+private:
+	zp_bool load( const zp_char* filename );
+	void unload();
+
+	friend class zpObjectContentManager;
+};
+
+class zpObjectResourceInstance : public zpResourceInstance< zpObjectResource >
+{};
+
 
 class zpObject
 {
+	friend class zpObjectContentManager;
+
 public:
-	zpObject( const zp_char* filename );
+	zpObject( const zpObjectResourceInstance& res );
 	~zpObject();
 
 	zpAllComponents* getComponents();
@@ -40,6 +58,8 @@ public:
 	void setApplication( zpApplication* application );
 
 private:
+	void loadObject();
+
 	zpMatrix4f m_transform;
 	zpString m_name;
 	zpFlag64 m_flags;
@@ -47,17 +67,26 @@ private:
 
 	zpWorld* m_world;
 	zpApplication* m_application;
+
+	zpObjectResourceInstance m_object;
 };
 
-class zpObjectPooledContent : public zpContentPool< zpObject, 256 >
+class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 128 >, private zpContentPool< zpObject, 256 >
 {
 public:
-	zpObjectPooledContent();
-	~zpObjectPooledContent();
+	zpObject* createObject( const zp_char* filename );
 
 	void update();
 
 private:
+	zp_bool createResource( zpObjectResource* res, const zp_char* filename );
+	void destroyResource( zpObjectResource* res );
+
+	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+	friend class zpContentManager;
 };
+
+
+
 
 #endif

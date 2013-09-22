@@ -5,8 +5,8 @@ template<typename T, zp_uint Count>
 zpContentPool<T, Count>::~zpContentPool()
 {}
 
-template<typename T, zp_uint Count>
-T* zpContentPool<T, Count>::create( const zp_char* filename )
+template<typename T, zp_uint Count> template<typename R>
+T* zpContentPool<T, Count>::create( const R& param )
 {
 	for( zp_uint i = 0; i < Count; ++i )
 	{
@@ -14,7 +14,8 @@ T* zpContentPool<T, Count>::create( const zp_char* filename )
 		{
 			T* ptr = ( ( (T*)m_pool ) + i );
 			markUsed( i, true );
-			new (ptr) T( filename );
+			zp_zero_memory( ptr );
+			new (ptr) T( param );
 			return ptr;
 		}
 	}
@@ -30,7 +31,6 @@ void zpContentPool<T, Count>::destroy( T* obj )
 		{
 			markUsed( i, false );
 			ptr->~T();
-			zp_zero_memory( ptr );
 			return;
 		}
 	}

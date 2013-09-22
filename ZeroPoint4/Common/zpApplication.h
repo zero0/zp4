@@ -2,7 +2,7 @@
 #ifndef ZP_APPLICATION_H
 #define ZP_APPLICATION_H
 
-class zpApplication : public zpWindowProcListener, public zpWindowFocusListener
+class zpApplication : public zpWindowProcListener, public zpWindowFocusListener, public zpWindowDragDropListener
 {
 public:
 	zpApplication();
@@ -27,6 +27,7 @@ public:
 	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam );
 	virtual void onFocusGained();
 	virtual void onFocusLost();
+	virtual void onDragDrop( const zp_char* filename, zp_int x, zp_int y );
 
 	zp_bool loadFile( const zp_char* filename );
 	zp_bool handleDragAndDrop( const zp_char* filename, zp_int x, zp_int y );
@@ -64,7 +65,7 @@ private:
 	zpInputManager m_inputManager;
 	zpRenderingPipeline m_renderingPipeline;
 	
-	zpObjectPooledContent m_objectContent;
+	zpObjectContentManager m_objectContent;
 	zpWorldPooledContent m_worldContent;
 
 	zpTextContentManager m_textContent;

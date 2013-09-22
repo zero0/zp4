@@ -9,7 +9,8 @@ public:
 	zpContentPool();
 	~zpContentPool();
 
-	T* create( const zp_char* filename );
+	template<typename R>
+	T* create( const R& param );
 	void destroy( T* obj );
 
 	zp_uint size() const;

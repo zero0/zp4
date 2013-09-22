@@ -147,9 +147,6 @@
     <ClInclude Include="zpRandom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpPooledObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpDataBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -228,9 +225,6 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpMessageTypes.inc">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="zpPooledObject.inl">
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpMathFpu.inl">

@@ -1,13 +1,64 @@
 #include "zpCommon.h"
 
-zpObject::zpObject( const zp_char* filename )
+zp_bool zpObjectResource::load( const zp_char* filename )
+{
+	m_filename = filename;
+
+	zp_bool loaded = false;
+	loaded = m_resource.readFromFile( m_filename );
+	return loaded;
+}
+void zpObjectResource::unload()
+{
+	m_filename.clear();
+}
+
+zpObject* zpObjectContentManager::createObject( const zp_char* filename )
+{
+	zpObject* o = ZP_NULL;
+
+	zpObjectResourceInstance obj;
+	getResource( filename, obj );
+	o = create( obj );
+
+	return o;
+}
+
+void zpObjectContentManager::update()
+{
+	for( zp_uint i = 0; i < size(); ++i )
+	{
+		if( isUsed( i ) )
+		{
+			zpObject* o = at( i );
+			if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
+			{
+				destroy( o );
+			}
+		}
+	}
+}
+
+zp_bool zpObjectContentManager::createResource( zpObjectResource* res, const zp_char* filename )
+{
+	return res->load( filename );
+}
+void zpObjectContentManager::destroyResource( zpObjectResource* res )
+{
+	res->unload();
+}
+
+zpObject::zpObject( const zpObjectResourceInstance& res )
 	: m_transform()
 	, m_name()
 	, m_flags( ZP_OBJECT_FLAG_ENABLED )
 	, m_components()
 	, m_world( ZP_NULL )
 	, m_application( ZP_NULL )
-{}
+	, m_object( res )
+{
+	loadObject();
+}
 zpObject::~zpObject()
 {}
 
@@ -70,21 +121,34 @@ void zpObject::setApplication( zpApplication* application )
 	m_application = application;
 }
 
-
-zpObjectPooledContent::zpObjectPooledContent() {}
-zpObjectPooledContent::~zpObjectPooledContent() {}
-
-void zpObjectPooledContent::update()
+void zpObject::loadObject()
 {
-	for( zp_uint i = 0; i < size(); ++i )
+	if( m_object.isVaild() )
 	{
-		if( isUsed( i ) )
-		{
-			zpObject* o = at( i );
-			if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
-			{
-				destroy( o );
-			}
-		}
+		const zpBison::Value& root = m_object.getResource()->getData()->root();
+
+		m_name = root[ "Name" ].asCString();
+	}
+	else
+	{
+		setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
 	}
 }
+
+//zpObjectPooledContent::zpObjectPooledContent() {}
+//zpObjectPooledContent::~zpObjectPooledContent() {}
+//
+//void zpObjectPooledContent::update()
+//{
+//	for( zp_uint i = 0; i < size(); ++i )
+//	{
+//		if( isUsed( i ) )
+//		{
+//			zpObject* o = at( i );
+//			if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
+//			{
+//				destroy( o );
+//			}
+//		}
+//	}
+//}

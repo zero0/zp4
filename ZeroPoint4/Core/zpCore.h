@@ -257,7 +257,6 @@ class zpXmlParser;
 #include "zpMap.h"
 #include "zpFile.h"
 
-#include "zpPooledObject.h"
 #include "zpProperties.h"
 #include "zpMemorySystem.h"
 #include "zpReferencedObject.h"

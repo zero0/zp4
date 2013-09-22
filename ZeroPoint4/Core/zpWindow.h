@@ -28,6 +28,13 @@ public:
 	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) = 0;
 };
 
+ZP_PURE_INTERFACE zpWindowDragDropListener
+{
+public:
+	virtual void onDragDrop( const zp_char* filename, zp_int x, zp_int y ) = 0;
+};
+
+
 class zpWindow
 {
 public:
@@ -69,12 +76,17 @@ public:
 	void removeProcListener( zpWindowProcListener* listener );
 	void removeAllProcListeners();
 
+	void addDragDropListener( zpWindowDragDropListener* listener );
+	void removeDragDropListener( zpWindowDragDropListener* listener );
+	void removeAllDragDropListeners();
+
 	void serialize( zpSerializedOutput* out );
 	void deserialize( zpSerializedInput* in );
 
 private:
 	typedef zpArrayList<zpWindowFocusListener*> zpWindowFocusListenerList;
 	typedef zpArrayList<zpWindowProcListener*> zpWindowProcListenerList;
+	typedef zpArrayList<zpWindowDragDropListener*> zpWindowDragDropListenerList;
 
 	void moveResize();
 	void resizeWindow();
@@ -92,6 +104,7 @@ private:
 
 	zpWindowFocusListenerList m_focusListeners;
 	zpWindowProcListenerList m_procListeners;
+	zpWindowDragDropListenerList m_dragDropListeners;
 };
 
 #endif

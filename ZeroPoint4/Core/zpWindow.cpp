@@ -2,6 +2,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <ShellAPI.h>
 
 #define WINDOW_STYLE		WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_VISIBLE
 #define WINDOW_PTR_INDEX	GWL_USERDATA
@@ -154,7 +155,7 @@ void zpWindow::create()
 	resizeWindow();
 
 	m_hWnd = (zp_handle)CreateWindowEx(
-		0,
+		WS_EX_ACCEPTFILES,
 		WINDOW_CLASS_NAME,
 		m_title.str(),
 		__zpStyleToWS( m_style ),
@@ -257,6 +258,32 @@ void zpWindow::windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam )
 			moveResize();
 		}
 		break;
+	case WM_DROPFILES:
+		{
+			HDROP drop = (HDROP)wParam;
+			
+			POINT pnt;
+			if( DragQueryPoint( drop, &pnt ) )
+			{
+				zp_uint dropCount = DragQueryFile( drop, 0xFFFFFFFF, ZP_NULL, 0 );
+				if( dropCount > 0 )
+				{
+					zp_uint len;
+					zp_char buff[ 256 ];
+					for( zp_uint i = 0; i < dropCount; ++i )
+					{
+						len = DragQueryFile( drop, i, buff, 256 );
+						buff[ len ] = '\0';
+
+						m_dragDropListeners.foreach( [ &pnt, &buff ]( zpWindowDragDropListener* listener )
+						{
+							listener->onDragDrop( buff, pnt.x, pnt.y );
+						} );
+					}
+				}
+			}
+		}
+		break;
 	default:
 		{
 			m_procListeners.foreach( [ &uMessage, &wParam, &lParam ]( zpWindowProcListener* listener ) {
@@ -291,6 +318,19 @@ void zpWindow::removeProcListener( zpWindowProcListener* listener )
 void zpWindow::removeAllProcListeners()
 {
 	m_procListeners.clear();
+}
+
+void zpWindow::addDragDropListener( zpWindowDragDropListener* listener )
+{
+	m_dragDropListeners.pushBack( listener );
+}
+void zpWindow::removeDragDropListener( zpWindowDragDropListener* listener )
+{
+	m_dragDropListeners.eraseAll( listener );
+}
+void zpWindow::removeAllDragDropListeners()
+{
+	m_dragDropListeners.clear();
 }
 
 void zpWindow::moveResize()

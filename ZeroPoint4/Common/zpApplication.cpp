@@ -65,6 +65,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_window.setTitle( window[ "Title" ].asCString() );
 	m_window.addProcListener( this );
 	m_window.addFocusListener( this );
+	m_window.addDragDropListener( this );
 
 	m_window.create();
 
@@ -189,6 +190,10 @@ void zpApplication::onFocusLost()
 	m_inputManager.onFocusLost();
 	m_renderingPipeline.onFocusLost();
 }
+void zpApplication::onDragDrop( const zp_char* filename, zp_int x, zp_int y )
+{
+	handleDragAndDrop( filename, x, y );
+}
 
 zp_bool zpApplication::loadFile( const zp_char* filename )
 {
@@ -203,14 +208,14 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	{
 		loaded = m_textContent.reloadResource( filename );
 	}
-	else if( strFilename.endsWith( ".zpo" ) )
+	else if( strFilename.endsWith( ".objectb" ) )
 	{
-		if( m_currentWorld )
+		//if( m_currentWorld )
 		{
-			zpObject* o = m_objectContent.create( filename );
+			zpObject* o = m_objectContent.createObject( filename );
 			if( o )
 			{
-				m_currentWorld->addObject( o );
+				if( m_currentWorld ) m_currentWorld->addObject( o );
 				loaded = true;
 			}
 		}

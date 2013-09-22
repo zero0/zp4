@@ -144,7 +144,6 @@
     <ClInclude Include="zpMessageReceiver.h" />
     <ClInclude Include="zpPair.h" />
     <ClInclude Include="zpPlane.h" />
-    <ClInclude Include="zpPooledObject.h" />
     <ClInclude Include="zpProfiler.h" />
     <ClInclude Include="zpProperties.h" />
     <ClInclude Include="zpRandom.h" />
@@ -183,7 +182,6 @@
     <None Include="zpMatrix4Simd.inl" />
     <None Include="zpMessageTypes.inc" />
     <None Include="zpPair.inl" />
-    <None Include="zpPooledObject.inl" />
     <None Include="zpBaseTypesSimd.inl" />
     <None Include="zpRect.inl" />
     <None Include="zpTween.inl" />
