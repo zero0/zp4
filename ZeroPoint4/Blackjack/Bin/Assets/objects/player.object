@@ -11,7 +11,7 @@
 	},
 	"Components" :
 	{
-		"CameraComponent" :
+		"EditorCamera" :
 		{
 		}
 	}

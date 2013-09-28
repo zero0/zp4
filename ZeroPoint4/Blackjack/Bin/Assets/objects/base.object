@@ -3,8 +3,5 @@
 	"Transform" : { "x" : 10 },
 	"Components" :
 	{
-		"Script" : 
-		{
-		}
 	}
 }
