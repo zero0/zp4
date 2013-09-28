@@ -151,11 +151,13 @@ void zpApplication::update()
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
 
+	m_editorCameraContentPool.update();
+
 	handleInput();
 }
 void zpApplication::simulate()
 {
-
+	m_editorCameraContentPool.simulate();
 }
 
 void zpApplication::garbageCollect()
@@ -212,7 +214,7 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	{
 		//if( m_currentWorld )
 		{
-			zpObject* o = m_objectContent.createObject( filename );
+			zpObject* o = m_objectContent.createObject( this, filename );
 			if( o )
 			{
 				if( m_currentWorld ) m_currentWorld->addObject( o );

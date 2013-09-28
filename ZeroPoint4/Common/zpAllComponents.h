@@ -5,6 +5,7 @@
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) class zp##cmp;
 #include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 
 class zpAllComponents
 {
@@ -12,26 +13,23 @@ public:
 	zpAllComponents();
 	~zpAllComponents();
 
-	void create();
-	void destroy();
-
-	void simulate();
-	void update();
-
-	void receiveMessage( const zpMessage& message );
-
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) zp##cmp* get##cmp();
+#define ZP_COMPONENT_DEF( cmp ) zp##cmp##Component* get##cmp##Component() { return m_##cmp; }
 	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
+	void load( zpObject* obj, const zp_char* componentName, const zpBison::Value& cmp );
+	void unload();
+
+	void setApplication( zpApplication* app ) { m_app = app; }
 
 private:
-	zp_ptr m_unused;
+	zpApplication* m_app;
+
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp )	zp##cmp* m_##cmp;
+#define ZP_COMPONENT_DEF( cmp )	zp##cmp##Component* m_##cmp;
 	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 };
 
 #endif

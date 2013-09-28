@@ -39,6 +39,9 @@ public:
 	zpRenderingPipeline* getRenderPipeline() { return &m_renderingPipeline; }
 
 	zpTextContentManager* getTextContentManager() { return &m_textContent; }
+	zpObjectContentManager* getObjectContentManager() { return &m_objectContent; }
+
+	zpEditorCameraComponentPool* getEditorCameraComponentPool() { return &m_editorCameraContentPool; }
 
 private:
 	void runGarbageCollect();
@@ -67,6 +70,8 @@ private:
 	
 	zpObjectContentManager m_objectContent;
 	zpWorldPooledContent m_worldContent;
+
+	zpEditorCameraComponentPool m_editorCameraContentPool;
 
 	zpTextContentManager m_textContent;
 };

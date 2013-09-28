@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{ed6c1df4-37f0-4cb3-a210-acfeab425211}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h">
@@ -50,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="zpGameFlow.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpCameraComponent.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -67,6 +67,7 @@
     <ClInclude Include="zpAllComponents.h" />
     <ClInclude Include="zpAllGameManagers.h" />
     <ClInclude Include="zpApplication.h" />
+    <ClInclude Include="zpCameraComponent.h" />
     <ClInclude Include="zpCommon.h" />
     <ClInclude Include="zpComponent.h" />
     <ClInclude Include="zpEditorCameraComponent.h" />

@@ -11,17 +11,19 @@ public:
 
 	template<typename R>
 	T* create( const R& param );
+
+	template<typename R0, typename R1>
+	T* create( const R0& param0, const R1& param1 );
+
 	void destroy( T* obj );
 
 	zp_uint size() const;
 
 protected:
-	void markUsed( zp_uint index, zp_bool used );
-	zp_bool isUsed( zp_uint index ) const;
-	T* at( zp_uint index );
-
-	zpFlag8 m_isUsed[ ( Count / 8 ) + 1 ];
 	zp_byte m_pool[ Count * sizeof( T ) ];
+
+	zpFixedArrayList< T*, Count > m_used;
+	zpFixedArrayList< T*, Count > m_free;
 };
 
 #include "zpContentPool.inl"

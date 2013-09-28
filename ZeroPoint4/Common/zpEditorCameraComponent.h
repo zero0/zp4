@@ -8,13 +8,10 @@ class zpEditorCameraComponent
 	, public zpMouseListener
 {
 public:
-	zpEditorCameraComponent();
+	zpEditorCameraComponent( zpObject* obj, const zpBison::Value& def );
 	virtual ~zpEditorCameraComponent();
 
 	void receiveMessage( const zpMessage& message );
-
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
 
 	void onKeyDown( zpKeyCode key );
 	void onKeyRepeat( zpKeyCode key );
@@ -46,6 +43,16 @@ private:
 
 	zpCamera m_editorCamera;
 	zp_float padding;
+};
+
+class zpEditorCameraComponentPool : public zpContentPool< zpEditorCameraComponent, 4 >
+{
+public:
+	zpEditorCameraComponentPool();
+	virtual ~zpEditorCameraComponentPool();
+
+	void update();
+	void simulate();
 };
 
 #endif

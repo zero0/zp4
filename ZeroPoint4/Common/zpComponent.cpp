@@ -1,18 +1,14 @@
 #include "zpCommon.h"
 
-zpComponent::zpComponent()
+zpComponent::zpComponent( zpObject* obj )
 	: m_flags( 0 )
-	, m_parentObject( ZP_NULL )
+	, m_parentObject( obj )
 {}
 zpComponent::~zpComponent()
 {
 	destroy();
 }
 
-void zpComponent::setParentObject( zpObject* parent )
-{
-	m_parentObject = parent;
-}
 zpObject* zpComponent::getParentObject() const
 {
 	return m_parentObject;
@@ -23,9 +19,12 @@ void zpComponent::setEnabled( zp_bool enabled )
 	zp_bool wasEnabled = m_flags.isMarked( ZP_COMPONENT_FLAG_ENABLED );
 	m_flags.setMarked( ZP_COMPONENT_FLAG_ENABLED, enabled );
 
-	if( wasEnabled && !enabled ) {
+	if( wasEnabled && !enabled )
+	{
 		onDisabled();
-	} else if( !wasEnabled && enabled ) {
+	}
+	else if( !wasEnabled && enabled )
+	{
 		onEnabled();
 	}
 }
@@ -55,15 +54,26 @@ void zpComponent::simulate()
 
 void zpComponent::create()
 {
-	if( m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) ) return;
-	m_flags.mark( ZP_COMPONENT_FLAG_CREATED );
-	onCreate();
+	if( !m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) )
+	{
+		m_flags.mark( ZP_COMPONENT_FLAG_CREATED );
+		onCreate();
+	}
+}
+void zpComponent::initialize()
+{
+	if( m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) )
+	{
+		onInitialize();
+	}
 }
 void zpComponent::destroy()
 {
-	if( !m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) ) return;
-	m_flags.unmark( ZP_COMPONENT_FLAG_CREATED );
-	onDestroy();
+	if( m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) )
+	{
+		m_flags.unmark( ZP_COMPONENT_FLAG_CREATED );
+		onDestroy();
+	}
 }
 
 void zpComponent::sendMessageToParentGameObject( const zpMessage& message )
@@ -72,7 +82,7 @@ void zpComponent::sendMessageToParentGameObject( const zpMessage& message )
 }
 void zpComponent::sendMessageToSiblingComponents( const zpMessage& message )
 {
-	m_parentObject->getComponents()->receiveMessage( message );
+	//m_parentObject->getComponents()->receiveMessage( message );
 }
 
 zpWorld* zpComponent::getWorld() const

@@ -8,7 +8,6 @@
 #include "Rendering\zpRendering.h"
 
 //class zpHealthComponent;
-//class zpEditorCameraComponent;
 //
 //#include "zpHealthComponent.h"
 //#include "zpEditorCameraComponent.h"
@@ -18,17 +17,20 @@ class zpComponent;
 class zpWorld;
 class zpObject;
 
+class zpEditorCameraComponent;
+
+#include "zpComponent.h"
+
+#include "zpEditorCameraComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"
 
 #include "zpObject.h"
 #include "zpWorld.h"
-#include "zpComponent.h"
 #include "zpApplication.h"
 
 //#include "zpHealthComponent.h"
-//#include "zpEditorCameraComponent.h"
 
 
 #endif

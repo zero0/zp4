@@ -36,7 +36,7 @@ class zpObject
 	friend class zpObjectContentManager;
 
 public:
-	zpObject( const zpObjectResourceInstance& res );
+	zpObject( zpApplication* application, const zpObjectResourceInstance& res );
 	~zpObject();
 
 	zpAllComponents* getComponents();
@@ -78,7 +78,7 @@ private:
 class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 128 >, private zpContentPool< zpObject, 256 >
 {
 public:
-	zpObject* createObject( const zp_char* filename );
+	zpObject* createObject( zpApplication* application, const zp_char* filename );
 
 	void update();
 

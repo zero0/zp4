@@ -421,7 +421,6 @@ class zpUIManager;
 template<typename V, typename I> class zpImmediateBuffer;
 
 ZP_ABSTRACT_CLASS zpRenderingComponent;
-class zpCameraComponent;
 class zpLightComponent;
 class zpStaticMeshRenderingComponent;
 class zpTextRenderingComponent;
@@ -491,7 +490,6 @@ struct zpRenderingCommand
 #include "zpImmediateBuffer.h"
 
 #include "zpRenderingComponent.h"
-#include "zpCameraComponent.h"
 #include "zpLightComponent.h"
 #include "zpStaticMeshRenderingComponent.h"
 #include "zpTextRenderingComponent.h"

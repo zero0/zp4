@@ -13,10 +13,9 @@ enum zpComponentFlag
 ZP_ABSTRACT_CLASS zpComponent
 {
 public:
-	zpComponent();
+	zpComponent( zpObject* obj );
 	virtual ~zpComponent();
 
-	void setParentObject( zpObject* parent );
 	zpObject* getParentObject() const;
 
 	void setEnabled( zp_bool enabled );
@@ -27,6 +26,7 @@ public:
 	void simulate();
 
 	void create();
+	void initialize();
 	void destroy();
 
 	void sendMessageToParentGameObject( const zpMessage& message );
@@ -36,14 +36,15 @@ public:
 	zpApplication* getApplication() const;
 
 protected:
-	virtual void onCreate() = 0;
-	virtual void onDestroy() = 0;
+	virtual void onCreate() {};
+	virtual void onInitialize() {};
+	virtual void onDestroy() {};
 
-	virtual void onUpdate() = 0;
+	virtual void onUpdate() {};
 	virtual void onSimulate() {};
 
-	virtual void onEnabled() = 0;
-	virtual void onDisabled() = 0;
+	virtual void onEnabled() {};
+	virtual void onDisabled() {};
 
 private:
 	zpFlag8 m_flags;

@@ -6,64 +6,33 @@
 //#include "Scripting/zpScripting.h"
 
 zpAllComponents::zpAllComponents()
-	: m_unused( 0 )
+	: m_app( ZP_NULL )
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) , m_##cmp( ZP_NULL )
 	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 {}
 zpAllComponents::~zpAllComponents()
 {
-#undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) { zp##cmp##Pool::getInstance()->release( m_##cmp ); m_##cmp = ZP_NULL; }
-	#include "zpAllComponents.inl"
+	unload();
 }
 
-void zpAllComponents::create()
+void zpAllComponents::load( zpObject* obj, const zp_char* componentName, const zpBison::Value& def )
 {
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->create();
+#define ZP_COMPONENT_DEF( cmp ) if( zp_strcmp( componentName, #cmp ) == 0 ) { m_##cmp = m_app->get##cmp##ComponentPool()->create( obj, def ); m_##cmp->create(); }
 	#include "zpAllComponents.inl"
-}
-void zpAllComponents::destroy()
-{
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->destroy();
-	#include "zpAllComponents.inl"
-}
-
-void zpAllComponents::simulate()
-{
-#undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->simulate();
-	#include "zpAllComponents.inl"
-}
-void zpAllComponents::update()
-{
-#undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->update();
-	#include "zpAllComponents.inl"
-}
-
-void zpAllComponents::receiveMessage( const zpMessage& message )
-{
-#undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->receiveMessage( message );
-	#include "zpAllComponents.inl"
-}
 
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) zp##cmp* zpAllComponents::get##cmp() { return m_##cmp; }
-#include "zpAllComponents.inl"
-
-void zpAllComponents::serialize( zpSerializedOutput* out )
-{
-#undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) m_##cmp->serialize( out );
+#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) { m_##cmp->initialize(); }
 	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 }
-void zpAllComponents::deserialize( zpSerializedInput* in )
+void zpAllComponents::unload()
 {
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) in->readSerializableOfType( &m_##cmp ); //if( m_##cmp ) m_##cmp->deserialize( in );
+#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) { m_app->get##cmp##ComponentPool()->destroy( m_##cmp ); m_##cmp = ZP_NULL; }
 	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 }
