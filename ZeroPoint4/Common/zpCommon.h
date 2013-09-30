@@ -6,6 +6,7 @@
 #include "Input\zpInput.h"
 #include "Content\zpContent.h"
 #include "Rendering\zpRendering.h"
+#include "Scripting\zpScripting.h"
 
 //class zpHealthComponent;
 //
@@ -18,10 +19,12 @@ class zpWorld;
 class zpObject;
 
 class zpEditorCameraComponent;
+class zpScriptComponent;
 
 #include "zpComponent.h"
 
 #include "zpEditorCameraComponent.h"
+#include "zpScriptComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"

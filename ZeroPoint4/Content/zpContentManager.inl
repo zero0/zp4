@@ -56,6 +56,8 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		outInstance.m_resource = found;
 		found->addRef();
 
+		outInstance.initialized();
+
 		return true;
 	}
 
@@ -86,6 +88,8 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 			empty->addRef();
 			empty->m_isLoaded = true;
 			empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
+
+			outInstance.initialized();
 
 			return true;
 		}

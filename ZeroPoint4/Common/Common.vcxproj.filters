@@ -16,6 +16,12 @@
     <Filter Include="Header Files\Rendering">
       <UniqueIdentifier>{ed6c1df4-37f0-4cb3-a210-acfeab425211}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scripting">
+      <UniqueIdentifier>{a52e9a54-9856-44e3-9c80-33b99746ff18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scripting">
+      <UniqueIdentifier>{7c586232-0583-4fab-a988-9265950ac6bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h">
@@ -57,6 +63,9 @@
     <ClInclude Include="zpCameraComponent.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="zpScriptComponent.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -88,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="zpApplication.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpScriptComponent.cpp">
+      <Filter>Source Files\Scripting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

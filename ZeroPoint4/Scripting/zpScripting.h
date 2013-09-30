@@ -5,21 +5,24 @@
 #include "Core\zpCore.h"
 #include "Content\zpContent.h"
 
-class zpScriptingResourceCreator;
-class zpScriptResource;
+#include "zpAngelScript.h"
+#include "zpScript.h"
 
-class zpScriptingManager;
-class zpScriptingComponent;
-
-#include "zpScriptingResourceCreator.h"
-#include "zpScriptResource.h"
-#include "zpScriptInstance.h"
-
-#include "zpScriptingManager.h"
-#include "zpScriptingComponent.h"
-
-typedef zpPooledObject<zpScriptingComponent, 128> zpScriptingComponentPool;
-
-void zpScriptingRegisterSerializables();
+//class zpScriptingResourceCreator;
+//class zpScriptResource;
+//
+//class zpScriptingManager;
+//class zpScriptingComponent;
+//
+//#include "zpScriptingResourceCreator.h"
+//#include "zpScriptResource.h"
+//#include "zpScriptInstance.h"
+//
+//#include "zpScriptingManager.h"
+//#include "zpScriptingComponent.h"
+//
+//typedef zpPooledObject<zpScriptingComponent, 128> zpScriptingComponentPool;
+//
+//void zpScriptingRegisterSerializables();
 
 #endif

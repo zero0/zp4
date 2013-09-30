@@ -1,5 +1,4 @@
 #include "zpScripting.h"
-#include "zpAngelScript.h"
 #include "angelscript.h"
 
 #if ZP_DEBUG
@@ -29,7 +28,7 @@ void __onMessageCallback( const asSMessageInfo& info ) {
 	*out << info.section << " [" << info.row << ',' << info.col << "] " << info.message << zpLog::endl;
 }
 #pragma endregion
-
+#if 0
 #pragma region Register zpString
 zpString as_zpString_Factory( asUINT length, const char* string ) {
 	return zpString( string, length );
@@ -393,43 +392,213 @@ void as_zpGameObject_Register( asIScriptEngine* engine ) {
 
 }
 #pragma endregion
+#endif
+zpAngelScript::zpAngelScript()
+{}
+zpAngelScript::~zpAngelScript()
+{}
 
-zpAngelScript::zpAngelScript() {}
-zpAngelScript::~zpAngelScript() {}
-
-asIScriptEngine* zpAngelScript::s_engine = ZP_NULL;
-zp_bool zpAngelScript::createInstance() {
-	if( s_engine ) return false;
+zp_bool zpAngelScript::createEngine()
+{
+	if( m_engine ) return false;
 
 	asSetGlobalMemoryFunctions( allocate, deallocate );
 
-	s_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
-	if( !s_engine ) return false;
+	m_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
+	if( !m_engine ) return false;
 	
-	as_zp_real_Register( s_engine );
-	as_zpString_Register( s_engine );
+	//as_zp_real_Register( s_engine );
+	//as_zpString_Register( s_engine );
 	//as_zpArray_Register( s_engine );
-	as_zpVector4f_Register( s_engine );
-	as_zpMatrix4f_Register( s_engine );
+	//as_zpVector4f_Register( s_engine );
+	//as_zpMatrix4f_Register( s_engine );
 
-	as_zpGameObject_Register( s_engine );
+	//as_zpGameObject_Register( s_engine );
 
+	m_threadContexts.resize( ZP_SCRIPT_THREAD_COUNT );
+	m_freeThreads.reserve( m_threadContexts.size() );
+	m_usedThreads.reserve( m_threadContexts.size() );
+
+	zpScriptThreadContext* begin = m_threadContexts.begin();
+	zpScriptThreadContext* end = m_threadContexts.end();
+	for( ; begin != end; ++begin )
+	{
+		m_freeThreads.pushBack( begin );
+	}
+	
 	return true;
 }
-void zpAngelScript::destroyInstance() {
-	if( s_engine ) {
-		s_engine->Release();
-		s_engine = ZP_NULL;
+void zpAngelScript::destroyEngine()
+{
+	if( m_engine )
+	{
+		( (asIScriptEngine*)m_engine )->Release();
+		m_engine = ZP_NULL;
 	}
 }
 
-asIScriptEngine* zpAngelScript::getInstance() {
-	return s_engine;
+void zpAngelScript::processThreads()
+{
+	asIScriptEngine* engine = (asIScriptEngine*)m_engine;
+	zp_long time = zpTime::getInstance()->getTime();
+
+	zp_uint gc1, gc2;
+	zp_int r;
+
+	for( m_currentThread = 0; m_currentThread < (zp_int)m_usedThreads.size(); ++m_currentThread )
+	{
+		zpScriptThreadContext* thread = m_usedThreads[ m_currentThread ];
+		if( thread->sleepUntil < time )
+		{
+			engine->GetGCStatistics( &gc1 );
+
+			asIScriptContext* context = (asIScriptContext*)thread->coRoutines[ thread->currentCoRoutine ];
+			r = context->Execute();
+
+			engine->GetGCStatistics( &gc2 );
+
+			if( r != asEXECUTION_SUSPENDED )
+			{
+				context->Release();
+
+				thread->coRoutines.erase( thread->currentCoRoutine );
+
+				if( thread->currentCoRoutine >= thread->coRoutines.size() )
+				{
+					thread->currentCoRoutine = 0;
+				}
+
+				if( thread->coRoutines.isEmpty() )
+				{
+					m_freeThreads.pushBack( thread );
+					m_usedThreads.erase( m_currentThread );
+					--m_currentThread;
+				}
+			}
+
+			if( gc2 > gc1 )
+			{
+				engine->GarbageCollect( asGC_FULL_CYCLE | asGC_DESTROY_GARBAGE );
+			}
+
+			engine->GarbageCollect( asGC_ONE_STEP | asGC_DETECT_GARBAGE );
+		}
+	}
 }
 
-void* zpAngelScript::allocate( zp_uint size ) {
-	return zpMemorySystem::getInstance()->allocate( size );
+zpAngelScript* zpAngelScript::getInstance()
+{
+	static zpAngelScript s_instance;
+	return &s_instance;
 }
-void zpAngelScript::deallocate( void* ptr ) {
-	zpMemorySystem::getInstance()->deallocate( ptr );
+
+zp_handle zpAngelScript::getEngine() const
+{
+	return m_engine;
+}
+
+zp_handle zpAngelScript::createScriptObject( zp_handle objectType )
+{
+	asIScriptEngine* engine = (asIScriptEngine*)m_engine;
+	asIObjectType* oType = (asIObjectType*)objectType;
+
+	zp_handle scriptObject = engine->CreateScriptObject( oType );
+	engine->AddRefScriptObject( scriptObject, oType );
+
+	return scriptObject;
+}
+void zpAngelScript::destroyScriptObject( zp_handle scriptObject, zp_handle objectType )
+{
+	asIScriptEngine* engine = (asIScriptEngine*)m_engine;
+	asIObjectType* oType = (asIObjectType*)objectType;
+
+	engine->ReleaseScriptObject( scriptObject, oType );
+}
+
+void zpAngelScript::callObjectMethod( zp_handle object, zp_handle method )
+{
+	if( object != ZP_NULL )
+	{
+		asIScriptEngine* engine = (asIScriptEngine*)m_engine;
+		asIScriptContext* context = engine->CreateContext();
+
+		context->Prepare( (asIScriptFunction*)method );
+		context->SetObject( object );
+
+		zpScriptThreadContext* threadContext;
+		if( !m_freeThreads.isEmpty() )
+		{
+			threadContext = m_freeThreads.back();
+			m_freeThreads.popBack();
+		}
+
+		threadContext->sleepUntil = 0;
+		threadContext->currentCoRoutine = 0;
+		threadContext->coRoutines.pushBack( context );
+		context->SetUserData( threadContext );
+
+		m_usedThreads.pushBack( threadContext );
+	}
+}
+
+void zpAngelScript::sleep( zp_uint milliseconds )
+{
+	asIScriptContext* context = asGetActiveContext();
+	if( context )
+	{
+		zpScriptThreadContext* threadContext = (zpScriptThreadContext*)context->GetUserData();
+		if( threadContext )
+		{
+			zp_long time = zpTime::getInstance()->getTime();
+
+			threadContext->sleepUntil = time + ( milliseconds * 1000 );
+			threadContext->currentCoRoutine = ( threadContext->currentCoRoutine + 1 ) % threadContext->coRoutines.size();
+		}
+	}
+}
+void zpAngelScript::yield()
+{
+	asIScriptContext* context = asGetActiveContext();
+	if( context )
+	{
+		context->Suspend();
+
+		zpScriptThreadContext* threadContext = (zpScriptThreadContext*)context->GetUserData();
+		if( threadContext )
+		{
+			threadContext->currentCoRoutine = ( threadContext->currentCoRoutine + 1 ) % threadContext->coRoutines.size();
+		}
+	}
+}
+void zpAngelScript::createCoRoutine( const zp_char* methodName )
+{
+	asIScriptContext* context = asGetActiveContext();
+	if( context )
+	{
+		zpScriptThreadContext* threadContext = (zpScriptThreadContext*)context->GetUserData();
+		if( threadContext )
+		{
+			asIScriptEngine* engine = (asIScriptEngine*)m_engine;
+
+			const zp_char* moduleName = context->GetFunction()->GetModuleName();
+			asIScriptFunction* method = engine->GetModule( moduleName )->GetFunctionByName( methodName );
+
+			asIScriptContext* methodContext = engine->CreateContext();
+			methodContext->Prepare( method );
+
+			threadContext->coRoutines.pushBack( methodContext );
+			methodContext->SetUserData( threadContext );
+		}
+	}
+}
+
+void* zpAngelScript::allocate( zp_uint size )
+{
+	return zp_malloc( size );
+	//return zpMemorySystem::getInstance()->allocate( size );
+}
+void zpAngelScript::deallocate( void* ptr )
+{
+	return zp_free( ptr );
+	//zpMemorySystem::getInstance()->deallocate( ptr );
 }

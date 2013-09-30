@@ -76,6 +76,7 @@
     <ClInclude Include="zpGameFlow.h" />
     <ClInclude Include="zpObject.h" />
     <ClInclude Include="zpHealthComponent.h" />
+    <ClInclude Include="zpScriptComponent.h" />
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +91,7 @@
     <ClCompile Include="zpGame.cpp" />
     <ClCompile Include="zpObject.cpp" />
     <ClCompile Include="zpHealthComponent.cpp" />
+    <ClCompile Include="zpScriptComponent.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +106,9 @@
     </ProjectReference>
     <ProjectReference Include="..\Rendering\Rendering.vcxproj">
       <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Scripting\Scripting.vcxproj">
+      <Project>{23b9d3dd-536d-4afb-bacd-736612e095c5}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

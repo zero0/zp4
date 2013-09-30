@@ -13,30 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Include">
-      <UniqueIdentifier>{ae941dbc-456c-4b8f-9387-0cf3d9ae54ca}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpScripting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpScriptingComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpScriptingManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpScriptingResourceCreator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpAngelScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpScriptResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpScriptInstance.h">
+    <ClInclude Include="zpScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,31 +29,11 @@
     <ClCompile Include="zpScripting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpScriptingComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpScriptingManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpScriptingResourceCreator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpAngelScript.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpScriptResource.cpp">
+    <ClCompile Include="zpScript.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpScriptInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="zpScriptingManagers.inl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="zpScriptingComponents.inl">
-      <Filter>Source Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

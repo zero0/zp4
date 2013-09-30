@@ -38,8 +38,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(ProjectDir)lib\x86\;$(LibraryPath)</LibraryPath>
+    <SourcePath>$(ProjectDir)angelscript/source;$(SourcePath)</SourcePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <SourcePath>$(SourcePath)</SourcePath>
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -47,7 +51,7 @@
       <PreprocessorDefinitions>_MBCS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>zpScripting.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir)angelscript/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -74,24 +78,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="zpAngelScript.h" />
+    <ClInclude Include="zpScript.h" />
     <ClInclude Include="zpScripting.h" />
-    <ClInclude Include="zpScriptingComponent.h" />
-    <ClInclude Include="zpScriptInstance.h" />
-    <ClInclude Include="zpScriptingManager.h" />
-    <ClInclude Include="zpScriptResource.h" />
-    <ClInclude Include="zpScriptingResourceCreator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpAngelScript.cpp" />
+    <ClCompile Include="zpScript.cpp" />
     <ClCompile Include="zpScripting.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="zpScriptingComponent.cpp" />
-    <ClCompile Include="zpScriptInstance.cpp" />
-    <ClCompile Include="zpScriptingManager.cpp" />
-    <ClCompile Include="zpScriptResource.cpp" />
-    <ClCompile Include="zpScriptingResourceCreator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content\Content.vcxproj">
@@ -100,10 +96,6 @@
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{e1c56d07-b4d0-4eb3-b0f7-dca0b0f13ab4}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="zpScriptingComponents.inl" />
-    <None Include="zpScriptingManagers.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -40,8 +40,10 @@ public:
 
 	zpTextContentManager* getTextContentManager() { return &m_textContent; }
 	zpObjectContentManager* getObjectContentManager() { return &m_objectContent; }
+	zpScriptContentManager* getScriptContentManager() { return &m_scriptContent; }
 
 	zpEditorCameraComponentPool* getEditorCameraComponentPool() { return &m_editorCameraContentPool; }
+	zpScriptComponentPool* getScriptComponentPool() { return &m_scriptContentPool; }
 
 private:
 	void runGarbageCollect();
@@ -70,8 +72,10 @@ private:
 	
 	zpObjectContentManager m_objectContent;
 	zpWorldPooledContent m_worldContent;
+	zpScriptContentManager m_scriptContent;
 
 	zpEditorCameraComponentPool m_editorCameraContentPool;
+	zpScriptComponentPool m_scriptContentPool;
 
 	zpTextContentManager m_textContent;
 };

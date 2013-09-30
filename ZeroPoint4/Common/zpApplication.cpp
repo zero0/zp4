@@ -153,6 +153,14 @@ void zpApplication::update()
 
 	m_editorCameraContentPool.update();
 
+	ZP_PROFILE_START( SCRIPT_UPDATE );
+	m_scriptContentPool.update();
+	ZP_PROFILE_END( SCRIPT_UPDATE );
+
+	ZP_PROFILE_START( SCRIPT_PROC_THREADS );
+	zpAngelScript::getInstance()->processThreads();
+	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
+
 	handleInput();
 }
 void zpApplication::simulate()
