@@ -1,0 +1,13 @@
+class Test
+{
+	void create()
+	{
+		print( "Hello AngelScript!" );
+	}
+	
+	void initialize()
+	{
+		string abs = "Init Scripts!";
+		println( abs );
+	}
+}
