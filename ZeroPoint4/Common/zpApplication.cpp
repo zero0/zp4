@@ -32,6 +32,9 @@ const zpString& zpApplication::getOptionsFilename() const
 void zpApplication::initialize( const zpArrayList< zpString >& args )
 {
 	m_textContent.setApplication( this );
+	m_objectContent.setApplication( this );
+	m_scriptContent.setApplication( this );
+
 	m_renderingPipeline.getMaterialContentManager()->setApplication( this );
 	m_renderingPipeline.getShaderContentManager()->setApplication( this );
 	m_renderingPipeline.getTextureContentManager()->setApplication( this );

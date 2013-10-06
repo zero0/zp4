@@ -3,13 +3,23 @@
 zpScriptComponent::zpScriptComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 {
-	zp_uint count = def.size();
-	m_scripts.reserve( count );
-	def.foreachArray( [ this ]( const zpBison::Value& script )
+	const zpBison::Value scripts = def[ "Scripts" ];
+
+	if( scripts.isArray() )
 	{
-		const zp_char* scriptFile = script.asCString();
-		getApplication()->getScriptContentManager()->getResource( scriptFile, m_scripts.pushBackEmpty() );
-	} );
+		zp_uint count = scripts.size();
+		if( count > 0 )
+		{
+			zpScriptContentManager* scriptContent = getApplication()->getScriptContentManager();
+
+			m_scripts.reserve( count );
+			scripts.foreachArray( [ this, scriptContent ]( const zpBison::Value& script )
+			{
+				const zp_char* scriptFile = script.asCString();
+				scriptContent->getResource( scriptFile, m_scripts.pushBackEmpty() );
+			} );
+		}
+	}
 }
 zpScriptComponent::~zpScriptComponent()
 {
@@ -20,21 +30,21 @@ void zpScriptComponent::onCreate()
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
-		script.callMethod( "create" );
+		script.callMethodImmidiate( "create" );
 	} );
 }
 void zpScriptComponent::onInitialize()
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
-		script.callMethod( "onInitialize" );
+		script.callMethodImmidiate( "initialize" );
 	} );
 }
 void zpScriptComponent::onDestroy()
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
-		script.callMethod( "onDestroy" );
+		script.callMethodImmidiate( "onDestroy" );
 	} );
 }
 
@@ -42,14 +52,14 @@ void zpScriptComponent::onUpdate()
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
-		script.callMethod( "update" );
+		script.callMethodImmidiate( "update" );
 	} );
 }
 void zpScriptComponent::onSimulate()
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
-		script.callMethod( "simulate" );
+		script.callMethodImmidiate( "simulate" );
 	} );
 }
 
@@ -57,14 +67,14 @@ void zpScriptComponent::onEnabled()
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
-		script.callMethod( "onEnabled" );
+		script.callMethodImmidiate( "onEnabled" );
 	} );
 }
 void zpScriptComponent::onDisabled()
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
-		script.callMethod( "onDisabled" );
+		script.callMethodImmidiate( "onDisabled" );
 	} );
 }
 

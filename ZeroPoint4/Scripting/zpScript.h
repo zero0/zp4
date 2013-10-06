@@ -26,6 +26,7 @@ public:
 	virtual ~zpScriptResourceInstance();
 
 	void callMethod( const zp_char* methodName );
+	void callMethodImmidiate( const zp_char* methodName );
 
 private:
 	void initialized();

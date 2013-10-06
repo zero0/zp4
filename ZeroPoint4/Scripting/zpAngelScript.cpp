@@ -18,9 +18,11 @@
 #define AS_ASSERT( r )	if( (r) < asSUCCESS ) { zpLog::debug() << "Assert Failed: (" << r << ") " << __FILE__ << ':' << __LINE__ << zpLog::endl; }
 
 #pragma region Message Callback
-void __onMessageCallback( const asSMessageInfo& info ) {
+void as_MessageCallback( const asSMessageInfo& info )
+{
 	zpLogOutput* out;
-	switch( info.type ) {
+	switch( info.type )
+	{
 	case asMSGTYPE_ERROR:
 		out = &zpLog::error();
 		break;
@@ -36,44 +38,69 @@ void __onMessageCallback( const asSMessageInfo& info ) {
 	*out << info.section << " [" << info.row << ',' << info.col << "] " << info.message << zpLog::endl;
 }
 #pragma endregion
-#if 0
+
+void as_zp_printf( const zpString& str )
+{
+	zp_printf( str.str() );
+}
+void as_zp_printfln( const zpString& str )
+{
+	zp_printfln( str.str() );
+}
+
+void as_Register_Core( asIScriptEngine* engine )
+{
+	zp_int r;
+
+	r = engine->RegisterGlobalFunction( "void print(const string &in)", asFUNCTION( as_zp_printf ), asCALL_CDECL );  AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void println(const string &in)", asFUNCTION( as_zp_printfln ), asCALL_CDECL );  AS_ASSERT( r );
+}
+
 #pragma region Register zpString
-zpString as_zpString_Factory( asUINT length, const char* string ) {
+zpString as_zpString_Factory( asUINT length, const char* string )
+{
 	return zpString( string, length );
 }
 
-void as_zpString_FactoryGeneric( asIScriptGeneric* gen ) {
+void as_zpString_FactoryGeneric( asIScriptGeneric* gen )
+{
 	asUINT length = gen->GetArgDWord( 0 );
 	const char* string = (const char*)gen->GetArgAddress( 1 );
 
-	//new (gen->GetAddressOfReturnLocation()) zpString( string, length );
-	*((zpString*)gen->GetAddressOfReturnLocation()) = zp_move( zpString( string, length ) );
+	new (gen->GetAddressOfReturnLocation()) zpString( string, length );
+	//*((zpString*)gen->GetAddressOfReturnLocation()) = zp_move( zpString( string, length ) );
 }
 
-void as_zpString_Constructor( zpString* self ) {
-	*self = zp_move( zpString() );
+void as_zpString_Constructor( zpString* self )
+{
+	new (self) zpString();
 }
-void as_zpString_CopyConstructor( zpString* self, const zpString& copy ) {
-	*self = zp_move( zpString( copy ) );
+void as_zpString_CopyConstructor( zpString* self, const zpString& copy )
+{
+	new (self) zpString( copy );
 }
-void as_zpString_Deconstructor( zpString* self ) {
+void as_zpString_Deconstructor( zpString* self )
+{
 	self->~zpString();
 }
 
-zpString as_zpString_Substring( const zpString* self, zp_uint start, zp_int end ) {
-	return self->substring( start, end );
-}
-zp_int as_zpString_IndexOf( const zpString* self, const zpString& str, zp_uint start ) {
+//zpString as_zpString_Substring( const zpString* self, zp_uint start, zp_int end )
+//{
+//	return self->substring( start, end );
+//}
+zp_int as_zpString_IndexOf( const zpString* self, const zpString& str, zp_uint start )
+{
 	zp_uint index = self->indexOf( str, start );
 	return index == zpString::npos ? -1 : (zp_int)index;
 }
-zp_int as_zpString_LastIndexOf( const zpString* self, const zpString& str, zp_uint end ) {
+zp_int as_zpString_LastIndexOf( const zpString* self, const zpString& str, zp_uint end )
+{
 	zp_uint index = self->lastIndexOf( str, end );
 	return index == zpString::npos ? -1 : (zp_int)index;
 }
 
-void as_zpString_Register( asIScriptEngine* engine ) {
-	if( !engine ) return;
+void as_zpString_Register( asIScriptEngine* engine )
+{
 	zp_int r;
 
 	r = engine->RegisterObjectType( "string", sizeof( zpString ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
@@ -84,7 +111,7 @@ void as_zpString_Register( asIScriptEngine* engine ) {
 	r = engine->RegisterObjectBehaviour( "string", asBEHAVE_CONSTRUCT, "void f( const string &in )", asFUNCTION( as_zpString_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( "string", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpString_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( "string", "string& opAssign( const string &in )", asMETHODPR( zpString, operator=, ( const zpString& ), zpString& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "string", "void opAssign( const string &in )", asMETHODPR( zpString, operator=, ( const zpString& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 	
 	r = engine->RegisterObjectMethod( "string", "uint length() const", asMETHODPR( zpString, length, () const, zp_uint ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( "string", "bool isEmpty() const", asMETHODPR( zpString, isEmpty, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
@@ -92,34 +119,32 @@ void as_zpString_Register( asIScriptEngine* engine ) {
 	r = engine->RegisterObjectMethod( "string", "uint8& opIndex( uint index )", asMETHODPR( zpString, operator[], ( zp_uint index ), zp_char& ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( "string", "const uint8 opIndex( uint index ) const", asMETHOD( zpString, charAt ), asCALL_THISCALL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "string", "string substring( uint start, int end = -1 ) const", asFUNCTION( as_zpString_Substring ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "string", "string substring( uint start, int end = -1 ) const", asFUNCTION( as_zpString_Substring ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( "string", "int indexOf( const string& in, uint start = 0 ) const", asFUNCTION( as_zpString_IndexOf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( "string", "int lastIndexOf( const string& in, uint end = 0 ) const", asFUNCTION( as_zpString_LastIndexOf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( "string", "string toLower() const", asMETHODPR( zpString, toLower, () const, zpString ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "string", "string toUpper() const", asMETHODPR( zpString, toUpper, () const, zpString ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "string", "string toLower() const", asMETHODPR( zpString, toLower, () const, zpString ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "string", "string toUpper() const", asMETHODPR( zpString, toUpper, () const, zpString ), asCALL_THISCALL ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( "string", "bool startsWith( const string& in ) const", asMETHOD( zpString, startsWith ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "string", "bool endsWith( const string& in ) const", asMETHOD( zpString, endsWith ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "string", "bool startsWith( const string& in ) const", asMETHOD( zpString, startsWith ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "string", "bool endsWith( const string& in ) const", asMETHOD( zpString, endsWith ), asCALL_THISCALL ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( "string", "string trim() const", asMETHODPR( zpString, trim, () const, zpString ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "string", "string trim() const", asMETHODPR( zpString, trim, () const, zpString ), asCALL_THISCALL ); AS_ASSERT( r );
 
 	r = engine->RegisterObjectMethod( "string", "int opCmp( const string& in ) const", asMETHOD( zpString, compareTo ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( "string", "bool opEquals( const string &in ) const", asFUNCTIONPR( operator==, (const zpString& string1, const zpString& string2), zp_bool ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-
 }
 #pragma endregion
 
 #pragma region Register Array
-void as_zpArray_Register( asIScriptEngine* engine ) {
-	if( !engine ) return;
-	zp_int r;
+void as_zpArray_Register( asIScriptEngine* engine )
+{
+	//zp_int r;
 
-	r = engine->RegisterObjectType( "array<class T>", 0, asOBJ_REF | asOBJ_GC | asOBJ_TEMPLATE ); AS_ASSERT( r );
-
+	//r = engine->RegisterObjectType( "array<class T>", sizeof( zpArrayList ), asOBJ_REF | asOBJ_GC | asOBJ_TEMPLATE ); AS_ASSERT( r );
 }
 #pragma endregion
-
+#if 0
 #pragma region Register zp_real
 void as_zp_real_Constructor( zpScalar* self ) {
 	*self = zpScalarZero();
@@ -415,17 +440,25 @@ zp_bool zpAngelScript::createEngine()
 	m_engine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
 	if( !m_engine ) return false;
 	
+	asIScriptEngine* engine = (asIScriptEngine*)m_engine;
+
+	engine->SetMessageCallback( asFUNCTION( as_MessageCallback ), 0, asCALL_CDECL );
+
+	as_zpString_Register( engine );
+
+	as_Register_Core( engine );
 	//as_zp_real_Register( s_engine );
-	//as_zpString_Register( s_engine );
 	//as_zpArray_Register( s_engine );
 	//as_zpVector4f_Register( s_engine );
 	//as_zpMatrix4f_Register( s_engine );
 
 	//as_zpGameObject_Register( s_engine );
 
+	m_immidiateContext = engine->CreateContext();
+
 	m_threadContexts.resize( ZP_SCRIPT_THREAD_COUNT );
-	m_freeThreads.reserve( m_threadContexts.size() );
-	m_usedThreads.reserve( m_threadContexts.size() );
+	m_freeThreads.reserve( ZP_SCRIPT_THREAD_COUNT );
+	m_usedThreads.reserve( ZP_SCRIPT_THREAD_COUNT );
 
 	zpScriptThreadContext* begin = m_threadContexts.begin();
 	zpScriptThreadContext* end = m_threadContexts.end();
@@ -438,6 +471,12 @@ zp_bool zpAngelScript::createEngine()
 }
 void zpAngelScript::destroyEngine()
 {
+	if( m_immidiateContext )
+	{
+		( (asIScriptContext*)m_immidiateContext )->Release();
+		m_immidiateContext = ZP_NULL;
+	}
+
 	if( m_engine )
 	{
 		( (asIScriptEngine*)m_engine )->Release();
@@ -525,7 +564,7 @@ void zpAngelScript::destroyScriptObject( zp_handle scriptObject, zp_handle objec
 
 void zpAngelScript::callObjectMethod( zp_handle object, zp_handle method )
 {
-	if( object != ZP_NULL )
+	if( object != ZP_NULL && method != ZP_NULL )
 	{
 		asIScriptEngine* engine = (asIScriptEngine*)m_engine;
 		asIScriptContext* context = engine->CreateContext();
@@ -546,6 +585,18 @@ void zpAngelScript::callObjectMethod( zp_handle object, zp_handle method )
 		context->SetUserData( threadContext );
 
 		m_usedThreads.pushBack( threadContext );
+	}
+}
+void zpAngelScript::callObjectMethodImmidiate( zp_handle object, zp_handle method )
+{
+	if( object != ZP_NULL && method != ZP_NULL  )
+	{
+		asIScriptContext* context = (asIScriptContext*)m_immidiateContext;
+		
+		context->Unprepare();
+		context->Prepare( (asIScriptFunction*)method );
+		context->SetObject( object );
+		context->Execute();
 	}
 }
 

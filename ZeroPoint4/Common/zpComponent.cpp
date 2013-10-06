@@ -91,5 +91,5 @@ zpWorld* zpComponent::getWorld() const
 }
 zpApplication* zpComponent::getApplication() const
 {
-	return ZP_NULL; //return m_parentGameObject->getWorld()->getGame();
+	return m_parentObject->getApplication();
 }

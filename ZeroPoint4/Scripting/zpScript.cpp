@@ -6,16 +6,17 @@ zp_handle zpScriptResource::getMethod( const zp_char* methodName ) const
 	zp_handle method = ZP_NULL;
 	zp_handle* foundMethod = ZP_NULL;
 	zpString methodStr( methodName );
+
 	if( m_cachedMethods.find( methodStr, &foundMethod ) )
 	{
 		method = *foundMethod;
 	}
-	else
-	{
-		asIObjectType* objectType = (asIObjectType*)m_resource;
-		method = objectType->GetMethodByName( methodName );
-		m_cachedMethods[ methodStr ] = method;
-	}
+	//else
+	//{
+	//	asIObjectType* objectType = (asIObjectType*)m_resource;
+	//	method = objectType->GetMethodByName( methodName );
+	//	m_cachedMethods[ methodStr ] = method;
+	//}
 
 	return method;
 }
@@ -103,6 +104,14 @@ void zpScriptResourceInstance::callMethod( const zp_char* methodName )
 	{
 		zp_handle method = getResource()->getMethod( methodName );
 		zpAngelScript::getInstance()->callObjectMethod( m_scriptObject, method );
+	}
+}
+void zpScriptResourceInstance::callMethodImmidiate( const zp_char* methodName )
+{
+	if( isVaild() )
+	{
+		zp_handle method = getResource()->getMethod( methodName );
+		zpAngelScript::getInstance()->callObjectMethodImmidiate( m_scriptObject, method );
 	}
 }
 void zpScriptResourceInstance::initialized()

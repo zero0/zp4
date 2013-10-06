@@ -26,6 +26,7 @@ public:
 	void destroyScriptObject( zp_handle object, zp_handle objectType );
 
 	void callObjectMethod( zp_handle object, zp_handle method );
+	void callObjectMethodImmidiate( zp_handle object, zp_handle method );
 
 	void sleep( zp_uint milliseconds );
 	void yield();
@@ -38,6 +39,7 @@ private:
 	zpAngelScript();
 
 	zp_handle m_engine;
+	zp_handle m_immidiateContext;
 
 	struct zpScriptThreadContext
 	{

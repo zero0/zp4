@@ -59,7 +59,9 @@ zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& 
 	loadObject();
 }
 zpObject::~zpObject()
-{}
+{
+	unloadObject();
+}
 
 zpAllComponents* zpObject::getComponents()
 {
