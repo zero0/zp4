@@ -12,7 +12,8 @@ zpBufferImpl::zpBufferImpl()
 {}
 zpBufferImpl::~zpBufferImpl()
 {
-	//ZP_SAFE_RELEASE( m_buffer );
+	release();
+	m_buffer = ZP_NULL;
 }
 
 zp_uint zpBufferImpl::getSize() const
@@ -34,6 +35,15 @@ zpDisplayFormat zpBufferImpl::getFormat() const
 zpBufferBindType zpBufferImpl::getBufferBindType() const
 {
 	return m_bind;
+}
+
+void zpBufferImpl::addRef()
+{
+	m_buffer->AddRef();
+}
+void zpBufferImpl::release()
+{
+	m_buffer->Release();
 }
 
 #if 0

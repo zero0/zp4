@@ -6,6 +6,7 @@ template<typename T>
 class zpRect {
 public:
 	zpRect();
+	zpRect( const T& x, const T& y, const T& w, const T& h );
 	zpRect( const zpVector2<T>& position, const zpVector2<T>& size );
 	zpRect( const zpRect& rect );
 	zpRect( zpRect&& rect );
@@ -19,6 +20,11 @@ public:
 
 	void setPosition( const zpVector2<T>& position );
 	void setSize( const zpVector2<T>& size );
+
+	T getLeft() const;
+	T getRight() const;
+	T getTop() const;
+	T getBottom() const;
 
 private:
 	zpVector2<T> m_position;

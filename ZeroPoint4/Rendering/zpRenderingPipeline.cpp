@@ -36,6 +36,8 @@ const zp_char* g_cullMode[] =
 
 zpRenderingPipeline::zpRenderingPipeline()
 	: m_engine( zpRenderingFactory::getRenderingEngine() )
+	, m_cameraBuffer()
+	, m_currentCamera( ZP_NULL )
 {
 }
 zpRenderingPipeline::~zpRenderingPipeline()
@@ -59,8 +61,6 @@ void zpRenderingPipeline::initialize()
 	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
 	ZP_ASSERT( ok, "" );
 
-	m_mat.setTextureOverride( ZP_MATERIAL_TEXTURE_SLOT_DIFFUSE, t );
-
 	const zpVector2i& size = m_engine->getWindow()->getScreenSize();
 
 	m_viewport.width = (zp_float)size.getX();
@@ -72,6 +72,9 @@ void zpRenderingPipeline::initialize()
 	raster.depthClipEnable = false;
 	
 	m_raster = m_engine->createRasterState( raster );
+
+	//m_cameraBuffer = m_engine->createBuffer( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
+	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 }
 void zpRenderingPipeline::destroy()
 {
@@ -83,6 +86,14 @@ void zpRenderingPipeline::beginFrame()
 {
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 	i->clearState();
+
+	if( m_currentCamera && m_currentCamera->update() )
+	{
+		i->update( &m_cameraBuffer, &m_currentCamera->getCameraBufferData(), sizeof( zpCameraBufferData ) );
+	}
+
+	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &m_cameraBuffer );
+
 	i->setRasterState( m_raster );
 }
 
@@ -90,15 +101,10 @@ void zpRenderingPipeline::submitRendering()
 {
 	zpTexture* t = m_engine->getBackBufferRenderTarget();
 	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
-
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 
-	i->setRenderTarget( 0, 1, &t, d );
-	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
-	i->setViewport( m_viewport );
-	i->setScissorRect( zpRecti( zpVector2i( 0, 0 ), zpVector2i( (zp_int)m_viewport.width, (zp_int)m_viewport.height ) ) );
-
-	i->beginDrawImmediate( ZP_RENDERING_LAYER_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
+	// 1) render things
+	i->beginDrawImmediate( ZP_RENDERING_LAYER_UI_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
 	//i->addQuad(
 		i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 ) );
 		i->addVertex( zpVector4f( 0, 1, 0, 1 ), zpVector2f( 0, 0 ) );
@@ -111,13 +117,31 @@ void zpRenderingPipeline::submitRendering()
 		i->addVertex( zpVector4f(  0,  0, 0, 1 ), zpVector2f( 1, 0 ) );
 		i->addVertex( zpVector4f(  0, -1, 0, 1 ), zpVector2f( 1, 1 ) );
 		i->addQuadIndex( 4, 5, 6, 7 );
+
+		i->addQuad(
+			zpVector4f( -1, 0, 0, 1 ), zpVector2f( 0, 1 ),
+			zpVector4f( -1, 1, 0, 1 ), zpVector2f( 0, 0 ),
+			zpVector4f(  0, 1, 0, 1 ), zpVector2f( 1, 0 ),
+			zpVector4f(  0, 0, 0, 1 ), zpVector2f( 1, 1 )
+			);
 	//	);
 	i->endDrawImmediate();
 
-	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh );
+	i->drawMesh( ZP_RENDERING_LAYER_UI_OPAQUE, &m_mesh );
 
-	i->preprocessCommands();
-	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
+	i->fillBuffers();
+
+	// 2) process commands, sorting, etc.
+	i->preprocessCommands( ZP_NULL );
+
+	// 3) actually render commands
+	i->setRenderTarget( 0, 1, &t, d );
+	i->clearDepthStencilBuffer( d, 1.0f, 0 );
+	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
+	i->setViewport( m_viewport );
+	i->setScissorRect( zpRecti( 0, 0, (zp_int)m_viewport.width, (zp_int)m_viewport.height ) );
+
+	i->processCommands( ZP_RENDERING_LAYER_UI_OPAQUE );
 }
 void zpRenderingPipeline::submitDebugRendering()
 {
@@ -164,7 +188,7 @@ void zpRenderingPipeline::generateSamplerStateDesc( const zpBison::Value& sample
 	// start with default sampler state
 	outSamplerDesc = zpSamplerStateDesc();
 
-	if( sampler.isEmpty() )
+	if( !sampler.isEmpty() )
 	{
 		const zpBison::Value cmpFuncValue = sampler[ "CmpFunc" ];
 		const zpBison::Value minFilterValue = sampler[ "MinFilter" ];
@@ -329,7 +353,7 @@ void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster,
 	// start with default raster state
 	outRasterDesc = zpRasterStateDesc();
 
-	if( raster.isEmpty() )
+	if( !raster.isEmpty() )
 	{
 		const zpBison::Value cullModeValue = raster[ "CullMode" ];
 		const zpBison::Value fillModeSolidValue = raster[ "FillModeSolid" ];

@@ -48,6 +48,9 @@ private:
 	zpTextureContentManager m_textureContent;
 	zpMeshContentManager m_meshContent;
 
+	zpBuffer m_cameraBuffer;
+
+	zpCamera* m_currentCamera;
 	zpViewport m_viewport;
 
 	zpMaterialResourceInstance m_mat;

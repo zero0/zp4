@@ -23,7 +23,7 @@ void zpRenderingEngineImpl::initialize()
 	hr = m_dxgiFactory->EnumAdapters( 0, &m_dxgiAdapter );
 	ZP_ASSERT( SUCCEEDED( hr ), "Unable to Get Adapter 0" );
 }
-void zpRenderingEngineImpl::create( zpWindow* window, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget )
+void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint height, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget )
 {
 	HRESULT hr;
 	zp_uint flags = 0;
@@ -34,8 +34,8 @@ void zpRenderingEngineImpl::create( zpWindow* window, zpDisplayMode& displayMode
 	// if neither of the display mode's dimensions are set, set to the window screen size
 	if( !displayMode.width || !displayMode.height )
 	{
-		displayMode.width = window->getScreenSize().getX();
-		displayMode.height = window->getScreenSize().getY();
+		displayMode.width = width;
+		displayMode.height = height;
 	}
 	// if the display mode is set to unknown, default to RGBA8_UNORM
 	if( displayMode.displayFormat == ZP_DISPLAY_FORMAT_UNKNOWN )
@@ -62,7 +62,7 @@ void zpRenderingEngineImpl::create( zpWindow* window, zpDisplayMode& displayMode
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = 1;
-	swapChainDesc.OutputWindow = (HWND)window->getWindowHandle();
+	swapChainDesc.OutputWindow = (HWND)hWindow;
 	swapChainDesc.Windowed = screenMode == ZP_SCREEN_MODE_WINDOWED;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swapChainDesc.Flags = 0;//DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -129,13 +129,7 @@ void zpRenderingEngineImpl::create( zpWindow* window, zpDisplayMode& displayMode
 	outImmediateRenderTarget->m_texture = backBuffer;
 	outImmediateRenderTarget->m_textureResourceView = ZP_NULL;
 	outImmediateRenderTarget->m_textureRenderTarget = backBufferView;
-	//m_immediateRenderTarget = target;
-	//
-	//m_immediateDepthStencilBuffer = createDepthBuffer( ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT, displayMode.width, displayMode.height );
-	//
-	//// set render target and depth buffer for the immediate context automatically
-	//m_immediateContext->setRenderTarget( m_immediateRenderTarget );
-	//m_immediateContext->setDepthStencilBuffer( m_immediateDepthStencilBuffer );
+
 	while( m_inputLayouts.size() < zpVertexFormat_Count )
 	{
 		m_inputLayouts.pushBack( ZP_NULL );
@@ -211,8 +205,8 @@ zp_bool zpRenderingEngineImpl::destroyBuffer( zpBufferImpl* buffer )
 {
 	if( buffer )
 	{
-		ZP_SAFE_RELEASE( buffer->m_buffer );
-		ZP_SAFE_DELETE( buffer );
+		//ZP_SAFE_RELEASE( buffer->m_buffer );
+		//ZP_SAFE_DELETE( buffer );
 		return true;
 	}
 	return false;
@@ -403,6 +397,17 @@ zpDepthStencilBufferImpl* zpRenderingEngineImpl::createDepthStencilBuffer( zp_ui
 
 	return new zpDepthStencilBufferImpl( format, texture, view, width, height );
 }
+zp_bool zpRenderingEngineImpl::destroyDepthStencilBuffer( zpDepthStencilBufferImpl* depthStencil )
+{
+	if( depthStencil )
+	{
+		ZP_SAFE_RELEASE( depthStencil->m_depthStencilView );
+		ZP_SAFE_RELEASE( depthStencil->m_depthTexture );
+		ZP_SAFE_DELETE( depthStencil );
+	}
+	return depthStencil == ZP_NULL;
+}
+
 zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterStateDesc& desc )
 {
 	HRESULT hr;

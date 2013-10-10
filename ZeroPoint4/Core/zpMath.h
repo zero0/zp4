@@ -157,6 +157,7 @@ namespace zpMath
 
 	ZP_FORCE_INLINE void LookAtLH( zpMatrix4f& s, const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up );
 	ZP_FORCE_INLINE void PerspectiveLH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar );
+	ZP_FORCE_INLINE void OrthoLH( zpMatrix4f& s, const zpScalar& l, const zpScalar& r, const zpScalar& t, const zpScalar& b, const zpScalar& zNear, const zpScalar& zFar );
 
 	ZP_FORCE_INLINE void Transpose( zpMatrix4f& s, const zpMatrix4f& a );
 	ZP_FORCE_INLINE void Determinant( zpScalar& s, const zpMatrix4f& a );

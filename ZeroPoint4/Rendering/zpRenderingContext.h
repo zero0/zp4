@@ -14,7 +14,7 @@ public:
 	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
 
 	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
-	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
+	void clearDepthStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth, zp_uint clearStencil );
 	void clearState();
 
 	void setViewport( const zpViewport& viewport );
@@ -23,6 +23,7 @@ public:
 
 	void setRasterState( zpRasterState* raster );
 	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
+	void setConstantBuffer( zp_uint bindSlots, zp_uint index, zpBuffer* buffer );
 
 	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
@@ -31,9 +32,9 @@ public:
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 );
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0, const zpVector2f& uv1 );
 
-	void addLineIndex( zp_short index0, zp_short index1 );
-	void addTriangleIndex( zp_short index0, zp_short index1, zp_short index2 );
-	void addQuadIndex( zp_short index0, zp_short index1, zp_short index2, zp_short index3 );
+	void addLineIndex( zp_ushort index0, zp_ushort index1 );
+	void addTriangleIndex( zp_ushort index0, zp_ushort index1, zp_ushort index2 );
+	void addQuadIndex( zp_ushort index0, zp_ushort index1, zp_ushort index2, zp_ushort index3 );
 
 	void addLine( const zpVector4f& pos0, const zpVector4f& pos1, const zpColor4f& color );
 	void addLine( const zpVector4f& pos0, const zpColor4f& color0, const zpVector4f& pos1, const zpColor4f& color1 );
@@ -80,8 +81,6 @@ public:
 
 	void endDrawImmediate();
 
-	void drawBuffered( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpBuffer* vertexBuffe, zpBuffer* indexBuffer, zp_uint vertexCount, zp_uint indexCount, zpMaterialResourceInstance* material, zpBoundingAABB* boundingBox = 0 );
-
 	void drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, zpMaterialResourceInstance* material = 0 );
 
 	//void drawInstanced( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
@@ -89,12 +88,11 @@ public:
 	void map( zpBuffer* buffer, void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
 	void unmap( zpBuffer* buffer, zp_uint subResource = 0 );
 
-	void update( zpBuffer* buffer, void* data, zp_uint size );
+	void update( zpBuffer* buffer, const void* data, zp_uint size );
 
-	void preprocessCommands();
-
+	void fillBuffers();
+	void preprocessCommands( zpCamera* camera );
 	void processCommands( zpRenderingLayer layer );
-
 	void finalizeCommands();
 
 	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }
@@ -102,6 +100,8 @@ public:
 private:
 	zpRenderingContext();
 	zpRenderingContext( zpRenderingEngine* engine, zpRenderingContextImpl* impl );
+
+	void generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera );
 
 	zpRenderingContextImpl* m_renderContextImpl;
 	zpRenderingEngine* m_renderingEngine;
@@ -111,9 +111,6 @@ private:
 	zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE > m_scratchVertexBuffer;
 	zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE > m_scratchIndexBuffer;
 
-	zp_byte* m_immediateVertexData;
-	zp_byte* m_immediateIndexData;
-
 	zp_uint m_immediateVertexSize;
 	zp_uint m_immediateIndexSize;
 
@@ -121,8 +118,11 @@ private:
 	zpBuffer* m_currentVertexBuffer;
 	zpBuffer* m_currentIndexBuffer;
 
-	zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
-	zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
+
+	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
+	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
+	//zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
+	//zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
 	zpFixedArrayList< zpRecti, 8 > m_scissorRectQueue;
 
 	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingLayer_Count ];

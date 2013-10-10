@@ -382,31 +382,68 @@ ZP_FORCE_INLINE void zpMath::PerspectiveLH( zpMatrix4f& s, const zpScalar& fovy,
 	s.setRow( 2, zpVector4f( z,  z, r22, r23 ) );
 	s.setRow( 3, zpVector4f( z,  z, o,   z ) );
 }
+ZP_FORCE_INLINE void zpMath::OrthoLH( zpMatrix4f& s, const zpScalar& l, const zpScalar& r, const zpScalar& t, const zpScalar& b, const zpScalar& zNear, const zpScalar& zFar )
+{
+	zpScalar rml, rpl, tmb, tpb, fmn, fpn, h( 2.0f ), z( 0.0f ), o( 1.0f );
+	zpScalar m00, m11, m22, m30, m31, m32;
+
+	zpMath::Sub( rml, r, l );
+	zpMath::Sub( tmb, t, b );
+	zpMath::Sub( fmn, zFar, zNear );
+
+	zpMath::Add( rpl, r, l );
+	zpMath::Add( tpb, t, b );
+	zpMath::Add( fpn, zFar, zNear );
+
+	zpMath::Rcp( m00, rml );
+	zpMath::Mul( m00, m00, h );
+
+	zpMath::Rcp( m11, tmb );
+	zpMath::Mul( m11, m11, h );
+
+	zpMath::Rcp( m22, fmn );
+	zpMath::Mul( m22, m22, h );
+	zpMath::Neg( m22, m22 );
+
+	zpMath::Div( m30, rpl, rml );
+	zpMath::Neg( m30, m30);
+
+	zpMath::Div( m31, tpb, tmb );
+	zpMath::Neg( m31, m31);
+
+	zpMath::Div( m32, fpn, fmn );
+	zpMath::Neg( m32, m32);
+
+	s.setRow( 0, zpVector4f( m00, z,   z,   z ) );
+	s.setRow( 1, zpVector4f( z,   m11, z,   z ) );
+	s.setRow( 2, zpVector4f( z,   z,   m22, z ) );
+	s.setRow( 3, zpVector4f( m30, m31, m32, o ) );
+}
 
 ZP_FORCE_INLINE void zpMath::Transpose( zpMatrix4f& s, const zpMatrix4f& a )
 {
-	zp_float m[4][4];
-	m[0][0] = a.m_matrix[0][0];
-	m[0][1] = a.m_matrix[1][0];
-	m[0][2] = a.m_matrix[2][0];
-	m[0][3] = a.m_matrix[3][0];
+	zpMatrix4f m;
+	m.m_matrix[0][0] = a.m_matrix[0][0];
+	m.m_matrix[0][1] = a.m_matrix[1][0];
+	m.m_matrix[0][2] = a.m_matrix[2][0];
+	m.m_matrix[0][3] = a.m_matrix[3][0];
 	
-	m[1][0] = a.m_matrix[0][1];
-	m[1][1] = a.m_matrix[1][1];
-	m[1][2] = a.m_matrix[2][1];
-	m[1][3] = a.m_matrix[3][1];
+	m.m_matrix[1][0] = a.m_matrix[0][1];
+	m.m_matrix[1][1] = a.m_matrix[1][1];
+	m.m_matrix[1][2] = a.m_matrix[2][1];
+	m.m_matrix[1][3] = a.m_matrix[3][1];
 	
-	m[2][0] = a.m_matrix[0][2];
-	m[2][1] = a.m_matrix[1][2];
-	m[2][2] = a.m_matrix[2][2];
-	m[2][3] = a.m_matrix[3][2];
+	m.m_matrix[2][0] = a.m_matrix[0][2];
+	m.m_matrix[2][1] = a.m_matrix[1][2];
+	m.m_matrix[2][2] = a.m_matrix[2][2];
+	m.m_matrix[2][3] = a.m_matrix[3][2];
 	
-	m[3][0] = a.m_matrix[0][3];
-	m[3][1] = a.m_matrix[1][3];
-	m[3][2] = a.m_matrix[2][3];
-	m[3][3] = a.m_matrix[3][3];
+	m.m_matrix[3][0] = a.m_matrix[0][3];
+	m.m_matrix[3][1] = a.m_matrix[1][3];
+	m.m_matrix[3][2] = a.m_matrix[2][3];
+	m.m_matrix[3][3] = a.m_matrix[3][3];
 
-	zp_memcpy( s.m_data, sizeof( s.m_data ), m, sizeof( s.m_data ) );
+	s = m;
 }
 ZP_FORCE_INLINE void zpMath::Determinant( zpScalar& s, const zpMatrix4f& a )
 {

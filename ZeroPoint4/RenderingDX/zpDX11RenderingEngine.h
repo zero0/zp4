@@ -18,7 +18,7 @@ public:
 	~zpRenderingEngineImpl();
 
 	void initialize();
-	void create( zpWindow* window, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget );
+	void create( zp_handle hWindow, zp_uint width, zp_uint height, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget );
 	void destroy();
 	void shutdown();
 
@@ -30,8 +30,11 @@ public:
 	zp_bool destroyTexture( zpTextureImpl* texture );
 
 	zpDepthStencilBufferImpl* createDepthStencilBuffer( zp_uint width, zp_uint height, zpDisplayFormat format );
+	zp_bool destroyDepthStencilBuffer( zpDepthStencilBufferImpl* depthStencil );
+
 	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerStateImpl* createSamplerState( const zpSamplerStateDesc& desc );
+
 	zpShaderImpl* createShader();
 	zp_bool loadShader( zpShaderImpl* shader, const zpBison::Value& shaderFile );
 	zp_bool destroyShader( zpShaderImpl* shader );

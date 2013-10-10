@@ -24,6 +24,9 @@ public:
 	zpDisplayFormat getFormat() const;
 	zpBufferBindType getBufferBindType() const;
 
+	void addRef();
+	void release();
+
 private:
 	zp_uint m_size;
 	zp_uint m_stride;

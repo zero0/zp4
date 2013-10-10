@@ -2,7 +2,7 @@
 #ifndef ZP_COLLISION_H
 #define ZP_COLLISION_H
 
-#define ZP_IS_COLLISION( c ) ( (c) != ZP_COLLISION_TYPE_NONE )
+#define ZP_IS_COLLISION( a, b ) ( zpCollision::testCollision( (a), (b) ) != ZP_COLLISION_TYPE_NONE )
 
 enum zpCollisionType {
 	ZP_COLLISION_TYPE_NONE = 0,

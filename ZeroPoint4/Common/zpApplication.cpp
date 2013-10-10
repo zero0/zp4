@@ -340,6 +340,8 @@ void zpApplication::processFrame()
 void zpApplication::runGarbageCollect()
 {
 	m_textContent.garbageCollect();
+	m_objectContent.garbageCollect();
+	m_scriptContent.garbageCollect();
 
 	m_renderingPipeline.getMeshContentManager()->garbageCollect();
 	m_renderingPipeline.getMaterialContentManager()->garbageCollect();

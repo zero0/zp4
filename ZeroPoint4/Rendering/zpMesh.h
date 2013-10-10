@@ -17,8 +17,8 @@ struct zpMeshPart
 struct zpMesh
 {
 	zpVertexFormat m_format;
-	zpBuffer* m_vertex;
-	zpBuffer* m_index;
+	zpBuffer m_vertex;
+	zpBuffer m_index;
 	zpArrayList< zpMeshPart > m_parts;
 };
 

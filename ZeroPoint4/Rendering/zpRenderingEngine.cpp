@@ -16,16 +16,22 @@ void zpRenderingEngine::initialize()
 }
 void zpRenderingEngine::create()
 {
+	const zpVector2i& size = m_window->getScreenSize();
+
 	zpRenderingContextImpl* immediateContext;
 	zpTextureImpl* immediateRenderTarget;
-	m_renderingEngine->create( m_window, m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
+	m_renderingEngine->create( m_window->getWindowHandle(), size.getX(), size.getY(), m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
 
 	m_immediateRenderTarget.m_textureImpl = immediateRenderTarget;
+
+	m_immediateDepthStencilBuffer = createDepthBuffer( size.getX(), size.getY(), ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT );
+
 	m_renderingContexts.pushBack( new zpRenderingContext( this, immediateContext ) );
 }
 void zpRenderingEngine::destroy()
 {
 	ZP_SAFE_DELETE( m_immediateRenderTarget.m_textureImpl );
+	
 	m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
 		delete cxt;
 	} );
@@ -97,7 +103,7 @@ zpTexture* zpRenderingEngine::getBackBufferRenderTarget()
 }
 zpDepthStencilBuffer* zpRenderingEngine::getBackBufferDepthStencilBuffer() const
 {
-	return ZP_NULL;
+	return m_immediateDepthStencilBuffer;
 }
 
 zp_uint zpRenderingEngine::getNumRenderingContexts() const
@@ -115,11 +121,9 @@ zpRenderingContext* zpRenderingEngine::createRenderingContext()
 	return ZP_NULL;
 }
 
-zpBuffer* zpRenderingEngine::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, const void* data )
+void zpRenderingEngine::createBuffer( zpBuffer& outBuffer, zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, const void* data )
 {
-	zpBufferImpl* buffer;
-	buffer = m_renderingEngine->createBuffer( type, bind, size, stride, data );
-	return new zpBuffer( buffer );
+	outBuffer.m_buffer = m_renderingEngine->createBuffer( type, bind, size, stride, data );
 }
 zp_bool zpRenderingEngine::destroyBuffer( zpBuffer* buffer )
 {
@@ -127,7 +131,7 @@ zp_bool zpRenderingEngine::destroyBuffer( zpBuffer* buffer )
 	{
 		if( m_renderingEngine->destroyBuffer( buffer->m_buffer ) )
 		{
-			ZP_SAFE_DELETE( buffer );
+			//ZP_SAFE_DELETE( buffer );
 			return true;
 		}
 	}
@@ -143,7 +147,7 @@ zp_bool zpRenderingEngine::createTexture( zpTexture* texture, zp_uint width, zp_
 			destroyTexture( texture );
 		}
 
-		texture->m_textureImpl = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, mipLevels );;
+		texture->m_textureImpl = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, mipLevels );
 	}
 	return texture && texture->m_textureImpl;
 }

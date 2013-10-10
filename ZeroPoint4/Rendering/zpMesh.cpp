@@ -56,8 +56,10 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 		const zpBison::Value vertex = root[ "Vertex" ];
 		const zpBison::Value index = root[ "Index" ];
 
-		m_resource.m_vertex = pipeline->getRenderingEngine()->createBuffer( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, vertex.size(), 0, vertex.asData() );
-		m_resource.m_index  = pipeline->getRenderingEngine()->createBuffer( ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_IMMUTABLE, index.size(), sizeof( zp_short ), index.asData() );
+		//m_resource.m_vertex = pipeline->getRenderingEngine()->createBuffer( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, vertex.size(), 0, vertex.asData() );
+		//m_resource.m_index  = pipeline->getRenderingEngine()->createBuffer( ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_IMMUTABLE, index.size(), sizeof( zp_short ), index.asData() );
+		pipeline->getRenderingEngine()->createBuffer( m_resource.m_vertex, ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, vertex.size(), 0, vertex.asData() );
+		pipeline->getRenderingEngine()->createBuffer( m_resource.m_index, ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_IMMUTABLE, index.size(), sizeof( zp_short ), index.asData() );
 
 		const zpBison::Value parts = root[ "Parts" ];
 		m_resource.m_parts.reserve( parts.size() );
@@ -84,12 +86,12 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 }
 void zpMeshResource::unload( zpRenderingEngine* engine )
 {
-	engine->destroyBuffer( m_resource.m_vertex );
-	engine->destroyBuffer( m_resource.m_index );
+	engine->destroyBuffer( &m_resource.m_vertex );
+	engine->destroyBuffer(& m_resource.m_index );
 
 	m_resource.m_format = ZP_VERTEX_FORMAT_VERTEX_COLOR;
-	m_resource.m_vertex = ZP_NULL;
-	m_resource.m_index = ZP_NULL;
+	//m_resource.m_vertex = ZP_NULL;
+	//m_resource.m_index = ZP_NULL;
 	m_resource.m_parts.clear();
 }
 

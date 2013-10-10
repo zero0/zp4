@@ -4,6 +4,11 @@ zpRect<T>::zpRect()
 {}
 
 template<typename T>
+zpRect<T>::zpRect( const T& x, const T& y, const T& w, const T& h )
+	: m_position( x, y )
+	, m_size( w, h )
+{}
+template<typename T>
 zpRect<T>::zpRect( const zpVector2<T>& position, const zpVector2<T>& size )
 	: m_position( position )
 	, m_size( size )
@@ -61,4 +66,25 @@ template<typename T>
 void zpRect<T>::setSize( const zpVector2<T>& size )
 {
 	m_size = size;
+}
+
+template<typename T>
+T zpRect<T>::getLeft() const
+{
+	return m_position.getX();
+}
+template<typename T>
+T zpRect<T>::getRight() const
+{
+	return m_position.getX() + m_size.getX();
+}
+template<typename T>
+T zpRect<T>::getTop() const
+{
+	return m_position.getY();
+}
+template<typename T>
+T zpRect<T>::getBottom() const
+{
+	return m_position.getY() + m_size.getY();
 }

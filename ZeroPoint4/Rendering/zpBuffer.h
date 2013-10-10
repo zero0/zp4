@@ -6,9 +6,12 @@ class zpBufferImpl;
 
 class zpBuffer
 {
-	ZP_NON_COPYABLE( zpBuffer );
 public:
+	zpBuffer();
 	~zpBuffer();
+
+	void operator=( const zpBuffer& buffer );
+	void operator=( zpBuffer&& buffer );
 
 	zp_uint getSize() const;
 	zp_uint getStride() const;
@@ -17,6 +20,8 @@ public:
 	zpBufferBindType getBufferBindType() const;
 
 	zpBufferImpl* getBufferImpl() const;
+
+	void release();
 
 private:
 	zpBuffer( zpBufferImpl* buffer );

@@ -13,7 +13,7 @@ public:
 	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
 
 	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
-	void clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil );
+	void clearDepthStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth, zp_uint clearStencil );
 	void clearState();
 
 	void setViewport( const zpViewport& viewport );
@@ -21,15 +21,18 @@ public:
 
 	void setRasterState( zpRasterState* raster );
 	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
+	void setConstantBuffer( zp_uint bindSlots, zp_uint index, zpBuffer* buffer );
 
 	void map( zpBufferImpl* buffer, void** data, zpMapType mapType = ZP_MAP_TYPE_WRITE_DISCARD, zp_uint subResource = 0 );
 	void unmap( zpBufferImpl* buffer, zp_uint subResource = 0 );
 
-	void update( zpBufferImpl* buffer, void* data, zp_uint size );
+	void update( zpBufferImpl* buffer, const void* data, zp_uint size );
 
 	void processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands );
 
 private:
+	void bindMaterial( const zpMaterial* material );
+
 	ID3D11DeviceContext* m_context;
 };
 

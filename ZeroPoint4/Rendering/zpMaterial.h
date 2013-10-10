@@ -13,6 +13,7 @@ struct zpMaterial
 		zpSamplerState* sampler;
 	};
 
+	zp_ushort materialId;
 	zpShaderResourceInstance shader;
 	zpFixedArrayList< zpMaterialTextureSampler, zpMaterialTextureSlot_Count > textures;
 };
@@ -20,36 +21,25 @@ struct zpMaterial
 class zpMaterialResource : public zpResource< zpMaterial >
 {
 private:
-	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline );
+	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline, zp_ushort materialId );
 	void unload();
 
 	friend class zpMaterialContentManager;
 };
 
 class zpMaterialResourceInstance : public zpResourceInstance< zpMaterialResource >
-{
-public:
-	zpMaterialResourceInstance();
-	~zpMaterialResourceInstance();
-
-	void setTextureOverride( zpMaterialTextureSlot slot, const zpTextureResourceInstance& texture );
-	void resetTexture( zpMaterialTextureSlot slot );
-	zp_bool hasTextureOverride() const;
-
-	zp_uint getNumTextures() const;
-	const zpTexture* getTexture( zpMaterialTextureSlot slot ) const;
-	const zpSamplerState* getSampler( zpMaterialTextureSlot slot ) const;
-	zpResourceBindSlotType getBindSlot( zpMaterialTextureSlot slot ) const;
-
-private:
-	zpFixedArrayList< zpTextureResourceInstance, zpMaterialTextureSlot_Count > m_textureOverides;
-};
+{};
 
 class zpMaterialContentManager : public zpContentManager< zpMaterialResource, zpMaterialResourceInstance, zpMaterialContentManager, 128 >
 {
+public:
+	zpMaterialContentManager();
+
 private:
 	zp_bool createResource( zpMaterialResource* res, const zp_char* filename );
 	void destroyResource( zpMaterialResource* res );
+
+	zp_ushort m_currentMaterialId;
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

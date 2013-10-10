@@ -33,9 +33,10 @@ void zpRenderingContextImpl::clearRenderTarget( zpTexture* renderTarget, const z
 	zpTextureImpl* t = renderTarget->getTextureImpl();
 	m_context->ClearRenderTargetView( t->m_textureRenderTarget, clearColor.asFloat4() );
 }
-void zpRenderingContextImpl::clearDepthStencilBuffer( zp_float clearDepth, zp_uint clearStencil )
+void zpRenderingContextImpl::clearDepthStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth, zp_uint clearStencil )
 {
-	m_context->ClearDepthStencilView( ZP_NULL, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil );
+	ID3D11DepthStencilView* d = depthStencilBuffer == ZP_NULL ? ZP_NULL : depthStencilBuffer->getDepthStencilBufferImpl()->m_depthStencilView;
+	m_context->ClearDepthStencilView( d, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil );
 }
 void zpRenderingContextImpl::clearState()
 {
@@ -92,6 +93,27 @@ void zpRenderingContextImpl::setSamplerState( zp_uint bindSlots, zp_uint index, 
 		m_context->PSSetSamplers( index, 1, &state );
 	}
 }
+void zpRenderingContextImpl::setConstantBuffer( zp_uint bindSlots, zp_uint index, zpBuffer* buffer )
+{
+	ID3D11Buffer* buff = buffer == ZP_NULL ? ZP_NULL : buffer->getBufferImpl()->m_buffer;
+
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
+	{
+		m_context->VSSetConstantBuffers( index, 1, &buff );
+	}
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
+	{
+		m_context->GSSetConstantBuffers( index, 1, &buff );
+	}
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_COMPUTE_SHADER )
+	{
+		m_context->CSSetConstantBuffers( index, 1, &buff );
+	}
+	if( bindSlots & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
+	{
+		m_context->PSSetConstantBuffers( index, 1, &buff );
+	}
+}
 
 void zpRenderingContextImpl::map( zpBufferImpl* buffer, void** data, zpMapType mapType, zp_uint subResource )
 {
@@ -108,7 +130,7 @@ void zpRenderingContextImpl::unmap( zpBufferImpl* buffer, zp_uint subResource )
 	m_context->Unmap( buffer->m_buffer, subResource );
 }
 
-void zpRenderingContextImpl::update( zpBufferImpl* buffer, void* data, zp_uint size )
+void zpRenderingContextImpl::update( zpBufferImpl* buffer, const void* data, zp_uint size )
 {
 	m_context->UpdateSubresource( buffer->m_buffer, 0, ZP_NULL, data, size, 0 );
 }
@@ -144,39 +166,11 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 				ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
 
 				const zpMaterial* mat = command->material->getResource()->getData();
-				if( prevMaterial != mat || command->material->hasTextureOverride() )
+				if( prevMaterial != mat )
 				{
 					prevMaterial = mat;
 
-					const zpShaderImpl* shader = mat->shader.getResource()->getData()->getShaderImpl();
-					if( shader->m_vertexShader )   m_context->VSSetShader( shader->m_vertexShader, 0, 0 );
-					if( shader->m_geometryShader ) m_context->GSSetShader( shader->m_geometryShader, 0, 0 );
-					if( shader->m_pixelShader )    m_context->PSSetShader( shader->m_pixelShader, 0, 0 );
-
-					zp_uint numTextures = command->material->getNumTextures();
-					for( zp_uint i = 0; i < numTextures; ++i )
-					{
-						zpMaterialTextureSlot slot = (zpMaterialTextureSlot)i;
-						const zpTexture* t = command->material->getTexture( slot );
-						const zpSamplerState* s = command->material->getSampler( slot );
-						zpResourceBindSlotType b = command->material->getBindSlot( slot );
-
-						if( b & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
-						{
-							m_context->VSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
-							m_context->VSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
-						}
-						if( b & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
-						{
-							m_context->GSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
-							m_context->GSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
-						}
-						if( b & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
-						{
-							m_context->PSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
-							m_context->PSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
-						}
-					}
+					bindMaterial( mat );
 				}
 
 				zp_uint offset = 0;
@@ -193,6 +187,39 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 			{
 			}
 			break;
+		}
+	}
+}
+
+void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
+{
+	const zpShaderImpl* shader = material->shader.getResource()->getData()->getShaderImpl();
+	if( shader->m_vertexShader )   m_context->VSSetShader( shader->m_vertexShader, 0, 0 );
+	if( shader->m_geometryShader ) m_context->GSSetShader( shader->m_geometryShader, 0, 0 );
+	if( shader->m_pixelShader )    m_context->PSSetShader( shader->m_pixelShader, 0, 0 );
+
+	const zpMaterial::zpMaterialTextureSampler* b = material->textures.begin();
+	const zpMaterial::zpMaterialTextureSampler* e = material->textures.end();
+	for( zp_uint i = 0; b != e; ++i, ++b )
+	{
+		const zpTexture* t = b->texture.getResource()->getData();
+		const zpSamplerState* s = b->sampler;
+		zpResourceBindSlotType slot = b->bindSlots;
+
+		if( slot & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
+		{
+			m_context->VSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+			m_context->VSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
+		}
+		if( slot & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
+		{
+			m_context->GSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+			m_context->GSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
+		}
+		if( slot & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
+		{
+			m_context->PSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+			m_context->PSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
 		}
 	}
 }

@@ -12,7 +12,7 @@ public:
 	zpCamera();
 	~zpCamera();
 
-	void update();
+	zp_bool update();
 
 	void setProjectionType( zpCameraProjection type );
 
@@ -27,6 +27,9 @@ public:
 
 	zp_float getAspectRation() const;
 	zp_float getFovy() const;
+	zp_float getNear() const { return m_bufferData.zNear; }
+	zp_float getFar() const { return m_bufferData.zFar; }
+	zp_float getNearFarDistance() const;
 
 	const zpVector4f& getPosition() const;
 	const zpVector4f& getLookTo() const;
@@ -40,9 +43,6 @@ public:
 	const zpMatrix4f& getInvViewProjection() const;
 	const zpCameraBufferData& getCameraBufferData() const;
 
-	zp_bool isDirty() const;
-	void unmarkDirty();
-
 	void generateRay( const zpVector2i& windowPosition, zpRay& outRay ) const;
 
 private:
@@ -50,18 +50,8 @@ private:
 
 	zp_bool m_isViewDirty;
 	zp_bool m_isProjectionDirty;
-	zp_bool m_isDirty;
-
-	zp_float m_near;
-	zp_float m_far;
-	zp_float m_fovy;
-	zp_float m_aspectRatio;
 
 	zpRecti m_orthoRect;
-
-	zpVector4f m_up;
-	zpVector4f m_lookTo;
-	zpVector4f m_position;
 
 	zpFrustum m_frustum;
 
