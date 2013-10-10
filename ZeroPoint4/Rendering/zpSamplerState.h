@@ -14,7 +14,6 @@ public:
 
 private:
 	zpSamplerStateImpl* m_samplerState;
-	zp_hash m_descHash;
 
 	friend class zpRenderingEngine;
 };

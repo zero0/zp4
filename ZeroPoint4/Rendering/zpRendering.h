@@ -34,8 +34,10 @@ enum
 	ZP_RENDERING_MAX_COMMNADS =					1024,
 	ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS	=	2,
 	ZP_RENDERING_MAX_RENDERING_CONTEXTS =		8,
+
 	ZP_RENDERING_MAX_RASTER_STATES =			16,
-	ZP_RENDERING_MAX_SAMPLER_STATES =			32,
+	ZP_RENDERING_MAX_SAMPLER_STATES =			16,
+	ZP_RENDERING_MAX_DEPTH_STENCIL_STATES =		16,
 
 	ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE = ZP_MEMORY_MB( 1.0f ),
 	ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE =	65535 * sizeof( zp_short ), //ZP_MEMORY_MB( 0.25f ),
@@ -287,13 +289,13 @@ enum zpTextureFilter : zp_byte
 
 enum zpComparisonFunc : zp_byte
 {
-	ZP_COMPARISON_FUNC_NONE =		0,
+	ZP_COMPARISON_FUNC_NEVER =		1,
 	ZP_COMPARISON_FUNC_LESS,
-	ZP_COMPARISON_FUNC_LESS_EQUAL,
 	ZP_COMPARISON_FUNC_EQUAL,
+	ZP_COMPARISON_FUNC_LESS_EQUAL,
+	ZP_COMPARISON_FUNC_GREATER,
 	ZP_COMPARISON_FUNC_NOT_EQUAL,
 	ZP_COMPARISON_FUNC_GREATER_EQUAL,
-	ZP_COMPARISON_FUNC_GREATER,
 	ZP_COMPARISON_FUNC_ALWAYS,
 
 	zpComparisonFunc_Count,
@@ -334,6 +336,20 @@ enum zpCpuAccess : zp_byte
 	zpCpuAccess_Count,
 };
 
+enum zpStencilOp : zp_byte
+{
+	ZP_STENCIL_OP_KEEP =		1,
+	ZP_STENCIL_OP_ZERO,
+	ZP_STENCIL_OP_REPLACE,
+	ZP_STENCIL_OP_INCR_SAT,
+	ZP_STENCIL_OP_DECR_SAT,
+	ZP_STENCIL_OP_INVERT,
+	ZP_STENCIL_OP_INCR,
+	ZP_STENCIL_OP_DECR,
+
+	zpStencilOp_Count,
+};
+
 struct zpSamplerStateDesc
 {
 	struct
@@ -372,6 +388,29 @@ struct zpRasterStateDesc
 	zp_float slopeScaledDepthBias;
 
 	zpRasterStateDesc();
+};
+
+struct zpDepthStencilOp
+{
+	zpStencilOp stencilFail;
+	zpStencilOp stencilPassDepthFail;
+	zpStencilOp stencilPassDepthPass;
+	zpComparisonFunc stencilFunc;
+
+	zpDepthStencilOp();
+};
+struct zpDepthStencilState
+{
+	zp_bool depthEnabled;
+	zp_bool depthWriteMaskAll;
+	zpComparisonFunc depthFunc;
+	zp_bool stencilenabled;
+	zp_byte stencilReadMask;
+	zp_byte stencilWriteMask;
+	zpDepthStencilOp frontFace;
+	zpDepthStencilOp backFace;
+
+	zpDepthStencilState();
 };
 
 struct zpViewport
@@ -463,8 +502,6 @@ struct zpRenderingCommand
 	zp_uint indexOffset;
 	zpRecti scissor;
 	zpBoundingAABB boundingBox;
-
-	zp_uint generateSortKey() const;
 };
 
 #include "zpImage.h"

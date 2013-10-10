@@ -410,55 +410,91 @@ zp_bool zpRenderingEngineImpl::destroyDepthStencilBuffer( zpDepthStencilBufferIm
 
 zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterStateDesc& desc )
 {
-	HRESULT hr;
-	D3D11_RASTERIZER_DESC rasterDesc;
-	zp_zero_memory( &rasterDesc );
-	rasterDesc.FillMode = __zpToDX( desc.fillMode );
-	rasterDesc.CullMode = __zpToDX( desc.cullMode );
-	rasterDesc.FrontCounterClockwise = desc.frontFace == ZP_FRONT_FACE_CCW;
-	rasterDesc.DepthBias = desc.depthBias;
-	rasterDesc.DepthBiasClamp = desc.depthBiasClamp;
-	rasterDesc.SlopeScaledDepthBias = desc.slopeScaledDepthBias;
-	rasterDesc.DepthClipEnable = desc.depthClipEnable;
-	rasterDesc.ScissorEnable = desc.scissorEnable;
-	rasterDesc.MultisampleEnable = desc.multisampleEnable;
-	rasterDesc.AntialiasedLineEnable = desc.antialiasedLineEnable;
+	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpSamplerStateDesc ), 0 );
 
-	ID3D11RasterizerState* state;
-	hr = m_d3dDevice->CreateRasterizerState( &rasterDesc, &state );
-	ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Raster State" );
+	zpRasterStateImpl* sampler = ZP_NULL;
+	zpRasterStateImpl* s = m_rasterStates.begin();
+	zpRasterStateImpl* e = m_rasterStates.end();
+	for( ; s != e; ++s )
+	{
+		if( s->m_descHash == descHash )
+		{
+			sampler = s;
+			break;
+		}
+	}
 
-	zpRasterStateImpl* impl = new zpRasterStateImpl;
-	impl->m_raster = state;
-	impl->m_desc = desc;
+	if( sampler == ZP_NULL )
+	{
+		HRESULT hr;
+		D3D11_RASTERIZER_DESC rasterDesc;
+		zp_zero_memory( &rasterDesc );
+		rasterDesc.FillMode = __zpToDX( desc.fillMode );
+		rasterDesc.CullMode = __zpToDX( desc.cullMode );
+		rasterDesc.FrontCounterClockwise = desc.frontFace == ZP_FRONT_FACE_CCW;
+		rasterDesc.DepthBias = desc.depthBias;
+		rasterDesc.DepthBiasClamp = desc.depthBiasClamp;
+		rasterDesc.SlopeScaledDepthBias = desc.slopeScaledDepthBias;
+		rasterDesc.DepthClipEnable = desc.depthClipEnable;
+		rasterDesc.ScissorEnable = desc.scissorEnable;
+		rasterDesc.MultisampleEnable = desc.multisampleEnable;
+		rasterDesc.AntialiasedLineEnable = desc.antialiasedLineEnable;
 
-	return impl;
+		ID3D11RasterizerState* state;
+		hr = m_d3dDevice->CreateRasterizerState( &rasterDesc, &state );
+		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Raster State" );
+
+		sampler = &m_rasterStates.pushBackEmpty();
+		sampler->m_raster = state;
+		sampler->m_descHash = descHash;
+		sampler->m_desc = desc;
+	}
+
+	return sampler;
 }
 zpSamplerStateImpl* zpRenderingEngineImpl::createSamplerState( const zpSamplerStateDesc& desc )
 {
-	HRESULT hr;
-	D3D11_SAMPLER_DESC samplerDesc;
-	zp_zero_memory( &samplerDesc );
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;	// TODO: update with real value
-	samplerDesc.AddressU = __zpToDX( desc.texWrapU );
-	samplerDesc.AddressV = __zpToDX( desc.texWrapV );
-	samplerDesc.AddressW = __zpToDX( desc.texWrapW );
-	samplerDesc.MipLODBias = desc.lodBias;
-	samplerDesc.MaxAnisotropy = desc.maxAnisotrpy;
-	samplerDesc.ComparisonFunc = __zpToDX( desc.cmpFunc );
-	desc.borderColor.store4( samplerDesc.BorderColor );
-	samplerDesc.MinLOD = desc.lodMin;
-	samplerDesc.MaxLOD = desc.lodMax;
+	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpSamplerStateDesc ), 0 );
 
-	ID3D11SamplerState* state;
-	hr = m_d3dDevice->CreateSamplerState( &samplerDesc, &state );
-	ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Sampler State" );
+	zpSamplerStateImpl* sampler = ZP_NULL;
+	zpSamplerStateImpl* s = m_samplerStates.begin();
+	zpSamplerStateImpl* e = m_samplerStates.end();
+	for( ; s != e; ++s )
+	{
+		if( s->m_descHash == descHash )
+		{
+			sampler = s;
+			break;
+		}
+	}
 
-	zpSamplerStateImpl* impl = new zpSamplerStateImpl;
-	impl->m_sampler = state;
-	impl->m_desc = desc;
+	if( sampler == ZP_NULL )
+	{
+		HRESULT hr;
+		D3D11_SAMPLER_DESC samplerDesc;
+		zp_zero_memory( &samplerDesc );
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;	// TODO: update with real value
+		samplerDesc.AddressU = __zpToDX( desc.texWrapU );
+		samplerDesc.AddressV = __zpToDX( desc.texWrapV );
+		samplerDesc.AddressW = __zpToDX( desc.texWrapW );
+		samplerDesc.MipLODBias = desc.lodBias;
+		samplerDesc.MaxAnisotropy = desc.maxAnisotrpy;
+		samplerDesc.ComparisonFunc = __zpToDX( desc.cmpFunc );
+		desc.borderColor.store4( samplerDesc.BorderColor );
+		samplerDesc.MinLOD = desc.lodMin;
+		samplerDesc.MaxLOD = desc.lodMax;
 
-	return impl;
+		ID3D11SamplerState* state;
+		hr = m_d3dDevice->CreateSamplerState( &samplerDesc, &state );
+		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Sampler State" );
+
+		sampler = &m_samplerStates.pushBackEmpty();
+		sampler->m_sampler = state;
+		sampler->m_descHash = descHash;
+		sampler->m_desc = desc;
+	}
+
+	return sampler;
 }
 zpShaderImpl* zpRenderingEngineImpl::createShader()
 {

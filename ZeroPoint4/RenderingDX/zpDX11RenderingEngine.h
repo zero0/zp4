@@ -52,6 +52,9 @@ private:
 	ID3D11Device* m_d3dDevice;
 
 	zpFixedArrayList< ID3D11InputLayout*, zpVertexFormat_Count > m_inputLayouts;
+
+	zpFixedArrayList< zpSamplerStateImpl, ZP_RENDERING_MAX_SAMPLER_STATES > m_samplerStates;
+	zpFixedArrayList< zpRasterStateImpl, ZP_RENDERING_MAX_RASTER_STATES > m_rasterStates;
 };
 
 #if 0

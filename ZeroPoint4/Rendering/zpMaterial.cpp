@@ -33,7 +33,7 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 			ZP_ASSERT( ok, "Failed to load texture '%s' for material '%s'", tex, getFilename().str() );
 
 			zpSamplerStateDesc sampler;
-			t.sampler = pipeline->getRenderingEngine()->createSamplerState( sampler );
+			pipeline->getRenderingEngine()->createSamplerState( t.sampler, sampler );
 		} );
 
 		// load constants from the material
@@ -47,7 +47,7 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 
 			zpSamplerStateDesc sampler;
 			pipeline->generateSamplerStateDesc( v, sampler );
-			t.sampler = pipeline->getRenderingEngine()->createSamplerState( sampler );
+			pipeline->getRenderingEngine()->createSamplerState( t.sampler, sampler );
 		} );
 	}
 

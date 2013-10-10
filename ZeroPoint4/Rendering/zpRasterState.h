@@ -7,14 +7,13 @@ class zpRasterStateImpl;
 class zpRasterState
 {
 public:
-	zpRasterState();	
+	zpRasterState();
 	~zpRasterState();
 
 	zpRasterStateImpl* getRasterStateImpl() const;
 
 private:
 	zpRasterStateImpl* m_rasterState;
-	zp_hash m_descHash;
 
 	friend class zpRenderingEngine;
 };

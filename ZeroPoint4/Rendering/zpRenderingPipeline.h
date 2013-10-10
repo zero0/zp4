@@ -56,7 +56,7 @@ private:
 	zpMaterialResourceInstance m_mat;
 	zpMeshResourceInstance m_mesh;
 
-	zpRasterState* m_raster;
+	zpRasterState m_raster;
 };
 
 #endif

@@ -10,7 +10,7 @@ struct zpMaterial
 	{
 		zpTextureResourceInstance texture;
 		zpResourceBindSlotType bindSlots;
-		zpSamplerState* sampler;
+		zpSamplerState sampler;
 	};
 
 	zp_ushort materialId;

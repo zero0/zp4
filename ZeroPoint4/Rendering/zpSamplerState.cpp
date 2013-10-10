@@ -10,11 +10,10 @@
 
 zpSamplerState::zpSamplerState()
 	: m_samplerState( ZP_NULL )
-	, m_descHash( 0 )
 {}
 zpSamplerState::~zpSamplerState()
 {
-	ZP_SAFE_DELETE( m_samplerState );
+	//ZP_SAFE_DELETE( m_samplerState );
 }
 
 zpSamplerStateImpl* zpSamplerState::getSamplerStateImpl() const

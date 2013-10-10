@@ -181,53 +181,55 @@ zpDepthStencilBuffer* zpRenderingEngine::createDepthBuffer( zp_uint width, zp_ui
 	return new zpDepthStencilBuffer( buffer );
 }
 
-zpRasterState* zpRenderingEngine::createRasterState( const zpRasterStateDesc& desc )
+void zpRenderingEngine::createRasterState( zpRasterState& state, const zpRasterStateDesc& desc )
 {
-	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpRasterStateDesc ), 0 );
-
-	zpRasterState* raster = ZP_NULL;
-	for( zp_uint i = 0; i < m_rasterStates.size(); ++i )
-	{
-		zpRasterState* r = &m_rasterStates[ i ];
-		if( r->m_descHash == descHash )
-		{
-			raster = r;
-			break;
-		}
-	}
-
-	if( raster == ZP_NULL )
-	{
-		raster = &m_rasterStates.pushBackEmpty();
-		raster->m_rasterState = m_renderingEngine->createRasterState( desc );
-		raster->m_descHash = descHash;
-	}
-
-	return raster;
+	//zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpRasterStateDesc ), 0 );
+	//
+	//zpRasterState* raster = ZP_NULL;
+	//for( zp_uint i = 0; i < m_rasterStates.size(); ++i )
+	//{
+	//	zpRasterState* r = &m_rasterStates[ i ];
+	//	if( r->m_descHash == descHash )
+	//	{
+	//		raster = r;
+	//		break;
+	//	}
+	//}
+	//
+	//if( raster == ZP_NULL )
+	//{
+	//	raster = &m_rasterStates.pushBackEmpty();
+	//	raster->m_rasterState = m_renderingEngine->createRasterState( desc );
+	//	raster->m_descHash = descHash;
+	//}
+	//
+	//return raster;
+	state.m_rasterState = m_renderingEngine->createRasterState( desc );
 }
-zpSamplerState* zpRenderingEngine::createSamplerState( const zpSamplerStateDesc& desc )
+void zpRenderingEngine::createSamplerState( zpSamplerState& state, const zpSamplerStateDesc& desc )
 {
-	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpSamplerStateDesc ), 0 );
-
-	zpSamplerState* sampler = ZP_NULL;
-	for( zp_uint i = 0; i < m_samplerStates.size(); ++i )
-	{
-		zpSamplerState* s = &m_samplerStates[ i ];
-		if( s->m_descHash == descHash )
-		{
-			sampler = s;
-			break;
-		}
-	}
-
-	if( sampler == ZP_NULL )
-	{
-		sampler = &m_samplerStates.pushBackEmpty();
-		sampler->m_samplerState = m_renderingEngine->createSamplerState( desc );
-		sampler->m_descHash = descHash;
-	}
-
-	return sampler;
+	//zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpSamplerStateDesc ), 0 );
+	//
+	//zpSamplerState* sampler = ZP_NULL;
+	//for( zp_uint i = 0; i < m_samplerStates.size(); ++i )
+	//{
+	//	zpSamplerState* s = &m_samplerStates[ i ];
+	//	if( s->m_descHash == descHash )
+	//	{
+	//		sampler = s;
+	//		break;
+	//	}
+	//}
+	//
+	//if( sampler == ZP_NULL )
+	//{
+	//	sampler = &m_samplerStates.pushBackEmpty();
+	//	sampler->m_samplerState = m_renderingEngine->createSamplerState( desc );
+	//	sampler->m_descHash = descHash;
+	//}
+	//
+	//return sampler;
+	state.m_samplerState = m_renderingEngine->createSamplerState( desc );
 }
 
 zp_bool zpRenderingEngine::createShader( zpShader* shader )

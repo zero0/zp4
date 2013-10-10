@@ -67,11 +67,12 @@ void zpRenderingPipeline::initialize()
 	m_viewport.height = (zp_float)size.getY();
 
 	zpRasterStateDesc raster;
-	raster.cullMode = ZP_CULL_MODE_BACK;
-	raster.frontFace = ZP_FRONT_FACE_CW;
-	raster.depthClipEnable = false;
+	//raster.cullMode = ZP_CULL_MODE_BACK;
+	//raster.frontFace = ZP_FRONT_FACE_CW;
+	//raster.fillMode = ZP_FILL_MODE_WIREFRAME;
+	//raster.depthClipEnable = true;
 	
-	m_raster = m_engine->createRasterState( raster );
+	m_engine->createRasterState( m_raster, raster );
 
 	//m_cameraBuffer = m_engine->createBuffer( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
@@ -94,7 +95,7 @@ void zpRenderingPipeline::beginFrame()
 
 	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &m_cameraBuffer );
 
-	i->setRasterState( m_raster );
+	i->setRasterState( &m_raster );
 }
 
 void zpRenderingPipeline::submitRendering()

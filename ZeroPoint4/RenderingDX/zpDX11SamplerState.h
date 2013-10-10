@@ -12,6 +12,7 @@ public:
 
 private:
 	ID3D11SamplerState* m_sampler;
+	zp_hash m_descHash;
 	zpSamplerStateDesc m_desc;
 
 	friend class zpRenderingEngineImpl;

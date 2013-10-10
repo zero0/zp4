@@ -203,22 +203,22 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 	for( zp_uint i = 0; b != e; ++i, ++b )
 	{
 		const zpTexture* t = b->texture.getResource()->getData();
-		const zpSamplerState* s = b->sampler;
+		const zpSamplerState& s = b->sampler;
 		zpResourceBindSlotType slot = b->bindSlots;
 
 		if( slot & ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER )
 		{
-			m_context->VSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+			m_context->VSSetSamplers( i, 1, &s.getSamplerStateImpl()->m_sampler );
 			m_context->VSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
 		}
 		if( slot & ZP_RESOURCE_BIND_SLOT_GEOMETRY_SHADER )
 		{
-			m_context->GSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+			m_context->GSSetSamplers( i, 1, &s.getSamplerStateImpl()->m_sampler );
 			m_context->GSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
 		}
 		if( slot & ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER )
 		{
-			m_context->PSSetSamplers( i, 1, &s->getSamplerStateImpl()->m_sampler );
+			m_context->PSSetSamplers( i, 1, &s.getSamplerStateImpl()->m_sampler );
 			m_context->PSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
 		}
 	}

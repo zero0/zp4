@@ -53,8 +53,8 @@ public:
 
 	//virtual zpVertexLayout* createVertexLayout( const zpString& desc ) = 0;
 
-	zpRasterState* createRasterState( const zpRasterStateDesc& desc );
-	zpSamplerState* createSamplerState( const zpSamplerStateDesc& desc );
+	void createRasterState( zpRasterState& state, const zpRasterStateDesc& desc );
+	void createSamplerState( zpSamplerState& state, const zpSamplerStateDesc& desc );
 
 	zp_bool createShader( zpShader* shader );
 	zp_bool loadShader( zpShader* shader, const zpBison::Value& shaderfile );

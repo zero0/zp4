@@ -3,7 +3,7 @@
 //#pragma comment( lib, "Awesomium" )
 
 zpSamplerStateDesc::zpSamplerStateDesc()
-	: cmpFunc( ZP_COMPARISON_FUNC_NONE )
+	: cmpFunc( ZP_COMPARISON_FUNC_NEVER )
 	, minFilter (ZP_TEXTURE_FILTER_POINT )
 	, magFilter( ZP_TEXTURE_FILTER_POINT )
 	, mipFilter( ZP_TEXTURE_FILTER_POINT )
@@ -30,6 +30,21 @@ zpRasterStateDesc::zpRasterStateDesc()
 	, antialiasedLineEnable( false )
 {}
 
+zpDepthStencilOp::zpDepthStencilOp()
+	: stencilFail( ZP_STENCIL_OP_KEEP )
+	, stencilPassDepthFail( ZP_STENCIL_OP_KEEP )
+	, stencilPassDepthPass( ZP_STENCIL_OP_KEEP )
+	, stencilFunc( ZP_COMPARISON_FUNC_ALWAYS )
+{}
+
+zpDepthStencilState::zpDepthStencilState()
+	: depthEnabled( true )
+	, depthWriteMaskAll( true )
+	, depthFunc( ZP_COMPARISON_FUNC_LESS )
+	, stencilenabled( false )
+	, stencilReadMask( 0xFF )
+	, stencilWriteMask( 0xFF )
+{}
 //ZP_SERIALIZE_POOLED_OBJECT( CameraComponent )
 //ZP_SERIALIZE_POOLED_OBJECT( LightComponent )
 //ZP_SERIALIZE_POOLED_OBJECT( StaticMeshRenderingComponent )
@@ -44,13 +59,4 @@ void zpRenderingRegisterSerializables() {
 	//ZP_REGISTER_SERIALZED_POOL( StaticMeshRenderingComponent );
 	//
 	//zpRegisterSerializable::registerSerializable<zpDeferredRenderingComponent>();
-}
-
-#define LAYER_TO_SORT_KEY( layer )	( ( 1 << ( layer ) ) << 16 )
-
-zp_uint zpRenderingCommand::generateSortKey() const
-{
-	
-
-	return 0;
 }
