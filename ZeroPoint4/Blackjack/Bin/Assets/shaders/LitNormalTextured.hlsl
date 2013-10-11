@@ -1,7 +1,24 @@
-//#pragma pack_matrix( row_major )
+#pragma pack_matrix( row_major )
 
 SamplerState texSampler : register( s0 );
 Texture2D<float4> tex : register( t0 );
+
+struct Camera
+{
+	float4x4 viewProjection;
+	float4x4 invViewProjection;
+	
+	float4 up;
+	float4 lookTo;
+	float4 position;
+
+	float zNear;
+	float zFar;
+	float fovy;
+	float aspectRatio;
+};
+
+Camera camera : register( b0 );
 
 struct VS_Input
 {
@@ -20,7 +37,7 @@ struct PS_Input
 PS_Input main_vs( VS_Input input )
 {
 	PS_Input output = (PS_Input)0;
-	output.position = input.position;
+	output.position = mul( input.position, camera.viewProjection );
 	output.normal = input.normal;
 	output.texCoord = input.texCoord;
 	
