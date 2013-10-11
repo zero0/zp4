@@ -120,6 +120,19 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	}
 }
 
+void zpRenderingContext::setBoundingBox( const zpBoundingAABB& bounding )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+
+	m_currentCommnad->boundingBox = bounding;
+}
+void zpRenderingContext::setBoundingBoxCenter( const zpVector4f& center )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+
+	m_currentCommnad->boundingBox.setCenter( center );
+}
+
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpColor4f& color )
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
@@ -432,10 +445,11 @@ void zpRenderingContext::endDrawImmediate()
 	m_immediateIndexSize = m_scratchIndexBuffer.size();
 }
 
-void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, zpMaterialResourceInstance* material )
+void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpVector4f& center, zpMaterialResourceInstance* material )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 
+	zpVector4f c;
 	const zpMesh* m = mesh->getResource()->getData();
 	const zpMeshPart* b = m->m_parts.begin();
 	const zpMeshPart* e = m->m_parts.end();
@@ -456,6 +470,10 @@ void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstanc
 		command.vertexOffset = b->m_vertexOffset;
 		command.indexOffset = b->m_indexOffset;
 		command.boundingBox = b->m_boundingBox;
+
+		b->m_boundingBox.getCenter( c );
+		zpMath::Add( c, c, center );
+		command.boundingBox.setCenter( c );
 
 		switch( command.vertexFormat )
 		{

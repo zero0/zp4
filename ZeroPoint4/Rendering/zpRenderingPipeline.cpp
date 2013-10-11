@@ -128,16 +128,16 @@ void zpRenderingPipeline::submitRendering()
 		i->addVertex( zpVector4f(  0, -1, 0, 1 ), zpVector2f( 1, 1 ) );
 		i->addQuadIndex( 4, 5, 6, 7 );
 
-		i->addQuad(
-			zpVector4f( -1, 0, 0, 1 ), zpVector2f( 0, 1 ),
-			zpVector4f( -1, 1, 0, 1 ), zpVector2f( 0, 0 ),
-			zpVector4f(  0, 1, 0, 1 ), zpVector2f( 1, 0 ),
-			zpVector4f(  0, 0, 0, 1 ), zpVector2f( 1, 1 )
-			);
+		//i->addQuad(
+		//	zpVector4f( -1, 0, 0, 1 ), zpVector2f( 0, 1 ),
+		//	zpVector4f( -1, 1, 0, 1 ), zpVector2f( 0, 0 ),
+		//	zpVector4f(  0, 1, 0, 1 ), zpVector2f( 1, 0 ),
+		//	zpVector4f(  0, 0, 0, 1 ), zpVector2f( 1, 1 )
+		//	);
 	//	);
 	i->endDrawImmediate();
 
-	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh );
+	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh, zpVector4f( 0 ) );
 	
 	// 1) fill buffers
 	i->fillBuffers();

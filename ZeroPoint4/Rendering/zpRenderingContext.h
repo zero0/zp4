@@ -27,6 +27,9 @@ public:
 
 	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
+	void setBoundingBox( const zpBoundingAABB& bounding );
+	void setBoundingBoxCenter( const zpVector4f& center );
+
 	void addVertex( const zpVector4f& pos, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 );
@@ -81,7 +84,7 @@ public:
 
 	void endDrawImmediate();
 
-	void drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, zpMaterialResourceInstance* material = 0 );
+	void drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpVector4f& center, zpMaterialResourceInstance* material = 0 );
 
 	//void drawInstanced( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
