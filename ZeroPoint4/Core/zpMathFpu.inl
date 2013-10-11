@@ -336,51 +336,96 @@ ZP_FORCE_INLINE void zpMath::Cmp( zp_int& s, const zpVector4f& a, const zpVector
 
 ZP_FORCE_INLINE void zpMath::LookAtLH( zpMatrix4f& s, const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up )
 {
-	zpVector4f x, y, z, e;
+	zpVector4f x, y, z;
 	zpScalar ex, ey, ez;
 
 	zpMath::Normalize3( z, direction );
 	zpMath::Cross3( x, up, z );
+	zpMath::Normalize3( x, x );
 	zpMath::Cross3( y, z, x );
-	zpMath::Neg( e, eye );
-	zpMath::Neg( x, x );
 
-	zpMath::Dot3( ex, e, x );
-	zpMath::Dot3( ey, e, y );
-	zpMath::Dot3( ez, e, z );
+	zpMath::Dot3( ex, x, eye );
+	zpMath::Dot3( ey, y, eye );
+	zpMath::Dot3( ez, z, eye );
+
+	zpMath::Neg( ex, ex );
+	zpMath::Neg( ey, ey );
+	zpMath::Neg( ez, ez );
 
 	s.setRow( 0, x );
 	s.setRow( 1, y );
 	s.setRow( 2, z );
-	s.setRow( 3, zpVector4f( ex, ey, ez, zpScalar( 1.0f ) ) );
-	
+	s.setRow( 3, zpVector4f( 0 ) );
 	zpMath::Transpose( s, s );
+
+	s.setRow( 3, zpVector4f( ex, ey, ez, zpScalar( 1.0f ) ) );
+}
+ZP_FORCE_INLINE void zpMath::LookAtRH( zpMatrix4f& s, const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up )
+{
+	zpVector4f x, y, z;
+	zpScalar ex, ey, ez;
+
+	zpMath::Neg( z, direction );
+	zpMath::Normalize3( z, z );
+	zpMath::Cross3( x, up, z );
+	zpMath::Normalize3( x, x );
+	zpMath::Cross3( y, z, x );
+
+	zpMath::Dot3( ex, x, eye );
+	zpMath::Dot3( ey, y, eye );
+	zpMath::Dot3( ez, z, eye );
+
+	s.setRow( 0, x );
+	s.setRow( 1, y );
+	s.setRow( 2, z );
+	s.setRow( 3, zpVector4f( 0 ) );
+	zpMath::Transpose( s, s );
+
+	s.setRow( 3, zpVector4f( ex, ey, ez, zpScalar( 1.0f ) ) );
 }
 
 ZP_FORCE_INLINE void zpMath::PerspectiveLH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar )
 {
-	zpScalar f, fa, z( 0.0f ), o( 1.0f ), fn, nf, r22, r23;
-	zpMath::DegToRad( f, f );
-	zpMath::Mul( f, f, zpScalar( 0.5f ) );
-	zpMath::Tan( f, f );
-	zpMath::Rcp( f, f );
+	zpScalar yScale, xScale, z( 0.0f ), fn, r22, r32, o( 1.0f );
+	zpMath::DegToRad( yScale, fovy );
+	zpMath::Mul( yScale, yScale, zpScalar( 0.5f ) );
+	zpMath::Tan( yScale, yScale );
+	zpMath::Rcp( yScale, yScale );
 
-	zpMath::Div( fa, f, aspectRatio );
-	zpMath::Add( fn, zFar, zNear );
-	zpMath::Neg( fn, fn );
+	zpMath::Div( xScale, yScale, aspectRatio );
+
+	zpMath::Sub( fn, zFar, zNear );
+
+	zpMath::Div( r22, zFar, fn );
+
+	zpMath::Mul( r32, zNear, r22 );
+	zpMath::Neg( r32, r32 );
+
+	s.setRow( 0, zpVector4f( xScale, z,      z,   z ) );
+	s.setRow( 1, zpVector4f( z,      yScale, z,   z ) );
+	s.setRow( 2, zpVector4f( z,      z,      r22, o ) );
+	s.setRow( 3, zpVector4f( z,      z,      r32, z ) );
+}
+ZP_FORCE_INLINE void zpMath::PerspectiveRH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar )
+{
+	zpScalar yScale, xScale, z( 0.0f ), nf, r22, r32, no( -1.0f );
+	zpMath::DegToRad( yScale, fovy );
+	zpMath::Mul( yScale, yScale, zpScalar( 0.5f ) );
+	zpMath::Tan( yScale, yScale );
+	zpMath::Rcp( yScale, yScale );
+
+	zpMath::Div( xScale, yScale, aspectRatio );
 
 	zpMath::Sub( nf, zNear, zFar );
 
-	zpMath::Div( r22, fn, nf );
+	zpMath::Div( r22, zFar, nf );
 
-	zpMath::Mul( r23, zpScalar( 2.0f ), zNear );
-	zpMath::Mul( r23, r23, zFar );
-	zpMath::Div( r23, r23, nf );
+	zpMath::Mul( r32, zNear, r22 );
 
-	s.setRow( 0, zpVector4f( fa, z, z,   z ) );
-	s.setRow( 1, zpVector4f( z,  f, z,   z ) );
-	s.setRow( 2, zpVector4f( z,  z, r22, r23 ) );
-	s.setRow( 3, zpVector4f( z,  z, o,   z ) );
+	s.setRow( 0, zpVector4f( xScale, z,      z,   z ) );
+	s.setRow( 1, zpVector4f( z,      yScale, z,   z ) );
+	s.setRow( 2, zpVector4f( z,      z,      r22, no ) );
+	s.setRow( 3, zpVector4f( z,      z,      r32, z ) );
 }
 ZP_FORCE_INLINE void zpMath::OrthoLH( zpMatrix4f& s, const zpScalar& l, const zpScalar& r, const zpScalar& t, const zpScalar& b, const zpScalar& zNear, const zpScalar& zFar )
 {

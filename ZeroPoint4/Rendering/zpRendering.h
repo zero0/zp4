@@ -462,12 +462,13 @@ enum zpRenderingCommandType : zp_uint
 	zpRenderingCommandType_Force32 = ZP_FORECE_32BIT,
 };
 
+class zpCamera;
+
 class zpRenderingContext;
 class zpRenderingEngine;
 class zpRenderingFactory;
 class zpRenderingPipeline;
 
-class zpCamera;
 class zpRenderingManager;
 class zpUIManager;
 
@@ -529,12 +530,13 @@ struct zpRenderingCommand
 #include "zpStaticMeshResource.h"
 #include "zpOBJStaticMeshResource.h"
 
+#include "zpCamera.h"
+
 #include "zpRenderingContext.h"
 #include "zpRenderingEngine.h"
 #include "zpRenderingFactory.h"
 #include "zpRenderingPipeline.h"
 
-#include "zpCamera.h"
 #include "zpRenderingManager.h"
 #include "zpUIManager.h"
 

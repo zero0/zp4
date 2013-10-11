@@ -40,6 +40,10 @@ public:
 	void generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc );
 	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
 
+	zpCamera* getDefaultCamera() { return &m_defaultCamera; };
+	zpCamera* getCurrentCamera() { return m_currentCamera; };
+	void setCurrentCamera( zpCamera* camera ) { m_currentCamera = camera; };
+
 private:
 	zpRenderingEngine* m_engine;
 
@@ -50,6 +54,7 @@ private:
 
 	zpBuffer m_cameraBuffer;
 
+	zpCamera m_defaultCamera;
 	zpCamera* m_currentCamera;
 	zpViewport m_viewport;
 

@@ -37,7 +37,7 @@ const zp_char* g_cullMode[] =
 zpRenderingPipeline::zpRenderingPipeline()
 	: m_engine( zpRenderingFactory::getRenderingEngine() )
 	, m_cameraBuffer()
-	, m_currentCamera( ZP_NULL )
+	, m_currentCamera( &m_defaultCamera )
 {
 }
 zpRenderingPipeline::~zpRenderingPipeline()
@@ -63,12 +63,14 @@ void zpRenderingPipeline::initialize()
 
 	const zpVector2i& size = m_engine->getWindow()->getScreenSize();
 
+	m_viewport.minDepth = 0.0f;
+	m_viewport.maxDepth = 1.0f;
 	m_viewport.width = (zp_float)size.getX();
 	m_viewport.height = (zp_float)size.getY();
 
 	zpRasterStateDesc raster;
-	//raster.cullMode = ZP_CULL_MODE_BACK;
-	//raster.frontFace = ZP_FRONT_FACE_CW;
+	raster.cullMode = ZP_CULL_MODE_BACK;
+	raster.frontFace = ZP_FRONT_FACE_CW;
 	//raster.fillMode = ZP_FILL_MODE_WIREFRAME;
 	//raster.depthClipEnable = true;
 	
@@ -76,6 +78,13 @@ void zpRenderingPipeline::initialize()
 
 	//m_cameraBuffer = m_engine->createBuffer( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
+
+	m_defaultCamera.setPosition( zpVector4f( 1, 1, 1, 1 ) );
+	m_defaultCamera.setLookAt( zpVector4f( 0, 0, 0, 1 ) );
+	m_defaultCamera.setUp( zpVector4f( 0, 1, 0, 0 ) );
+	m_defaultCamera.setAspectRatio( m_viewport.width / m_viewport.height );
+	m_defaultCamera.setFovy( 45.0f );
+	m_defaultCamera.setNearFar( 1.0f, 100.0f );
 }
 void zpRenderingPipeline::destroy()
 {
@@ -104,7 +113,7 @@ void zpRenderingPipeline::submitRendering()
 	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 
-	// 1) render things
+	// 0) render things outside this loop
 	i->beginDrawImmediate( ZP_RENDERING_LAYER_UI_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
 	//i->addQuad(
 		i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 ) );
@@ -128,19 +137,22 @@ void zpRenderingPipeline::submitRendering()
 	//	);
 	i->endDrawImmediate();
 
-	i->drawMesh( ZP_RENDERING_LAYER_UI_OPAQUE, &m_mesh );
-
+	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh );
+	
+	// 1) fill buffers
 	i->fillBuffers();
 
 	// 2) process commands, sorting, etc.
-	i->preprocessCommands( ZP_NULL );
+	i->preprocessCommands( m_currentCamera );
 
 	// 3) actually render commands
-	i->setRenderTarget( 0, 1, &t, d );
-	i->clearDepthStencilBuffer( d, 1.0f, 0 );
+	i->setRenderTarget( 0, 1, &t, ZP_NULL );
+	//i->clearDepthStencilBuffer( d, 1.0f, 0 );
 	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
 	i->setViewport( m_viewport );
 	i->setScissorRect( zpRecti( 0, 0, (zp_int)m_viewport.width, (zp_int)m_viewport.height ) );
+
+	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
 
 	i->processCommands( ZP_RENDERING_LAYER_UI_OPAQUE );
 }
