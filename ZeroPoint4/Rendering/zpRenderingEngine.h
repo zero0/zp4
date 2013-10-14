@@ -39,11 +39,11 @@ public:
 	zpRenderingContext* createRenderingContext();
 
 	void createBuffer( zpBuffer& outBuffer, zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride = 0, const void* data = 0 );
-	zp_bool destroyBuffer( zpBuffer* buffer );
+	zp_bool destroyBuffer( zpBuffer& buffer );
 
-	zp_bool createTexture( zpTexture* texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
-	zp_bool createTextureFromFile( zpTexture* texture, const zpString& filename );
-	zp_bool destroyTexture( zpTexture* texture );
+	zp_bool createTexture( zpTexture& texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
+	zp_bool createTextureFromFile( zpTexture& texture, const zpString& filename );
+	zp_bool destroyTexture( zpTexture& texture );
 
 	void createDepthBuffer( zpDepthStencilBuffer& depthStencilBuffer, zp_uint width, zp_uint height, zpDisplayFormat format );
 	void destroyDepthBuffer( zpDepthStencilBuffer& depthStencilBuffer );

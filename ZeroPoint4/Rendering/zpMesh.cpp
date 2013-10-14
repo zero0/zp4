@@ -86,8 +86,8 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 }
 void zpMeshResource::unload( zpRenderingEngine* engine )
 {
-	engine->destroyBuffer( &m_resource.m_vertex );
-	engine->destroyBuffer(& m_resource.m_index );
+	engine->destroyBuffer( m_resource.m_vertex );
+	engine->destroyBuffer( m_resource.m_index );
 
 	m_resource.m_format = ZP_VERTEX_FORMAT_VERTEX_COLOR;
 	//m_resource.m_vertex = ZP_NULL;
