@@ -80,12 +80,14 @@ void zpRenderingPipeline::initialize()
 	//m_cameraBuffer = m_engine->createBuffer( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 
+	m_defaultCamera.setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
 	m_defaultCamera.setPosition( zpVector4f( 1, 1, 1, 1 ) );
 	m_defaultCamera.setLookAt( zpVector4f( 0, 0, 0, 1 ) );
 	m_defaultCamera.setUp( zpVector4f( 0, 1, 0, 0 ) );
 	m_defaultCamera.setAspectRatio( m_viewport.width / m_viewport.height );
 	m_defaultCamera.setFovy( 45.0f );
 	m_defaultCamera.setNearFar( 1.0f, 100.0f );
+	m_defaultCamera.setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
 }
 void zpRenderingPipeline::destroy()
 {

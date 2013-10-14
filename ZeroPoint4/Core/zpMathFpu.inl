@@ -429,42 +429,63 @@ ZP_FORCE_INLINE void zpMath::PerspectiveRH( zpMatrix4f& s, const zpScalar& fovy,
 }
 ZP_FORCE_INLINE void zpMath::OrthoLH( zpMatrix4f& s, const zpScalar& l, const zpScalar& r, const zpScalar& t, const zpScalar& b, const zpScalar& zNear, const zpScalar& zFar )
 {
-	zpScalar rml, rpl, tmb, tpb, fmn, fpn, h( 2.0f ), z( 0.0f ), o( 1.0f );
+	zpScalar rml, lmr, rpl, tmb, bmt, tpb, fmn, nmf, h( 2.0f ), z( 0.0f ), o( 1.0f );
 	zpScalar m00, m11, m22, m30, m31, m32;
 
 	zpMath::Sub( rml, r, l );
+	zpMath::Sub( lmr, l, r );
 	zpMath::Sub( tmb, t, b );
+	zpMath::Sub( bmt, b, t );
 	zpMath::Sub( fmn, zFar, zNear );
+	zpMath::Sub( nmf, zNear, zFar );
 
 	zpMath::Add( rpl, r, l );
 	zpMath::Add( tpb, t, b );
-	zpMath::Add( fpn, zFar, zNear );
 
-	zpMath::Rcp( m00, rml );
-	zpMath::Mul( m00, m00, h );
-
-	zpMath::Rcp( m11, tmb );
-	zpMath::Mul( m11, m11, h );
-
+	// scale
+	zpMath::Div( m00, h, rml );
+	zpMath::Div( m11, h, tmb );
 	zpMath::Rcp( m22, fmn );
-	zpMath::Mul( m22, m22, h );
-	zpMath::Neg( m22, m22 );
 
-	zpMath::Div( m30, rpl, rml );
-	zpMath::Neg( m30, m30);
-
-	zpMath::Div( m31, tpb, tmb );
-	zpMath::Neg( m31, m31);
-
-	zpMath::Div( m32, fpn, fmn );
-	zpMath::Neg( m32, m32);
+	// translate
+	zpMath::Div( m30, rpl, lmr );
+	zpMath::Div( m31, tpb, bmt );
+	zpMath::Div( m32, zNear, nmf );
 
 	s.setRow( 0, zpVector4f( m00, z,   z,   z ) );
 	s.setRow( 1, zpVector4f( z,   m11, z,   z ) );
 	s.setRow( 2, zpVector4f( z,   z,   m22, z ) );
 	s.setRow( 3, zpVector4f( m30, m31, m32, o ) );
 }
+ZP_FORCE_INLINE void zpMath::OrthoRH( zpMatrix4f& s, const zpScalar& l, const zpScalar& r, const zpScalar& t, const zpScalar& b, const zpScalar& zNear, const zpScalar& zFar )
+{
+	zpScalar rml, lmr, rpl, tmb, bmt, tpb, nmf, h( 2.0f ), z( 0.0f ), o( 1.0f );
+	zpScalar m00, m11, m22, m30, m31, m32;
 
+	zpMath::Sub( rml, r, l );
+	zpMath::Sub( lmr, l, r );
+	zpMath::Sub( tmb, t, b );
+	zpMath::Sub( bmt, b, t );
+	zpMath::Sub( nmf, zNear, zFar );
+
+	zpMath::Add( rpl, r, l );
+	zpMath::Add( tpb, t, b );
+
+	// scale
+	zpMath::Div( m00, h, rml );
+	zpMath::Div( m11, h, tmb );
+	zpMath::Rcp( m22, nmf );
+
+	// translate
+	zpMath::Div( m30, rpl, lmr );
+	zpMath::Div( m31, tpb, bmt );
+	zpMath::Div( m32, zNear, nmf );
+
+	s.setRow( 0, zpVector4f( m00, z,   z,   z ) );
+	s.setRow( 1, zpVector4f( z,   m11, z,   z ) );
+	s.setRow( 2, zpVector4f( z,   z,   m22, z ) );
+	s.setRow( 3, zpVector4f( m30, m31, m32, o ) );
+}
 ZP_FORCE_INLINE void zpMath::Transpose( zpMatrix4f& s, const zpMatrix4f& a )
 {
 	zpMatrix4f m;

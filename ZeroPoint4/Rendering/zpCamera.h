@@ -16,6 +16,8 @@ public:
 
 	void setProjectionType( zpCameraProjection type );
 
+	void setOrthoRect( const zpRecti& rect ) { m_orthoRect = rect; }
+
 	void setNearFar( zp_float nearDist, zp_float farDist );
 	void setFovy( zp_float fovy );
 	void setAspectRatio( zp_float aspectRatio );

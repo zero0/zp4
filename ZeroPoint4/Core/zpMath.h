@@ -160,6 +160,7 @@ namespace zpMath
 	ZP_FORCE_INLINE void PerspectiveLH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar );
 	ZP_FORCE_INLINE void PerspectiveRH( zpMatrix4f& s, const zpScalar& fovy, const zpScalar& aspectRatio, const zpScalar& zNear, const zpScalar& zFar );
 	ZP_FORCE_INLINE void OrthoLH( zpMatrix4f& s, const zpScalar& l, const zpScalar& r, const zpScalar& t, const zpScalar& b, const zpScalar& zNear, const zpScalar& zFar );
+	ZP_FORCE_INLINE void OrthoRH( zpMatrix4f& s, const zpScalar& l, const zpScalar& r, const zpScalar& t, const zpScalar& b, const zpScalar& zNear, const zpScalar& zFar );
 
 	ZP_FORCE_INLINE void Transpose( zpMatrix4f& s, const zpMatrix4f& a );
 	ZP_FORCE_INLINE void Determinant( zpScalar& s, const zpMatrix4f& a );
