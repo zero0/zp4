@@ -13,13 +13,13 @@ void zpRenderingEngine::initialize()
 {
 	m_renderingEngine->initialize();
 }
-void zpRenderingEngine::create()
+void zpRenderingEngine::create( zp_handle hWindow, const zpVector2i& size )
 {
-	const zpVector2i& size = m_window->getScreenSize();
+	m_screenSize = size;
 
 	zpRenderingContextImpl* immediateContext;
 	zpTextureImpl* immediateRenderTarget;
-	m_renderingEngine->create( m_window->getWindowHandle(), size.getX(), size.getY(), m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
+	m_renderingEngine->create( hWindow, size.getX(), size.getY(), m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
 
 	m_immediateRenderTarget.m_textureImpl = immediateRenderTarget;
 
@@ -67,15 +67,6 @@ void zpRenderingEngine::setScreenMode( zpScreenMode mode )
 zpScreenMode zpRenderingEngine::getScreenMode() const
 {
 	return m_screenMode;
-}
-
-void zpRenderingEngine::setWindow( zpWindow* window )
-{
-	m_window = window;
-}
-zpWindow* zpRenderingEngine::getWindow() const
-{
-	return m_window;
 }
 
 void zpRenderingEngine::setVSyncEnabled( zp_bool enabled )

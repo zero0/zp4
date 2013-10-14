@@ -62,7 +62,7 @@ void zpRenderingPipeline::initialize()
 	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
 	ZP_ASSERT( ok, "" );
 
-	const zpVector2i& size = m_engine->getWindow()->getScreenSize();
+	const zpVector2i& size = m_engine->getScreenSize();
 
 	m_viewport.minDepth = 0.0f;
 	m_viewport.maxDepth = 1.0f;

@@ -83,11 +83,10 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
 
 	zpRenderingEngine* re = m_renderingPipeline.getRenderingEngine();
-	re->setWindow( &m_window );
 	re->setScreenMode( ZP_SCREEN_MODE_WINDOWED );
 	re->setDisplayMode( displayMode );
 	re->setVSyncEnabled( render[ "VSync" ].asBool() );
-	re->create();
+	re->create( m_window.getWindowHandle(), m_window.getScreenSize() );
 
 	m_isRunning = true;
 	m_lastTime = m_timer->getTime();

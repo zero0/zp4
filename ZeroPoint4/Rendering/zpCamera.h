@@ -43,7 +43,7 @@ public:
 	const zpMatrix4f& getInvViewProjection() const;
 	const zpCameraBufferData& getCameraBufferData() const;
 
-	void generateRay( const zpVector2i& windowPosition, zpRay& outRay ) const;
+	void generateRay( const zpVector2i& screenSize, const zpVector2i& windowPosition, zpRay& outRay ) const;
 
 private:
 	zpCameraProjection m_projectionType;

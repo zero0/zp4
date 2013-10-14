@@ -13,7 +13,7 @@ public:
 	~zpRenderingEngine();
 
 	void initialize();
-	void create();
+	void create( zp_handle hWindow, const zpVector2i& size );
 	void destroy();
 	void shutdown();
 
@@ -24,9 +24,6 @@ public:
 
 	void setScreenMode( zpScreenMode mode );
 	zpScreenMode getScreenMode() const;
-
-	void setWindow( zpWindow* window );
-	zpWindow* getWindow() const;
 
 	void setVSyncEnabled( zp_bool enabled );
 	zp_bool isVSyncEnabled() const;
@@ -61,13 +58,15 @@ public:
 
 	zpRenderingEngineImpl* getRenderingEngineImpl() const { return m_renderingEngine; }
 
+	const zpVector2i& getScreenSize() const { return m_screenSize; }
+
 private:
 	zpRenderingEngineImpl* m_renderingEngine;
 	
+	zpVector2i m_screenSize;
 	zpRenderingEngineType m_renderingEngineType;
 	zpDisplayMode m_displayMode;
 	zpScreenMode m_screenMode;
-	zpWindow* m_window;
 	zp_bool m_isVSyncEnabled;
 
 	zpTexture m_immediateRenderTarget;

@@ -178,6 +178,7 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::g
 		if( res->getRefCount() == 0 && res->isLoaded() )
 		{
 			impl->destroyResource( res );
+			res->m_isLoaded = false;
 		}
 	}
 }

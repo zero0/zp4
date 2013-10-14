@@ -166,10 +166,8 @@ const zpCameraBufferData& zpCamera::getCameraBufferData() const
 	return m_bufferData;
 }
 
-void zpCamera::generateRay( const zpVector2i& windowPosition, zpRay& outRay ) const
+void zpCamera::generateRay( const zpVector2i& screenSize, const zpVector2i& windowPosition, zpRay& outRay ) const
 {
-	const zpVector2i& screenSize = zpRenderingFactory::getRenderingEngine()->getWindow()->getScreenSize();
-
 	zp_float x = ( ( 2.0f * (zp_float)windowPosition.getX() ) / (zp_float)screenSize.getX() ) - 1.0f;
 	zp_float y = -( ( ( 2.0f * (zp_float)windowPosition.getY() ) / (zp_float)screenSize.getY() ) - 1.0f );
 
