@@ -29,13 +29,21 @@ void zpRenderingEngineImpl::initialize()
 	}
 
 	m_textures.resize( ZP_RENDERING_MAX_TEXTURES );
-
-	zpTextureImpl* b = m_textures.begin();
-	zpTextureImpl* e = m_textures.end();
-	for( ; b != e; ++b )
+	zpTextureImpl* tb = m_textures.begin();
+	zpTextureImpl* te = m_textures.end();
+	for( ; tb != te; ++tb )
 	{
-		m_freeTextures.pushBack( b );
+		m_freeTextures.pushBack( tb );
 	}
+
+	m_shaders.resize( ZP_RENDERING_MAX_SHADERS );
+	zpShaderImpl* sb = m_shaders.begin();
+	zpShaderImpl* eb = m_shaders.end();
+	for( ; sb != eb; ++sb )
+	{
+		m_freeShaders.pushBack( sb );
+	}
+	
 }
 void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint height, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget )
 {
@@ -160,6 +168,9 @@ void zpRenderingEngineImpl::destroy()
 }
 void zpRenderingEngineImpl::shutdown()
 {
+	ZP_ASSERT( m_usedTextures.isEmpty(), "Texture still in use" );
+	ZP_ASSERT( m_usedShaders.isEmpty(), "Shader still in use" );
+
 	ZP_SAFE_RELEASE( m_dxgiAdapter );
 	ZP_SAFE_RELEASE( m_dxgiFactory );
 }
@@ -581,9 +592,12 @@ zpDepthStencilStateImpl* zpRenderingEngineImpl::createDepthStencilState( const z
 
 zpShaderImpl* zpRenderingEngineImpl::createShader()
 {
-	zpShaderImpl* shader = new zpShaderImpl;
+	ZP_ASSERT( !m_freeShaders.isEmpty(), "Ran out of Shaders" );
+	if( m_freeShaders.isEmpty() ) return ZP_NULL;
 
-	//loadShader( shader, shaderfileName );
+	zpShaderImpl* shader = m_freeShaders.back();
+	m_freeShaders.popBack();
+	m_usedShaders.pushBack( shader );
 
 	return shader;
 }
@@ -699,12 +713,21 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison::
 }
 zp_bool zpRenderingEngineImpl::destroyShader( zpShaderImpl* shader )
 {
-	ZP_SAFE_RELEASE( shader->m_vertexShader );
-	ZP_SAFE_RELEASE( shader->m_pixelShader );
-	ZP_SAFE_RELEASE( shader->m_geometryShader );
-	ZP_SAFE_RELEASE( shader->m_computeShader );
+	zp_uint count = m_usedShaders.eraseAll( shader );
+	ZP_ASSERT( count > 0, "Unknown Shader being destroyed" );
+	if( count > 0 )
+	{
+		ZP_SAFE_RELEASE( shader->m_vertexShader );
+		ZP_SAFE_RELEASE( shader->m_pixelShader );
+		ZP_SAFE_RELEASE( shader->m_geometryShader );
+		ZP_SAFE_RELEASE( shader->m_computeShader );
 
-	return true;
+		m_freeShaders.pushBack( shader );
+
+		shader = ZP_NULL;
+	}
+	
+	return shader == ZP_NULL;
 }
 
 void zpRenderingEngineImpl::present( zp_bool vsync )

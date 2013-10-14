@@ -61,6 +61,10 @@ private:
 	zpFixedArrayList< zpTextureImpl, ZP_RENDERING_MAX_TEXTURES > m_textures;
 	zpFixedArrayList< zpTextureImpl*, ZP_RENDERING_MAX_TEXTURES > m_freeTextures;
 	zpFixedArrayList< zpTextureImpl*, ZP_RENDERING_MAX_TEXTURES > m_usedTextures;
+
+	zpFixedArrayList< zpShaderImpl, ZP_RENDERING_MAX_SHADERS > m_shaders;
+	zpFixedArrayList< zpShaderImpl*, ZP_RENDERING_MAX_SHADERS > m_freeShaders;
+	zpFixedArrayList< zpShaderImpl*, ZP_RENDERING_MAX_SHADERS > m_usedShaders;
 };
 
 #if 0

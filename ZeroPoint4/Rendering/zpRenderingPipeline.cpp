@@ -43,6 +43,7 @@ zpRenderingPipeline::zpRenderingPipeline()
 zpRenderingPipeline::~zpRenderingPipeline()
 {
 	m_engine = ZP_NULL;
+	zpRenderingFactory::destroyRenderingEngine();
 }
 
 zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
