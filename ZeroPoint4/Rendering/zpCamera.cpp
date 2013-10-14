@@ -33,6 +33,18 @@ zp_bool zpCamera::update()
 				zpMath::OrthoLH( m_projection, l, r, t, b, n, f );
 			}
 			break;
+		case ZP_CAMERA_PROJECTION_ORTHO_CENTERED:
+			{
+				zpScalar l( m_orthoRect.getSize().getX() * -0.5f );
+				zpScalar r( m_orthoRect.getSize().getX() *  0.5f );
+				zpScalar t( m_orthoRect.getSize().getY() *  0.5f );
+				zpScalar b( m_orthoRect.getSize().getY() * -0.5f );
+				zpScalar n( m_bufferData.zNear );
+				zpScalar f( m_bufferData.zFar );
+
+				zpMath::OrthoLH( m_projection, l, r, t, b, n, f );
+			}
+			break;
 		case ZP_CAMERA_PROJECTION_PERSPECTIVE:
 			{
 				zpScalar fovy( m_bufferData.fovy );
