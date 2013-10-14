@@ -20,7 +20,7 @@ void operator delete( void* ptr ) {
 	zp_aligned_free( ptr );
 }
 #else
-void* operator new( zp_uint size ) {
+void* operator new( zp_size size ) {
 	return zp_malloc( size );
 }
 

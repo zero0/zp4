@@ -83,6 +83,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpDepthStencilState.h" />
     <ClInclude Include="zpImage.h" />
     <ClInclude Include="zpMesh.h" />
     <ClInclude Include="zpRenderingPipeline.h" />
@@ -123,6 +124,7 @@
     <ClCompile Include="zpCamera.cpp" />
     <ClCompile Include="zpDeferredRenderingComponent.cpp" />
     <ClCompile Include="zpDepthStencilBuffer.cpp" />
+    <ClCompile Include="zpDepthStencilState.cpp" />
     <ClCompile Include="zpFontResource.cpp" />
     <ClCompile Include="zpImage.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />

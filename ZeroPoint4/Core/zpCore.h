@@ -89,7 +89,7 @@
 #include "zpBaseTypes.h"
 
 // extending placement new and delete to include parameters
-inline void* operator new( zp_uint sz, void* here ) throw() { return here; }
+inline void* operator new( size_t sz, void* here ) throw() { return here; }
 inline void operator delete( void*, void* ) throw() {}
 
 #if ZP_USE_ASSERTIONS
@@ -160,7 +160,7 @@ zp_bool zp_is_print( zp_char ch );
 
 zp_uint zp_near_pow2( zp_uint number );
 
-void zp_sleep( zp_int milliseconds );
+void zp_sleep( zp_uint milliseconds );
 
 template<typename T>
 ZP_FORCE_INLINE zp_hash zp_fnv1_32( const T& d, zp_hash h = 0 )

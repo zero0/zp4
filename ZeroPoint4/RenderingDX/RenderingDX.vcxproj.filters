@@ -48,6 +48,9 @@
     <ClCompile Include="zpDX11VertexLayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpDX11DepthStencilState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpDX11.h">
@@ -88,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="zpDX11Lib.inc">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11DepthStencilState.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

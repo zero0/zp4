@@ -19,6 +19,7 @@ public:
 	void simulate();
 
 	void garbageCollect();
+	void reloadAllResources();
 
 	void exit( zp_int exitCode = 0 );
 
@@ -47,10 +48,13 @@ public:
 
 private:
 	void runGarbageCollect();
+	void runReloadAllResources();
 
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
 	zp_bool m_shouldGarbageCollect;
+	zp_bool m_shouldReloadAllResources;
+
 	zp_int m_exitCode;
 	zpString m_optionsFilename;
 	zpString m_nextWorldFilename;

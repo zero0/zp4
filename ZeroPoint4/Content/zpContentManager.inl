@@ -138,6 +138,8 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::reloadAllResources()
 {
+	zpString filename;
+
 	Resource* found = ZP_NULL;
 	Resource* res = m_resources.begin();
 	Resource* end = m_resources.end();
@@ -148,13 +150,14 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 	{
 		if( res->getRefCount() > 0 )
 		{
+			filename = res->getFilename();
 			if( res->isLoaded() )
 			{
 				impl->destroyResource( res );
 				res->m_isLoaded = false;
 			}
 
-			if( impl->createResource( res, res->getFilename().str() ) )
+			if( impl->createResource( res, filename.str() ) )
 			{
 				res->m_isLoaded = true;
 				res->m_lastTimeLoaded = zpTime::getInstance()->getTime();

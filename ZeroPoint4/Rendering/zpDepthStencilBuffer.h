@@ -7,6 +7,7 @@ class zpDepthStencilBufferImpl;
 class zpDepthStencilBuffer
 {
 public:
+	zpDepthStencilBuffer();
 	~zpDepthStencilBuffer();
 
 	zp_uint getWidth() const;
@@ -17,8 +18,6 @@ public:
 	zpDepthStencilBufferImpl* getDepthStencilBufferImpl() const;
 
 private:
-	zpDepthStencilBuffer( zpDepthStencilBufferImpl* impl );
-
 	zpDepthStencilBufferImpl* m_impl;
 
 	friend class zpRenderingEngine;

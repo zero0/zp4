@@ -1,5 +1,4 @@
 #include "zpRendering.h"
-
 #include "zpRenderingImpl.inl"
 
 zpRenderingEngine::zpRenderingEngine()
@@ -24,13 +23,13 @@ void zpRenderingEngine::create()
 
 	m_immediateRenderTarget.m_textureImpl = immediateRenderTarget;
 
-	m_immediateDepthStencilBuffer = createDepthBuffer( size.getX(), size.getY(), ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT );
+	createDepthBuffer( m_immediateDepthStencilBuffer, size.getX(), size.getY(), ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT );
 
 	m_renderingContexts.pushBack( new zpRenderingContext( this, immediateContext ) );
 }
 void zpRenderingEngine::destroy()
 {
-	ZP_SAFE_DELETE( m_immediateRenderTarget.m_textureImpl );
+	destroyTexture( &m_immediateRenderTarget );
 	
 	m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
 		delete cxt;
@@ -101,9 +100,9 @@ zpTexture* zpRenderingEngine::getBackBufferRenderTarget()
 {
 	return &m_immediateRenderTarget;
 }
-zpDepthStencilBuffer* zpRenderingEngine::getBackBufferDepthStencilBuffer() const
+zpDepthStencilBuffer* zpRenderingEngine::getBackBufferDepthStencilBuffer()
 {
-	return m_immediateDepthStencilBuffer;
+	return &m_immediateDepthStencilBuffer;
 }
 
 zp_uint zpRenderingEngine::getNumRenderingContexts() const
@@ -174,11 +173,9 @@ zp_bool zpRenderingEngine::destroyTexture( zpTexture* texture )
 	return texture && texture->m_textureImpl == ZP_NULL;
 }
 
-zpDepthStencilBuffer* zpRenderingEngine::createDepthBuffer( zp_uint width, zp_uint height, zpDisplayFormat format )
+void zpRenderingEngine::createDepthBuffer( zpDepthStencilBuffer& depthStencilBuffer, zp_uint width, zp_uint height, zpDisplayFormat format )
 {
-	zpDepthStencilBufferImpl* buffer;
-	buffer = m_renderingEngine->createDepthStencilBuffer( width, height, format );
-	return new zpDepthStencilBuffer( buffer );
+	depthStencilBuffer.m_impl = m_renderingEngine->createDepthStencilBuffer( width, height, format );
 }
 
 void zpRenderingEngine::createRasterState( zpRasterState& state, const zpRasterStateDesc& desc )
@@ -231,24 +228,28 @@ void zpRenderingEngine::createSamplerState( zpSamplerState& state, const zpSampl
 	//return sampler;
 	state.m_samplerState = m_renderingEngine->createSamplerState( desc );
 }
+void zpRenderingEngine::createDepthStencilState( zpDepthStencilState& state, const zpDepthStencilStateDesc& desc )
+{
+	state.m_depthStencilState = m_renderingEngine->createDepthStencilState( desc );
+}
 
-zp_bool zpRenderingEngine::createShader( zpShader* shader )
+zp_bool zpRenderingEngine::createShader( zpShader& shader )
 {
-	if( shader )
+	if( shader.m_shader == ZP_NULL )
 	{
-		shader->m_shader = m_renderingEngine->createShader();
+		shader.m_shader = m_renderingEngine->createShader();
 	}
-	return shader && shader->m_shader != ZP_NULL;
+	return shader.m_shader != ZP_NULL;
 }
-zp_bool zpRenderingEngine::loadShader( zpShader* shader, const zpBison::Value& shaderfile )
+zp_bool zpRenderingEngine::loadShader( zpShader& shader, const zpBison::Value& shaderfile )
 {
-	return m_renderingEngine->loadShader( shader->getShaderImpl(), shaderfile );
+	return m_renderingEngine->loadShader( shader.getShaderImpl(), shaderfile );
 }
-zp_bool zpRenderingEngine::destroyShader( zpShader* shader )
+zp_bool zpRenderingEngine::destroyShader( zpShader& shader )
 {
-	if( shader && m_renderingEngine->destroyShader( shader->getShaderImpl() ) )
+	if( m_renderingEngine->destroyShader( shader.getShaderImpl() ) )
 	{
-		shader->m_shader = ZP_NULL;
+		shader.m_shader = ZP_NULL;
 	}
-	return shader && shader->m_shader == ZP_NULL;
+	return shader.m_shader == ZP_NULL;
 }

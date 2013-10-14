@@ -8,6 +8,7 @@ zpApplication::zpApplication()
 	: m_isRunning( false )
 	, m_hasNextWorld( false )
 	, m_shouldGarbageCollect( false )
+	, m_shouldReloadAllResources( false )
 	, m_exitCode( 0 )
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
 	, m_console( ZP_NULL )
@@ -175,6 +176,10 @@ void zpApplication::garbageCollect()
 {
 	m_shouldGarbageCollect = true;
 }
+void zpApplication::reloadAllResources()
+{
+	m_shouldReloadAllResources = true;
+}
 
 void zpApplication::exit( zp_int exitCode )
 {
@@ -261,6 +266,10 @@ void zpApplication::handleInput()
 	{
 		garbageCollect();
 	}
+	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyDown( ZP_KEY_CODE_R ) )
+	{
+		reloadAllResources();
+	}
 	else if( keyboard->isKeyDown( ZP_KEY_CODE_P ) )
 	{
 		zpProfiler::getInstance()->printProfile( ZP_PROFILER_STEP_FRAME );
@@ -281,6 +290,14 @@ void zpApplication::processFrame()
 		runGarbageCollect();
 		ZP_PROFILE_END( GARBAGE_COLLECT );
 	}
+
+	if( m_shouldReloadAllResources )
+	{
+		m_shouldReloadAllResources = false;
+
+		runReloadAllResources();
+	}
+
 	zp_long now = m_timer->getTime();
 	zp_uint numUpdates = 0;
 
@@ -347,4 +364,15 @@ void zpApplication::runGarbageCollect()
 	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
 	m_renderingPipeline.getShaderContentManager()->garbageCollect();
 	m_renderingPipeline.getTextureContentManager()->garbageCollect();
+}
+void zpApplication::runReloadAllResources()
+{
+	m_textContent.reloadAllResources();
+	m_objectContent.reloadAllResources();
+	m_scriptContent.reloadAllResources();
+
+	m_renderingPipeline.getMeshContentManager()->reloadAllResources();
+	m_renderingPipeline.getMaterialContentManager()->reloadAllResources();
+	m_renderingPipeline.getShaderContentManager()->reloadAllResources();
+	m_renderingPipeline.getTextureContentManager()->reloadAllResources();
 }

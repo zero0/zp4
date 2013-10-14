@@ -22,6 +22,20 @@ void zpRenderingEngineImpl::initialize()
 
 	hr = m_dxgiFactory->EnumAdapters( 0, &m_dxgiAdapter );
 	ZP_ASSERT( SUCCEEDED( hr ), "Unable to Get Adapter 0" );
+
+	while( m_inputLayouts.size() < zpVertexFormat_Count )
+	{
+		m_inputLayouts.pushBack( ZP_NULL );
+	}
+
+	m_textures.resize( ZP_RENDERING_MAX_TEXTURES );
+
+	zpTextureImpl* b = m_textures.begin();
+	zpTextureImpl* e = m_textures.end();
+	for( ; b != e; ++b )
+	{
+		m_freeTextures.pushBack( b );
+	}
 }
 void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint height, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget )
 {
@@ -121,7 +135,10 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 	backBuffer->Release();
 
 	// create the render target and depth buffer for the immediate context
-	outImmediateRenderTarget = new zpTextureImpl;
+	outImmediateRenderTarget = m_freeTextures.back();
+	m_freeTextures.popBack();
+	m_usedTextures.pushBack( outImmediateRenderTarget );
+
 	outImmediateRenderTarget->m_width = displayMode.width;
 	outImmediateRenderTarget->m_height = displayMode.height;
 	outImmediateRenderTarget->m_dimension = ZP_TEXTURE_DIMENSION_2D;
@@ -129,11 +146,6 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 	outImmediateRenderTarget->m_texture = backBuffer;
 	outImmediateRenderTarget->m_textureResourceView = ZP_NULL;
 	outImmediateRenderTarget->m_textureRenderTarget = backBufferView;
-
-	while( m_inputLayouts.size() < zpVertexFormat_Count )
-	{
-		m_inputLayouts.pushBack( ZP_NULL );
-	}
 }
 void zpRenderingEngineImpl::destroy()
 {
@@ -218,6 +230,14 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 	ID3D11Resource* texture = ZP_NULL;
 	ID3D11ShaderResourceView* srv = ZP_NULL;
 	ID3D11RenderTargetView* rtv = ZP_NULL;
+	zpTextureImpl* tex;
+
+	ZP_ASSERT( !m_freeTextures.isEmpty(), "Ran out of textures" );
+	if( m_freeTextures.isEmpty() ) return ZP_NULL;
+
+	tex = m_freeTextures.back();
+	m_freeTextures.popBack();
+	m_usedTextures.pushBack( tex );
 
 	D3D11_TEXTURE2D_DESC texDesc;
 	zp_zero_memory( &texDesc );
@@ -310,7 +330,6 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 	ZP_SAFE_RELEASE( srv );
 	ZP_SAFE_RELEASE( rtv );
 
-	zpTextureImpl* tex = new zpTextureImpl;
 	tex->m_width = width;
 	tex->m_height = height;
 	tex->m_dimension = dimension;
@@ -327,6 +346,14 @@ zpTextureImpl* zpRenderingEngineImpl::createTextureFromFile( const zpString& fil
 	ID3D11Resource* texture;
 	ID3D11ShaderResourceView* srv;
 	D3DX11_IMAGE_INFO info;
+	zpTextureImpl* tex;
+
+	ZP_ASSERT( !m_freeTextures.isEmpty(), "Ran out of textures" );
+	if( m_freeTextures.isEmpty() ) return ZP_NULL;
+
+	tex = m_freeTextures.back();
+	m_freeTextures.popBack();
+	m_usedTextures.pushBack( tex );
 
 	hr = D3DX11CreateTextureFromFile( m_d3dDevice, filename.str(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
 	ZP_ASSERT( SUCCEEDED( hr ), "" );
@@ -337,7 +364,6 @@ zpTextureImpl* zpRenderingEngineImpl::createTextureFromFile( const zpString& fil
 	hr = D3DX11GetImageInfoFromFile( filename.str(), ZP_NULL, &info, ZP_NULL );
 	ZP_ASSERT( SUCCEEDED( hr ), "" );
 
-	zpTextureImpl* tex = new zpTextureImpl;
 	tex->m_width = info.Width;
 	tex->m_height = info.Height;
 	tex->m_dimension = __dxToZP( info.ResourceDimension );
@@ -350,13 +376,19 @@ zpTextureImpl* zpRenderingEngineImpl::createTextureFromFile( const zpString& fil
 }
 zp_bool zpRenderingEngineImpl::destroyTexture( zpTextureImpl* texture )
 {
-	if( texture )
+	ZP_SAFE_RELEASE( texture->m_texture );
+	ZP_SAFE_RELEASE( texture->m_textureResourceView );
+	ZP_SAFE_RELEASE( texture->m_textureRenderTarget );
+
+	zp_uint count = m_usedTextures.eraseAll( texture );
+	ZP_ASSERT( count > 0, "Unknown Texture being destroyed" );
+
+	if( count > 0 )
 	{
-		ZP_SAFE_RELEASE( texture->m_texture );
-		ZP_SAFE_RELEASE( texture->m_textureResourceView );
-		ZP_SAFE_RELEASE( texture->m_textureRenderTarget );
-		ZP_SAFE_DELETE( texture );
+		m_freeTextures.pushBack( texture );
+		texture = ZP_NULL;
 	}
+	
 	return texture == ZP_NULL;
 }
 
@@ -412,19 +444,19 @@ zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterState
 {
 	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpSamplerStateDesc ), 0 );
 
-	zpRasterStateImpl* sampler = ZP_NULL;
+	zpRasterStateImpl* raster = ZP_NULL;
 	zpRasterStateImpl* s = m_rasterStates.begin();
 	zpRasterStateImpl* e = m_rasterStates.end();
 	for( ; s != e; ++s )
 	{
 		if( s->m_descHash == descHash )
 		{
-			sampler = s;
+			raster = s;
 			break;
 		}
 	}
 
-	if( sampler == ZP_NULL )
+	if( raster == ZP_NULL )
 	{
 		HRESULT hr;
 		D3D11_RASTERIZER_DESC rasterDesc;
@@ -444,13 +476,13 @@ zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterState
 		hr = m_d3dDevice->CreateRasterizerState( &rasterDesc, &state );
 		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Raster State" );
 
-		sampler = &m_rasterStates.pushBackEmpty();
-		sampler->m_raster = state;
-		sampler->m_descHash = descHash;
-		sampler->m_desc = desc;
+		raster = &m_rasterStates.pushBackEmpty();
+		raster->m_raster = state;
+		raster->m_descHash = descHash;
+		raster->m_desc = desc;
 	}
 
-	return sampler;
+	return raster;
 }
 zpSamplerStateImpl* zpRenderingEngineImpl::createSamplerState( const zpSamplerStateDesc& desc )
 {
@@ -496,6 +528,57 @@ zpSamplerStateImpl* zpRenderingEngineImpl::createSamplerState( const zpSamplerSt
 
 	return sampler;
 }
+zpDepthStencilStateImpl* zpRenderingEngineImpl::createDepthStencilState( const zpDepthStencilStateDesc& desc )
+{
+	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpDepthStencilStateDesc ), 0 );
+
+	zpDepthStencilStateImpl* sampler = ZP_NULL;
+	zpDepthStencilStateImpl* s = m_depthStencilStates.begin();
+	zpDepthStencilStateImpl* e = m_depthStencilStates.end();
+	for( ; s != e; ++s )
+	{
+		if( s->m_descHash == descHash )
+		{
+			sampler = s;
+			break;
+		}
+	}
+
+	if( sampler == ZP_NULL )
+	{
+		HRESULT hr;
+		D3D11_DEPTH_STENCIL_DESC samplerDesc;
+		zp_zero_memory( &samplerDesc );
+		samplerDesc.DepthEnable = desc.depthEnabled;
+		samplerDesc.DepthWriteMask = desc.depthWriteMaskAll ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+		samplerDesc.DepthFunc = __zpToDX( desc.depthFunc );
+		samplerDesc.StencilEnable = desc.stencilEnabled;
+		samplerDesc.StencilReadMask = desc.stencilReadMask;
+		samplerDesc.StencilWriteMask = desc.stencilWriteMask;
+
+		samplerDesc.FrontFace.StencilFailOp = __zpToDX( desc.frontFace.stencilFail );
+		samplerDesc.FrontFace.StencilDepthFailOp = __zpToDX( desc.frontFace.stencilPassDepthFail );
+		samplerDesc.FrontFace.StencilPassOp = __zpToDX( desc.frontFace.stencilPassDepthPass );
+		samplerDesc.FrontFace.StencilFunc = __zpToDX( desc.frontFace.stencilFunc );
+		
+		samplerDesc.BackFace.StencilFailOp = __zpToDX( desc.backFace.stencilFail );
+		samplerDesc.BackFace.StencilDepthFailOp = __zpToDX( desc.backFace.stencilPassDepthFail );
+		samplerDesc.BackFace.StencilPassOp = __zpToDX( desc.backFace.stencilPassDepthPass );
+		samplerDesc.BackFace.StencilFunc = __zpToDX( desc.backFace.stencilFunc );
+
+		ID3D11DepthStencilState* state;
+		hr = m_d3dDevice->CreateDepthStencilState( &samplerDesc, &state );
+		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Depth Stencil State" );
+
+		sampler = &m_depthStencilStates.pushBackEmpty();
+		sampler->m_depthStencil = state;
+		sampler->m_descHash = descHash;
+		sampler->m_desc = desc;
+	}
+
+	return sampler;
+}
+
 zpShaderImpl* zpRenderingEngineImpl::createShader()
 {
 	zpShaderImpl* shader = new zpShaderImpl;
@@ -578,14 +661,14 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison::
 
 		zpArrayList< zp_uint > strides;
 		strides.reserve( stridesValue.size() );
-		for( zp_uint i = 0; i < strides.size(); ++i )
+		for( zp_uint i = 0; i < stridesValue.size(); ++i )
 		{
 			strides.pushBackEmpty() = stridesValue[ i ].asInt();
 		}
 
 		zpArrayList< D3D11_SO_DECLARATION_ENTRY > entries;
 		entries.reserve( entriesValue.size() );
-		for( zp_uint i = 0; i < entries.size(); ++i )
+		for( zp_uint i = 0; i < entriesValue.size(); ++i )
 		{
 			const zpBison::Value entryValue = entriesValue[ i ];
 

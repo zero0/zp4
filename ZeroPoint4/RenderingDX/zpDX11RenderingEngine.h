@@ -34,6 +34,7 @@ public:
 
 	zpRasterStateImpl* createRasterState( const zpRasterStateDesc& desc );
 	zpSamplerStateImpl* createSamplerState( const zpSamplerStateDesc& desc );
+	zpDepthStencilStateImpl* createDepthStencilState( const zpDepthStencilStateDesc& desc );
 
 	zpShaderImpl* createShader();
 	zp_bool loadShader( zpShaderImpl* shader, const zpBison::Value& shaderFile );
@@ -55,6 +56,11 @@ private:
 
 	zpFixedArrayList< zpSamplerStateImpl, ZP_RENDERING_MAX_SAMPLER_STATES > m_samplerStates;
 	zpFixedArrayList< zpRasterStateImpl, ZP_RENDERING_MAX_RASTER_STATES > m_rasterStates;
+	zpFixedArrayList< zpDepthStencilStateImpl, ZP_RENDERING_MAX_DEPTH_STENCIL_STATES > m_depthStencilStates;
+
+	zpFixedArrayList< zpTextureImpl, ZP_RENDERING_MAX_TEXTURES > m_textures;
+	zpFixedArrayList< zpTextureImpl*, ZP_RENDERING_MAX_TEXTURES > m_freeTextures;
+	zpFixedArrayList< zpTextureImpl*, ZP_RENDERING_MAX_TEXTURES > m_usedTextures;
 };
 
 #if 0

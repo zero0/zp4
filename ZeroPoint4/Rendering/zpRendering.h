@@ -39,6 +39,9 @@ enum
 	ZP_RENDERING_MAX_SAMPLER_STATES =			16,
 	ZP_RENDERING_MAX_DEPTH_STENCIL_STATES =		16,
 
+	ZP_RENDERING_MAX_SHADERS =					32,
+	ZP_RENDERING_MAX_TEXTURES =					64,
+
 	ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE = ZP_MEMORY_MB( 1.0f ),
 	ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE =	65535 * sizeof( zp_short ), //ZP_MEMORY_MB( 0.25f ),
 
@@ -399,18 +402,18 @@ struct zpDepthStencilOp
 
 	zpDepthStencilOp();
 };
-struct zpDepthStencilState
+struct zpDepthStencilStateDesc
 {
 	zp_bool depthEnabled;
 	zp_bool depthWriteMaskAll;
 	zpComparisonFunc depthFunc;
-	zp_bool stencilenabled;
+	zp_bool stencilEnabled;
 	zp_byte stencilReadMask;
 	zp_byte stencilWriteMask;
 	zpDepthStencilOp frontFace;
 	zpDepthStencilOp backFace;
 
-	zpDepthStencilState();
+	zpDepthStencilStateDesc();
 };
 
 struct zpViewport
@@ -523,6 +526,7 @@ struct zpRenderingCommand
 #include "zpVertexLayout.h"
 #include "zpSamplerState.h"
 #include "zpRasterState.h"
+#include "zpDepthStencilState.h"
 
 #include "zpMaterial.h"
 #include "zpMesh.h"

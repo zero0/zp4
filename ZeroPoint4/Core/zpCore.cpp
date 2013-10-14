@@ -347,7 +347,7 @@ zp_uint zp_near_pow2( zp_uint number )
 	return i;
 }
 
-void zp_sleep( zp_int milliseconds )
+void zp_sleep( zp_uint milliseconds )
 {
 #if ZP_WIN_32 || ZP_WIN_64
 	Sleep( milliseconds );

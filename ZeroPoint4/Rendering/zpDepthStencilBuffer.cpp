@@ -2,8 +2,8 @@
 
 #include "zpRenderingImpl.inl"
 
-zpDepthStencilBuffer::zpDepthStencilBuffer( zpDepthStencilBufferImpl* impl )
-	: m_impl( impl )
+zpDepthStencilBuffer::zpDepthStencilBuffer()
+	: m_impl( ZP_NULL )
 {}
 zpDepthStencilBuffer::~zpDepthStencilBuffer()
 {

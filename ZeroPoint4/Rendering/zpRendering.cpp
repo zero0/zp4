@@ -37,11 +37,11 @@ zpDepthStencilOp::zpDepthStencilOp()
 	, stencilFunc( ZP_COMPARISON_FUNC_ALWAYS )
 {}
 
-zpDepthStencilState::zpDepthStencilState()
+zpDepthStencilStateDesc::zpDepthStencilStateDesc()
 	: depthEnabled( true )
 	, depthWriteMaskAll( true )
 	, depthFunc( ZP_COMPARISON_FUNC_LESS )
-	, stencilenabled( false )
+	, stencilEnabled( false )
 	, stencilReadMask( 0xFF )
 	, stencilWriteMask( 0xFF )
 {}

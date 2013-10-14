@@ -41,10 +41,10 @@ zp_bool zpShaderResource::load( const zp_char* filename, zpRenderingEngine* engi
 
 	ZP_ASSERT( ok, "Failed to read shader '%s'", getFilename().str() );
 
-	ok = engine->createShader( &m_resource );
+	ok = engine->createShader( m_resource );
 	ZP_ASSERT( ok, "Failed to create shader '%s'", getFilename().str() );
 
-	ok = engine->loadShader( &m_resource, shaderData.root() );
+	ok = engine->loadShader( m_resource, shaderData.root() );
 	ZP_ASSERT( ok, "Failed to build shader '%s'", getFilename().str() );
 
 	return ok;
@@ -52,7 +52,7 @@ zp_bool zpShaderResource::load( const zp_char* filename, zpRenderingEngine* engi
 void zpShaderResource::unload( zpRenderingEngine* engine )
 {
 	zp_bool ok;
-	ok = engine->destroyShader( &m_resource );
+	ok = engine->destroyShader( m_resource );
 	ZP_ASSERT( ok, "Failed to destroy shader '%s'", getFilename().str() );
 }
 
