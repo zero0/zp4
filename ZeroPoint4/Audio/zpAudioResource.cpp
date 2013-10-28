@@ -1,89 +1,142 @@
 #include "zpAudio.h"
-#include "zpFMOD.h"
-#include "fmod.hpp"
 
-#define FR( r )	if( r != FMOD_OK ) { return false; }
+#define CHECK_WAVE_ID( id, a, b, c, d )		( (id)[0] == (a) && (id)[1] == (b) && (id)[2] == (c) && (id)[3] == (d) )
 
-zpAudioResource::zpAudioResource() :
-m_isStreaming( false ),
-	m_isLooping( false ),
-	m_sound( ZP_NULL ),
-	m_group( ZP_AUDIO_CHANNEL_GROUP_SFX ),
-	m_loopFrom( ZP_AUDIO_LOOP_POINT_NONE ),
-	m_loopTo( ZP_AUDIO_LOOP_POINT_NONE )
+struct zpWaveHeader
+{
+	zp_char chunkId[4];
+	zp_uint chunkSize;
+	zp_char format[4];
+	zp_char subChunkId[4];
+	zp_uint subChunkSize;
+	zp_ushort audioFormat;
+	zp_ushort numChannels;
+	zp_uint sampleRate;
+	zp_uint bytesPerSecond;
+	zp_ushort blockAlign;
+	zp_ushort bitsPerSample;
+	zp_char dataChunkId[4];
+	zp_uint dataSize;
+};
+
+zp_bool decodeWave( const zpString& filename, zpWaveHeader& header, zpDataBuffer& data )
+{
+	zpFile waveFile( filename );
+	zpDataBuffer waveFileData;
+
+	if( waveFile.open( ZP_FILE_MODE_BINARY_READ ) )
+	{
+		waveFile.readFileBinary( waveFileData );
+		waveFile.close();
+
+		waveFileData.readAt( header, 0 );
+
+		if( !CHECK_WAVE_ID( header.chunkId, 'R', 'I', 'F', 'F' ) )
+		{
+			return false;
+		}
+
+		if( !CHECK_WAVE_ID( header.format, 'W', 'A', 'V', 'E' ) )
+		{
+			return false;
+		}
+
+		if( !CHECK_WAVE_ID( header.subChunkId, 'f', 'm', 't', ' ' ) )
+		{
+			return false;
+		}
+
+		if( !CHECK_WAVE_ID( header.dataChunkId, 'd', 'a', 't', 'a' ) )
+		{
+			return false;
+		}
+
+		data.reserve( (zp_uint)header.dataSize );
+		data.writeBulk( waveFileData.getData() + sizeof( zpWaveHeader ), (zp_uint)header.dataSize );
+
+		return true;
+	}
+
+	return false;
+}
+
+zp_bool zpAudioResource::load( const zp_char* filename )
+{
+	m_filename = filename;
+
+	zpAudioEngine* engine = zpAudioEngine::getInstance();
+
+	zp_bool ok = false;
+	zpWaveHeader header;
+	zpDataBuffer buffer;
+	if( decodeWave( m_filename, header, buffer ) )
+	{
+		ok = true;
+		engine->createSoundBuffer( m_resource, ZP_AUDIO_TYPE_2D, (zp_uint)header.dataSize, (zp_uint)header.sampleRate, header.bitsPerSample, header.numChannels );
+		engine->fillSoundBuffer( m_resource, buffer.getData(), buffer.size() );
+	}
+
+	return ok;
+}
+void zpAudioResource::unload()
+{
+	zpAudioEngine::getInstance()->destroySoundBuffer( m_resource );
+}
+
+
+zpAudioResourceInstance::zpAudioResourceInstance()
+	: m_engine( zpAudioEngine::getInstance() )
 {}
-zpAudioResource::~zpAudioResource() {}
-
-zp_bool zpAudioResource::load() {
-	FMOD::System* system = zpFMOD::getInstance();
-	FMOD_RESULT r;
-
-	zp_uint mode = FMOD_HARDWARE;
-	mode |= m_is3DSound ? FMOD_3D : FMOD_2D;
-	mode |= m_isLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
-
-	FMOD::Sound* sound = *(FMOD::Sound**)&m_sound;
-	if( m_isStreaming ) {
-		r = system->createStream( getFilename().c_str(), mode, 0, &sound );
-	} else {
-		r = system->createSound( getFilename().c_str(), mode, 0, &sound );
-	}
-	FR( r );
-
-	if( m_isLooping ) {
-		r = sound->setLoopPoints( m_loopFrom, FMOD_TIMEUNIT_MS, m_loopTo, FMOD_TIMEUNIT_MS );
-		FR( r );
-	}
-
-	r = sound->setUserData( this );
-	FR( r );
-
-	return true;
+zpAudioResourceInstance::~zpAudioResourceInstance()
+{
+	stop();
+	m_engine = ZP_NULL;
 }
-void zpAudioResource::unload() {
-	if( m_sound ) {
-		( (FMOD::Sound*)m_sound )->release();
-		m_sound = ZP_NULL;
-	}
+void zpAudioResourceInstance::setPosition( const zpVector4f& pos )
+{
+	m_engine->setPosition( m_instanceAudioBuffer, pos );
+}
+void zpAudioResourceInstance::setVolume( zp_float volume )
+{
+	m_engine->setVolume( m_instanceAudioBuffer, volume );
+}
+void zpAudioResourceInstance::setPan( zp_float pan )
+{
+	m_engine->setPan( m_instanceAudioBuffer, pan );
+}
+void zpAudioResourceInstance::setFrequency( zp_float frequency )
+{
 }
 
-
-zp_bool zpAudioResource::isStreaming() const {
-	return m_isStreaming;
+void zpAudioResourceInstance::play( zp_bool repeat )
+{
+	m_engine->play( m_instanceAudioBuffer, repeat );
 }
-zp_bool zpAudioResource::isLooping() const {
-	return m_isLooping;
-}
-zp_bool zpAudioResource::is3DSound() const {
-	return m_is3DSound;
-}
-zpAudioChannelGroup zpAudioResource::getChannelGroup() const {
-	return m_group;
-}
-zp_uint zpAudioResource::getLoopFrom() const {
-	return m_loopFrom;
-}
-zp_uint zpAudioResource::getLoopTo() const {
-	return m_loopTo;
+void zpAudioResourceInstance::stop()
+{
+	m_engine->stop( m_instanceAudioBuffer );
 }
 
-void* zpAudioResource::getSound() const {
-	return m_sound;
+zp_bool zpAudioResourceInstance::isPlaying() const
+{
+	return m_engine->isPlaying( m_instanceAudioBuffer );
 }
 
-void zpAudioResource::setIsStreaming( zp_bool isStreaming ) {
-	m_isStreaming = isStreaming;
+void zpAudioResourceInstance::initialized()
+{
+	m_engine->cloneSoundBuffer( *getResource()->getData(), m_instanceAudioBuffer );
 }
-void zpAudioResource::setIsLooping( zp_bool isLooping ) {
-	m_isLooping = isLooping;
+
+
+zpAudioContentManager::zpAudioContentManager()
+{}
+zpAudioContentManager::~zpAudioContentManager()
+{}
+zp_bool zpAudioContentManager::createResource( zpAudioResource* res, const zp_char* filename )
+{
+	return res->load( filename );
 }
-void zpAudioResource::setIs3DSound( zp_bool is3DSound ) {
-	m_is3DSound = is3DSound;
-}
-void zpAudioResource::setChannelGroup( zpAudioChannelGroup group ) {
-	m_group = group;
-}
-void zpAudioResource::setLoopFromTo( zp_uint loopFrom, zp_uint loopTo ) {
-	m_loopFrom = loopFrom;
-	m_loopTo = loopTo;
+void zpAudioContentManager::destroyResource( zpAudioResource* res )
+{
+	res->unload();
 }

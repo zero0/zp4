@@ -93,6 +93,9 @@ copy "$(SolutionDir)Rendering\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AudioDS\AudioDS.vcxproj">
+      <Project>{6cbc917a-2712-4b89-97af-31ab27a149ae}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Audio\Audio.vcxproj">
       <Project>{d1af3ee6-a733-4511-978f-ebb52e43cdc5}</Project>
     </ProjectReference>

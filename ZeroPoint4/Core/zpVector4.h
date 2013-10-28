@@ -40,12 +40,12 @@ public:
 	ZP_FORCE_INLINE void setZ( const zpScalar& z );
 	ZP_FORCE_INLINE void setW( const zpScalar& w );
 
-	//ZP_FORCE_INLINE void store3( zp_float* xyz ) const;
-	//ZP_FORCE_INLINE void store4( zp_float* xyzw ) const;
-	//
-	//ZP_FORCE_INLINE void load3( const zp_float* xyz );
-	//ZP_FORCE_INLINE void load4( const zp_float* xyzw );
-	//
+	ZP_FORCE_INLINE void store3( zp_float* xyz ) const;
+	ZP_FORCE_INLINE void store4( zp_float* xyzw ) const;
+	
+	ZP_FORCE_INLINE void load3( const zp_float* xyz );
+	ZP_FORCE_INLINE void load4( const zp_float* xyzw );
+	
 	//ZP_FORCE_INLINE void mul3( const zpVector4f& vector );
 	//ZP_FORCE_INLINE void mul4( const zpVector4f& vector );
 	//ZP_FORCE_INLINE void div3( const zpVector4f& vector );

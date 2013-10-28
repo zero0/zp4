@@ -3,7 +3,12 @@
 
 class zpCameraComponent : public zpComponent
 {
+public:
+	zpCameraComponent();
+	~zpCameraComponent();
 
+private:
+	zpCamera m_camera;
 };
 
 #endif

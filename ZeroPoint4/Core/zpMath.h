@@ -29,6 +29,13 @@ ZP_FORCE_INLINE void zp_clamp( T& s, const T& val, const T& low, const T& high )
 	s = val > high ? high : val < low ? low : val;
 }
 
+template<typename T>
+ZP_FORCE_INLINE void zp_lerp( T& s, const T& low, const T& high, zp_float alpha )
+{
+	zp_saturate( alpha, alpha );
+	s = low + (T)( ( high - low ) * alpha );
+}
+
 zp_float zp_cos( zp_float v );
 zp_float zp_sin( zp_float v );
 zp_float zp_tan( zp_float v );

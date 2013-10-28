@@ -5,37 +5,38 @@
 #include "Core\zpCore.h"
 #include "Content\zpContent.h"
 
-enum zpAudioChannelGroup {
+struct zpAudioBuffer
+{
+	zp_handle soundBuffer;
+	zp_handle soundBuffer3D;
+};
+
+enum zpAudioChannelGroup
+{
 	ZP_AUDIO_CHANNEL_GROUP_MASTER,
 	ZP_AUDIO_CHANNEL_GROUP_MUSIC,
 	ZP_AUDIO_CHANNEL_GROUP_SFX,
 	ZP_AUDIO_CHANNEL_GROUP_DIALOG,
 };
 
-enum zpAudioSpeakerMode {
+enum zpAudioSpeakerMode
+{
 	ZP_AUDIO_SPEAKER_MODE_MONO,
+	ZP_AUDIO_SPEAKER_MODE_HEADPHONE,
 	ZP_AUDIO_SPEAKER_MODE_STEREO,
 	ZP_AUDIO_SPEAKER_MODE_51_SURROUND,
 	ZP_AUDIO_SPEAKER_MODE_71_SURROUND,
 };
 
-class zpAudioManager;
-class zpAudioResourceCreator;
-class zpAudioResource;
-template<> class zpResourceInstance<zpAudioResource>;
-class zpAudioEmitterComponent;
-class zpAudioListenerComponent;
+enum zpAudioType
+{
+	ZP_AUDIO_TYPE_2D,
+	ZP_AUDIO_TYPE_3D,
+};
 
-#include "zpAudioManager.h"
-#include "zpAudioResourceCreator.h"
+class zpAudioEngine;
+
 #include "zpAudioResource.h"
-#include "zpAudioInstance.h"
-#include "zpAudioEmitterComponent.h"
-#include "zpAudioListenerComponent.h"
-
-typedef zpPooledObject<zpAudioEmitterComponent, 64> zpAudioEmitterComponentPool;
-typedef zpPooledObject<zpAudioListenerComponent, 8> zpAudioListenerComponentPool;
-
-void zpAudioRegisterSerializables();
+#include "zpAudioEngine.h"
 
 #endif

@@ -534,24 +534,35 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 	// filter all commands into layer buckets, 
 	zpRenderingCommand* cmd = m_renderingCommands.begin();
 	zpRenderingCommand* end = m_renderingCommands.end();
-	for( ; cmd != end; ++cmd )
+	if( camera )
 	{
-		switch( cmd->layer )
+		for( ; cmd != end; ++cmd )
 		{
-		case ZP_RENDERING_LAYER_UI_OPAQUE:
-		case ZP_RENDERING_LAYER_DEBUG_UI_OPAQUE:
-		case ZP_RENDERING_LAYER_UI_TRANSPARENT:
-		case ZP_RENDERING_LAYER_DEBUG_UI_TRANSPARENT:
-			m_filteredCommands[ cmd->layer ].pushBack( cmd );
-			break;
-		default:
-			if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
+			switch( cmd->layer )
 			{
-				generateSortKeyForCommand( cmd, camera );
+			case ZP_RENDERING_LAYER_UI_OPAQUE:
+			case ZP_RENDERING_LAYER_DEBUG_UI_OPAQUE:
+			case ZP_RENDERING_LAYER_UI_TRANSPARENT:
+			case ZP_RENDERING_LAYER_DEBUG_UI_TRANSPARENT:
 				m_filteredCommands[ cmd->layer ].pushBack( cmd );
+				break;
+			default:
+				if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
+				{
+					generateSortKeyForCommand( cmd, camera );
+					m_filteredCommands[ cmd->layer ].pushBack( cmd );
+				}
 			}
 		}
 	}
+	else
+	{
+		for( ; cmd != end; ++cmd )
+		{
+			m_filteredCommands[ cmd->layer ].pushBack( cmd );
+		}
+	}
+	
 
 	// sort opaque layer buckets
 	for( zp_uint i = zpRenderingLayer_StartOpaque; i < zpRenderingLayer_EndOpaque; ++i )

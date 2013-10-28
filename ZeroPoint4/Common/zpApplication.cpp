@@ -35,6 +35,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_textContent.setApplication( this );
 	m_objectContent.setApplication( this );
 	m_scriptContent.setApplication( this );
+	m_audioContent.setApplication( this );
 
 	m_renderingPipeline.getMaterialContentManager()->setApplication( this );
 	m_renderingPipeline.getShaderContentManager()->setApplication( this );
@@ -93,12 +94,18 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_renderingPipeline.initialize();
 
+	zpAudioEngine::getInstance()->create( m_window.getWindowHandle() );
+
 	// register input with window
 	m_window.addFocusListener( &m_inputManager );
 	m_window.addProcListener( &m_inputManager );
 }
 void zpApplication::run()
 {
+	zpAudioResourceInstance s;
+	m_audioContent.getResource( "sounds/SwordSwipe1_3d.wav", s );
+	s.play( true );
+
 	while( m_isRunning && m_window.processMessages() )
 	{
 		processFrame();
@@ -113,6 +120,8 @@ zp_int zpApplication::shutdown()
 	m_renderingPipeline.getRenderingEngine()->destroy();
 
 	runGarbageCollect();
+
+	zpAudioEngine::getInstance()->destroy();
 
 	if( m_console )
 	{
@@ -163,6 +172,8 @@ void zpApplication::update()
 	ZP_PROFILE_START( SCRIPT_PROC_THREADS );
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
+
+	zpAudioEngine::getInstance()->update();
 
 	handleInput();
 }
@@ -358,6 +369,7 @@ void zpApplication::runGarbageCollect()
 	m_textContent.garbageCollect();
 	m_objectContent.garbageCollect();
 	m_scriptContent.garbageCollect();
+	m_audioContent.garbageCollect();
 
 	m_renderingPipeline.getMeshContentManager()->garbageCollect();
 	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
@@ -369,6 +381,7 @@ void zpApplication::runReloadAllResources()
 	m_textContent.reloadAllResources();
 	m_objectContent.reloadAllResources();
 	m_scriptContent.reloadAllResources();
+	m_audioContent.reloadAllResources();
 
 	m_renderingPipeline.getMeshContentManager()->reloadAllResources();
 	m_renderingPipeline.getMaterialContentManager()->reloadAllResources();

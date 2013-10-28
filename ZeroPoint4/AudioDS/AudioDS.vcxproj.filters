@@ -15,24 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="zpAudio.h">
+    <ClInclude Include="zpAudioEngineImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpAudioResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpAudioEngine.h">
+    <ClInclude Include="zpAudioDS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zpAudio.cpp">
+    <ClCompile Include="zpAudioEngineImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpAudioResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpAudioEngine.cpp">
+    <ClCompile Include="zpAudioDS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

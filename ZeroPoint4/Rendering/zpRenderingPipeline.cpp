@@ -36,10 +36,7 @@ const zp_char* g_cullMode[] =
 
 zpRenderingPipeline::zpRenderingPipeline()
 	: m_engine( zpRenderingFactory::getRenderingEngine() )
-	, m_cameraBuffer()
-	, m_currentCamera( &m_defaultCamera )
-{
-}
+{}
 zpRenderingPipeline::~zpRenderingPipeline()
 {
 	m_engine = ZP_NULL;
@@ -62,12 +59,15 @@ void zpRenderingPipeline::initialize()
 	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
 	ZP_ASSERT( ok, "" );
 
+	m_cameras.resize( ZP_RENDERING_MAX_CAMERAS );
+
 	const zpVector2i& size = m_engine->getScreenSize();
 
-	m_viewport.minDepth = 0.0f;
-	m_viewport.maxDepth = 1.0f;
-	m_viewport.width = (zp_float)size.getX();
-	m_viewport.height = (zp_float)size.getY();
+	zpViewport viewport;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+	viewport.width = (zp_float)size.getX();
+	viewport.height = (zp_float)size.getY();
 
 	zpRasterStateDesc raster;
 	raster.cullMode = ZP_CULL_MODE_BACK;
@@ -80,14 +80,17 @@ void zpRenderingPipeline::initialize()
 	//m_cameraBuffer = m_engine->createBuffer( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 
-	m_defaultCamera.setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
-	m_defaultCamera.setPosition( zpVector4f( 1, 1, 1, 1 ) );
-	m_defaultCamera.setLookAt( zpVector4f( 0, 0, 0, 1 ) );
-	m_defaultCamera.setUp( zpVector4f( 0, 1, 0, 0 ) );
-	m_defaultCamera.setAspectRatio( m_viewport.width / m_viewport.height );
-	m_defaultCamera.setFovy( 45.0f );
-	m_defaultCamera.setNearFar( 1.0f, 100.0f );
-	m_defaultCamera.setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
+	zpCamera* cam = getCamera( 0 );
+	cam->setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
+	cam->setPosition( zpVector4f( 1, 1, 1, 1 ) );
+	cam->setLookAt( zpVector4f( 0, 0, 0, 1 ) );
+	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
+	cam->setAspectRatio( viewport.width / viewport.height );
+	cam->setFovy( 45.0f );
+	cam->setNearFar( 1.0f, 100.0f );
+	cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
+	cam->setViewport( viewport );
+	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
 }
 void zpRenderingPipeline::destroy()
 {
@@ -99,13 +102,6 @@ void zpRenderingPipeline::beginFrame()
 {
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 	i->clearState();
-
-	if( m_currentCamera && m_currentCamera->update() )
-	{
-		i->update( &m_cameraBuffer, &m_currentCamera->getCameraBufferData(), sizeof( zpCameraBufferData ) );
-	}
-
-	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, &m_cameraBuffer );
 
 	i->setRasterState( &m_raster );
 }
@@ -145,15 +141,18 @@ void zpRenderingPipeline::submitRendering()
 	// 1) fill buffers
 	i->fillBuffers();
 
+	zpCamera* cam = getCamera( 0 );
+
 	// 2) process commands, sorting, etc.
-	i->preprocessCommands( m_currentCamera );
+	i->preprocessCommands( cam );
 
 	// 3) actually render commands
-	i->setRenderTarget( 0, 1, &t, ZP_NULL );
-	//i->clearDepthStencilBuffer( d, 1.0f, 0 );
+	i->setRenderTarget( 0, 1, &t, d );
+	i->clearDepthStencilBuffer( d, 1.0f, 0 );
 	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
-	i->setViewport( m_viewport );
-	i->setScissorRect( zpRecti( 0, 0, (zp_int)m_viewport.width, (zp_int)m_viewport.height ) );
+	//i->setViewport( m_viewport );
+	//i->setScissorRect( zpRecti( 0, 0, (zp_int)m_viewport.width, (zp_int)m_viewport.height ) );
+	useCamera( i, cam, &m_cameraBuffer );
 
 	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
 
@@ -440,4 +439,20 @@ void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster,
 			outRasterDesc.slopeScaledDepthBias = slopeScaledDepthBiasValue.asFloat();
 		}
 	}
+}
+
+zpCamera* zpRenderingPipeline::getCamera( zp_int cameraIndex )
+{
+	return &m_cameras[ cameraIndex ];
+}
+void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer )
+{
+	if( camera->update() )
+	{
+		i->update( cameraBuffer, &camera->getCameraBufferData(), sizeof( zpCameraBufferData ) );
+	}
+	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, cameraBuffer );
+
+	i->setViewport( camera->getViewport() );
+	i->setScissorRect( camera->getClipRect() );
 }

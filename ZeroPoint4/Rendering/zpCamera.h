@@ -46,6 +46,12 @@ public:
 	const zpMatrix4f& getInvViewProjection() const;
 	const zpCameraBufferData& getCameraBufferData() const;
 
+	const zpViewport& getViewport() const { return m_viewport; }
+	void setViewport( const zpViewport& viewport ) { m_viewport = viewport; }
+
+	const zpRecti& getClipRect() const { return m_clipRect; }
+	void setClipRect( const zpRecti& clip ) { m_clipRect = clip; }
+
 	void generateRay( const zpVector2i& screenSize, const zpVector2i& windowPosition, zpRay& outRay ) const;
 
 private:
@@ -55,6 +61,8 @@ private:
 	zp_bool m_isProjectionDirty;
 
 	zpRecti m_orthoRect;
+	zpRecti m_clipRect;
+	zpViewport m_viewport;
 
 	zpFrustum m_frustum;
 

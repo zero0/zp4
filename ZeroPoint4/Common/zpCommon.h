@@ -7,6 +7,7 @@
 #include "Content\zpContent.h"
 #include "Rendering\zpRendering.h"
 #include "Scripting\zpScripting.h"
+#include "Audio\zpAudio.h"
 
 //class zpHealthComponent;
 //

@@ -40,11 +40,11 @@ public:
 	void generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc );
 	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
 
-	zpCamera* getDefaultCamera() { return &m_defaultCamera; };
-	zpCamera* getCurrentCamera() { return m_currentCamera; };
-	void setCurrentCamera( zpCamera* camera ) { m_currentCamera = camera; };
+	zpCamera* getCamera( zp_int cameraIndex );
 
 private:
+	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );
+
 	zpRenderingEngine* m_engine;
 
 	zpMaterialContentManager m_materialContent;
@@ -54,14 +54,12 @@ private:
 
 	zpBuffer m_cameraBuffer;
 
-	zpCamera m_defaultCamera;
-	zpCamera* m_currentCamera;
-	zpViewport m_viewport;
-
 	zpMaterialResourceInstance m_mat;
 	zpMeshResourceInstance m_mesh;
 
 	zpRasterState m_raster;
+
+	zpFixedArrayList< zpCamera, ZP_RENDERING_MAX_CAMERAS > m_cameras;
 };
 
 #endif
