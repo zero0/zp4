@@ -34,6 +34,7 @@
 	<mapper id="mesh.map" type="glob" from="*.obj" to="*.meshb" />
 	<mapper id="object.map" type="glob" from="*.object" to="*.objectb" />
 	<mapper id="script.map" type="glob" from="*.script" to="*.scriptb" />
+	<mapper id="sound.map" type="glob" from="*.wav" to="*.wav" />
 	
 	<fileset id="shader.files" dir="${assets.dir}" includes="**/*.shader" casesensitive="true" />
 	<fileset id="material.files" dir="${assets.dir}" includes="**/*.material" casesensitive="true" />
@@ -42,6 +43,7 @@
 	<fileset id="mesh.files" dir="${assets.dir}" includes="**/*.obj" casesensitive="true" />
 	<fileset id="object.files" dir="${assets.dir}" includes="**/*.object" casesensitive="true" />
 	<fileset id="script.files" dir="${assets.dir}" includes="**/*.script" casesensitive="true" />
+	<fileset id="sound.files" dir="${assets.dir}" includes="**/*.wav" casesensitive="true" />
 	
 	<target name="usage">
 		<echo message="base = ${base.dir}" />
@@ -120,6 +122,7 @@
 		<mkdir dir="${out.dir}/textures" />
 		<mkdir dir="${out.dir}/objects" />
 		<mkdir dir="${out.dir}/scripts" />
+		<mkdir dir="${out.dir}/sounds" />
 	</target>
 
 	<target name="compile-json" depends="make-out-dir">
@@ -201,7 +204,15 @@
 		</copy>
 	</target>
 
-	<target name="compile-assets" depends="compile-json, compile-textures, compile-materials, compile-shaders, compile-meshes, compile-objects, compile-scripts">
+	<target name="compile-sounds" depends="make-out-dir">
+		<!-- for now just copy -->
+		<copy todir="${out.dir}">
+			<fileset refid="sound.files" />
+			<mapper refid="sound.map" />
+		</copy>
+	</target>
+	
+	<target name="compile-assets" depends="compile-json, compile-textures, compile-materials, compile-shaders, compile-meshes, compile-objects, compile-scripts, compile-sounds">
 	</target>
 
 	<target name="find-shader-dep">
