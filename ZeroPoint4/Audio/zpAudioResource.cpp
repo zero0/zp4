@@ -2,6 +2,14 @@
 
 #define CHECK_WAVE_ID( id, a, b, c, d )		( (id)[0] == (a) && (id)[1] == (b) && (id)[2] == (c) && (id)[3] == (d) )
 
+struct zpAudioInfo
+{
+	zp_uint dataSize;
+	zp_uint sampleRate;
+	zp_ushort bitsPerSample;
+	zp_ushort numChannels;
+};
+
 struct zpWaveHeader
 {
 	zp_char chunkId[4];
@@ -19,7 +27,7 @@ struct zpWaveHeader
 	zp_uint dataSize;
 };
 
-zp_bool decodeWave( const zpString& filename, zpWaveHeader& header, zpDataBuffer& data )
+zp_bool decodeWave( const zpString& filename, zpAudioInfo& info, zpDataBuffer& data )
 {
 	zpFile waveFile( filename );
 	zpDataBuffer waveFileData;
@@ -29,6 +37,7 @@ zp_bool decodeWave( const zpString& filename, zpWaveHeader& header, zpDataBuffer
 		waveFile.readFileBinary( waveFileData );
 		waveFile.close();
 
+		zpWaveHeader header;
 		waveFileData.readAt( header, 0 );
 
 		if( !CHECK_WAVE_ID( header.chunkId, 'R', 'I', 'F', 'F' ) )
@@ -50,6 +59,11 @@ zp_bool decodeWave( const zpString& filename, zpWaveHeader& header, zpDataBuffer
 		{
 			return false;
 		}
+
+		info.dataSize = header.dataSize;
+		info.sampleRate = header.sampleRate;
+		info.bitsPerSample = header.bitsPerSample;
+		info.numChannels = header.numChannels;
 
 		data.reserve( (zp_uint)header.dataSize );
 		data.writeBulk( waveFileData.getData() + sizeof( zpWaveHeader ), (zp_uint)header.dataSize );
@@ -73,12 +87,19 @@ zp_bool zpAudioResource::load( const zp_char* filename )
 	}
 
 	zp_bool ok = false;
-	zpWaveHeader header;
 	zpDataBuffer buffer;
-	if( decodeWave( m_filename, header, buffer ) )
+	zpAudioInfo info;
+
+	// decode based on file extension
+	if( m_filename.endsWith( ".wav" ) )
 	{
-		ok = true;
-		engine->createSoundBuffer( m_resource, type, header.dataSize, header.sampleRate, header.bitsPerSample, header.numChannels );
+		ok = decodeWave( m_filename, info, buffer );
+	}
+
+	// if decoding complete, create and fill buffer
+	if( ok )
+	{
+		engine->createSoundBuffer( m_resource, type, info.dataSize, info.sampleRate, info.bitsPerSample, info.numChannels );
 		engine->fillSoundBuffer( m_resource, buffer.getData(), buffer.size() );
 
 		m_resource.soundFilenameHash = zp_fnv1_32_string( filename, 0 );
@@ -104,6 +125,10 @@ void zpAudioResourceInstance::setPosition( const zpVector4f& pos )
 {
 	m_engine->setPosition( m_instanceAudioBuffer, pos );
 }
+void zpAudioResourceInstance::setVelocity( const zpVector4f& vel )
+{
+	m_engine->setVelocity( m_instanceAudioBuffer, vel );
+}
 void zpAudioResourceInstance::setVolume( zp_float volume )
 {
 	m_engine->setVolume( m_instanceAudioBuffer, volume );
@@ -128,6 +153,10 @@ void zpAudioResourceInstance::stop()
 zp_bool zpAudioResourceInstance::isPlaying() const
 {
 	return m_engine->isPlaying( m_instanceAudioBuffer );
+}
+zp_bool zpAudioResourceInstance::is3DSound() const
+{
+	return m_instanceAudioBuffer.soundBuffer3D != ZP_NULL;
 }
 
 void zpAudioResourceInstance::initialized()

@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Scripting">
       <UniqueIdentifier>{7c586232-0583-4fab-a988-9265950ac6bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Audio">
+      <UniqueIdentifier>{cea7215f-0fa1-49cd-a2cd-136c9bd79c50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{55c282c1-eb10-4a60-89b3-8b77177fe6fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h">
@@ -66,6 +72,9 @@
     <ClInclude Include="zpScriptComponent.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
+    <ClInclude Include="zpAudioEmitterComponent.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -100,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="zpScriptComponent.cpp">
       <Filter>Source Files\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="zpAudioEmitterComponent.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

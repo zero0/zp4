@@ -44,8 +44,10 @@ public:
 	zpScriptContentManager* getScriptContentManager() { return &m_scriptContent; }
 	zpAudioContentManager* getAudioContentManager() { return &m_audioContent; }
 
-	zpEditorCameraComponentPool* getEditorCameraComponentPool() { return &m_editorCameraContentPool; }
-	zpScriptComponentPool* getScriptComponentPool() { return &m_scriptContentPool; }
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp ) zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
+#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 
 private:
 	void runGarbageCollect();
@@ -80,8 +82,10 @@ private:
 	zpScriptContentManager m_scriptContent;
 	zpAudioContentManager m_audioContent;
 
-	zpEditorCameraComponentPool m_editorCameraContentPool;
-	zpScriptComponentPool m_scriptContentPool;
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp )	zp##cmp##ComponentPool m_componentPool##cmp;
+#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 
 	zpTextContentManager m_textContent;
 };

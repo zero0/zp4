@@ -159,15 +159,17 @@ void zpApplication::update()
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
 
-	m_editorCameraContentPool.update();
+	m_componentPoolEditorCamera.update();
 
 	ZP_PROFILE_START( SCRIPT_UPDATE );
-	m_scriptContentPool.update();
+	m_componentPoolScript.update();
 	ZP_PROFILE_END( SCRIPT_UPDATE );
 
 	ZP_PROFILE_START( SCRIPT_PROC_THREADS );
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
+
+	m_componentPoolAudioEmitter.update();
 
 	zpAudioEngine::getInstance()->update();
 
@@ -175,7 +177,7 @@ void zpApplication::update()
 }
 void zpApplication::simulate()
 {
-	m_editorCameraContentPool.simulate();
+	m_componentPoolEditorCamera.simulate();
 }
 
 void zpApplication::garbageCollect()

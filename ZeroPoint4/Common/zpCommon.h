@@ -21,11 +21,13 @@ class zpObject;
 
 class zpEditorCameraComponent;
 class zpScriptComponent;
+class zpAudioEmitterComponent;
 
 #include "zpComponent.h"
 
 #include "zpEditorCameraComponent.h"
 #include "zpScriptComponent.h"
+#include "zpAudioEmitterComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"

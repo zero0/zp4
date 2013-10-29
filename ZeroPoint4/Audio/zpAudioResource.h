@@ -33,6 +33,7 @@ public:
 	void stop();
 
 	zp_bool isPlaying() const;
+	zp_bool is3DSound() const;
 
 protected:
 	void initialized();

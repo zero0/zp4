@@ -67,6 +67,7 @@
     <ClInclude Include="zpAllComponents.h" />
     <ClInclude Include="zpAllGameManagers.h" />
     <ClInclude Include="zpApplication.h" />
+    <ClInclude Include="zpAudioEmitterComponent.h" />
     <ClInclude Include="zpCameraComponent.h" />
     <ClInclude Include="zpCommon.h" />
     <ClInclude Include="zpComponent.h" />
@@ -83,6 +84,7 @@
     <ClCompile Include="zpAllComponents.cpp" />
     <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpApplication.cpp" />
+    <ClCompile Include="zpAudioEmitterComponent.cpp" />
     <ClCompile Include="zpCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
