@@ -65,6 +65,12 @@ zp_bool zpAudioResource::load( const zp_char* filename )
 	m_filename = filename;
 
 	zpAudioEngine* engine = zpAudioEngine::getInstance();
+	
+	zpAudioType type = ZP_AUDIO_TYPE_2D;
+	if( m_filename.indexOf( "_3d" ) != zpString::npos )
+	{
+		type = ZP_AUDIO_TYPE_3D;
+	}
 
 	zp_bool ok = false;
 	zpWaveHeader header;
@@ -72,8 +78,10 @@ zp_bool zpAudioResource::load( const zp_char* filename )
 	if( decodeWave( m_filename, header, buffer ) )
 	{
 		ok = true;
-		engine->createSoundBuffer( m_resource, ZP_AUDIO_TYPE_2D, (zp_uint)header.dataSize, (zp_uint)header.sampleRate, header.bitsPerSample, header.numChannels );
+		engine->createSoundBuffer( m_resource, type, header.dataSize, header.sampleRate, header.bitsPerSample, header.numChannels );
 		engine->fillSoundBuffer( m_resource, buffer.getData(), buffer.size() );
+
+		m_resource.soundFilenameHash = zp_fnv1_32_string( filename, 0 );
 	}
 
 	return ok;

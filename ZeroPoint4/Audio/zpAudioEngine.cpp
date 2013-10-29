@@ -24,6 +24,15 @@ void zpAudioEngine::destroy()
 	m_engine->destroy();
 }
 
+void zpAudioEngine::setMasterVolume( zp_float volume )
+{
+	m_engine->setMasterVolume( volume );
+}
+void zpAudioEngine::getMasterVolume( zp_float& volume )
+{
+	m_engine->getMasterVolume( volume );
+}
+
 void zpAudioEngine::setListenerPosition( const zpVector4f& pos )
 {
 	m_engine->setListenerPosition( pos );
@@ -87,6 +96,27 @@ void zpAudioEngine::setVelocity( const zpAudioBuffer& buffer, const zpVector4f& 
 void zpAudioEngine::setDistances( const zpAudioBuffer& buffer, zp_float minDistance, zp_float maxDistance )
 {
 	m_engine->setSoundBufferDistances( buffer, minDistance, maxDistance );
+}
+
+void zpAudioEngine::getVolume( const zpAudioBuffer& buffer, zp_float& volume )
+{
+	m_engine->getSoundBufferVolume( buffer, volume );
+}
+void zpAudioEngine::getPan( const zpAudioBuffer& buffer, zp_float& pan )
+{
+	m_engine->getSoundBufferPan( buffer, pan );
+}
+void zpAudioEngine::getPosition( const zpAudioBuffer& buffer, zpVector4f& pos )
+{
+	m_engine->getSoundBufferPosition( buffer, pos );
+}
+void zpAudioEngine::getVelocity( const zpAudioBuffer& buffer, zpVector4f& vel )
+{
+	m_engine->getSoundBufferVelocity( buffer, vel );
+}
+void zpAudioEngine::getDistances( const zpAudioBuffer& buffer, zp_float& minDistance, zp_float& maxDistance )
+{
+	m_engine->getSoundBufferDistances( buffer, minDistance, maxDistance );
 }
 
 void zpAudioEngine::play( const zpAudioBuffer& buffer, zp_bool repeat )

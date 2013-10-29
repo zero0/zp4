@@ -8,6 +8,9 @@ public:
 	void create( zp_handle hWnd );
 	void destroy();
 
+	void setMasterVolume( zp_float volume );
+	void getMasterVolume( zp_float& volume );
+
 	void setListenerPosition( const zpVector4f& pos );
 	void setListenerVelocity( const zpVector4f& vel );
 	void setListenerOrientation( const zpVector4f& forward, const zpVector4f& up );
@@ -27,6 +30,12 @@ public:
 	void setSoundBufferPosition( const zpAudioBuffer& buffer, const zpVector4f& pos );
 	void setSoundBufferVelocity( const zpAudioBuffer& buffer, const zpVector4f& vel );
 	void setSoundBufferDistances( const zpAudioBuffer& buffer, zp_float minDistance, zp_float maxDistance );
+
+	void getSoundBufferVolume( const zpAudioBuffer& buffer, zp_float& volume );
+	void getSoundBufferPan( const zpAudioBuffer& buffer, zp_float& pan );
+	void getSoundBufferPosition( const zpAudioBuffer& buffer, zpVector4f& pos );
+	void getSoundBufferVelocity( const zpAudioBuffer& buffer, zpVector4f& vel );
+	void getSoundBufferDistances( const zpAudioBuffer& buffer, zp_float& minDistance, zp_float& maxDistance );
 
 	void playSoundBuffer( const zpAudioBuffer& buffer, zp_bool loop );
 	void stopSoundBuffer( const zpAudioBuffer& buffer );

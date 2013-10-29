@@ -102,10 +102,6 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 }
 void zpApplication::run()
 {
-	zpAudioResourceInstance s;
-	m_audioContent.getResource( "sounds/SwordSwipe1_3d.wav", s );
-	s.play( true );
-
 	while( m_isRunning && m_window.processMessages() )
 	{
 		processFrame();

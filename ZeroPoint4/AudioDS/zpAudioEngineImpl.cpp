@@ -20,10 +20,18 @@ ZP_FORCE_INLINE LONG __zpNormalizeVolume( zp_float volume )
 	zp_lerp< LONG >( vol, DSBVOLUME_MIN, DSBVOLUME_MAX, volume );
 	return vol;
 }
+ZP_FORCE_INLINE zp_float __zpUnNormalizeVolume( LONG volume )
+{
+	return (zp_float)( DSBVOLUME_MIN + ( DSBVOLUME_MAX - volume ) ) / (zp_float)DSBVOLUME_MIN;
+}
 ZP_FORCE_INLINE LONG __zpNormalizePan( zp_float pan )
 {
 	zp_clamp( pan, pan, -1.0f, 1.0f );
 	return (LONG)( pan * DSBPAN_RIGHT );
+}
+ZP_FORCE_INLINE zp_float __zpUnNormalizePan( LONG pan )
+{
+	return (zp_float)pan / (zp_float)DSBPAN_RIGHT;
 }
 
 void zpAudioEngineImpl::create( zp_handle hWnd )
@@ -86,6 +94,20 @@ void zpAudioEngineImpl::destroy()
 		( (LPDIRECTSOUND)m_dsound )->Release();
 		m_dsound = ZP_NULL;
 	}
+}
+
+void zpAudioEngineImpl::setMasterVolume( zp_float volume )
+{
+	LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)m_primaryBuffer;
+	soundBuffer->SetVolume( __zpNormalizeVolume( volume ) );
+}
+void zpAudioEngineImpl::getMasterVolume( zp_float& volume )
+{
+	LONG vol;
+	LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)m_primaryBuffer;
+	soundBuffer->GetVolume( &vol );
+
+	volume = __zpUnNormalizeVolume( vol );
 }
 
 void zpAudioEngineImpl::setListenerPosition( const zpVector4f& pos )
@@ -211,8 +233,15 @@ void zpAudioEngineImpl::cloneSoundBuffer( const zpAudioBuffer& buffer, zpAudioBu
 	h = dsound->DuplicateSoundBuffer( soundBuffer, &dupBuffer );
 	ZP_ASSERT( SUCCEEDED( h ), "" );
 
+	// to fix duplicate buffers not playing at the correct volume
+	LONG vol;
+	soundBuffer->GetVolume( &vol );
+	vol--;
+	dupBuffer->SetVolume( vol );
+
 	copyBuffer.soundBuffer = dupBuffer;
 	copyBuffer.soundBuffer3D = ZP_NULL;
+	copyBuffer.soundFilenameHash = buffer.soundFilenameHash;
 
 	if( buffer.soundBuffer3D != ZP_NULL )
 	{
@@ -292,6 +321,45 @@ void zpAudioEngineImpl::setSoundBufferDistances( const zpAudioBuffer& buffer, zp
 	soundBuffer->SetMaxDistance( maxDistance, DS3D_DEFERRED );
 
 	m_isDirty = true;
+}
+
+void zpAudioEngineImpl::getSoundBufferVolume( const zpAudioBuffer& buffer, zp_float& volume )
+{
+	LONG vol;
+	LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)buffer.soundBuffer;
+	soundBuffer->GetVolume( &vol );
+
+	volume = __zpUnNormalizeVolume( vol );
+}
+void zpAudioEngineImpl::getSoundBufferPan( const zpAudioBuffer& buffer, zp_float& pan )
+{
+	LONG p;
+	LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)buffer.soundBuffer;
+	soundBuffer->GetPan( &p );
+
+	pan = __zpUnNormalizePan( p );
+}
+void zpAudioEngineImpl::getSoundBufferPosition( const zpAudioBuffer& buffer, zpVector4f& pos )
+{
+	D3DVECTOR p;
+	LPDIRECTSOUND3DBUFFER soundBuffer = (LPDIRECTSOUND3DBUFFER)buffer.soundBuffer3D;
+	soundBuffer->GetPosition( &p );
+
+	pos = zpVector4f( p.x, p.y, p.z );
+}
+void zpAudioEngineImpl::getSoundBufferVelocity( const zpAudioBuffer& buffer, zpVector4f& vel )
+{
+	D3DVECTOR v;
+	LPDIRECTSOUND3DBUFFER soundBuffer = (LPDIRECTSOUND3DBUFFER)buffer.soundBuffer3D;
+	soundBuffer->GetVelocity( &v );
+
+	vel = zpVector4f( v.x, v.y, v.z );
+}
+void zpAudioEngineImpl::getSoundBufferDistances( const zpAudioBuffer& buffer, zp_float& minDistance, zp_float& maxDistance )
+{
+	LPDIRECTSOUND3DBUFFER soundBuffer = (LPDIRECTSOUND3DBUFFER)buffer.soundBuffer3D;
+	soundBuffer->GetMinDistance( &minDistance );
+	soundBuffer->GetMaxDistance( &maxDistance );
 }
 
 void zpAudioEngineImpl::playSoundBuffer( const zpAudioBuffer& buffer, zp_bool loop )

@@ -14,6 +14,9 @@ public:
 	void create( zp_handle hWnd );
 	void destroy();
 
+	void setMasterVolume( zp_float volume );
+	void getMasterVolume( zp_float& volume );
+
 	void setListenerPosition( const zpVector4f& pos );
 	void setListenerVelocity( const zpVector4f& vel );
 	void setListenerOrientation( const zpVector4f& forward, const zpVector4f& up );
@@ -33,6 +36,12 @@ public:
 	void setPosition( const zpAudioBuffer& buffer, const zpVector4f& pos );
 	void setVelocity( const zpAudioBuffer& buffer, const zpVector4f& vel );
 	void setDistances( const zpAudioBuffer& buffer, zp_float minDistance, zp_float maxDistance );
+
+	void getVolume( const zpAudioBuffer& buffer, zp_float& volume );
+	void getPan( const zpAudioBuffer& buffer, zp_float& pan );
+	void getPosition( const zpAudioBuffer& buffer, zpVector4f& pos );
+	void getVelocity( const zpAudioBuffer& buffer, zpVector4f& vel );
+	void getDistances( const zpAudioBuffer& buffer, zp_float& minDistance, zp_float& maxDistance );
 
 	void play( const zpAudioBuffer& buffer, zp_bool repeat = false );
 	void stop( const zpAudioBuffer& buffer );
