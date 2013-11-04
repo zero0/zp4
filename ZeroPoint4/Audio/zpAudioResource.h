@@ -35,14 +35,12 @@ public:
 	zp_bool isPlaying() const;
 	zp_bool is3DSound() const;
 
-protected:
-	void initialized();
-
 private:
 	zpAudioBuffer m_instanceAudioBuffer;
 
 	zpAudioEngine* m_engine;
 
+	friend class zpAudioContentManager;
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;
 };
@@ -56,6 +54,7 @@ public:
 private:
 	zp_bool createResource( zpAudioResource* res, const zp_char* filename );
 	void destroyResource( zpAudioResource* res );
+	void initializeInstance( zpAudioResourceInstance& instance );
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

@@ -8,11 +8,11 @@ class zpObjectResource;
 
 enum zpObjectFlag : zp_ulong
 {
-	ZP_OBJECT_FLAG_ENABLED =		( 0 << 1 ),
+	ZP_OBJECT_FLAG_ENABLED =		( 1 << 0 ),
 	ZP_OBJECT_FLAG_CREATED =		( 1 << 1 ),
-	ZP_OBJECT_FLAG_SHOULD_DESTROY =	( 2 << 1 ),
+	ZP_OBJECT_FLAG_SHOULD_DESTROY =	( 1 << 2 ),
 
-	ZP_OBJECT_FLAG_USER0 =			( 3 << 1 ),
+	ZP_OBJECT_FLAG_USER0 =			( 1 << 3 ),
 
 	zpObjectFlag_Count,
 };
@@ -85,6 +85,7 @@ public:
 private:
 	zp_bool createResource( zpObjectResource* res, const zp_char* filename );
 	void destroyResource( zpObjectResource* res );
+	void initializeInstance( zpObjectResourceInstance& instance ) {}
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

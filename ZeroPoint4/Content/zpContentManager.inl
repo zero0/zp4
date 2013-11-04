@@ -49,6 +49,8 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		}
 	}
 
+	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
+
 	// if the resource was already loaded, add a ref and return
 	if( found )
 	{
@@ -56,7 +58,8 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		outInstance.m_resource = found;
 		found->addRef();
 
-		outInstance.initialized();
+		//outInstance.initialized();
+		impl->initializeInstance( outInstance );
 
 		return true;
 	}
@@ -67,8 +70,6 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 	{
 		return false;
 	}
-
-	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
 
 	// if the empty slot was loaded (between garbage collects), unload it
 	if( empty->isLoaded() )
@@ -89,7 +90,8 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 			empty->m_isLoaded = true;
 			empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
 
-			outInstance.initialized();
+			//outInstance.initialized();
+			impl->initializeInstance( outInstance );
 
 			return true;
 		}
@@ -145,6 +147,7 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 	Resource* end = m_resources.end();
 
 	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
+	zpTime* time = zpTime::getInstance();
 
 	for( ; res != end; ++res )
 	{
@@ -160,7 +163,7 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 			if( impl->createResource( res, filename.str() ) )
 			{
 				res->m_isLoaded = true;
-				res->m_lastTimeLoaded = zpTime::getInstance()->getTime();
+				res->m_lastTimeLoaded = time->getTime();
 			}
 		}
 	}

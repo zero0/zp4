@@ -45,6 +45,7 @@ class zpShaderContentManager : public zpContentManager< zpShaderResource, zpShad
 private:
 	zp_bool createResource( zpShaderResource* res, const zp_char* filename );
 	void destroyResource( zpShaderResource* res );
+	void initializeInstance( zpShaderResourceInstance& instance ) {}
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

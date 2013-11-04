@@ -251,7 +251,6 @@ void zpAudioEngineImpl::cloneSoundBuffer( const zpAudioBuffer& buffer, zpAudioBu
 void zpAudioEngineImpl::destroySoundBuffer( zpAudioBuffer& buffer )
 {
 	LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)buffer.soundBuffer;
-	
 	ZP_SAFE_RELEASE( soundBuffer );
 
 	buffer.soundBuffer = ZP_NULL;
@@ -265,7 +264,7 @@ void zpAudioEngineImpl::fillSoundBuffer( const zpAudioBuffer& buffer, const void
 	void *audioPtr1 = ZP_NULL, *audioPtr2 = ZP_NULL;
 	DWORD audioSize1 = 0, audioSize2 = 0;
 	HRESULT h;
-
+	
 	h = soundBuffer->Lock( 0, size, &audioPtr1, &audioSize1, &audioPtr2, &audioSize2, 0 );
 	ZP_ASSERT( SUCCEEDED( h ), "" );
 

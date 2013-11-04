@@ -42,6 +42,7 @@ class zpMeshContentManager : public zpContentManager< zpMeshResource, zpMeshReso
 private:
 	zp_bool createResource( zpMeshResource* res, const zp_char* filename );
 	void destroyResource( zpMeshResource* res );
+	void initializeInstance( zpMeshResourceInstance& instance ) {}
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

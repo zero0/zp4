@@ -29,11 +29,11 @@ public:
 	void callMethodImmidiate( const zp_char* methodName );
 
 private:
-	void initialized();
 	void destroyed();
 
 	zp_handle m_scriptObject;
 
+	friend class zpScriptContentManager;
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;
 };
@@ -47,6 +47,7 @@ public:
 private:
 	zp_bool createResource( zpScriptResource* res, const zp_char* filename );
 	void destroyResource( zpScriptResource* res );
+	void initializeInstance( zpScriptResourceInstance& instance );
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

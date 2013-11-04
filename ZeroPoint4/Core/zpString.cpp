@@ -365,7 +365,7 @@ zp_int zpString::indexOf( const zp_char* string, zp_uint fromIndex ) const
 		if( i <= count ) {
 			j = i + 1;
 			end = j + len - 1;
-			for( k = 1; j < end && a[ i ] == string[ k ]; ++j, ++k );
+			for( k = 1; j < end && a[ j ] == string[ k ]; ++j, ++k );
 
 			// if whole string found, return index
 			if( j == end ) return (zp_int)i;

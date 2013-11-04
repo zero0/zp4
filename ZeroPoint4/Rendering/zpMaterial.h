@@ -38,6 +38,7 @@ public:
 private:
 	zp_bool createResource( zpMaterialResource* res, const zp_char* filename );
 	void destroyResource( zpMaterialResource* res );
+	void initializeInstance( zpMaterialResourceInstance& instance ) {}
 
 	zp_ushort m_currentMaterialId;
 

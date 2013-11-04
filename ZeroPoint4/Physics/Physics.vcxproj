@@ -70,12 +70,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="zpColliderComponent.h" />
-    <ClInclude Include="zpKinematicComponent.h" />
-    <ClInclude Include="zpPhantomComponent.h" />
     <ClInclude Include="zpPhysics.h" />
-    <ClInclude Include="zpPhysicsManager.h" />
-    <ClInclude Include="zpRigidBodyComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
@@ -83,19 +78,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="zpColliderComponent.cpp" />
-    <ClCompile Include="zpKinematicComponent.cpp" />
-    <ClCompile Include="zpPhantomComponent.cpp" />
     <ClCompile Include="zpPhysics.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="zpPhysicsManager.cpp" />
-    <ClCompile Include="zpRigidBodyComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="zpPhysicsComponents.inl" />
     <None Include="zpPhysicsLib.inc" />
-    <None Include="zpPhysicsManagers.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -114,16 +114,6 @@ void zpScriptResourceInstance::callMethodImmidiate( const zp_char* methodName )
 		zpAngelScript::getInstance()->callObjectMethodImmidiate( m_scriptObject, method );
 	}
 }
-void zpScriptResourceInstance::initialized()
-{
-	if( m_scriptObject != ZP_NULL )
-	{
-		destroyed();
-	}
-
-	zp_handle objectType = *getResource()->getData();
-	m_scriptObject = zpAngelScript::getInstance()->createScriptObject( objectType );
-}
 void zpScriptResourceInstance::destroyed()
 {
 	if( isVaild() && m_scriptObject != ZP_NULL )
@@ -150,4 +140,14 @@ zp_bool zpScriptContentManager::createResource( zpScriptResource* res, const zp_
 void zpScriptContentManager::destroyResource( zpScriptResource* res )
 {
 	res->unload();
+}
+void zpScriptContentManager::initializeInstance( zpScriptResourceInstance& instance )
+{
+	if( instance.m_scriptObject != ZP_NULL )
+	{
+		instance.destroyed();
+	}
+
+	zp_handle objectType = *instance.getResource()->getData();
+	instance.m_scriptObject = zpAngelScript::getInstance()->createScriptObject( objectType );
 }

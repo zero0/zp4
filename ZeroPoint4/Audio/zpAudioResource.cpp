@@ -159,11 +159,6 @@ zp_bool zpAudioResourceInstance::is3DSound() const
 	return m_instanceAudioBuffer.soundBuffer3D != ZP_NULL;
 }
 
-void zpAudioResourceInstance::initialized()
-{
-	m_engine->cloneSoundBuffer( *getResource()->getData(), m_instanceAudioBuffer );
-}
-
 
 zpAudioContentManager::zpAudioContentManager()
 {}
@@ -176,4 +171,8 @@ zp_bool zpAudioContentManager::createResource( zpAudioResource* res, const zp_ch
 void zpAudioContentManager::destroyResource( zpAudioResource* res )
 {
 	res->unload();
+}
+void zpAudioContentManager::initializeInstance( zpAudioResourceInstance& instance )
+{
+	instance.m_engine->cloneSoundBuffer( *instance.getResource()->getData(), instance.m_instanceAudioBuffer );
 }

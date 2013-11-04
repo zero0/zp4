@@ -58,6 +58,7 @@ class zpTextureContentManager : public zpContentManager< zpTextureResource, zpTe
 private:
 	zp_bool createResource( zpTextureResource* res, const zp_char* filename );
 	void destroyResource( zpTextureResource* res );
+	void initializeInstance( zpTextureResourceInstance& instance ) {}
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

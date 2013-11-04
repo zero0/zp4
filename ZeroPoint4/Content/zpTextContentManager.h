@@ -21,6 +21,7 @@ class zpTextContentManager : public zpContentManager< zpTextResource, zpTextReso
 private:
 	zp_bool createResource( zpTextResource* res, const zp_char* filename );
 	void destroyResource( zpTextResource* res );
+	void initializeInstance( zpTextResourceInstance& instance ) {}
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

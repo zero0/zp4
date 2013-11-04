@@ -67,8 +67,6 @@ public:
 	}
 
 private:
-	virtual void initialized() {};
-
 	Resource* m_resource;
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
