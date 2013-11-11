@@ -97,6 +97,8 @@ void zpRenderingPipeline::destroy()
 	m_mat.release();
 	m_mesh.release();
 
+	m_engine->destroyBuffer( m_cameraBuffer );
+
 	m_engine->destroy();
 }
 

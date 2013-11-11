@@ -33,6 +33,7 @@ void zpRenderingEngine::destroy()
 {
 	destroyTexture( m_immediateRenderTarget );
 	
+	m_immediateContext.destroy();
 	//m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
 	//	delete cxt;
 	//} );

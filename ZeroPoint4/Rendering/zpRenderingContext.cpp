@@ -39,6 +39,14 @@ void zpRenderingContext::setup( zpRenderingEngine* engine, zpRenderingContextImp
 	m_currentVertexBuffer = &m_immediateVertexBuffers[ m_currentBufferIndex ];
 	m_currentIndexBuffer = &m_immediateIndexBuffers[ m_currentBufferIndex ];
 }
+void zpRenderingContext::destroy()
+{
+	for( zp_uint i = 0; i < ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS; ++i )
+	{
+		m_renderingEngine->destroyBuffer( m_immediateVertexBuffers[i] );
+		m_renderingEngine->destroyBuffer( m_immediateIndexBuffers[i] );
+	}
+}
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
 {

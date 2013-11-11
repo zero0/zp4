@@ -104,6 +104,7 @@ private:
 	zpRenderingContext();
 
 	void setup( zpRenderingEngine* engine, zpRenderingContextImpl* impl );
+	void destroy();
 
 	void generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera );
 
