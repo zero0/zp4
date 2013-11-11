@@ -52,6 +52,8 @@ private:
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_d3dDevice;
 
+	zpRenderingContextImpl m_immidiateContext;
+
 	zpFixedArrayList< ID3D11InputLayout*, zpVertexFormat_Count > m_inputLayouts;
 
 	zpFixedArrayList< zpSamplerStateImpl, ZP_RENDERING_MAX_SAMPLER_STATES > m_samplerStates;

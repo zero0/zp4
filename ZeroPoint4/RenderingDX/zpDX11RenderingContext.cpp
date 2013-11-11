@@ -5,8 +5,8 @@
 
 #define MAX_SET_BUFFER_VERTEX_COUNT	8
 
-zpRenderingContextImpl::zpRenderingContextImpl( ID3D11DeviceContext* context )
-	: m_context( context )
+zpRenderingContextImpl::zpRenderingContextImpl()
+	: m_context( ZP_NULL )
 {}
 zpRenderingContextImpl::~zpRenderingContextImpl()
 {

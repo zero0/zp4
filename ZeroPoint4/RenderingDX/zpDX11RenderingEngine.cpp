@@ -129,7 +129,9 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 
 	// create the immediate context wrapper
 	//m_immediateContext = new zpDX11RenderingContext( immediate, zpString( "immediate" ) );
-	outImmediateContext = new zpRenderingContextImpl( immediate );
+	//outImmediateContext = new zpRenderingContextImpl( immediate );
+	m_immidiateContext.set( immediate );
+	outImmediateContext = &m_immidiateContext;
 
 	// get the actual feature level of the rendering engine
 	switch( actualFeatureLevel )

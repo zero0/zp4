@@ -664,11 +664,17 @@ void zpAngelScript::createCoRoutine( const zp_char* methodName )
 
 void* zpAngelScript::allocate( zp_uint size )
 {
+#if ZP_USE_MEMORY_SYSTEM
+	return zpMemorySystem::getInstance()->allocate( size );
+#else
 	return zp_malloc( size );
-	//return zpMemorySystem::getInstance()->allocate( size );
+#endif
 }
 void zpAngelScript::deallocate( void* ptr )
 {
+#if ZP_USE_MEMORY_SYSTEM
+	zpMemorySystem::getInstance()->deallocate( ptr );
+#else
 	return zp_free( ptr );
-	//zpMemorySystem::getInstance()->deallocate( ptr );
+#endif
 }

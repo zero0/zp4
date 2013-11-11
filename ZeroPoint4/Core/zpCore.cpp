@@ -95,7 +95,6 @@ void zp_assert_warning( const zp_char* file, zp_int line, const zp_char* msg, ..
 		// ignore
 		break;
 	}
-
 }
 
 #endif

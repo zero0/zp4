@@ -7,7 +7,7 @@ struct ID3D11DeviceContext;
 class zpRenderingContextImpl
 {
 public:
-	zpRenderingContextImpl( ID3D11DeviceContext* context );
+	zpRenderingContextImpl();
 	~zpRenderingContextImpl();
 
 	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
@@ -29,6 +29,8 @@ public:
 	void update( zpBufferImpl* buffer, const void* data, zp_uint size );
 
 	void processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands );
+
+	void set( ID3D11DeviceContext* context ) { m_context = context; }
 
 private:
 	void bindMaterial( const zpMaterial* material );
