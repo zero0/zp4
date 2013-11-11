@@ -429,6 +429,7 @@ zpDepthStencilBufferImpl* zpRenderingEngineImpl::createDepthStencilBuffer( zp_ui
 	HRESULT hr;
 	ID3D11Texture2D* texture;
 	ID3D11DepthStencilView* view;
+	zpDepthStencilBufferImpl* depth;
 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	zp_zero_memory( &depthStencilDesc );
@@ -459,7 +460,14 @@ zpDepthStencilBufferImpl* zpRenderingEngineImpl::createDepthStencilBuffer( zp_ui
 	// remove reference to texture so view now owns pointer
 	texture->Release();
 
-	return new zpDepthStencilBufferImpl( format, texture, view, width, height );
+	depth = new zpDepthStencilBufferImpl;
+	depth->m_depthStencilView = view;
+	depth->m_depthTexture = texture;
+	depth->m_format = format;
+	depth->m_width = width;
+	depth->m_height = height;
+
+	return depth;
 }
 zp_bool zpRenderingEngineImpl::destroyDepthStencilBuffer( zpDepthStencilBufferImpl* depthStencil )
 {

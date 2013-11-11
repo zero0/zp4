@@ -33,6 +33,8 @@ void zpRenderingEngine::destroy()
 {
 	destroyTexture( m_immediateRenderTarget );
 	
+	destroyDepthBuffer( m_immediateDepthStencilBuffer );
+
 	m_immediateContext.destroy();
 	//m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
 	//	delete cxt;
@@ -162,7 +164,10 @@ void zpRenderingEngine::createDepthBuffer( zpDepthStencilBuffer& depthStencilBuf
 {
 	depthStencilBuffer.m_impl = m_renderingEngine->createDepthStencilBuffer( width, height, format );
 }
-
+void zpRenderingEngine::destroyDepthBuffer( zpDepthStencilBuffer& depthStencilBuffer )
+{
+	m_renderingEngine->destroyDepthStencilBuffer( depthStencilBuffer.m_impl );
+}
 void zpRenderingEngine::createRasterState( zpRasterState& state, const zpRasterStateDesc& desc )
 {
 	//zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpRasterStateDesc ), 0 );

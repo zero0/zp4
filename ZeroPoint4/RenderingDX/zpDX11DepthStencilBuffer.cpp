@@ -8,13 +8,6 @@ zpDepthStencilBufferImpl::zpDepthStencilBufferImpl()
 	, m_width( 0 )
 	, m_height( 0 )
 {}
-zpDepthStencilBufferImpl::zpDepthStencilBufferImpl( zpDisplayFormat format, ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height )
-	: m_depthStencilView( view )
-	, m_depthTexture( texture )
-	, m_format( format )
-	, m_width( width )
-	, m_height( height )
-{}
 zpDepthStencilBufferImpl::~zpDepthStencilBufferImpl()
 {
 	ZP_SAFE_RELEASE( m_depthStencilView );
@@ -33,13 +26,4 @@ zp_uint zpDepthStencilBufferImpl::getHeight() const
 zpDisplayFormat zpDepthStencilBufferImpl::getDisplayFormat() const
 {
 	return m_format;
-}
-
-ID3D11DepthStencilView* zpDepthStencilBufferImpl::getDepthStencilView()
-{
-	return m_depthStencilView;
-}
-ID3D11Texture2D* zpDepthStencilBufferImpl::getDepthTexture()
-{
-	return m_depthTexture;
 }

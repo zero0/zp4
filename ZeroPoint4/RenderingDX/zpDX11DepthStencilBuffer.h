@@ -17,10 +17,6 @@ public:
 
 private:
 	zpDepthStencilBufferImpl();
-	zpDepthStencilBufferImpl( zpDisplayFormat format, ID3D11Texture2D* texture, ID3D11DepthStencilView* view, zp_uint width, zp_uint height );
-
-	ID3D11DepthStencilView* getDepthStencilView();
-	ID3D11Texture2D* getDepthTexture();
 
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11Texture2D* m_depthTexture;
