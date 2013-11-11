@@ -38,6 +38,8 @@ public:
 	zpRenderingContext* getRenderingContext( zp_uint index ) const;
 	zpRenderingContext* createRenderingContext();
 
+	void destroyRenderingContext( zpRenderingContext& context );
+
 	void createBuffer( zpBuffer& outBuffer, zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride = 0, const void* data = 0 );
 	zp_bool destroyBuffer( zpBuffer& buffer );
 

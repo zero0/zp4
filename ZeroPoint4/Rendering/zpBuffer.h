@@ -10,9 +10,6 @@ public:
 	zpBuffer();
 	~zpBuffer();
 
-	void operator=( const zpBuffer& buffer );
-	void operator=( zpBuffer&& buffer );
-
 	zp_uint getSize() const;
 	zp_uint getStride() const;
 	zpBufferType getBufferType() const;
@@ -21,11 +18,7 @@ public:
 
 	zpBufferImpl* getBufferImpl() const;
 
-	void release();
-
 private:
-	zpBuffer( zpBufferImpl* buffer );
-
 	zpBufferImpl* m_buffer;
 
 	friend class zpRenderingEngine;

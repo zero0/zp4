@@ -36,6 +36,14 @@ void zpRenderingEngineImpl::initialize()
 		m_freeTextures.pushBack( tb );
 	}
 
+	m_buffers.resize( ZP_RENDERING_MAX_BUFFERS );
+	zpBufferImpl* bb = m_buffers.begin();
+	zpBufferImpl* be = m_buffers.end();
+	for( ; bb != be; ++bb )
+	{
+		m_freeBuffers.pushBack( bb );
+	}
+
 	m_shaders.resize( ZP_RENDERING_MAX_SHADERS );
 	zpShaderImpl* sb = m_shaders.begin();
 	zpShaderImpl* eb = m_shaders.end();
@@ -169,6 +177,7 @@ void zpRenderingEngineImpl::destroy()
 void zpRenderingEngineImpl::shutdown()
 {
 	ZP_ASSERT( m_usedTextures.isEmpty(), "Texture still in use" );
+	ZP_ASSERT( m_usedBuffers.isEmpty(), "Buffer still in use" );
 	ZP_ASSERT( m_usedShaders.isEmpty(), "Shader still in use" );
 
 	ZP_SAFE_RELEASE( m_dxgiAdapter );
@@ -179,6 +188,14 @@ zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBi
 {
 	HRESULT hr;
 	zpDisplayFormat format = ZP_DISPLAY_FORMAT_UNKNOWN;
+	zpBufferImpl* buff;
+
+	ZP_ASSERT( !m_freeBuffers.isEmpty(), "Ran out of buffers" );
+	if( m_freeBuffers.isEmpty() ) return ZP_NULL;
+
+	buff = m_freeBuffers.back();
+	m_freeBuffers.popBack();
+	m_usedBuffers.pushBack( buff );
 
 	if( type == ZP_BUFFER_TYPE_INDEX )
 	{
@@ -214,25 +231,29 @@ zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBi
 
 	ZP_ASSERT( SUCCEEDED( hr ), "Unable to create buffer." );
 
-	zpBufferImpl* bufferImpl = new zpBufferImpl;
-	bufferImpl->m_size = size;
-	bufferImpl->m_stride = stride;
-	bufferImpl->m_type = type;
-	bufferImpl->m_format = format;
-	bufferImpl->m_bind = bind;
-	bufferImpl->m_buffer = buffer;
+	buff->m_size = size;
+	buff->m_stride = stride;
+	buff->m_type = type;
+	buff->m_format = format;
+	buff->m_bind = bind;
+	buff->m_buffer = buffer;
 
-	return bufferImpl;
+	return buff;
 }
 zp_bool zpRenderingEngineImpl::destroyBuffer( zpBufferImpl* buffer )
 {
-	if( buffer )
+	ZP_SAFE_RELEASE( buffer->m_buffer );
+	
+	zp_uint count = m_usedBuffers.eraseAll( buffer );
+	ZP_ASSERT( count > 0, "Unknown Buffer being destroyed" );
+
+	if( count > 0 )
 	{
-		//ZP_SAFE_RELEASE( buffer->m_buffer );
-		//ZP_SAFE_DELETE( buffer );
-		return true;
+		m_freeBuffers.pushBack( buffer );
+		buffer = ZP_NULL;
 	}
-	return false;
+
+	return buffer == ZP_NULL;
 }
 
 zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )

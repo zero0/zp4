@@ -113,6 +113,11 @@ zpRenderingContext* zpRenderingEngine::createRenderingContext()
 	return ZP_NULL;
 }
 
+void zpRenderingEngine::destroyRenderingContext( zpRenderingContext& context )
+{
+	
+}
+
 void zpRenderingEngine::createBuffer( zpBuffer& outBuffer, zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, const void* data )
 {
 	outBuffer.m_buffer = m_renderingEngine->createBuffer( type, bind, size, stride, data );
