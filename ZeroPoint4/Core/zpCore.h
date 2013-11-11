@@ -12,7 +12,7 @@
 #define ZP_WIN_64				1
 #endif
 
-#define ZP_USE_COLOR_CONSOLE	1
+#define ZP_USE_COLOR_CONSOLE	0
 #define ZP_USE_FAST_MATH		0
 #define ZP_USE_SAFE_FUNCTIONS	1
 #define ZP_USE_CONSOLE_PRINT	1
@@ -22,7 +22,8 @@
 #define ZP_USE_ALIGNMENT		0
 #define ZP_USE_LOGGING			1
 #define ZP_USE_ASSERTIONS		1
-#define ZP_USE_MEMORY_SYSTEM	0
+#define ZP_USE_MEMORY_SYSTEM	1
+#define ZP_USE_HOT_RELOAD		1
 
 //#ifdef _WIN32
 //#define ZP_USE_SIMD			0

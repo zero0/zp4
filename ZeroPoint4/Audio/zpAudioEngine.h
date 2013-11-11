@@ -9,6 +9,7 @@ class zpAudioEngine
 	ZP_NON_COPYABLE( zpAudioEngine );
 
 public:
+	zpAudioEngine();
 	~zpAudioEngine();
 
 	void create( zp_handle hWnd );
@@ -49,11 +50,7 @@ public:
 
 	void update();
 
-	static zpAudioEngine* getInstance();
-
 private:
-	zpAudioEngine();
-
 	zpAudioEngineImpl* m_engine;
 };
 

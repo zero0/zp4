@@ -34,6 +34,7 @@ class zpMaterialContentManager : public zpContentManager< zpMaterialResource, zp
 {
 public:
 	zpMaterialContentManager();
+	virtual ~zpMaterialContentManager() {}
 
 private:
 	zp_bool createResource( zpMaterialResource* res, const zp_char* filename );

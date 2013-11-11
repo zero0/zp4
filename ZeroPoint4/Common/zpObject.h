@@ -6,17 +6,19 @@ class zpObject;
 class zpObjectContentManager;
 class zpObjectResource;
 
-enum zpObjectFlag : zp_ulong
+enum zpObjectFlag : zp_uint
 {
-	ZP_OBJECT_FLAG_ENABLED =		( 1 << 0 ),
-	ZP_OBJECT_FLAG_CREATED =		( 1 << 1 ),
-	ZP_OBJECT_FLAG_SHOULD_DESTROY =	( 1 << 2 ),
+	ZP_OBJECT_FLAG_ENABLED,
+	ZP_OBJECT_FLAG_CREATED,
+	ZP_OBJECT_FLAG_SHOULD_DESTROY,
+	ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD,
 
-	ZP_OBJECT_FLAG_USER0 =			( 1 << 3 ),
+	ZP_OBJECT_FLAG_USER0,
 
 	zpObjectFlag_Count,
-};
 
+	zpObjectFlagUser_Count = 31,
+};
 
 class zpObjectResource : public zpResource< zpBison >
 {
@@ -51,11 +53,7 @@ public:
 	const zpMatrix4f& getTransform() const;
 	void setTransform( const zpMatrix4f& transform );
 
-	zpWorld* getWorld() const;
-	void setWorld( zpWorld* world );
-
 	zpApplication* getApplication() const;
-	void setApplication( zpApplication* application );
 
 	void update();
 
@@ -65,21 +63,21 @@ private:
 
 	zpMatrix4f m_transform;
 	zpString m_name;
-	zpFlag64 m_flags;
+	zpFlag32 m_flags;
 	zp_long m_lastLoadTime;
 	zpAllComponents m_components;
 
-	zpWorld* m_world;
 	zpApplication* m_application;
 
 	zpObjectResourceInstance m_object;
 };
 
-class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 128 >, private zpContentPool< zpObject, 256 >
+class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 4 >, private zpContentPool< zpObject, 8 >
 {
 public:
 	zpObject* createObject( zpApplication* application, const zp_char* filename );
 
+	void destroyAllObjects( zp_bool isWorldSwap );
 	void update();
 
 private:
@@ -90,8 +88,5 @@ private:
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;
 };
-
-
-
 
 #endif

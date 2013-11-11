@@ -1,12 +1,6 @@
 #include "zpAudio.h"
 #include "AudioDS\zpAudioDS.h"
 
-zpAudioEngine* zpAudioEngine::getInstance()
-{
-	static zpAudioEngine instance;
-	return &instance;
-}
-
 zpAudioEngine::zpAudioEngine()
 	: m_engine( new zpAudioEngineImpl )
 {}

@@ -2,6 +2,7 @@
 #ifndef ZP_AUDIO_RESOURCE_H
 #define ZP_AUDIO_RESOURCE_H
 
+class zpAudioEngine;
 class zpAudioResource;
 class zpAudioResourceInstance;
 class zpAudioContentManager;
@@ -11,8 +12,8 @@ class zpAudioResource : public zpResource< zpAudioBuffer >
 public:
 
 private:
-	zp_bool load( const zp_char* filename );
-	void unload();
+	zp_bool load( const zp_char* filename, zpAudioEngine* engine );
+	void unload( zpAudioEngine* engine );
 
 	friend class zpAudioContentManager;
 };
@@ -51,6 +52,8 @@ public:
 	zpAudioContentManager();
 	virtual ~zpAudioContentManager();
 
+	zpAudioEngine* getAudioEngine() { return &m_engine; }
+
 private:
 	zp_bool createResource( zpAudioResource* res, const zp_char* filename );
 	void destroyResource( zpAudioResource* res );
@@ -58,6 +61,8 @@ private:
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;
+
+	zpAudioEngine m_engine;
 };
 
 

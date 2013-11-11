@@ -1,8 +1,8 @@
 
 template<typename Key, typename Value>
 zpHashMap<Key, Value>::zpHashMap()
-	: m_map( new zpMapEntity*[ ZP_HASH_MAP_DEFAULT_CAPACITY ] )
-	, m_capacity( ZP_HASH_MAP_DEFAULT_CAPACITY )
+	: m_map( ZP_NULL )
+	, m_capacity( 0 )
 	, m_size( 0 )
 	, m_loadFactor( ZP_HASH_MAP_DEFAULT_LOAD_FACTOR )
 {
@@ -319,7 +319,7 @@ void zpHashMap<Key, Value>::clear()
 	{
 		for( zp_uint i = 0; i < m_capacity; ++i )
 		{
-			for( zpMapEntity* e = m_map[ i ], *next = e; next != ZP_NULL;  )
+			for( zpMapEntity* e = m_map[ i ], *next = e; next != ZP_NULL; )
 			{
 				next = e->next;
 				ZP_SAFE_DELETE( e );
@@ -334,11 +334,14 @@ void zpHashMap<Key, Value>::clear()
 template<typename Key, typename Value> template<typename Func>
 void zpHashMap<Key, Value>::foreach( Func func ) const
 {
-	for( zp_uint i = 0; i < m_capacity; ++i )
+	if( m_map && m_size > 0 )
 	{
-		for( zpMapEntity* e = m_map[ i ]; e != ZP_NULL; e = e->next )
+		for( zp_uint i = 0; i < m_capacity; ++i )
 		{
-			func( e->key, e->value );
+			for( zpMapEntity* e = m_map[ i ]; e != ZP_NULL; e = e->next )
+			{
+				func( e->key, e->value );
+			}
 		}
 	}
 }

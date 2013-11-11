@@ -38,7 +38,7 @@ private:
 	friend class zpContentManager;
 };
 
-class zpScriptContentManager : public zpContentManager< zpScriptResource, zpScriptResourceInstance, zpScriptContentManager, 128 >
+class zpScriptContentManager : public zpContentManager< zpScriptResource, zpScriptResourceInstance, zpScriptContentManager, 8 >
 {
 public:
 	zpScriptContentManager();

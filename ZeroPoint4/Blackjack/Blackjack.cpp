@@ -7,19 +7,23 @@
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
-	zpApplication app;
+	zp_int exitCode = 0;
 
-	zpString cmdLine( lpCmdLine );
-	zpArrayList< zpString > args;
-	cmdLine.split( ' ', args );
-
-	zp_int exitCode;
-
-	app.setOptionsFilename( BLACKJACK_CONFIG );
-
-	app.initialize( args );
-	app.run();
-	exitCode = app.shutdown();
+	zpMemorySystem::getInstance()->initialize( 0 );
+	{
+		zpApplication app;
+		
+		zpString cmdLine( lpCmdLine );
+		zpArrayList< zpString > args;
+		cmdLine.split( ' ', args );
+		
+		app.setOptionsFilename( BLACKJACK_CONFIG );
+		
+		app.initialize( args );
+		app.run();
+		exitCode = app.shutdown();
+	}
+	zpMemorySystem::getInstance()->shutdown();
 
 	return exitCode;
 }

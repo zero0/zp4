@@ -25,16 +25,29 @@ zpObject* zpObjectContentManager::createObject( zpApplication* application, cons
 
 	return o;
 }
-
+void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
+{
+	for( zp_int i = 0; i < m_used.size(); ++i )
+	{
+		zpObject* o = m_used[ i ];
+		if( !isWorldSwap || ( isWorldSwap && !o->isFlagSet( ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD ) ) )
+		{
+			o->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+		}
+	}
+}
 void zpObjectContentManager::update()
 {
-	m_used.foreach( [ this ]( zpObject* o )
+	//m_used.foreach( [ this ]( zpObject* o )
+	for( zp_int i = 0; i < m_used.size(); ++i )
 	{
+		zpObject* o = m_used[ i ];
 		if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
 		{
 			destroy( o );
+			--i;
 		}
-	} );
+	}
 }
 
 zp_bool zpObjectContentManager::createResource( zpObjectResource* res, const zp_char* filename )
@@ -52,7 +65,6 @@ zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& 
 	, m_flags( ZP_OBJECT_FLAG_ENABLED )
 	, m_lastLoadTime( 0 )
 	, m_components()
-	, m_world( ZP_NULL )
 	, m_application( application )
 	, m_object( res )
 {
@@ -103,32 +115,20 @@ void zpObject::setTransform( const zpMatrix4f& transform )
 	m_transform = transform;
 }
 
-zpWorld* zpObject::getWorld() const
-{
-	return m_world;
-}
-
-void zpObject::setWorld( zpWorld* world )
-{
-	m_world = world;
-}
-
 zpApplication* zpObject::getApplication() const
 {
 	return m_application;
 }
-void zpObject::setApplication( zpApplication* application )
-{
-	m_application = application;
-}
 
 void zpObject::update()
 {
+#if ZP_USE_HOT_RELOAD
 	if( m_object.isVaild() && m_lastLoadTime != m_object.getResource()->getLastTimeLoaded() )
 	{
 		unloadObject();
 		loadObject();
 	}
+#endif
 }
 
 void zpObject::loadObject()

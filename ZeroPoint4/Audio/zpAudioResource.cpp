@@ -74,12 +74,10 @@ zp_bool decodeWave( const zpString& filename, zpAudioInfo& info, zpDataBuffer& d
 	return false;
 }
 
-zp_bool zpAudioResource::load( const zp_char* filename )
+zp_bool zpAudioResource::load( const zp_char* filename, zpAudioEngine* engine )
 {
 	m_filename = filename;
 
-	zpAudioEngine* engine = zpAudioEngine::getInstance();
-	
 	zpAudioType type = ZP_AUDIO_TYPE_2D;
 	if( m_filename.indexOf( "_3d" ) != zpString::npos )
 	{
@@ -107,14 +105,14 @@ zp_bool zpAudioResource::load( const zp_char* filename )
 
 	return ok;
 }
-void zpAudioResource::unload()
+void zpAudioResource::unload( zpAudioEngine* engine )
 {
-	zpAudioEngine::getInstance()->destroySoundBuffer( m_resource );
+	engine->destroySoundBuffer( m_resource );
 }
 
 
 zpAudioResourceInstance::zpAudioResourceInstance()
-	: m_engine( zpAudioEngine::getInstance() )
+	: m_engine( ZP_NULL )
 {}
 zpAudioResourceInstance::~zpAudioResourceInstance()
 {
@@ -166,13 +164,14 @@ zpAudioContentManager::~zpAudioContentManager()
 {}
 zp_bool zpAudioContentManager::createResource( zpAudioResource* res, const zp_char* filename )
 {
-	return res->load( filename );
+	return res->load( filename, &m_engine );
 }
 void zpAudioContentManager::destroyResource( zpAudioResource* res )
 {
-	res->unload();
+	res->unload( &m_engine );
 }
 void zpAudioContentManager::initializeInstance( zpAudioResourceInstance& instance )
 {
+	instance.m_engine = &m_engine;
 	instance.m_engine->cloneSoundBuffer( *instance.getResource()->getData(), instance.m_instanceAudioBuffer );
 }

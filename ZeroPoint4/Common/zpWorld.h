@@ -2,42 +2,79 @@
 #ifndef ZP_WORLD_H
 #define ZP_WORLD_H
 
-class zpWorldPooledContent;
+class zpWorld;
+class zpWorldContentManager;
+class zpWorldResource;
+
+enum zpWorldFlag : zp_uint
+{
+	ZP_WORLD_FLAG_CREATED,
+	ZP_WORLD_FLAG_SHOULD_CREATE,
+	ZP_WORLD_FLAG_SHOULD_DESTROY,
+	ZP_WORLD_FLAG_STEP_CREATE,
+	ZP_WORLD_FLAG_DESTROY_AFTER_LOAD,
+
+	zpWorldFlag_Count,
+};
+
+class zpWorldResource : public zpResource< zpBison >
+{
+private:
+	zp_bool load( const zp_char* filename );
+	void unload();
+
+	friend class zpWorldContentManager;
+};
+
+class zpWorldResourceInstance : public zpResourceInstance< zpWorldResource >
+{};
+
 
 class zpWorld
 {
+	friend class zpWorldContentManager;
+
 public:
-	zpWorld( const zp_char* filename );
+	zpWorld( zpApplication* application, const zpWorldResourceInstance& res );
 	~zpWorld();
 
-	void addObject( zpObject* go );
-	void removeObject( zpObject* go );
-	void removeObjectAtIndex( zp_uint index );
-	zpObject* getObject( zp_uint index ) const;
-	zp_uint getNumObjects() const;
+	zp_bool isFlagSet( zpWorldFlag flag ) const;
+	void setFlag( zpWorldFlag flag );
+	void unsetFlag( zpWorldFlag flag );
 
-	void create();
+	zp_bool createStep();
 	void destroy();
 
 	const zpString& getName() const;
-
-	void setApplication( zpApplication* application );
 	zpApplication* getApplication() const;
 
+	void additivlyLoad( const zpWorldResourceInstance& world );
+
 private:
-	zpArrayList<zpObject*> m_objects;
+	zpString m_name;
+	zpFlag32 m_flags;
 	zpApplication* m_application;
 
-	zpString m_name;
+	zp_uint m_numObjectsLoaded;
+	zp_uint m_totalObjects;
+
+	zpWorldResourceInstance m_world;
 };
 
-class zpWorldPooledContent : public zpContentPool< zpWorld, 8 >
+class zpWorldContentManager : public zpContentManager< zpWorldResource, zpWorldResourceInstance, zpWorldContentManager, 4 >, private zpContentPool< zpWorld, 4 >
 {
 public:
-	zpWorldPooledContent();
-	~zpWorldPooledContent();
+	zpWorld* createWorld( zpApplication* application, const zp_char* filename );
+
+	void update();
 
 private:
+	zp_bool createResource( zpWorldResource* res, const zp_char* filename );
+	void destroyResource( zpWorldResource* res );
+	void initializeInstance( zpWorldResourceInstance& instance ) {}
+
+	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+	friend class zpContentManager;
 };
 
 #endif

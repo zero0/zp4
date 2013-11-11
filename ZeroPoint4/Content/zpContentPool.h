@@ -19,6 +19,9 @@ public:
 
 	zp_uint size() const;
 
+	T* getUsed( zp_uint index );
+	zp_uint getUsedCount() const;
+
 protected:
 	zp_byte m_pool[ Count * sizeof( T ) ];
 

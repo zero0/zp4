@@ -20,10 +20,10 @@ zpTime::zpTime()
 }
 zpTime::~zpTime() {}
 
-zpTime zpTime::s_instance;
 zpTime* zpTime::getInstance()
 {
-	return &s_instance;
+	static zpTime instance;
+	return &instance;
 }
 
 zp_float zpTime::getDeltaSeconds() const

@@ -12,6 +12,7 @@ enum zpProfilerSteps
 	ZP_PROFILER_STEP_DEBUG_RENDER,
 	ZP_PROFILER_STEP_RENDER_PRESENT,
 	ZP_PROFILER_STEP_OBJECT_UPDATE,
+	ZP_PROFILER_STEP_WORLD_UPDATE,
 	ZP_PROFILER_STEP_SCRIPT_UPDATE,
 	ZP_PROFILER_STEP_SCRIPT_PROC_THREADS,
 
@@ -23,9 +24,9 @@ enum zpProfilerSteps
 };
 
 #if ZP_USE_PROFILER
-#define ZP_PROFILE_START( step )	zpProfiler::getInstance()->start( ZP_PROFILER_STEP_##step )
-#define ZP_PROFILE_END( step )		zpProfiler::getInstance()->end( ZP_PROFILER_STEP_##step )
-#define ZP_PROFILE_FINALIZE()		zpProfiler::getInstance()->finalize()
+#define ZP_PROFILE_START( step )	m_profiler.start( ZP_PROFILER_STEP_##step )
+#define ZP_PROFILE_END( step )		m_profiler.end( ZP_PROFILER_STEP_##step )
+#define ZP_PROFILE_FINALIZE()		m_profiler.finalize()
 #else
 #define ZP_PROFILE_START( step )	(void)0
 #define ZP_PROFILE_END( step )		(void)0
@@ -36,9 +37,8 @@ class zpProfiler
 {
 	ZP_NON_COPYABLE( zpProfiler );
 public:
+	zpProfiler();
 	~zpProfiler();
-
-	static zpProfiler* getInstance();
 
 	void start( zpProfilerSteps step );
 	void end( zpProfilerSteps step );
@@ -53,10 +53,6 @@ public:
 	void printProfile( zpProfilerSteps step );
 
 private:
-	zpProfiler();
-
-	static zpProfiler s_instance;
-
 	zpTime* m_time;
 
 	struct zpProfilerPart

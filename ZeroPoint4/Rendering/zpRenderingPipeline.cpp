@@ -96,6 +96,8 @@ void zpRenderingPipeline::destroy()
 {
 	m_mat.release();
 	m_mesh.release();
+
+	m_engine->destroy();
 }
 
 void zpRenderingPipeline::beginFrame()

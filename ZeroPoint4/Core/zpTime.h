@@ -14,7 +14,6 @@ public:
 
 	void setTimeScale( zp_float timeScale );
 	zp_float getTimeScale() const;
-	
 
 	void tick();
 	void resetTimer();
@@ -30,8 +29,6 @@ public:
 private:
 	zpTime();
 	
-	static zpTime s_instance;
-
 	zp_long m_baseTime;
 	zp_long m_currentTime;
 	zp_long m_previousTime;

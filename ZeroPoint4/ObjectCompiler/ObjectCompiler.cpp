@@ -90,6 +90,28 @@ zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedF
 	return ok;
 }
 
+zp_bool compileWorld( zpJsonParser& parser, zpArrayList< zpString >& processedFiles, const zpString& srcFile, zpJson& outWorld )
+{
+	zp_bool ok = false;
+
+	if( parser.parseFile( srcFile, outWorld ) )
+	{
+		ok = true;
+		/*
+		zpString path;
+		zpArrayList< zpString > members;
+		zpJson& objects = outWorld[ "Objects" ];
+		for( zp_int i = 0; i < objects.size(); ++i )
+		{
+			zpJson& obj = objects[ i ];
+			path = obj.asCString();
+		}
+		*/
+	}
+
+	return ok;
+}
+
 zp_int main( zp_int argCount, const zp_char* args[] )
 {
 	zpArrayList< zpString > arguments;
@@ -117,20 +139,40 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		const zpString& inputFile = arguments[ arguments.size() - 2 ];
 		const zpString& outputFile = arguments[ arguments.size() - 1 ];
 
+		zp_bool ok = false;
 		zpJson outputJson;
 		zpJsonParser parser;
 		zpArrayList< zpString > processedFiles;
+		processedFiles.reserve( 5 );
 		processedFiles.pushBack( inputFile );
 
-		compileObject( parser, processedFiles, inputFile, outputJson );
-
-		if( zpBison::compileToFile( outputFile, outputJson ) )
+		// compile object
+		if( inputFile.endsWith( ".object" ) )
 		{
-			zpLog::message() << "Successfully compiled '" << outputFile << "'" << zpLog::endl;
+			ok = compileObject( parser, processedFiles, inputFile, outputJson );
 		}
+		// compile world
+		else if( inputFile.endsWith( ".world" ) )
+		{
+			ok = compileWorld( parser, processedFiles, inputFile, outputJson );
+		}
+
+		// if compilation ok
+		if( ok )
+		{
+			if( zpBison::compileToFile( outputFile, outputJson ) )
+			{
+				zpLog::message() << "Successfully compiled '" << outputFile << "'" << zpLog::endl;
+			}
+			else
+			{
+				zpLog::error() << "Unable to compile output file '" << outputFile << "'" << zpLog::endl;
+			}
+		}
+		// failed to compile
 		else
 		{
-			zpLog::error() << "Unable to compile output file '" << outputFile << "'" << zpLog::endl;
+			zpLog::error() << "Failed to compile '" << outputFile << "'" << zpLog::endl;
 		}
 	}
 

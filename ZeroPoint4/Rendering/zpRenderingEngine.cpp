@@ -21,21 +21,23 @@ void zpRenderingEngine::create( zp_handle hWindow, const zpVector2i& size )
 	zpTextureImpl* immediateRenderTarget;
 	m_renderingEngine->create( hWindow, size.getX(), size.getY(), m_displayMode, m_screenMode, m_renderingEngineType, immediateContext, immediateRenderTarget );
 
+	m_immediateContext.setup( this, immediateContext );
+
 	m_immediateRenderTarget.m_textureImpl = immediateRenderTarget;
 
 	createDepthBuffer( m_immediateDepthStencilBuffer, size.getX(), size.getY(), ZP_DISPLAY_FORMAT_D24S8_UNORM_UINT );
 
-	m_renderingContexts.pushBack( new zpRenderingContext( this, immediateContext ) );
+	//m_renderingContexts.pushBack( new zpRenderingContext( this, immediateContext ) );
 }
 void zpRenderingEngine::destroy()
 {
 	destroyTexture( m_immediateRenderTarget );
 	
-	m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
-		delete cxt;
-	} );
+	//m_renderingContexts.foreach( []( zpRenderingContext* cxt ) {
+	//	delete cxt;
+	//} );
 
-	m_renderingContexts.clear();
+	//m_renderingContexts.clear();
 	m_rasterStates.clear();
 	m_samplerStates.clear();
 
@@ -83,9 +85,9 @@ void zpRenderingEngine::present()
 	m_renderingEngine->present( m_isVSyncEnabled );
 }
 
-zpRenderingContext* zpRenderingEngine::getImmediateRenderingContext() const
+zpRenderingContext* zpRenderingEngine::getImmediateRenderingContext()
 {
-	return m_renderingContexts[ 0 ];
+	return &m_immediateContext; //m_renderingContexts[ 0 ];
 }
 zpTexture* zpRenderingEngine::getBackBufferRenderTarget()
 {
@@ -98,11 +100,11 @@ zpDepthStencilBuffer* zpRenderingEngine::getBackBufferDepthStencilBuffer()
 
 zp_uint zpRenderingEngine::getNumRenderingContexts() const
 {
-	return m_renderingContexts.size();
+	return 1; //m_renderingContexts.size();
 }
 zpRenderingContext* zpRenderingEngine::getRenderingContext( zp_uint index ) const
 {
-	return m_renderingContexts[ index ];
+	return ZP_NULL; //m_renderingContexts[ index ];
 }
 zpRenderingContext* zpRenderingEngine::createRenderingContext()
 {

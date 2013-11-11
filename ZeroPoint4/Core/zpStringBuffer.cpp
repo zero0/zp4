@@ -31,12 +31,12 @@ zpStringBuffer::zpStringBuffer( zpStringBuffer&& buff )
 }
 zpStringBuffer::~zpStringBuffer()
 {
-	ZP_SAFE_FREE( m_buffer );
+	ZP_SAFE_DELETE_ARRAY( m_buffer );
 }
 
 void zpStringBuffer::operator=( const zpStringBuffer& buff )
 {
-	ZP_SAFE_DELETE( m_buffer );
+	ZP_SAFE_DELETE_ARRAY( m_buffer );
 
 	m_capacity = 0;
 	m_length = 0;
@@ -44,7 +44,7 @@ void zpStringBuffer::operator=( const zpStringBuffer& buff )
 }
 void zpStringBuffer::operator=( zpStringBuffer&& buff )
 {
-	ZP_SAFE_DELETE( m_buffer );
+	ZP_SAFE_DELETE_ARRAY( m_buffer );
 
 	m_buffer = buff.m_buffer;
 	m_capacity = buff.m_capacity;

@@ -20,7 +20,7 @@ private:
 	ID3D11InputLayout* m_layout;
 	zp_uint m_stride;
 
-	static zpHashMap<zpString, zpDX11VertexLayout*> s_layouts;
+	//static zpHashMap<zpString, zpDX11VertexLayout*> s_layouts;
 
 	friend class zpDX11RenderingContext;
 	friend class zpDX11RenderingEngine;

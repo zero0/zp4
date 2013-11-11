@@ -36,19 +36,19 @@ zpMemorySystem::zpMemorySystem()
 	, m_numDeallocs( 0 )
 	, m_memAllocated( 0 )
 	, m_memDeallocated( 0 )
-	, m_totalMemorySize( 0 )
+	, m_memUsed( 0 )
 	, m_allMemory( ZP_NULL )
 	, m_alignedMemory( ZP_NULL )
 {
-	initialize( ZP_MEMORY_MB( 1 ) );
+	//initialize( ZP_MEMORY_MB( 10 ) );
 }
-zpMemorySystem::~zpMemorySystem() {
-	ZP_ASSERT_WARN( m_memAllocated - m_memDeallocated == 0, "Memory leak of %d", m_memAllocated - m_memDeallocated );
-
-	ZP_SAFE_FREE( m_allMemory );
+zpMemorySystem::~zpMemorySystem()
+{
+	
 }
 
-zpMemorySystem* zpMemorySystem::getInstance() {
+zpMemorySystem* zpMemorySystem::getInstance()
+{
 	static zpMemorySystem memory;
 	return &memory;
 }
@@ -67,9 +67,18 @@ void zpMemorySystem::deallocate( void* ptr ) {
 #else
 void* zpMemorySystem::allocate( zp_uint size )
 {
+	++m_numAllocs;
+	m_memAllocated += size;
+	m_memUsed += size;
+	void* ptr = zp_malloc( size + sizeof( zp_uint ) );
+	zp_uint* i = (zp_uint*)ptr;
+	*i = size;
+	return (void*)( i + 1 );
+
 	zp_uint alignedSize = ZP_MEMORY_ALIGN_SIZE( size + sizeof( zpMemoryBlock ) );
 
-	zpMemoryBlock* freeBlock = m_blockTable[ ZP_MEMORY_TABLE_INDEX( alignedSize ) ];
+	zp_uint index = ZP_MEMORY_TABLE_INDEX( alignedSize );
+	zpMemoryBlock* freeBlock = m_blockTable[ index ];
 	if( freeBlock == ZP_NULL )
 	{
 		for( zp_uint i = ZP_MEMORY_BLOCK_TABLE_SIZE - 1; i != 0 ; --i )
@@ -83,7 +92,7 @@ void* zpMemorySystem::allocate( zp_uint size )
 	}
 
 	zpMemoryBlock* block = ZP_NULL;
-	if( freeBlock->size < alignedSize )
+	if( freeBlock->size <= alignedSize )
 	{
 		block = freeBlock;
 	}
@@ -107,6 +116,14 @@ void* zpMemorySystem::allocate( zp_uint size )
 
 void zpMemorySystem::deallocate( void* ptr )
 {
+	++m_numDeallocs;
+	zp_uint* i = (zp_uint*)ptr;
+	--i;
+	m_memDeallocated += *i;
+	m_memUsed -= *i;
+	zp_free( i );
+	return;
+
 	zpMemoryBlock* block = ( reinterpret_cast<zpMemoryBlock*>( ptr ) - 1 );
 
 	m_memDeallocated += block->size;
@@ -142,6 +159,7 @@ void zpMemorySystem::deallocate( void* ptr )
 
 void zpMemorySystem::initialize( zp_uint size ) 
 {
+	return;
 	zp_zero_memory_array( m_blockTable );
 
 	zp_uint paddedSize = ZP_MEMORY_ALIGN_SIZE( size );
@@ -162,6 +180,15 @@ void zpMemorySystem::initialize( zp_uint size )
 
 	addBlock( block );
 }
+void zpMemorySystem::shutdown()
+{
+	ZP_ASSERT_WARN( m_memUsed == 0, "Possible memory leak of %d", m_memUsed );
+	ZP_ASSERT_WARN( m_numAllocs - m_numDeallocs == 0, "Missing %d allocs->frees", m_numAllocs - m_numDeallocs );	
+	ZP_ASSERT_WARN( m_memAllocated - m_memDeallocated == 0, "Memory leak of %d", m_memAllocated - m_memDeallocated );
+
+	ZP_SAFE_FREE( m_allMemory );
+}
+
 void zpMemorySystem::addBlock( zpMemoryBlock* block )
 {
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );

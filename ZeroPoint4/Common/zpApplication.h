@@ -55,6 +55,7 @@ private:
 
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
+	zp_bool m_addNextWorld;
 	zp_bool m_shouldGarbageCollect;
 	zp_bool m_shouldReloadAllResources;
 
@@ -62,6 +63,7 @@ private:
 	zpString m_optionsFilename;
 	zpString m_nextWorldFilename;
 
+	zpProfiler m_profiler;
 	zpConsole* m_console;
 	zpTime* m_timer;
 	zpWorld* m_currentWorld;
@@ -78,7 +80,7 @@ private:
 	zpRenderingPipeline m_renderingPipeline;
 	
 	zpObjectContentManager m_objectContent;
-	zpWorldPooledContent m_worldContent;
+	zpWorldContentManager m_worldContent;
 	zpScriptContentManager m_scriptContent;
 	zpAudioContentManager m_audioContent;
 

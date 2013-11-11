@@ -37,7 +37,7 @@ enum zpAudioType
 
 class zpAudioEngine;
 
-#include "zpAudioResource.h"
 #include "zpAudioEngine.h"
+#include "zpAudioResource.h"
 
 #endif

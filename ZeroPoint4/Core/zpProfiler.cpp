@@ -3,21 +3,12 @@
 zpProfiler::zpProfiler()
 	: m_time( zpTime::getInstance() )
 {
-	for( zp_uint i = 0; i < zpProfilerSteps_Count; ++i )
-	{
-		m_profiles.pushBackEmpty();
-	}
+	m_profiles.resize( zpProfilerSteps_Count );
 	reset();
 }
 zpProfiler::~zpProfiler()
 {
 	reset();
-}
-
-zpProfiler zpProfiler::s_instance;
-zpProfiler* zpProfiler::getInstance()
-{
-	return &s_instance;
 }
 
 void zpProfiler::start( zpProfilerSteps step )

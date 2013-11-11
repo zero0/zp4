@@ -13,8 +13,10 @@ class zpAngelScript
 public:
 	~zpAngelScript();
 
+	static void createInstance();
 	static zpAngelScript* getInstance();
-	
+	static void destroyInstance();
+
 	zp_handle getEngine() const;
 
 	zp_bool createEngine();
@@ -36,6 +38,7 @@ private:
 	static void* allocate( zp_uint size );
 	static void deallocate( void* ptr );
 
+	static zpAngelScript* s_instance;
 	zpAngelScript();
 
 	zp_handle m_engine;

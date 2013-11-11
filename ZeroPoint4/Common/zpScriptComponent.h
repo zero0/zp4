@@ -22,7 +22,7 @@ private:
 	zpArrayList< zpScriptResourceInstance > m_scripts;
 };
 
-class zpScriptComponentPool : public zpContentPool< zpScriptComponent, 128 >
+class zpScriptComponentPool : public zpContentPool< zpScriptComponent, 8 >
 {
 public:
 	zpScriptComponentPool();

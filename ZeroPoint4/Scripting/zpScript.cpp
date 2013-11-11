@@ -85,7 +85,7 @@ void zpScriptResource::unload()
 		m_resource = ZP_NULL;
 	}
 
-	asIScriptEngine* engine = (asIScriptEngine*)zpAngelScript::getInstance();
+	asIScriptEngine* engine = (asIScriptEngine*)zpAngelScript::getInstance()->getEngine();
 	engine->DiscardModule( m_filename.str() );
 
 	m_filename.clear();
@@ -126,11 +126,13 @@ void zpScriptResourceInstance::destroyed()
 
 zpScriptContentManager::zpScriptContentManager()
 {
+	zpAngelScript::createInstance();
 	zpAngelScript::getInstance()->createEngine();
 }
 zpScriptContentManager::~zpScriptContentManager()
 {
 	zpAngelScript::getInstance()->destroyEngine();
+	zpAngelScript::destroyInstance();
 }
 
 zp_bool zpScriptContentManager::createResource( zpScriptResource* res, const zp_char* filename )

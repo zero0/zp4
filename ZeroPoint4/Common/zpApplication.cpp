@@ -7,6 +7,7 @@
 zpApplication::zpApplication()
 	: m_isRunning( false )
 	, m_hasNextWorld( false )
+	, m_addNextWorld( false )
 	, m_shouldGarbageCollect( false )
 	, m_shouldReloadAllResources( false )
 	, m_exitCode( 0 )
@@ -34,6 +35,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 {
 	m_textContent.setApplication( this );
 	m_objectContent.setApplication( this );
+	m_worldContent.setApplication( this );
 	m_scriptContent.setApplication( this );
 	m_audioContent.setApplication( this );
 
@@ -94,7 +96,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_renderingPipeline.initialize();
 
-	zpAudioEngine::getInstance()->create( m_window.getWindowHandle() );
+	m_audioContent.getAudioEngine()->create( m_window.getWindowHandle() );
 
 	// register input with window
 	m_window.addFocusListener( &m_inputManager );
@@ -111,13 +113,14 @@ zp_int zpApplication::shutdown()
 {
 	m_renderingPipeline.destroy();
 
-	m_appOptions.release();
+	m_objectContent.destroyAllObjects( false );
+	m_objectContent.update();
 
-	m_renderingPipeline.getRenderingEngine()->destroy();
+	m_appOptions.release();
 
 	runGarbageCollect();
 
-	zpAudioEngine::getInstance()->destroy();
+	m_audioContent.getAudioEngine()->destroy();
 
 	if( m_console )
 	{
@@ -135,19 +138,40 @@ zp_int zpApplication::shutdown()
 
 void zpApplication::update()
 {
-	if( m_hasNextWorld )
+	if( m_hasNextWorld && !m_nextWorldFilename.isEmpty() )
 	{
-		if( m_currentWorld )
+		// if the next world should be added
+		if( m_addNextWorld )
 		{
-			m_currentWorld->destroy();
-			m_worldContent.destroy( m_currentWorld );
+			zpWorld* addWorld = m_worldContent.createWorld( this, m_nextWorldFilename.str() );
+			addWorld->setFlag( ZP_WORLD_FLAG_SHOULD_CREATE );
+			addWorld->setFlag( ZP_WORLD_FLAG_DESTROY_AFTER_LOAD );
+		}
+		// otherwise, do a world swap
+		else
+		{
+			// if the current world is set, it's a world swap, unload objects
+			if( m_currentWorld )
+			{
+				m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
+				m_objectContent.destroyAllObjects( true );
+			}
+
+			// create the new world and mark for create
+			m_currentWorld = m_worldContent.createWorld( this, m_nextWorldFilename.str() );
+			m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_CREATE );
 		}
 
-		m_currentWorld = m_worldContent.create( m_nextWorldFilename.str() );
-		m_currentWorld->create();
-
+		// reset state
+		m_nextWorldFilename.clear();
 		m_hasNextWorld = false;
+		m_addNextWorld = false;
 	}
+
+	// update world, delete, create objects, etc.
+	ZP_PROFILE_START( WORLD_UPDATE );
+	m_worldContent.update();
+	ZP_PROFILE_END( WORLD_UPDATE );
 
 	// update object, delete any etc
 	ZP_PROFILE_START( OBJECT_UPDATE );
@@ -159,25 +183,25 @@ void zpApplication::update()
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
 
-	m_componentPoolEditorCamera.update();
+	//m_componentPoolEditorCamera.update();
 
 	ZP_PROFILE_START( SCRIPT_UPDATE );
-	m_componentPoolScript.update();
+	//m_componentPoolScript.update();
 	ZP_PROFILE_END( SCRIPT_UPDATE );
 
 	ZP_PROFILE_START( SCRIPT_PROC_THREADS );
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
 
-	m_componentPoolAudioEmitter.update();
+	//m_componentPoolAudioEmitter.update();
 
-	zpAudioEngine::getInstance()->update();
+	m_audioContent.getAudioEngine()->update();
 
 	handleInput();
 }
 void zpApplication::simulate()
 {
-	m_componentPoolEditorCamera.simulate();
+	//m_componentPoolEditorCamera.simulate();
 }
 
 void zpApplication::garbageCollect()
@@ -236,22 +260,16 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	}
 	else if( strFilename.endsWith( ".objectb" ) )
 	{
-		//if( m_currentWorld )
-		{
-			zpObject* o = m_objectContent.createObject( this, filename );
-			if( o )
-			{
-				if( m_currentWorld ) m_currentWorld->addObject( o );
-				loaded = true;
-			}
-		}
+		zpObject* o = m_objectContent.createObject( this, filename );
+		loaded = o != ZP_NULL;
 	}
-	else if( strFilename.endsWith( ".zpw" ) )
+	else if( strFilename.endsWith( ".worldb" ) )
 	{
 		m_nextWorldFilename = filename;
 		m_hasNextWorld = true;
+		loaded = true;
 	}
-	else if( strFilename.endsWith( ".zps" ) )
+	else if( strFilename.endsWith( ".shaderb" ) )
 	{
 		loaded = m_renderingPipeline.getShaderContentManager()->reloadResource( filename );
 	}
@@ -280,7 +298,7 @@ void zpApplication::handleInput()
 	}
 	else if( keyboard->isKeyDown( ZP_KEY_CODE_P ) )
 	{
-		zpProfiler::getInstance()->printProfile( ZP_PROFILER_STEP_FRAME );
+		m_profiler.printProfile( ZP_PROFILER_STEP_FRAME );
 	}
 }
 
@@ -366,6 +384,7 @@ void zpApplication::runGarbageCollect()
 {
 	m_textContent.garbageCollect();
 	m_objectContent.garbageCollect();
+	m_worldContent.garbageCollect();
 	m_scriptContent.garbageCollect();
 	m_audioContent.garbageCollect();
 
@@ -378,6 +397,7 @@ void zpApplication::runReloadAllResources()
 {
 	m_textContent.reloadAllResources();
 	m_objectContent.reloadAllResources();
+	m_worldContent.reloadAllResources();
 	m_scriptContent.reloadAllResources();
 	m_audioContent.reloadAllResources();
 

@@ -287,7 +287,7 @@ void zpArrayList<T>::ensureCapacity( zp_uint size )
 			newArray[ i ] = zp_move( m_array[ i ] );
 		}
 
-		delete[] m_array;
+		ZP_SAFE_DELETE_ARRAY( m_array );
 	}
 	m_array = newArray;
 }

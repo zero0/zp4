@@ -30,7 +30,7 @@ public:
 
 	void present();
 
-	zpRenderingContext* getImmediateRenderingContext() const;
+	zpRenderingContext* getImmediateRenderingContext();
 	zpTexture* getBackBufferRenderTarget();
 	zpDepthStencilBuffer* getBackBufferDepthStencilBuffer();
 
@@ -71,7 +71,9 @@ private:
 
 	zpTexture m_immediateRenderTarget;
 	zpDepthStencilBuffer m_immediateDepthStencilBuffer;
-	zpFixedArrayList< zpRenderingContext*, ZP_RENDERING_MAX_RENDERING_CONTEXTS > m_renderingContexts;
+	zpRenderingContext m_immediateContext;
+
+	//zpFixedArrayList< zpRenderingContext*, ZP_RENDERING_MAX_RENDERING_CONTEXTS > m_renderingContexts;
 
 	//zpHashMap< zp_hash, zpRasterState* >  m_rasterStates;
 	//zpHashMap< zp_hash, zpSamplerState* > m_samplerStates;

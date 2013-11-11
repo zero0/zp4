@@ -23,7 +23,6 @@ zpScriptComponent::zpScriptComponent( zpObject* obj, const zpBison::Value& def )
 }
 zpScriptComponent::~zpScriptComponent()
 {
-	m_scripts.clear();
 }
 
 void zpScriptComponent::onCreate()

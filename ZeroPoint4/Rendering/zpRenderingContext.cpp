@@ -8,32 +8,36 @@
 #error( "No rendering engine selected!" )
 #endif
 
-zpRenderingContext::zpRenderingContext( zpRenderingEngine* engine, zpRenderingContextImpl* impl )
-	: m_renderContextImpl( impl )
-	, m_renderingEngine( engine )
+zpRenderingContext::zpRenderingContext()
+	: m_renderContextImpl( ZP_NULL )
+	, m_renderingEngine( ZP_NULL )
 	, m_currentCommnad( ZP_NULL )
 	, m_immediateVertexSize( 0 )
 	, m_immediateIndexSize( 0 )
 	, m_currentBufferIndex( 0 )
 	, m_currentVertexBuffer( ZP_NULL )
 	, m_currentIndexBuffer( ZP_NULL )
-{
-	for( zp_uint i = 0; i < ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS; ++i )
-	{
-		engine->createBuffer( m_immediateVertexBuffers.pushBackEmpty(), ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE );
-		engine->createBuffer( m_immediateIndexBuffers.pushBackEmpty(), ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, sizeof( zp_ushort ) );
-		//m_immediateVertexBuffers.pushBack( engine->createBuffer( ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE ) );
-		//m_immediateIndexBuffers.pushBack( engine->createBuffer( ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, sizeof( zp_ushort ) ) );
-	}
-
-	m_currentVertexBuffer = &m_immediateVertexBuffers[ m_currentBufferIndex ];
-	m_currentIndexBuffer = &m_immediateIndexBuffers[ m_currentBufferIndex ];
-}
+{}
 zpRenderingContext::~zpRenderingContext()
 {
 	m_renderingCommands.clear();
 	m_immediateVertexBuffers.clear();
 	m_immediateIndexBuffers.clear();
+}
+
+void zpRenderingContext::setup( zpRenderingEngine* engine, zpRenderingContextImpl* impl )
+{
+	m_renderingEngine = engine;
+	m_renderContextImpl = impl;
+
+	for( zp_uint i = 0; i < ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS; ++i )
+	{
+		engine->createBuffer( m_immediateVertexBuffers.pushBackEmpty(), ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE );
+		engine->createBuffer( m_immediateIndexBuffers.pushBackEmpty(), ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, sizeof( zp_ushort ) );
+	}
+
+	m_currentVertexBuffer = &m_immediateVertexBuffers[ m_currentBufferIndex ];
+	m_currentIndexBuffer = &m_immediateIndexBuffers[ m_currentBufferIndex ];
 }
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )

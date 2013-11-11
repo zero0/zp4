@@ -67,3 +67,14 @@ zp_uint zpContentPool<T, Count>::size() const
 {
 	return Count;
 }
+
+template<typename T, zp_uint Count>
+T* zpContentPool<T, Count>::getUsed( zp_uint index )
+{
+	return m_used[ index ];
+}
+template<typename T, zp_uint Count>
+zp_uint zpContentPool<T, Count>::getUsedCount() const
+{
+	return m_used.size();
+}

@@ -427,6 +427,9 @@ void as_zpGameObject_Register( asIScriptEngine* engine ) {
 #pragma endregion
 #endif
 zpAngelScript::zpAngelScript()
+	: m_engine( ZP_NULL )
+	, m_immidiateContext( ZP_NULL )
+	, m_currentThread( 0 )
 {}
 zpAngelScript::~zpAngelScript()
 {}
@@ -533,10 +536,18 @@ void zpAngelScript::processThreads()
 	}
 }
 
+zpAngelScript* zpAngelScript::s_instance = ZP_NULL;
+void zpAngelScript::createInstance()
+{
+	s_instance = new zpAngelScript;
+}
 zpAngelScript* zpAngelScript::getInstance()
 {
-	static zpAngelScript s_instance;
-	return &s_instance;
+	return s_instance;
+}
+void zpAngelScript::destroyInstance()
+{
+	ZP_SAFE_DELETE( s_instance );
 }
 
 zp_handle zpAngelScript::getEngine() const
