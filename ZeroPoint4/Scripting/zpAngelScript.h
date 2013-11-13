@@ -34,6 +34,8 @@ public:
 	void yield();
 	void createCoRoutine( const zp_char* methodName );
 
+	void garbageCollect();
+
 private:
 	static void* allocate( zp_uint size );
 	static void deallocate( void* ptr );

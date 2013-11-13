@@ -42,6 +42,8 @@ public:
 	void keys( zpArrayList< Key >& keys ) const;
 	void values( zpArrayList< Value >& values ) const;
 
+	void reserve( zp_uint size );
+
 	void clear();
 
 	template<typename Func>

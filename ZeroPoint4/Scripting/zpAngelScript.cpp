@@ -474,6 +474,8 @@ zp_bool zpAngelScript::createEngine()
 }
 void zpAngelScript::destroyEngine()
 {
+	garbageCollect();
+
 	if( m_immidiateContext )
 	{
 		( (asIScriptContext*)m_immidiateContext )->Release();
@@ -561,7 +563,7 @@ zp_handle zpAngelScript::createScriptObject( zp_handle objectType )
 	asIObjectType* oType = (asIObjectType*)objectType;
 
 	zp_handle scriptObject = engine->CreateScriptObject( oType );
-	engine->AddRefScriptObject( scriptObject, oType );
+	//engine->AddRefScriptObject( scriptObject, oType );
 
 	return scriptObject;
 }
@@ -660,6 +662,12 @@ void zpAngelScript::createCoRoutine( const zp_char* methodName )
 			methodContext->SetUserData( threadContext );
 		}
 	}
+}
+
+void zpAngelScript::garbageCollect()
+{
+	asIScriptEngine* engine = (asIScriptEngine*)m_engine;
+	engine->GarbageCollect( asGC_FULL_CYCLE | asGC_DESTROY_GARBAGE );
 }
 
 void* zpAngelScript::allocate( zp_uint size )

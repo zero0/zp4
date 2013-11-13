@@ -313,6 +313,16 @@ void zpHashMap<Key, Value>::values( zpArrayList< Value >& values ) const
 }
 
 template<typename Key, typename Value>
+void zpHashMap<Key, Value>::reserve( zp_uint size )
+{
+	size = (zp_uint)( size * ( 1.0f + m_loadFactor ) ) + 1;
+	if( m_capacity < size )
+	{
+		resize( size );
+	}
+}
+
+template<typename Key, typename Value>
 void zpHashMap<Key, Value>::clear()
 {
 	if( m_map && m_size > 0 )

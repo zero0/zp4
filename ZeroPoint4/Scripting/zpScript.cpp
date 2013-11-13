@@ -62,6 +62,7 @@ zp_bool zpScriptResource::load( const zp_char* filename )
 
 	asIScriptFunction* method;
 	zp_uint count = objectType->GetMethodCount();
+	m_cachedMethods.reserve( count );
 	for( zp_uint i = 0; i < count; ++i )
 	{
 		method = objectType->GetMethodByIndex( i );

@@ -32,7 +32,7 @@ void zpAllComponents::load( zpObject* obj, const zp_char* componentName, const z
 void zpAllComponents::unload()
 {
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) { m_app->get##cmp##ComponentPool()->destroy( m_##cmp ); m_##cmp = ZP_NULL; }
+#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) { m_##cmp->destroy(); m_app->get##cmp##ComponentPool()->destroy( m_##cmp ); m_##cmp = ZP_NULL; }
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 }

@@ -6,7 +6,7 @@ zpComponent::zpComponent( zpObject* obj )
 {}
 zpComponent::~zpComponent()
 {
-	destroy();
+	//destroy();
 }
 
 zpObject* zpComponent::getParentObject() const

@@ -54,10 +54,14 @@ zpArrayList<T>::zpArrayList( zpArrayList&& arr )
 template<typename T>
 zpArrayList<T>::~zpArrayList()
 {
-	clear();
-	if( !m_isFixed )
+	if( m_isFixed )
+	{
+		clear();
+	}
+	else
 	{
 		ZP_SAFE_DELETE_ARRAY( m_array );
+		m_size = 0;
 	}
 }
 
