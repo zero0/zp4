@@ -26,9 +26,10 @@ void zpEditorCameraComponent::onMouseChange( const zpVector2i& delta ) {}
 
 void zpEditorCameraComponent::onCreate()
 {
-	zp_printfln( "editor camera component" );
+	zp_printfln( "create editor camera component" );
 }
 void zpEditorCameraComponent::onDestroy() {
+	zp_printfln( "destroy editor camera component" );
 }
 
 void zpEditorCameraComponent::onUpdate() {

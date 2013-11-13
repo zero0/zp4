@@ -47,6 +47,8 @@ private:
 	zp_uint m_memDeallocated;
 	zp_uint m_memUsed;
 
+	zpFixedArrayList< void*, 1024 > m_allocedPointers;
+
 	zp_byte* m_allMemory;
 	zp_byte* m_alignedMemory;
 

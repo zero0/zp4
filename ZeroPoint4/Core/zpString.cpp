@@ -832,8 +832,7 @@ void zpString::reserve( zp_uint size )
 }
 void zpString::clear()
 {
-	m_length = 0;
-	getCharsInternal()[ 0 ] = '\0';
+	(*this) = "";
 }
 
 zp_bool operator==( const zpString& string1, const zpString& string2 )

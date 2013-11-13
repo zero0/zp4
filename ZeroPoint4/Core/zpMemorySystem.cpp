@@ -73,6 +73,7 @@ void* zpMemorySystem::allocate( zp_uint size )
 	void* ptr = zp_malloc( size + sizeof( zp_uint ) );
 	zp_uint* i = (zp_uint*)ptr;
 	*i = size;
+	m_allocedPointers.pushBack( ptr );
 	return (void*)( i + 1 );
 
 	zp_uint alignedSize = ZP_MEMORY_ALIGN_SIZE( size + sizeof( zpMemoryBlock ) );
@@ -116,11 +117,17 @@ void* zpMemorySystem::allocate( zp_uint size )
 
 void zpMemorySystem::deallocate( void* ptr )
 {
+
 	++m_numDeallocs;
 	zp_uint* i = (zp_uint*)ptr;
 	--i;
 	m_memDeallocated += *i;
 	m_memUsed -= *i;
+
+	zp_int p = m_allocedPointers.indexOf( i );
+	ZP_ASSERT_WARN( p != -1, "Unknown allocation being deallocated" );
+	m_allocedPointers.erase( p );
+
 	zp_free( i );
 	return;
 
@@ -183,6 +190,7 @@ void zpMemorySystem::initialize( zp_uint size )
 void zpMemorySystem::shutdown()
 {
 	ZP_ASSERT_WARN( m_memUsed == 0, "Possible memory leak of %d", m_memUsed );
+	ZP_ASSERT_WARN( m_allocedPointers.isEmpty(), "Not all allocated memory freed" );
 	ZP_ASSERT_WARN( m_numAllocs - m_numDeallocs == 0, "Missing %d allocs->frees", m_numAllocs - m_numDeallocs );	
 	ZP_ASSERT_WARN( m_memAllocated - m_memDeallocated == 0, "Memory leak of %d", m_memAllocated - m_memDeallocated );
 
