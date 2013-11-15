@@ -12,7 +12,6 @@ public final class Main
 {
 	public static void main( String[] args )
 	{
-		ArcAnt.instance().init();
 		ArcAnt.instance().execute( "clean-tools" );
 		
 		try {
