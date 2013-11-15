@@ -27,7 +27,6 @@ import org.zero0.zeropoint.tools.arc.util.OutputAppender;
 
 public final class Arc implements FileWatcherListener, ArcCompilerListener
 {
-
 	private static String arcPropertiesFile = "arc.properties";
 
 	private static String arcThreads = "arc.threads";

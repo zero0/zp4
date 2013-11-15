@@ -5,12 +5,14 @@
 		ZeroPoint4 Compiler
 	</description>
 
+	<property file="arc.properties" />
+
 	<!-- <property file="" /> -->
-	<property name="vc.dir" location="C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC" />
+	<property name="vc.dir" location="D:/Program Files (x86)/Microsoft Visual Studio 10.0/VC" />
 	<property name="vc.sln" value="ZeroPoint4.sln" />
 
 	<property name="platform" value="x86" />
-	<property name="rendering" value="DX11" />
+	<property name="rendering" value="DX10" />
 	<property name="mode" value="Debug" />
 
 	<property name="base.dir" location="." />
@@ -121,6 +123,7 @@
 		<mkdir dir="${out.dir}/materials" />
 		<mkdir dir="${out.dir}/textures" />
 		<mkdir dir="${out.dir}/objects" />
+		<mkdir dir="${out.dir}/meshes" />
 		<mkdir dir="${out.dir}/scripts" />
 		<mkdir dir="${out.dir}/sounds" />
 	</target>
