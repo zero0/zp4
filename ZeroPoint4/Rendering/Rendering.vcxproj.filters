@@ -120,6 +120,9 @@
     <ClInclude Include="zpDepthStencilState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpGenerateMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -210,6 +213,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpDepthStencilState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpGenerateMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

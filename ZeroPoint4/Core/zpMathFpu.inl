@@ -161,6 +161,17 @@ ZP_FORCE_INLINE void zpMath::Cross3( zpVector4f& s, const zpVector4f& a, const z
 	s.m_xyzw.z = a.m_xyzw.x * b.m_xyzw.y - a.m_xyzw.y * b.m_xyzw.x;
 	s.m_xyzw.w = 0.0f;
 }
+ZP_FORCE_INLINE void zpMath::Perpendicular3( zpVector4f& s, const zpVector4f& a )
+{
+	zpScalar l;
+	Cross3( s, a, zpVector4f( 1, 0, 0 ) );
+	LengthSquared3( l, s );
+
+	if( Cmp( l, zpScalar( ZP_EPSILON ) ) < 0 )
+	{
+		Cross3( s, a, zpVector4f( 0, 1, 0 ) );
+	}
+}
 
 ZP_FORCE_INLINE void zpMath::LengthSquared2( zpScalar& s, const zpVector4f& a )
 {
@@ -545,4 +556,18 @@ ZP_FORCE_INLINE void zpMath::Invert( zpMatrix4f& s, const zpMatrix4f& a )
 	s.m_data[15] = a.m_12*a.m_23*a.m_31 - a.m_13*a.m_22*a.m_31 + a.m_13*a.m_21*a.m_32 - a.m_11*a.m_23*a.m_32 - a.m_12*a.m_21*a.m_33 + a.m_11*a.m_22*a.m_33;
 
 	zpMath::Mul( s, d, s );
+}
+
+
+ZP_FORCE_INLINE void zpMath::Lerp( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& alpha )
+{
+	zpMath::Sub( s, b, a );
+	zpMath::Mul( s, s, alpha );
+	zpMath::Add( s, s, a );
+}
+ZP_FORCE_INLINE void zpMath::Lerp( zpScalar& s, const zpScalar& a, const zpScalar& b, const zpScalar& alpha )
+{
+	zpMath::Sub( s, b, a );
+	zpMath::Mul( s, s, alpha );
+	zpMath::Add( s, s, a );
 }

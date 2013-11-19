@@ -500,6 +500,8 @@ struct zpRenderingCommand
 	zpBoundingAABB boundingBox;
 };
 
+#include "zpGenerateMesh.h"
+
 #include "zpImage.h"
 #include "zpBufferData.h"
 

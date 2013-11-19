@@ -244,17 +244,19 @@ zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBi
 }
 zp_bool zpRenderingEngineImpl::destroyBuffer( zpBufferImpl* buffer )
 {
-	ZP_SAFE_RELEASE( buffer->m_buffer );
-	
-	zp_uint count = m_usedBuffers.eraseAll( buffer );
-	ZP_ASSERT( count > 0, "Unknown Buffer being destroyed" );
-
-	if( count > 0 )
+	if( buffer )
 	{
-		m_freeBuffers.pushBack( buffer );
-		buffer = ZP_NULL;
-	}
+		ZP_SAFE_RELEASE( buffer->m_buffer );
 
+		zp_uint count = m_usedBuffers.eraseAll( buffer );
+		ZP_ASSERT( count > 0, "Unknown Buffer being destroyed" );
+
+		if( count > 0 )
+		{
+			m_freeBuffers.pushBack( buffer );
+			buffer = ZP_NULL;
+		}
+	}
 	return buffer == ZP_NULL;
 }
 

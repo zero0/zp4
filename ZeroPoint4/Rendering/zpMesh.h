@@ -33,8 +33,6 @@ private:
 
 class zpMeshResourceInstance : public zpResourceInstance< zpMeshResource >
 {
-public:
-	void drawMesh( zpRenderingPipeline* pipeline );
 };
 
 class zpMeshContentManager : public zpContentManager< zpMeshResource, zpMeshResourceInstance, zpMeshContentManager, 64 >

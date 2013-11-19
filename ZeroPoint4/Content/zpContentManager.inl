@@ -79,7 +79,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 	}
 
 	// create the resource
-	if( impl != ZP_NULL )
+	//if( impl != ZP_NULL )
 	{
 		// if the resource was able to create, add ref and return
 		if( impl->createResource( empty, filename ) )
@@ -95,6 +95,57 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 
 			return true;
 		}
+	}
+
+	return false;
+}
+
+template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::getResourceWithoutLoad( ResourceInstance& outInstance )
+{
+	Resource* empty = ZP_NULL;
+	Resource* res = m_resources.begin();
+	Resource* end = m_resources.end();
+
+	for( ; res != end; ++res )
+	{
+		if( res->getRefCount() == 0 )
+		{
+			empty = res;
+			break;
+		}
+	}
+
+	// if the resource was not found, make sure there is an empty slot to put it in
+	ZP_ASSERT( empty != ZP_NULL, "" );
+	if( empty == ZP_NULL )
+	{
+		return false;
+	}
+
+	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
+
+	// if the empty slot was loaded (between garbage collects), unload it
+	if( empty->isLoaded() )
+	{
+		impl->destroyResource( empty );
+		empty->m_isLoaded = false;
+	}
+
+	// create the resource
+	//if( impl != ZP_NULL )
+	{
+		// if the resource was able to create, add ref and return
+		outInstance.release();
+		outInstance.m_resource = empty;
+		empty->addRef();
+		empty->m_isLoaded = true;
+		empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
+
+		//outInstance.initialized();
+		impl->initializeInstance( outInstance );
+
+		return true;
 	}
 
 	return false;

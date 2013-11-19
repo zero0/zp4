@@ -84,6 +84,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="zpDepthStencilState.h" />
+    <ClInclude Include="zpGenerateMesh.h" />
     <ClInclude Include="zpImage.h" />
     <ClInclude Include="zpMesh.h" />
     <ClInclude Include="zpRenderingPipeline.h" />
@@ -126,6 +127,7 @@
     <ClCompile Include="zpDepthStencilBuffer.cpp" />
     <ClCompile Include="zpDepthStencilState.cpp" />
     <ClCompile Include="zpFontResource.cpp" />
+    <ClCompile Include="zpGenerateMesh.cpp" />
     <ClCompile Include="zpImage.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpMaterial.cpp" />

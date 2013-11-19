@@ -27,7 +27,7 @@ zpObject* zpObjectContentManager::createObject( zpApplication* application, cons
 }
 void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
 {
-	for( zp_int i = 0; i < m_used.size(); ++i )
+	for( zp_uint i = 0; i < m_used.size(); ++i )
 	{
 		zpObject* o = m_used[ i ];
 		if( !isWorldSwap || ( isWorldSwap && !o->isFlagSet( ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD ) ) )
@@ -39,7 +39,7 @@ void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
 void zpObjectContentManager::update()
 {
 	//m_used.foreach( [ this ]( zpObject* o )
-	for( zp_int i = 0; i < m_used.size(); ++i )
+	for( zp_int i = 0; i < (zp_int)m_used.size(); ++i )
 	{
 		zpObject* o = m_used[ i ];
 		if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )

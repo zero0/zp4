@@ -105,6 +105,7 @@ namespace zpMath
 	ZP_FORCE_INLINE void Dot4( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
 	
 	ZP_FORCE_INLINE void Cross3( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
+	ZP_FORCE_INLINE void Perpendicular3( zpVector4f& s, const zpVector4f& a );
 
 	ZP_FORCE_INLINE void LengthSquared2( zpScalar& s, const zpVector4f& a );
 	ZP_FORCE_INLINE void LengthSquared3( zpScalar& s, const zpVector4f& a );
@@ -172,6 +173,10 @@ namespace zpMath
 	ZP_FORCE_INLINE void Transpose( zpMatrix4f& s, const zpMatrix4f& a );
 	ZP_FORCE_INLINE void Determinant( zpScalar& s, const zpMatrix4f& a );
 	ZP_FORCE_INLINE void Invert( zpMatrix4f& s, const zpMatrix4f& a );
+
+	ZP_FORCE_INLINE void Lerp( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& alpha );
+	ZP_FORCE_INLINE void Lerp( zpScalar& s, const zpScalar& a, const zpScalar& b, const zpScalar& alpha );
+
 };
 
 #if ZP_USE_SIMD

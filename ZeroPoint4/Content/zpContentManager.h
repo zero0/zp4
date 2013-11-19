@@ -54,6 +54,7 @@ public:
 	}
 
 	const Resource* getResource() const { return m_resource; }
+	Resource* getResource() { return m_resource; }
 
 	zp_bool isVaild() const { return m_resource != ZP_NULL; }
 
@@ -82,10 +83,11 @@ class zpContentManager
 
 public:
 	zpContentManager();
-	~zpContentManager();
+	virtual ~zpContentManager();
 
 	zp_bool getResource( const zpString& filename, ResourceInstance& outInstance );
 	zp_bool getResource( const zp_char* filename, ResourceInstance& outInstance );
+	zp_bool getResourceWithoutLoad( ResourceInstance& outInstance );
 
 	zp_bool reloadResource( const zp_char* filename );
 	void reloadAllResources();
@@ -101,7 +103,5 @@ private:
 };
 
 #include "zpContentManager.inl"
-
-
 
 #endif
