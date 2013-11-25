@@ -49,9 +49,9 @@ void zpGenerateMesh::Plane( zpArrayList< zpVector4f >& verts, zpArrayList< zpVec
 	{
 		for( zp_uint h = 0; h <= ops.heightSegments; ++h )
 		{
-			zpScalar wd( w ), hd( h ), u, v;
-			zpMath::Div( wd, wd, zpScalar( ops.widthSegments ) );
-			zpMath::Div( hd, hd, zpScalar( ops.heightSegments ) );
+			zpScalar wd( (zp_float)w ), hd( (zp_float)h ), u, v;
+			zpMath::Div( wd, wd, zpScalar( (zp_float)ops.widthSegments ) );
+			zpMath::Div( hd, hd, zpScalar( (zp_float)ops.heightSegments ) );
 
 			zpMath::Lerp( u, uMin, uMax, wd );
 			zpMath::Lerp( v, vMin, vMax, hd );

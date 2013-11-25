@@ -38,6 +38,8 @@ void zpRenderingContext::setup( zpRenderingEngine* engine, zpRenderingContextImp
 
 	m_currentVertexBuffer = &m_immediateVertexBuffers[ m_currentBufferIndex ];
 	m_currentIndexBuffer = &m_immediateIndexBuffers[ m_currentBufferIndex ];
+
+	engine->createBuffer( m_perDratCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
 }
 void zpRenderingContext::destroy()
 {
@@ -46,6 +48,8 @@ void zpRenderingContext::destroy()
 		m_renderingEngine->destroyBuffer( m_immediateVertexBuffers[i] );
 		m_renderingEngine->destroyBuffer( m_immediateIndexBuffers[i] );
 	}
+
+	m_renderingEngine->destroyBuffer( m_perDratCallBuffer );
 }
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
@@ -114,6 +118,7 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	m_currentCommnad->indexCount = 0;
 	m_currentCommnad->vertexOffset = 0;
 	m_currentCommnad->indexOffset = 0;
+	m_currentCommnad->matrix.setIdentity();
 
 	switch( vertexFormat )
 	{
@@ -143,6 +148,13 @@ void zpRenderingContext::setBoundingBoxCenter( const zpVector4f& center )
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 
 	m_currentCommnad->boundingBox.setCenter( center );
+}
+
+void zpRenderingContext::setMatrix( const zpMatrix4f& matrix )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+
+	m_currentCommnad->matrix = matrix;
 }
 
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpColor4f& color )
@@ -457,11 +469,12 @@ void zpRenderingContext::endDrawImmediate()
 	m_immediateIndexSize = m_scratchIndexBuffer.size();
 }
 
-void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpVector4f& center, zpMaterialResourceInstance* material )
+void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpMatrix4f& matrix, zpMaterialResourceInstance* material )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 
-	zpVector4f c;
+	zpVector4f c, center( matrix.getRow( 3 ) );
+
 	const zpMesh* m = mesh->getResource()->getData();
 	const zpMeshPart* b = m->m_parts.begin();
 	const zpMeshPart* e = m->m_parts.end();
@@ -470,11 +483,10 @@ void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstanc
 		zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
 		command.type = ZP_RENDERING_COMMNAD_DRAW_BUFFERED;
 		command.layer = layer;
-		command.sortKey = 0;
 
 		command.topology = ZP_TOPOLOGY_TRIANGLE_LIST;
-		command.vertexBuffer = m->m_vertex.getBufferImpl(); //m->m_vertex->getBufferImpl();
-		command.indexBuffer = m->m_index.getBufferImpl(); //m->m_index->getBufferImpl();
+		command.vertexBuffer = m->m_vertex.getBufferImpl();
+		command.indexBuffer = m->m_index.getBufferImpl();
 		command.material = material == ZP_NULL ? &b->m_material : material;
 		command.vertexFormat = m->m_format;
 		command.vertexCount = b->m_vertexCount;
@@ -482,6 +494,9 @@ void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstanc
 		command.vertexOffset = b->m_vertexOffset;
 		command.indexOffset = b->m_indexOffset;
 		command.boundingBox = b->m_boundingBox;
+		command.matrix = matrix;
+
+		command.sortKey = command.material->getResource()->getData()->materialId;
 
 		b->m_boundingBox.getCenter( c );
 		zpMath::Add( c, c, center );
@@ -559,7 +574,7 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 				m_filteredCommands[ cmd->layer ].pushBack( cmd );
 				break;
 			default:
-				if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
+				//if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
 				{
 					generateSortKeyForCommand( cmd, camera );
 					m_filteredCommands[ cmd->layer ].pushBack( cmd );
@@ -574,7 +589,6 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 			m_filteredCommands[ cmd->layer ].pushBack( cmd );
 		}
 	}
-	
 
 	// sort opaque layer buckets
 	for( zp_uint i = zpRenderingLayer_StartOpaque; i < zpRenderingLayer_EndOpaque; ++i )
@@ -595,7 +609,23 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 
 void zpRenderingContext::processCommands( zpRenderingLayer layer )
 {
-	m_renderContextImpl->processCommands( m_renderingEngine->getRenderingEngineImpl(), m_filteredCommands[ layer ] );
+	const zpRenderingCommand* const* cmd = m_filteredCommands[ layer ].begin();
+	const zpRenderingCommand* const* end = m_filteredCommands[ layer ].end();
+	
+	if( cmd != end )
+	{
+		setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_perDratCallBuffer );
+
+		zpDrawCallBufferData drawCallData;
+		for( ; cmd != end; ++cmd )
+		{
+			drawCallData.world = (*cmd)->matrix;
+			update( &m_perDratCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
+
+			m_renderContextImpl->processCommand( m_renderingEngine->getRenderingEngineImpl(), *cmd );
+		}
+	}
+	//m_renderContextImpl->processCommands( m_renderingEngine->getRenderingEngineImpl(), m_filteredCommands[ layer ] );
 }
 
 void zpRenderingContext::finalizeCommands()

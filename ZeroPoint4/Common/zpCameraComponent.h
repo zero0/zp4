@@ -4,11 +4,35 @@
 class zpCameraComponent : public zpComponent
 {
 public:
-	zpCameraComponent();
-	~zpCameraComponent();
+	zpCameraComponent( zpObject* obj, const zpBison::Value& def );
+	virtual ~zpCameraComponent();
+
+	zpCamera* getCamera() { return m_camera; }
+
+protected:
+	void onCreate();
+	void onInitialize();
+	void onDestroy();
+
+	void onUpdate();
+	void onSimulate();
+
+	void onEnabled();
+	void onDisabled();
 
 private:
-	zpCamera m_camera;
+	zpCamera* m_camera;
+};
+
+
+class zpCameraComponentPool : public zpContentPool< zpCameraComponent, 8 >
+{
+public:
+	zpCameraComponentPool();
+	virtual ~zpCameraComponentPool();
+
+	void update();
+	void simulate();
 };
 
 #endif

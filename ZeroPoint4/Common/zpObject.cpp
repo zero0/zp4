@@ -62,12 +62,13 @@ void zpObjectContentManager::destroyResource( zpObjectResource* res )
 zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& res )
 	: m_transform()
 	, m_name()
-	, m_flags( ZP_OBJECT_FLAG_ENABLED )
+	, m_flags()
 	, m_lastLoadTime( 0 )
 	, m_components()
 	, m_application( application )
 	, m_object( res )
 {
+	setFlag( ZP_OBJECT_FLAG_ENABLED );
 	loadObject();
 }
 zpObject::~zpObject()
@@ -157,6 +158,8 @@ void zpObject::loadObject()
 		{
 			m_components.load( this, key.asCString(), value );
 		} );
+		zp_bool en = isFlagSet( ZP_OBJECT_FLAG_ENABLED );
+		m_components.setEnabled( en );
 	}
 	else
 	{

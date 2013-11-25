@@ -59,8 +59,6 @@ void zpRenderingPipeline::initialize()
 	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
 	ZP_ASSERT( ok, "" );
 
-	m_cameras.resize( ZP_RENDERING_MAX_CAMERAS );
-
 	const zpVector2i& size = m_engine->getScreenSize();
 
 	zpViewport viewport;
@@ -79,10 +77,13 @@ void zpRenderingPipeline::initialize()
 
 	//m_cameraBuffer = m_engine->createBuffer( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
+	m_engine->createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
+
+	m_cameras.resize( 4 );
 
 	zpCamera* cam = getCamera( 0 );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
-	cam->setPosition( zpVector4f( 1, 1, 1, 1 ) );
+	cam->setPosition( zpVector4f( 10, 10, 10, 1 ) );
 	cam->setLookAt( zpVector4f( 0, 0, 0, 1 ) );
 	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
 	cam->setAspectRatio( viewport.width / viewport.height );
@@ -98,6 +99,7 @@ void zpRenderingPipeline::destroy()
 	m_mesh.release();
 
 	m_engine->destroyBuffer( m_cameraBuffer );
+	m_engine->destroyBuffer( m_perFrameBuffer );
 
 	m_engine->destroy();
 }
@@ -108,6 +110,16 @@ void zpRenderingPipeline::beginFrame()
 	i->clearState();
 
 	i->setRasterState( &m_raster );
+
+	zpTime* time = zpTime::getInstance();
+	zpFrameBufferData perFrameData;
+	perFrameData.deltaTime = time->getDeltaSeconds();
+	perFrameData.actualDeltaTime = time->getActualDeltaSeconds();
+	perFrameData.fixedDeltaTime = 0.0f;
+	perFrameData.timeFromStart = (zp_float)time->getTime();
+
+	i->update( &m_perFrameBuffer, &perFrameData, sizeof( zpFrameBufferData ) );
+	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_FRAME, &m_perFrameBuffer );
 }
 
 void zpRenderingPipeline::submitRendering()
@@ -115,7 +127,7 @@ void zpRenderingPipeline::submitRendering()
 	zpTexture* t = m_engine->getBackBufferRenderTarget();
 	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
 	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
-
+	/*
 	// 0) render things outside this loop
 	i->beginDrawImmediate( ZP_RENDERING_LAYER_UI_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
 	//i->addQuad(
@@ -124,13 +136,13 @@ void zpRenderingPipeline::submitRendering()
 		i->addVertex( zpVector4f( 1, 1, 0, 1 ), zpVector2f( 1, 0 ) );
 		i->addVertex( zpVector4f( 1, 0, 0, 1 ), zpVector2f( 1, 1 ) );
 		i->addQuadIndex( 0, 1, 2, 3 );
-
+	
 		i->addVertex( zpVector4f( -1, -1, 0, 1 ), zpVector2f( 0, 1 ) );
 		i->addVertex( zpVector4f( -1,  0, 0, 1 ), zpVector2f( 0, 0 ) );
 		i->addVertex( zpVector4f(  0,  0, 0, 1 ), zpVector2f( 1, 0 ) );
 		i->addVertex( zpVector4f(  0, -1, 0, 1 ), zpVector2f( 1, 1 ) );
 		i->addQuadIndex( 4, 5, 6, 7 );
-
+	
 		//i->addQuad(
 		//	zpVector4f( -1, 0, 0, 1 ), zpVector2f( 0, 1 ),
 		//	zpVector4f( -1, 1, 0, 1 ), zpVector2f( 0, 0 ),
@@ -139,8 +151,11 @@ void zpRenderingPipeline::submitRendering()
 		//	);
 	//	);
 	i->endDrawImmediate();
-
-	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh, zpVector4f( 0 ) );
+	*/
+	zpMatrix4f m;
+	m.setIdentity();
+	
+	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh, m );
 	
 	// 1) fill buffers
 	i->fillBuffers();
@@ -455,7 +470,7 @@ void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zp
 	{
 		i->update( cameraBuffer, &camera->getCameraBufferData(), sizeof( zpCameraBufferData ) );
 	}
-	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, 0, cameraBuffer );
+	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_CAMERA, cameraBuffer );
 
 	i->setViewport( camera->getViewport() );
 	i->setScissorRect( camera->getClipRect() );

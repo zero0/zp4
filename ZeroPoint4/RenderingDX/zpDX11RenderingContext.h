@@ -28,6 +28,7 @@ public:
 
 	void update( zpBufferImpl* buffer, const void* data, zp_uint size );
 
+	void processCommand( zpRenderingEngineImpl* engine, const zpRenderingCommand* command );
 	void processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands );
 
 	void set( ID3D11DeviceContext* context ) { m_context = context; }
@@ -36,6 +37,8 @@ private:
 	void bindMaterial( const zpMaterial* material );
 
 	ID3D11DeviceContext* m_context;
+
+	const zpMaterial* m_prevMaterial;
 };
 
 #if 0

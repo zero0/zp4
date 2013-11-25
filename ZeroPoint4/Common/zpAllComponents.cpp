@@ -36,3 +36,11 @@ void zpAllComponents::unload()
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 }
+
+void zpAllComponents::setEnabled( zp_bool enabled )
+{
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) { m_##cmp->setEnabled( enabled ); }
+	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
+}

@@ -2,9 +2,17 @@
 #ifndef ZP_BUFFER_DATA_H
 #define ZP_BUFFER_DATA_H
 
-struct zpWorldBufferData
+struct zpDrawCallBufferData
 {
 	zpMatrix4f world;
+};
+
+struct zpFrameBufferData
+{
+	zp_float deltaTime;
+	zp_float actualDeltaTime;
+	zp_float fixedDeltaTime;
+	zp_float timeFromStart;
 };
 
 struct zpCameraBufferData

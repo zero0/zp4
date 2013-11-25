@@ -2,13 +2,17 @@
 #ifndef ZP_CAMERA_H
 #define ZP_CAMERA_H
 
-enum zpCameraProjection {
+enum zpCameraProjection
+{
 	ZP_CAMERA_PROJECTION_ORTHO,
 	ZP_CAMERA_PROJECTION_ORTHO_CENTERED,
-	ZP_CAMERA_PROJECTION_PERSPECTIVE
+	ZP_CAMERA_PROJECTION_PERSPECTIVE,
+
+	zpCameraProjection_Count,
 };
 
-class zpCamera {
+class zpCamera
+{
 public:
 	zpCamera();
 	~zpCamera();

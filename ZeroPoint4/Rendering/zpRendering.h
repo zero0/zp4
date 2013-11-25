@@ -259,6 +259,13 @@ enum zpMaterialTextureSlot : zp_byte
 	zpMaterialTextureSlot_Count
 };
 
+enum zpConstantBufferSlot
+{
+	ZP_CONSTANT_BUFFER_SLOT_CAMERA =		0,
+	ZP_CONSTANT_BUFFER_SLOT_PER_FRAME,
+	ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL,
+};
+
 enum zpTextureWrap : zp_byte
 {
 	ZP_TEXTURE_WRAP_REPEAT =		0,
@@ -496,7 +503,7 @@ struct zpRenderingCommand
 	zp_uint indexCount;
 	zp_uint vertexOffset;
 	zp_uint indexOffset;
-	zpRecti scissor;
+	zpMatrix4f matrix;
 	zpBoundingAABB boundingBox;
 };
 

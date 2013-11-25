@@ -211,7 +211,7 @@ zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBi
 	D3D11_BUFFER_DESC desc;
 	zp_zero_memory( &desc );
 	desc.Usage = __zpToDX( bind );
-	desc.ByteWidth = size;
+	desc.ByteWidth = type == ZP_BUFFER_TYPE_CONSTANT ? zp_round_up_pow2( size, 16 ) : size;
 	desc.StructureByteStride = stride;
 	desc.BindFlags = __zpToDX( type );
 	desc.CPUAccessFlags = bind == ZP_BUFFER_BIND_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;

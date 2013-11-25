@@ -23,11 +23,18 @@ class zpEditorCameraComponent;
 class zpScriptComponent;
 class zpAudioEmitterComponent;
 
+class zpCameraComponent;
+class zpMeshRendererComponent;
+
 #include "zpComponent.h"
 
 #include "zpEditorCameraComponent.h"
 #include "zpScriptComponent.h"
 #include "zpAudioEmitterComponent.h"
+
+// Rendering
+#include "zpCameraComponent.h"
+#include "zpMeshRendererComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"

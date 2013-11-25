@@ -28,6 +28,9 @@
     <Filter Include="Source Files\Audio">
       <UniqueIdentifier>{55c282c1-eb10-4a60-89b3-8b77177fe6fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{1fc4937e-7d0f-442d-9c3a-c8558499c6da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h">
@@ -75,6 +78,9 @@
     <ClInclude Include="zpAudioEmitterComponent.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="zpMeshRendererComponent.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -112,6 +118,12 @@
     </ClCompile>
     <ClCompile Include="zpAudioEmitterComponent.cpp">
       <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="zpCameraComponent.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="zpMeshRendererComponent.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

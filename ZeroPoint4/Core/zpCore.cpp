@@ -346,6 +346,15 @@ zp_uint zp_near_pow2( zp_uint number )
 	return i;
 }
 
+zp_int zp_round_up( zp_int number, zp_int multiple )
+{
+	return ( number + multiple - 1 ) / multiple * multiple;
+}
+zp_int zp_round_up_pow2( zp_int number, zp_int multiple )
+{
+	return ( number + multiple - 1 ) & ~( multiple - 1 );
+}
+
 void zp_sleep( zp_uint milliseconds )
 {
 #if ZP_WIN_32 || ZP_WIN_64

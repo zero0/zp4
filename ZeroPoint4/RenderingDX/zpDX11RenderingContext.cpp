@@ -40,6 +40,7 @@ void zpRenderingContextImpl::clearDepthStencilBuffer( zpDepthStencilBuffer* dept
 }
 void zpRenderingContextImpl::clearState()
 {
+	m_prevMaterial = ZP_NULL;
 	m_context->ClearState();
 }
 
@@ -134,60 +135,61 @@ void zpRenderingContextImpl::update( zpBufferImpl* buffer, const void* data, zp_
 {
 	m_context->UpdateSubresource( buffer->m_buffer, 0, ZP_NULL, data, size, 0 );
 }
+void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, const zpRenderingCommand* command )
+{
+	switch( command->type )
+	{
+	case ZP_RENDERING_COMMNAD_NOOP:
+		break;
 
+	case ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT:
+		{
+			//setScissorRect( command->scissor );
+		}
+		break;
+
+	case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
+	case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
+		{
+			ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
+			ID3D11Buffer* index = command->indexBuffer->m_buffer;
+			ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
+
+			const zpMaterial* mat = command->material->getResource()->getData();
+			if( m_prevMaterial != mat )
+			{
+				m_prevMaterial = mat;
+
+				bindMaterial( mat );
+			}
+
+			zp_uint offset = 0;
+			m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
+			m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
+			m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &offset );
+			m_context->IASetInputLayout( inputLayout );
+
+			m_context->DrawIndexed( command->indexCount, 0, 0 );
+		}
+		break;
+
+	case ZP_RENDERING_COMMNAD_DRAW_INSTANCED:
+		{
+		}
+		break;
+	}
+}
 void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands )
 {
 	const zp_uint count = renderCommands.size();
 	zpRenderingCommand* const* cmd = renderCommands.begin();
 	zpRenderingCommand* const* end = renderCommands.end();
 
-	const zpMaterial* prevMaterial = ZP_NULL;
-
 	for( ; cmd != end; ++cmd )
 	{
 		const zpRenderingCommand* command = *cmd;
 
-		switch( command->type )
-		{
-		case ZP_RENDERING_COMMNAD_NOOP:
-			break;
-
-		case ZP_RENDERING_COMMNAD_SET_SCISSOR_RECT:
-			{
-				setScissorRect( command->scissor );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
-		case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
-			{
-				ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
-				ID3D11Buffer* index = command->indexBuffer->m_buffer;
-				ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
-
-				const zpMaterial* mat = command->material->getResource()->getData();
-				if( prevMaterial != mat )
-				{
-					prevMaterial = mat;
-
-					bindMaterial( mat );
-				}
-
-				zp_uint offset = 0;
-				m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
-				m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
-				m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &offset );
-				m_context->IASetInputLayout( inputLayout );
-
-				m_context->DrawIndexed( command->indexCount, 0, 0 );
-			}
-			break;
-
-		case ZP_RENDERING_COMMNAD_DRAW_INSTANCED:
-			{
-			}
-			break;
-		}
+		processCommand( engine, command );
 	}
 }
 

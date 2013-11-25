@@ -1,7 +1,16 @@
 
 ZP_COMPONENT_DEF( EditorCamera )
+
+// Scrpting
 ZP_COMPONENT_DEF( Script )
+
+// Audio
 ZP_COMPONENT_DEF( AudioEmitter )
+
+// Rendering
+ZP_COMPONENT_DEF( Camera )
+ZP_COMPONENT_DEF( MeshRenderer )
+
 
 //#include "Audio/zpAudioComponents.inl"
 //#include "Physics/zpPhysicsComponents.inl"

@@ -75,6 +75,7 @@
     <ClInclude Include="zpGame.h" />
     <ClInclude Include="zpComponentManager.h" />
     <ClInclude Include="zpGameFlow.h" />
+    <ClInclude Include="zpMeshRendererComponent.h" />
     <ClInclude Include="zpObject.h" />
     <ClInclude Include="zpHealthComponent.h" />
     <ClInclude Include="zpScriptComponent.h" />
@@ -85,12 +86,14 @@
     <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpApplication.cpp" />
     <ClCompile Include="zpAudioEmitterComponent.cpp" />
+    <ClCompile Include="zpCameraComponent.cpp" />
     <ClCompile Include="zpCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="zpComponent.cpp" />
     <ClCompile Include="zpEditorCameraComponent.cpp" />
     <ClCompile Include="zpGame.cpp" />
+    <ClCompile Include="zpMeshRendererComponent.cpp" />
     <ClCompile Include="zpObject.cpp" />
     <ClCompile Include="zpHealthComponent.cpp" />
     <ClCompile Include="zpScriptComponent.cpp" />

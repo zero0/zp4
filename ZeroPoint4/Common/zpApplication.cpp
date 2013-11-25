@@ -186,12 +186,13 @@ void zpApplication::update()
 	//m_componentPoolEditorCamera.update();
 
 	ZP_PROFILE_START( SCRIPT_UPDATE );
-	//m_componentPoolScript.update();
+	m_componentPoolScript.update();
 	ZP_PROFILE_END( SCRIPT_UPDATE );
 
 	ZP_PROFILE_START( SCRIPT_PROC_THREADS );
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
+
 
 	//m_componentPoolAudioEmitter.update();
 
@@ -356,6 +357,8 @@ void zpApplication::processFrame()
 	ZP_PROFILE_START( RENDER_BEGIN );
 	m_renderingPipeline.beginFrame();
 	ZP_PROFILE_END( RENDER_BEGIN );
+
+	m_componentPoolMeshRenderer.render();
 
 	// render
 	ZP_PROFILE_START( RENDER );

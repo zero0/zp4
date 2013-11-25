@@ -30,6 +30,8 @@ public:
 	void setBoundingBox( const zpBoundingAABB& bounding );
 	void setBoundingBoxCenter( const zpVector4f& center );
 
+	void setMatrix( const zpMatrix4f& matrix );
+
 	void addVertex( const zpVector4f& pos, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 );
@@ -84,7 +86,7 @@ public:
 
 	void endDrawImmediate();
 
-	void drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpVector4f& center, zpMaterialResourceInstance* material = 0 );
+	void drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpMatrix4f& matrix, zpMaterialResourceInstance* material = 0 );
 
 	//void drawInstanced( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
@@ -122,13 +124,10 @@ private:
 	zp_uint m_currentBufferIndex;
 	zpBuffer* m_currentVertexBuffer;
 	zpBuffer* m_currentIndexBuffer;
-
+	zpBuffer m_perDratCallBuffer;
 
 	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
 	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
-	//zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
-	//zpFixedArrayList< zpBuffer*, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
-	zpFixedArrayList< zpRecti, 8 > m_scissorRectQueue;
 
 	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingLayer_Count ];
 

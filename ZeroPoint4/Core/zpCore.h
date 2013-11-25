@@ -161,6 +161,9 @@ zp_bool zp_is_print( zp_char ch );
 
 zp_uint zp_near_pow2( zp_uint number );
 
+zp_int zp_round_up( zp_int number, zp_int multiple );
+zp_int zp_round_up_pow2( zp_int number, zp_int multiple );
+
 void zp_sleep( zp_uint milliseconds );
 
 template<typename T>

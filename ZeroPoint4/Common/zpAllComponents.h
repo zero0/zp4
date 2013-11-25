@@ -21,6 +21,8 @@ public:
 	void load( zpObject* obj, const zp_char* componentName, const zpBison::Value& cmp );
 	void unload();
 
+	void setEnabled( zp_bool enabled );
+
 	void setApplication( zpApplication* app ) { m_app = app; }
 
 private:

@@ -40,6 +40,7 @@ public:
 	void generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc );
 	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
 
+	zp_uint getNumCameras() const { return m_cameras.size(); }
 	zpCamera* getCamera( zp_int cameraIndex );
 
 private:
@@ -53,6 +54,7 @@ private:
 	zpMeshContentManager m_meshContent;
 
 	zpBuffer m_cameraBuffer;
+	zpBuffer m_perFrameBuffer;
 
 	zpMaterialResourceInstance m_mat;
 	zpMeshResourceInstance m_mesh;
