@@ -11,14 +11,30 @@ struct Camera
 	float4 up;
 	float4 lookTo;
 	float4 position;
-
+	//float4 zNearFarFovAspect;
+	
 	float zNear;
 	float zFar;
 	float fovy;
 	float aspectRatio;
 };
 
+struct PerFrame
+{
+	float deltaTime;
+	float actualDeltaTime;
+	float fixedDeltaTime;
+	float timeFromStart;
+};
+
+struct PerDrawCall
+{
+	float4x4 world;
+};
+
 Camera camera : register( b0 );
+PerFrame frameData : register( b1 );
+PerDrawCall drawData : register( b2 );
 
 struct VS_Input
 {
@@ -37,7 +53,9 @@ struct PS_Input
 PS_Input main_vs( VS_Input input )
 {
 	PS_Input output = (PS_Input)0;
-	output.position = mul( input.position, camera.viewProjection );
+	output.position = input.position;
+	output.position = mul( output.position, drawData.world );
+	output.position = mul( output.position, camera.viewProjection );
 	output.normal = input.normal;
 	output.texCoord = input.texCoord;
 	

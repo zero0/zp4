@@ -23,7 +23,13 @@ public class ScanRefTask extends Task
 	private List<Path> paths = new ArrayList<Path>();
 	private List<FilterChain> filterChains = new ArrayList<FilterChain>();
 	private String reference = null;
-
+	private String search = null;
+	
+	public void setSearch( String search )
+	{
+		this.search = search;
+	}
+	
 	public void addPath( Path path )
 	{
 		paths.add( path );

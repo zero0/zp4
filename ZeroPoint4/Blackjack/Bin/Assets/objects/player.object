@@ -7,16 +7,17 @@
 	"Layer" : "Default",
 	"Transform" :
 	{
-		"Position" : [ 0, 1, 2 ]
+		"Position" : [ 0, 5, 0 ]
 	},
 	"Components" :
 	{
-		"EditorCamera" :
-		{
-		},
 		"Script" :
 		{
 			"Scripts" : [ "scripts/Test.scriptb" ]
+		},
+		"MeshRenderer" :
+		{
+			"Mesh" : "meshes/cube.meshb"
 		}
 	}
 }

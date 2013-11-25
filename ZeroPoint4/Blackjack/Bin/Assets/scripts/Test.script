@@ -10,4 +10,9 @@ class Test
 		string abs = "Init Scripts!";
 		println( abs );
 	}
+	
+	void onDestroy()
+	{
+		println( "destroyed object!" );
+	}
 }
