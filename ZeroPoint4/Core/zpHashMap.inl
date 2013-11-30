@@ -141,7 +141,7 @@ void zpHashMap<Key, Value>::put( const Key& key, const Value& value )
 	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
 
 	zp_hash h = generateHash( (zp_hash)key );
-	zp_uint index = h & m_capacity - 1;
+	zp_uint index = h % m_capacity;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
 	{
 		if( e->hash == h && e->key == key )
@@ -161,7 +161,7 @@ void zpHashMap<Key, Value>::put( Key&& key, const Value& value )
 	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
 
 	zp_hash h = generateHash( (zp_hash)key );
-	zp_uint index = h & m_capacity - 1;
+	zp_uint index = h % m_capacity;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
 	{
 		if( e->hash == h && e->key == key )
@@ -181,7 +181,7 @@ void zpHashMap<Key, Value>::put( Key&& key, Value&& value )
 	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
 
 	zp_hash h = generateHash( (zp_hash)key );
-	zp_uint index = h & m_capacity - 1;
+	zp_uint index = h % m_capacity;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
 	{
 		if( e->hash == h && e->key == key )
@@ -215,7 +215,7 @@ zp_bool zpHashMap<Key, Value>::containsKey( const Key& key ) const
 	if( m_capacity > 0 )
 	{
 		zp_hash h = generateHash( (zp_hash)key );
-		zp_uint index = h & m_capacity - 1;
+		zp_uint index = h % m_capacity;
 		for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
 		{
 			if( e->hash == h && e->key == key )
@@ -249,7 +249,7 @@ zp_bool zpHashMap<Key, Value>::erase( const Key& key )
 	if( m_capacity > 0 )
 	{
 		zp_hash h = generateHash( (zp_hash)key );
-		zp_uint index = h & m_capacity - 1;
+		zp_uint index = h % m_capacity;
 		for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
 		{
 			next = e->next;
@@ -280,7 +280,7 @@ zp_bool zpHashMap<Key, Value>::find( const Key& key, const Value** outValue ) co
 	if( m_capacity > 0 )
 	{
 		zp_hash h = generateHash( (zp_hash)key );
-		zp_uint index = h & m_capacity - 1;
+		zp_uint index = h % m_capacity;
 		for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
 		{
 			next = e->next;
@@ -300,7 +300,7 @@ zp_bool zpHashMap<Key, Value>::find( const Key& key, Value** outValue )
 	if( m_capacity > 0 )
 	{
 		zp_hash h = generateHash( (zp_hash)key );
-		zp_uint index = h & m_capacity - 1;
+		zp_uint index = h % m_capacity;
 		for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
 		{
 			next = e->next;
