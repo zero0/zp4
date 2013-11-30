@@ -6,7 +6,6 @@ zpHashMap<Key, Value>::zpHashMap()
 	, m_size( 0 )
 	, m_loadFactor( ZP_HASH_MAP_DEFAULT_LOAD_FACTOR )
 {
-	zp_zero_memory_array( m_map, m_capacity );
 }
 template<typename Key, typename Value>
 zpHashMap<Key, Value>::zpHashMap( zp_uint size, zp_float loadFactor )
@@ -67,6 +66,8 @@ void zpHashMap<Key, Value>::operator=( zpHashMap&& map )
 template<typename Key, typename Value>
 Value& zpHashMap<Key, Value>::operator[]( const Key& key )
 {
+	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
+
 	zp_hash h = generateHash( (zp_hash)key );
 	zp_uint index = h % m_capacity;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
@@ -84,6 +85,8 @@ Value& zpHashMap<Key, Value>::operator[]( const Key& key )
 template<typename Key, typename Value>
 Value& zpHashMap<Key, Value>::operator[]( Key&& key )
 {
+	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
+
 	zp_hash h = generateHash( (zp_hash)key );
 	zp_uint index = h % m_capacity;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
@@ -113,6 +116,8 @@ zp_bool zpHashMap<Key, Value>::isEmpty() const
 template<typename Key, typename Value>
 const Value& zpHashMap<Key, Value>::get( const Key& key ) const
 {
+	ZP_ASSERT( m_capacity != 0, "zpHashMap: Trying to get from an empty table" );
+
 	zp_hash h = generateHash( (zp_hash)key );
 	zp_uint index = h % m_capacity;
 	Value* v = ZP_NULL;
@@ -133,6 +138,8 @@ const Value& zpHashMap<Key, Value>::get( const Key& key ) const
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( const Key& key, const Value& value )
 {
+	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
+
 	zp_hash h = generateHash( (zp_hash)key );
 	zp_uint index = h & m_capacity - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
@@ -151,6 +158,8 @@ void zpHashMap<Key, Value>::put( const Key& key, const Value& value )
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( Key&& key, const Value& value )
 {
+	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
+
 	zp_hash h = generateHash( (zp_hash)key );
 	zp_uint index = h & m_capacity - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
@@ -169,6 +178,8 @@ void zpHashMap<Key, Value>::put( Key&& key, const Value& value )
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::put( Key&& key, Value&& value )
 {
+	if( m_capacity == 0 ) reserve( ZP_HASH_MAP_DEFAULT_CAPACITY );
+
 	zp_hash h = generateHash( (zp_hash)key );
 	zp_uint index = h & m_capacity - 1;
 	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
@@ -188,27 +199,32 @@ void zpHashMap<Key, Value>::put( Key&& key, Value&& value )
 template<typename Key, typename Value>
 void zpHashMap<Key, Value>::putAll( const zpHashMap& map )
 {
-	for( zp_uint i = 0; i < m_capacity; ++i )
-	{
-		for( zpMapEntity* e = m_map[ i ]; e != ZP_NULL; e = e->next )
-		{
-			put( e->key, e->value );
-		}
-	}
+	ZP_ASSERT( false, "Unimplimented" );
+	//for( zp_uint i = 0; i < m_capacity; ++i )
+	//{
+	//	for( zpMapEntity* e = m_map[ i ]; e != ZP_NULL; e = e->next )
+	//	{
+	//		put( e->key, e->value );
+	//	}
+	//}
 }
 
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::containsKey( const Key& key ) const
 {
-	zp_hash h = generateHash( (zp_hash)key );
-	zp_uint index = h & m_capacity - 1;
-	for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
+	if( m_capacity > 0 )
 	{
-		if( e->hash == h && e->key == key )
+		zp_hash h = generateHash( (zp_hash)key );
+		zp_uint index = h & m_capacity - 1;
+		for( zpMapEntity* e = m_map[ index ]; e != ZP_NULL; e = e->next )
 		{
-			return true;
+			if( e->hash == h && e->key == key )
+			{
+				return true;
+			}
 		}
 	}
+	
 	return false;
 }
 template<typename Key, typename Value>
@@ -230,60 +246,72 @@ zp_bool zpHashMap<Key, Value>::containsValue( const Value& value ) const
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::erase( const Key& key )
 {
-	zp_hash h = generateHash( (zp_hash)key );
-	zp_uint index = h & m_capacity - 1;
-	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
+	if( m_capacity > 0 )
 	{
-		next = e->next;
-		if( e->hash == h && e->key == key )
+		zp_hash h = generateHash( (zp_hash)key );
+		zp_uint index = h & m_capacity - 1;
+		for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
 		{
-			--m_size;
-			if( prev == e )
+			next = e->next;
+			if( e->hash == h && e->key == key )
 			{
-				m_map[ index ] = next;
-			}
-			else
-			{
-				prev->next = next;
-			}
+				--m_size;
+				if( prev == e )
+				{
+					m_map[ index ] = next;
+				}
+				else
+				{
+					prev->next = next;
+				}
 
-			ZP_SAFE_DELETE( e );
-			return true;
+				ZP_SAFE_DELETE( e );
+				return true;
+			}
 		}
 	}
+	
 	return false;
 }
 
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::find( const Key& key, const Value** outValue ) const
 {
-	zp_hash h = generateHash( (zp_hash)key );
-	zp_uint index = h & m_capacity - 1;
-	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
+	if( m_capacity > 0 )
 	{
-		next = e->next;
-		if( e->hash == h && e->key == key )
+		zp_hash h = generateHash( (zp_hash)key );
+		zp_uint index = h & m_capacity - 1;
+		for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
 		{
-			if( outValue ) *outValue = &e->value;
-			return true;
+			next = e->next;
+			if( e->hash == h && e->key == key )
+			{
+				if( outValue ) *outValue = &e->value;
+				return true;
+			}
 		}
 	}
+	
 	return false;
 }
 template<typename Key, typename Value>
 zp_bool zpHashMap<Key, Value>::find( const Key& key, Value** outValue )
 {
-	zp_hash h = generateHash( (zp_hash)key );
-	zp_uint index = h & m_capacity - 1;
-	for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
+	if( m_capacity > 0 )
 	{
-		next = e->next;
-		if( e->hash == h && e->key == key )
+		zp_hash h = generateHash( (zp_hash)key );
+		zp_uint index = h & m_capacity - 1;
+		for( zpMapEntity* e = m_map[ index ], *prev = e, *next; e != ZP_NULL; prev = e, e = next )
 		{
-			if( outValue ) *outValue = &e->value;
-			return true;
+			next = e->next;
+			if( e->hash == h && e->key == key )
+			{
+				if( outValue ) *outValue = &e->value;
+				return true;
+			}
 		}
 	}
+	
 	return false;
 }
 
