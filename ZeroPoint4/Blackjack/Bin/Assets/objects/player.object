@@ -1,6 +1,6 @@
 {
 	"Name" : "player",
-	"_Extends" : [ "Assets/objects/base.object" ],
+	"_Extends" : [ "objects/base.object" ],
 	"Tags" : [
 		"Player"
 	],

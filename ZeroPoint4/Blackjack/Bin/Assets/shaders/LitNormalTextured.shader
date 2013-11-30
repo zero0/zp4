@@ -1,5 +1,5 @@
 {
-    "File" : "Assets/shaders/LitNormalTextured.hlsl",
+    "File" : "shaders/LitNormalTextured.hlsl",
     "VS" : 
     {
         "Main" : "main_vs",
