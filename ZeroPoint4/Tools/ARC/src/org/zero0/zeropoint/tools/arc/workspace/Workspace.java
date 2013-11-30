@@ -4,9 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -67,17 +66,15 @@ import org.zero0.zeropoint.tools.arc.OutputLevel;
 import org.zero0.zeropoint.tools.arc.Platform;
 import org.zero0.zeropoint.tools.arc.Rendering;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
+import org.zero0.zeropoint.tools.arc.util.FileWatcherListener;
 import org.zero0.zeropoint.tools.arc.util.OutputAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintErrAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintErrWrapper;
 import org.zero0.zeropoint.tools.arc.util.PrintOutAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintOutWrapper;
 
-import com.fasterxml.jackson.core.util.TextBuffer;
-
 public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender
 {
-
 	static Map<String, Image> cachedImages = new HashMap<String, Image>();
 
 	private static Image CreateImage( Device device, String imageFile )
@@ -174,7 +171,11 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	String treeFilter;
 
 	Properties properties;
+	
+	boolean showAllFilesInRoot = false;
 
+	private static final String workspacePropertyFile = "workspace.properties";
+	
 	public Workspace( Composite parent )
 	{
 		super( parent, SWT.NONE );
@@ -182,7 +183,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		properties = new Properties();
 		try
 		{
-			properties.load( new BufferedInputStream( new FileInputStream( "workspace.properties" ) ) );
+			properties.load( new BufferedInputStream( new FileInputStream( workspacePropertyFile ) ) );
 		}
 		catch( Exception e )
 		{
@@ -518,42 +519,41 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 			Properties icons = Arc.getSubProperties( properties, "arc.workspace.ext.icon" );
 			SimpleDateFormat dateFormat = new SimpleDateFormat( properties.getProperty( "arc.workspace.dateformat" ) );
 
+			String trimFront( String str, String trim )
+			{
+				if( str.startsWith( trim ) )
+				{
+					return str.substring( trim.length() );
+				}
+				return str;
+			}
+			
 			public void handleEvent( Event event )
 			{
+				List<String> allFiles = Arc.getInstance().getFiles();
+				if( allFiles.isEmpty() )
+				{
+					return;
+				}
+				
 				TreeItem item = (TreeItem) event.item;
-				TreeItem parentItem = item.getParentItem();
-				String text = null;
-				File file = null;
 
-				if( parentItem == null )
-				{
-					file = ( (File) tree.getData() ).listFiles()[tree.indexOf( item )];
-				}
-				else
-				{
-					file = ( (File) parentItem.getData() ).listFiles()[parentItem.indexOf( item )];
-				}
-				text = file.getName();
+				String filename = allFiles.get( tree.indexOf( item ) );
+				String shortFilename = trimFront( filename, Arc.getInstance().getBaseDirectory() );
+				String text = shortFilename.substring( shortFilename.lastIndexOf( File.separator ) + 1 );
 
-				item.setData( file );
+				item.setData( filename );
 				item.setText( 0, text );
-				if( file.isDirectory() )
+				
+				String ext = text.substring( text.lastIndexOf( '.' ) + 1 );
+				item.setText( 1, ext );
+				if( icons.containsKey( ext ) )
 				{
-					item.setText( 1, "" );
-					item.setItemCount( file.list().length );
-					item.setImage( CreateIcon( getDisplay(), icons.getProperty( "directory" ) ) );
-					item.setText( 2, "" );
+					item.setImage( CreateIcon( getDisplay(), icons.getProperty( ext ) ) );
 				}
-				else
-				{
-					String ext = text.substring( text.lastIndexOf( '.' ) + 1 );
-					item.setText( 1, ext );
-					if( icons.containsKey( ext ) )
-					{
-						item.setImage( CreateIcon( getDisplay(), icons.getProperty( ext ) ) );
-					}
-					item.setText( 2, dateFormat.format( new Date( file.lastModified() ) ) );
-				}
+				
+				long modTime = Arc.getInstance().getFileModificationTime( filename );
+				item.setText( 2, dateFormat.format( new Date( modTime ) ) );
 			}
 		} );
 		tree.addListener( SWT.DefaultSelection, new Listener()
@@ -561,7 +561,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 			public void handleEvent( Event event )
 			{
 				TreeItem item = (TreeItem) event.item;
-				File f = (File) item.getData();
+				String f = (String)item.getData();
 
 				Arc.getInstance().addCompilerTask( f );
 			}
@@ -576,7 +576,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 					final Menu clickMenu = new Menu( getShell() );
 					tree.setMenu( clickMenu );
 					clickMenu.setLocation( e.x, e.y );
-					clickMenu.addListener( SWT.Hide, new Listener()
+					clickMenu.addListener( SWT.Dispose, new Listener()
 					{
 						public void handleEvent( Event e )
 						{
@@ -595,9 +595,9 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 							List<String> files = new ArrayList<String>( t.getSelectionCount() );
 							for( TreeItem i : t.getSelection() )
 							{
-								files.add( ( (File) i.getData() ).getAbsolutePath() );
+								files.add( (String) i.getData() );
 							}
-							Arc.getInstance().addCompilerTasks( (String[]) files.toArray() );
+							Arc.getInstance().addCompilerTasks( files.toArray( new String[ files.size() ] ) );
 						}
 					} );
 
@@ -611,8 +611,8 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 							@Override
 							public void widgetSelected( SelectionEvent event )
 							{
-								File viewFile = (File) ( t.getSelection()[0] ).getData();
-								System.out.print( viewFile.getName() );
+								String viewFile = (String) ( t.getSelection()[0] ).getData();
+								System.out.print( viewFile );
 								StringBuilder contents = new StringBuilder();
 								try
 								{
@@ -643,8 +643,23 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 				}
 			}
 		} );
-		tree.setData( new File( Arc.getInstance().getRootDirectory() ) );
+		tree.setData( Arc.getInstance().getBaseDirectory() );
 		refreshTree();
+		
+		Arc.getInstance().addFileWatcherListener( new FileWatcherListener()
+		{
+			@Override
+			public void fileChanged( String filePath )
+			{
+				refreshTree();
+			}
+			
+			@Override
+			public void fileAdded( String filePath )
+			{
+				refreshTree();
+			}
+		} );
 
 		FormData fd;
 		fd = new FormData();
@@ -669,10 +684,17 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 
 	private void refreshTree()
 	{
-		tree.setRedraw( false );
-		tree.setItemCount( 0 );
-		tree.setItemCount( ( (File) tree.getData() ).list().length );
-		tree.setRedraw( true );
+		Display.getDefault().asyncExec( new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				tree.setRedraw( false );
+				tree.setItemCount( 0 );
+				tree.setItemCount( Arc.getInstance().getNumFiles() );
+				tree.setRedraw( true );
+			}
+		} );
 	}
 
 	void createTop()

@@ -2,7 +2,6 @@ package org.zero0.zeropoint.tools.arc.util;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,6 +17,8 @@ public class FileWatcher implements Runnable, FilenameFilter
 	Map<String, Long> filesToWatch;
 	List<FileWatcherListener> listeners;
 	List<String> includeExtensions;
+	List<String> filesChanged;
+	List<String> filesAdded;
 
 	File rootDir;
 	String rootPath;
@@ -27,30 +28,29 @@ public class FileWatcher implements Runnable, FilenameFilter
 	boolean isEnabled;
 	long delay;
 
-	public FileWatcher( String root )
+	public FileWatcher()
 	{
 		thread = null;
 		filesToWatch = new HashMap<String, Long>();
 		listeners = new ArrayList<FileWatcherListener>();
 		includeExtensions = new ArrayList<String>();
+		filesChanged = new ArrayList<String>();
+		filesAdded = new ArrayList<String>();
 
-		isRunning = true;
+		isRunning = false;
 		isEnabled = false;
 		delay = 1000;
-
+	}
+	
+	public void setRootDir( String root )
+	{
 		rootDir = new File( root );
-		try
-		{
-			rootPath = rootDir.getCanonicalPath();
-		}
-		catch( IOException e )
-		{
-			rootPath = rootDir.getAbsolutePath();
-		}
+		rootPath = root;
 	}
 
 	public void start()
 	{
+		isRunning = true;
 		if( thread == null )
 		{
 			thread = new Thread( this );
@@ -62,14 +62,25 @@ public class FileWatcher implements Runnable, FilenameFilter
 		filesToWatch.clear();
 	}
 	
-	public Set<String> getFiles()
+	public long getFileModificationTime( String filename )
 	{
-		return Collections.unmodifiableSet( filesToWatch.keySet() );
+		Long modTime = filesToWatch.get( filename );
+		return modTime == null ? -1 : modTime.longValue();
+	}
+	
+	public List<String> getFiles()
+	{
+		return Collections.unmodifiableList( new ArrayList<String>( filesToWatch.keySet() ) );
+	}
+	
+	public int getNumFiles()
+	{
+		return filesToWatch.size();
 	}
 
 	public void addFile( File file )
 	{
-		synchronized( lock )
+		//synchronized( lock )
 		{
 			if( file.isDirectory() )
 			{
@@ -80,14 +91,15 @@ public class FileWatcher implements Runnable, FilenameFilter
 			}
 			else
 			{
-				filesToWatch.put( getStandardPathForFile( file ), file.lastModified() );
+				//filesToWatch.put( getStandardPathForFile( file ), file.lastModified() );
+				filesAdded.add( getStandardPathForFile( file ) );
 			}
 		}
 	}
 
 	public void addAcceptedFileExtension( String extension )
 	{
-		includeExtensions.add( extension );
+		includeExtensions.add( "." + extension );
 	}
 
 	public void addListener( FileWatcherListener listener )
@@ -153,7 +165,8 @@ public class FileWatcher implements Runnable, FilenameFilter
 			if( lastModified != currentModified )
 			{
 				e.setValue( currentModified );
-				fireChangeListeners( e.getKey() );
+				//fireChangeListeners( e.getKey() );
+				filesChanged.add( e.getKey() );
 			}
 		}
 	}
@@ -169,13 +182,46 @@ public class FileWatcher implements Runnable, FilenameFilter
 		}
 		else
 		{
-			
 			String path = getStandardPathForFile( file );
 			if( !filesToWatch.containsKey( path ) )
 			{
 				filesToWatch.put( path, file.lastModified() );
-				fireAddListeners( path );
+				//fireAddListeners( path );
+				filesAdded.add( path );
 			}
+		}
+	}
+	
+	void checkRemovedFiles( File file )
+	{
+		// get all the files in the directory
+		List<String> filePaths = new ArrayList<String>();
+		getListOfAcceptableFiles( file, filePaths );
+		
+		// remove all the tracked files from the ones in the path
+		Set<String> trackedFiles = filesToWatch.keySet();
+		if( trackedFiles.removeAll( filePaths ) )
+		{
+			// if there are any paths left, remove them from the tracked files
+			for( String s : filePaths )
+			{
+				filesToWatch.remove( s );
+			}
+		}
+	}
+	
+	private void getListOfAcceptableFiles( File file, List<String> filePaths )
+	{
+		if( file.isDirectory() )
+		{
+			for( File f : file.listFiles( this ) )
+			{
+				getListOfAcceptableFiles( f, filePaths );
+			}
+		}
+		else
+		{
+			filePaths.add( getStandardPathForFile( file ) );
 		}
 	}
 	
@@ -186,11 +232,11 @@ public class FileWatcher implements Runnable, FilenameFilter
 		{
 			path = file.getCanonicalPath();
 			
-			path = path.substring( rootPath.length() + 1 );
+			//path = path.substring( rootPath.length() );
 		}
 		catch( Exception e )
 		{
-			e.printStackTrace();
+			path = file.getAbsolutePath();
 		}
 		return path;
 	}
@@ -216,9 +262,32 @@ public class FileWatcher implements Runnable, FilenameFilter
 			{
 				synchronized( lock )
 				{
+					// check for file updates
 					checkUpdateFiles();
 
+					// check for new files added
 					checkNewFiles( rootDir );
+					
+					// check for removed files
+					//checkRemovedFiles( rootDir );
+				}
+				
+				if( !filesChanged.isEmpty() )
+				{
+					for( String path : filesChanged )
+					{
+						fireChangeListeners( path );
+					}
+					filesChanged.clear();
+				}
+				
+				if( !filesAdded.isEmpty() )
+				{
+					for( String path : filesAdded )
+					{
+						fireAddListeners( path );
+					}
+					filesAdded.clear();
 				}
 			}
 		}

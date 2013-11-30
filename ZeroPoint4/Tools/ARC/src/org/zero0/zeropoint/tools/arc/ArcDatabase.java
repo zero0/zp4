@@ -256,6 +256,7 @@ public class ArcDatabase
 	public List<String> getFilesReferencedFrom( String srcFile, boolean directReference )
 	{
 		List<String> files = new ArrayList<String>();
+		files.add( srcFile );
 
 		try
 		{

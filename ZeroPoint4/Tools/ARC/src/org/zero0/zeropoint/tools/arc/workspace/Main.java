@@ -10,7 +10,7 @@ import org.zero0.zeropoint.tools.arc.ArcAnt;
 
 public final class Main
 {
-	public static void main( String[] args )
+	public static void antmain( String[] args )
 	{
 		ArcAnt.instance().execute( "clean-tools" );
 		
@@ -25,7 +25,7 @@ public final class Main
 	/**
 	 * @param args
 	 */
-	public static void oldmain( String[] args )
+	public static void main( String[] args )
 	{
 		Arc.getInstance().initialize();
 
