@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,6 +36,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 
 	private static final String arcProject = "arc.project";
 	private static final String arcThreads = "arc.threads";
+	private static final String arcWatcherDelay = "arc.watcher-delay";
 	private static final String arcPlatform = "arc.platform";
 	private static final String arcRendering = "arc.rendering";
 	private static final String arcOutputLevel = "arc.output-level";
@@ -121,6 +121,9 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		
 		fileWatcher = new FileWatcher();
 		fileWatcher.setRootDir( getAssetsDirectory() );
+		
+		long watcherDelay = Long.parseLong( properties.getProperty( arcWatcherDelay, "1000" ) );
+		fileWatcher.setDelay( watcherDelay );
 
 		int numThreads = Integer.parseInt( properties.getProperty( arcThreads, "10" ) );
 		compilerExecutor = Executors.newFixedThreadPool( numThreads );
@@ -145,7 +148,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 						//compilerProperties.put( compilerClass, new Properties() );
 						compilers.put( key, compilerClass );
 
-						// get the sub properties for this compiler
+						// get the extensions for this compiler
 						String exts = compilersProp.getProperty( key + ".ext", "" ).toLowerCase();
 						for( String ext : exts.split( "," ) )
 						{
@@ -154,6 +157,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 							fileWatcher.addAcceptedFileExtension( extension );
 						}
 						
+						// get the output extension for this compiler
 						String outExt = compilersProp.getProperty( key + ".out", "" ).toLowerCase();
 						if( !outExt.isEmpty() )
 						{
@@ -178,26 +182,22 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	public final String getFullDirectoryPath( String path )
 	{
 		String fullPath = null;
-		try
 		{
 			path = path
 					.replace( "{Platform}", platform.name() )
+					.replace( "{Arch}", platform.getArch() )
 					.replace( "{ExeMode}", executableMode.name() )
 					.replace( "{Rendering}", rendering.name() )
 					.replace( "{Project}", getProject() )
 					;
 
-			fullPath = new File( path ).getCanonicalPath();
-		}
-		catch( IOException e )
-		{
-			err( "Unable to create directory structure: " + path );
+			fullPath = fileWatcher.getStandardPathForFile( new File( path ) );
 		}
 		
 		return fullPath;
 	}
 	
-	private final void saveProperties()
+	public final void saveProperties()
 	{
 		OutputStream out = null;
 		try
@@ -323,6 +323,38 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		return fileWatcher.getNumFiles();
 	}
 
+	public final void executeCompiler( String compiler )
+	{
+		Class<? extends ArcCompiler> clazz = compilers.get( compiler );
+		if( clazz != null )
+		{
+			try
+			{
+				ArcCompiler arcCompiler = clazz.newInstance();
+				arcCompiler.setProperties( properties );
+				arcCompiler.setFileToCompile( "" );
+				arcCompiler.setProject( getProject() );
+				arcCompiler.setPlatform( getPlatform() );
+				arcCompiler.setRendering( getRendering() );
+				arcCompiler.setExectuableMode( getExecutableMode() );
+				arcCompiler.setInputDirectory( getAssetsDirectory() );
+				arcCompiler.setOutputDirectory( getOutputRootDirectory() );
+				arcCompiler.setTempDirectory( getTempDirectory() );
+				arcCompiler.setListener( this );
+				if( compilerOutExtension.containsKey( compiler ) )
+				{
+					arcCompiler.setOutputExtension( compilerOutExtension.get( compiler ) );
+				}
+	
+				compilerExecutor.execute( arcCompiler );
+			}
+			catch( Exception e )
+			{
+				err( e.getMessage() );
+			}
+		}
+	}
+	
 	public final void addCompilerTask( File file )
 	{
 		addCompilerTask( fileWatcher.getStandardPathForFile( file ) );
@@ -351,7 +383,9 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 				if( clazz != null )
 				{
 					ArcCompiler arcCompiler = clazz.newInstance();
+					arcCompiler.setProperties( properties );
 					arcCompiler.setFileToCompile( filePath );
+					arcCompiler.setProject( getProject() );
 					arcCompiler.setPlatform( getPlatform() );
 					arcCompiler.setRendering( getRendering() );
 					arcCompiler.setExectuableMode( getExecutableMode() );
@@ -364,7 +398,6 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 						arcCompiler.setOutputExtension( compilerOutExtension.get( compiler ) );
 					}
 
-					// arcCompiler.run();
 					compilerExecutor.execute( arcCompiler );
 				}
 			}
@@ -389,6 +422,17 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	{
 		database.filesAdded( filePath );
 		addCompilerTasks( filePath );
+	}
+	
+	@Override
+	public void fileRemoved( String filePath )
+	{
+		database.removeFiles( filePath );
+	}
+
+	@Override
+	public void fileListChanged()
+	{
 	}
 
 	public final Platform getPlatform()

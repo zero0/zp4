@@ -17,6 +17,7 @@ import org.zero0.zeropoint.tools.arc.Rendering;
 public abstract class ArcCompiler implements Runnable
 {
 	private Properties properties = new Properties();
+	private String project = "";
 	private String fileToCompile = "";
 	private String inputDir = "";
 	private String outputDir = "";
@@ -29,6 +30,15 @@ public abstract class ArcCompiler implements Runnable
 	private Rendering rendering = Rendering.DX11;
 	private ExecutableMode executableMode = ExecutableMode.Debug;
 	
+	public final void setProject( String project )
+	{
+		this.project = project;
+	}
+	
+	public final String getProject()
+	{
+		return project;
+	}
 
 	public final void setProperties( Properties properties )
 	{
@@ -134,16 +144,19 @@ public abstract class ArcCompiler implements Runnable
 	public final void run()
 	{
 		String directory = getFileToCompile();
-		directory = directory.substring( getInputDirectory().length() );
-		outputFile = getOutputDirectory() + directory + "b";
-		if( outputExtension != null )
+		if( !directory.isEmpty() )
 		{
-			outputFile = outputFile.substring( 0, outputFile.lastIndexOf( '.' ) + 1 ) + outputExtension;
+			directory = directory.substring( getInputDirectory().length() );
+			outputFile = getOutputDirectory() + directory + "b";
+			if( outputExtension != null )
+			{
+				outputFile = outputFile.substring( 0, outputFile.lastIndexOf( '.' ) + 1 ) + outputExtension;
+			}
+			directory = outputFile.substring( 0, outputFile.lastIndexOf( File.separatorChar ) + 1 );
+			
+			Arc.getInstance().out( OutputLevel.Verbos, "Creating Directory: " + directory );
+			new File( directory ).mkdirs();
 		}
-		directory = outputFile.substring( 0, outputFile.lastIndexOf( File.separatorChar ) + 1 );
-		
-		Arc.getInstance().out( OutputLevel.Verbos, "Creating Directory: " + directory );
-		new File( directory ).mkdirs();
 		
 		long startTime = System.currentTimeMillis();
 		internalRunCompiler();
@@ -156,11 +169,16 @@ public abstract class ArcCompiler implements Runnable
 		return compileTime;
 	}
 
+	public String getWorkingDirectory()
+	{
+		return inputDir;
+	}
+	
 	private void internalRunCompiler()
 	{
 		String className = getClass().getSimpleName();
 		String compilerName;
-		Class<?> clazz = getClass();
+		
 		if( getClass().isAnnotationPresent( ArcCompilerName.class ) )
 		{
 			compilerName = getClass().getAnnotation( ArcCompilerName.class ).value();
@@ -172,15 +190,19 @@ public abstract class ArcCompiler implements Runnable
 		
 		Arc.getInstance().out( OutputLevel.Verbos, className + ": " + getFileToCompile() );
 		
-		String exe =  Arc.getInstance().getToolsExeDirectory() + File.separator + compilerName + ".exe";
+		String exe = "";
+		if( !compilerName.isEmpty() )
+		{
+			exe = Arc.getInstance().getToolsExeDirectory() + File.separator + compilerName + ".exe";
+		}
 		
 		List<String> params = new ArrayList<String>();
-		params.add( exe );
+		if( !exe.isEmpty() ) params.add( exe );
 		params.addAll( getCompilerParams() );
 		
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.command( params );
-		pb.directory( new File( Arc.getInstance().getAssetsDirectory() ) );
+		pb.directory( new File( getWorkingDirectory() ) );
 		pb.redirectOutput( Redirect.PIPE );
 		pb.redirectError( Redirect.PIPE );
 		

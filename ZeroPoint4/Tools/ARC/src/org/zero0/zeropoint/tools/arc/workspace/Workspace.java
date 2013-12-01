@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -66,7 +65,7 @@ import org.zero0.zeropoint.tools.arc.OutputLevel;
 import org.zero0.zeropoint.tools.arc.Platform;
 import org.zero0.zeropoint.tools.arc.Rendering;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
-import org.zero0.zeropoint.tools.arc.util.FileWatcherListener;
+import org.zero0.zeropoint.tools.arc.util.FileWatcherAdapter;
 import org.zero0.zeropoint.tools.arc.util.OutputAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintErrAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintErrWrapper;
@@ -76,7 +75,8 @@ import org.zero0.zeropoint.tools.arc.util.PrintOutWrapper;
 public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender
 {
 	static Map<String, Image> cachedImages = new HashMap<String, Image>();
-
+	static Map<Integer, Color> cachedColors = new HashMap<Integer, Color>();
+	
 	private static Image CreateImage( Device device, String imageFile )
 	{
 		Image img = null;
@@ -116,15 +116,27 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	{
 		return CreateImage( device, "res/famfamfam_silk_icons_v013.zip:icons/" + icon + ".png" );
 	}
+	
+	private static Color CreateColor( Device device, int r, int g, int b )
+	{
+		Color c = null;
+		Integer hash = ( r & 0xFF ) << 16 | ( g & 0xFF ) << 8 | ( b & 0xFF );
+		
+		if( cachedColors.containsKey( hash ) )
+		{
+			c = cachedColors.get( hash );
+		}
+		else
+		{
+			c = new Color( device, r, g, b );
+			cachedColors.put( hash, c );
+		}
+		
+		return c;
+	}
 
 	static final FormAttachment fa0 = new FormAttachment( 0 );
 	static final FormAttachment fa100 = new FormAttachment( 100 );
-
-	static final List<Rendering> renderings = new ArrayList<Rendering>();
-	static
-	{
-		renderings.addAll( Arrays.asList( Rendering.values() ) );
-	}
 
 	TabFolder tabs;
 	TabItem mainTab;
@@ -492,28 +504,137 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 				refreshTree();
 			}
 		} );
-
+		
+		item = new ToolItem( bar, SWT.SEPARATOR );
+		
+		item = new ToolItem( bar, SWT.PUSH );
+		item.setImage( CreateIcon( getDisplay(), "wrench" ) );
+		item.setToolTipText( "Build Tools" );
+		item.addListener( SWT.Selection, new Listener()
+		{
+			@Override
+			public void handleEvent( Event event )
+			{
+				Arc.getInstance().executeCompiler( "build-tools" );
+			}
+		} );
+		
+		item = new ToolItem( bar, SWT.PUSH );
+		item.setImage( CreateIcon( getDisplay(), "wand" ) );
+		item.setToolTipText( "Build Game" );
+		item.addListener( SWT.Selection, new Listener()
+		{
+			@Override
+			public void handleEvent( Event event )
+			{
+				Arc.getInstance().executeCompiler( "build-game" );
+			}
+		} );
+		
+		item = new ToolItem( bar, SWT.SEPARATOR );
+		
+		item = new ToolItem( bar, SWT.PUSH );
+		item.setImage( CreateIcon( getDisplay(), "bin" ) );
+		item.setToolTipText( "Build Tools" );
+		item.addListener( SWT.Selection, new Listener()
+		{
+			@Override
+			public void handleEvent( Event event )
+			{
+				Arc.getInstance().executeCompiler( "build-tools" );
+			}
+		} );
+		
+		item = new ToolItem( bar, SWT.PUSH );
+		item.setImage( CreateIcon( getDisplay(), "bomb" ) );
+		item.setToolTipText( "Build Game" );
+		item.addListener( SWT.Selection, new Listener()
+		{
+			@Override
+			public void handleEvent( Event event )
+			{
+				Arc.getInstance().executeCompiler( "build-game" );
+			}
+		} );
+		
+		item = new ToolItem( bar, SWT.SEPARATOR );
+		
+		item = new ToolItem( bar, SWT.PUSH );
+		item.setImage( CreateIcon( getDisplay(), "joystick" ) );
+		item.setToolTipText( "Run Game" );
+		item.addListener( SWT.Selection, new Listener()
+		{
+			@Override
+			public void handleEvent( Event event )
+			{
+				Arc.getInstance().executeCompiler( "run-game" );
+			}
+		} );
+		
+		
 		tree = new Tree( treeComposite, SWT.VIRTUAL | SWT.FULL_SELECTION | SWT.MULTI );
 		tree.setHeaderVisible( true );
 
+		//Listener sortListener = new Listener()
+		//{
+		//	@Override
+		//	public void handleEvent( Event e )
+		//	{
+		//		// determine new sort column and direction
+		//		TreeColumn sortColumn = tree.getSortColumn();
+		//		TreeColumn currentColumn = (TreeColumn) e.widget;
+		//		int dir = tree.getSortDirection();
+		//		if( sortColumn == currentColumn )
+		//		{
+		//			dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+		//		}
+		//		else
+		//		{
+		//			tree.setSortColumn( currentColumn );
+		//			dir = SWT.UP;
+		//		}
+		//
+		//		int[] order = tree.getColumnOrder();
+		//		int s = -1;
+		//		for( int o : order )
+		//		{
+		//			if( currentColumn == tree.getColumn( order[o] ) )
+		//			{
+		//				s = order[o];
+		//				break;
+		//			}
+		//		}
+		//		
+		//		TreeItem[] items = tree.getItems();
+		//		
+		//		// update data displayed in table
+		//		tree.setSortDirection( dir );
+		//	}
+		//};
+		
 		col = new TreeColumn( tree, SWT.LEFT );
 		col.setText( "File" );
-		col.setWidth( 200 );
+		col.setWidth( 225 );
 		col.setResizable( true );
 		col.setMoveable( true );
-
+		//col.addListener( SWT.Selection, sortListener );
+		
 		col = new TreeColumn( tree, SWT.LEFT );
 		col.setText( "Type" );
-		col.setWidth( 100 );
+		col.setWidth( 75 );
 		col.setResizable( true );
 		col.setMoveable( true );
-
+		//col.addListener( SWT.Selection, sortListener );
+		//tree.setSortColumn( col );
+		//tree.setSortDirection( SWT.DOWN );
+		
 		col = new TreeColumn( tree, SWT.LEFT );
 		col.setText( "Last Modified" );
 		col.setWidth( 150 );
 		col.setResizable( true );
 		col.setMoveable( true );
-
+		//col.addListener( SWT.Selection, sortListener );
+		
 		tree.addListener( SWT.SetData, new Listener()
 		{
 			Properties icons = Arc.getSubProperties( properties, "arc.workspace.ext.icon" );
@@ -646,16 +767,10 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		tree.setData( Arc.getInstance().getBaseDirectory() );
 		refreshTree();
 		
-		Arc.getInstance().addFileWatcherListener( new FileWatcherListener()
+		Arc.getInstance().addFileWatcherListener( new FileWatcherAdapter()
 		{
 			@Override
-			public void fileChanged( String filePath )
-			{
-				refreshTree();
-			}
-			
-			@Override
-			public void fileAdded( String filePath )
+			public void fileListChanged()
 			{
 				refreshTree();
 			}
@@ -743,7 +858,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 			@Override
 			public void widgetSelected( SelectionEvent event )
 			{
-				Arc.getInstance().setRendering( renderings.get( renderingCombo.getSelectionIndex() ) );
+				Arc.getInstance().setRendering( Rendering.values()[ renderingCombo.getSelectionIndex() ] );
 			}
 		} );
 	}
@@ -1129,7 +1244,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		int offset = this.console.getText().length();
 
 		this.console.append( text );
-		this.console.setStyleRange( new StyleRange( offset, text.length(), new Color( getDisplay(), 255, 0, 0 ), null ) );
+		this.console.setStyleRange( new StyleRange( offset, text.length(), CreateColor( getDisplay(), 255, 0, 0 ), null ) );
 	}
 
 	void filterTree( String filter )
@@ -1137,7 +1252,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		treeFilter = filter;
 
 		Pattern p = treeFilter != null && treeFilter.length() > 0 ? Pattern.compile( ".*" + treeFilter + ".*", Pattern.CASE_INSENSITIVE ) : null;
-		Color gray = new Color( getDisplay(), 100, 100, 100 );
+		Color gray = CreateColor( getDisplay(), 100, 100, 100 );
 
 		for( TreeItem i : tree.getItems() )
 		{
@@ -1158,7 +1273,15 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	void updateOptionsText()
 	{
 		StringBuffer options = new StringBuffer();
-		options.append( "Output: " ).append( Arc.getInstance().getOutputLevel().name() ).append( '\t' ).append( "Platform: " ).append( Arc.getInstance().getPlatform().name() ).append( '\t' ).append( "Rendering: " ).append( Arc.getInstance().getRendering().name() ).append( '\t' ).append( "Exe Mode: " ).append( Arc.getInstance().getExecutableMode().name() );
+		options
+		.append( "Output: " ).append( Arc.getInstance().getOutputLevel().name() )
+		.append( '\t' )
+		.append( "Platform: " ).append( Arc.getInstance().getPlatform().name() )
+		.append( '\t' )
+		.append( "Rendering: " ).append( Arc.getInstance().getRendering().name() )
+		.append( '\t' )
+		.append( "Exe Mode: " ).append( Arc.getInstance().getExecutableMode().name() )
+		;
 
 		optionsLabel.setText( options.toString() );
 	}
