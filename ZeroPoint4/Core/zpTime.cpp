@@ -6,6 +6,7 @@ zpTime::zpTime()
 	, m_currentTime( 0 )
 	, m_previousTime( 0 )
 	, m_deltaTime( 0 )
+	, m_timeSinceStart( 0 )
 	, m_secondsPerTick( 0.f )
 	, m_timeScale( 1.f )
 	, m_deltaSeconds( 0.f )
@@ -38,6 +39,10 @@ zp_float zpTime::getSecondsPerTick() const
 {
 	return m_secondsPerTick;
 }
+zp_float zpTime::getSecondsSinceStart() const
+{
+	return m_timeSinceStart * m_secondsPerTick;
+}
 
 void zpTime::setTimeScale( zp_float timeScale )
 {
@@ -54,10 +59,9 @@ void zpTime::tick()
 
 	m_deltaTime = m_currentTime - m_previousTime;
 	m_previousTime = m_currentTime;
-	if( m_deltaTime < 0 ) {
-		m_deltaTime = 0;
-	}
+	m_deltaTime = ZP_MAX( 0, m_deltaTime );
 
+	m_timeSinceStart += m_deltaTime;
 	m_actualDeltaSeconds = m_deltaTime * m_secondsPerTick;
 	m_deltaSeconds = m_actualDeltaSeconds * m_timeScale;
 }
@@ -78,7 +82,10 @@ zp_long zpTime::getDeltaTime() const
 {
 	return m_deltaTime;
 }
-
+zp_long zpTime::getTimeSinceStart() const
+{
+	return m_timeSinceStart;
+}
 
 zp_float zpTime::getInterpolation() const
 {
