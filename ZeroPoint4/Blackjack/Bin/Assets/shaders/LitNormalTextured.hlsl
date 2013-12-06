@@ -3,23 +3,22 @@
 SamplerState texSampler : register( s0 );
 Texture2D<float4> tex : register( t0 );
 
-struct Camera
+cbuffer Camera : register( b0 )
 {
 	float4x4 viewProjection;
 	float4x4 invViewProjection;
-	
+
 	float4 up;
 	float4 lookTo;
 	float4 position;
-	//float4 zNearFarFovAspect;
-	
+    
 	float zNear;
 	float zFar;
 	float fovy;
 	float aspectRatio;
 };
 
-struct PerFrame
+cbuffer PerFrame : register( b1 )
 {
 	float deltaTime;
 	float actualDeltaTime;
@@ -27,14 +26,14 @@ struct PerFrame
 	float timeFromStart;
 };
 
-struct PerDrawCall
+cbuffer PerDrawCall : register( b2 )
 {
 	float4x4 world;
 };
 
-Camera camera : register( b0 );
-PerFrame frameData : register( b1 );
-PerDrawCall drawData : register( b2 );
+//Camera camera : register( b0 );
+//PerFrame frameData : register( b1 );
+//PerDrawCall drawData : register( b2 );
 
 struct VS_Input
 {
@@ -54,11 +53,11 @@ PS_Input main_vs( VS_Input input )
 {
 	PS_Input output = (PS_Input)0;
 	output.position = input.position;
-	output.position = mul( output.position, drawData.world );
-	output.position = mul( output.position, camera.viewProjection );
+	output.position = mul( output.position, world );
+	output.position = mul( output.position, viewProjection );
 	output.normal = input.normal;
 	output.texCoord = input.texCoord;
-	
+
 	return output;
 }
 
