@@ -70,12 +70,11 @@ void zpRenderingPipeline::initialize()
 	zpRasterStateDesc raster;
 	raster.cullMode = ZP_CULL_MODE_BACK;
 	raster.frontFace = ZP_FRONT_FACE_CW;
-	//raster.fillMode = ZP_FILL_MODE_WIREFRAME;
+	raster.fillMode = ZP_FILL_MODE_SOLID;
 	//raster.depthClipEnable = true;
 	
 	m_engine->createRasterState( m_raster, raster );
 
-	//m_cameraBuffer = m_engine->createBuffer( ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
 
@@ -116,7 +115,7 @@ void zpRenderingPipeline::beginFrame()
 	perFrameData.deltaTime = time->getDeltaSeconds();
 	perFrameData.actualDeltaTime = time->getActualDeltaSeconds();
 	perFrameData.fixedDeltaTime = 0.0f;
-	perFrameData.timeFromStart = (zp_float)time->getTime();
+	perFrameData.timeFromStart = time->getSecondsSinceStart();
 
 	i->update( &m_perFrameBuffer, &perFrameData, sizeof( zpFrameBufferData ) );
 	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_FRAME, &m_perFrameBuffer );
@@ -151,12 +150,12 @@ void zpRenderingPipeline::submitRendering()
 		//	);
 	//	);
 	i->endDrawImmediate();
-	*/
+	
 	zpMatrix4f m;
 	m.setIdentity();
 	
 	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh, m );
-	
+	*/
 	// 1) fill buffers
 	i->fillBuffers();
 

@@ -614,7 +614,7 @@ void zpRenderingContext::processCommands( zpRenderingLayer layer )
 	
 	if( cmd != end )
 	{
-		setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_perDratCallBuffer );
+		setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_perDratCallBuffer );
 
 		zpDrawCallBufferData drawCallData;
 		for( ; cmd != end; ++cmd )
