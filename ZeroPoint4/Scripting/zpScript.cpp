@@ -127,13 +127,9 @@ void zpScriptResourceInstance::destroyed()
 
 zpScriptContentManager::zpScriptContentManager()
 {
-	zpAngelScript::createInstance();
-	zpAngelScript::getInstance()->createEngine();
 }
 zpScriptContentManager::~zpScriptContentManager()
 {
-	zpAngelScript::getInstance()->destroyEngine();
-	zpAngelScript::destroyInstance();
 }
 
 zp_bool zpScriptContentManager::createResource( zpScriptResource* res, const zp_char* filename )

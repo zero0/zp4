@@ -15,6 +15,7 @@ void operator delete( void* ptr );
 #define ZP_MEMORY_ALIGN_SIZE( s )	( ( (s) + ZP_MEMORY_INCREMENT_SIZE ) & ( ~ZP_MEMORY_INCREMENT_MASK ) )
 //#define ZP_MEMORY_TABLE_INDEX( s )	ZP_MIN( ( (s) >> ZP_MEMORY_INCREMENT_SHIFT ), ( ZP_MEMORY_BLOCK_TABLE_SIZE - 1 ) )
 #define ZP_MEMORY_TABLE_INDEX( s )	( (s) % ZP_MEMORY_BLOCK_TABLE_SIZE )
+#define ZP_MEMORY_TRACK_POINTERS	0
 
 class zpMemorySystem {
 public:
@@ -46,9 +47,9 @@ private:
 	zp_uint m_memAllocated;
 	zp_uint m_memDeallocated;
 	zp_uint m_memUsed;
-
-	zpFixedArrayList< void*, 1024 > m_allocedPointers;
-
+#if ZP_MEMORY_TRACK_POINTERS
+	zpFixedArrayList< void*, 2 * 1024 > m_allocedPointers;
+#endif
 	zp_byte* m_allMemory;
 	zp_byte* m_alignedMemory;
 

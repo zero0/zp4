@@ -98,6 +98,9 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_audioContent.getAudioEngine()->create( m_window.getWindowHandle() );
 
+	zpAngelScript::createInstance();
+	zpAngelScript::getInstance()->createEngine( this );
+
 	// register input with window
 	m_window.addFocusListener( &m_inputManager );
 	m_window.addProcListener( &m_inputManager );
@@ -117,6 +120,9 @@ zp_int zpApplication::shutdown()
 	m_objectContent.update();
 
 	m_appOptions.release();
+
+	zpAngelScript::getInstance()->destroyEngine();
+	zpAngelScript::destroyInstance();
 
 	runGarbageCollect();
 

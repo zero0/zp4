@@ -1,6 +1,9 @@
 #include "zpScripting.h"
 #include "angelscript.h"
 
+#include "Common/zpCommon.h"
+#include "Rendering/zpRendering.h"
+
 #if ZP_WIN_32
 #if ZP_DEBUG
 #pragma comment( lib, "angelscriptd.lib" )
@@ -17,7 +20,7 @@
 
 #define AS_ASSERT( r )	if( (r) < asSUCCESS ) { zpLog::debug() << "Assert Failed: (" << r << ") " << __FILE__ << ':' << __LINE__ << zpLog::endl; }
 
-#pragma region Message Callback
+#pragma region Register Core
 void as_MessageCallback( const asSMessageInfo& info )
 {
 	zpLogOutput* out;
@@ -37,7 +40,6 @@ void as_MessageCallback( const asSMessageInfo& info )
 
 	*out << info.section << " [" << info.row << ',' << info.col << "] " << info.message << zpLog::endl;
 }
-#pragma endregion
 
 void as_zp_printf( const zpString& str )
 {
@@ -48,13 +50,27 @@ void as_zp_printfln( const zpString& str )
 	zp_printfln( str.str() );
 }
 
+void as_Register_zpString( asIScriptEngine* engine );
+void as_Register_zpArray( asIScriptEngine* engine );
+void as_Register_zpScalar( asIScriptEngine* engine );
+void as_Register_zpVector4f( asIScriptEngine* engine );
+void as_Register_zpVector2f( asIScriptEngine* engine );
+void as_Register_zpColor4f( asIScriptEngine* engine );
+
 void as_Register_Core( asIScriptEngine* engine )
 {
-	zp_int r;
+	as_Register_zpString( engine );
+	as_Register_zpArray( engine );
+	as_Register_zpScalar( engine );
+	as_Register_zpVector4f( engine );
+	as_Register_zpVector2f( engine );
+	as_Register_zpColor4f( engine );
 
+	zp_int r;
 	r = engine->RegisterGlobalFunction( "void print(const string &in)", asFUNCTION( as_zp_printf ), asCALL_CDECL );  AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void println(const string &in)", asFUNCTION( as_zp_printfln ), asCALL_CDECL );  AS_ASSERT( r );
 }
+#pragma endregion
 
 #pragma region Register zpString
 zpString as_zpString_Factory( asUINT length, const char* string )
@@ -99,7 +115,7 @@ zp_int as_zpString_LastIndexOf( const zpString* self, const zpString& str, zp_ui
 	return index == zpString::npos ? -1 : (zp_int)index;
 }
 
-void as_zpString_Register( asIScriptEngine* engine )
+void as_Register_zpString( asIScriptEngine* engine )
 {
 	zp_int r;
 
@@ -137,224 +153,453 @@ void as_zpString_Register( asIScriptEngine* engine )
 #pragma endregion
 
 #pragma region Register Array
-void as_zpArray_Register( asIScriptEngine* engine )
+void as_Register_zpArray( asIScriptEngine* engine )
 {
 	//zp_int r;
 
 	//r = engine->RegisterObjectType( "array<class T>", sizeof( zpArrayList ), asOBJ_REF | asOBJ_GC | asOBJ_TEMPLATE ); AS_ASSERT( r );
 }
 #pragma endregion
-#if 0
-#pragma region Register zp_real
-void as_zp_real_Constructor( zpScalar* self ) {
-	*self = zpScalarZero();
-	//zp_real r = zp_real_zero();
-	//memcpy( self, &r, sizeof( zp_real ) );
+
+#pragma region Register zpScalar
+void as_zpScalar_Constructor( zpScalar* self )
+{
+	*self = zpScalar();
 }
-void as_zp_real_ConstructorX( zpScalar* self, float value ) {
-	*self = zpScalarFromFloat( value );
-	//zp_real r = zp_real_from_float( value );
-	//memcpy( self, &r, sizeof( zp_real ) );
+void as_zpScalar_ConstructorX( zpScalar* self, float value )
+{
+	*self = zpScalar( value );
 }
-void as_zp_real_CopyConstructor( zpScalar* self, zpScalar real ) {
-	*self = real;
-	//memcpy( self, &real, sizeof( zp_real ) );
+void as_zpScalar_CopyConstructor( zpScalar* self, const zpScalar& scalar )
+{
+	*self = scalar;
 }
-void as_zp_real_Deconstructor( zpScalar* self ) {
-	//*self = zp_real_zero();
+void as_zpScalar_Deconstructor( zpScalar* self )
+{
+	self->~zpScalar();
 }
 
-zpScalar as_zp_real_Add( zpScalar* self, zpScalar b ) {
-	return zpScalarAdd( *self, b );
+zpScalar as_zpScalar_Add( zpScalar* self, const zpScalar& b )
+{
+	zpScalar s;
+	zpMath::Add( s, *self, b );
+	return s;
 }
-zpScalar as_zp_real_Sub( zpScalar* self, zpScalar b ) {
-	return zpScalarSub( *self, b );
+zpScalar as_zpScalar_Sub( zpScalar* self, const zpScalar& b )
+{
+	zpScalar s;
+	zpMath::Sub( s, *self, b );
+	return s;
 }
-zpScalar as_zp_real_Mul( zpScalar* self, zpScalar b ) {
-	return zpScalarMul( *self, b );
+zpScalar as_zpScalar_Mul( zpScalar* self, const zpScalar& b )
+{
+	zpScalar s;
+	zpMath::Mul( s, *self, b );
+	return s;
 }
-zpScalar as_zp_real_Div( zpScalar* self, zpScalar b ) {
-	return zpScalarDiv( *self, b );
-}
-
-zpScalar as_zp_real_Addf( zpScalar* self, zp_float b ) {
-	return zpScalarAdd( *self, zpScalarFromFloat( b ) );
-}
-zpScalar as_zp_real_Subf( zpScalar* self, zp_float b ) {
-	return zpScalarSub( *self, zpScalarFromFloat( b ) );
-}
-zpScalar as_zp_real_Mulf( zpScalar* self, zp_float b ) {
-	return zpScalarMul( *self, zpScalarFromFloat( b ) );
-}
-zpScalar as_zp_real_Divf( zpScalar* self, zp_float b ) {
-	return zpScalarDiv( *self, zpScalarFromFloat( b ) );
-}
-
-zpScalar as_zp_real_AddAssign( zpScalar* self, zpScalar b ) {
-	*self = zpScalarAdd( *self, b );
-	return *self;
-}
-zpScalar as_zp_real_SubAssign( zpScalar* self, zpScalar b ) {
-	*self =  zpScalarSub( *self, b );
-	return *self;
-}
-zpScalar as_zp_real_MulAssign( zpScalar* self, zpScalar b ) {
-	*self =  zpScalarMul( *self, b );
-	return *self;
-}
-zpScalar as_zp_real_DivAssign( zpScalar* self, zpScalar b ) {
-	*self =  zpScalarDiv( *self, b );
-	return *self;
+zpScalar as_zpScalar_Div( zpScalar* self, const zpScalar& b )
+{
+	zpScalar s;
+	zpMath::Div( s, *self, b );
+	return s;
 }
 
-zpScalar as_zp_real_AddAssignf( zpScalar* self, zp_float b ) {
-	*self = zpScalarAdd( *self, zpScalarFromFloat( b ) );
+zpScalar as_zpScalar_Addf( zpScalar* self, zp_float b )
+{
+	zpScalar s;
+	zpMath::Add( s, *self, zpScalar( b ) );
+	return s;
+}
+zpScalar as_zpScalar_Subf( zpScalar* self, zp_float b )
+{
+	zpScalar s;
+	zpMath::Sub( s, *self, zpScalar( b ) );
+	return s;
+}
+zpScalar as_zpScalar_Mulf( zpScalar* self, zp_float b )
+{
+	zpScalar s;
+	zpMath::Mul( s, *self, zpScalar( b ) );
+	return s;
+}
+zpScalar as_zpScalar_Divf( zpScalar* self, zp_float b )
+{
+	zpScalar s;
+	zpMath::Div( s, *self, zpScalar( b ) );
+	return s;
+}
+
+zpScalar as_zpScalar_AddAssign( zpScalar* self, const zpScalar& b )
+{
+	zpMath::Add( *self, *self, b );
 	return *self;
 }
-zpScalar as_zp_real_SubAssignf( zpScalar* self, zp_float b ) {
-	*self =  zpScalarSub( *self, zpScalarFromFloat( b ) );
+zpScalar as_zpScalar_SubAssign( zpScalar* self, const zpScalar& b )
+{
+	zpMath::Sub( *self, *self, b );
 	return *self;
 }
-zpScalar as_zp_real_MulAssignf( zpScalar* self, zp_float b ) {
-	*self =  zpScalarMul( *self, zpScalarFromFloat( b ) );
+zpScalar as_zpScalar_MulAssign( zpScalar* self, const zpScalar& b )
+{
+	zpMath::Mul( *self, *self, b );
 	return *self;
 }
-zpScalar as_zp_real_DivAssignf( zpScalar* self, zp_float b ) {
-	*self =  zpScalarDiv( *self, zpScalarFromFloat( b ) );
+zpScalar as_zpScalar_DivAssign( zpScalar* self, const zpScalar& b )
+{
+	zpMath::Div( *self, *self, b );
 	return *self;
 }
 
-zpScalar as_zp_real_Neg( zpScalar* self ) {
-	return zpScalarNeg( *self );
+zpScalar as_zpScalar_AddAssignf( zpScalar* self, zp_float b )
+{
+	zpMath::Add( *self, *self, zpScalar( b ) );
+	return *self;
+}
+zpScalar as_zpScalar_SubAssignf( zpScalar* self, zp_float b )
+{
+	zpMath::Sub( *self, *self, zpScalar( b ) );
+	return *self;
+}
+zpScalar as_zpScalar_MulAssignf( zpScalar* self, zp_float b )
+{
+	zpMath::Mul( *self, *self, zpScalar( b ) );
+	return *self;
+}
+zpScalar as_zpScalar_DivAssignf( zpScalar* self, zp_float b )
+{
+	zpMath::Div( *self, *self, zpScalar( b ) );
+	return *self;
 }
 
-zp_bool as_zp_real_Eq( zpScalar* self, zpScalar b ) {
-	return zpScalarEq( *self, b );
-}
-zp_bool as_zp_real_Eqf( zpScalar* self, zp_float b ) {
-	return zpScalarEq( *self, zpScalarFromFloat( b ) );
-}
-
-zp_float as_zp_real_AsFloat( zpScalar* self ) {
-	return zpScalarToFloat( *self );
+zpScalar as_zpScalar_Neg( zpScalar* self )
+{
+	zpScalar s;
+	zpMath::Neg( s, *self );
+	return s;
 }
 
-void as_zp_real_Register( asIScriptEngine* engine ) {
-	if( !engine ) return;
+zp_bool as_zpScalar_Eq( zpScalar* self, zpScalar b )
+{
+	return zpMath::Cmp( *self, b ) == 0;
+}
+zp_bool as_zpScalar_Eqf( zpScalar* self, zp_float b )
+{
+	return zpMath::Cmp( *self, zpScalar( b ) ) == 0;
+}
+
+zp_float as_zpScalar_AsFloat( zpScalar* self )
+{
+	return self->getFloat();
+}
+
+void as_Register_zpScalar( asIScriptEngine* engine )
+{
 	zp_int r;
 
-	r = engine->RegisterObjectType( "real", sizeof( zpScalar ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "real", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zp_real_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "real", asBEHAVE_CONSTRUCT, "void f( const float )", asFUNCTION( as_zp_real_ConstructorX ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "real", asBEHAVE_CONSTRUCT, "void f( real )", asFUNCTION( as_zp_real_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "real", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zp_real_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectType( "scalar", sizeof( zpScalar ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "scalar", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpScalar_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "scalar", asBEHAVE_CONSTRUCT, "void f( const float )", asFUNCTION( as_zpScalar_ConstructorX ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "scalar", asBEHAVE_CONSTRUCT, "void f( const scalar& in )", asFUNCTION( as_zpScalar_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "scalar", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpScalar_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "scalar", asBEHAVE_VALUE_CAST, "float f() const", asFUNCTION( as_zpScalar_AsFloat ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( "real", "void opAssign( real )", asFUNCTION( as_zp_real_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "void opAssign( const scalar& in )", asFUNCTION( as_zpScalar_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "real", "real opAdd( real )", asFUNCTION( as_zp_real_Add ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opSub( real )", asFUNCTION( as_zp_real_Sub ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opMul( real )", asFUNCTION( as_zp_real_Mul ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opDiv( real )", asFUNCTION( as_zp_real_Div ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opAdd( const scalar& in )", asFUNCTION( as_zpScalar_Add ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opSub( const scalar& in )", asFUNCTION( as_zpScalar_Sub ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opMul( const scalar& in )", asFUNCTION( as_zpScalar_Mul ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opDiv( const scalar& in )", asFUNCTION( as_zpScalar_Div ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( "real", "real opAdd( float )", asFUNCTION( as_zp_real_Addf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opSub( float )", asFUNCTION( as_zp_real_Subf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opMul( float )", asFUNCTION( as_zp_real_Mulf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opDiv( float )", asFUNCTION( as_zp_real_Divf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opAdd( float )", asFUNCTION( as_zpScalar_Addf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opSub( float )", asFUNCTION( as_zpScalar_Subf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opMul( float )", asFUNCTION( as_zpScalar_Mulf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opDiv( float )", asFUNCTION( as_zpScalar_Divf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "real", "real opAddAssign( real )", asFUNCTION( as_zp_real_AddAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opSubAssign( real )", asFUNCTION( as_zp_real_SubAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opMulAssign( real )", asFUNCTION( as_zp_real_MulAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opDivAssign( real )", asFUNCTION( as_zp_real_DivAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opAddAssign( const scalar& in )", asFUNCTION( as_zpScalar_AddAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opSubAssign( const scalar& in )", asFUNCTION( as_zpScalar_SubAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opMulAssign( const scalar& in )", asFUNCTION( as_zpScalar_MulAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opDivAssign( const scalar& in )", asFUNCTION( as_zpScalar_DivAssign ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "real", "real opAddAssign( float )", asFUNCTION( as_zp_real_AddAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opSubAssign( float )", asFUNCTION( as_zp_real_SubAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opMulAssign( float )", asFUNCTION( as_zp_real_MulAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opDivAssign( float )", asFUNCTION( as_zp_real_DivAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opAddAssign( float )", asFUNCTION( as_zpScalar_AddAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opSubAssign( float )", asFUNCTION( as_zpScalar_SubAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opMulAssign( float )", asFUNCTION( as_zpScalar_MulAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opDivAssign( float )", asFUNCTION( as_zpScalar_DivAssignf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "real", "real opNeg()", asFUNCTION( as_zp_real_Neg ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opNeg()", asFUNCTION( as_zpScalar_Neg ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( "real", "real opEquals( real )", asFUNCTION( as_zp_real_Eq ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "real", "real opEquals( float )", asFUNCTION( as_zp_real_Eqf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opEquals( const scalar& in )", asFUNCTION( as_zpScalar_Eq ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "scalar opEquals( float )", asFUNCTION( as_zpScalar_Eqf ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "real", "float asFloat() const", asFUNCTION( as_zp_real_AsFloat ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "scalar", "float asFloat() const", asFUNCTION( as_zpScalar_AsFloat ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 }
 #pragma endregion
 
 #pragma region Register zpVector4f
-void as_zpVector4f_Constructor( zpVector4f* self ) {
+void as_zpVector4f_Constructor( zpVector4f* self )
+{
 	*self = zp_move( zpVector4f() );
 }
-void as_zpVector4f_ConstructorXYZ( zpVector4f* self, zp_float x, zp_float y, zp_float z ) {
+void as_zpVector4f_ConstructorXY( zpVector4f* self, zp_float x, zp_float y )
+{
+	*self = zp_move( zpVector4f( x, y ) );
+}
+void as_zpVector4f_ConstructorXYZ( zpVector4f* self, zp_float x, zp_float y, zp_float z )
+{
 	*self = zp_move( zpVector4f( x, y, z ) );
 }
-void as_zpVector4f_ConstructorXYZW( zpVector4f* self, zp_float x, zp_float y, zp_float z, zp_float w ) {
+void as_zpVector4f_ConstructorXYZW( zpVector4f* self, zp_float x, zp_float y, zp_float z, zp_float w )
+{
 	*self = zp_move( zpVector4f( x, y, z, w ) );
 }
-void as_zpVector4f_CopyConstructor( zpVector4f* self, const zpVector4f& copy ) {
-	*self = zp_move( zpVector4f( copy ) );
+void as_zpVector4f_CopyConstructor( zpVector4f* self, const zpVector4f& copy )
+{
+	*self = copy;
 }
-void as_zpVector4f_Deconstructor( zpVector4f* self ) {
+void as_zpVector4f_Deconstructor( zpVector4f* self )
+{
 	self->~zpVector4f();
 }
 
-void as_zpVector4f_SetX( zpVector4f* self, zp_float value ) {
-	self->setX( zpScalarFromFloat( value ) );
+void as_zpVector4f_SetX( zpVector4f* self, zp_float value )
+{
+	self->setX( zpScalar( value ) );
 }
-void as_zpVector4f_SetY( zpVector4f* self, zp_float value ) {
-	self->setY( zpScalarFromFloat( value ) );
+void as_zpVector4f_SetY( zpVector4f* self, zp_float value )
+{
+	self->setY( zpScalar( value ) );
 }
-void as_zpVector4f_SetZ( zpVector4f* self, zp_float value ) {
-	self->setZ( zpScalarFromFloat( value ) );
+void as_zpVector4f_SetZ( zpVector4f* self, zp_float value )
+{
+	self->setZ( zpScalar( value ) );
 }
-void as_zpVector4f_SetW( zpVector4f* self, zp_float value ) {
-	self->setW( zpScalarFromFloat( value ) );
+void as_zpVector4f_SetW( zpVector4f* self, zp_float value )
+{
+	self->setW( zpScalar( value ) );
 }
 
-void as_zpVector4f_Register( asIScriptEngine* engine ) {
-	if( !engine ) return;
+zpScalar as_zpVector4f_Dot2( const zpVector4f& a, const zpVector4f& b )
+{
+	zpScalar s;
+	zpMath::Dot2( s, a, b );
+	return s;
+}
+zpScalar as_zpVector4f_Dot3( const zpVector4f& a, const zpVector4f& b )
+{
+	zpScalar s;
+	zpMath::Dot3( s, a, b );
+	return s;
+}
+zpScalar as_zpVector4f_Dot4( const zpVector4f& a, const zpVector4f& b )
+{
+	zpScalar s;
+	zpMath::Dot4( s, a, b );
+	return s;
+}
+zpVector4f as_zpVector4f_Cross3( const zpVector4f& a, const zpVector4f& b )
+{
+	zpVector4f s;
+	zpMath::Cross3( s, a, b );
+	return s;
+}
+
+zpScalar as_zpVector4f_Length2( zpVector4f* self )
+{
+	zpScalar s;
+	zpMath::Length2( s, *self );
+	return s;
+}
+zpScalar as_zpVector4f_Length3( zpVector4f* self )
+{
+	zpScalar s;
+	zpMath::Length3( s, *self );
+	return s;
+}
+zpScalar as_zpVector4f_LengthSqr2( zpVector4f* self )
+{
+	zpScalar s;
+	zpMath::LengthSquared2( s, *self );
+	return s;
+}
+zpScalar as_zpVector4f_LengthSqr3( zpVector4f* self )
+{
+	zpScalar s;
+	zpMath::LengthSquared3( s, *self );
+	return s;
+}
+
+void as_Register_zpVector4f( asIScriptEngine* engine )
+{
 	zp_int r;
 
-	r = engine->RegisterObjectType( "Vector4f", sizeof( zpVector4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Vector4f", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpVector4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Vector4f", asBEHAVE_CONSTRUCT, "void f( float, float, float )", asFUNCTION( as_zpVector4f_ConstructorXYZ ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Vector4f", asBEHAVE_CONSTRUCT, "void f( float, float, float, float )", asFUNCTION( as_zpVector4f_ConstructorXYZW ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Vector4f", asBEHAVE_CONSTRUCT, "void f( const Vector4f& in )", asFUNCTION( as_zpVector4f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Vector4f", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpVector4f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      "vec4", sizeof( zpVector4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec4", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpVector4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec4", asBEHAVE_CONSTRUCT, "void f( float, float )", asFUNCTION( as_zpVector4f_ConstructorXY ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec4", asBEHAVE_CONSTRUCT, "void f( float, float, float )", asFUNCTION( as_zpVector4f_ConstructorXYZ ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec4", asBEHAVE_CONSTRUCT, "void f( float, float, float, float )", asFUNCTION( as_zpVector4f_ConstructorXYZW ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec4", asBEHAVE_CONSTRUCT, "void f( const vec4& in )", asFUNCTION( as_zpVector4f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec4", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpVector4f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "void opAssign( const Vector4f& in )", asMETHODPR( zpVector4f, operator=, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "void opAssign( const vec4& in )", asMETHODPR( zpVector4f, operator=, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "real get_x() const", asMETHODPR( zpVector4f, getX, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "real get_y() const", asMETHODPR( zpVector4f, getY, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "real get_z() const", asMETHODPR( zpVector4f, getZ, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "real get_w() const", asMETHODPR( zpVector4f, getW, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_x() const", asMETHODPR( zpVector4f, getX, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_y() const", asMETHODPR( zpVector4f, getY, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_z() const", asMETHODPR( zpVector4f, getZ, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_w() const", asMETHODPR( zpVector4f, getW, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "void set_x( real )", asMETHODPR( zpVector4f, setX, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "void set_y( real )", asMETHODPR( zpVector4f, setY, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "void set_z( real )", asMETHODPR( zpVector4f, setZ, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "void set_w( real )", asMETHODPR( zpVector4f, setW, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "void set_x( const scalar& in )", asMETHODPR( zpVector4f, setX, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "void set_y( const scalar& in )", asMETHODPR( zpVector4f, setY, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "void set_z( const scalar& in )", asMETHODPR( zpVector4f, setZ, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "void set_w( const scalar& in )", asMETHODPR( zpVector4f, setW, ( const zpScalar& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "void zero3()", asMETHODPR( zpVector4f, zero3, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "void zero4()", asMETHODPR( zpVector4f, zero4, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_length2() const", asFUNCTION( as_zpVector4f_Length2 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_length3() const", asFUNCTION( as_zpVector4f_Length3 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "bool isZero3() const", asMETHODPR( zpVector4f, isZero3, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "bool isZero4() const", asMETHODPR( zpVector4f, isZero4, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_lengthSqr2() const", asFUNCTION( as_zpVector4f_LengthSqr2 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec4", "scalar get_lengthSqr3() const", asFUNCTION( as_zpVector4f_LengthSqr3 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "real dot3( const Vector4f& in ) const", asMETHODPR( zpVector4f, dot3, ( const zpVector4f& ) const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "real dot4( const Vector4f& in ) const", asMETHODPR( zpVector4f, dot4, ( const zpVector4f& ) const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "scalar dot2( const vec4& in, const vec4& in )", asFUNCTION( as_zpVector4f_Dot2 ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "scalar dot3( const vec4& in, const vec4& in )", asFUNCTION( as_zpVector4f_Dot3 ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "scalar dot4( const vec4& in, const vec4& in )", asFUNCTION( as_zpVector4f_Dot4 ), asCALL_CDECL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "Vector4f cross3( const Vector4f& in ) const", asMETHODPR( zpVector4f, cross3, ( const zpVector4f& ) const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "Vector4f cross4( const Vector4f& in ) const", asMETHODPR( zpVector4f, cross4, ( const zpVector4f& ) const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "vec4 cross3( const vec4& in, const vec4& in )", asFUNCTION( as_zpVector4f_Cross3 ), asCALL_CDECL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "Vector4f", "real magnitude3() const", asMETHODPR( zpVector4f, magnitude3, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "real magnitude4() const", asMETHODPR( zpVector4f, magnitude4, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Vector4f", "real magnitudeSquared3() const", asMETHODPR( zpVector4f, magnitudeSquared3, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Vector4f", "real magnitudeSquared4() const", asMETHODPR( zpVector4f, magnitudeSquared4, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Vector4f", "bool opEquals( const Vector4f& in ) const", asMETHODPR( zpVector4f, operator==, ( const zpVector4f& ) const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "Vector4f", "void zero3()", asMETHODPR( zpVector4f, zero3, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "Vector4f", "void zero4()", asMETHODPR( zpVector4f, zero4, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "Vector4f", "bool isZero3() const", asMETHODPR( zpVector4f, isZero3, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "Vector4f", "bool isZero4() const", asMETHODPR( zpVector4f, isZero4, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "Vector4f", "real dot3( const Vector4f& in ) const", asMETHODPR( zpVector4f, dot3, ( const zpVector4f& ) const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "Vector4f", "real dot4( const Vector4f& in ) const", asMETHODPR( zpVector4f, dot4, ( const zpVector4f& ) const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "Vector4f", "Vector4f cross3( const Vector4f& in ) const", asMETHODPR( zpVector4f, cross3, ( const zpVector4f& ) const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "Vector4f", "Vector4f cross4( const Vector4f& in ) const", asMETHODPR( zpVector4f, cross4, ( const zpVector4f& ) const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitude3() const", asMETHODPR( zpVector4f, magnitude3, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitude4() const", asMETHODPR( zpVector4f, magnitude4, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitudeSquared3() const", asMETHODPR( zpVector4f, magnitudeSquared3, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitudeSquared4() const", asMETHODPR( zpVector4f, magnitudeSquared4, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "Vector4f", "bool opEquals( const Vector4f& in ) const", asMETHODPR( zpVector4f, operator==, ( const zpVector4f& ) const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
 }
 #pragma endregion
 
+#pragma region Register zpVector2
+void as_zpVector2f_Constructor( zpVector2f* self )
+{
+	*self = zp_move( zpVector2f() );
+}
+void as_zpVector2f_ConstructorXY( zpVector2f* self, zp_float x, zp_float y )
+{
+	*self = zp_move( zpVector2f( x, y ) );
+}
+void as_zpVector2f_CopyConstructor( zpVector2f* self, const zpVector2f& copy )
+{
+	*self = copy;
+}
+void as_zpVector2f_Deconstructor( zpVector2f* self )
+{
+	self->~zpVector2f();
+}
+
+void as_Register_zpVector2f( asIScriptEngine* engine )
+{
+	zp_int r;
+
+	r = engine->RegisterObjectType(      "vec2f", sizeof( zpVector2f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec2f", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpVector2f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec2f", asBEHAVE_CONSTRUCT, "void f( float, float )", asFUNCTION( as_zpVector2f_ConstructorXY ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec2f", asBEHAVE_CONSTRUCT, "void f( const vec2f& in )", asFUNCTION( as_zpVector2f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "vec2f", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpVector2f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "vec2f", "void opAssign( const vec2f& in )", asMETHODPR( zpVector2f, operator=, ( const zpVector2f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "vec2f", "float get_x() const", asMETHODPR( zpVector2f, getX, () const, zp_float ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec2f", "float get_y() const", asMETHODPR( zpVector2f, getY, () const, zp_float ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "vec2f", "void set_x( float )", asMETHODPR( zpVector2f, setX, ( zp_float ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "vec2f", "void set_y( float )", asMETHODPR( zpVector2f, setY, ( zp_float ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+}
+#pragma endregion
+
+#pragma region Register zpColor4f
+void as_zpColor4f_Constructor( zpColor4f* self )
+{
+	*self = zp_move( zpColor4f() );
+}
+void as_zpColor4f_ConstructorRGB( zpColor4f* self, float r, float g, float b )
+{
+	*self = zp_move( zpColor4f( r, g, b ) );
+}
+void as_zpColor4f_ConstructorRGBA( zpColor4f* self, float r, float g, float b, float a )
+{
+	*self = zp_move( zpColor4f( r, g, b, a ) );
+}
+void as_zpColor4f_CopyConstructor( zpColor4f* self, const zpColor4f& color )
+{
+	*self = color;
+}
+void as_zpColor4f_Deconstructor( zpColor4f* self )
+{
+	self->~zpColor4f();
+}
+
+void as_Register_zpColor4f( asIScriptEngine* engine )
+{
+	zp_int r;
+
+	r = engine->RegisterObjectType( "color", sizeof( zpColor4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "color", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpColor4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "color", asBEHAVE_CONSTRUCT, "void f( float, float, float )", asFUNCTION( as_zpColor4f_ConstructorRGB ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "color", asBEHAVE_CONSTRUCT, "void f( float, float, float, float )", asFUNCTION( as_zpColor4f_ConstructorRGBA ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "color", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpColor4f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "color", "void opAssign( const color& in )", asFUNCTION( as_zpColor4f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+}
+#pragma endregion
+
+#pragma region Register Rendering
+void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
+{
+	zp_int r;
+	zpRenderingContext* i = app->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
+
+	r = engine->RegisterEnum( "RenderingLayer" ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "Opaque",			ZP_RENDERING_LAYER_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "UIOpaque",		ZP_RENDERING_LAYER_UI_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "DebugUIOpaque",	ZP_RENDERING_LAYER_DEBUG_UI_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "DebugOpaque",		ZP_RENDERING_LAYER_DEBUG_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "Transparent",			ZP_RENDERING_LAYER_TRANSPARENT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "UITransparent",		ZP_RENDERING_LAYER_UI_TRANSPARENT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "DebugUITransparent",	ZP_RENDERING_LAYER_DEBUG_UI_TRANSPARENT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "DebugTransparent",	ZP_RENDERING_LAYER_DEBUG_TRANSPARENT ); AS_ASSERT( r );
+
+	r = engine->RegisterEnum( "Topology" ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "Topology", "Unknown",		ZP_TOPOLOGY_UNKNOWN ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "Topology", "PointList",		ZP_TOPOLOGY_POINT_LIST ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "Topology", "LineList",		ZP_TOPOLOGY_LINE_LIST ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "Topology", "LineStrip",		ZP_TOPOLOGY_LINE_STRIP ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "Topology", "TriangleList",	ZP_TOPOLOGY_TRIANGLE_LIST ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "Topology", "TriangleStrip",	ZP_TOPOLOGY_TRIANGLE_STRIP ); AS_ASSERT( r );
+
+	r = engine->RegisterEnum( "VertexFormat" ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "VertexFormat", "VertexColor",		ZP_VERTEX_FORMAT_VERTEX_COLOR ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "VertexFormat", "VertexUV",			ZP_VERTEX_FORMAT_VERTEX_UV ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV2",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "void BeginDraw( RenderingLayer, Topology, VertexFormat, int )", asMETHODPR( zpRenderingContext, beginDrawImmediate, ( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void EndDraw()", asMETHODPR( zpRenderingContext, endDrawImmediate, (), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const color& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "void AddTriangleIndex( int, int, int )", asMETHODPR( zpRenderingContext, addTriangleIndex, ( zp_ushort, zp_ushort, zp_ushort ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+}
+#pragma endregion
+
+#if 0
 #pragma region Register zpMatrix4f
 void as_zpMatrix4f_Constructor( zpMatrix4f* self ) {
 	*self = zp_move( zpMatrix4f() );
@@ -426,6 +671,7 @@ void as_zpGameObject_Register( asIScriptEngine* engine ) {
 }
 #pragma endregion
 #endif
+
 zpAngelScript::zpAngelScript()
 	: m_engine( ZP_NULL )
 	, m_immidiateContext( ZP_NULL )
@@ -434,9 +680,10 @@ zpAngelScript::zpAngelScript()
 zpAngelScript::~zpAngelScript()
 {}
 
-zp_bool zpAngelScript::createEngine()
+zp_bool zpAngelScript::createEngine( zpApplication* app )
 {
 	if( m_engine ) return false;
+	m_application = app;
 
 	asSetGlobalMemoryFunctions( allocate, deallocate );
 
@@ -447,10 +694,9 @@ zp_bool zpAngelScript::createEngine()
 
 	engine->SetMessageCallback( asFUNCTION( as_MessageCallback ), 0, asCALL_CDECL );
 
-	as_zpString_Register( engine );
-
 	as_Register_Core( engine );
-	//as_zp_real_Register( s_engine );
+	as_Register_Rendering( engine, app );
+	//as_zpScalar_Register( s_engine );
 	//as_zpArray_Register( s_engine );
 	//as_zpVector4f_Register( s_engine );
 	//as_zpMatrix4f_Register( s_engine );

@@ -19,7 +19,7 @@ public:
 
 	zp_handle getEngine() const;
 
-	zp_bool createEngine();
+	zp_bool createEngine( zpApplication* app );
 	void destroyEngine();
 
 	void processThreads();
@@ -36,12 +36,16 @@ public:
 
 	void garbageCollect();
 
+	zpApplication* getApplication() const { return m_application; }
+
 private:
 	static void* allocate( zp_uint size );
 	static void deallocate( void* ptr );
 
 	static zpAngelScript* s_instance;
 	zpAngelScript();
+
+	zpApplication* m_application;
 
 	zp_handle m_engine;
 	zp_handle m_immidiateContext;
