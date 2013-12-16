@@ -2,6 +2,8 @@ class Test
 {
 	void create()
 	{
+		scalar f;
+		f = 1.23f;
 		print( "Hello AngelScript!" );
 	}
 	
@@ -14,5 +16,15 @@ class Test
 	void onDestroy()
 	{
 		println( "destroyed object!" );
+	}
+	
+	void update()
+	{
+		BeginDraw( RenderingLayer::Opaque, Topology::TriangleList, VertexFormat::VertexColor, 0 );
+		AddVertex( vec4( 0, 0, 0, 1 ), color( 1, 0, 0 ) );
+		AddVertex( vec4( 0, 1, 0, 1 ), color( 0, 1, 0 ) );
+		AddVertex( vec4( 1, 1, 0, 1 ), color( 0, 0, 1 ) );
+		AddTriangleIndex( 0, 1, 2 );
+		EndDraw();
 	}
 }
