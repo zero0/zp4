@@ -54,7 +54,7 @@ public:
 	}
 
 	const Resource* getResource() const { return m_resource; }
-	Resource* getResource() { return m_resource; }
+	//Resource* getResource() { return m_resource; }
 
 	zp_bool isVaild() const { return m_resource != ZP_NULL; }
 

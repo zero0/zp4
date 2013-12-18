@@ -139,11 +139,11 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		outInstance.release();
 		outInstance.m_resource = empty;
 		empty->addRef();
-		empty->m_isLoaded = true;
-		empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
+		//empty->m_isLoaded = true;
+		//empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
 
 		//outInstance.initialized();
-		impl->initializeInstance( outInstance );
+		//impl->initializeInstance( outInstance );
 
 		return true;
 	}

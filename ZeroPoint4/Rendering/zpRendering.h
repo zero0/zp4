@@ -533,7 +533,6 @@ struct zpRenderingCommand
 #include "zpMesh.h"
 #include "zpFontResource.h"
 #include "zpStaticMeshResource.h"
-#include "zpOBJStaticMeshResource.h"
 
 #include "zpCamera.h"
 

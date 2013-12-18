@@ -57,9 +57,6 @@
     <ClInclude Include="zpStaticMeshResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpOBJStaticMeshResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpSamplerState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -144,9 +141,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpStaticMeshResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpOBJStaticMeshResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpStaticMeshRenderingComponent.cpp">

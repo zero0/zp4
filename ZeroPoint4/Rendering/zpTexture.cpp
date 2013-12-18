@@ -37,19 +37,18 @@ zpTextureImpl* zpTexture::getTextureImpl() const
 zp_bool zpTextureResource::load( const zp_char* filename, zpRenderingEngine* engine )
 {
 	m_filename = filename;
+	
 	zp_bool loaded;
-
 	loaded = engine->createTextureFromFile( m_resource, m_filename );
-	ZP_ASSERT( loaded, "Failed to load texture '%s'", m_filename.str() );
 
+	ZP_ASSERT( loaded, "Failed to load texture '%s'", m_filename.str() );
 	return loaded;
 }
-void zpTextureResource::unload()
+void zpTextureResource::unload( zpRenderingEngine* engine )
 {
 	zp_bool ok;
 	ZP_UNUSED( ok );
 
-	zpRenderingEngine* engine = zpRenderingFactory::getRenderingEngine();
 	ok = engine->destroyTexture( m_resource );
 	ZP_ASSERT( ok, "Failed to unload texture '%s'", m_filename.str() );
 }
@@ -57,9 +56,11 @@ void zpTextureResource::unload()
 
 zp_bool zpTextureContentManager::createResource( zpTextureResource* res, const zp_char* filename )
 {
-	return res->load( filename, getApplication()->getRenderPipeline()->getRenderingEngine() );
+	zpRenderingEngine* engine = getApplication()->getRenderPipeline()->getRenderingEngine();
+	return res->load( filename, engine );
 }
 void zpTextureContentManager::destroyResource( zpTextureResource* res )
 {
-	res->unload();
+	zpRenderingEngine* engine = getApplication()->getRenderPipeline()->getRenderingEngine();
+	res->unload( engine );
 }
