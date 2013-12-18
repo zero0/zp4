@@ -54,25 +54,16 @@
     <ClInclude Include="zpTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpStaticMeshResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpSamplerState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpRasterState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpStaticMeshRenderingComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpLightComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpFontResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpImmediateBuffer.h">
@@ -120,6 +111,9 @@
     <ClInclude Include="zpGenerateMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpFont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -140,22 +134,10 @@
     <ClCompile Include="zpCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpStaticMeshResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpStaticMeshRenderingComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpStaticMeshInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpRenderingComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpLightComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpFontResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpTextRenderingComponent.cpp">
@@ -210,6 +192,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpGenerateMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpFont.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

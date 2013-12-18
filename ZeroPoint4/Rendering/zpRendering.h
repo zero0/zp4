@@ -438,15 +438,6 @@ class zpRasterState;
 
 class zpShader;
 class zpTexture;
-class zpMaterialResource;
-class zpMeshResource;
-
-class zpFontResource;
-template<> class zpResourceInstance<zpFontResource>;
-
-ZP_ABSTRACT_CLASS zpStaticMeshResource;
-class zpOBJStaticMeshResource;
-template<> class zpResourceInstance<zpStaticMeshResource>;
 
 
 enum zpRenderingCommandType : zp_uint
@@ -531,8 +522,7 @@ struct zpRenderingCommand
 
 #include "zpMaterial.h"
 #include "zpMesh.h"
-#include "zpFontResource.h"
-#include "zpStaticMeshResource.h"
+#include "zpFont.h"
 
 #include "zpCamera.h"
 
@@ -548,7 +538,6 @@ struct zpRenderingCommand
 
 #include "zpRenderingComponent.h"
 #include "zpLightComponent.h"
-#include "zpStaticMeshRenderingComponent.h"
 #include "zpTextRenderingComponent.h"
 #include "zpUIRenderingComponent.h"
 
