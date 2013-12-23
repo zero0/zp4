@@ -440,8 +440,4 @@ template<typename T, zp_uint Size>
 zpFixedArrayList<T, Size>::zpFixedArrayList()
 	: zpArrayList<T>( m_fixedArray, Size )
 {}
-template<typename T, zp_uint Size>
-zpFixedArrayList<T, Size>::~zpFixedArrayList()
-{
-	clear();
-}
+

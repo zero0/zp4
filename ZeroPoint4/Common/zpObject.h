@@ -53,6 +53,17 @@ public:
 	const zpMatrix4f& getTransform() const;
 	void setTransform( const zpMatrix4f& transform );
 
+	const zpString& getTags() const;
+	void clearTags();
+
+	zp_bool hasTag( const zp_char* tag ) const;
+	void addTag( const zp_char* tag );
+	void removeTag( const zp_char* tag );
+
+	zp_bool hasTag( const zpString& tag ) const;
+	void addTag( const zpString& tag );
+	void removeTag( const zpString& tag );
+
 	zpApplication* getApplication() const;
 
 	void update();
@@ -63,6 +74,8 @@ private:
 
 	zpMatrix4f m_transform;
 	zpString m_name;
+	zpString m_tags;
+	zpFlag32 m_layers;
 	zpFlag32 m_flags;
 	zp_long m_lastLoadTime;
 	zpAllComponents m_components;

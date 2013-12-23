@@ -101,7 +101,6 @@ template<typename T, zp_uint Size>
 class zpFixedArrayList : public zpArrayList<T> {
 public:
 	zpFixedArrayList();
-	~zpFixedArrayList();
 
 private:
 	T m_fixedArray[ Size ];
