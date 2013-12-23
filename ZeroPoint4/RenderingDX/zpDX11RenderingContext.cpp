@@ -150,6 +150,7 @@ void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, cons
 
 	case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
 	case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
+		if( command->material )
 		{
 			ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
 			ID3D11Buffer* index = command->indexBuffer->m_buffer;

@@ -56,6 +56,7 @@ void as_Register_zpScalar( asIScriptEngine* engine );
 void as_Register_zpVector4f( asIScriptEngine* engine );
 void as_Register_zpVector2f( asIScriptEngine* engine );
 void as_Register_zpColor4f( asIScriptEngine* engine );
+void as_Register_zpMatrix4f( asIScriptEngine* engine );
 
 void as_Register_Core( asIScriptEngine* engine )
 {
@@ -65,6 +66,7 @@ void as_Register_Core( asIScriptEngine* engine )
 	as_Register_zpVector4f( engine );
 	as_Register_zpVector2f( engine );
 	as_Register_zpColor4f( engine );
+	as_Register_zpMatrix4f( engine );
 
 	zp_int r;
 	r = engine->RegisterGlobalFunction( "void print(const string &in)", asFUNCTION( as_zp_printf ), asCALL_CDECL );  AS_ASSERT( r );
@@ -560,6 +562,79 @@ void as_Register_zpColor4f( asIScriptEngine* engine )
 }
 #pragma endregion
 
+#pragma region Register zpMatrix4f
+void as_zpMatrix4f_Constructor( zpMatrix4f* self )
+{
+	*self = zp_move( zpMatrix4f() );
+}
+void as_zpMatrix4f_CopyConstructor( zpMatrix4f* self, const zpMatrix4f& copy )
+{
+	*self = copy;
+}
+void as_zpMatrix4f_Deconstructor( zpMatrix4f* self )
+{
+	self->~zpMatrix4f();
+}
+
+zpVector4f as_zpMatrix_MulVector( const zpVector4f& a, const zpMatrix4f& b )
+{
+	zpVector4f s;
+	zpMath::Mul( s, a, b );
+	return s;
+}
+zpMatrix4f as_zpMatrix_MulMatrix( const zpMatrix4f& a, const zpMatrix4f& b )
+{
+	zpMatrix4f s;
+	zpMath::Mul( s, a, b );
+	return s;
+}
+zpMatrix4f as_zpMatrix_MulScalar( const zpScalar& a, const zpMatrix4f& b )
+{
+	zpMatrix4f s;
+	zpMath::Mul( s, a, b );
+	return s;
+}
+
+void as_Register_zpMatrix4f( asIScriptEngine* engine )
+{
+	zp_int r;
+
+	r = engine->RegisterObjectType(      "matrix", sizeof( zpMatrix4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "matrix", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "matrix", asBEHAVE_CONSTRUCT, "void f( const matrix& in )", asFUNCTION( as_zpMatrix4f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "matrix", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "matrix", "void opAssign( const matrix& in )", asMETHODPR( zpMatrix4f, operator=, ( const zpMatrix4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "matrix", "void setIdentity()", asMETHODPR( zpMatrix4f, setIdentity, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "matrix", "void setRow( uint, const vec4& in )", asMETHODPR( zpMatrix4f, setRow, ( zp_uint, const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "matrix", "const vec4& getRow( uint ) const", asMETHODPR( zpMatrix4f, getRow, ( zp_uint ) const, const zpVector4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "vec4 mul( const vec4& in, const matrix& in )", asFUNCTION( as_zpMatrix_MulVector ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "matrix mul( const matrix& in, const matrix& in )", asFUNCTION( as_zpMatrix_MulMatrix ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "matrix mul( const scalar& in, const matrix& in )", asFUNCTION( as_zpMatrix_MulScalar ), asCALL_CDECL ); AS_ASSERT( r );
+}
+#pragma endregion
+
+
+#pragma region Register zpGameObject
+
+void as_zpGameObject_Register( asIScriptEngine* engine ) {
+	//if( !engine ) return;
+	//zp_int r;
+	//zpGameObject::
+	//r = engine->RegisterObjectType( "GameObject", sizeof( zpGameObject ), asOBJ_REF ); AS_ASSERT( r );
+	//r = engine->RegisterObjectBehaviour( "GameObject", asBEHAVE_ADDREF, "void f()", asMETHODPR( zpGameObject, addReference, () const, void ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectBehaviour( "GameObject", asBEHAVE_RELEASE, "void f()", asMETHODPR( zpGameObject, removeReference, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
+	//
+	//r = engine->RegisterObjectMethod( "GameObject", "const string& getName() const", asMETHODPR( zpGameObject, getName, () const, const zpString& ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "GameObject", "const Matrix4f& getLocalTransform() const", asMETHODPR( zpGameObject, getLocalTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( "GameObject", "const Matrix4f& getWorldTransform() const", asMETHODPR( zpGameObject, getWorldTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+
+}
+#pragma endregion
+
 #pragma region Register Rendering
 void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 {
@@ -598,79 +673,6 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	r = engine->RegisterGlobalFunction( "void AddTriangleIndex( int, int, int )", asMETHODPR( zpRenderingContext, addTriangleIndex, ( zp_ushort, zp_ushort, zp_ushort ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 }
 #pragma endregion
-
-#if 0
-#pragma region Register zpMatrix4f
-void as_zpMatrix4f_Constructor( zpMatrix4f* self ) {
-	*self = zp_move( zpMatrix4f() );
-}
-void as_zpMatrix4f_ConstructorXYZW( zpMatrix4f* self, zp_float x, zp_float y, zp_float z, zp_float w ) {
-	*self = zp_move( zpMatrix4f() );
-}
-void as_zpMatrix4f_CopyConstructor( zpMatrix4f* self, const zpMatrix4f& copy ) {
-	*self = zp_move( zpMatrix4f( copy ) );
-}
-void as_zpMatrix4f_Deconstructor( zpMatrix4f* self ) {
-	self->~zpMatrix4f();
-}
-
-void as_zpMatrix4f_Register( asIScriptEngine* engine ) {
-	if( !engine ) return;
-	zp_int r;
-
-	r = engine->RegisterObjectType( "Matrix4f", sizeof( zpMatrix4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Matrix4f", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Matrix4f", asBEHAVE_CONSTRUCT, "void f( const Matrix4f& in )", asFUNCTION( as_zpMatrix4f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( "Matrix4f", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "void opAssign( const Matrix4f& in )", asMETHODPR( zpMatrix4f, operator=, ( const zpMatrix4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "float& at( uint, uint )", asMETHODPR( zpMatrix4f, operator(), ( zp_uint, zp_uint ), zp_float& ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "void getPosition( Vector4f& out ) const", asMETHODPR( zpMatrix4f, getPosition, ( zpVector4f& ) const, void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void setPosition( const Vector4f& in )", asMETHODPR( zpMatrix4f, setPosition, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "void translate( const Vector4f& in )", asMETHODPR( zpMatrix4f, translate, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void rotateX( real )", asMETHODPR( zpMatrix4f, rotateX, ( zpScalar ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void rotateY( real )", asMETHODPR( zpMatrix4f, rotateY, ( zpScalar ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void rotateZ( real )", asMETHODPR( zpMatrix4f, rotateZ, ( zpScalar ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void scale( real )", asMETHODPR( zpMatrix4f, scale, ( zpScalar ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void scale( const Vector4f& in )", asMETHODPR( zpMatrix4f, scale, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "bool isIdentity() const", asMETHODPR( zpMatrix4f, isIdentity, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "void mul( const Vector4f& in, Vector4f& out ) const", asMETHODPR( zpMatrix4f, mul, ( const zpVector4f&, zpVector4f& ) const, void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void mul( const Matrix4f& in, Matrix4f& out ) const", asMETHODPR( zpMatrix4f, mul, ( const zpMatrix4f&, zpMatrix4f& ) const, void ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "void lootAt( const Vector4f& in, const Vector4f& in, const Vector4f& in )", asMETHODPR( zpMatrix4f, lookAt, ( const zpVector4f&, const zpVector4f&, const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void lootTo( const Vector4f& in, const Vector4f& in, const Vector4f& in )", asMETHODPR( zpMatrix4f, lookTo, ( const zpVector4f&, const zpVector4f&, const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void perspective( float, float, float, float )", asMETHODPR( zpMatrix4f, perspective, ( zp_float, zp_float, zp_float, zp_float ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "Matrix4f", "void ortho( float, float, float, float )", asMETHODPR( zpMatrix4f, ortho, ( zp_float, zp_float, zp_float, zp_float ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "void transpose()", asMETHODPR( zpMatrix4f, transpose, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
-
-	r = engine->RegisterObjectMethod( "Matrix4f", "bool opEquals( const Matrix4f& in ) const", asMETHODPR( zpMatrix4f, operator==, ( const zpMatrix4f& ) const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
-
-}
-#pragma endregion
-
-
-#pragma region Register zpGameObject
-
-void as_zpGameObject_Register( asIScriptEngine* engine ) {
-	//if( !engine ) return;
-	//zp_int r;
-	//zpGameObject::
-	//r = engine->RegisterObjectType( "GameObject", sizeof( zpGameObject ), asOBJ_REF ); AS_ASSERT( r );
-	//r = engine->RegisterObjectBehaviour( "GameObject", asBEHAVE_ADDREF, "void f()", asMETHODPR( zpGameObject, addReference, () const, void ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectBehaviour( "GameObject", asBEHAVE_RELEASE, "void f()", asMETHODPR( zpGameObject, removeReference, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
-	//
-	//r = engine->RegisterObjectMethod( "GameObject", "const string& getName() const", asMETHODPR( zpGameObject, getName, () const, const zpString& ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "GameObject", "const Matrix4f& getLocalTransform() const", asMETHODPR( zpGameObject, getLocalTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "GameObject", "const Matrix4f& getWorldTransform() const", asMETHODPR( zpGameObject, getWorldTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
-
-}
-#pragma endregion
-#endif
 
 zpAngelScript::zpAngelScript()
 	: m_engine( ZP_NULL )

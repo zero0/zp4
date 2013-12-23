@@ -21,18 +21,33 @@ void zpWorldContentManager::destroyResource( zpWorldResource* res )
 {
 	res->unload();
 }
-zpWorld* zpWorldContentManager::createWorld( zpApplication* application, const zp_char* filename )
+zpWorld* zpWorldContentManager::createWorld( const zp_char* filename, zp_bool destroyAfterLoad )
 {
 	zpWorld* w = ZP_NULL;
 
 	zpWorldResourceInstance world;
 	if( getResource( filename, world ) )
 	{
-		w = create( application, world );
+		w = create( getApplication(), world );
+		w->setFlag( ZP_WORLD_FLAG_SHOULD_CREATE );
+
+		if( destroyAfterLoad )
+		{
+			w->setFlag( ZP_WORLD_FLAG_DESTROY_AFTER_LOAD );
+		}
 	}
 
 	return w;
 }
+void zpWorldContentManager::destroyAllWorlds()
+{
+	for( zp_int i = 0; i < (zp_int)m_used.size(); ++i )
+	{
+		zpWorld* world = m_used[ i ];
+		world->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
+	}
+}
+
 void zpWorldContentManager::update()
 {
 	if( !m_used.isEmpty() )

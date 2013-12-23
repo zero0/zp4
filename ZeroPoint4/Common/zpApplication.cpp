@@ -55,7 +55,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
 
 	const zpBison::Value console = appOptions[ "Console" ];
-	if( console.isBool() && console.asBool() )
+	if( console.asBool() )
 	{
 		m_console = zpConsole::getInstance();
 		m_console->create();
@@ -104,6 +104,12 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	// register input with window
 	m_window.addFocusListener( &m_inputManager );
 	m_window.addProcListener( &m_inputManager );
+
+	const zpBison::Value world = appOptions[ "World" ];
+	if( world.isString() )
+	{
+		m_currentWorld = m_worldContent.createWorld( world.asCString() );
+	}
 }
 void zpApplication::run()
 {
@@ -119,12 +125,15 @@ zp_int zpApplication::shutdown()
 	m_objectContent.destroyAllObjects( false );
 	m_objectContent.update();
 
+	m_worldContent.destroyAllWorlds();
+	m_worldContent.update();
+
 	m_appOptions.release();
+
+	runGarbageCollect();
 
 	zpAngelScript::getInstance()->destroyEngine();
 	zpAngelScript::destroyInstance();
-
-	runGarbageCollect();
 
 	m_audioContent.getAudioEngine()->destroy();
 
@@ -149,7 +158,7 @@ void zpApplication::update()
 		// if the next world should be added
 		if( m_addNextWorld )
 		{
-			zpWorld* addWorld = m_worldContent.createWorld( this, m_nextWorldFilename.str() );
+			zpWorld* addWorld = m_worldContent.createWorld( m_nextWorldFilename.str() );
 			addWorld->setFlag( ZP_WORLD_FLAG_SHOULD_CREATE );
 			addWorld->setFlag( ZP_WORLD_FLAG_DESTROY_AFTER_LOAD );
 		}
@@ -164,7 +173,7 @@ void zpApplication::update()
 			}
 
 			// create the new world and mark for create
-			m_currentWorld = m_worldContent.createWorld( this, m_nextWorldFilename.str() );
+			m_currentWorld = m_worldContent.createWorld( m_nextWorldFilename.str() );
 			m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_CREATE );
 		}
 
@@ -358,29 +367,31 @@ void zpApplication::processFrame()
 	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
 
 	ZP_PROFILE_START( RENDER_FRAME );
+	{
+		// render begin
+		ZP_PROFILE_START( RENDER_BEGIN );
+		m_renderingPipeline.beginFrame();
+		ZP_PROFILE_END( RENDER_BEGIN );
 
-	// render begin
-	ZP_PROFILE_START( RENDER_BEGIN );
-	m_renderingPipeline.beginFrame();
-	ZP_PROFILE_END( RENDER_BEGIN );
+		// individual component render
+		m_componentPoolMeshRenderer.render();
 
-	m_componentPoolMeshRenderer.render();
+		// render commands
+		ZP_PROFILE_START( RENDER );
+		m_renderingPipeline.submitRendering();
+		ZP_PROFILE_END( RENDER );
 
-	// render
-	ZP_PROFILE_START( RENDER );
-	m_renderingPipeline.submitRendering();
-	ZP_PROFILE_END( RENDER );
+	#if ZP_DEBUG
+		ZP_PROFILE_START( DEBUG_RENDER );
+		m_renderingPipeline.submitDebugRendering();
+		ZP_PROFILE_END( DEBUG_RENDER );
+	#endif
 
-#if ZP_DEBUG
-	ZP_PROFILE_START( DEBUG_RENDER );
-	m_renderingPipeline.submitDebugRendering();
-	ZP_PROFILE_END( DEBUG_RENDER );
-#endif
-
-	ZP_PROFILE_START( RENDER_PRESENT );
-	m_renderingPipeline.endFrame();
-	ZP_PROFILE_END( RENDER_PRESENT );
-
+		// present
+		ZP_PROFILE_START( RENDER_PRESENT );
+		m_renderingPipeline.endFrame();
+		ZP_PROFILE_END( RENDER_PRESENT );
+	}
 	ZP_PROFILE_END( RENDER_FRAME );
 
 	ZP_PROFILE_END( FRAME );

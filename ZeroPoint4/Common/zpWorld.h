@@ -48,8 +48,6 @@ public:
 	const zpString& getName() const;
 	zpApplication* getApplication() const;
 
-	void additivlyLoad( const zpWorldResourceInstance& world );
-
 private:
 	zpString m_name;
 	zpFlag32 m_flags;
@@ -64,7 +62,8 @@ private:
 class zpWorldContentManager : public zpContentManager< zpWorldResource, zpWorldResourceInstance, zpWorldContentManager, 4 >, private zpContentPool< zpWorld, 4 >
 {
 public:
-	zpWorld* createWorld( zpApplication* application, const zp_char* filename );
+	zpWorld* createWorld( const zp_char* filename, zp_bool destroyAfterLoad = true );
+	void destroyAllWorlds();
 
 	void update();
 

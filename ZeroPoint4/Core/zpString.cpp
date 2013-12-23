@@ -44,7 +44,7 @@ zpString::zpString( const zp_char* string, zp_uint length )
 			m_capacity = m_length + 1;
 
 			m_string = new zp_char[ m_capacity ];
-			zp_strcpy( m_string, m_capacity * sizeof( zp_char ), string );
+			zp_strncpy( m_string, m_capacity * sizeof( zp_char ), string, m_length );
 		}
 	}
 	getCharsInternal()[ m_length ] = '\0';
@@ -646,7 +646,7 @@ void zpString::erase( zp_int startIndex, zp_uint count )
 			}
 
 			m_length -= count;
-			zp_strcpy( m_chars, m_length * sizeof( zp_char ), c );
+			zp_strcpy( m_chars, m_capacity * sizeof( zp_char ), c );
 			ZP_SAFE_DELETE_ARRAY( c );
 		}
 		else
@@ -804,7 +804,7 @@ void zpString::ensureCapacity( zp_uint size )
 			while( cap <= size ) cap *= 2;
 
 			zp_char* buff = new zp_char[ cap ];
-			zp_strcpy( buff, m_length * sizeof( zp_char ), m_chars );
+			zp_strcpy( buff, m_capacity * sizeof( zp_char ), m_chars );
 			zp_zero_memory_array( m_chars );
 
 			m_string = buff;
@@ -818,7 +818,7 @@ void zpString::ensureCapacity( zp_uint size )
 			while( m_capacity <= size ) m_capacity *= 2;
 
 			zp_char* buff = new zp_char[ m_capacity ];
-			zp_strcpy( buff, m_length * sizeof( zp_char ), m_string );
+			zp_strcpy( buff, m_capacity * sizeof( zp_char ), m_string );
 			ZP_SAFE_DELETE_ARRAY( m_string );
 
 			m_string = buff;

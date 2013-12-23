@@ -44,15 +44,24 @@ zp_bool BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 	m_inputFile = args[ args.size() - 2 ];
 	m_outputFile = args[ args.size() - 1 ];
 
+	zpFile::convertToFilePath( m_inputFile );
+	zpFile::convertToFilePath( m_outputFile );
+
 	zpJsonParser parser;
 	zp_bool success = false;
 
 	// parse input file and read in shader file text
 	if( parser.parseFile( m_inputFile, m_shaderDesc ) )
 	{
-		const zp_char* filename = m_shaderDesc[ "File" ].asCString();
-		zpFile shaderFile( filename );
+		const zp_char* filenameStr = m_shaderDesc[ "File" ].asCString();
 
+		zp_int lastSlash = m_inputFile.lastIndexOf( zpFile::sep );
+		
+		zpString filename;
+		m_inputFile.substring( filename, 0, lastSlash + 1 );
+		filename.append( filenameStr );
+
+		zpFile shaderFile( filename );
 		if( shaderFile.open( ZP_FILE_MODE_ASCII_READ ) )
 		{
 			shaderFile.readFile( m_shaderText );
