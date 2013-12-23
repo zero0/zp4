@@ -10,5 +10,6 @@
     "Render" : {
         "Refresh" : 60,
         "VSync" : false
-    }
+    },
+	"World" : "worlds/test.worldb"
 }

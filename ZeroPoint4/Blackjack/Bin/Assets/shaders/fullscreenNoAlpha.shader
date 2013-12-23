@@ -1,5 +1,5 @@
 {
-    "File" : "shaders/fullscreenNoAlpha.hlsl",
+    "File" : "fullscreenNoAlpha.hlsl",
     "VS" : 
     {
         "Main" : "main_vs",

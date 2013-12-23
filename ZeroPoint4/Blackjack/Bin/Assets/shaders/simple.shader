@@ -1,5 +1,5 @@
 {
-    "File" : "shaders/simple.hlsl",
+    "File" : "simple.hlsl",
     "Macros" :
     {
         "ZP_MACRO" : "value"
