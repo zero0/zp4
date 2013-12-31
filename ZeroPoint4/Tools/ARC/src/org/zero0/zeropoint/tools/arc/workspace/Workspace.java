@@ -66,13 +66,14 @@ import org.zero0.zeropoint.tools.arc.Platform;
 import org.zero0.zeropoint.tools.arc.Rendering;
 import org.zero0.zeropoint.tools.arc.compiler.ArcCompiler;
 import org.zero0.zeropoint.tools.arc.util.FileWatcherAdapter;
+import org.zero0.zeropoint.tools.arc.util.FileWatcherListener;
 import org.zero0.zeropoint.tools.arc.util.OutputAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintErrAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintErrWrapper;
 import org.zero0.zeropoint.tools.arc.util.PrintOutAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintOutWrapper;
 
-public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender
+public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender, FileWatcherListener
 {
 	static Map<String, Image> cachedImages = new HashMap<String, Image>();
 	static Map<Integer, Color> cachedColors = new HashMap<Integer, Color>();
@@ -211,6 +212,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 
 		createDbTab();
 
+		Arc.getInstance().addFileWatcherListener( this );
 		// printOut = new PrintOutWrapper( this );
 		// printErr = new PrintErrWrapper( this );
 		// System.setOut( printOut );
@@ -535,25 +537,25 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		
 		item = new ToolItem( bar, SWT.PUSH );
 		item.setImage( CreateIcon( getDisplay(), "bin" ) );
-		item.setToolTipText( "Build Tools" );
+		item.setToolTipText( "Clean Tools" );
 		item.addListener( SWT.Selection, new Listener()
 		{
 			@Override
 			public void handleEvent( Event event )
 			{
-				Arc.getInstance().executeCompiler( "build-tools" );
+				Arc.getInstance().executeCompiler( "clean-tools" );
 			}
 		} );
 		
 		item = new ToolItem( bar, SWT.PUSH );
 		item.setImage( CreateIcon( getDisplay(), "bomb" ) );
-		item.setToolTipText( "Build Game" );
+		item.setToolTipText( "Clean Game" );
 		item.addListener( SWT.Selection, new Listener()
 		{
 			@Override
 			public void handleEvent( Event event )
 			{
-				Arc.getInstance().executeCompiler( "build-game" );
+				Arc.getInstance().executeCompiler( "clean-game" );
 			}
 		} );
 		
@@ -1296,5 +1298,27 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	public void printErr( String err )
 	{
 		appendFromPrintErr( err );
+	}
+
+	@Override
+	public void fileChanged( String filePath )
+	{
+		refreshTree();
+	}
+
+	@Override
+	public void fileAdded( String filePath )
+	{
+	}
+
+	@Override
+	public void fileRemoved( String filePath )
+	{
+	}
+
+	@Override
+	public void fileListChanged()
+	{
+		refreshTree();
 	}
 }

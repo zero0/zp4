@@ -3,7 +3,6 @@ package org.zero0.zeropoint.tools.arc.compiler;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -203,8 +202,8 @@ public abstract class ArcCompiler implements Runnable
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.command( params );
 		pb.directory( new File( getWorkingDirectory() ) );
-		pb.redirectOutput( Redirect.PIPE );
-		pb.redirectError( Redirect.PIPE );
+		//pb.redirectOutput( Redirect.PIPE );
+		//pb.redirectError( Redirect.PIPE );
 		
 		Process p = null;
 		try

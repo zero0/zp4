@@ -345,7 +345,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 				{
 					arcCompiler.setOutputExtension( compilerOutExtension.get( compiler ) );
 				}
-	
+
 				compilerExecutor.execute( arcCompiler );
 			}
 			catch( Exception e )
