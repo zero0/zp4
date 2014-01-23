@@ -549,7 +549,102 @@ zpSamplerStateImpl* zpRenderingEngineImpl::createSamplerState( const zpSamplerSt
 		HRESULT hr;
 		D3D11_SAMPLER_DESC samplerDesc;
 		zp_zero_memory( &samplerDesc );
-		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;	// TODO: update with real value
+
+		D3D11_FILTER filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+
+		// all point
+		if( desc.minFilter == ZP_TEXTURE_FILTER_POINT && desc.magFilter == ZP_TEXTURE_FILTER_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_POINT )
+		{
+			filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		}
+		// all linear
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_LINEAR )
+		{
+			filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		}
+		
+		// one linear, rest point
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_POINT )
+		{
+			filter = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_POINT && desc.magFilter == ZP_TEXTURE_FILTER_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_POINT )
+		{
+			filter = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_POINT && desc.magFilter == ZP_TEXTURE_FILTER_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_LINEAR )
+		{
+			filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+		}
+
+		// min linear, one linear, one point
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_POINT )
+		{
+			filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_LINEAR )
+		{
+			filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_POINT && desc.magFilter == ZP_TEXTURE_FILTER_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_LINEAR )
+		{
+			filter = D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+		}
+
+		// one anisotropic
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_ANISOTROPIC || desc.magFilter == ZP_TEXTURE_FILTER_ANISOTROPIC || desc.mipFilter == ZP_TEXTURE_FILTER_ANISOTROPIC )
+		{
+			filter = D3D11_FILTER_ANISOTROPIC;
+		}
+
+		// comp
+		// all point
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+		}
+		// all linear
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+		}
+
+		// one linear, rest point
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
+		}
+
+		// min linear, one linear, one point
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		}
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_POINT && desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR && desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_LINEAR )
+		{
+			filter = D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
+		}
+
+		// one comp anisotropic
+		else if( desc.minFilter == ZP_TEXTURE_FILTER_COMPARISON_ANISOTROPIC || desc.magFilter == ZP_TEXTURE_FILTER_COMPARISON_ANISOTROPIC || desc.mipFilter == ZP_TEXTURE_FILTER_COMPARISON_ANISOTROPIC )
+		{
+			filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+		}
+
+
+		samplerDesc.Filter = filter;	// TODO: update with real value
 		samplerDesc.AddressU = __zpToDX( desc.texWrapU );
 		samplerDesc.AddressV = __zpToDX( desc.texWrapV );
 		samplerDesc.AddressW = __zpToDX( desc.texWrapW );

@@ -64,7 +64,7 @@ zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedF
 			}
 			if( !rotation.isEmpty() )
 			{
-
+				
 			}
 			if( !scale.isEmpty() )
 			{

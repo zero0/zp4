@@ -7,7 +7,7 @@
 	"Layer" : "Default",
 	"Transform" :
 	{
-		"Position" : [ 0, 0, 0 ]
+		"Position" : [ 30, -45, -20 ]
 	},
 	"Components" :
 	{

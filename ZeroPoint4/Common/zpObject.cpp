@@ -39,13 +39,18 @@ void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
 void zpObjectContentManager::update()
 {
 	//m_used.foreach( [ this ]( zpObject* o )
-	for( zp_int i = 0; i < (zp_int)m_used.size(); ++i )
+	zpObject** b = m_used.begin();
+	zpObject** e = m_used.end();
+	for( ; b != e; ++b )
 	{
-		zpObject* o = m_used[ i ];
+		zpObject* o = *b;
+		if( o->isFlagSet( ZP_OBJECT_FLAG_ENABLED ) )
+		{
+			o->update();
+		}
 		if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
 		{
 			destroy( o );
-			--i;
 		}
 	}
 }

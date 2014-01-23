@@ -2,10 +2,16 @@
     "Shader" : "shaders/LitNormalTextured.shaderb",
     "Textures" :
     [
-		"textures/test.png"
+		"textures/helmet.jpg"
 	],
     "Constants" :
     {},
     "Samplers" :
-    []
+    [
+		{
+			"MinFilter" : "Anisotropic",
+			"TextureWrapU" : "Clamp",
+			"TextureWrapV" : "Clamp"
+		}
+	]
 }

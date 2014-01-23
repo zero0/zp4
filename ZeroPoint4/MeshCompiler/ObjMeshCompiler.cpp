@@ -81,6 +81,8 @@ zp_bool ObjMessCompiler::compileMesh()
 			else if( zp_strstr( l, "vt " ) == l )
 			{
 				sscanf_s( l, "vt %f %f", &x, &y );
+				if( x < 0.0f ) x = 1.0f + x;
+				y = 1.0f - y;
 				uvs.pushBack( x );
 				uvs.pushBack( y );
 			}

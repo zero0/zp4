@@ -26,6 +26,7 @@ const zp_char* g_textureWrap[] =
 	"Mirror",
 	"Clamp",
 	"Border",
+	"MirrorOnce",
 };
 const zp_char* g_cullMode[] =
 {
@@ -82,7 +83,7 @@ void zpRenderingPipeline::initialize()
 
 	zpCamera* cam = getCamera( 0 );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
-	cam->setPosition( zpVector4f( 10, 10, 10, 1 ) );
+	cam->setPosition( zpVector4f( -10, 10, 10, 1 ) );
 	cam->setLookAt( zpVector4f( 0, 0, 0, 1 ) );
 	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
 	cam->setAspectRatio( viewport.width / viewport.height );
