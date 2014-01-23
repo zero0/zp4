@@ -7,7 +7,7 @@
 	"Layer" : "Default",
 	"Transform" :
 	{
-		"Position" : [ 0, 3, 0 ]
+		"Position" : [ 0, 0, 0 ]
 	},
 	"Components" :
 	{
@@ -17,7 +17,7 @@
 		},
 		"MeshRenderer" :
 		{
-			"Mesh" : "meshes/cube.meshb"
+			"Mesh" : "meshes/orig_helmet.meshb"
 		}
 	}
 }

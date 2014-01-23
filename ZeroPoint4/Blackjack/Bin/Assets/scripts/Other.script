@@ -1,0 +1,25 @@
+class Other
+{
+	void create()
+	{
+		print( "Hello Other!" );
+	}
+	
+	void initialize()
+	{
+	}
+	
+	void onDestroy()
+	{
+		println( "destroyed object!" );
+	}
+	
+	void update()
+	{
+	}
+	
+	public void testCrosscall()
+	{
+		println( "Test Cross Call!" );
+	}
+}
