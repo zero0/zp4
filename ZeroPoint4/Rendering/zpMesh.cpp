@@ -71,13 +71,14 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 			mp.m_indexCount= v[ "IndexCount" ].asInt();
 			mp.m_vertexOffset = v[ "VertexOffset" ].asInt();
 			mp.m_vertexCount = v[ "VertexCount" ].asInt();
-			const zp_char* mat = v[ "Material" ].asCString();
+
 			zpBoundingAABB* box = (zpBoundingAABB*)v[ "BoundingBox" ].asData();
 			if( box )
 			{
 				mp.m_boundingBox = *box;
 			}
 
+			const zp_char* mat = v[ "Material" ].asCString();
 			ok = pipeline->getMaterialContentManager()->getResource( mat, mp.m_material );
 		}
 	}

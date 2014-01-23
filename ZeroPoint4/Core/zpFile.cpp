@@ -1,6 +1,7 @@
 #include "zpCore.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <sys/stat.h>
 
 #if ZP_WIN_32 || ZP_WIN_64
 #include <Windows.h>
@@ -109,6 +110,16 @@ void zpFile::convertToFilePath( zpString& filepath )
 		return ch == '/' || ch == '\\' ? zpFile::sep : ch;
 	} );
 }
+zp_long zpFile::getFileModificationTime( const zp_char* filepath )
+{
+	zp_long time = 0;
+#if ZP_WIN_32 || ZP_WIN_64
+	struct stat fileStat;
+	zp_int r = stat( filepath, &fileStat );
+	time = (zp_long)fileStat.st_mtime;
+#endif
+	return time;
+}
 
 
 zpFileMode zpFile::getFileMode() const
@@ -209,7 +220,7 @@ zp_int zpFile::readLine( zpStringBuffer& buffer )
 		len = zp_strlen( buff );
 		newLineFound = buff[ len - 1 ] == '\n';
 		buffer.append( buff, newLineFound ? len - 1 : len );
-		count += len;
+		count += newLineFound ? len - 1 : len;
 	}
 
 	return count;

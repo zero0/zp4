@@ -108,7 +108,8 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	const zpBison::Value world = appOptions[ "World" ];
 	if( world.isString() )
 	{
-		m_currentWorld = m_worldContent.createWorld( world.asCString() );
+		m_nextWorldFilename = world.asCString();
+		m_hasNextWorld = true;
 	}
 }
 void zpApplication::run()
@@ -340,6 +341,10 @@ void zpApplication::processFrame()
 		runReloadAllResources();
 	}
 
+#if ZP_USE_HOT_RELOAD
+	runReloadChangedResources();
+#endif
+
 	zp_long now = m_timer->getTime();
 	zp_uint numUpdates = 0;
 
@@ -426,3 +431,19 @@ void zpApplication::runReloadAllResources()
 	m_renderingPipeline.getShaderContentManager()->reloadAllResources();
 	m_renderingPipeline.getTextureContentManager()->reloadAllResources();
 }
+
+#if ZP_USE_HOT_RELOAD
+void zpApplication::runReloadChangedResources()
+{
+	m_textContent.reloadChangedResources();
+	m_objectContent.reloadChangedResources();
+	m_worldContent.reloadChangedResources();
+	m_scriptContent.reloadChangedResources();
+	m_audioContent.reloadChangedResources();
+
+	m_renderingPipeline.getMeshContentManager()->reloadChangedResources();
+	m_renderingPipeline.getMaterialContentManager()->reloadChangedResources();
+	m_renderingPipeline.getShaderContentManager()->reloadChangedResources();
+	m_renderingPipeline.getTextureContentManager()->reloadChangedResources();
+}
+#endif

@@ -3,8 +3,10 @@
 zpMeshRendererComponent::zpMeshRendererComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 {
+	zp_bool ok = false;
 	const zp_char* meshFile = def[ "Mesh" ].asCString();
-	getApplication()->getRenderPipeline()->getMeshContentManager()->getResource( meshFile, m_mesh );
+	ok = getApplication()->getRenderPipeline()->getMeshContentManager()->getResource( meshFile, m_mesh );
+	ZP_ASSERT_WARN( ok, "Unable to load mesh %s", meshFile );
 }
 zpMeshRendererComponent::~zpMeshRendererComponent() {}
 

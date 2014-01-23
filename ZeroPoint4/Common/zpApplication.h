@@ -53,6 +53,10 @@ private:
 	void runGarbageCollect();
 	void runReloadAllResources();
 
+#if ZP_USE_HOT_RELOAD
+	void runReloadChangedResources();
+#endif
+
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
 	zp_bool m_addNextWorld;

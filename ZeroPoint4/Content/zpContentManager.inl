@@ -88,7 +88,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 			outInstance.m_resource = empty;
 			empty->addRef();
 			empty->m_isLoaded = true;
-			empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
+			empty->m_lastTimeLoaded = zpFile::getFileModificationTime( filename );
 
 			//outInstance.initialized();
 			impl->initializeInstance( outInstance );
@@ -180,7 +180,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		if( impl->createResource( found, filename ) )
 		{
 			found->m_isLoaded = true;
-			found->m_lastTimeLoaded = zpTime::getInstance()->getTime();
+			found->m_lastTimeLoaded = zpFile::getFileModificationTime( filename );
 			return true;
 		}
 	}
@@ -198,7 +198,6 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 	Resource* end = m_resources.end();
 
 	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
-	zpTime* time = zpTime::getInstance();
 
 	for( ; res != end; ++res )
 	{
@@ -214,7 +213,7 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 			if( impl->createResource( res, filename.str() ) )
 			{
 				res->m_isLoaded = true;
-				res->m_lastTimeLoaded = time->getTime();
+				res->m_lastTimeLoaded = zpFile::getFileModificationTime( filename.str() );
 			}
 		}
 	}
@@ -236,3 +235,41 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::g
 		}
 	}
 }
+
+#if ZP_USE_HOT_RELOAD
+template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::reloadChangedResources()
+{
+	zpString filename;
+
+	zp_long mtime;
+	Resource* found = ZP_NULL;
+	Resource* res = m_resources.begin();
+	Resource* end = m_resources.end();
+
+	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
+
+	for( ; res != end; ++res )
+	{
+		if( res->getRefCount() > 0 )
+		{
+			filename = res->getFilename();
+			mtime = zpFile::getFileModificationTime( filename.str() );
+			if( res->m_lastTimeLoaded != mtime )
+			{
+				if( res->isLoaded() )
+				{
+					impl->destroyResource( res );
+					res->m_isLoaded = false;
+				}
+
+				if( impl->createResource( res, filename.str() ) )
+				{
+					res->m_isLoaded = true;
+					res->m_lastTimeLoaded = mtime;
+				}
+			}
+		}
+	}
+}
+#endif

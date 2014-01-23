@@ -41,10 +41,11 @@ zpWorld* zpWorldContentManager::createWorld( const zp_char* filename, zp_bool de
 }
 void zpWorldContentManager::destroyAllWorlds()
 {
-	for( zp_int i = 0; i < (zp_int)m_used.size(); ++i )
+	zpWorld** b = m_used.begin();
+	zpWorld** e = m_used.end();
+	for( ; b != e; ++b )
 	{
-		zpWorld* world = m_used[ i ];
-		world->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
+		(*b)->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
 	}
 }
 
@@ -52,9 +53,11 @@ void zpWorldContentManager::update()
 {
 	if( !m_used.isEmpty() )
 	{
-		for( zp_int i = 0; i < (zp_int)m_used.size(); ++i )
+		zpWorld** b = m_used.begin();
+		zpWorld** e = m_used.end();
+		for( ; b != e; ++b )
 		{
-			zpWorld* world = m_used[ i ];
+			zpWorld* world = *b;
 			if( world->isFlagSet( ZP_WORLD_FLAG_SHOULD_CREATE ) )
 			{
 				if( world->createStep() )
@@ -71,7 +74,6 @@ void zpWorldContentManager::update()
 			else if( world->isFlagSet( ZP_WORLD_FLAG_SHOULD_DESTROY ) )
 			{
 				destroy( world );
-				--i;
 			}
 		}
 	}

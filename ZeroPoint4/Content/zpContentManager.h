@@ -97,6 +97,10 @@ public:
 	void setApplication( zpApplication* app ) { m_application = app; }
 	zpApplication* getApplication() { return m_application; }
 
+#if ZP_USE_HOT_RELOAD
+	void reloadChangedResources();
+#endif
+
 private:
 	zpApplication* m_application;
 	zpFixedArrayList< Resource, ResourceCount > m_resources;

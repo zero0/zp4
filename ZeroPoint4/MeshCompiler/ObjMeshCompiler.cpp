@@ -48,11 +48,9 @@ zp_bool ObjMessCompiler::compileMesh()
 	VertexFormat format = VF_NONE;
 	zpArrayList< Group > groups;
 	groups.reserve( 10 );
-	groups.pushBackEmpty();
-	groups.back().material = "default";
 
 	zp_float x, y, z;
-	zp_int v[3], t[3], n[3];
+	zp_int v[4], t[4], n[4];
 
 	zpStringBuffer line;
 	zpFile objMeshFile( m_inputFile );
@@ -142,6 +140,110 @@ zp_bool ObjMessCompiler::compileMesh()
 						v0.t = zpVector2f( *( tp + t[i] + 0 ), *( tp + t[i] + 1 ) );
 					}
 				}
+				if( sscanf_s( l, "f %d %d %d %d", &v[0], &v[1], &v[2], &v[3] ) == 4 )
+				{
+					format = VF_VERTEX;
+					zp_float* vp = verts.begin();
+
+					zp_int vi0 = ( v[0] - 1 ) * 3;
+					zp_int vi1 = ( v[1] - 1 ) * 3;
+					zp_int vi2 = ( v[2] - 1 ) * 3;
+					zp_int vi3 = ( v[3] - 1 ) * 3;
+
+					zpVector4f v0( *( vp + vi0 + 0 ), *( vp + vi0 + 1 ), *( vp + vi0 + 2 ), 1.0f );
+					zpVector4f v1( *( vp + vi1 + 0 ), *( vp + vi1 + 1 ), *( vp + vi1 + 2 ), 1.0f );
+					zpVector4f v2( *( vp + vi2 + 0 ), *( vp + vi2 + 1 ), *( vp + vi2 + 2 ), 1.0f );
+					zpVector4f v3( *( vp + vi3 + 0 ), *( vp + vi3 + 1 ), *( vp + vi3 + 2 ), 1.0f );
+
+					groups.back().verts.pushBackEmpty().v = v0;
+					groups.back().verts.pushBackEmpty().v = v1;
+					groups.back().verts.pushBackEmpty().v = v2;
+
+					groups.back().verts.pushBackEmpty().v = v2;
+					groups.back().verts.pushBackEmpty().v = v3;
+					groups.back().verts.pushBackEmpty().v = v0;
+				}
+				else if( sscanf_s( l, "f %d//%d %d//%d %d//%d %d//%d", &v[0], &n[0], &v[1], &n[1], &v[2], &n[2], &v[3], &n[3] ) == 8 )
+				{
+					format = VF_VERTEX_NORMAL;
+					zp_float* vp = verts.begin();
+					zp_float* np = normals.begin();
+
+					zp_int vi0 = ( v[0] - 1 ) * 3;
+					zp_int vi1 = ( v[1] - 1 ) * 3;
+					zp_int vi2 = ( v[2] - 1 ) * 3;
+					zp_int vi3 = ( v[3] - 1 ) * 3;
+
+					zp_int ni0 = ( n[0] - 1 ) * 3;
+					zp_int ni1 = ( n[1] - 1 ) * 3;
+					zp_int ni2 = ( n[2] - 1 ) * 3;
+					zp_int ni3 = ( n[3] - 1 ) * 3;
+
+					zpVector4f v0( *( vp + vi0 + 0 ), *( vp + vi0 + 1 ), *( vp + vi0 + 2 ), 1.0f );
+					zpVector4f v1( *( vp + vi1 + 0 ), *( vp + vi1 + 1 ), *( vp + vi1 + 2 ), 1.0f );
+					zpVector4f v2( *( vp + vi2 + 0 ), *( vp + vi2 + 1 ), *( vp + vi2 + 2 ), 1.0f );
+					zpVector4f v3( *( vp + vi3 + 0 ), *( vp + vi3 + 1 ), *( vp + vi3 + 2 ), 1.0f );
+
+					zpVector4f n0( *( np + ni0 + 0 ), *( np + ni0 + 1 ), *( np + ni0 + 2 ), 0.0f );
+					zpVector4f n1( *( np + ni1 + 0 ), *( np + ni1 + 1 ), *( np + ni1 + 2 ), 0.0f );
+					zpVector4f n2( *( np + ni2 + 0 ), *( np + ni2 + 1 ), *( np + ni2 + 2 ), 0.0f );
+					zpVector4f n3( *( np + ni3 + 0 ), *( np + ni3 + 1 ), *( np + ni3 + 2 ), 0.0f );
+
+					Vertex* vert;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v0; vert->n = n0;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v1; vert->n = n1;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v2; vert->n = n2;
+
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v2; vert->n = n2;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v3; vert->n = n3;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v0; vert->n = n0;
+				}
+				else if( sscanf_s( l, "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &v[0], &t[0], &n[0], &v[1], &t[1], &n[1], &v[2], &t[2], &n[2], &v[3], &t[3], &n[3] ) == 12 )
+				{
+					format = VF_VERTEX_NORMAL_TEXTURE;
+					zp_float* vp = verts.begin();
+					zp_float* np = normals.begin();
+					zp_float* tp = uvs.begin();
+
+					zp_int vi0 = ( v[0] - 1 ) * 3;
+					zp_int vi1 = ( v[1] - 1 ) * 3;
+					zp_int vi2 = ( v[2] - 1 ) * 3;
+					zp_int vi3 = ( v[3] - 1 ) * 3;
+
+					zp_int ni0 = ( n[0] - 1 ) * 3;
+					zp_int ni1 = ( n[1] - 1 ) * 3;
+					zp_int ni2 = ( n[2] - 1 ) * 3;
+					zp_int ni3 = ( n[3] - 1 ) * 3;
+
+					zp_int ti0 = ( t[0] - 1 ) * 2;
+					zp_int ti1 = ( t[1] - 1 ) * 2;
+					zp_int ti2 = ( t[2] - 1 ) * 2;
+					zp_int ti3 = ( t[3] - 1 ) * 2;
+
+					zpVector4f v0( *( vp + vi0 + 0 ), *( vp + vi0 + 1 ), *( vp + vi0 + 2 ), 1.0f );
+					zpVector4f v1( *( vp + vi1 + 0 ), *( vp + vi1 + 1 ), *( vp + vi1 + 2 ), 1.0f );
+					zpVector4f v2( *( vp + vi2 + 0 ), *( vp + vi2 + 1 ), *( vp + vi2 + 2 ), 1.0f );
+					zpVector4f v3( *( vp + vi3 + 0 ), *( vp + vi3 + 1 ), *( vp + vi3 + 2 ), 1.0f );
+
+					zpVector4f n0( *( np + ni0 + 0 ), *( np + ni0 + 1 ), *( np + ni0 + 2 ), 0.0f );
+					zpVector4f n1( *( np + ni1 + 0 ), *( np + ni1 + 1 ), *( np + ni1 + 2 ), 0.0f );
+					zpVector4f n2( *( np + ni2 + 0 ), *( np + ni2 + 1 ), *( np + ni2 + 2 ), 0.0f );
+					zpVector4f n3( *( np + ni3 + 0 ), *( np + ni3 + 1 ), *( np + ni3 + 2 ), 0.0f );
+
+					zpVector2f t0( *( tp + ti0 + 0 ), *( tp + ti0 + 1 ) );
+					zpVector2f t1( *( tp + ti1 + 0 ), *( tp + ti1 + 1 ) );
+					zpVector2f t2( *( tp + ti2 + 0 ), *( tp + ti2 + 1 ) );
+					zpVector2f t3( *( tp + ti3 + 0 ), *( tp + ti3 + 1 ) );
+
+					Vertex* vert;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v0; vert->n = n0; vert->t = t0;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v1; vert->n = n1; vert->t = t1;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v2; vert->n = n2; vert->t = t2;
+
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v2; vert->n = n2; vert->t = t2;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v3; vert->n = n3; vert->t = t3;
+					vert = &groups.back().verts.pushBackEmpty(); vert->v = v0; vert->n = n0; vert->t = t0;
+				}
 			}
 			//else if( zp_strstr( l, "o " ) == l )
 			//{
@@ -150,7 +252,6 @@ zp_bool ObjMessCompiler::compileMesh()
 			else if( zp_strstr( l, "g " ) == l )
 			{
 				groups.pushBackEmpty().name =  ( l + 1 );
-				groups.back().material = "default";
 			}
 			else if( zp_strstr( l, "usemtl " ) == l )
 			{
@@ -191,6 +292,7 @@ zp_bool ObjMessCompiler::compileMesh()
 		for( zpString* kb = keys.begin(), *ke = keys.end(); kb != ke; ++kb )
 		{
 			const zpArrayList< const Vertex* >& mv = materialVertices[ *kb ];
+			if( mv.isEmpty() ) continue;
 
 			MeshDataPart& part = m_data.parts.pushBackEmpty();
 			part.material = *kb;
