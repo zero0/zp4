@@ -643,8 +643,7 @@ zpSamplerStateImpl* zpRenderingEngineImpl::createSamplerState( const zpSamplerSt
 			filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
 		}
 
-
-		samplerDesc.Filter = filter;	// TODO: update with real value
+		samplerDesc.Filter = filter;
 		samplerDesc.AddressU = __zpToDX( desc.texWrapU );
 		samplerDesc.AddressV = __zpToDX( desc.texWrapV );
 		samplerDesc.AddressW = __zpToDX( desc.texWrapW );

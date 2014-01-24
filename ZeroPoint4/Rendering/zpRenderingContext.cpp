@@ -108,6 +108,7 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	m_currentCommnad->type = ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE;
 	m_currentCommnad->layer = layer;
 	m_currentCommnad->sortKey = material ? material->getResource()->getData()->materialId : 0;
+	m_currentCommnad->sortBias = 0;
 
 	m_currentCommnad->topology = topology;
 	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->getBufferImpl();
@@ -120,21 +121,7 @@ void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology 
 	m_currentCommnad->indexOffset = 0;
 	m_currentCommnad->matrix.setIdentity();
 
-	switch( vertexFormat )
-	{
-	case ZP_VERTEX_FORMAT_VERTEX_COLOR:
-		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR;
-		break;
-	case ZP_VERTEX_FORMAT_VERTEX_UV:
-		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_UV;
-		break;
-	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV:
-		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV;
-		break;
-	case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2:
-		m_currentCommnad->vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV2;
-		break;
-	}
+	m_currentCommnad->vertexStride = VertexFormatStrides[ vertexFormat ];
 }
 
 void zpRenderingContext::setBoundingBox( const zpBoundingAABB& bounding )
@@ -155,6 +142,12 @@ void zpRenderingContext::setMatrix( const zpMatrix4f& matrix )
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 
 	m_currentCommnad->matrix = matrix;
+}
+void zpRenderingContext::setSortBias( zp_ushort bias )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+
+	m_currentCommnad->sortBias = bias;
 }
 
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpColor4f& color )
@@ -497,26 +490,13 @@ void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstanc
 		command.matrix = matrix;
 
 		command.sortKey = command.material->getResource()->getData()->materialId;
+		command.sortBias = 0;
 
 		b->m_boundingBox.getCenter( c );
 		zpMath::Add( c, c, center );
 		command.boundingBox.setCenter( c );
 
-		switch( command.vertexFormat )
-		{
-		case ZP_VERTEX_FORMAT_VERTEX_COLOR:
-			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR;
-			break;
-		case ZP_VERTEX_FORMAT_VERTEX_UV:
-			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_UV;
-			break;
-		case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV:
-			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV;
-			break;
-		case ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2:
-			command.vertexStride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV2;
-			break;
-		}
+		command.vertexStride = VertexFormatStrides[ command.vertexFormat ];
 	}
 }
 
@@ -538,14 +518,20 @@ void zpRenderingContext::fillBuffers()
 {
 	void* mapData;
 
-	map( m_currentVertexBuffer, &mapData );
-	zp_memcpy( mapData, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
-	unmap( m_currentVertexBuffer );
+	if( m_scratchVertexBuffer.size() )
+	{
+		map( m_currentVertexBuffer, &mapData );
+		zp_memcpy( mapData, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
+		unmap( m_currentVertexBuffer );
+	}
 
-	map( m_currentIndexBuffer, &mapData );
-	zp_memcpy( mapData, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
-	unmap( m_currentIndexBuffer );
-
+	if( m_scratchIndexBuffer.size() )
+	{
+		map( m_currentIndexBuffer, &mapData );
+		zp_memcpy( mapData, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
+		unmap( m_currentIndexBuffer );
+	}
+	
 	m_scratchVertexBuffer.reset();
 	m_scratchIndexBuffer.reset();
 }
@@ -567,10 +553,9 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 		{
 			switch( cmd->layer )
 			{
-			case ZP_RENDERING_LAYER_UI_OPAQUE:
-			case ZP_RENDERING_LAYER_DEBUG_UI_OPAQUE:
-			case ZP_RENDERING_LAYER_UI_TRANSPARENT:
-			case ZP_RENDERING_LAYER_DEBUG_UI_TRANSPARENT:
+			case ZP_RENDERING_LAYER_SKYBOX:
+			case ZP_RENDERING_LAYER_UI:
+			case ZP_RENDERING_LAYER_UI_DEBUG:
 				m_filteredCommands[ cmd->layer ].pushBack( cmd );
 				break;
 			default:
@@ -590,21 +575,21 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 		}
 	}
 
-	// sort opaque layer buckets
-	for( zp_uint i = zpRenderingLayer_StartOpaque; i < zpRenderingLayer_EndOpaque; ++i )
-	{
-		m_filteredCommands[ i ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
-			return cmd0->sortKey < cmd1->sortKey;
-		} );
-	}
+	// sort opaque front to back
+	m_filteredCommands[ ZP_RENDERING_LAYER_OPAQUE ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+		return cmd0->sortKey < cmd1->sortKey;
+	} );
+	m_filteredCommands[ ZP_RENDERING_LAYER_OPAQUE_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+		return cmd0->sortKey < cmd1->sortKey;
+	} );
 
-	// sort transparent layer buckets
-	for( zp_uint i = zpRenderingLayer_StartTransparent; i < zpRenderingLayer_EndTransparent; ++i )
-	{
-		m_filteredCommands[ i ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
-			return cmd0->sortKey > cmd1->sortKey;
-		} );
-	}
+	// sort transparent back to front
+	m_filteredCommands[ ZP_RENDERING_LAYER_TRANSPARENT ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+		return cmd0->sortKey > cmd1->sortKey;
+	} );
+	m_filteredCommands[ ZP_RENDERING_LAYER_TRANSPARENT_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+		return cmd0->sortKey > cmd1->sortKey;
+	} );
 }
 
 void zpRenderingContext::processCommands( zpRenderingLayer layer )
@@ -651,8 +636,8 @@ void zpRenderingContext::generateSortKeyForCommand( zpRenderingCommand* command,
 	zpMath::Mul( dist, dist, dist );
 	zpMath::Div( len, len, dist );
 
-	zp_uint distKey = (zp_ushort)( len.getFloat() * (zp_float)zp_limit_max<zp_ushort>() );
+	zp_ushort distKey = command->sortBias + (zp_ushort)( len.getFloat() * (zp_float)zp_limit_max<zp_ushort>() );
 	zp_uint matKey = command->sortKey;
 
-	command->sortKey = ( distKey << 16 ) | matKey;
+	command->sortKey = ( distKey << 16 ) | ( matKey && 0xFFFF );
 }

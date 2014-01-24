@@ -33,7 +33,6 @@ enum
 	ZP_RENDERING_MAX_SHADERS =					32,
 	ZP_RENDERING_MAX_TEXTURES =					64,
 	ZP_RENDERING_MAX_BUFFERS =					64,
-	ZP_RENDERING_MAX_CAMERAS =					8,
 
 	ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE = ZP_MEMORY_MB( 1.0f ),
 	ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE =	65535 * sizeof( zp_short ), //ZP_MEMORY_MB( 0.25f ),
@@ -50,28 +49,39 @@ enum
 #error( "No rendering engine selected!" )
 #endif
 
+enum zpCameraType : zp_byte
+{
+	ZP_CAMERA_TYPE_MAIN,
+	ZP_CAMERA_TYPE_UI,
+
+	ZP_CAMERA_TYPE_USER0,
+	ZP_CAMERA_TYPE_USER1,
+	ZP_CAMERA_TYPE_USER2,
+	ZP_CAMERA_TYPE_USER3,
+	ZP_CAMERA_TYPE_USER4,
+
+	ZP_CAMERA_TYPE_DEBUG,
+
+	zpCameraType_Count,
+};
+
 enum zpRenderingLayer : zp_byte
 {
 	ZP_RENDERING_LAYER_OPAQUE,
-	ZP_RENDERING_LAYER_UI_OPAQUE,
-	ZP_RENDERING_LAYER_DEBUG_UI_OPAQUE,
-	ZP_RENDERING_LAYER_DEBUG_OPAQUE,
+	ZP_RENDERING_LAYER_OPAQUE_DEBUG,
+
+	ZP_RENDERING_LAYER_SKYBOX,
 
 	ZP_RENDERING_LAYER_TRANSPARENT,
-	ZP_RENDERING_LAYER_UI_TRANSPARENT,
-	ZP_RENDERING_LAYER_DEBUG_UI_TRANSPARENT,
-	ZP_RENDERING_LAYER_DEBUG_TRANSPARENT,
+	ZP_RENDERING_LAYER_TRANSPARENT_DEBUG,
+
+	ZP_RENDERING_LAYER_UI,
+	ZP_RENDERING_LAYER_UI_DEBUG,	
 
 	ZP_RENDERING_LAYER_LIGHTS,
 	ZP_RENDERING_LAYER_SHADOWS,
 
 	zpRenderingLayer_Count,
-
-	zpRenderingLayer_StartOpaque = ZP_RENDERING_LAYER_OPAQUE,
-	zpRenderingLayer_EndOpaque = ZP_RENDERING_LAYER_DEBUG_OPAQUE + 1,
-
-	zpRenderingLayer_StartTransparent = ZP_RENDERING_LAYER_TRANSPARENT,
-	zpRenderingLayer_EndTransparent = ZP_RENDERING_LAYER_DEBUG_TRANSPARENT + 1,
 };
 
 enum zpRenderingEngineType
@@ -181,6 +191,9 @@ enum zpVertexFormatStride : zp_uint
 	ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV =	sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ),
 	ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV2 =	sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ) + sizeof( zpVector2f ),
 };
+
+zpVertexFormatDesc VertexFormatDescs[];
+zpVertexFormatStride VertexFormatStrides[];
 
 enum zpScreenMode
 {
@@ -492,6 +505,7 @@ struct zpRenderingCommand
 	zpRenderingCommandType type;
 	zpRenderingLayer layer;
 	zp_uint sortKey;
+	zp_ushort sortBias;
 
 	zpTopology topology;
 	const zpBufferImpl* vertexBuffer;

@@ -164,7 +164,7 @@ void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, cons
 				bindMaterial( mat );
 			}
 
-			zp_uint offset = 0;
+			zp_uint offset = command->vertexOffset;
 			m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
 			m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
 			m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &offset );

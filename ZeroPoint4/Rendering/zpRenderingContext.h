@@ -31,6 +31,7 @@ public:
 	void setBoundingBoxCenter( const zpVector4f& center );
 
 	void setMatrix( const zpMatrix4f& matrix );
+	void setSortBias( zp_ushort bias );
 
 	void addVertex( const zpVector4f& pos, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );

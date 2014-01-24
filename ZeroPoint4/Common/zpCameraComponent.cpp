@@ -23,21 +23,21 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 	}
 
 	zpBison::Value size = def[ "ScreenSize" ];
-	if( size.isArray() )
+	if( size.isArray() && !size.isEmpty() )
 	{
 		screenSize.setX( size[ 0 ].asInt() );
 		screenSize.setY( size[ 1 ].asInt() );
 	}
 
 	zpBison::Value position = def[ "ScreenPosition" ];
-	if( position.isArray() )
+	if( position.isArray() && !size.isEmpty() )
 	{
 		screenPosition.setX( position[ 0 ].asInt() );
 		screenPosition.setY( position[ 1 ].asInt() );
 	}
 
 	zpBison::Value depthValues = def[ "NearFarZ" ];
-	if( depthValues.isArray() )
+	if( depthValues.isArray() && !size.isEmpty() )
 	{
 		nearZ = depthValues[ 0 ].asFloat();
 		farZ = depthValues[ 1 ].asFloat();
@@ -50,13 +50,13 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 	}
 
 	zpBison::Value upValue = def[ "Up" ];
-	if( upValue.isArray() )
+	if( upValue.isArray() && !size.isEmpty() )
 	{
 		up = zpVector4f( upValue[ 0 ].asFloat(), upValue[ 1 ].asFloat(), upValue[ 2 ].asFloat(), 0.0f );
 	}
 
 	zpBison::Value lookToValue = def[ "LookTo" ];
-	if( lookToValue.isArray() )
+	if( lookToValue.isArray() && !size.isEmpty() )
 	{
 		lookTo = zpVector4f( lookToValue[ 0 ].asFloat(), lookToValue[ 1 ].asFloat(), lookToValue[ 2 ].asFloat() );
 	}
@@ -68,7 +68,7 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 	viewport.minDepth = nearZ;
 	viewport.maxDepth = farZ;
 
-	m_camera = pipeline->getCamera( 0 );
+	m_camera = pipeline->getCamera( ZP_CAMERA_TYPE_MAIN );
 	m_camera->setProjectionType( projection );
 	m_camera->setPosition( getParentObject()->getTransform().getRow( 3 ) );
 	m_camera->setLookTo( lookTo );

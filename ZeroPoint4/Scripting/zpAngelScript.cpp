@@ -642,14 +642,13 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	zpRenderingContext* i = app->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
 
 	r = engine->RegisterEnum( "RenderingLayer" ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "Opaque",			ZP_RENDERING_LAYER_OPAQUE ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "UIOpaque",		ZP_RENDERING_LAYER_UI_OPAQUE ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "DebugUIOpaque",	ZP_RENDERING_LAYER_DEBUG_UI_OPAQUE ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "DebugOpaque",		ZP_RENDERING_LAYER_DEBUG_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "Opaque",				ZP_RENDERING_LAYER_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "OpaqueDebug",			ZP_RENDERING_LAYER_OPAQUE_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "Skybox",				ZP_RENDERING_LAYER_SKYBOX ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "RenderingLayer", "Transparent",			ZP_RENDERING_LAYER_TRANSPARENT ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "UITransparent",		ZP_RENDERING_LAYER_UI_TRANSPARENT ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "DebugUITransparent",	ZP_RENDERING_LAYER_DEBUG_UI_TRANSPARENT ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "DebugTransparent",	ZP_RENDERING_LAYER_DEBUG_TRANSPARENT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "TransparentDebug",	ZP_RENDERING_LAYER_TRANSPARENT_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "UI",					ZP_RENDERING_LAYER_UI ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "UIDebug",				ZP_RENDERING_LAYER_UI_DEBUG ); AS_ASSERT( r );
 
 	r = engine->RegisterEnum( "Topology" ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "Topology", "Unknown",		ZP_TOPOLOGY_UNKNOWN ); AS_ASSERT( r );

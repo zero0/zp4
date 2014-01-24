@@ -41,7 +41,7 @@ public:
 	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
 
 	zp_uint getNumCameras() const { return m_cameras.size(); }
-	zpCamera* getCamera( zp_int cameraIndex );
+	zpCamera* getCamera( zpCameraType type );
 
 private:
 	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );
@@ -61,7 +61,7 @@ private:
 
 	zpRasterState m_raster;
 
-	zpFixedArrayList< zpCamera, ZP_RENDERING_MAX_CAMERAS > m_cameras;
+	zpFixedArrayList< zpCamera, zpCameraType_Count > m_cameras;
 };
 
 #endif
