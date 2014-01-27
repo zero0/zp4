@@ -2,6 +2,8 @@
 #ifndef ZP_CORE_H
 #define ZP_CORE_H
 
+#include <new>
+
 #if defined(DEBUG) || defined(_DEBUG)
 #define ZP_DEBUG				1
 #endif
@@ -89,9 +91,6 @@
 
 #include "zpBaseTypes.h"
 
-// extending placement new and delete to include parameters
-inline void* operator new( size_t sz, void* here ) throw() { return here; }
-inline void operator delete( void*, void* ) throw() {}
 
 #if ZP_USE_ASSERTIONS
 void zp_assert( const zp_char* file, zp_int line, const zp_char* msg, ... );

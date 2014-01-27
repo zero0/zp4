@@ -86,7 +86,6 @@ void as_zpString_FactoryGeneric( asIScriptGeneric* gen )
 	const char* string = (const char*)gen->GetArgAddress( 1 );
 
 	new (gen->GetAddressOfReturnLocation()) zpString( string, length );
-	//*((zpString*)gen->GetAddressOfReturnLocation()) = zp_move( zpString( string, length ) );
 }
 
 void as_zpString_Constructor( zpString* self )
