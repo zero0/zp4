@@ -13,7 +13,7 @@ zpMeshRendererComponent::~zpMeshRendererComponent() {}
 void zpMeshRendererComponent::render()
 {
 	zpRenderingContext* i = getApplication()->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
-	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh, getParentObject()->getTransform() );
+	i->drawMesh( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, getParentObject()->getTransform() );
 }
 
 void zpMeshRendererComponent::onCreate() {}

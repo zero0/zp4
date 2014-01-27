@@ -25,14 +25,6 @@ struct Group
 	zpArrayList< Vertex > verts;
 };
 
-enum VertexFormat
-{
-	VF_NONE,
-	VF_VERTEX,
-	VF_VERTEX_NORMAL,
-	VF_VERTEX_NORMAL_TEXTURE,
-};
-
 ObjMessCompiler::~ObjMessCompiler()
 {
 }
@@ -321,21 +313,7 @@ zp_bool ObjMessCompiler::compileMesh()
 		}
 
 		// select vertex format
-		switch( format )
-		{
-		case VF_VERTEX:
-			m_data.format = "V";
-			break;
-		case VF_VERTEX_NORMAL:
-			m_data.format = "VN";
-			break;
-		case VF_VERTEX_NORMAL_TEXTURE:
-			m_data.format = "VNU";
-			break;
-		default:
-			ZP_ASSERT( false, "Unknown format" );
-			break;
-		}
+		formatToString( format, m_data.format );
 		
 		ok = format != VF_NONE;
 	}

@@ -41,11 +41,19 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(FBXSDK_DIR)include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(FBXSDK_DIR)\lib\vs2010\$(ProcessorArchitecture)\$(Configuration)\</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>copy "$(FBXSDK_DIR)\lib\vs2010\$(ProcessorArchitecture)\$(Configuration)\libfbxsdk.dll" "$(OutDir)libfbxsdk.dll"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -62,11 +70,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FbxMeshCompiler.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MeshCompiler.cpp" />
     <ClCompile Include="ObjMeshCompiler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FbxMeshCompiler.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="MeshCompiler.h" />
     <ClInclude Include="ObjMeshCompiler.h" />

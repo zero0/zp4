@@ -15,7 +15,7 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 	if( arguments.size() < 2 )
 	{
 		zpLog::message()
-			<< "Usage: MeshCompiler.exe " << zpLog::blue << "path/to/inputfile.json " << zpLog::green << "path/to/outputfile.bison" << zpLog::endl
+			<< "Usage: MeshCompiler.exe " << zpLog::blue << "path/to/inputfile " << zpLog::green << "path/to/outputfile" << zpLog::endl
 			;
 	}
 	else
@@ -26,6 +26,10 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		if( inputFilename.endsWith( ".obj" ) )
 		{
 			compiler = new ObjMessCompiler;
+		}
+		else if( inputFilename.endsWith( ".fbx" ) )
+		{
+			compiler = new FbxMessCompiler;
 		}
 
 		if( compiler )

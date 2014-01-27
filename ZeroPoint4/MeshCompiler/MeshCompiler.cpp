@@ -59,6 +59,25 @@ void BaseMeshCompiler::shutdown()
 	}
 }
 
+void BaseMeshCompiler::formatToString( VertexFormat fmt, zpString& outFormat ) const
+{
+	switch( fmt )
+	{
+	case VF_VERTEX:
+		outFormat = "V";
+		break;
+	case VF_VERTEX_NORMAL:
+		outFormat = "VN";
+		break;
+	case VF_VERTEX_NORMAL_TEXTURE:
+		outFormat = "VNU";
+		break;
+	default:
+		ZP_ASSERT( false, "Unknown format" );
+		break;
+	}
+}
+
 /************************************************************************/
 /* 
 {

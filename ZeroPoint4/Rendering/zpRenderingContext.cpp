@@ -101,12 +101,13 @@ void zpRenderingContext::setConstantBuffer( zp_uint bindSlots, zp_uint index, zp
 	m_renderContextImpl->setConstantBuffer( bindSlots, index, buffer );
 }
 
-void zpRenderingContext::beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material )
+void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 	m_currentCommnad = &m_renderingCommands.pushBackEmpty();
 	m_currentCommnad->type = ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE;
 	m_currentCommnad->layer = layer;
+	m_currentCommnad->queue = queue;
 	m_currentCommnad->sortKey = material ? material->getResource()->getData()->materialId : 0;
 	m_currentCommnad->sortBias = 0;
 
@@ -462,7 +463,7 @@ void zpRenderingContext::endDrawImmediate()
 	m_immediateIndexSize = m_scratchIndexBuffer.size();
 }
 
-void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpMatrix4f& matrix, zpMaterialResourceInstance* material )
+void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMeshResourceInstance* mesh, const zpMatrix4f& matrix, zpMaterialResourceInstance* material )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 
@@ -476,6 +477,7 @@ void zpRenderingContext::drawMesh( zpRenderingLayer layer, zpMeshResourceInstanc
 		zpRenderingCommand& command = m_renderingCommands.pushBackEmpty();
 		command.type = ZP_RENDERING_COMMNAD_DRAW_BUFFERED;
 		command.layer = layer;
+		command.queue = queue;
 
 		command.topology = ZP_TOPOLOGY_TRIANGLE_LIST;
 		command.vertexBuffer = m->m_vertex.getBufferImpl();
@@ -544,55 +546,61 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 		m_filteredCommands[ i ].reset();
 	}
 
-	// filter all commands into layer buckets, 
+	// filter all commands into layer buckets if camera is present
 	zpRenderingCommand* cmd = m_renderingCommands.begin();
 	zpRenderingCommand* end = m_renderingCommands.end();
 	if( camera )
 	{
 		for( ; cmd != end; ++cmd )
 		{
-			switch( cmd->layer )
+			// if the camera does not support any layer the command is not, don't add it
+			if( !camera->getRenderLayers().isAnyMarked( cmd->layer ) ) continue;
+
+			// filter commands into buckets
+			switch( cmd->queue )
 			{
-			case ZP_RENDERING_LAYER_SKYBOX:
-			case ZP_RENDERING_LAYER_UI:
-			case ZP_RENDERING_LAYER_UI_DEBUG:
-				m_filteredCommands[ cmd->layer ].pushBack( cmd );
+				// no sort key needed for non-sorted queues
+			case ZP_RENDERING_QUEUE_SKYBOX:
+			case ZP_RENDERING_QUEUE_UI:
+			case ZP_RENDERING_QUEUE_UI_DEBUG:
+				m_filteredCommands[ cmd->queue ].pushBack( cmd );
 				break;
 			default:
 				//if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
 				{
 					generateSortKeyForCommand( cmd, camera );
-					m_filteredCommands[ cmd->layer ].pushBack( cmd );
+					m_filteredCommands[ cmd->queue ].pushBack( cmd );
 				}
 			}
 		}
 	}
+	// otherwise, no filtering needs to take place
 	else
 	{
 		for( ; cmd != end; ++cmd )
 		{
-			m_filteredCommands[ cmd->layer ].pushBack( cmd );
+			m_filteredCommands[ cmd->queue ].pushBack( cmd );
 		}
 	}
 
 	// sort opaque front to back
-	m_filteredCommands[ ZP_RENDERING_LAYER_OPAQUE ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+	m_filteredCommands[ ZP_RENDERING_QUEUE_OPAQUE ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
 		return cmd0->sortKey < cmd1->sortKey;
 	} );
-	m_filteredCommands[ ZP_RENDERING_LAYER_OPAQUE_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+	m_filteredCommands[ ZP_RENDERING_QUEUE_OPAQUE_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
 		return cmd0->sortKey < cmd1->sortKey;
 	} );
 
 	// sort transparent back to front
-	m_filteredCommands[ ZP_RENDERING_LAYER_TRANSPARENT ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+	m_filteredCommands[ ZP_RENDERING_QUEUE_TRANSPARENT ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
 		return cmd0->sortKey > cmd1->sortKey;
 	} );
-	m_filteredCommands[ ZP_RENDERING_LAYER_TRANSPARENT_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
+	m_filteredCommands[ ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
 		return cmd0->sortKey > cmd1->sortKey;
 	} );
 }
 
-void zpRenderingContext::processCommands( zpRenderingLayer layer )
+void zpRenderingContext::processCommands( zpRenderingQueue layer )
 {
 	const zpRenderingCommand* const* cmd = m_filteredCommands[ layer ].begin();
 	const zpRenderingCommand* const* end = m_filteredCommands[ layer ].end();
@@ -639,5 +647,5 @@ void zpRenderingContext::generateSortKeyForCommand( zpRenderingCommand* command,
 	zp_ushort distKey = command->sortBias + (zp_ushort)( len.getFloat() * (zp_float)zp_limit_max<zp_ushort>() );
 	zp_uint matKey = command->sortKey;
 
-	command->sortKey = ( distKey << 16 ) | ( matKey && 0xFFFF );
+	command->sortKey = ( distKey << 16 ) | ( matKey & 0xFFFF );
 }

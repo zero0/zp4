@@ -40,8 +40,12 @@ public:
 	void generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc );
 	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
 
+	void enterDebugMode();
+	void leaveDebugMode();
+
 	zp_uint getNumCameras() const { return m_cameras.size(); }
 	zpCamera* getCamera( zpCameraType type );
+	void setCameraActive( zpCameraType type, zp_bool active );
 
 private:
 	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );
@@ -61,6 +65,7 @@ private:
 
 	zpRasterState m_raster;
 
+	zpCamera* m_prevCamera;
 	zpFixedArrayList< zpCamera, zpCameraType_Count > m_cameras;
 };
 

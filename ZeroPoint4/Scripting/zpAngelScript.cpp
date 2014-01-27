@@ -641,13 +641,13 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	zpRenderingContext* i = app->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
 
 	r = engine->RegisterEnum( "RenderingLayer" ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "Opaque",				ZP_RENDERING_LAYER_OPAQUE ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "OpaqueDebug",			ZP_RENDERING_LAYER_OPAQUE_DEBUG ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "Skybox",				ZP_RENDERING_LAYER_SKYBOX ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "Transparent",			ZP_RENDERING_LAYER_TRANSPARENT ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "TransparentDebug",	ZP_RENDERING_LAYER_TRANSPARENT_DEBUG ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "UI",					ZP_RENDERING_LAYER_UI ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "UIDebug",				ZP_RENDERING_LAYER_UI_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "Opaque",				ZP_RENDERING_QUEUE_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "OpaqueDebug",			ZP_RENDERING_QUEUE_OPAQUE_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "Skybox",				ZP_RENDERING_QUEUE_SKYBOX ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "Transparent",			ZP_RENDERING_QUEUE_TRANSPARENT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "TransparentDebug",	ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "UI",					ZP_RENDERING_QUEUE_UI ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingLayer", "UIDebug",				ZP_RENDERING_QUEUE_UI_DEBUG ); AS_ASSERT( r );
 
 	r = engine->RegisterEnum( "Topology" ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "Topology", "Unknown",		ZP_TOPOLOGY_UNKNOWN ); AS_ASSERT( r );
@@ -663,7 +663,7 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV2",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ); AS_ASSERT( r );
 
-	r = engine->RegisterGlobalFunction( "void BeginDraw( RenderingLayer, Topology, VertexFormat, int )", asMETHODPR( zpRenderingContext, beginDrawImmediate, ( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void BeginDraw( uint, RenderingLayer, Topology, VertexFormat, int )", asMETHODPR( zpRenderingContext, beginDrawImmediate, ( zp_uint, zpRenderingQueue layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void EndDraw()", asMETHODPR( zpRenderingContext, endDrawImmediate, (), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 
 	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const color& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );

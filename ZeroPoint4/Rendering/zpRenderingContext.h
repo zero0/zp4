@@ -25,7 +25,7 @@ public:
 	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
 	void setConstantBuffer( zp_uint bindSlots, zp_uint index, zpBuffer* buffer );
 
-	void beginDrawImmediate( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
+	void beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
 	void setBoundingBox( const zpBoundingAABB& bounding );
 	void setBoundingBoxCenter( const zpVector4f& center );
@@ -87,7 +87,7 @@ public:
 
 	void endDrawImmediate();
 
-	void drawMesh( zpRenderingLayer layer, zpMeshResourceInstance* mesh, const zpMatrix4f& matrix, zpMaterialResourceInstance* material = 0 );
+	void drawMesh( zp_uint layer, zpRenderingQueue queue, zpMeshResourceInstance* mesh, const zpMatrix4f& matrix, zpMaterialResourceInstance* material = 0 );
 
 	//void drawInstanced( zpRenderingLayer layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
 
@@ -98,7 +98,7 @@ public:
 
 	void fillBuffers();
 	void preprocessCommands( zpCamera* camera );
-	void processCommands( zpRenderingLayer layer );
+	void processCommands( zpRenderingQueue queue );
 	void finalizeCommands();
 
 	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }

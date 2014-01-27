@@ -92,6 +92,7 @@ void zpRenderingPipeline::initialize()
 	cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
 	cam->setViewport( viewport );
 	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
+	cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
 }
 void zpRenderingPipeline::destroy()
 {
@@ -120,6 +121,9 @@ void zpRenderingPipeline::beginFrame()
 
 	i->update( &m_perFrameBuffer, &perFrameData, sizeof( zpFrameBufferData ) );
 	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_FRAME, &m_perFrameBuffer );
+
+	// clear previous camera
+	m_prevCamera = ZP_NULL;
 }
 
 void zpRenderingPipeline::submitRendering()
@@ -169,33 +173,45 @@ void zpRenderingPipeline::submitRendering()
 	zpMatrix4f m;
 	m.setIdentity();
 	
-	i->drawMesh( ZP_RENDERING_LAYER_OPAQUE, &m_mesh, m );
+	i->drawMesh( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
 	
 	// 1) fill buffers
 	i->fillBuffers();
 
 	zpCamera* cam = getCamera( ZP_CAMERA_TYPE_MAIN );
+	zpCamera* uiCam = getCamera( ZP_CAMERA_TYPE_UI );
 
 	// 2) process commands, sorting, etc.
 	i->preprocessCommands( cam );
 
 	// 3) actually render commands
 	i->setRenderTarget( 0, 1, &t, d );
-	i->clearDepthStencilBuffer( d, 1.0f, 0 );
-	i->clearRenderTarget( t, zpColor4f( 1, 0, 0, 1 ) );
-
+	if( cam->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_BEFORE_RENDER ) )
+	{
+		if( cam->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH | ZP_CAMERA_CLEAR_MODE_STENCIL ) )
+		{
+			i->clearDepthStencilBuffer( d, cam->getDepthClear(), cam->getStencilClear() );
+		}
+		if( cam->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_COLOR ) )
+		{
+			i->clearRenderTarget( t, cam->getClearColor() );
+		}
+	}
+	
 	useCamera( i, cam, &m_cameraBuffer );
 
-	i->processCommands( ZP_RENDERING_LAYER_OPAQUE );
-	i->processCommands( ZP_RENDERING_LAYER_OPAQUE_DEBUG );
+	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
+	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
 
-	i->processCommands( ZP_RENDERING_LAYER_SKYBOX );
+	i->processCommands( ZP_RENDERING_QUEUE_SKYBOX );
 
-	i->processCommands( ZP_RENDERING_LAYER_TRANSPARENT );
-	i->processCommands( ZP_RENDERING_LAYER_TRANSPARENT_DEBUG );
+	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT );
+	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
 
-	i->processCommands( ZP_RENDERING_LAYER_UI );
-	i->processCommands( ZP_RENDERING_LAYER_UI_DEBUG );
+	i->processCommands( ZP_RENDERING_QUEUE_OVERLAY );
+
+	i->processCommands( ZP_RENDERING_QUEUE_UI );
+	i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
 }
 void zpRenderingPipeline::submitDebugRendering()
 {
@@ -486,8 +502,9 @@ zpCamera* zpRenderingPipeline::getCamera( zpCameraType type )
 }
 void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer )
 {
-	if( camera->update() )
+	if( camera->update() || m_prevCamera != camera )
 	{
+		m_prevCamera = camera;
 		i->update( cameraBuffer, &camera->getCameraBufferData(), sizeof( zpCameraBufferData ) );
 	}
 	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_CAMERA, cameraBuffer );

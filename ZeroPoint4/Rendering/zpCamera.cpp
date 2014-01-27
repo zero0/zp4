@@ -7,9 +7,14 @@ zpCamera::zpCamera()
 	, m_orthoRect()
 	, m_clipRect()
 	, m_viewport()
+	, m_clearColor( 0, 0, 0, 0 )
+	, m_clearDepth( 1.0f )
+	, m_clearStencil( 0 )
 	, m_frustum()
 	, m_view()
 	, m_projection()
+	, m_clearMode( ZP_CAMERA_CLEAR_MODE_DEFAULT )
+	, m_layers( ZP_RENDERING_LAYER_DEFAULT )
 	, m_bufferData()
 {}
 zpCamera::~zpCamera()
@@ -195,4 +200,57 @@ void zpCamera::generateRay( const zpVector2i& screenSize, const zpVector2i& wind
 
 	outRay.setOrigin( nearZ );
 	outRay.setDirection( farZ );
+}
+
+void zpCamera::setRenderLayers( zp_uint layers )
+{
+	m_layers.set( layers );
+}
+void zpCamera::setRenderLayer( zp_bool isMarked, zp_uint layerIndex )
+{
+	m_layers.setMarked( layerIndex, isMarked );
+}
+zp_bool zpCamera::isRenderLayerSet( zp_uint layerIndex ) const
+{
+	return m_layers.isMarked( layerIndex );
+}
+const zpFlag32& zpCamera::getRenderLayers() const
+{
+	return m_layers;
+}
+
+const zpFlag8& zpCamera::getClearMode() const
+{
+	return m_clearMode;
+}
+void zpCamera::setClearMode( zp_byte clearMode )
+{
+	m_clearMode.set( clearMode );
+}
+
+const zpColor4f& zpCamera::getClearColor() const
+{
+	return m_clearColor;
+}
+void zpCamera::setClearColor( const zpColor4f& color )
+{
+	m_clearColor = color;
+}
+
+zp_float zpCamera::getDepthClear() const
+{
+	return m_clearDepth;
+}
+void zpCamera::setDepthClear( zp_float depthClear )
+{
+	m_clearDepth = depthClear;
+}
+
+zp_uint zpCamera::getStencilClear() const
+{
+	return m_clearStencil;
+}
+void zpCamera::setStencilClear( zp_uint stencilClear )
+{
+	m_clearStencil = stencilClear;
 }
