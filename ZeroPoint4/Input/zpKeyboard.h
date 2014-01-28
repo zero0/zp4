@@ -175,6 +175,7 @@ public:
 
 	zp_bool isKeyDown( zpKeyCode key ) const;
 	zp_bool isKeyUp( zpKeyCode key ) const;
+	zp_bool isKeyPressed( zpKeyCode key ) const;
 
 	zp_char keyToChar( zpKeyCode key ) const;
 
@@ -196,6 +197,7 @@ private:
 	zpArrayList<zpKeyboardListener*> m_listeners;
 	zp_byte m_keyBuffer[ ZP_INPUT_MAX_KEYS ];
 	zp_byte m_keyDownBuffer[ ZP_INPUT_MAX_KEYS ];
+	zp_byte m_keyPressBuffer[ ZP_INPUT_MAX_KEYS ];
 
 	friend class zpInputManager;
 };

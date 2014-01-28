@@ -10,6 +10,7 @@ zpApplication::zpApplication()
 	, m_addNextWorld( false )
 	, m_shouldGarbageCollect( false )
 	, m_shouldReloadAllResources( false )
+	, m_inEditMode( false )
 	, m_exitCode( 0 )
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
 	, m_console( ZP_NULL )
@@ -209,7 +210,6 @@ void zpApplication::update()
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
 
-
 	//m_componentPoolAudioEmitter.update();
 
 	m_audioContent.getAudioEngine()->update();
@@ -218,7 +218,10 @@ void zpApplication::update()
 }
 void zpApplication::simulate()
 {
-	//m_componentPoolEditorCamera.simulate();
+	if( !m_inEditMode )
+	{
+		//m_componentPoolEditorCamera.simulate();
+	}
 }
 
 void zpApplication::garbageCollect()
@@ -301,19 +304,31 @@ void zpApplication::handleInput()
 {
 	const zpKeyboard* keyboard = m_inputManager.getKeyboard();
 
-	if( keyboard->isKeyDown( ZP_KEY_CODE_ESC ) )
+	if( keyboard->isKeyPressed( ZP_KEY_CODE_ESC ) )
 	{
 		exit( 0 );
 	}
-	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyDown( ZP_KEY_CODE_G ) )
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_TAB ) )
+	{
+		m_inEditMode = !m_inEditMode;
+		if( m_inEditMode )
+		{
+			enterEditMode();
+		}
+		else
+		{
+			leaveEditMode();
+		}
+	}
+	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_G ) )
 	{
 		garbageCollect();
 	}
-	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyDown( ZP_KEY_CODE_R ) )
+	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_R ) )
 	{
 		reloadAllResources();
 	}
-	else if( keyboard->isKeyDown( ZP_KEY_CODE_P ) )
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_P ) )
 	{
 		m_profiler.printProfile( ZP_PROFILER_STEP_FRAME );
 	}
@@ -338,12 +353,17 @@ void zpApplication::processFrame()
 	{
 		m_shouldReloadAllResources = false;
 
+		ZP_PROFILE_START( RELOAD_ALL );
 		runReloadAllResources();
+		ZP_PROFILE_END( RELOAD_ALL );
 	}
 
 #if ZP_USE_HOT_RELOAD
+	ZP_PROFILE_START( HOT_RELOAD );
 	runReloadChangedResources();
+	ZP_PROFILE_END( HOT_RELOAD );
 #endif
+
 
 	zp_long now = m_timer->getTime();
 	zp_uint numUpdates = 0;
@@ -371,26 +391,21 @@ void zpApplication::processFrame()
 
 	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
 
+
 	ZP_PROFILE_START( RENDER_FRAME );
 	{
+		// individual component render
+		m_componentPoolMeshRenderer.render();
+
 		// render begin
 		ZP_PROFILE_START( RENDER_BEGIN );
 		m_renderingPipeline.beginFrame();
 		ZP_PROFILE_END( RENDER_BEGIN );
 
-		// individual component render
-		m_componentPoolMeshRenderer.render();
-
 		// render commands
 		ZP_PROFILE_START( RENDER );
 		m_renderingPipeline.submitRendering();
 		ZP_PROFILE_END( RENDER );
-
-	#if ZP_DEBUG
-		ZP_PROFILE_START( DEBUG_RENDER );
-		m_renderingPipeline.submitDebugRendering();
-		ZP_PROFILE_END( DEBUG_RENDER );
-	#endif
 
 		// present
 		ZP_PROFILE_START( RENDER_PRESENT );
@@ -447,3 +462,12 @@ void zpApplication::runReloadChangedResources()
 	m_renderingPipeline.getTextureContentManager()->reloadChangedResources();
 }
 #endif
+
+void zpApplication::enterEditMode()
+{
+	zp_printfln( "enter edit" );
+}
+void zpApplication::leaveEditMode()
+{
+	zp_printfln( "leave edit" );
+}

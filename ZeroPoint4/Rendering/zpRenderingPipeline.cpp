@@ -204,10 +204,6 @@ void zpRenderingPipeline::submitRendering()
 	i->processCommands( ZP_RENDERING_QUEUE_UI );
 	i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
 }
-void zpRenderingPipeline::submitDebugRendering()
-{
-
-}
 
 void zpRenderingPipeline::endFrame()
 {

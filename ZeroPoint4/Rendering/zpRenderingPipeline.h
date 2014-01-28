@@ -25,7 +25,6 @@ public:
 	void beginFrame();
 
 	void submitRendering();
-	void submitDebugRendering();
 
 	void endFrame();
 
@@ -40,8 +39,8 @@ public:
 	void generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc );
 	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
 
-	void enterDebugMode();
-	void leaveDebugMode();
+	void enterEditMode();
+	void leaveEditMode();
 
 	zp_uint getNumCameras() const { return m_cameras.size(); }
 	zpCamera* getCamera( zpCameraType type );

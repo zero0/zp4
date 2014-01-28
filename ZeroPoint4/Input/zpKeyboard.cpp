@@ -8,8 +8,6 @@ zpKeyboard::zpKeyboard()
 	: m_isCreated( false )
 	, m_hasFocus( true )
 {
-	zp_memset( m_keyDownBuffer, KEY_UP, sizeof( m_keyDownBuffer ) );
-	zp_memset( m_keyBuffer, KEY_UP, sizeof( m_keyDownBuffer ) );
 }
 zpKeyboard::~zpKeyboard()
 {
@@ -22,19 +20,20 @@ void zpKeyboard::poll()
 	{
 		for( zp_uint k = 0; k < ZP_INPUT_MAX_KEYS; ++k )
 		{
+			m_keyPressBuffer[ k ] = KEY_UP;
 			if( m_keyBuffer[ k ] == KEY_DOWN )
 			{
 				if( m_keyDownBuffer[ k ] == KEY_DOWN )
 				{
 					// repeat
-					m_listeners.foreach( [ &k ]( zpKeyboardListener* listener ) {
+					m_listeners.foreach( [ k ]( zpKeyboardListener* listener ) {
 						listener->onKeyRepeat( (zpKeyCode)k );
 					} );
 				}
 				else
 				{
 					// down
-					m_listeners.foreach( [ &k ]( zpKeyboardListener* listener ) {
+					m_listeners.foreach( [ k ]( zpKeyboardListener* listener ) {
 						listener->onKeyDown( (zpKeyCode)k );
 					} );
 				}
@@ -43,9 +42,10 @@ void zpKeyboard::poll()
 			else if( m_keyDownBuffer[ k ] == KEY_DOWN )
 			{
 				m_keyDownBuffer[ k ] = KEY_UP;
+				m_keyPressBuffer[ k ] = KEY_DOWN;
 
 				// up
-				m_listeners.foreach( [ &k ]( zpKeyboardListener* listener ) {
+				m_listeners.foreach( [ k ]( zpKeyboardListener* listener ) {
 					listener->onKeyUp( (zpKeyCode)k );
 				} );
 			}
@@ -57,6 +57,7 @@ void zpKeyboard::create()
 	m_isCreated = true;
 	zp_memset( m_keyBuffer, KEY_UP, sizeof( m_keyDownBuffer ) );
 	zp_memset( m_keyDownBuffer, KEY_UP, sizeof( m_keyDownBuffer ) );
+	zp_memset( m_keyPressBuffer, KEY_UP, sizeof( m_keyPressBuffer ) );
 }
 void zpKeyboard::destroy()
 {
@@ -76,6 +77,10 @@ zp_bool zpKeyboard::isKeyDown( zpKeyCode key ) const
 zp_bool zpKeyboard::isKeyUp( zpKeyCode key ) const
 {
 	return m_keyDownBuffer[ (zp_byte)( ZP_KEY_CODE_STRIP_MOD( key ) ) ] == KEY_UP;
+}
+zp_bool zpKeyboard::isKeyPressed( zpKeyCode key ) const
+{
+	return m_keyPressBuffer[ (zp_byte)( ZP_KEY_CODE_STRIP_MOD( key ) ) ] == KEY_DOWN;
 }
 
 zp_char zpKeyboard::keyToChar( zpKeyCode key ) const
