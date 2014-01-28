@@ -69,7 +69,7 @@ public:
 	void update();
 
 private:
-	void loadObject();
+	void loadObject( zp_bool isInitialLoad );
 	void unloadObject();
 
 	zpMatrix4f m_transform;

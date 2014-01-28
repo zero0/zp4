@@ -27,9 +27,11 @@ zpObject* zpObjectContentManager::createObject( zpApplication* application, cons
 }
 void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
 {
-	for( zp_uint i = 0; i < m_used.size(); ++i )
+	zpObject** b = m_used.begin();
+	zpObject** e = m_used.end();
+	for( ; b != e; ++b )
 	{
-		zpObject* o = m_used[ i ];
+		zpObject* o = *b;
 		if( !isWorldSwap || ( isWorldSwap && !o->isFlagSet( ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD ) ) )
 		{
 			o->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
@@ -38,7 +40,6 @@ void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
 }
 void zpObjectContentManager::update()
 {
-	//m_used.foreach( [ this ]( zpObject* o )
 	zpObject** b = m_used.begin();
 	zpObject** e = m_used.end();
 	for( ; b != e; ++b )
@@ -75,7 +76,7 @@ zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& 
 	, m_object( res )
 {
 	setFlag( ZP_OBJECT_FLAG_ENABLED );
-	loadObject();
+	loadObject( true );
 }
 zpObject::~zpObject()
 {
@@ -181,12 +182,12 @@ void zpObject::update()
 	if( m_object.isVaild() && m_lastLoadTime != m_object.getResource()->getLastTimeLoaded() )
 	{
 		unloadObject();
-		loadObject();
+		loadObject( false );
 	}
 #endif
 }
 
-void zpObject::loadObject()
+void zpObject::loadObject( zp_bool isInitialLoad )
 {
 	// if the object is valid, read data from it
 	if( m_object.isVaild() )
@@ -196,10 +197,6 @@ void zpObject::loadObject()
 		const zpBison::Value& root = m_object.getResource()->getData()->root();
 		
 		const zpBison::Value name = root[ "Name" ];
-		const zpBison::Value enabled = root[ "Enabled" ];
-		const zpBison::Value tags = root[ "Tags" ];
-		const zpBison::Value layer = root[ "Layer" ];
-		const zpBison::Value transform = root[ "Transform" ];
 		const zpBison::Value components = root[ "Components" ];
 
 		// set the name of the object if given
@@ -208,23 +205,32 @@ void zpObject::loadObject()
 			m_name = name.asCString();
 		}
 
-		// override default enabled status if given
-		if( enabled.isBool() )
+		// if initial load, setup tags, layers, transform, etc
+		if( isInitialLoad )
 		{
-			m_flags.setMarked( ZP_OBJECT_FLAG_ENABLED, enabled.asBool() );
-		}
+			const zpBison::Value enabled = root[ "Enabled" ];
+			const zpBison::Value tags = root[ "Tags" ];
+			const zpBison::Value layer = root[ "Layer" ];
+			const zpBison::Value transform = root[ "Transform" ];
 
-		// set tags
-		if( tags.isString() )
-		{
-			m_tags = tags.asCString();
-		}
+			// override default enabled status if given
+			if( enabled.isBool() )
+			{
+				m_flags.setMarked( ZP_OBJECT_FLAG_ENABLED, enabled.asBool() );
+			}
 
-		// set transform
-		m_transform.setIdentity();
-		if( !transform.isEmpty() )
-		{
-			m_transform = *(zpMatrix4f*)transform.asData();
+			// set tags
+			if( tags.isString() )
+			{
+				m_tags = tags.asCString();
+			}
+
+			// set transform
+			m_transform.setIdentity();
+			if( !transform.isEmpty() )
+			{
+				m_transform = *(zpMatrix4f*)transform.asData();
+			}
 		}
 
 		// add and create components
