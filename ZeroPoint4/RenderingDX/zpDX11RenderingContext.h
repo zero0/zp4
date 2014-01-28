@@ -10,10 +10,12 @@ public:
 	zpRenderingContextImpl();
 	~zpRenderingContextImpl();
 
-	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer );
+	void setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture* const* targets, zpDepthStencilBuffer* depthStencilBuffer );
 
 	void clearRenderTarget( zpTexture* renderTarget, const zpColor4f& clearColor );
 	void clearDepthStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth, zp_uint clearStencil );
+	void clearDepthBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth );
+	void clearStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_uint clearStencil );
 	void clearState();
 
 	void setViewport( const zpViewport& viewport );

@@ -13,7 +13,7 @@ zpRenderingContextImpl::~zpRenderingContextImpl()
 	ZP_SAFE_RELEASE( m_context );
 }
 
-void zpRenderingContextImpl::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
+void zpRenderingContextImpl::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture* const* targets, zpDepthStencilBuffer* depthStencilBuffer )
 {
 	ID3D11RenderTargetView* rtvs[ ZP_RENDER_TARGET_MAX_COUNT ];
 	ID3D11DepthStencilView* d = depthStencilBuffer == ZP_NULL ? ZP_NULL : depthStencilBuffer->getDepthStencilBufferImpl()->m_depthStencilView;
@@ -37,6 +37,16 @@ void zpRenderingContextImpl::clearDepthStencilBuffer( zpDepthStencilBuffer* dept
 {
 	ID3D11DepthStencilView* d = depthStencilBuffer == ZP_NULL ? ZP_NULL : depthStencilBuffer->getDepthStencilBufferImpl()->m_depthStencilView;
 	m_context->ClearDepthStencilView( d, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, clearDepth, clearStencil );
+}
+void zpRenderingContextImpl::clearDepthBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth )
+{
+	ID3D11DepthStencilView* d = depthStencilBuffer == ZP_NULL ? ZP_NULL : depthStencilBuffer->getDepthStencilBufferImpl()->m_depthStencilView;
+	m_context->ClearDepthStencilView( d, D3D11_CLEAR_DEPTH, clearDepth, 0 );
+}
+void zpRenderingContextImpl::clearStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_uint clearStencil )
+{
+	ID3D11DepthStencilView* d = depthStencilBuffer == ZP_NULL ? ZP_NULL : depthStencilBuffer->getDepthStencilBufferImpl()->m_depthStencilView;
+	m_context->ClearDepthStencilView( d, D3D11_CLEAR_STENCIL, 0.0f, clearStencil );
 }
 void zpRenderingContextImpl::clearState()
 {

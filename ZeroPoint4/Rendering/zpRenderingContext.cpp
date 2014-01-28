@@ -52,7 +52,7 @@ void zpRenderingContext::destroy()
 	m_renderingEngine->destroyBuffer( m_perDratCallBuffer );
 }
 
-void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture** targets, zpDepthStencilBuffer* depthStencilBuffer )
+void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture* const* targets, zpDepthStencilBuffer* depthStencilBuffer )
 {
 	ZP_ASSERT( ( startIndex + count ) < ZP_RENDER_TARGET_MAX_COUNT, "Too many render targets set, max of %d", ZP_RENDER_TARGET_MAX_COUNT );
 
@@ -66,6 +66,14 @@ void zpRenderingContext::clearRenderTarget( zpTexture* renderTarget, const zpCol
 void zpRenderingContext::clearDepthStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth, zp_uint clearStencil )
 {
 	m_renderContextImpl->clearDepthStencilBuffer( depthStencilBuffer, clearDepth, clearStencil );
+}
+void zpRenderingContext::clearDepthBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth )
+{
+	m_renderContextImpl->clearDepthBuffer( depthStencilBuffer, clearDepth );
+}
+void zpRenderingContext::clearStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_uint clearStencil )
+{
+	m_renderContextImpl->clearStencilBuffer( depthStencilBuffer, clearStencil );
 }
 void zpRenderingContext::clearState()
 {

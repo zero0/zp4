@@ -85,8 +85,19 @@ public:
 	zp_uint getStencilClear() const;
 	void setStencilClear( zp_uint stencilClear );
 
+	zp_uint getNumRenderTargets() const;
+	zpTexture* const* getRenderTargets() const;
+	void setRenderTarget( zp_uint index, zpTexture* target );
+	void removeRenderTargets();
+
+	zpDepthStencilBuffer* getDepthStencilBuffer() const;
+	void setDepthStencilBuffer( zpDepthStencilBuffer* depthStencil );
+
 private:
 	zpCameraProjection m_projectionType;
+
+	zpFixedArrayList< zpTexture*, 4 > m_renderTargets;
+	zpDepthStencilBuffer* m_depthStencil;
 
 	zp_bool m_isViewDirty;
 	zp_bool m_isProjectionDirty;

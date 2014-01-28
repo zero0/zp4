@@ -2,6 +2,7 @@
 
 zpCamera::zpCamera()
 	: m_projectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE )
+	, m_depthStencil( ZP_NULL )
 	, m_isViewDirty( true )
 	, m_isProjectionDirty( true )
 	, m_orthoRect()
@@ -253,4 +254,35 @@ zp_uint zpCamera::getStencilClear() const
 void zpCamera::setStencilClear( zp_uint stencilClear )
 {
 	m_clearStencil = stencilClear;
+}
+
+
+zp_uint zpCamera::getNumRenderTargets() const
+{
+	return m_renderTargets.size();
+}
+zpTexture* const* zpCamera::getRenderTargets() const
+{
+	return m_renderTargets.begin();
+}
+void zpCamera::setRenderTarget( zp_uint index, zpTexture* target )
+{
+	while( m_renderTargets.size() < index + 1 )
+	{
+		m_renderTargets.pushBack( ZP_NULL );
+	}
+	m_renderTargets[ index ] = target;
+}
+void zpCamera::removeRenderTargets()
+{
+	m_renderTargets.clear();
+}
+
+zpDepthStencilBuffer* zpCamera::getDepthStencilBuffer() const
+{
+	return m_depthStencil;
+}
+void zpCamera:: setDepthStencilBuffer( zpDepthStencilBuffer* depthStencil )
+{
+	m_depthStencil = depthStencil;
 }

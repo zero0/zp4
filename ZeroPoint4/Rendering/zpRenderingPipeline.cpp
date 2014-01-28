@@ -93,6 +93,11 @@ void zpRenderingPipeline::initialize()
 	cam->setViewport( viewport );
 	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
 	cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
+	cam->setStencilClear( 0 );
+	cam->setDepthClear( 1.0f );
+	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_DEFAULT );
+	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
+	cam->setDepthStencilBuffer( m_engine->getBackBufferDepthStencilBuffer() );
 }
 void zpRenderingPipeline::destroy()
 {
@@ -179,25 +184,11 @@ void zpRenderingPipeline::submitRendering()
 	i->fillBuffers();
 
 	zpCamera* cam = getCamera( ZP_CAMERA_TYPE_MAIN );
-	zpCamera* uiCam = getCamera( ZP_CAMERA_TYPE_UI );
 
 	// 2) process commands, sorting, etc.
 	i->preprocessCommands( cam );
 
 	// 3) actually render commands
-	i->setRenderTarget( 0, 1, &t, d );
-	if( cam->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_BEFORE_RENDER ) )
-	{
-		if( cam->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH | ZP_CAMERA_CLEAR_MODE_STENCIL ) )
-		{
-			i->clearDepthStencilBuffer( d, cam->getDepthClear(), cam->getStencilClear() );
-		}
-		if( cam->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_COLOR ) )
-		{
-			i->clearRenderTarget( t, cam->getClearColor() );
-		}
-	}
-	
 	useCamera( i, cam, &m_cameraBuffer );
 
 	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
@@ -502,6 +493,31 @@ zpCamera* zpRenderingPipeline::getCamera( zpCameraType type )
 }
 void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer )
 {
+	zpTexture* const* rts = camera->getRenderTargets();
+	zpDepthStencilBuffer* d = camera->getDepthStencilBuffer();
+
+	i->setRenderTarget( 0, camera->getNumRenderTargets(), rts, d );
+	if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_BEFORE_RENDER ) )
+	{
+		if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH | ZP_CAMERA_CLEAR_MODE_STENCIL ) )
+		{
+			i->clearDepthStencilBuffer( d, camera->getDepthClear(), camera->getStencilClear() );
+		}
+		else if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH ) )
+		{
+			i->clearDepthBuffer( d, camera->getDepthClear() );
+		}
+		else if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_STENCIL ) )
+		{
+			i->clearStencilBuffer( d, camera->getStencilClear() );
+		}
+
+		if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_COLOR ) )
+		{
+			i->clearRenderTarget( rts[0], camera->getClearColor() );
+		}
+	}
+
 	if( camera->update() || m_prevCamera != camera )
 	{
 		m_prevCamera = camera;
