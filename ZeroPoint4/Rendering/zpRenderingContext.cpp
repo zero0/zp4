@@ -546,7 +546,7 @@ void zpRenderingContext::fillBuffers()
 	m_scratchIndexBuffer.reset();
 }
 
-void zpRenderingContext::preprocessCommands( zpCamera* camera )
+void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 {
 	// clear filtered commands
 	for( zp_uint i = 0; i < zpRenderingLayer_Count; ++i )
@@ -562,7 +562,7 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 		for( ; cmd != end; ++cmd )
 		{
 			// if the camera does not support any layer the command is not, don't add it
-			if( !camera->getRenderLayers().isAnyMarked( cmd->layer ) ) continue;
+			if( ( layer & cmd->layer ) == 0 ) continue;
 
 			// filter commands into buckets
 			switch( cmd->queue )
@@ -587,6 +587,9 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera )
 	{
 		for( ; cmd != end; ++cmd )
 		{
+			// if the camera does not support any layer the command is not, don't add it
+			if( ( layer & cmd->layer ) == 0 ) continue;
+			
 			m_filteredCommands[ cmd->queue ].pushBack( cmd );
 		}
 	}

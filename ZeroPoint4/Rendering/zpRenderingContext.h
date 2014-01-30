@@ -99,7 +99,7 @@ public:
 	void update( zpBuffer* buffer, const void* data, zp_uint size );
 
 	void fillBuffers();
-	void preprocessCommands( zpCamera* camera );
+	void preprocessCommands( zpCamera* camera, zp_uint layer );
 	void processCommands( zpRenderingQueue queue );
 	void finalizeCommands();
 

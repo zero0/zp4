@@ -10,6 +10,9 @@ public:
 
 	void render();
 
+	void setRenderLayer( zp_uint layer );
+	zp_uint getRenderLayer() const;
+
 protected:
 	void onCreate();
 	void onInitialize();
@@ -22,6 +25,7 @@ protected:
 	void onDisabled();
 
 private:
+	zp_uint m_layer;
 	zpMeshResourceInstance m_mesh;
 };
 

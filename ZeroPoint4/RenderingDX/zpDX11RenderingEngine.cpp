@@ -477,8 +477,8 @@ zp_bool zpRenderingEngineImpl::destroyDepthStencilBuffer( zpDepthStencilBufferIm
 {
 	if( depthStencil )
 	{
-		ZP_SAFE_RELEASE( depthStencil->m_depthStencilView );
 		ZP_SAFE_RELEASE( depthStencil->m_depthTexture );
+		ZP_SAFE_RELEASE( depthStencil->m_depthStencilView );
 		ZP_SAFE_DELETE( depthStencil );
 	}
 	return depthStencil == ZP_NULL;

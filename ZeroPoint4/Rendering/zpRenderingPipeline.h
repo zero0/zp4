@@ -48,6 +48,7 @@ public:
 
 private:
 	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );
+	void renderCamera( zpRenderingContext* i, zpCamera* camera );
 
 	zpRenderingEngine* m_engine;
 
