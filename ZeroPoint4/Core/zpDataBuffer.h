@@ -21,6 +21,7 @@ public:
 
 	void clear();
 	void reset();
+	void destroy();
 
 	template<typename T>
 	void read( T& out ) const;

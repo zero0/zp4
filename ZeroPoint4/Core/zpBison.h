@@ -37,6 +37,9 @@ public:
 	zp_bool readFromFile( const zpString& filename );
 	zp_bool readFromBuffer( const zpDataBuffer& buffer );
 
+	void clear();
+	void destroy();
+
 	class Value
 	{
 	public:

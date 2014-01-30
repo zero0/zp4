@@ -33,10 +33,7 @@ zpDataBuffer::zpDataBuffer( zp_byte* data, zp_uint capacity )
 
 zpDataBuffer::~zpDataBuffer()
 {
-	if( !m_isFixed )
-	{
-		ZP_SAFE_FREE( m_data );
-	}
+	destroy();
 }
 
 void zpDataBuffer::operator=( const zpDataBuffer& other )
@@ -101,6 +98,14 @@ void zpDataBuffer::clear()
 void zpDataBuffer::reset()
 {
 	m_size = 0;
+}
+void zpDataBuffer::destroy()
+{
+	m_size = 0;
+	if( !m_isFixed )
+	{
+		ZP_SAFE_FREE( m_data );
+	}
 }
 
 void zpDataBuffer::readIn( const zpDataBuffer& buffer )

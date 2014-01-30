@@ -328,7 +328,7 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 		zp_zero_memory( &srvDesc );
 		srvDesc.Format = texDesc.Format;
-		switch( type )
+		switch( dimension )
 		{
 		case ZP_TEXTURE_DIMENSION_1D:
 			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;

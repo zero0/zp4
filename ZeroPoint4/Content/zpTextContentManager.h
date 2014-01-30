@@ -18,6 +18,9 @@ class zpTextResourceInstance : public zpResourceInstance< zpTextResource >
 
 class zpTextContentManager : public zpContentManager< zpTextResource, zpTextResourceInstance, zpTextContentManager, 16 >
 {
+public:
+	zp_bool getResourceWithoutLoadJson( zpTextResourceInstance& outInstance, const zpJson& json );
+
 private:
 	zp_bool createResource( zpTextResource* res, const zp_char* filename );
 	void destroyResource( zpTextResource* res );

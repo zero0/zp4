@@ -37,6 +37,17 @@ zp_bool zpBison::readFromBuffer( const zpDataBuffer& buffer )
 	return true;
 }
 
+void zpBison::clear()
+{
+	m_buffer.clear();
+	m_root = null;
+}
+void zpBison::destroy()
+{
+	m_buffer.destroy();
+	m_root = null;
+}
+
 const zpBison::Value& zpBison::root() const
 {
 	return m_root;

@@ -26,6 +26,7 @@ public:
 
 protected:
 	zp_bool m_isLoaded;
+	zp_bool m_isLoadedFromFile;
 	zp_uint m_refCount;
 	zp_long m_lastTimeLoaded;
 	zpString m_filename;

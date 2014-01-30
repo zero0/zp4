@@ -28,6 +28,17 @@ zp_bool zpTextResource::load( const zp_char* filename )
 void zpTextResource::unload()
 {
 	m_filename.clear();
+	m_resource.destroy();
+}
+zp_bool zpTextContentManager::getResourceWithoutLoadJson( zpTextResourceInstance& outInstance, const zpJson& json )
+{
+	zpDataBuffer data;
+	zpBison::compileToBuffer( data, json );
+
+	zpBison bison;
+	bison.readFromBuffer( data );
+
+	return getResourceWithoutLoad( outInstance, bison );
 }
 
 zp_bool zpTextContentManager::createResource( zpTextResource* res, const zp_char* filename )

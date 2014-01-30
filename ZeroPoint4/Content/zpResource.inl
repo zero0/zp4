@@ -2,6 +2,7 @@
 template<typename Resource>
 zpResource<Resource>::zpResource()
 	: m_isLoaded( false )
+	, m_isLoadedFromFile( false )
 	, m_refCount( 0 )
 	, m_lastTimeLoaded( 0 )
 	, m_filename()
