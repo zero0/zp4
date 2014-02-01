@@ -22,10 +22,10 @@ public:
 	void initialize();
 	void destroy();
 
+	void update();
+
 	void beginFrame();
-
 	void submitRendering();
-
 	void endFrame();
 
 	zpMaterialContentManager* getMaterialContentManager();
@@ -46,10 +46,25 @@ public:
 	zpCamera* getCamera( zpCameraType type );
 	void setCameraActive( zpCameraType type, zp_bool active );
 
+	template< typename T >
+	T* pushCameraState( zpCameraType type )
+	{
+		T* state = new T;
+		pushCameraState( type, state );
+		return state;
+	};
+	void popCameraState( zpCameraType type );
+
+	void setApplication( zpApplication* app ) { m_application = app; };
+	zpApplication* getApplication() const { return m_application; };
+
 private:
+	void pushCameraState( zpCameraType type, zpCameraState* state );
+
 	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );
 	void renderCamera( zpRenderingContext* i, zpCamera* camera );
 
+	zpApplication* m_application;
 	zpRenderingEngine* m_engine;
 
 	zpMaterialContentManager m_materialContent;
@@ -67,6 +82,7 @@ private:
 
 	zpCamera* m_prevCamera;
 	zpFixedArrayList< zpCamera, zpCameraType_Count > m_cameras;
+	zpFixedArrayList< zpArrayList< zpCameraState* >, zpCameraType_Count > m_cameraStack;
 };
 
 #endif

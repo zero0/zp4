@@ -81,6 +81,12 @@ void zpRenderingPipeline::initialize()
 
 	m_cameras.resize( zpCameraType_Count );
 
+	m_cameraStack.reserve( zpCameraType_Count );
+	for( zp_uint i = 0; i < zpCameraType_Count; ++i )
+	{
+		m_cameraStack.pushBackEmpty().reserve( 5 );
+	}
+
 	zpCamera* cam;
 	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
@@ -89,7 +95,7 @@ void zpRenderingPipeline::initialize()
 	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
 	cam->setAspectRatio( viewport.width / viewport.height );
 	cam->setFovy( 45.0f );
-	cam->setNearFar( 1.0f, 100.0f );
+	cam->setNearFar( 1.0f, 1000.0f );
 	cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
 	cam->setViewport( viewport );
 	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
@@ -101,24 +107,24 @@ void zpRenderingPipeline::initialize()
 	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
 	cam->setDepthStencilBuffer( m_engine->getBackBufferDepthStencilBuffer() );
 
-	cam = getCamera( ZP_CAMERA_TYPE_UI );
-	cam->setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
-	cam->setPosition( zpVector4f( 0, 0, -10, 1 ) );
-	cam->setLookTo( zpVector4f( 0, 0, -1, 0 ) );
-	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
-	cam->setAspectRatio( viewport.width / viewport.height );
-	cam->setFovy( 45.0f );
-	cam->setNearFar( 1.0f, 100.0f );
-	cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
-	cam->setViewport( viewport );
-	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
-	cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
-	cam->setRenderLayers( 1 << 1 );
-	cam->setStencilClear( 0 );
-	cam->setDepthClear( 1.0f );
-	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_NONE );
-	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
-	cam->setDepthStencilBuffer( ZP_NULL );
+	//cam = getCamera( ZP_CAMERA_TYPE_UI );
+	//cam->setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
+	//cam->setPosition( zpVector4f( 0, 0, -10, 1 ) );
+	//cam->setLookTo( zpVector4f( 0, 0, -1, 0 ) );
+	//cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
+	//cam->setAspectRatio( viewport.width / viewport.height );
+	//cam->setFovy( 45.0f );
+	//cam->setNearFar( 1.0f, 100.0f );
+	//cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
+	//cam->setViewport( viewport );
+	//cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
+	//cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
+	//cam->setRenderLayers( 1 << 1 );
+	//cam->setStencilClear( 0 );
+	//cam->setDepthClear( 1.0f );
+	//cam->setClearMode( ZP_CAMERA_CLEAR_MODE_NONE );
+	//cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
+	//cam->setDepthStencilBuffer( ZP_NULL );
 }
 void zpRenderingPipeline::destroy()
 {
@@ -129,6 +135,25 @@ void zpRenderingPipeline::destroy()
 	m_engine->destroyBuffer( m_perFrameBuffer );
 
 	m_engine->destroy();
+}
+
+void zpRenderingPipeline::update()
+{
+	zp_bool shouldPop;
+	for( zp_uint i = 0; i < zpCameraType_Count; ++i )
+	{
+		zpCamera* camera = &m_cameras[ i ];
+		zpArrayList< zpCameraState* >& stack = m_cameraStack[ i ];
+		
+		if( !stack.isEmpty() )
+		{
+			shouldPop = stack.back()->onUpdate( m_application, camera );
+			if( shouldPop )
+			{
+				popCameraState( (zpCameraType)i );
+			}
+		}
+	}
 }
 
 void zpRenderingPipeline::beginFrame()
@@ -227,26 +252,26 @@ void zpRenderingPipeline::submitRendering()
 	i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
 
 	
-	cam = getCamera( ZP_CAMERA_TYPE_UI );
-
-	// 2) process commands, sorting, etc.
-	i->preprocessCommands( cam, cam->getRenderLayers() );
-
-	// 3) actually render commands
-	useCamera( i, cam, &m_cameraBuffer );
-
-	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
-	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
-
-	i->processCommands( ZP_RENDERING_QUEUE_SKYBOX );
-
-	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT );
-	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
-
-	i->processCommands( ZP_RENDERING_QUEUE_OVERLAY );
-
-	i->processCommands( ZP_RENDERING_QUEUE_UI );
-	i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
+	//cam = getCamera( ZP_CAMERA_TYPE_UI );
+	//
+	//// 2) process commands, sorting, etc.
+	//i->preprocessCommands( cam, cam->getRenderLayers() );
+	//
+	//// 3) actually render commands
+	//useCamera( i, cam, &m_cameraBuffer );
+	//
+	//i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
+	//i->processCommands( ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
+	//
+	//i->processCommands( ZP_RENDERING_QUEUE_SKYBOX );
+	//
+	//i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT );
+	//i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
+	//
+	//i->processCommands( ZP_RENDERING_QUEUE_OVERLAY );
+	//
+	//i->processCommands( ZP_RENDERING_QUEUE_UI );
+	//i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
 	
 }
 
@@ -568,4 +593,42 @@ void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zp
 
 	i->setViewport( camera->getViewport() );
 	i->setScissorRect( camera->getClipRect() );
+}
+
+void zpRenderingPipeline::pushCameraState( zpCameraType type, zpCameraState* state )
+{
+	if( state != ZP_NULL )
+	{
+		zpArrayList< zpCameraState* >& stack = m_cameraStack[ type ];
+		zpCamera* camera = &m_cameras[ type ];
+
+		if( !stack.isEmpty() )
+		{
+			stack.back()->onLeave( camera );
+		}
+
+		m_cameraStack[ type ].pushBackEmpty() = state;
+
+		state->onEnter( camera );
+	}
+}
+void zpRenderingPipeline::popCameraState( zpCameraType type )
+{
+	zpArrayList< zpCameraState* >& stack = m_cameraStack[ type ];
+
+	if( !stack.isEmpty() )
+	{
+		zpCamera* camera = &m_cameras[ type ];
+
+		zpCameraState* old = stack.back();
+		old->onLeave( camera );
+		delete old;
+		
+		stack.popBack();
+
+		if( !stack.isEmpty() )
+		{
+			stack.back()->onEnter( camera );
+		}
+	}
 }

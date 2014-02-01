@@ -114,6 +114,9 @@
     <ClInclude Include="zpFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpCameraState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">

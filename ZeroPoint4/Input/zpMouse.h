@@ -52,6 +52,7 @@ public:
 	const zpVector2i& getLocation() const;
 	const zpVector2i& getDelta() const;
 	zp_int getScrollWheel() const;
+	zp_int getScrollWheelDelta() const;
 
 	//void setSensitivity( zp_float sensitivity );
 	//zp_float getSensitivity() const;
@@ -73,6 +74,7 @@ private:
 
 	zp_int m_scrollWheel;
 	zp_int m_scrollWheelBuffer;
+	zp_int m_scrollWheelDelta;
 
 	zpFlag16 m_buttonBuffer;
 	zpFlag16 m_buttonDownBuffer;

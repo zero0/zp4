@@ -83,6 +83,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpCameraState.h" />
     <ClInclude Include="zpDepthStencilState.h" />
     <ClInclude Include="zpGenerateMesh.h" />
     <ClInclude Include="zpImage.h" />

@@ -65,5 +65,7 @@ void zpProfiler::printProfile( zpProfilerSteps step )
 {
 	zpProfilerPart& part = m_profiles[ step ];
 
-	zp_printfln( "step duration max_time avg_time\n%4d %8d %8d %8d", step, ( part.prevEndTime - part.prevStartTime ), part.maxTime, part.averageTime );
+	zp_float t = (zp_float)( part.prevEndTime - part.prevStartTime );
+	t *= zpTime::getInstance()->getSecondsPerTick();
+	zp_printfln( "   sec duration max_time avg_time\n%1.4f %8d %8d %8d", t, ( part.prevEndTime - part.prevStartTime ), part.maxTime, part.averageTime );
 }

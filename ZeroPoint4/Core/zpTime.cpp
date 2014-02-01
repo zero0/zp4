@@ -2,11 +2,13 @@
 #include <Windows.h>
 
 zpTime::zpTime()
-	: m_baseTime( 0 )
+	: m_isPaused( false )
+	, m_baseTime( 0 )
 	, m_currentTime( 0 )
 	, m_previousTime( 0 )
 	, m_deltaTime( 0 )
 	, m_timeSinceStart( 0 )
+	, m_wallClockDeltaTime( 0 )
 	, m_secondsPerTick( 0.f )
 	, m_timeScale( 1.f )
 	, m_deltaSeconds( 0.f )
@@ -43,6 +45,10 @@ zp_float zpTime::getSecondsSinceStart() const
 {
 	return m_timeSinceStart * m_secondsPerTick;
 }
+zp_float zpTime::getWallClockDeltaSeconds() const
+{
+	return m_wallClockDeltaTime * m_secondsPerTick;
+}
 
 void zpTime::setTimeScale( zp_float timeScale )
 {
@@ -56,12 +62,20 @@ zp_float zpTime::getTimeScale() const
 void zpTime::tick()
 {
 	QueryPerformanceCounter( (LARGE_INTEGER*)&m_currentTime );
+	m_wallClockDeltaTime = m_currentTime - m_previousTime;
 
-	m_deltaTime = m_currentTime - m_previousTime;
+	if( m_isPaused )
+	{
+		m_deltaTime = 0;
+	}
+	else
+	{
+		m_deltaTime = m_wallClockDeltaTime;
+		m_deltaTime = ZP_MAX( 0, m_deltaTime );
+	}
 	m_previousTime = m_currentTime;
-	m_deltaTime = ZP_MAX( 0, m_deltaTime );
 
-	m_timeSinceStart += m_deltaTime;
+	m_timeSinceStart += m_wallClockDeltaTime;
 	m_actualDeltaSeconds = m_deltaTime * m_secondsPerTick;
 	m_deltaSeconds = m_actualDeltaSeconds * m_timeScale;
 }
@@ -85,6 +99,10 @@ zp_long zpTime::getDeltaTime() const
 zp_long zpTime::getTimeSinceStart() const
 {
 	return m_timeSinceStart;
+}
+zp_long zpTime::getWallClockDeltaTime() const
+{
+	return m_wallClockDeltaTime;
 }
 
 zp_float zpTime::getInterpolation() const

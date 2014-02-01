@@ -473,6 +473,7 @@ enum zpRenderingCommandType : zp_uint
 	zpRenderingCommandType_Force32 = ZP_FORECE_32BIT,
 };
 
+ZP_ABSTRACT_CLASS zpCameraState;
 class zpCamera;
 
 class zpRenderingContext;
@@ -544,6 +545,7 @@ struct zpRenderingCommand
 #include "zpMesh.h"
 #include "zpFont.h"
 
+#include "zpCameraState.h"
 #include "zpCamera.h"
 
 #include "zpRenderingContext.h"

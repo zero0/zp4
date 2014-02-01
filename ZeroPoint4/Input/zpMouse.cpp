@@ -6,6 +6,7 @@ zpMouse::zpMouse()
 	, m_hasFocus( true )
 	, m_scrollWheel( 0 )
 	, m_scrollWheelBuffer( 0 )
+	, m_scrollWheelDelta( 0 )
 {}
 zpMouse::~zpMouse()
 {}
@@ -47,6 +48,7 @@ void zpMouse::poll()
 
 	if( m_scrollWheelBuffer != 0 )
 	{
+		m_scrollWheelDelta = m_scrollWheelBuffer;
 		m_scrollWheel += m_scrollWheelBuffer;
 
 		m_listeners.foreach( [ this ]( zpMouseListener* listener ) {
@@ -54,6 +56,10 @@ void zpMouse::poll()
 		} );
 
 		m_scrollWheelBuffer = 0;
+	}
+	else
+	{
+		m_scrollWheelDelta = 0;
 	}
 
 	if( !m_locationBuffer.isZero() )
@@ -117,6 +123,10 @@ const zpVector2i& zpMouse::getDelta() const
 zp_int zpMouse::getScrollWheel() const
 {
 	return m_scrollWheel;
+}
+zp_int zpMouse::getScrollWheelDelta() const
+{
+	return m_scrollWheelDelta;
 }
 
 //void zpMouse::setSensitivity( zp_float sensitivity ) {}

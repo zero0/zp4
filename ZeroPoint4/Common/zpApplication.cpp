@@ -40,6 +40,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_scriptContent.setApplication( this );
 	m_audioContent.setApplication( this );
 
+	m_renderingPipeline.setApplication( this );
 	m_renderingPipeline.getMaterialContentManager()->setApplication( this );
 	m_renderingPipeline.getShaderContentManager()->setApplication( this );
 	m_renderingPipeline.getTextureContentManager()->setApplication( this );
@@ -200,6 +201,7 @@ void zpApplication::update()
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
 
+	m_renderingPipeline.update();
 	//m_componentPoolEditorCamera.update();
 
 	ZP_PROFILE_START( SCRIPT_UPDATE );
@@ -466,8 +468,77 @@ void zpApplication::runReloadChangedResources()
 void zpApplication::enterEditMode()
 {
 	zp_printfln( "enter edit" );
+	class EditorCameraController : public zpCameraState
+	{
+	public:
+		~EditorCameraController() {}
+
+		void onEnter( zpCamera* camera )
+		{
+			startPos = camera->getPosition();
+			startLook = camera->getLookTo();
+			startUp = camera->getUp();
+		};
+		void onLeave( zpCamera* camera )
+		{
+			camera->setPosition( startPos );
+			camera->setLookTo( startLook );
+			camera->setUp( startUp );
+		};
+
+		zp_bool onUpdate( zpApplication* app, zpCamera* camera )
+		{
+			const zpMouse* mouse = app->getInputManager()->getMouse();
+			const zpKeyboard* keyboard = app->getInputManager()->getKeyboard();
+			zp_float dt = zpTime::getInstance()->getWallClockDeltaSeconds();
+
+			const zpVector4f& pos = camera->getPosition();
+			const zpVector4f& forward = camera->getLookTo();
+			const zpVector4f& up = camera->getUp();
+
+			zpVector4f right;
+			zpMath::Cross3( right, forward, up );
+
+			zp_int w = mouse->getScrollWheelDelta();
+			if( w != 0 )
+			{
+				if( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) )
+				{
+					w *= 6;
+				}
+
+				zpVector4f f;
+				zpMath::Mul( f, forward, zpScalar( w ) );
+				zpMath::Add( f, pos, f );
+				
+				camera->setPosition( f );
+			}
+			
+			if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) )
+			{
+				if( mouse->isButtonDown( ZP_MOUSE_BUTTON_LEFT ) )
+				{
+					zpVector4f r, u;
+					zpMath::Mul( r, right, zpScalar( dt * mouse->getDelta().getX() ) );
+					zpMath::Mul( u, up, zpScalar( dt * mouse->getDelta().getY() ) );
+					zpMath::Add( r, r, u );
+					zpMath::Add( r, r, pos );
+
+					camera->setPosition( r );
+				}
+			}
+
+			return false;
+		};
+
+	private:
+		zpVector4f startPos, startLook, startUp;
+	};
+	
+	m_renderingPipeline.pushCameraState< EditorCameraController >( ZP_CAMERA_TYPE_MAIN );
 }
 void zpApplication::leaveEditMode()
 {
 	zp_printfln( "leave edit" );
+	m_renderingPipeline.popCameraState( ZP_CAMERA_TYPE_MAIN );
 }

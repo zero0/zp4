@@ -44,6 +44,8 @@ public:
 	zpScriptContentManager* getScriptContentManager() { return &m_scriptContent; }
 	zpAudioContentManager* getAudioContentManager() { return &m_audioContent; }
 
+	zpInputManager* getInputManager() { return &m_inputManager; }
+
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
 #include "zpAllComponents.inl"
