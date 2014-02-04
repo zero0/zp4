@@ -191,6 +191,9 @@ void zpApplication::update()
 	m_worldContent.update();
 	ZP_PROFILE_END( WORLD_UPDATE );
 
+	// update breakables (marking objects as destroyed)
+	m_componentPoolBreakable.update();
+
 	// update object, delete any etc
 	ZP_PROFILE_START( OBJECT_UPDATE );
 	m_objectContent.update();
@@ -201,18 +204,19 @@ void zpApplication::update()
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
 
-	m_renderingPipeline.update();
-	//m_componentPoolEditorCamera.update();
-
+	// update scripts
 	ZP_PROFILE_START( SCRIPT_UPDATE );
 	m_componentPoolScript.update();
 	ZP_PROFILE_END( SCRIPT_UPDATE );
 
+	// process script threads
 	ZP_PROFILE_START( SCRIPT_PROC_THREADS );
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
 
-	//m_componentPoolAudioEmitter.update();
+	m_componentPoolAudioEmitter.update();
+
+	m_renderingPipeline.update();
 
 	m_audioContent.getAudioEngine()->update();
 
@@ -508,7 +512,7 @@ void zpApplication::enterEditMode()
 				}
 
 				zpVector4f f;
-				zpMath::Mul( f, forward, zpScalar( w ) );
+				zpMath::Mul( f, forward, zpScalar( (zp_float)w ) );
 				zpMath::Add( f, pos, f );
 				
 				camera->setPosition( f );

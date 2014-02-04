@@ -41,3 +41,27 @@ zp_float zp_atan2( zp_float y, zp_float x )
 {
 	return atan2f( y, x );
 }
+
+zp_float zp_ceil( zp_float v )
+{
+	return ceilf( v );
+}
+zp_float zp_floor( zp_float v )
+{
+	return floorf( v );
+}
+
+zp_int zp_ceil_to_int( zp_float v )
+{
+	return static_cast< zp_int >( ceilf( v ) );
+}
+zp_int zp_floor_to_int( zp_float v )
+{
+	return static_cast< zp_int >( floorf( v ) );
+}
+
+zp_bool zp_approximate( zp_float a, zp_float b )
+{
+	zp_float c = a - b;
+	return ( c < ZP_EPSILON ) && ( c > -ZP_EPSILON );
+}

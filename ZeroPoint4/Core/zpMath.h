@@ -50,6 +50,14 @@ zp_float zp_pow( zp_float b, zp_float p );
 
 zp_float zp_sqrt( zp_float v );
 
+zp_float zp_ceil( zp_float v );
+zp_float zp_floor( zp_float v );
+
+zp_int zp_ceil_to_int( zp_float v );
+zp_int zp_floor_to_int( zp_float v );
+
+zp_bool zp_approximate( zp_float a, zp_float b );
+
 template<typename T>
 ZP_FORCE_INLINE void zp_abs( T& a, const T& value )
 {

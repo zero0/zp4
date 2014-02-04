@@ -26,6 +26,8 @@ class zpAudioEmitterComponent;
 class zpCameraComponent;
 class zpMeshRendererComponent;
 
+class zpBreakableComponent;
+
 #include "zpComponent.h"
 
 #include "zpEditorCameraComponent.h"
@@ -35,6 +37,8 @@ class zpMeshRendererComponent;
 // Rendering
 #include "zpCameraComponent.h"
 #include "zpMeshRendererComponent.h"
+
+#include "zpBreakableComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"
