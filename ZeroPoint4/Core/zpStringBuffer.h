@@ -9,11 +9,11 @@ public:
 	zpStringBuffer();
 	zpStringBuffer( const zpString& str );
 	zpStringBuffer( const zpStringBuffer& buff );
-	zpStringBuffer( zpStringBuffer&& buff );
+	//zpStringBuffer( zpStringBuffer&& buff );
 	~zpStringBuffer();
 
 	void operator=( const zpStringBuffer& buff );
-	void operator=( zpStringBuffer&& buff );
+	//void operator=( zpStringBuffer&& buff );
 
 	zp_char& operator[]( zp_uint index );
 	zp_char operator[]( zp_uint index ) const;
@@ -84,12 +84,37 @@ public:
 
 	void reserve( zp_uint size );
 
+protected:
+	zpStringBuffer( zp_char* buffer, zp_uint size );
+
 private:
 	void ensureCapacity( zp_uint size );
 
 	zp_char* m_buffer;
 	zp_uint m_length;
 	zp_uint m_capacity;
+	zp_bool m_isFixed;
 };
+
+template< zp_uint Size >
+class zpFixedStringBuffer : public zpStringBuffer
+{
+	ZP_NON_COPYABLE( zpFixedStringBuffer );
+public:
+	zpFixedStringBuffer();
+	virtual ~zpFixedStringBuffer();
+private:
+	zp_char m_fixedBuffer[ Size ];
+};
+
+template< zp_uint Size >
+zpFixedStringBuffer<Size>::zpFixedStringBuffer()
+	: zpStringBuffer( m_fixedBuffer, Size )
+{}
+template< zp_uint Size >
+zpFixedStringBuffer<Size>::~zpFixedStringBuffer()
+{
+	clear();
+}
 
 #endif

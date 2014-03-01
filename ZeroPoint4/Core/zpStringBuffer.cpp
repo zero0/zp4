@@ -7,11 +7,13 @@ zpStringBuffer::zpStringBuffer()
 	: m_buffer( ZP_NULL )
 	, m_length( 0 )
 	, m_capacity( 0 )
+	, m_isFixed( false )
 {}
 zpStringBuffer::zpStringBuffer( const zpString& str )
 	: m_buffer( ZP_NULL )
 	, m_length( 0 )
 	, m_capacity( 0 )
+	, m_isFixed( false )
 {
 	append( str );
 }
@@ -19,18 +21,40 @@ zpStringBuffer::zpStringBuffer( const zpStringBuffer& buff )
 	: m_buffer( ZP_NULL )
 	, m_length( 0 )
 	, m_capacity( 0 )
+	, m_isFixed( false )
 {
 	append( buff.m_buffer, buff.m_length );
 }
-zpStringBuffer::zpStringBuffer( zpStringBuffer&& buff )
-	: m_buffer( buff.m_buffer )
-	, m_length( buff.m_length )
-	, m_capacity( buff.m_capacity )
+zpStringBuffer::zpStringBuffer( zp_char* buffer, zp_uint size )
+	: m_buffer( buffer )
+	, m_length( 0 )
+	, m_capacity( size )
+	, m_isFixed( true )
 {
-	buff.m_buffer = ZP_NULL;
+	clear();
 }
+//zpStringBuffer::zpStringBuffer( zpStringBuffer&& buff )
+//	: m_buffer( ZP_NULL )
+//	, m_length( 0 )
+//	, m_capacity( 0 )
+//	, m_isFixed( false )
+//{
+//	if( buff.m_isFixed )
+//	{
+//		append( buff.m_buffer, buff.m_length );
+//	}
+//	else
+//	{
+//		m_buffer = buff.m_buffer;
+//		m_length = buff.m_length;
+//		m_capacity = buff.m_capacity;
+//
+//		buff.m_buffer = ZP_NULL;
+//	}
+//}
 zpStringBuffer::~zpStringBuffer()
 {
+	clear();
 	ZP_SAFE_DELETE_ARRAY( m_buffer );
 }
 
@@ -42,16 +66,23 @@ void zpStringBuffer::operator=( const zpStringBuffer& buff )
 	m_length = 0;
 	append( buff.m_buffer, buff.m_length );
 }
-void zpStringBuffer::operator=( zpStringBuffer&& buff )
-{
-	ZP_SAFE_DELETE_ARRAY( m_buffer );
-
-	m_buffer = buff.m_buffer;
-	m_capacity = buff.m_capacity;
-	m_length = buff.m_length;
-
-	buff.m_buffer = ZP_NULL;
-}
+//void zpStringBuffer::operator=( zpStringBuffer&& buff )
+//{
+//	ZP_SAFE_DELETE_ARRAY( m_buffer );
+//
+//	if( buff.m_isFixed )
+//	{
+//		append( buff.m_buffer, buff.m_length );
+//	}
+//	else
+//	{
+//		m_buffer = buff.m_buffer;
+//		m_length = buff.m_length;
+//		m_capacity = buff.m_capacity;
+//
+//		buff.m_buffer = ZP_NULL;
+//	}
+//}
 
 zp_char& zpStringBuffer::operator[]( zp_uint index )
 {
@@ -351,20 +382,23 @@ void zpStringBuffer::ensureCapacity( zp_uint size )
 {
 	if( size > m_capacity )
 	{
-		if( m_capacity == 0 )
+		ZP_ASSERT( !m_isFixed, "Attempting to grow fixed size data buffer" );
+		if( !m_isFixed )
 		{
-			m_capacity = ZP_STRING_BUFFER_DEFAULT_SIZE;
-		}
-
-		while( m_capacity < size ) m_capacity *= 2;
+			if( m_capacity == 0 )
+			{
+				m_capacity = ZP_STRING_BUFFER_DEFAULT_SIZE;
+			}
+			while( m_capacity < size ) m_capacity *= 2;
 		
-		zp_char* buff = new zp_char[ m_capacity ];
-		if( m_buffer && m_length > 0 )
-		{
-			zp_strcpy( buff, 1 + m_length * sizeof( zp_char ), m_buffer );
-		}
-		ZP_SAFE_DELETE_ARRAY( m_buffer );
+			zp_char* buff = new zp_char[ m_capacity ];
+			if( m_buffer && m_length > 0 )
+			{
+				zp_strcpy( buff, ( 1 + m_length ) * sizeof( zp_char ), m_buffer );
+			}
+			ZP_SAFE_DELETE_ARRAY( m_buffer );
 		
-		m_buffer = buff;
+			m_buffer = buff;
+		}
 	}
 }

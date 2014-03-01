@@ -22,6 +22,9 @@ public:
 
 	ZP_FORCE_INLINE void setIdentity();
 
+	ZP_FORCE_INLINE zp_float* getData() { return m_data; };
+	ZP_FORCE_INLINE const zp_float* getData() const { return m_data; };
+
 	//ZP_FORCE_INLINE zp_float& operator()( zp_uint row, zp_uint col );
 	//ZP_FORCE_INLINE zp_float operator()( zp_uint row, zp_uint col ) const;
 	//

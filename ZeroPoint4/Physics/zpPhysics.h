@@ -4,4 +4,12 @@
 
 #include "Core\zpCore.h"
 
+class zpRigidBody;
+class zpCollider;
+class zpPhysicsEngine;
+
+#include "zpRigidBody.h"
+#include "zpCollider.h"
+#include "zpPhysicsEngine.h"
+
 #endif
