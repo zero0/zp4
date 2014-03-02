@@ -18,6 +18,20 @@
 		"MeshRenderer" :
 		{
 			"Mesh" : "meshes/orig_helmet.meshb"
+		},
+		"RigidBody" :
+		{
+			"Mass" : 1,
+			"Group" : "Main",
+			"Mask" : "Main",
+			"Collider" :
+			{
+				"Shape" : "Box",
+				"Size" :
+				{
+					"Extents" : [ 10, 10, 10 ]
+				}
+			}
 		}
 	}
 }
