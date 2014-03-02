@@ -11,6 +11,8 @@ ZP_COMPONENT_DEF( AudioEmitter )
 ZP_COMPONENT_DEF( Camera )
 ZP_COMPONENT_DEF( MeshRenderer )
 
+// Physics
+ZP_COMPONENT_DEF( RigidBody )
 ZP_COMPONENT_DEF( Breakable )
 
 //#include "Audio/zpAudioComponents.inl"

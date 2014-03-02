@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Rendering">
       <UniqueIdentifier>{1fc4937e-7d0f-442d-9c3a-c8558499c6da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{ed9933e6-ad87-4c3d-b47e-8fea4e2da4af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{a495d763-fa63-421a-8ec0-bc46ce0b78ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h">
@@ -81,6 +87,9 @@
     <ClInclude Include="zpMeshRendererComponent.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="zpRigidBodyComponent.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
     <ClInclude Include="zpBreakableComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -127,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="zpMeshRendererComponent.cpp">
       <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="zpRigidBodyComponent.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="zpBreakableComponent.cpp">
       <Filter>Source Files</Filter>

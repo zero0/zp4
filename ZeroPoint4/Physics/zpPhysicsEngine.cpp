@@ -28,6 +28,13 @@ void zpPhysicsEngine::create()
 	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
 
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
+	dynamicsWorld->setGravity( btVector3( m_gravity.getX().getFloat(), m_gravity.getY().getFloat(), m_gravity.getZ().getFloat() ) );
+
+	m_broardphase = broadphase;
+	m_collisionConfig = collisionConfiguration;
+	m_dispatcher = dispatcher;
+	m_solver = solver;
+	m_dynamicsWorld = dynamicsWorld;
 }
 void zpPhysicsEngine::destroy()
 {
@@ -57,7 +64,7 @@ void zpPhysicsEngine::update()
 void zpPhysicsEngine::simulate()
 {
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
-	dynamicsWorld->stepSimulation( m_timestep, m_numSubStep, m_fixedTimestep );
+	dynamicsWorld->stepSimulation( zpTime::getInstance()->getDeltaSeconds(), m_numSubStep, m_fixedTimestep );
 }
 
 const zpVector4f& zpPhysicsEngine::getGravity() const

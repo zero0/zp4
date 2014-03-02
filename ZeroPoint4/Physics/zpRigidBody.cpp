@@ -72,8 +72,6 @@ void zpRigidBody::destroy()
 
 	m_rigidBody = ZP_NULL;
 	m_motionState = ZP_NULL;
-
-	zpColliderCache::getInstance()->removeCollider( m_collider );
 }
 
 zp_bool zpRigidBody::getMatrix( zpMatrix4f& transform )

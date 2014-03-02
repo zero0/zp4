@@ -8,6 +8,7 @@
 #include "Rendering\zpRendering.h"
 #include "Scripting\zpScripting.h"
 #include "Audio\zpAudio.h"
+#include "Physics\zpPhysics.h"
 
 //class zpHealthComponent;
 //
@@ -26,6 +27,8 @@ class zpAudioEmitterComponent;
 class zpCameraComponent;
 class zpMeshRendererComponent;
 
+class zpRigidBodyComponent;
+
 class zpBreakableComponent;
 
 #include "zpComponent.h"
@@ -37,6 +40,8 @@ class zpBreakableComponent;
 // Rendering
 #include "zpCameraComponent.h"
 #include "zpMeshRendererComponent.h"
+
+#include "zpRigidBodyComponent.h"
 
 #include "zpBreakableComponent.h"
 

@@ -4,12 +4,12 @@
 const zp_char* s_colliderNames[] =
 {
 	"",
-	"plane",
-	"box",
-	"capsule",
-	"sphere",
-	"cylinder",
-	"hull",
+	"Plane",
+	"Box",
+	"Capsule",
+	"Sphere",
+	"Cylinder",
+	"Hull",
 };
 
 zpColliderShape _strToCollider( const zp_char* str )

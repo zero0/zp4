@@ -79,6 +79,7 @@
     <ClInclude Include="zpMeshRendererComponent.h" />
     <ClInclude Include="zpObject.h" />
     <ClInclude Include="zpHealthComponent.h" />
+    <ClInclude Include="zpRigidBodyComponent.h" />
     <ClInclude Include="zpScriptComponent.h" />
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
@@ -98,6 +99,7 @@
     <ClCompile Include="zpMeshRendererComponent.cpp" />
     <ClCompile Include="zpObject.cpp" />
     <ClCompile Include="zpHealthComponent.cpp" />
+    <ClCompile Include="zpRigidBodyComponent.cpp" />
     <ClCompile Include="zpScriptComponent.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
@@ -110,6 +112,9 @@
     </ProjectReference>
     <ProjectReference Include="..\Input\Input.vcxproj">
       <Project>{eed15947-2655-4c7a-ad5f-83f51ae8f6ce}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Physics\Physics.vcxproj">
+      <Project>{0c2b608b-1858-4139-8d69-e9c8a165da02}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Rendering\Rendering.vcxproj">
       <Project>{6f74d63b-8fae-4cc1-8e81-c1008b72fa76}</Project>

@@ -55,7 +55,10 @@ zpStringBuffer::zpStringBuffer( zp_char* buffer, zp_uint size )
 zpStringBuffer::~zpStringBuffer()
 {
 	clear();
-	ZP_SAFE_DELETE_ARRAY( m_buffer );
+	if( !m_isFixed )
+	{
+		ZP_SAFE_DELETE_ARRAY( m_buffer );
+	}
 }
 
 void zpStringBuffer::operator=( const zpStringBuffer& buff )

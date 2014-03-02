@@ -40,6 +40,8 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_scriptContent.setApplication( this );
 	m_audioContent.setApplication( this );
 
+	m_physicsEngine.create();
+
 	m_renderingPipeline.setApplication( this );
 	m_renderingPipeline.getMaterialContentManager()->setApplication( this );
 	m_renderingPipeline.getShaderContentManager()->setApplication( this );
@@ -130,6 +132,8 @@ zp_int zpApplication::shutdown()
 
 	m_worldContent.destroyAllWorlds();
 	m_worldContent.update();
+	
+	m_physicsEngine.destroy();
 
 	m_appOptions.release();
 
@@ -214,6 +218,11 @@ void zpApplication::update()
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
 
+	m_physicsEngine.update();
+
+	m_componentPoolRigidBody.update();
+
+	//m_componentPoolAudioEmitter.update();
 	m_componentPoolAudioEmitter.update();
 
 	m_renderingPipeline.update();
@@ -227,6 +236,9 @@ void zpApplication::simulate()
 	if( !m_inEditMode )
 	{
 		//m_componentPoolEditorCamera.simulate();
+		m_physicsEngine.simulate();
+
+		m_componentPoolRigidBody.simulate();
 	}
 }
 

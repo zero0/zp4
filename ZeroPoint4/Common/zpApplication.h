@@ -39,6 +39,8 @@ public:
 	zpWindow* getWindow() { return &m_window; }
 	zpRenderingPipeline* getRenderPipeline() { return &m_renderingPipeline; }
 
+	zpPhysicsEngine* getPhysicsEngine() { return &m_physicsEngine; }
+
 	zpTextContentManager* getTextContentManager() { return &m_textContent; }
 	zpObjectContentManager* getObjectContentManager() { return &m_objectContent; }
 	zpScriptContentManager* getScriptContentManager() { return &m_scriptContent; }
@@ -93,6 +95,8 @@ private:
 	zpWorldContentManager m_worldContent;
 	zpScriptContentManager m_scriptContent;
 	zpAudioContentManager m_audioContent;
+
+	zpPhysicsEngine m_physicsEngine;
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )	zp##cmp##ComponentPool m_componentPool##cmp;
