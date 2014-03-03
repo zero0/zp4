@@ -303,6 +303,10 @@ zpMeshContentManager* zpRenderingPipeline::getMeshContentManager()
 {
 	return &m_meshContent;
 }
+zpFontContentManager* zpRenderingPipeline::getFontContentManager()
+{
+	return &m_fontContent;
+}
 
 void zpRenderingPipeline::onFocusGained()
 {
@@ -320,18 +324,18 @@ void zpRenderingPipeline::generateSamplerStateDesc( const zpBison::Value& sample
 
 	if( !sampler.isEmpty() )
 	{
-		const zpBison::Value cmpFuncValue = sampler[ "CmpFunc" ];
-		const zpBison::Value minFilterValue = sampler[ "MinFilter" ];
-		const zpBison::Value magFilterValue = sampler[ "MagFilter" ];
-		const zpBison::Value mipFilterValue = sampler[ "MipFilter" ];
-		const zpBison::Value texWrapUValue = sampler[ "TextureWrapU" ];
-		const zpBison::Value texWrapVValue = sampler[ "TextureWrapV" ];
-		const zpBison::Value texWrapWValue = sampler[ "TextureWrapW" ];
-		const zpBison::Value maxAnisotrpyValue = sampler[ "MaxAnisotrpy" ];
-		const zpBison::Value lodMinValue = sampler[ "LodMin" ];
-		const zpBison::Value lodMaxValue = sampler[ "LodMax" ];
-		const zpBison::Value lodBiasValue = sampler[ "LodBias" ];
-		const zpBison::Value borderColorValue = sampler[ "BorderColor" ];
+		const zpBison::Value& cmpFuncValue = sampler[ "CmpFunc" ];
+		const zpBison::Value& minFilterValue = sampler[ "MinFilter" ];
+		const zpBison::Value& magFilterValue = sampler[ "MagFilter" ];
+		const zpBison::Value& mipFilterValue = sampler[ "MipFilter" ];
+		const zpBison::Value& texWrapUValue = sampler[ "TextureWrapU" ];
+		const zpBison::Value& texWrapVValue = sampler[ "TextureWrapV" ];
+		const zpBison::Value& texWrapWValue = sampler[ "TextureWrapW" ];
+		const zpBison::Value& maxAnisotrpyValue = sampler[ "MaxAnisotrpy" ];
+		const zpBison::Value& lodMinValue = sampler[ "LodMin" ];
+		const zpBison::Value& lodMaxValue = sampler[ "LodMax" ];
+		const zpBison::Value& lodBiasValue = sampler[ "LodBias" ];
+		const zpBison::Value& borderColorValue = sampler[ "BorderColor" ];
 
 		if( cmpFuncValue.isString() )
 		{
@@ -485,16 +489,16 @@ void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster,
 
 	if( !raster.isEmpty() )
 	{
-		const zpBison::Value cullModeValue = raster[ "CullMode" ];
-		const zpBison::Value fillModeSolidValue = raster[ "FillModeSolid" ];
-		const zpBison::Value frontFaceCWValue = raster[ "FrontFaceCW" ];
-		const zpBison::Value depthClipEnabledValue = raster[ "DepthClipEnabled" ];
-		const zpBison::Value scissorEnabledValue = raster[ "ScissorEnabled" ];
-		const zpBison::Value multisampleEnabledValue = raster[ "MultiSampleEnabled" ];
-		const zpBison::Value antialiasedLinedEnabledValue = raster[ "AntialiasedLinedEnabled" ];
-		const zpBison::Value depthBiasValue = raster[ "DepthBias" ];
-		const zpBison::Value depthBiasClampValue = raster[ "DepthBiasClamp" ];
-		const zpBison::Value slopeScaledDepthBiasValue = raster[ "SlopeScaledDepthBias" ];
+		const zpBison::Value& cullModeValue = raster[ "CullMode" ];
+		const zpBison::Value& fillModeSolidValue = raster[ "FillModeSolid" ];
+		const zpBison::Value& frontFaceCWValue = raster[ "FrontFaceCW" ];
+		const zpBison::Value& depthClipEnabledValue = raster[ "DepthClipEnabled" ];
+		const zpBison::Value& scissorEnabledValue = raster[ "ScissorEnabled" ];
+		const zpBison::Value& multisampleEnabledValue = raster[ "MultiSampleEnabled" ];
+		const zpBison::Value& antialiasedLinedEnabledValue = raster[ "AntialiasedLinedEnabled" ];
+		const zpBison::Value& depthBiasValue = raster[ "DepthBias" ];
+		const zpBison::Value& depthBiasClampValue = raster[ "DepthBiasClamp" ];
+		const zpBison::Value& slopeScaledDepthBiasValue = raster[ "SlopeScaledDepthBias" ];
 
 		if( cullModeValue.isString() )
 		{

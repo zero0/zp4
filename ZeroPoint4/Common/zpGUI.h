@@ -48,7 +48,7 @@ private:
 		zpArrayList< zpGUIWidget* > children;
 	};
 
-	zpGUIWidget* addWidget();
+	zpGUIWidget* addWidget( zp_float height );
 
 	void getWorldRect( zpGUIWidget* widget, zpRectf& outWorldRect ) const;
 	zp_bool isMouseOverWidget( zpGUIWidget* widget, zpRectf& outWorldRect, zp_bool& isDown ) const;

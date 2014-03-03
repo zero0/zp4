@@ -377,6 +377,44 @@ void zpRenderingContext::addQuad(
 	m_currentCommnad->boundingBox.add( pos3 );
 }
 void zpRenderingContext::addQuad( 
+	const zpVector4f& pos0, const zpVector2f& uv0, 
+	const zpVector4f& pos1, const zpVector2f& uv1, 
+	const zpVector4f& pos2, const zpVector2f& uv2,
+	const zpVector4f& pos3, const zpVector2f& uv3, const zpColor4f& color )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, "" );
+
+	m_scratchVertexBuffer.write( pos0 );
+	m_scratchVertexBuffer.write( color );
+	m_scratchVertexBuffer.write( uv0 );
+	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.write( color );
+	m_scratchVertexBuffer.write( uv1 );
+	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.write( color );
+	m_scratchVertexBuffer.write( uv2 );
+	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.write( color );
+	m_scratchVertexBuffer.write( uv3 );
+
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 1 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 2 );
+
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 2 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 3 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
+
+	m_currentCommnad->vertexCount += 4;
+	m_currentCommnad->indexCount += 6;
+
+	m_currentCommnad->boundingBox.add( pos0 );
+	m_currentCommnad->boundingBox.add( pos1 );
+	m_currentCommnad->boundingBox.add( pos2 );
+	m_currentCommnad->boundingBox.add( pos3 );
+}
+void zpRenderingContext::addQuad( 
 	const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
 	const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
 	const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2,
@@ -642,6 +680,21 @@ void zpRenderingContext::finalizeCommands()
 
 	m_immediateVertexSize = 0;
 	m_immediateIndexSize = 0;
+}
+
+void zpRenderingContext::beginDrawFont( zp_uint layer, zpRenderingQueue queue, const zpFontResourceInstance* font )
+{
+	ZP_ASSERT( m_currentFont == ZP_NULL, "Did not finish using previous font" );
+
+	m_currentFont = font;
+	beginDrawImmediate( layer, queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, 0 );
+}
+void zpRenderingContext::endDrawFont()
+{
+	ZP_ASSERT( m_currentFont != ZP_NULL, "BeginDrawFont not called" );
+
+	endDrawImmediate();
+	m_currentFont = ZP_NULL;
 }
 
 void zpRenderingContext::generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera )

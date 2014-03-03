@@ -77,6 +77,11 @@ public:
 		const zpVector4f& pos2, const zpVector2f& uv2,
 		const zpVector4f& pos3, const zpVector2f& uv3 );
 	void addQuad( 
+		const zpVector4f& pos0, const zpVector2f& uv0, 
+		const zpVector4f& pos1, const zpVector2f& uv1, 
+		const zpVector4f& pos2, const zpVector2f& uv2,
+		const zpVector4f& pos3, const zpVector2f& uv3, const zpColor4f& color );
+	void addQuad( 
 		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
 		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
 		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2,
@@ -102,6 +107,14 @@ public:
 	void preprocessCommands( zpCamera* camera, zp_uint layer );
 	void processCommands( zpRenderingQueue queue );
 	void finalizeCommands();
+
+	void beginDrawFont( zp_uint layer, zpRenderingQueue queue, const zpFontResourceInstance* font );
+	void calculateArea( const zp_char* text, zp_float size, zpRectf& area );
+	void addText( const zp_char* text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& color );
+	void addText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, zpFontAlignment alignment, const zpColor4f& color );
+	void addWrapText( const zp_char* text, zp_float size, const zpRectf& area, zpFontAlignment alignment );
+	void addWrapText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, const zpVector2f& area, zpFontAlignment alignment );
+	void endDrawFont();
 
 	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }
 
@@ -133,6 +146,8 @@ private:
 	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
 
 	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingLayer_Count ];
+
+	const zpFontResourceInstance* m_currentFont;
 
 	friend class zpRenderingEngine;
 };

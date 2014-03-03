@@ -564,10 +564,9 @@ void zpApplication::leaveEditMode()
 
 void zpApplication::guiEditMode()
 {
-	zpRectf window( 10, 10, 640, 480 );
+	zpRectf window( 10, 10, 320, 480 );
 	m_gui.beginWindow( "Application", window, window );
 
-	m_gui.button( "Click Me" );
 	m_gui.button( "Click Me" );
 	m_gui.button( "Click Me" );
 	m_gui.button( "Click Me" );

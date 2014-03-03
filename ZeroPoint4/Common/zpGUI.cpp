@@ -25,6 +25,14 @@ void zpGUI::beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& out
 
 	m_widgetStack.pushBack( window );
 
+	m_renderingContext->addQuad(
+		zpVector4f( rect.getLeft(),  rect.getBottom(), 0, 1 ),
+		zpVector4f( rect.getLeft(),  rect.getTop(),    0, 1 ),
+		zpVector4f( rect.getRight(), rect.getTop(), 0, 1 ),
+		zpVector4f( rect.getRight(), rect.getBottom(),    0, 1 ),
+		zpColor4f( 1, 1, 1, 1 )
+		);
+
 	outPos = window->localRect;
 }
 void zpGUI::endWindow()
@@ -34,12 +42,12 @@ void zpGUI::endWindow()
 
 void zpGUI::label( const zp_char* text )
 {
-	zpGUIWidget* label = addWidget();
+	zpGUIWidget* label = addWidget( 12.f );
 }
 
 zp_bool zpGUI::button( const zp_char* text )
 {
-	zpGUIWidget* button = addWidget();
+	zpGUIWidget* button = addWidget( 16.f );
 
 	zpRectf worldRect;
 	zp_bool isDown;
@@ -58,7 +66,7 @@ zp_bool zpGUI::button( const zp_char* text )
 
 zp_bool zpGUI::text( const zp_char* text, zp_char* outText )
 {
-	zpGUIWidget* label = addWidget();
+	zpGUIWidget* label = addWidget( 12.f );
 
 	return false;
 }
@@ -76,19 +84,20 @@ void zpGUI::endGUI()
 	m_renderingContext->endDrawImmediate();
 }
 
-zpGUI::zpGUIWidget* zpGUI::addWidget()
+zpGUI::zpGUIWidget* zpGUI::addWidget( zp_float height )
 {
 	zpGUIWidget* widget = &m_allWidgets.pushBackEmpty();
 	zpGUIWidget* window = m_widgetStack.back();
 
-	zp_float height = 12.f;
-	zp_float space = 1.f;
 	zpVector2f margin( 2, 2 );
 
-	zpVector2f pos = margin + zpVector2f( 0, height );
-	pos.setY( pos.getY() * window->children.size() );
+	zpVector2f pos = margin;
+	for( zp_uint i = 0, imax = window->children.size(); i < imax; ++i )
+	{
+		pos.setY( pos.getY() + window->children[ i ]->localRect.getSize().getY() + margin.getY() );
+	}
 
-	zpVector2f size( window->localRect.getSize().getX() - margin.getX(), height );
+	zpVector2f size( window->localRect.getSize().getX() - margin.getX() * 2.f, height );
 
 	window->children.pushBack( widget );
 	widget->localRect = zpRectf( pos, size );

@@ -32,6 +32,7 @@ public:
 	zpShaderContentManager* getShaderContentManager();
 	zpTextureContentManager* getTextureContentManager();
 	zpMeshContentManager* getMeshContentManager();
+	zpFontContentManager* getFontContentManager();
 
 	void onFocusGained();
 	void onFocusLost();
@@ -71,6 +72,7 @@ private:
 	zpShaderContentManager m_shaderContent;
 	zpTextureContentManager m_textureContent;
 	zpMeshContentManager m_meshContent;
+	zpFontContentManager m_fontContent;
 
 	zpBuffer m_cameraBuffer;
 	zpBuffer m_perFrameBuffer;
