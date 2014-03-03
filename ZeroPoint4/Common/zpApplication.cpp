@@ -218,7 +218,7 @@ void zpApplication::update()
 	zpAngelScript::getInstance()->processThreads();
 	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
 
-	m_physicsEngine.update();
+	m_physicsEngine.update( m_timer->getDeltaSeconds() );
 
 	m_componentPoolRigidBody.update();
 

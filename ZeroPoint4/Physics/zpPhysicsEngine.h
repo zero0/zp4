@@ -2,6 +2,13 @@
 #ifndef ZP_PHYSICS_ENGINE_H
 #define ZP_PHYSICS_ENGINE_H
 
+struct zpCollisionHitResult
+{
+	zpVector4f position;
+	zpVector4f normal;
+	void* hitObject;
+};
+
 class zpPhysicsEngine
 {
 	ZP_NON_COPYABLE( zpPhysicsEngine );
@@ -12,7 +19,7 @@ public:
 	void create();
 	void destroy();
 
-	void update();
+	void update( zp_float dt );
 	void simulate();
 
 	const zpVector4f& getGravity() const;
@@ -20,6 +27,10 @@ public:
 
 	void addRigidBody( zpRigidBody* body );
 	void removeRigidBody( zpRigidBody* body );
+
+	void setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps );
+
+	zp_bool raycast( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const;
 
 private:
 	zp_handle m_dynamicsWorld;

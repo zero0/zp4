@@ -57,14 +57,14 @@ void zpPhysicsEngine::destroy()
 	m_dynamicsWorld = ZP_NULL;
 }
 
-void zpPhysicsEngine::update()
+void zpPhysicsEngine::update( zp_float dt )
 {
-
+	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+	dynamicsWorld->stepSimulation( dt, m_numSubStep, m_fixedTimestep );
 }
 void zpPhysicsEngine::simulate()
 {
-	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
-	dynamicsWorld->stepSimulation( zpTime::getInstance()->getDeltaSeconds(), m_numSubStep, m_fixedTimestep );
+	
 }
 
 const zpVector4f& zpPhysicsEngine::getGravity() const
@@ -75,8 +75,11 @@ void zpPhysicsEngine::setGravity( const zpVector4f& gravity )
 {
 	m_gravity = gravity;
 
+	btVector3 g;
+	m_gravity.store4( g.m_floats );
+
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
-	dynamicsWorld->setGravity( btVector3( m_gravity.getX().getFloat(), m_gravity.getY().getFloat(), m_gravity.getZ().getFloat() ) );
+	dynamicsWorld->setGravity( g );
 }
 
 void zpPhysicsEngine::addRigidBody( zpRigidBody* body )
@@ -90,4 +93,32 @@ void zpPhysicsEngine::removeRigidBody( zpRigidBody* body )
 	btRigidBody* rigidBody = (btRigidBody*)body->getRigidBody();
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
 	dynamicsWorld->removeRigidBody( rigidBody );
+}
+
+void zpPhysicsEngine::setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps )
+{
+	m_fixedTimestep = fixedTimeStep;
+	m_numSubStep = numSteps;
+}
+
+zp_bool zpPhysicsEngine::raycast( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const
+{
+	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+
+	btVector3 from, to;
+	fromWorld.store4( from.m_floats );
+	toWorld.store4( to.m_floats );
+
+	btCollisionWorld::ClosestRayResultCallback cb( from, to );
+	dynamicsWorld->rayTest( from, to, cb );
+
+	if( cb.hasHit() )
+	{
+		hit.position.load4( cb.m_hitPointWorld.m_floats );
+		hit.normal.load4( cb.m_hitPointWorld.m_floats );
+		hit.hitObject = cb.m_collisionObject ? cb.m_collisionObject->getUserPointer() : ZP_NULL;
+		return true;
+	}
+
+	return false;
 }

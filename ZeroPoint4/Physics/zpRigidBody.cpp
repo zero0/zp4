@@ -33,10 +33,10 @@ void zpRigidBody::create( const zpMatrix4f& transform, const zpBison::Value& v )
 	btCollisionShape* shape = (btCollisionShape*)m_collider->getCollider();
 	btVector3 inertia( 0, 0, 0 );
 
-	const zpVector4f& p = transform.getRow( 3 );
-
 	btQuaternion rot( btQuaternion::getIdentity() );
-	btVector3 pos( p.getX().getFloat(), p.getY().getFloat(), p.getZ().getFloat() );
+	btVector3 pos;
+	transform.getRow( 3 ).store4( pos.m_floats );
+
 	btTransform trans( rot, pos );
 
 	if( m_isStatic )
