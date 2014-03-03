@@ -88,3 +88,15 @@ T zpRect<T>::getBottom() const
 {
 	return m_position.getY() + m_size.getY();
 }
+
+template<typename T>
+zp_bool zpRect<T>::contains( const zpVector2<T>& pos ) const
+{
+	zp_bool inside = !(
+		pos.getX() < getLeft() ||
+		pos.getX() > getRight() ||
+		pos.getY() < getTop() ||
+		pos.getY() > getBottom()
+		);
+	return inside;
+}

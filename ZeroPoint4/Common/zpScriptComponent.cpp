@@ -87,6 +87,8 @@ void zpScriptComponentPool::update()
 	{
 		o->update();
 	} );
+
+	zpAngelScript::getInstance()->processThreads();
 }
 void zpScriptComponentPool::simulate()
 {

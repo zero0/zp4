@@ -17,6 +17,7 @@ void zpMouse::poll()
 
 	for( zp_uint b = 0; b < zpMouseButton_Count; ++b )
 	{
+		m_buttonPressBuffer.unmark( b );
 		if( m_buttonBuffer.isMarked( b ) )
 		{
 			if( m_buttonDownBuffer.isMarked( b ) )
@@ -39,6 +40,7 @@ void zpMouse::poll()
 		{
 			// up
 			m_buttonDownBuffer.unmark( b );
+			m_buttonPressBuffer.mark( b );
 
 			m_listeners.foreach( [ &b ]( zpMouseListener* listener ) {
 				listener->onMouseButtonUp( (zpMouseButton)b );
@@ -84,9 +86,7 @@ void zpMouse::create()
 
 	m_buttonBuffer.clear();
 	m_buttonDownBuffer.clear();
-
-	m_buttonBuffer.clear();
-	m_buttonDownBuffer.clear();
+	m_buttonPressBuffer.clear();
 
 	m_location.zero();
 	m_locationBuffer.zero();
@@ -110,6 +110,10 @@ zp_bool zpMouse::isButtonDown( zpMouseButton button ) const
 zp_bool zpMouse::isButtonUp( zpMouseButton button ) const
 {
 	return !m_buttonDownBuffer.isMarked( button );
+}
+zp_bool zpMouse::isButtonPressed( zpMouseButton button ) const
+{
+	return m_buttonPressBuffer.isMarked( button );
 }
 
 const zpVector2i& zpMouse::getLocation() const

@@ -49,8 +49,11 @@ public:
 
 	zp_bool isButtonDown( zpMouseButton button ) const;
 	zp_bool isButtonUp( zpMouseButton button ) const;
+	zp_bool isButtonPressed( zpMouseButton button ) const;
+
 	const zpVector2i& getLocation() const;
 	const zpVector2i& getDelta() const;
+
 	zp_int getScrollWheel() const;
 	zp_int getScrollWheelDelta() const;
 
@@ -78,6 +81,7 @@ private:
 
 	zpFlag16 m_buttonBuffer;
 	zpFlag16 m_buttonDownBuffer;
+	zpFlag16 m_buttonPressBuffer;
 
 	zpVector2i m_location;
 	zpVector2i m_locationBuffer;

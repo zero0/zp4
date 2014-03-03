@@ -48,6 +48,8 @@ public:
 
 	zpInputManager* getInputManager() { return &m_inputManager; }
 
+	zpGUI* getGUI() { return &m_gui; }
+
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
 #include "zpAllComponents.inl"
@@ -63,6 +65,8 @@ private:
 
 	void enterEditMode();
 	void leaveEditMode();
+
+	void guiEditMode();
 
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
@@ -85,6 +89,8 @@ private:
 	zp_int m_renderMsHz;
 
 	zpWindow m_window;
+
+	zpGUI m_gui;
 
 	zpTextResourceInstance m_appOptions;
 

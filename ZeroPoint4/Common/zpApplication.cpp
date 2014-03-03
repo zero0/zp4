@@ -100,6 +100,9 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_renderingPipeline.initialize();
 
+	m_gui.setApplication( this );
+	m_gui.create();
+
 	m_audioContent.getAudioEngine()->create( m_window.getWindowHandle() );
 
 	zpAngelScript::createInstance();
@@ -125,6 +128,8 @@ void zpApplication::run()
 }
 zp_int zpApplication::shutdown()
 {
+	m_gui.destroy();
+
 	m_renderingPipeline.destroy();
 
 	m_objectContent.destroyAllObjects( false );
@@ -190,13 +195,26 @@ void zpApplication::update()
 		m_addNextWorld = false;
 	}
 
+
 	// update world, delete, create objects, etc.
 	ZP_PROFILE_START( WORLD_UPDATE );
 	m_worldContent.update();
 	ZP_PROFILE_END( WORLD_UPDATE );
 
-	// update breakables (marking objects as destroyed)
-	m_componentPoolBreakable.update();
+	m_physicsEngine.update( m_timer->getDeltaSeconds() );
+
+	m_gui.startGUI();
+
+	if( m_inEditMode ) guiEditMode();
+
+	// update all components
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp ) m_componentPool##cmp.update();
+	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
+
+
+	m_gui.endGUI();
 
 	// update object, delete any etc
 	ZP_PROFILE_START( OBJECT_UPDATE );
@@ -207,23 +225,6 @@ void zpApplication::update()
 	ZP_PROFILE_START( INPUT_UPDATE );
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
-
-	// update scripts
-	ZP_PROFILE_START( SCRIPT_UPDATE );
-	m_componentPoolScript.update();
-	ZP_PROFILE_END( SCRIPT_UPDATE );
-
-	// process script threads
-	ZP_PROFILE_START( SCRIPT_PROC_THREADS );
-	zpAngelScript::getInstance()->processThreads();
-	ZP_PROFILE_END( SCRIPT_PROC_THREADS );
-
-	m_physicsEngine.update( m_timer->getDeltaSeconds() );
-
-	m_componentPoolRigidBody.update();
-
-	//m_componentPoolAudioEmitter.update();
-	m_componentPoolAudioEmitter.update();
 
 	m_renderingPipeline.update();
 
@@ -409,7 +410,6 @@ void zpApplication::processFrame()
 
 	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
 
-
 	ZP_PROFILE_START( RENDER_FRAME );
 	{
 		// individual component render
@@ -550,11 +550,27 @@ void zpApplication::enterEditMode()
 	private:
 		zpVector4f startPos, startLook, startUp;
 	};
-	
+
+	m_timer->setTimeScale( 0.f );
 	m_renderingPipeline.pushCameraState< EditorCameraController >( ZP_CAMERA_TYPE_MAIN );
 }
 void zpApplication::leaveEditMode()
 {
+	m_timer->setTimeScale( 1.f );
+
 	zp_printfln( "leave edit" );
 	m_renderingPipeline.popCameraState( ZP_CAMERA_TYPE_MAIN );
+}
+
+void zpApplication::guiEditMode()
+{
+	zpRectf window( 10, 10, 640, 480 );
+	m_gui.beginWindow( "Application", window, window );
+
+	m_gui.button( "Click Me" );
+	m_gui.button( "Click Me" );
+	m_gui.button( "Click Me" );
+	m_gui.button( "Click Me" );
+
+	m_gui.endWindow();
 }

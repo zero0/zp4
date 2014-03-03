@@ -26,6 +26,8 @@ public:
 	T getTop() const;
 	T getBottom() const;
 
+	zp_bool contains( const zpVector2<T>& pos ) const;
+
 private:
 	zpVector2<T> m_position;
 	zpVector2<T> m_size;

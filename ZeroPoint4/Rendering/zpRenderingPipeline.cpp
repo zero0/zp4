@@ -107,24 +107,24 @@ void zpRenderingPipeline::initialize()
 	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
 	cam->setDepthStencilBuffer( m_engine->getBackBufferDepthStencilBuffer() );
 
-	//cam = getCamera( ZP_CAMERA_TYPE_UI );
-	//cam->setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
-	//cam->setPosition( zpVector4f( 0, 0, -10, 1 ) );
-	//cam->setLookTo( zpVector4f( 0, 0, -1, 0 ) );
-	//cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
-	//cam->setAspectRatio( viewport.width / viewport.height );
-	//cam->setFovy( 45.0f );
-	//cam->setNearFar( 1.0f, 100.0f );
-	//cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
-	//cam->setViewport( viewport );
-	//cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
-	//cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
-	//cam->setRenderLayers( 1 << 1 );
-	//cam->setStencilClear( 0 );
-	//cam->setDepthClear( 1.0f );
-	//cam->setClearMode( ZP_CAMERA_CLEAR_MODE_NONE );
-	//cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
-	//cam->setDepthStencilBuffer( ZP_NULL );
+	cam = getCamera( ZP_CAMERA_TYPE_UI );
+	cam->setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
+	cam->setPosition( zpVector4f( 0, 0, -1, 1 ) );
+	cam->setLookTo( zpVector4f( 0, 0, 1, 0 ) );
+	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
+	cam->setAspectRatio( viewport.width / viewport.height );
+	cam->setFovy( 45.0f );
+	cam->setNearFar( 1.0f, 100.0f );
+	cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
+	cam->setViewport( viewport );
+	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
+	cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
+	cam->setRenderLayers( 1 << 4 );
+	cam->setStencilClear( 0 );
+	cam->setDepthClear( 1.0f );
+	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_NONE );
+	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
+	cam->setDepthStencilBuffer( ZP_NULL );
 }
 void zpRenderingPipeline::destroy()
 {
@@ -212,27 +212,26 @@ void zpRenderingPipeline::submitRendering()
 	//	);
 	//i->endDrawImmediate();
 	//
-	i->beginDrawImmediate( 1 << 1, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
-	i->addQuad(
-		zpVector4f( -0.5f, -0.5, 0, 1 ), zpVector2f( 0, 1 ),
-		zpVector4f( -0.5f,  0.5, 0, 1 ), zpVector2f( 0, 0 ),
-		zpVector4f(  0.5f,  0.5, 0, 1 ), zpVector2f( 1, 0 ),
-		zpVector4f(  0.5f, -0.5, 0, 1 ), zpVector2f( 1, 1 )
-		);
-	i->endDrawImmediate();
-	
-	zpMatrix4f m;
-	m.setIdentity();
-	
-	i->drawMesh( 1 << 0, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
+	//i->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
+	//i->addQuad(
+	//	zpVector4f( -0.5f, -0.5, 0, 1 ), zpVector2f( 0, 1 ),
+	//	zpVector4f( -0.5f,  0.5, 0, 1 ), zpVector2f( 0, 0 ),
+	//	zpVector4f(  0.5f,  0.5, 0, 1 ), zpVector2f( 1, 0 ),
+	//	zpVector4f(  0.5f, -0.5, 0, 1 ), zpVector2f( 1, 1 )
+	//	);
+	//i->endDrawImmediate();
+	//
+	//zpMatrix4f m;
+	//m.setIdentity();
+	//
+	//i->drawMesh( 1 << 0, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
 	
 	// 1) fill buffers
 	i->fillBuffers();
 
 	zpCamera* cam;
-	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
-
 	// 2) process commands, sorting, etc.
+	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
 	i->preprocessCommands( cam, cam->getRenderLayers() );
 
 	// 3) actually render commands
@@ -247,6 +246,10 @@ void zpRenderingPipeline::submitRendering()
 	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
 
 	i->processCommands( ZP_RENDERING_QUEUE_OVERLAY );
+
+	cam = getCamera( ZP_CAMERA_TYPE_UI );
+	i->preprocessCommands( cam, cam->getRenderLayers() );
+	useCamera( i, cam, &m_cameraBuffer );
 
 	i->processCommands( ZP_RENDERING_QUEUE_UI );
 	i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );

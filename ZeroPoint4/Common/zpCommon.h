@@ -15,6 +15,7 @@
 //#include "zpHealthComponent.h"
 //#include "zpEditorCameraComponent.h"
 
+class zpGUI;
 class zpApplication;
 class zpComponent;
 class zpWorld;
@@ -30,6 +31,8 @@ class zpMeshRendererComponent;
 class zpRigidBodyComponent;
 
 class zpBreakableComponent;
+
+#include "zpGUI.h"
 
 #include "zpComponent.h"
 
