@@ -1,0 +1,9 @@
+{
+    "Shader" : "shaders/DiffuseColor.shaderb",
+    "Textures" :
+    [],
+    "Constants" :
+    {},
+    "Samplers" :
+    []
+}
