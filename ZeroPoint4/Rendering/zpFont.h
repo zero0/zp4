@@ -64,7 +64,7 @@ struct zpFontSet
 	zp_int blueChannel;
 
 	zpFixedArrayList< zpFontGlyph, 256 > glyphs;
-	zpArrayList< zpString > pages;
+	zpArrayList< zpTextureResourceInstance > pages;
 	zpArrayList< zpFontGlyphKerning > kernings;
 };
 
@@ -75,8 +75,8 @@ class zpFontContentManager;
 class zpFontResource : public zpResource< zpFontSet >
 {
 private:
-	zp_bool load( const zp_char* filename );
-	void unload();
+	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline );
+	void unload( zpRenderingPipeline* pipeline);
 
 	friend class zpFontContentManager;
 };
@@ -84,7 +84,6 @@ private:
 
 class zpFontResourceInstance : public zpResourceInstance< zpFontResource >
 {};
-
 
 class zpFontContentManager : public zpContentManager< zpFontResource, zpFontResourceInstance, zpFontContentManager, 4 >
 {
