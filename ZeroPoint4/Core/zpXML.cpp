@@ -494,8 +494,8 @@ zp_bool zpXmlParser::push( const zpString& nodeName )
 		return node->name == nodeName;
 	}, &found ) )
 	{
-		m_nodeStack.pushFront( m_current );
-		m_nodeNameStack.pushFront( nodeName );
+		m_nodeStack.pushBack( m_current );
+		m_nodeNameStack.pushBack( nodeName );
 		m_current = *found;
 		return true;
 	}
@@ -508,11 +508,11 @@ zp_bool zpXmlParser::next()
 }
 zp_bool zpXmlParser::pop()
 {
-	if( !m_current || !m_current->nextSibling || m_current->nextSibling->name != m_nodeNameStack.front() )
+	if( !m_current || !m_current->nextSibling || m_current->nextSibling->name != m_nodeNameStack.back() )
 	{
-		m_current = m_nodeStack.front();
-		m_nodeStack.popFront();
-		if( !m_nodeNameStack.isEmpty() ) m_nodeNameStack.popFront();
+		m_current = m_nodeStack.back();
+		m_nodeStack.popBack();
+		if( !m_nodeNameStack.isEmpty() ) m_nodeNameStack.popBack();
 	}
 	return m_current != ZP_NULL;
 }
