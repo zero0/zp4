@@ -29,14 +29,16 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
 				xmlParser.pop();
 			}
 
+			zp_int pageCount = 0;
 			if( xmlParser.push( zpString( "common" ) ) )
 			{
 				zpXmlNode* common = xmlParser.getCurrentNode();
+				pageCount =						common->attributes.getInt( "pages" );
+
 				outputJson[ "lineHeight" ] =	zpJson( common->attributes.getInt( "lineHeight" ) );
 				outputJson[ "base" ] =			zpJson( common->attributes.getInt( "base" ) );
 				outputJson[ "scaleW" ] =		zpJson( common->attributes.getInt( "scaleW" ) );
 				outputJson[ "scaleH" ] =		zpJson( common->attributes.getInt( "scaleH" ) );
-				//outputJson[ "pages" ] =			zpJson( common->attributes.getInt( "pages" ) );
 				outputJson[ "packed" ] =		zpJson( common->attributes.getInt( "packed" ) );
 				outputJson[ "alphaChnl" ] =		zpJson( common->attributes.getInt( "alphaChnl" ) );
 				outputJson[ "redChnl" ] =		zpJson( common->attributes.getInt( "redChnl" ) );
@@ -51,6 +53,7 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
 				if( xmlParser.push( zpString( "page" ) ) )
 				{
 					zpJson& pages = outputJson[ "pages" ];
+					pages.reserveArray( pageCount );
 					do
 					{
 						zpXmlNode* page = xmlParser.getCurrentNode();
@@ -74,6 +77,7 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
 				if( xmlParser.push( zpString( "char" ) ) )
 				{
 					zpJson& chars = outputJson[ "chars" ];
+					chars.reserveArray( count );
 					do
 					{
 						zpXmlNode* c = xmlParser.getCurrentNode();
@@ -104,6 +108,7 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
 				if( xmlParser.push( zpString( "kerning" ) ) )
 				{
 					zpJson& kernings = outputJson[ "kernings" ];
+					kernings.reserveArray( count );
 					do
 					{
 						zpXmlNode* k = xmlParser.getCurrentNode();

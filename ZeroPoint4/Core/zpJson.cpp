@@ -599,6 +599,20 @@ void zpJson::memberNames( zpArrayList< zpString >& names ) const
 	}
 }
 
+void zpJson::reserveArray( zp_uint size )
+{
+	ZP_ASSERT( isArray(), "" );
+
+	if( m_type == ZP_JSON_TYPE_NULL )
+	{
+		m_type = ZP_JSON_TYPE_ARRAY;
+		m_array = new zpArrayList< zpJson >();
+	}
+
+	m_array->reserve( size);
+}
+
+
 #define JSON_IS_NULL( j, i )	( \
 	(j)[ (i) + 1 ] == 'u' &&	\
 	(j)[ (i) + 2 ] == 'l' &&	\

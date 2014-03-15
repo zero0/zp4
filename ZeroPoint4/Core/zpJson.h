@@ -90,6 +90,8 @@ public:
 
 	void memberNames( zpArrayList< zpString >& names ) const;
 
+	void reserveArray( zp_uint size );
+
 	static const zpJson null;
 
 	template<typename Func>
