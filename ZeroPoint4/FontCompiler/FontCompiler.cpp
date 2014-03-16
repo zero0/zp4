@@ -1,6 +1,6 @@
 #include "FontCompiler.h"
 
-zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
+zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputFile, zpJson& outputJson )
 {
 	zp_bool ok = false;
 	zpXmlParser xmlParser;
@@ -23,8 +23,21 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
 				outputJson[ "aa" ] =		zpJson( info->attributes.getInt( "aa" ) );
 				outputJson[ "outline" ] =	zpJson( info->attributes.getInt( "outline" ) );
 
-				//outputJson[ "padding" ] = zpJson( info->attributes.getString( "padding" ) );
-				//outputJson[ "spacing" ] = zpJson( info->attributes.getString( "spacing" ) );
+				zpFixedArrayList< zpString, 4 > parts;
+				const zpString& padding = info->attributes.getString( "padding" );
+				const zpString& spacing = info->attributes.getString( "spacing" );
+
+				padding.split( ',', parts );
+				zpJson& p = outputJson[ "padding" ];
+				p[(zp_uint)0] = zpJson( zp_atoi( parts[0].str() ) );
+				p[(zp_uint)1] = zpJson( zp_atoi( parts[1].str() ) );
+				p[(zp_uint)2] = zpJson( zp_atoi( parts[2].str() ) );
+				p[(zp_uint)3] = zpJson( zp_atoi( parts[3].str() ) );
+
+				spacing.split( ',', parts );
+				zpJson& s = outputJson[ "spacing" ];
+				s[(zp_uint)0] = zpJson( zp_atoi( parts[0].str() ) );
+				s[(zp_uint)1] = zpJson( zp_atoi( parts[1].str() ) );
 
 				xmlParser.pop();
 			}
@@ -33,7 +46,7 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
 			if( xmlParser.push( zpString( "common" ) ) )
 			{
 				zpXmlNode* common = xmlParser.getCurrentNode();
-				pageCount =						common->attributes.getInt( "pages" );
+				pageCount = common->attributes.getInt( "pages" );
 
 				outputJson[ "lineHeight" ] =	zpJson( common->attributes.getInt( "lineHeight" ) );
 				outputJson[ "base" ] =			zpJson( common->attributes.getInt( "base" ) );
@@ -60,7 +73,12 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, zpJson& outputJson )
 						zp_int id = page->attributes.getInt( "id" );
 						const zpString& file = page->attributes.getString( "file" );
 
-						pages[ id ] = zpJson( file );
+						zpString outFile;
+						zp_int index = outputFile.lastIndexOf( zpFile::sep );
+						outputFile.substring( outFile, 0, index + 1 );
+						outFile.append( file );
+
+						pages[ id ] = zpJson( outFile );
 					}
 					while( xmlParser.next() );
 
@@ -166,7 +184,7 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 
 		if( inputFile.endsWith( ".fnt" ) )
 		{
-			ok = compileBitmapFontXML( inputFile, outputJson );
+			ok = compileBitmapFontXML( inputFile, outputFile, outputJson );
 		}
 		else if( inputFile.endsWith( ".ttf" ) )
 		{
