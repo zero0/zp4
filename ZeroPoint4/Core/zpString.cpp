@@ -778,17 +778,25 @@ void zpString::trim( zpString& out ) const
 	out = zpString( start, m_length - ( end - start ) );
 
 }
-void zpString::split( zp_char delim, zpArrayList< zpString >& slip ) const
+void zpString::split( zp_char delim, zpArrayList< zpString >& parts ) const
 {
 	zp_uint from = 0;
 	zp_uint to = 0;
 
+	parts.clear();
 	while( to != npos )
 	{
 		to = indexOf( delim, from );
 		if( from < m_length && from != to )
 		{
-			substring( slip.pushBackEmpty(), from, to );
+			if( to == npos )
+			{
+				substring( parts.pushBackEmpty(), from );
+			}
+			else
+			{
+				substring( parts.pushBackEmpty(), from, to );
+			}
 		}
 		from = to + 1;
 	}

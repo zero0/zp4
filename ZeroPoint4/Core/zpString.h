@@ -79,7 +79,7 @@ public:
 	void rtrim( zpString& out ) const;
 	void trim( zpString& out ) const;
 
-	void split( zp_char delim, zpArrayList< zpString >& slip ) const;
+	void split( zp_char delim, zpArrayList< zpString >& parts ) const;
 	
 	template<typename Func>
 	void foreach( Func func )
