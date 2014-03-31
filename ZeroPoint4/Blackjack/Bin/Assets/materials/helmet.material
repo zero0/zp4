@@ -9,7 +9,7 @@
     "Samplers" :
     [
 		{
-			"MinFilter" : "Anisotropic",
+			"MinFilter" : "Linear",
 			"TextureWrapU" : "Clamp",
 			"TextureWrapV" : "Clamp"
 		}

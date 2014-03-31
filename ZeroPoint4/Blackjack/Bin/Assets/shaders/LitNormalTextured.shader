@@ -3,7 +3,7 @@
     "VS" : 
     {
         "Main" : "main_vs",
-        "Format" : "VNU",
+        "Format" : "VNU"
     },
     "PS" :
     {

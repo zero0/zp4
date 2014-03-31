@@ -32,6 +32,11 @@
 					"Extents" : [ 10, 10, 10 ]
 				}
 			}
+		},
+		"Breakable" :
+		{
+			"Health" : 5,
+			"HealthDecayPerSecond" : 1
 		}
 	}
 }
