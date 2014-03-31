@@ -31,6 +31,7 @@ class zpMeshRendererComponent;
 class zpRigidBodyComponent;
 
 class zpBreakableComponent;
+class zpAttachmentComponent;
 
 #include "zpGUI.h"
 
@@ -47,6 +48,7 @@ class zpBreakableComponent;
 #include "zpRigidBodyComponent.h"
 
 #include "zpBreakableComponent.h"
+#include "zpAttachmentComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"

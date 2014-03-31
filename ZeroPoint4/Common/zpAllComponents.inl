@@ -14,6 +14,7 @@ ZP_COMPONENT_DEF( MeshRenderer )
 // Physics
 ZP_COMPONENT_DEF( RigidBody )
 ZP_COMPONENT_DEF( Breakable )
+ZP_COMPONENT_DEF( Attachment )
 
 //#include "Audio/zpAudioComponents.inl"
 //#include "Physics/zpPhysicsComponents.inl"

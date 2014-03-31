@@ -96,6 +96,9 @@
     <ClInclude Include="zpGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpAttachmentComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -147,6 +150,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpGUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpAttachmentComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

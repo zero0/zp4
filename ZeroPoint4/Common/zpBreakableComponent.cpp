@@ -1,6 +1,6 @@
 #include "zpCommon.h"
 
-#define BREAK_HEALTH	(1e-6)
+#define BREAK_HEALTH	(1e-6f)
 
 zpBreakableComponent::zpBreakableComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
@@ -203,12 +203,10 @@ void zpBreakableComponent::onUpdate()
 }
 void zpBreakableComponent::onSimulate()
 {
-
 }
 
 void zpBreakableComponent::onEnabled()
 {
-
 }
 void zpBreakableComponent::onDisabled()
 {
