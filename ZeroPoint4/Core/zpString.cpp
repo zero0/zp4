@@ -516,9 +516,10 @@ zp_int zpString::lastIndexOf( const zpString& string, zp_int fromIndex ) const
 	return npos;
 }
 
-zp_int zpString::findFirstOf( const zpString& string, zp_uint fromIndex ) const
+zp_int zpString::findFirstOf( const zpString& string, zp_int fromIndex ) const
 {
 	if( fromIndex > m_length ) return npos;
+	if( fromIndex < 0 ) fromIndex = m_length + fromIndex;
 
 	const zp_char* a = str();
 	const zp_char* b = string.str();
@@ -527,7 +528,7 @@ zp_int zpString::findFirstOf( const zpString& string, zp_uint fromIndex ) const
 	for( zp_uint i = fromIndex; i < m_length; ++i )
 	{
 		ch = a[ i ];
-		for( zp_uint j = string.length(); j --> 0; )
+		for( zp_uint j = 0; j < string.length(); ++j )
 		{
 			if( ch == b[ j ] ) return i;
 		}
@@ -595,22 +596,22 @@ zp_int zpString::compareToIgnoreCase( const zpString& string ) const
 	return m_length - string.m_length;
 }
 
-void zpString::substring( zpString& out, zp_uint startIndex ) const
+zpString zpString::substring( zp_uint startIndex ) const
 {
-	if( startIndex > m_length ) return;
+	if( startIndex > m_length ) return zpString();
 
 	zp_uint count = m_length - startIndex;
 
-	out = zpString( str() + startIndex, count );
+	return zpString( str() + startIndex, count );
 }
-void zpString::substring( zpString& out, zp_uint startIndex, zp_int endIndex ) const
+zpString zpString::substring( zp_uint startIndex, zp_int endIndex ) const
 {
 	if( endIndex < 0 ) endIndex = m_length + endIndex;
-	if( (zp_uint)endIndex <= startIndex ) return;
+	if( (zp_uint)endIndex <= startIndex ) return zpString();
 
 	zp_uint count = endIndex - startIndex;
 
-	out = zpString( str() + startIndex, count );
+	return zpString( str() + startIndex, count );
 }
 
 void zpString::erase( zp_int startIndex, zp_uint count )
@@ -646,7 +647,7 @@ void zpString::erase( zp_int startIndex, zp_uint count )
 			}
 
 			m_length -= count;
-			zp_strcpy( m_chars, m_capacity * sizeof( zp_char ), c );
+			zp_strcpy( m_chars, ZP_STRING_MAX_SMALL_SIZE * sizeof( zp_char ), c );
 			ZP_SAFE_DELETE_ARRAY( c );
 		}
 		else
@@ -668,7 +669,7 @@ void zpString::append( zp_char ch )
 {
 	ensureCapacity( m_length + 1 );
 
-	zp_char* c = getCharsInternal();
+	zp_char* c = ( m_length + 1 ) < ZP_STRING_MAX_SMALL_SIZE ? m_chars : m_string; //getCharsInternal();
 	c[ m_length ] = ch;
 	++m_length;
 	c[ m_length ] = '\0';
@@ -683,7 +684,7 @@ void zpString::append( const zp_char* str, zp_int length )
 	{
 		ensureCapacity( m_length + length );
 
-		zp_char* a = getCharsInternal();
+		zp_char* a = ( m_length + length ) < ZP_STRING_MAX_SMALL_SIZE ? m_chars : m_string; //getCharsInternal();
 		const zp_char* b = str;
 		for( zp_int i = 0; i < length; ++i, ++m_length )
 		{
@@ -714,18 +715,22 @@ void zpString::join( zpString& string, const zpArrayList< zpString >& parts, con
 	}
 	else
 	{
-		string = parts[ 0 ];
+		zpStringBuffer buff;
+		buff.append( parts[ 0 ] );
 		for( zp_uint i = 1; i < parts.size(); ++i )
 		{
-			string.append( delim );
-			string.append( parts[ i ] );
+			buff.append( delim );
+			buff.append( parts[ i ] );
 		}
+
+		string = buff.str();
 	}
 }
 
-void zpString::toCamelCase( zpString& outString, zp_bool capitalFirstLetter ) const
+zpString zpString::toCamelCase( zp_bool capitalFirstLetter ) const
 {
-	outString.erase( 0, outString.length() );
+	zpStringBuffer buff;
+	buff.reserve( m_length );
 
 	if( m_length > 0 )
 	{
@@ -742,22 +747,24 @@ void zpString::toCamelCase( zpString& outString, zp_bool capitalFirstLetter ) co
 			}
 			else
 			{
-				outString.append( shouldCapital ? zp_to_upper( c ) : zp_to_lower( c ) );
+				buff.append( shouldCapital ? zp_to_upper( c ) : zp_to_lower( c ) );
 				shouldCapital = false;
 			}
 		}
 	}
+
+	return buff.toString();
 }
 
-void zpString::ltrim( zpString& out ) const
+zpString zpString::ltrim() const
 {
 	const zp_char* start = str();
 	
 	while( *start && zp_is_whitespace( *start++ ) );
 
-	out = zpString( start );
+	return zpString( start );
 }
-void zpString::rtrim( zpString& out ) const
+zpString zpString::rtrim() const
 {
 	const zp_char* start = str();
 	const zp_char* end = start + m_length;
@@ -765,9 +772,9 @@ void zpString::rtrim( zpString& out ) const
 	while( *end && zp_is_whitespace( *end-- ) );
 	end++;
 
-	out = zpString( start, m_length - ( end - start ) );
+	return zpString( start, m_length - ( end - start ) );
 }
-void zpString::trim( zpString& out ) const
+zpString zpString::trim() const
 {
 	const zp_char* start = str();
 	const zp_char* end = start + m_length;
@@ -775,8 +782,7 @@ void zpString::trim( zpString& out ) const
 	while( *start && zp_is_whitespace( *start++ ) );
 	while( *end && zp_is_whitespace( *end-- ) );
 
-	out = zpString( start, m_length - ( end - start ) );
-
+	return zpString( start, m_length - ( end - start ) );
 }
 void zpString::split( zp_char delim, zpArrayList< zpString >& parts ) const
 {
@@ -791,11 +797,11 @@ void zpString::split( zp_char delim, zpArrayList< zpString >& parts ) const
 		{
 			if( to == npos )
 			{
-				substring( parts.pushBackEmpty(), from );
+				parts.pushBackEmpty() = zp_move( substring( from ) );
 			}
 			else
 			{
-				substring( parts.pushBackEmpty(), from, to );
+				parts.pushBackEmpty() = zp_move( substring( from, to ) );
 			}
 		}
 		from = to + 1;
@@ -806,13 +812,13 @@ void zpString::ensureCapacity( zp_uint size )
 {
 	if( IS_STRING_PACKED( this ) )
 	{
-		if( size > ZP_STRING_MAX_SMALL_SIZE )
+		if( size >= ZP_STRING_MAX_SMALL_SIZE )
 		{
 			zp_uint cap = ZP_STRING_MAX_SMALL_SIZE;
 			while( cap <= size ) cap *= 2;
 
 			zp_char* buff = new zp_char[ cap ];
-			zp_strcpy( buff, m_capacity * sizeof( zp_char ), m_chars );
+			zp_strcpy( buff, cap * sizeof( zp_char ), m_chars );
 			zp_zero_memory_array( m_chars );
 
 			m_string = buff;

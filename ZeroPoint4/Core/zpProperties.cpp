@@ -130,11 +130,11 @@ void zpProperties::load( const zpString& file )
 			if( buff.isEmpty() ) continue;
 
 			str = buff.str();
-			str.trim( line );
+			line = str.trim();
 
 			if( line.isEmpty() || line.charAt( 0 ) == '#' || ( pos = line.indexOf( '=' ) ) == zpString::npos ) continue;
 
-			line.substring( key, 0, pos );
+			key = line.substring( 0, pos );
 			line.substring( value, pos + 1 );
 			m_properties[ key ] = value;
 

@@ -622,7 +622,7 @@ void zpFile::getFileExtension( zpString& out ) const
 		zp_int pos = m_filename.lastIndexOf( '.' );
 		if( pos != zpString::npos )
 		{
-			m_filename.substring( out, pos + 1 );
+			out = m_filename.substring( pos + 1 );
 		}
 	}
 }
@@ -633,7 +633,7 @@ void zpFile::getFileDirectory( zpString& out ) const
 		zp_int pos = m_filename.lastIndexOf( zpFile::sep );
 		if( pos != zpString::npos )
 		{
-			m_filename.substring( out, 0, pos );
+			out = m_filename.substring( 0, pos );
 		}
 	}
 }

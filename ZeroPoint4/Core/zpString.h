@@ -50,7 +50,7 @@ public:
 	zp_int lastIndexOf( const zp_char* string, zp_int fromIndex = 0 ) const;
 	zp_int lastIndexOf( const zpString& string, zp_int fromIndex = 0 ) const;
 
-	zp_int findFirstOf( const zpString& string, zp_uint fromIndex = 0 ) const;
+	zp_int findFirstOf( const zpString& string, zp_int fromIndex = 0 ) const;
 
 	zp_bool isEmpty() const;
 	zp_uint length() const;
@@ -61,8 +61,8 @@ public:
 	zp_int compareTo( const zpString& string ) const;
 	zp_int compareToIgnoreCase( const zpString& string ) const;
 	
-	void substring( zpString& out, zp_uint startIndex ) const;
-	void substring( zpString& out, zp_uint startIndex, zp_int endIndex ) const;
+	zpString substring( zp_uint startIndex ) const;
+	zpString substring( zp_uint startIndex, zp_int endIndex ) const;
 
 	void erase( zp_int startIndex, zp_uint count );
 	void append( zp_char ch );
@@ -73,11 +73,11 @@ public:
 	static void toUpper( zpString& string );
 	static void join( zpString& string, const zpArrayList< zpString >& parts, const zp_char* delim );
 
-	void toCamelCase( zpString& outString, zp_bool capitalFirstLetter = true ) const;
+	zpString toCamelCase( zp_bool capitalFirstLetter = true ) const;
 	
-	void ltrim( zpString& out ) const;
-	void rtrim( zpString& out ) const;
-	void trim( zpString& out ) const;
+	zpString ltrim() const;
+	zpString rtrim() const;
+	zpString trim() const;
 
 	void split( zp_char delim, zpArrayList< zpString >& parts ) const;
 	

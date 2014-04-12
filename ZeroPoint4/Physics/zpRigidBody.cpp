@@ -137,7 +137,7 @@ zp_short zpCollisionMask::getCollisionMask( const zpString& maskName )
 			zpString part;
 			for( zp_uint i = 0; i < parts.size(); ++i )
 			{
-				parts[i].trim( part );
+				part = parts[i].trim();
 				
 				if( m_collisionMasks.find( part, &foundMask ) )
 				{

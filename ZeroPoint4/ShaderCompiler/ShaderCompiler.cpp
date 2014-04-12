@@ -57,8 +57,7 @@ zp_bool BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 
 		zp_int lastSlash = m_inputFile.lastIndexOf( zpFile::sep );
 		
-		zpString filename;
-		m_inputFile.substring( filename, 0, lastSlash + 1 );
+		zpString filename = m_inputFile.substring( 0, lastSlash + 1 );
 		filename.append( filenameStr );
 
 		zpFile shaderFile( filename );

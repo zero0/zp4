@@ -65,6 +65,16 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 			{
 				if( xmlParser.push( zpString( "page" ) ) )
 				{
+					zpString outFilePath;
+					zp_int indexSep = outputFile.lastIndexOf( zpFile::sep );
+					outFilePath = outputFile.substring( 0, indexSep + 1 );
+
+					const zpString& dir = zpFile::getCurrentDirectory();
+					outFilePath.erase( 0, dir.length() );
+
+					zpString arch( "Platform_x86/" );
+					outFilePath.erase( 0, arch.length() );
+
 					zpJson& pages = outputJson[ "pages" ];
 					pages.reserveArray( pageCount );
 					do
@@ -72,13 +82,14 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 						zpXmlNode* page = xmlParser.getCurrentNode();
 						zp_int id = page->attributes.getInt( "id" );
 						const zpString& file = page->attributes.getString( "file" );
+						zp_int indexDot = file.lastIndexOf( '.' );
 
-						zpString outFile;
-						zp_int index = outputFile.lastIndexOf( zpFile::sep );
-						outputFile.substring( outFile, 0, index + 1 );
-						outFile.append( file );
+						zpStringBuffer buff;
+						buff.append( outFilePath );
+						buff.append( file.substring( 0, indexDot + 1 ) );
+						buff.append( "textureb" );
 
-						pages[ id ] = zpJson( outFile );
+						pages[ id ] = zpJson( buff.str() );
 					}
 					while( xmlParser.next() );
 
@@ -179,8 +190,11 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 	{
 		zp_bool ok = false;
 		zpJson outputJson;
-		const zpString& inputFile = arguments[ 0 ];
-		const zpString& outputFile = arguments[ 1 ];
+		zpString inputFile = arguments[ 0 ];
+		zpString outputFile = arguments[ 1 ];
+
+		zpFile::convertToFilePath( inputFile );
+		zpFile::convertToFilePath( outputFile );
 
 		if( inputFile.endsWith( ".fnt" ) )
 		{

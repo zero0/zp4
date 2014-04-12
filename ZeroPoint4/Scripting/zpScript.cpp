@@ -51,8 +51,7 @@ zp_bool zpScriptResource::load( const zp_char* filename )
 	zp_int b = m_filename.lastIndexOf( zpFile::sep ) + 1;
 	zp_int e = m_filename.lastIndexOf( '.' );
 
-	zpString className;
-	m_filename.substring( className, b, e );
+	zpString className = m_filename.substring( b, e );
 
 	asIObjectType* objectType = module->GetObjectTypeByName( className.str() );
 	if( objectType == ZP_NULL ) return false;
