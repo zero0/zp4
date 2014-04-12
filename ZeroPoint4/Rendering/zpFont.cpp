@@ -1,4 +1,5 @@
 #include "zpRendering.h"
+#include "Common/zpCommon.h"
 
 zp_bool zpFontResource::load( const zp_char* filename, zpRenderingPipeline* pipeline )
 {
@@ -82,19 +83,21 @@ zp_bool zpFontResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 
 	return true;
 }
-void zpFontResource::unload( zpRenderingPipeline* pipeline)
+void zpFontResource::unload( zpRenderingPipeline* pipeline )
 {
-	m_resource.glyphs.clear();
 	m_resource.pages.clear();
+	m_resource.glyphs.clear();
 	m_resource.kernings.clear();
 }
 
 
 zp_bool zpFontContentManager::createResource( zpFontResource* res, const zp_char* filename )
 {
-	return res->load( filename );
+	zpRenderingPipeline* pipeline = getApplication()->getRenderPipeline();
+	return res->load( filename, pipeline );
 }
 void zpFontContentManager::destroyResource( zpFontResource* res )
 {
-	res->unload();
+	zpRenderingPipeline* pipeline = getApplication()->getRenderPipeline();
+	res->unload( pipeline );
 }

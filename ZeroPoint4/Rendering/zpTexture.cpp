@@ -54,6 +54,20 @@ void zpTextureResource::unload( zpRenderingEngine* engine )
 }
 
 
+zp_bool zpTextureContentManager::getResourceWithoutLoadTexture( zpTextureResourceInstance& outInstance, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
+{
+	zp_bool ok;
+
+	zpTexture* texture;
+	ok = getResourceWithoutLoad( outInstance, texture );
+	ZP_ASSERT( ok, "Failed to get texture resource without load" );
+
+	ok = getApplication()->getRenderPipeline()->getRenderingEngine()->createTexture( *texture, width, height, type, dimension, format, access, data, mipLevels );
+	ZP_ASSERT( ok, "Failed to create texture" );
+
+	return ok;
+}
+
 zp_bool zpTextureContentManager::createResource( zpTextureResource* res, const zp_char* filename )
 {
 	zpRenderingEngine* engine = getApplication()->getRenderPipeline()->getRenderingEngine();

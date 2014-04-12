@@ -103,7 +103,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 }
 
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount> template< typename ResourceType >
-zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::getResourceWithoutLoad( ResourceInstance& outInstance, const ResourceType& resource )
+zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::getResourceWithoutLoad( ResourceInstance& outInstance, ResourceType*& resource )
 {
 	Resource* empty = ZP_NULL;
 	Resource* res = m_resources.begin();
@@ -144,7 +144,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		empty->addRef();
 		empty->m_isLoaded = true;
 		empty->m_isLoadedFromFile = false;
-		empty->m_resource = resource;
+		resource = &empty->m_resource;
 		empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
 
 		//outInstance.initialized();
@@ -250,8 +250,6 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::g
 template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::reloadChangedResources()
 {
-	zpString filename;
-
 	zp_long mtime;
 	Resource* found = ZP_NULL;
 	Resource* res = m_resources.begin();
@@ -263,7 +261,7 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 	{
 		if( res->m_isLoadedFromFile && res->getRefCount() > 0 )
 		{
-			filename = res->getFilename();
+			const zpString& filename = res->getFilename();
 			mtime = zpFile::getFileModificationTime( filename.str() );
 			if( res->m_lastTimeLoaded != mtime )
 			{

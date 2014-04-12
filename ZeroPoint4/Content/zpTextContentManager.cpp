@@ -35,10 +35,11 @@ zp_bool zpTextContentManager::getResourceWithoutLoadJson( zpTextResourceInstance
 	zpDataBuffer data;
 	zpBison::compileToBuffer( data, json );
 
-	zpBison bison;
-	bison.readFromBuffer( data );
-
-	return getResourceWithoutLoad( outInstance, bison );
+	zpBison* bison;
+	zp_bool ok = getResourceWithoutLoad( outInstance, bison );
+	bison->readFromBuffer( data );
+	
+	return ok;
 }
 
 zp_bool zpTextContentManager::createResource( zpTextResource* res, const zp_char* filename )

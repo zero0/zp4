@@ -89,7 +89,7 @@ public:
 	zp_bool getResource( const zp_char* filename, ResourceInstance& outInstance );
 
 	template< typename ResourceType >
-	zp_bool getResourceWithoutLoad( ResourceInstance& outInstance, const ResourceType& resource );
+	zp_bool getResourceWithoutLoad( ResourceInstance& outInstance, ResourceType*& resource );
 
 	zp_bool reloadResource( const zp_char* filename );
 	void reloadAllResources();

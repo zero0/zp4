@@ -55,6 +55,9 @@ class zpTextureResourceInstance : public zpResourceInstance< zpTextureResource >
 
 class zpTextureContentManager : public zpContentManager< zpTextureResource, zpTextureResourceInstance, zpTextureContentManager, 128 >
 {
+public:
+	zp_bool getResourceWithoutLoadTexture( zpTextureResourceInstance& outInstance, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
+
 private:
 	zp_bool createResource( zpTextureResource* res, const zp_char* filename );
 	void destroyResource( zpTextureResource* res );
