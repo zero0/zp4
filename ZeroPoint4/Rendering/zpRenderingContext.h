@@ -27,7 +27,7 @@ public:
 	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
 	void setConstantBuffer( zp_uint bindSlots, zp_uint index, zpBuffer* buffer );
 
-	void beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material );
+	void beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* material );
 
 	void setBoundingBox( const zpBoundingAABB& bounding );
 	void setBoundingBoxCenter( const zpVector4f& center );
@@ -82,6 +82,11 @@ public:
 		const zpVector4f& pos2, const zpVector2f& uv2,
 		const zpVector4f& pos3, const zpVector2f& uv3, const zpColor4f& color );
 	void addQuad( 
+		const zpVector4f& pos0, const zpVector2f& uv0, const zpColor4f& color0,
+		const zpVector4f& pos1, const zpVector2f& uv1, const zpColor4f& color1,
+		const zpVector4f& pos2, const zpVector2f& uv2, const zpColor4f& color2,
+		const zpVector4f& pos3, const zpVector2f& uv3, const zpColor4f& color3 );
+	void addQuad( 
 		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
 		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
 		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2,
@@ -111,7 +116,9 @@ public:
 	void beginDrawFont( zp_uint layer, zpRenderingQueue queue, const zpFontResourceInstance* font );
 	void calculateArea( const zp_char* text, zp_float size, zpRectf& area );
 	void addText( const zp_char* text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& color );
+	void addText( const zp_char* text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& colorTop, const zpColor4f& colorBottom );
 	void addText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, zpFontAlignment alignment, const zpColor4f& color );
+	void addText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, zpFontAlignment alignment, const zpColor4f& colorTop, const zpColor4f& colorBottom );
 	void addWrapText( const zp_char* text, zp_float size, const zpRectf& area, zpFontAlignment alignment );
 	void addWrapText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, const zpVector2f& area, zpFontAlignment alignment );
 	void endDrawFont();

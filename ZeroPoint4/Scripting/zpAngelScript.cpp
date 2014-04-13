@@ -663,7 +663,7 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV2",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ); AS_ASSERT( r );
 
-	r = engine->RegisterGlobalFunction( "void BeginDraw( uint, RenderingLayer, Topology, VertexFormat, int )", asMETHODPR( zpRenderingContext, beginDrawImmediate, ( zp_uint, zpRenderingQueue layer, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void BeginDraw( uint, RenderingLayer, Topology, VertexFormat, int )", asMETHODPR( zpRenderingContext, beginDrawImmediate, ( zp_uint, zpRenderingQueue layer, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* material ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void EndDraw()", asMETHODPR( zpRenderingContext, endDrawImmediate, (), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 
 	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const color& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );

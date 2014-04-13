@@ -64,7 +64,7 @@ struct zpFontSet
 	zp_int blueChannel;
 
 	zpFixedArrayList< zpFontGlyph, 256 > glyphs;
-	zpArrayList< zpTextureResourceInstance > pages;
+	zpFixedArrayList< zpMaterialResourceInstance, 2 > pages;
 	zpArrayList< zpFontGlyphKerning > kernings;
 };
 

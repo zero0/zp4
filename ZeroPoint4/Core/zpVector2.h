@@ -96,6 +96,8 @@ public:
 	template<typename F>
 	zp_bool operator!=( const zpVector2<F>& vector ) const;
 
+	zpVector4f asVector4( T z = (T)0, T w = (T)1 ) const;
+
 private:
 	union {
 		T m_xy[2];

@@ -100,3 +100,24 @@ zp_bool zpRect<T>::contains( const zpVector2<T>& pos ) const
 		);
 	return inside;
 }
+
+template<typename T>
+zpVector2<T> zpRect<T>::getTopLeft() const
+{
+	return zpVector2<T>( getLeft(), getTop() );
+}
+template<typename T>
+zpVector2<T> zpRect<T>::getTopRight() const
+{
+	return zpVector2<T>( getRight(), getTop() );
+}
+template<typename T>
+zpVector2<T> zpRect<T>::getBottomLeft() const
+{
+	return zpVector2<T>( getLeft(), getBottom() );
+}
+template<typename T>
+zpVector2<T> zpRect<T>::getBottomRight() const
+{
+	return zpVector2<T>( getRight(), getBottom() );
+}

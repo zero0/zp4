@@ -52,13 +52,14 @@ zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 void zpRenderingPipeline::initialize()
 {
 	zp_bool ok;
-	m_materialContent.getResource( "materials/fullscreenNoAlpha.materialb", m_mat );
+	ok = m_materialContent.getResource( "materials/fullscreenNoAlpha.materialb", m_mat );
+	ZP_ASSERT( ok, "" );
 	
-	zpTextureResourceInstance t;
-	m_textureContent.getResource( "textures/uv_checker_large.png", t );
-
 	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
 	ZP_ASSERT( ok, "" );
+
+	//ok = m_fontContent.getResource( "fonts/arial32.fontb", m_debugFont );
+	//ZP_ASSERT( ok, "" );
 
 	const zpVector2i& size = m_engine->getScreenSize();
 
@@ -130,6 +131,7 @@ void zpRenderingPipeline::destroy()
 {
 	m_mat.release();
 	m_mesh.release();
+	m_debugFont.release();
 
 	m_engine->destroyBuffer( m_cameraBuffer );
 	m_engine->destroyBuffer( m_perFrameBuffer );
@@ -225,6 +227,10 @@ void zpRenderingPipeline::submitRendering()
 	//m.setIdentity();
 	//
 	//i->drawMesh( 1 << 0, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
+
+	//i->beginDrawFont( 0, ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, &m_debugFont );
+	//i->addText( "hello", 32.f, zpVector2f( 5, 5 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 0, 0, 1 ) );
+	//i->endDrawFont();
 	
 	// 1) fill buffers
 	i->fillBuffers();

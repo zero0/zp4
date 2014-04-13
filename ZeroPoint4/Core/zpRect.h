@@ -28,6 +28,11 @@ public:
 
 	zp_bool contains( const zpVector2<T>& pos ) const;
 
+	zpVector2<T> getTopLeft() const;
+	zpVector2<T> getTopRight() const;
+	zpVector2<T> getBottomLeft() const;
+	zpVector2<T> getBottomRight() const;
+
 private:
 	zpVector2<T> m_position;
 	zpVector2<T> m_size;

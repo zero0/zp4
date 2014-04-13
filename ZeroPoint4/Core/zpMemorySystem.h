@@ -4,8 +4,10 @@
 
 #if ZP_USE_MEMORY_SYSTEM
 void* operator new( zp_uint size );
+void* operator new[]( zp_uint size );
 
 void operator delete( void* ptr );
+void operator delete[]( void* ptr );
 #endif
 
 #define ZP_MEMORY_BLOCK_TABLE_SIZE	32
@@ -15,7 +17,7 @@ void operator delete( void* ptr );
 #define ZP_MEMORY_ALIGN_SIZE( s )	( ( (s) + ZP_MEMORY_INCREMENT_SIZE ) & ( ~ZP_MEMORY_INCREMENT_MASK ) )
 //#define ZP_MEMORY_TABLE_INDEX( s )	ZP_MIN( ( (s) >> ZP_MEMORY_INCREMENT_SHIFT ), ( ZP_MEMORY_BLOCK_TABLE_SIZE - 1 ) )
 #define ZP_MEMORY_TABLE_INDEX( s )	( (s) % ZP_MEMORY_BLOCK_TABLE_SIZE )
-#define ZP_MEMORY_TRACK_POINTERS	0
+#define ZP_MEMORY_TRACK_POINTERS	1
 
 class zpMemorySystem {
 public:
@@ -48,12 +50,15 @@ private:
 	zp_uint m_memDeallocated;
 	zp_uint m_memUsed;
 #if ZP_MEMORY_TRACK_POINTERS
-	zpFixedArrayList< void*, 2 * 1024 > m_allocedPointers;
+	zpFixedArrayList< void*, 1024 > m_allocedPointers;
+	zpFixedArrayList< zpStackTrace, 1024 > m_stackTraces;
 #endif
 	zp_byte* m_allMemory;
 	zp_byte* m_alignedMemory;
 
 	zpMemoryBlock* m_blockTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
+
+	static zpMemorySystem s_memory;
 };
 
 #endif

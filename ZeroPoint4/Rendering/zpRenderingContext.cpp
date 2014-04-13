@@ -17,6 +17,7 @@ zpRenderingContext::zpRenderingContext()
 	, m_currentBufferIndex( 0 )
 	, m_currentVertexBuffer( ZP_NULL )
 	, m_currentIndexBuffer( ZP_NULL )
+	, m_currentFont( ZP_NULL )
 {}
 zpRenderingContext::~zpRenderingContext()
 {
@@ -109,7 +110,7 @@ void zpRenderingContext::setConstantBuffer( zp_uint bindSlots, zp_uint index, zp
 	m_renderContextImpl->setConstantBuffer( bindSlots, index, buffer );
 }
 
-void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, zpMaterialResourceInstance* material )
+void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* material )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 	m_currentCommnad = &m_renderingCommands.pushBackEmpty();
@@ -415,6 +416,44 @@ void zpRenderingContext::addQuad(
 	m_currentCommnad->boundingBox.add( pos3 );
 }
 void zpRenderingContext::addQuad( 
+	const zpVector4f& pos0, const zpVector2f& uv0, const zpColor4f& color0,
+	const zpVector4f& pos1, const zpVector2f& uv1, const zpColor4f& color1,
+	const zpVector4f& pos2, const zpVector2f& uv2, const zpColor4f& color2,
+	const zpVector4f& pos3, const zpVector2f& uv3, const zpColor4f& color3 )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, "" );
+
+	m_scratchVertexBuffer.write( pos0 );
+	m_scratchVertexBuffer.write( color0 );
+	m_scratchVertexBuffer.write( uv0 );
+	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.write( color1 );
+	m_scratchVertexBuffer.write( uv1 );
+	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.write( color2 );
+	m_scratchVertexBuffer.write( uv2 );
+	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.write( color3 );
+	m_scratchVertexBuffer.write( uv3 );
+
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 1 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 2 );
+
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 2 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 3 );
+	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
+
+	m_currentCommnad->vertexCount += 4;
+	m_currentCommnad->indexCount += 6;
+
+	m_currentCommnad->boundingBox.add( pos0 );
+	m_currentCommnad->boundingBox.add( pos1 );
+	m_currentCommnad->boundingBox.add( pos2 );
+	m_currentCommnad->boundingBox.add( pos3 );
+}
+void zpRenderingContext::addQuad( 
 	const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
 	const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
 	const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2,
@@ -687,7 +726,78 @@ void zpRenderingContext::beginDrawFont( zp_uint layer, zpRenderingQueue queue, c
 	ZP_ASSERT( m_currentFont == ZP_NULL, "Did not finish using previous font" );
 
 	m_currentFont = font;
-	beginDrawImmediate( layer, queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, 0 );
+	const zpMaterialResourceInstance* mat = &m_currentFont->getResource()->getData()->pages[0];
+	beginDrawImmediate( layer, queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, mat );
+}
+void zpRenderingContext::calculateArea( const zp_char* text, zp_float size, zpRectf& area )
+{
+	ZP_ASSERT( m_currentFont != ZP_NULL, "BeginDrawFont not called" );
+}
+void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& color )
+{
+	addText( text, size, position, alignment, color, color );
+}
+void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& colorTop, const zpColor4f& colorBottom )
+{
+	ZP_ASSERT( m_currentFont != ZP_NULL, "BeginDrawFont not called" );
+
+	const zpFontSet* font = m_currentFont->getResource()->getData();
+
+	zp_float scale = size / (zp_float)font->size;
+
+	zp_char prev = '\0', curr = '\0';
+	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->width, 1.f / font->height ), cursor;
+	zpVector4f p0, p1, p2, p3, offset( 0.f );
+	for( ; *text != '\0'; ++text )
+	{
+		curr = *text;
+		const zpFontGlyph& glyph = font->glyphs[ (zp_int)curr ];
+
+		zpRectf uv( (zp_float)glyph.x, (zp_float)glyph.y, (zp_float)glyph.width, (zp_float)glyph.height );
+		zpRectf p( (zp_float)glyph.xOffset, (zp_float)glyph.yOffset, (zp_float)glyph.width, (zp_float)glyph.height );
+
+		p0 = ( p.getTopLeft()     + cursor ).asVector4();
+		p1 = ( p.getTopRight()    + cursor ).asVector4();
+		p2 = ( p.getBottomRight() + cursor ).asVector4();
+		p3 = ( p.getBottomLeft()  + cursor ).asVector4();
+
+		u0 = uv.getTopLeft()     * invSize;
+		u0 = uv.getTopRight()    * invSize;
+		u0 = uv.getBottomRight() * invSize;
+		u0 = uv.getBottomLeft()  * invSize;
+
+		addQuad(
+			p0, u0, colorTop,
+			p1, u1, colorTop,
+			p2, u2, colorBottom,
+			p3, u3, colorBottom
+			);
+
+		cursor += zpVector2f( (zp_float)glyph.xAdvance, 0 );
+	}
+}
+void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, zpFontAlignment alignment, const zpColor4f& color )
+{
+	addText( text, size, position, direction, alignment, color, color );
+}
+void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, zpFontAlignment alignment, const zpColor4f& colorTop, const zpColor4f& colorBottom )
+{
+	ZP_ASSERT( m_currentFont != ZP_NULL, "BeginDrawFont not called" );
+
+	const zpFontSet* font = m_currentFont->getResource()->getData();
+
+	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->width, 1.f / font->height );
+	zpVector4f cursor( position ), p0, p1, p2, p3, offset( 0.f );
+	for( ; *text != '\0'; ++text )
+	{
+		zp_int c = (zp_int)*text;
+
+		const zpFontGlyph& glyph = font->glyphs[ c ];
+		
+		zpRectf uv( (zp_float)glyph.x, (zp_float)glyph.y, (zp_float)glyph.width, (zp_float)glyph.height );
+		zpRectf v(  );
+
+	}
 }
 void zpRenderingContext::endDrawFont()
 {

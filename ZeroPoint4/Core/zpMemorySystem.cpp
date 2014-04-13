@@ -5,8 +5,14 @@
 void* operator new( zp_uint size ) {
 	return zpMemorySystem::getInstance()->allocate( size );
 }
+void* operator new[]( zp_uint size ) {
+	return zpMemorySystem::getInstance()->allocate( size );
+}
 
 void operator delete( void* ptr ) {
+	zpMemorySystem::getInstance()->deallocate( ptr );
+}
+void operator delete[]( void* ptr ) {
 	zpMemorySystem::getInstance()->deallocate( ptr );
 }
 #else
@@ -40,17 +46,17 @@ zpMemorySystem::zpMemorySystem()
 	, m_allMemory( ZP_NULL )
 	, m_alignedMemory( ZP_NULL )
 {
-	//initialize( ZP_MEMORY_MB( 10 ) );
+	initialize( ZP_MEMORY_MB( 10 ) );
 }
 zpMemorySystem::~zpMemorySystem()
 {
-	
+	shutdown();
 }
+zpMemorySystem zpMemorySystem::s_memory;
 
 zpMemorySystem* zpMemorySystem::getInstance()
 {
-	static zpMemorySystem memory;
-	return &memory;
+	return &s_memory;
 }
 
 #if ZP_USE_ALIGNMENT
@@ -75,6 +81,7 @@ void* zpMemorySystem::allocate( zp_uint size )
 	*i = size;
 #if ZP_MEMORY_TRACK_POINTERS
 	m_allocedPointers.pushBack( ptr );
+	m_stackTraces.pushBackEmpty();
 #endif
 	return (void*)( i + 1 );
 
@@ -119,7 +126,6 @@ void* zpMemorySystem::allocate( zp_uint size )
 
 void zpMemorySystem::deallocate( void* ptr )
 {
-
 	++m_numDeallocs;
 	zp_uint* i = (zp_uint*)ptr;
 	--i;
@@ -130,6 +136,7 @@ void zpMemorySystem::deallocate( void* ptr )
 	zp_int p = m_allocedPointers.indexOf( i );
 	ZP_ASSERT_WARN( p != -1, "Unknown allocation being deallocated" );
 	m_allocedPointers.erase( p );
+	m_stackTraces.erase( p );
 #endif
 
 	zp_free( i );
@@ -170,6 +177,8 @@ void zpMemorySystem::deallocate( void* ptr )
 
 void zpMemorySystem::initialize( zp_uint size ) 
 {
+	zpStackTrace::Initialize();
+
 	return;
 	zp_zero_memory_array( m_blockTable );
 
@@ -193,14 +202,21 @@ void zpMemorySystem::initialize( zp_uint size )
 }
 void zpMemorySystem::shutdown()
 {
-	ZP_ASSERT_WARN( m_memUsed == 0, "Possible memory leak of %d", m_memUsed );
 #if ZP_MEMORY_TRACK_POINTERS
+	if( !m_stackTraces.isEmpty() )
+	{
+		m_stackTraces.foreach( []( const zpStackTrace& t ) { t.print(); zp_printfln( "" ); } );
+	}
 	ZP_ASSERT_WARN( m_allocedPointers.isEmpty(), "Not all allocated memory freed" );
 #endif
+
+	ZP_ASSERT_WARN( m_memUsed == 0, "Possible memory leak of %d", m_memUsed );
 	ZP_ASSERT_WARN( m_numAllocs - m_numDeallocs == 0, "Missing %d allocs->frees", m_numAllocs - m_numDeallocs );	
 	ZP_ASSERT_WARN( m_memAllocated - m_memDeallocated == 0, "Memory leak of %d", m_memAllocated - m_memDeallocated );
 
 	ZP_SAFE_FREE( m_allMemory );
+
+	zpStackTrace::Shutdown();
 }
 
 void zpMemorySystem::addBlock( zpMemoryBlock* block )

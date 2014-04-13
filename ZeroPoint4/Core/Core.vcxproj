@@ -74,6 +74,9 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -155,6 +158,7 @@
     <ClInclude Include="zpRenderable.h" />
     <ClInclude Include="zpSerializable.h" />
     <ClInclude Include="zpSingleton.h" />
+    <ClInclude Include="zpStackTrace.h" />
     <ClInclude Include="zpString.h" />
     <ClInclude Include="zpStringBuffer.h" />
     <ClInclude Include="zpTime.h" />
@@ -219,6 +223,7 @@
     <ClCompile Include="zpReferencedObject.cpp" />
     <ClCompile Include="zpRegisterSerializable.cpp" />
     <ClCompile Include="zpSerializable.cpp" />
+    <ClCompile Include="zpStackTrace.cpp" />
     <ClCompile Include="zpString.cpp" />
     <ClCompile Include="zpStringBuffer.cpp" />
     <ClCompile Include="zpTime.cpp" />

@@ -60,6 +60,7 @@ zpArrayList<T>::~zpArrayList()
 	}
 	else
 	{
+		clear();
 		ZP_SAFE_DELETE_ARRAY( m_array );
 		m_size = 0;
 	}

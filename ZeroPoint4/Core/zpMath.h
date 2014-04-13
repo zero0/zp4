@@ -193,8 +193,8 @@ namespace zpMath
 #include "zpBaseTypesFpu.inl"
 #endif
 
-#include "zpVector2.h"
 #include "zpVector4.h"
+#include "zpVector2.h"
 
 //#include "zpInteger.h"
 #include "zpMatrix4.h"

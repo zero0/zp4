@@ -518,7 +518,7 @@ zp_int zpString::lastIndexOf( const zpString& string, zp_int fromIndex ) const
 
 zp_int zpString::findFirstOf( const zpString& string, zp_int fromIndex ) const
 {
-	if( fromIndex > m_length ) return npos;
+	if( fromIndex > (zp_int)m_length ) return npos;
 	if( fromIndex < 0 ) fromIndex = m_length + fromIndex;
 
 	const zp_char* a = str();

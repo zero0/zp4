@@ -919,7 +919,7 @@ void zpRenderingEngineImpl::createVertexLayout( zpVertexFormatDesc format, const
 				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), data, size, &inputLayout );
 				ZP_ASSERT( SUCCEEDED( hr ), "" );
 
-				m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ] = inputLayout;
+				m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_COLOR_UV ] = inputLayout;
 			}
 		}
 		break;

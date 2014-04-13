@@ -87,7 +87,7 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 						zpStringBuffer buff;
 						buff.append( outFilePath );
 						buff.append( file.substring( 0, indexDot + 1 ) );
-						buff.append( "textureb" );
+						buff.append( "materialb" );
 
 						pages[ id ] = zpJson( buff.str() );
 					}

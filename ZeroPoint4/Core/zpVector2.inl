@@ -239,3 +239,9 @@ template<typename T> template<typename F>
 zp_bool zpVector2<T>::operator!=( const zpVector2<F>& vector ) const {
 	return m_x != vector.m_x || m_y != vector.m_y;
 }
+
+template<typename T>
+zpVector4f zpVector2<T>::asVector4( T z, T w ) const
+{
+	return zpVector4f( (zp_float)m_x, (zp_float)m_y, (zp_float)z, (zp_float)w );
+}

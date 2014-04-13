@@ -82,6 +82,8 @@ private:
 
 	zpRasterState m_raster;
 
+	zpFontResourceInstance m_debugFont;
+
 	zpCamera* m_prevCamera;
 	zpFixedArrayList< zpCamera, zpCameraType_Count > m_cameras;
 	zpFixedArrayList< zpArrayList< zpCameraState* >, zpCameraType_Count > m_cameraStack;

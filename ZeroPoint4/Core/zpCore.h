@@ -24,7 +24,7 @@
 #define ZP_USE_ALIGNMENT		0
 #define ZP_USE_LOGGING			1
 #define ZP_USE_ASSERTIONS		1
-#define ZP_USE_MEMORY_SYSTEM	0
+#define ZP_USE_MEMORY_SYSTEM	1
 #define ZP_USE_HOT_RELOAD		1
 
 //#ifdef _WIN32
@@ -194,6 +194,8 @@ ZP_FORCE_INLINE void zp_move_swap( T& a, T& b )
 	b = zp_move( temp );
 }
 
+class zpStackTrace;
+
 class zpLog;
 class zpLogOutput;
 
@@ -236,6 +238,8 @@ class zpMemorySystem;
 ZP_PURE_INTERFACE zpReferencedObject;
 class zpJson;
 class zpXmlParser;
+
+#include "zpStackTrace.h"
 
 #include "zpMath.h"
 #include "zpTween.h"
@@ -281,6 +285,8 @@ class zpXmlParser;
 
 #include "zpMessage.h"
 #include "zpMessageReceiver.h"
+
+
 
 template<typename T>
 void zp_zero_memory( T* ptr )

@@ -47,7 +47,11 @@ zp_bool zpFontResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 		m_resource.pages.reserve( pages.size() );
 		pages.foreachArray( [ this, pipeline ]( const zpBison::Value& page )
 		{
-			pipeline->getTextureContentManager()->getResource( page.asCString(), m_resource.pages.pushBackEmpty() );
+			const zp_char* materialFile = page.asCString();
+
+			zp_bool ok;
+			ok = pipeline->getMaterialContentManager()->getResource( materialFile, m_resource.pages.pushBackEmpty() );
+			ZP_ASSERT( ok, "Failed to load Material %s", materialFile );
 		} );
 
 		// chars
@@ -88,6 +92,7 @@ void zpFontResource::unload( zpRenderingPipeline* pipeline )
 	m_resource.pages.clear();
 	m_resource.glyphs.clear();
 	m_resource.kernings.clear();
+	m_filename.clear();
 }
 
 

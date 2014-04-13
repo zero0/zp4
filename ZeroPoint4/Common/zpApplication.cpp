@@ -47,6 +47,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_renderingPipeline.getShaderContentManager()->setApplication( this );
 	m_renderingPipeline.getTextureContentManager()->setApplication( this );
 	m_renderingPipeline.getMeshContentManager()->setApplication( this );
+	m_renderingPipeline.getFontContentManager()->setApplication( this );
 
 	zp_bool ok;
 	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
@@ -446,6 +447,7 @@ void zpApplication::runGarbageCollect()
 	m_scriptContent.garbageCollect();
 	m_audioContent.garbageCollect();
 
+	m_renderingPipeline.getFontContentManager()->garbageCollect();
 	m_renderingPipeline.getMeshContentManager()->garbageCollect();
 	m_renderingPipeline.getMaterialContentManager()->garbageCollect();
 	m_renderingPipeline.getShaderContentManager()->garbageCollect();
@@ -459,6 +461,7 @@ void zpApplication::runReloadAllResources()
 	m_scriptContent.reloadAllResources();
 	m_audioContent.reloadAllResources();
 
+	m_renderingPipeline.getFontContentManager()->reloadAllResources();
 	m_renderingPipeline.getMeshContentManager()->reloadAllResources();
 	m_renderingPipeline.getMaterialContentManager()->reloadAllResources();
 	m_renderingPipeline.getShaderContentManager()->reloadAllResources();
