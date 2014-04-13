@@ -168,60 +168,24 @@ void zpRenderingEngine::destroyDepthBuffer( zpDepthStencilBuffer& depthStencilBu
 {
 	m_renderingEngine->destroyDepthStencilBuffer( depthStencilBuffer.m_impl );
 }
+
 void zpRenderingEngine::createRasterState( zpRasterState& state, const zpRasterStateDesc& desc )
 {
-	//zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpRasterStateDesc ), 0 );
-	//
-	//zpRasterState* raster = ZP_NULL;
-	//for( zp_uint i = 0; i < m_rasterStates.size(); ++i )
-	//{
-	//	zpRasterState* r = &m_rasterStates[ i ];
-	//	if( r->m_descHash == descHash )
-	//	{
-	//		raster = r;
-	//		break;
-	//	}
-	//}
-	//
-	//if( raster == ZP_NULL )
-	//{
-	//	raster = &m_rasterStates.pushBackEmpty();
-	//	raster->m_rasterState = m_renderingEngine->createRasterState( desc );
-	//	raster->m_descHash = descHash;
-	//}
-	//
-	//return raster;
 	state.m_rasterState = m_renderingEngine->createRasterState( desc );
 }
 void zpRenderingEngine::createSamplerState( zpSamplerState& state, const zpSamplerStateDesc& desc )
 {
-	//zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpSamplerStateDesc ), 0 );
-	//
-	//zpSamplerState* sampler = ZP_NULL;
-	//for( zp_uint i = 0; i < m_samplerStates.size(); ++i )
-	//{
-	//	zpSamplerState* s = &m_samplerStates[ i ];
-	//	if( s->m_descHash == descHash )
-	//	{
-	//		sampler = s;
-	//		break;
-	//	}
-	//}
-	//
-	//if( sampler == ZP_NULL )
-	//{
-	//	sampler = &m_samplerStates.pushBackEmpty();
-	//	sampler->m_samplerState = m_renderingEngine->createSamplerState( desc );
-	//	sampler->m_descHash = descHash;
-	//}
-	//
-	//return sampler;
 	state.m_samplerState = m_renderingEngine->createSamplerState( desc );
 }
 void zpRenderingEngine::createDepthStencilState( zpDepthStencilState& state, const zpDepthStencilStateDesc& desc )
 {
 	state.m_depthStencilState = m_renderingEngine->createDepthStencilState( desc );
 }
+void zpRenderingEngine::createBlendState( zpBlendState& state, const zpBlendStateDesc& desc )
+{
+	state.m_blendState = m_renderingEngine->createBlendState( desc );
+}
+
 
 zp_bool zpRenderingEngine::createShader( zpShader& shader )
 {

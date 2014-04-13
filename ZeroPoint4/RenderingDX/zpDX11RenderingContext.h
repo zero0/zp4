@@ -22,6 +22,9 @@ public:
 	void setScissorRect( const zpRecti& rect );
 
 	void setRasterState( zpRasterState* raster );
+	void setDepthStencilState( zpDepthStencilState* depthStencil, zp_uint stencilRef );
+	void setBlendState( zpBlendState* blend, zp_float blendFactor[4], zp_uint sampleMask );
+
 	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
 	void setConstantBuffer( zp_uint bindSlots, zp_uint index, zpBuffer* buffer );
 

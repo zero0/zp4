@@ -101,6 +101,15 @@ void zpRenderingContext::setRasterState( zpRasterState* raster )
 {
 	m_renderContextImpl->setRasterState( raster );
 }
+void zpRenderingContext::setDepthStencilState( zpDepthStencilState* depthStencil, zp_uint stencilRef )
+{
+	m_renderContextImpl->setDepthStencilState( depthStencil, stencilRef );
+}
+void zpRenderingContext::setBlendState( zpBlendState* blend, zp_float blendFactor[4], zp_uint sampleMask )
+{
+	m_renderContextImpl->setBlendState( blend, blendFactor, sampleMask );
+}
+
 void zpRenderingContext::setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler )
 {
 	m_renderContextImpl->setSamplerState( bindSlots, index, sampler );

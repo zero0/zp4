@@ -81,6 +81,7 @@ private:
 	zpMeshResourceInstance m_mesh;
 
 	zpRasterState m_raster;
+	zpBlendState m_blend;
 
 	zpFontResourceInstance m_debugFont;
 

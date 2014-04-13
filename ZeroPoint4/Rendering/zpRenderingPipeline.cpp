@@ -77,6 +77,14 @@ void zpRenderingPipeline::initialize()
 	
 	m_engine->createRasterState( m_raster, raster );
 
+	zpBlendStateDesc blend;
+	blend.renderTargets[0].enabled = true;
+	blend.renderTargets[0].srcBlend = ZP_BLEND_SRC_ALPHA;
+	blend.renderTargets[0].destBlend = ZP_BLEND_INV_SRC_ALPHA;
+	blend.renderTargets[0].blendOp = ZP_BLEND_OP_ADD;
+
+	m_engine->createBlendState( m_blend, blend );
+
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
 
@@ -164,6 +172,8 @@ void zpRenderingPipeline::beginFrame()
 	i->clearState();
 
 	i->setRasterState( &m_raster );
+
+	i->setBlendState( &m_blend, ZP_NULL, 0xFFFFFFFF );
 
 	zpTime* time = zpTime::getInstance();
 	zpFrameBufferData perFrameData;

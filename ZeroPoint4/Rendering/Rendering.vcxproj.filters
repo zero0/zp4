@@ -117,6 +117,9 @@
     <ClInclude Include="zpCameraState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpBlendState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -198,6 +201,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpBlendState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

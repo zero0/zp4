@@ -26,9 +26,10 @@ enum
 	ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS	=	2,
 	ZP_RENDERING_MAX_RENDERING_CONTEXTS =		8,
 
-	ZP_RENDERING_MAX_RASTER_STATES =			16,
-	ZP_RENDERING_MAX_SAMPLER_STATES =			16,
-	ZP_RENDERING_MAX_DEPTH_STENCIL_STATES =		16,
+	ZP_RENDERING_MAX_RASTER_STATES =			8,
+	ZP_RENDERING_MAX_SAMPLER_STATES =			8,
+	ZP_RENDERING_MAX_DEPTH_STENCIL_STATES =		8,
+	ZP_RENDERING_MAX_BLEND_STATES =				8,
 
 	ZP_RENDERING_MAX_SHADERS =					32,
 	ZP_RENDERING_MAX_TEXTURES =					64,
@@ -373,6 +374,55 @@ enum zpStencilOp : zp_byte
 	zpStencilOp_Count,
 };
 
+enum zpBlend : zp_uint
+{
+	ZP_BLEND_ZERO,
+	ZP_BLEND_ONE,
+	ZP_BLEND_SRC_COLOR,
+	ZP_BLEND_INV_SRC_COLOR,
+	ZP_BLEND_SRC_ALPHA,
+	ZP_BLEND_INV_SRC_ALPHA,
+	ZP_BLEND_DEST_ALPHA,
+	ZP_BLEND_INV_DEST_ALPHA,
+	ZP_BLEND_DEST_COLOR,
+	ZP_BLEND_INV_DEST_COLOR,
+	ZP_BLEND_SRC_ALPHA_SAT,
+	ZP_BLEND_BLEND_FACTOR,
+	ZP_BLEND_INV_BLEND_FACTOR,
+	ZP_BLEND_SRC1_COLOR,
+	ZP_BLEND_INV_SRC1_COLOR,
+	ZP_BLEND_SRC1_ALPHA,
+	ZP_BLEND_INV_SRC1_ALPHA,
+
+	zpBlend_Count,
+};
+
+enum zpBlendOp : zp_byte
+{
+	ZP_BLEND_OP_ADD,
+	ZP_BLEND_OP_SUBTRACT,
+	ZP_BLEND_OP_REV_SUBTRACT,
+	ZP_BLEND_OP_MIN,
+	ZP_BLEND_OP_MAX,
+
+	zpBlendOp_Count,
+};
+
+enum zpColorWriteEnable : zp_byte
+{
+	ZP_COLOR_WRITE_ENABLE_RED = 1,
+	ZP_COLOR_WRITE_ENABLE_GREEN = 2,
+	ZP_COLOR_WRITE_ENABLE_BLUE = 4,
+	ZP_COLOR_WRITE_ENABLE_ALPHA = 8,
+
+	ZP_COLOR_WRITE_ENABLE_ALL = (
+		ZP_COLOR_WRITE_ENABLE_RED |
+		ZP_COLOR_WRITE_ENABLE_GREEN |
+		ZP_COLOR_WRITE_ENABLE_BLUE |
+		ZP_COLOR_WRITE_ENABLE_ALPHA
+	)
+};
+
 struct zpSamplerStateDesc
 {
 	struct
@@ -411,6 +461,29 @@ struct zpRasterStateDesc
 	zp_float slopeScaledDepthBias;
 
 	zpRasterStateDesc();
+};
+
+struct zpBlendTargetDesc
+{
+	zp_bool enabled;
+	zpBlend srcBlend;
+	zpBlend destBlend;
+	zpBlendOp blendOp;
+	zpBlend srcBlendAlpha;
+	zpBlend destBlendAlpha;
+	zpBlendOp blendOpAlpah;
+	zp_byte renderTargetWriteMask;
+
+	zpBlendTargetDesc();
+};
+
+struct zpBlendStateDesc
+{
+	zp_bool alphaToConverageEnabled;
+	zp_bool independentBlendEnabled;
+	zpBlendTargetDesc renderTargets[ ZP_RENDER_TARGET_MAX_COUNT ];
+
+	zpBlendStateDesc();
 };
 
 struct zpDepthStencilOp
@@ -543,6 +616,7 @@ struct zpRenderingCommand
 #include "zpSamplerState.h"
 #include "zpRasterState.h"
 #include "zpDepthStencilState.h"
+#include "zpBlendState.h"
 
 #include "zpMaterial.h"
 #include "zpMesh.h"

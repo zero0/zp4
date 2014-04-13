@@ -51,6 +51,9 @@
     <ClCompile Include="zpDX11DepthStencilState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpDX11BlendState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpDX11.h">
@@ -93,6 +96,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="zpDX11DepthStencilState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11BlendState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

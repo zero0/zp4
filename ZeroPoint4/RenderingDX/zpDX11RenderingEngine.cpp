@@ -717,6 +717,57 @@ zpDepthStencilStateImpl* zpRenderingEngineImpl::createDepthStencilState( const z
 	return sampler;
 }
 
+zpBlendStateImpl* zpRenderingEngineImpl::createBlendState( const zpBlendStateDesc& desc )
+{
+	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpBlendStateDesc ), 0 );
+
+	zpBlendStateImpl* sampler = ZP_NULL;
+	zpBlendStateImpl* s = m_blendStates.begin();
+	zpBlendStateImpl* e = m_blendStates.end();
+	for( ; s != e; ++s )
+	{
+		if( s->m_descHash == descHash )
+		{
+			sampler = s;
+			break;
+		}
+	}
+
+	if( sampler == ZP_NULL )
+	{
+		HRESULT hr;
+		D3D11_BLEND_DESC samplerDesc;
+		zp_zero_memory( &samplerDesc );
+		samplerDesc.AlphaToCoverageEnable = desc.alphaToConverageEnabled;
+		samplerDesc.IndependentBlendEnable = desc.independentBlendEnabled;
+		for( zp_uint i = 0; i < ZP_RENDER_TARGET_MAX_COUNT; ++i )
+		{
+			const zpBlendTargetDesc& targetDesc = desc.renderTargets[ i ];
+			D3D11_RENDER_TARGET_BLEND_DESC& samplerTargetDesc = samplerDesc.RenderTarget[ i ];
+
+			samplerTargetDesc.BlendEnable = targetDesc.enabled;
+			samplerTargetDesc.SrcBlend = __zpToDX( targetDesc.srcBlend );
+			samplerTargetDesc.DestBlend = __zpToDX( targetDesc.destBlend );
+			samplerTargetDesc.BlendOp = __zpToDX( targetDesc.blendOp );
+			samplerTargetDesc.SrcBlendAlpha = __zpToDX( targetDesc.srcBlendAlpha );
+			samplerTargetDesc.DestBlendAlpha = __zpToDX( targetDesc.destBlendAlpha );
+			samplerTargetDesc.BlendOpAlpha = __zpToDX( targetDesc.blendOpAlpah );
+			samplerTargetDesc.RenderTargetWriteMask = targetDesc.renderTargetWriteMask;
+		}
+
+		ID3D11BlendState* state;
+		hr = m_d3dDevice->CreateBlendState( &samplerDesc, &state );
+		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create Blend State" );
+
+		sampler = &m_blendStates.pushBackEmpty();
+		sampler->m_blend = state;
+		sampler->m_descHash = descHash;
+		sampler->m_desc = desc;
+	}
+
+	return sampler;
+}
+
 zpShaderImpl* zpRenderingEngineImpl::createShader()
 {
 	ZP_ASSERT( !m_freeShaders.isEmpty(), "Ran out of Shaders" );

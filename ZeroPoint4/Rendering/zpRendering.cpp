@@ -64,6 +64,22 @@ zpDepthStencilStateDesc::zpDepthStencilStateDesc()
 //ZP_SERIALIZE_POOLED_OBJECT( LightComponent )
 //ZP_SERIALIZE_POOLED_OBJECT( StaticMeshRenderingComponent )
 
+zpBlendTargetDesc::zpBlendTargetDesc()
+	: enabled( false )
+	, srcBlend( ZP_BLEND_ONE )
+	, destBlend( ZP_BLEND_ZERO )
+	, blendOp( ZP_BLEND_OP_ADD )
+	, srcBlendAlpha( ZP_BLEND_ONE )
+	, destBlendAlpha( ZP_BLEND_ZERO )
+	, blendOpAlpah( ZP_BLEND_OP_ADD )
+	, renderTargetWriteMask( ZP_COLOR_WRITE_ENABLE_ALL )
+{}
+
+zpBlendStateDesc::zpBlendStateDesc()
+	: alphaToConverageEnabled( false )
+	, independentBlendEnabled( false )
+{}
+
 void zpRenderingRegisterSerializables() {
 	//zpRegisterSerializable::registerSerializable<zpRenderingManager>();
 	//zpRegisterSerializable::registerSerializable<zpUIManager>();

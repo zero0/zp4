@@ -83,6 +83,19 @@ void zpRenderingContextImpl::setRasterState( zpRasterState* raster )
 
 	m_context->RSSetState( state );
 }
+void zpRenderingContextImpl::setDepthStencilState( zpDepthStencilState* depthStencil, zp_uint stencilRef )
+{
+	ID3D11DepthStencilState* state = depthStencil == ZP_NULL ? ZP_NULL : depthStencil->getDepthStencilStateImpl()->m_depthStencil;
+
+	m_context->OMSetDepthStencilState( state, stencilRef );
+}
+void zpRenderingContextImpl::setBlendState( zpBlendState* blend, zp_float blendFactor[4], zp_uint sampleMask )
+{
+	ID3D11BlendState* state = blend == ZP_NULL ? ZP_NULL : blend->getBlendStateImpl()->m_blend;
+
+	m_context->OMSetBlendState( state, blendFactor, sampleMask );
+}
+
 void zpRenderingContextImpl::setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler )
 {
 	ID3D11SamplerState* state = sampler == ZP_NULL ? ZP_NULL : sampler->getSamplerStateImpl()->m_sampler;;

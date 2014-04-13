@@ -83,6 +83,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpBlendState.h" />
     <ClInclude Include="zpCameraState.h" />
     <ClInclude Include="zpDepthStencilState.h" />
     <ClInclude Include="zpGenerateMesh.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="zpViewport.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpBlendState.cpp" />
     <ClCompile Include="zpBuffer.cpp" />
     <ClCompile Include="zpCamera.cpp" />
     <ClCompile Include="zpDeferredRenderingComponent.cpp" />

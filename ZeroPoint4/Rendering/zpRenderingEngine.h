@@ -53,6 +53,7 @@ public:
 	void createRasterState( zpRasterState& state, const zpRasterStateDesc& desc );
 	void createSamplerState( zpSamplerState& state, const zpSamplerStateDesc& desc );
 	void createDepthStencilState( zpDepthStencilState& state, const zpDepthStencilStateDesc& desc );
+	void createBlendState( zpBlendState& state, const zpBlendStateDesc& desc );
 
 	zp_bool createShader( zpShader& shader );
 	zp_bool loadShader( zpShader& shader, const zpBison::Value& shaderfile );

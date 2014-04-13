@@ -14,6 +14,7 @@
     <ClCompile Include="zpDX11.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zpDX11BlendState.cpp" />
     <ClCompile Include="zpDX11Buffer.cpp" />
     <ClCompile Include="zpDX11DepthStencilBuffer.cpp" />
     <ClCompile Include="zpDX11DepthStencilState.cpp" />
@@ -28,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpDX11.h" />
+    <ClInclude Include="zpDX11BlendState.h" />
     <ClInclude Include="zpDX11Buffer.h" />
     <ClInclude Include="zpDX11DepthStencilBuffer.h" />
     <ClInclude Include="zpDX11DepthStencilState.h" />
