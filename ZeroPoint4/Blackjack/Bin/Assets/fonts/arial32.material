@@ -1,0 +1,11 @@
+{
+    "Shader" : "shaders/TransparentDiffuse.shaderb",
+    "Textures" :
+    [
+		"fonts/arial32_0.textureb"
+	],
+    "Constants" :
+    {},
+    "Samplers" :
+    []
+}

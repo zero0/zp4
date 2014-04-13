@@ -1,7 +1,5 @@
 {
 	"Name" : "test world",
 	"Objects" : [
-		"objects/player.objectb",
-		"objects/base.objectb"
 	]
 }
