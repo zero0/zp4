@@ -743,6 +743,8 @@ zpBlendStateImpl* zpRenderingEngineImpl::createBlendState( const zpBlendStateDes
 		for( zp_uint i = 0; i < ZP_RENDER_TARGET_MAX_COUNT; ++i )
 		{
 			const zpBlendTargetDesc& targetDesc = desc.renderTargets[ i ];
+			if( !targetDesc.enabled ) continue;
+
 			D3D11_RENDER_TARGET_BLEND_DESC& samplerTargetDesc = samplerDesc.RenderTarget[ i ];
 
 			samplerTargetDesc.BlendEnable = targetDesc.enabled;

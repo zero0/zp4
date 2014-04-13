@@ -173,8 +173,6 @@ void zpRenderingPipeline::beginFrame()
 
 	i->setRasterState( &m_raster );
 
-	i->setBlendState( &m_blend, ZP_NULL, 0xFFFFFFFF );
-
 	zpTime* time = zpTime::getInstance();
 	zpFrameBufferData perFrameData;
 	perFrameData.deltaTime = time->getDeltaSeconds();
@@ -239,7 +237,7 @@ void zpRenderingPipeline::submitRendering()
 	//i->drawMesh( 1 << 0, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
 
 	i->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI, &m_debugFont );
-	i->addText( "hello", 32, zpVector2f( 0, 0 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
+	i->addText( "Hello Zero Point Text", 32, zpVector2f( 0, 0 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
 	i->endDrawFont();
 	
 	// 1) fill buffers
@@ -253,11 +251,13 @@ void zpRenderingPipeline::submitRendering()
 	// 3) actually render commands
 	useCamera( i, cam, &m_cameraBuffer );
 
+	i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
 	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
 	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
 
 	i->processCommands( ZP_RENDERING_QUEUE_SKYBOX );
 
+	i->setBlendState( &m_blend, ZP_NULL, 0xFFFFFFFF );
 	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT );
 	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
 

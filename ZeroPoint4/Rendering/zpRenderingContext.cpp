@@ -647,6 +647,8 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 	{
 		for( ; cmd != end; ++cmd )
 		{
+			if( cmd->vertexCount == 0 ) continue;
+
 			// if the camera does not support any layer the command is not, don't add it
 			if( ( layer & cmd->layer ) == 0 ) continue;
 
