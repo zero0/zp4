@@ -746,7 +746,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 	zp_float scale = size / (zp_float)font->size;
 
 	zp_char prev = '\0', curr = '\0';
-	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->width, 1.f / font->height ), cursor;
+	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->scaleW, 1.f / font->scaleH ), cursor;
 	zpVector4f p0, p1, p2, p3, offset( 0.f );
 	for( ; *text != '\0'; ++text )
 	{
@@ -762,9 +762,9 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 		p3 = ( p.getBottomLeft()  + cursor ).asVector4();
 
 		u0 = uv.getTopLeft()     * invSize;
-		u0 = uv.getTopRight()    * invSize;
-		u0 = uv.getBottomRight() * invSize;
-		u0 = uv.getBottomLeft()  * invSize;
+		u1 = uv.getTopRight()    * invSize;
+		u2 = uv.getBottomRight() * invSize;
+		u3 = uv.getBottomLeft()  * invSize;
 
 		addQuad(
 			p0, u0, colorTop,
@@ -786,7 +786,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 
 	const zpFontSet* font = m_currentFont->getResource()->getData();
 
-	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->width, 1.f / font->height );
+	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->scaleW, 1.f / font->scaleH );
 	zpVector4f cursor( position ), p0, p1, p2, p3, offset( 0.f );
 	for( ; *text != '\0'; ++text )
 	{

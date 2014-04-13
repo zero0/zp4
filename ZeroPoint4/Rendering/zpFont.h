@@ -39,8 +39,6 @@ struct zpFontSet
 
 	zp_int size;
 	zp_int stretchH;
-	zp_int width;
-	zp_int height;
 	zp_int aa;
 	zp_int outline;
 

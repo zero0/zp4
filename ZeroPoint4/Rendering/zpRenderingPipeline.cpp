@@ -58,8 +58,8 @@ void zpRenderingPipeline::initialize()
 	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
 	ZP_ASSERT( ok, "" );
 
-	//ok = m_fontContent.getResource( "fonts/arial32.fontb", m_debugFont );
-	//ZP_ASSERT( ok, "" );
+	ok = m_fontContent.getResource( "fonts/arial32.fontb", m_debugFont );
+	ZP_ASSERT( ok, "" );
 
 	const zpVector2i& size = m_engine->getScreenSize();
 
@@ -228,9 +228,9 @@ void zpRenderingPipeline::submitRendering()
 	//
 	//i->drawMesh( 1 << 0, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
 
-	//i->beginDrawFont( 0, ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, &m_debugFont );
-	//i->addText( "hello", 32.f, zpVector2f( 5, 5 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 0, 0, 1 ) );
-	//i->endDrawFont();
+	i->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI, &m_debugFont );
+	i->addText( "hello", 32, zpVector2f( 0, 0 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
+	i->endDrawFont();
 	
 	// 1) fill buffers
 	i->fillBuffers();

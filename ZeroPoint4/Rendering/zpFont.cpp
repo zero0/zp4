@@ -19,7 +19,7 @@ zp_bool zpFontResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 		m_resource.isItalic = root[ "italic" ].asBool();
 		m_resource.charset = root[ "charset" ].asCString();
 		m_resource.isUnicode = root[ "unicode" ].asBool();
-		m_resource.stretchH = root[ "stretchh" ].asInt();
+		m_resource.stretchH = root[ "stretchH" ].asInt();
 		m_resource.isSmooth = root[ "smooth" ].asBool();
 		m_resource.aa = root[ "aa" ].asInt();
 
@@ -32,15 +32,15 @@ zp_bool zpFontResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 		m_resource.outline = root[ "outline" ].asInt();
 
 		// common
-		m_resource.lineHeight = root[ "lineheight" ].asInt();
+		m_resource.lineHeight = root[ "lineHeight" ].asInt();
 		m_resource.base = root[ "base" ].asInt();
-		m_resource.scaleW = root[ "scalew" ].asInt();
-		m_resource.scaleH = root[ "scaleh" ].asInt();
+		m_resource.scaleW = root[ "scaleW" ].asInt();
+		m_resource.scaleH = root[ "scaleH" ].asInt();
 		m_resource.isPacked = root[ "packed" ].asBool();
-		m_resource.alphaChannel = root[ "alphachnl" ].asInt();
-		m_resource.redChannel = root[ "redchnl" ].asInt();
-		m_resource.greenChannel = root[ "greenchnl" ].asInt();
-		m_resource.blueChannel = root[ "bluechnl" ].asInt();
+		m_resource.alphaChannel = root[ "alphaChnl" ].asInt();
+		m_resource.redChannel = root[ "redChnl" ].asInt();
+		m_resource.greenChannel = root[ "greenChnl" ].asInt();
+		m_resource.blueChannel = root[ "blueChnl" ].asInt();
 
 		// pages
 		const zpBison::Value& pages = root[ "pages" ];
