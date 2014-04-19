@@ -15,6 +15,7 @@ void zpGUI::destroy()
 void zpGUI::beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& outPos )
 {
 	zpGUIWidget* window = &m_allWidgets.pushBackEmpty();
+	window->type = ZP_GUI_WIDGET_CONTAINER;
 	window->localRect = rect;
 	window->parent = ZP_NULL;
 
@@ -40,33 +41,41 @@ void zpGUI::endWindow()
 	m_widgetStack.popBack();
 }
 
-void zpGUI::label( const zp_char* text )
+void zpGUI::label( zp_float size, const zp_char* text )
 {
-	zpGUIWidget* label = addWidget( 12.f );
+	zpGUIWidget* label = addWidget( size );
+
+	zpRectf worldRect;
+	getWorldRect( label, worldRect );
 }
 
-zp_bool zpGUI::button( const zp_char* text )
+zp_bool zpGUI::button( zp_float size, const zp_char* text )
 {
-	zpGUIWidget* button = addWidget( 16.f );
+	zpGUIWidget* button = addWidget( size );
+	button->type = ZP_GUI_WIDGET_BUTTON;
 
 	zpRectf worldRect;
 	zp_bool isDown;
 	zp_bool over = isMouseOverWidget( button, worldRect, isDown );
 
 	m_renderingContext->addQuad(
-		zpVector4f( worldRect.getLeft(),  worldRect.getBottom(), 0, 1 ),
-		zpVector4f( worldRect.getLeft(),  worldRect.getTop(),    0, 1 ),
-		zpVector4f( worldRect.getRight(), worldRect.getTop(), 0, 1 ),
-		zpVector4f( worldRect.getRight(), worldRect.getBottom(),    0, 1 ),
+		worldRect.getTopLeft().asVector4(),
+		worldRect.getTopRight().asVector4(),
+		worldRect.getBottomRight().asVector4(),
+		worldRect.getBottomLeft().asVector4(),
 		over ? m_backgroundColor * 0.8f : m_backgroundColor
 		);
 
 	return over && isDown;
 }
 
-zp_bool zpGUI::text( const zp_char* text, zp_char* outText )
+zp_bool zpGUI::text( zp_float size, const zp_char* text, zp_char* outText )
 {
-	zpGUIWidget* label = addWidget( 12.f );
+	zpGUIWidget* label = addWidget( size );
+	label->type = ZP_GUI_WIDGET_LABEL;
+
+	zpRectf worldRect;
+	getWorldRect( label, worldRect );
 
 	return false;
 }
@@ -76,7 +85,7 @@ void zpGUI::startGUI()
 	m_allWidgets.reset();
 
 	m_renderingContext = m_application->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
-	m_renderingContext->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+	m_renderingContext->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
 }
 void zpGUI::endGUI()
 {
@@ -92,16 +101,40 @@ zpGUI::zpGUIWidget* zpGUI::addWidget( zp_float height )
 	zpVector2f margin( 2, 2 );
 
 	zpVector2f pos = margin;
-	for( zp_uint i = 0, imax = window->children.size(); i < imax; ++i )
+	zpGUIWidget** b = window->children.begin();
+	zpGUIWidget** e = window->children.end();
+	for( ; b != e; ++b )
 	{
-		pos.setY( pos.getY() + window->children[ i ]->localRect.getSize().getY() + margin.getY() );
+		pos.setY( pos.getY() + (*b)->localRect.getSize().getY() + margin.getY() );
 	}
 
-	zpVector2f size( window->localRect.getSize().getX() - margin.getX() * 2.f, height );
+	zpVector2f size( window->localRect.getSize().getX() - ( margin.getX() * 2.f ), height );
 
 	window->children.pushBack( widget );
 	widget->localRect = zpRectf( pos, size );
 	widget->parent = window;
+
+	return widget;
+}
+zpGUI::zpGUIWidget* zpGUI::addChildWidget( zp_float height, zpGUIWidget* parent )
+{
+	zpGUIWidget* widget = &m_allWidgets.pushBackEmpty();
+
+	zpVector2f margin( 2, 2 );
+
+	zpVector2f pos = margin;
+	zpGUIWidget** b = parent->children.begin();
+	zpGUIWidget** e = parent->children.end();
+	for( ; b != e; ++b )
+	{
+		pos.setY( pos.getY() + (*b)->localRect.getSize().getY() + margin.getY() );
+	}
+
+	zpVector2f size( parent->localRect.getSize().getX() - ( margin.getX() * 2.f ), height );
+
+	parent->children.pushBack( widget );
+	widget->localRect = zpRectf( pos, size );
+	widget->parent = parent;
 
 	return widget;
 }

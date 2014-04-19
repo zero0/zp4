@@ -237,7 +237,9 @@ void zpRenderingPipeline::submitRendering()
 	//i->drawMesh( 1 << 0, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
 
 	i->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI, &m_debugFont );
-	i->addText( "Hello Zero Point Text", 32, zpVector2f( 0, 0 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
+	i->addText( "Hello Zero Point Text", 20, zpVector2f( 10, 10 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
+	i->addText( "Hello Zero Point Text", 30, zpVector2f( 40, 50 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
+	i->addText( "Hello Zero Point Text", 40, zpVector2f( 90, 90 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
 	i->endDrawFont();
 	
 	// 1) fill buffers

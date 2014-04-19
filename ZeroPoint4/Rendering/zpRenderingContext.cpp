@@ -757,7 +757,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 	zp_float scale = size / (zp_float)font->size;
 
 	zp_char prev = '\0', curr = '\0';
-	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->scaleW, 1.f / font->scaleH ), cursor;
+	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->scaleW, 1.f / font->scaleH ), cursor( position );
 	zpVector4f p0, p1, p2, p3, offset( 0.f );
 	for( ; *text != '\0'; ++text )
 	{
@@ -765,7 +765,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 		const zpFontGlyph& glyph = font->glyphs[ (zp_int)curr ];
 
 		zpRectf uv( (zp_float)glyph.x, (zp_float)glyph.y, (zp_float)glyph.width, (zp_float)glyph.height );
-		zpRectf p( (zp_float)glyph.xOffset, (zp_float)glyph.yOffset, (zp_float)glyph.width, (zp_float)glyph.height );
+		zpRectf p( scale * (zp_float)glyph.xOffset, scale * (zp_float)glyph.yOffset, scale * (zp_float)glyph.width, scale * (zp_float)glyph.height );
 
 		p0 = ( p.getTopLeft()     + cursor ).asVector4();
 		p1 = ( p.getTopRight()    + cursor ).asVector4();
@@ -784,7 +784,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 			p3, u3, colorBottom
 			);
 
-		cursor += zpVector2f( (zp_float)glyph.xAdvance, 0 );
+		cursor += zpVector2f( scale * (zp_float)glyph.xAdvance, 0 );
 	}
 }
 void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, zpFontAlignment alignment, const zpColor4f& color )
