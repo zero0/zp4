@@ -81,7 +81,6 @@
     <ClInclude Include="zpGUI.h" />
     <ClInclude Include="zpMeshRendererComponent.h" />
     <ClInclude Include="zpObject.h" />
-    <ClInclude Include="zpHealthComponent.h" />
     <ClInclude Include="zpRigidBodyComponent.h" />
     <ClInclude Include="zpScriptComponent.h" />
     <ClInclude Include="zpWorld.h" />
@@ -104,7 +103,6 @@
     <ClCompile Include="zpGUI.cpp" />
     <ClCompile Include="zpMeshRendererComponent.cpp" />
     <ClCompile Include="zpObject.cpp" />
-    <ClCompile Include="zpHealthComponent.cpp" />
     <ClCompile Include="zpRigidBodyComponent.cpp" />
     <ClCompile Include="zpScriptComponent.cpp" />
     <ClCompile Include="zpWorld.cpp" />
