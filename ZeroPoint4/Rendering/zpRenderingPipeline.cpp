@@ -166,9 +166,8 @@ void zpRenderingPipeline::update()
 	}
 }
 
-void zpRenderingPipeline::beginFrame()
+void zpRenderingPipeline::beginFrame( zpRenderingContext* i )
 {
-	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 	i->clearState();
 
 	i->setRasterState( &m_raster );
@@ -187,11 +186,10 @@ void zpRenderingPipeline::beginFrame()
 	m_prevCamera = ZP_NULL;
 }
 
-void zpRenderingPipeline::submitRendering()
+void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 {
 	zpTexture* t = m_engine->getBackBufferRenderTarget();
 	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
-	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 
 	// 0) render things outside this loop
 	//i->beginDrawImmediate( ZP_RENDERING_LAYER_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
@@ -296,11 +294,12 @@ void zpRenderingPipeline::submitRendering()
 	
 }
 
-void zpRenderingPipeline::endFrame()
+void zpRenderingPipeline::endFrame( zpRenderingContext* i )
 {
-	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
 	i->finalizeCommands();
-
+}
+void zpRenderingPipeline::present()
+{
 	m_engine->present();
 }
 

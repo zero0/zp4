@@ -413,22 +413,25 @@ void zpApplication::processFrame()
 
 	ZP_PROFILE_START( RENDER_FRAME );
 	{
+		zpRenderingContext* i = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
+
 		// individual component render
-		m_componentPoolMeshRenderer.render();
+		m_componentPoolMeshRenderer.render( i );
 
 		// render begin
 		ZP_PROFILE_START( RENDER_BEGIN );
-		m_renderingPipeline.beginFrame();
+		m_renderingPipeline.beginFrame( i );
 		ZP_PROFILE_END( RENDER_BEGIN );
 
 		// render commands
 		ZP_PROFILE_START( RENDER );
-		m_renderingPipeline.submitRendering();
+		m_renderingPipeline.submitRendering( i );
 		ZP_PROFILE_END( RENDER );
 
 		// present
 		ZP_PROFILE_START( RENDER_PRESENT );
-		m_renderingPipeline.endFrame();
+		m_renderingPipeline.endFrame( i );
+		m_renderingPipeline.present();
 		ZP_PROFILE_END( RENDER_PRESENT );
 	}
 	ZP_PROFILE_END( RENDER_FRAME );

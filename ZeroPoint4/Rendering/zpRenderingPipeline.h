@@ -24,9 +24,10 @@ public:
 
 	void update();
 
-	void beginFrame();
-	void submitRendering();
-	void endFrame();
+	void beginFrame( zpRenderingContext* i );
+	void submitRendering( zpRenderingContext* i );
+	void endFrame( zpRenderingContext* i );
+	void present();
 
 	zpMaterialContentManager* getMaterialContentManager();
 	zpShaderContentManager* getShaderContentManager();
