@@ -1,5 +1,7 @@
 {
 	"Name" : "test world",
 	"Objects" : [
+		"objects/cube.objectb",
+		"objects/player.objectb"
 	]
 }
