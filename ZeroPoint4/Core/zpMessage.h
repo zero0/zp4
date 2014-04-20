@@ -14,8 +14,10 @@ class zpMessageDataCache;
 #define MT_DEF( m )	m,
 #define MT_SYS( m ) SYS_##m,
 
-struct zpMessageTypes {
-	enum Types {
+struct zpMessageTypes
+{
+	enum Types
+	{
 #include "zpMessageTypes.inc"
 
 #ifdef ZP_MESSAGE_EXTERNAL_TYPES
@@ -29,7 +31,9 @@ struct zpMessageTypes {
 #undef MT_DEF
 #undef MT_SYS
 
-class zpMessage {
+class zpMessage
+{
+	ZP_NON_COPYABLE( zpMessage );
 public:
 	zpMessage();
 	zpMessage( zpMessageType type, zpMessageReceiver* sender = ZP_NULL );
@@ -40,45 +44,45 @@ public:
 	zpMessageReceiver* getSender() const;
 	zp_uint getMessageSize() const;
 	
-	template<typename MessageData>
-	zpMessage( zpMessageType type, const MessageData& data, zpMessageReceiver* sender = ZP_NULL ) : 
-		m_type( type ), 
-		m_sender( sender ), 
-		m_data( zpMessageDataCache::getInstance()->storeMessageData( data ) ),
-		m_dataSize( sizeof( MessageData ) ) 
+	template< typename MessageData >
+	zpMessage( zpMessageType type, const MessageData& data, zpMessageReceiver* sender = ZP_NULL )
+		: m_type( type )
+		, m_sender( sender )
+		, m_data( zpMessageDataCache::getInstance()->storeMessageData( data ) )
+		, m_dataSize( sizeof( MessageData ) )
 	{}
-	template<typename MessageData>
-	const MessageData& getMessageData() const {
-		ZP_ASSERT( m_dataSize == sizeof( MessageData ), "zpMessage: Inconsistant data size. Size: %d Given: %d", m_dataSize, sizeof( MessageData ) );
-		return zpMessageDataCache::getInstance()->getMessageData<MessageData>( m_data, m_dataSize );
+	template< typename MessageData >
+	const MessageData& getMessageData() const
+	{
+		ZP_ASSERT( m_dataSize == sizeof( MessageData ), "zpMessage: Inconsistent data size. Size: %d Given: %d", m_dataSize, sizeof( MessageData ) );
+		return zpMessageDataCache::getInstance()->getMessageData< MessageData >( m_data, m_dataSize );
 	}
 
 private:
-	zpMessage( const zpMessage& copy ) {}
-	void operator=( const zpMessage& copy ) {}
-	void operator=( zpMessage&& copy ) {}
-
 	zpMessageType m_type;
 	zpMessageReceiver* m_sender;
 	zpMessageDataHandle m_data;
 	zp_uint m_dataSize;
 };
 
-class zpMessageDataCache {
+class zpMessageDataCache
+{
 public:
 	~zpMessageDataCache();
 
 	static zpMessageDataCache* getInstance();
 
-	template<typename MessageData>
-	zpMessageDataHandle storeMessageData( const MessageData& data ) {
+	template< typename MessageData >
+	zpMessageDataHandle storeMessageData( const MessageData& data )
+	{
 		return allocateMessageData( (void*)&data, sizeof( MessageData ) );
 	}
 
 	void removeMessageData( zpMessageDataHandle handle, zp_uint size );
 
-	template<typename MessageData>
-	const MessageData& getMessageData( zpMessageDataHandle handle, zp_uint size ) {
+	template< typename MessageData >
+	const MessageData& getMessageData( zpMessageDataHandle handle, zp_uint size )
+	{
 		return *(const MessageData*)getMessageData( handle, size );
 	}
 
@@ -92,7 +96,8 @@ private:
 	void* getMessageData( zpMessageDataHandle& handle, zp_uint size );
 };
 
-class zpMessageTypeSystem {
+class zpMessageTypeSystem
+{
 public:
 	~zpMessageTypeSystem();
 
@@ -108,8 +113,8 @@ private:
 
 	static zpMessageTypeSystem s_instance;
 
-	zpArrayList<zpString> m_names;
-	zpArrayList<zpMessageType> m_types;
+	zpArrayList< zpString > m_names;
+	zpArrayList< zpMessageType > m_types;
 };
 
 #endif

@@ -64,6 +64,9 @@ public:
 	
 	template<typename Func>
 	zp_bool findIf( Func func, T** found );
+
+	template<typename Func>
+	zp_bool findIndexIf( Func func, zp_uint& index ) const;
 	
 	template<typename Func>
 	void foreach( Func func ) const;

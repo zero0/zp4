@@ -12,11 +12,9 @@ enum zpObjectFlag : zp_uint
 	ZP_OBJECT_FLAG_CREATED,
 	ZP_OBJECT_FLAG_SHOULD_DESTROY,
 	ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD,
-
-	ZP_OBJECT_FLAG_USER0,
-
 	zpObjectFlag_Count,
 
+	ZP_OBJECT_FLAG_USER0,
 	zpObjectFlagUser_Count = 31,
 };
 
@@ -46,6 +44,9 @@ public:
 	void setFlag( zpObjectFlag flag );
 	void unsetFlag( zpObjectFlag flag );
 	zp_bool isFlagSet( zpObjectFlag flag ) const;
+
+	void setEnabled( zp_bool enabled );
+	zp_bool isEnabled() const;
 
 	const zpString& getName() const;
 	void setName( const zpString& name );

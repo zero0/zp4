@@ -373,6 +373,20 @@ zp_bool zpArrayList<T>::findIf( Func func, T** found )
 }
 
 template<typename T> template<typename Func>
+zp_bool zpArrayList<T>::findIndexIf( Func func, zp_uint& index ) const
+{
+	for( zp_uint i = 0; i < m_size; ++i )
+	{
+		if( func( m_array[ i ] ) )
+		{
+			index = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+template<typename T> template<typename Func>
 void zpArrayList<T>::foreach( Func func ) const
 {
 	for( zp_uint i = 0; i < m_size; ++i )

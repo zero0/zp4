@@ -743,6 +743,7 @@ void zpRenderingContext::beginDrawFont( zp_uint layer, zpRenderingQueue queue, c
 void zpRenderingContext::calculateArea( const zp_char* text, zp_float size, zpRectf& area )
 {
 	ZP_ASSERT( m_currentFont != ZP_NULL, "BeginDrawFont not called" );
+
 }
 void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& color )
 {

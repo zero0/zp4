@@ -35,6 +35,25 @@ zpBreakableComponent::zpBreakableComponent( zpObject* obj, const zpBison::Value&
 		m_messageOnBreak = messageOnBreak.asCString();
 	}
 
+	const zpBison::Value& breakOnMessage = def[ "BreakOnMessage" ];
+	if( breakOnMessage.isString() )
+	{
+		m_breakOnMessage = breakOnMessage.asCString();
+	}
+
+	const zpBison::Value& eventOnBreak = def[ "EventOnBreak" ];
+	if( eventOnBreak.isString() )
+	{
+		m_eventOnBreak = eventOnBreak.asCString();
+	}
+
+	const zpBison::Value& breakOnEvent = def[ "BreakOnEvent" ];
+	if( breakOnEvent.isString() )
+	{
+		m_breakOnEvent = breakOnEvent.asCString();
+		getApplication()->getEventManager()->addEventListener( m_breakOnEvent, this, m_breakEventHandler );
+	}
+
 	const zpBison::Value& replacement = def[ "ReplacementObject" ];
 	if( replacement.isString() )
 	{
@@ -152,25 +171,63 @@ void zpBreakableComponent::loseHealth( zp_float change )
 
 void zpBreakableComponent::doBreak()
 {
+	const zpMatrix4f& transform = getParentObject()->getTransform();
+	zpObjectContentManager* objectContent = getApplication()->getObjectContentManager();
+
+	// replace object with same transform
 	if( !m_replacementObject.isEmpty() )
 	{
-		zpObject* replacement = getApplication()->getObjectContentManager()->createObject( getApplication(), m_replacementObject.str() );
-		replacement->setTransform( getParentObject()->getTransform() );
+		zpObject* replacement = objectContent->createObject( getApplication(), m_replacementObject.str() );
+		replacement->setTransform( transform );
 	}
 
+	// create objects at same position as broken object
 	if( !m_breakIntoObjects.isEmpty() )
 	{
+		zpMatrix4f pos;
+		pos.setIdentity();
+		pos.setRow( 3, transform.getRow( 3 ) );
+
+		zpObject* obj;
 		zpString* b = m_breakIntoObjects.begin();
 		zpString* e = m_breakIntoObjects.end();
 		for( ; b != e; ++b )
 		{
-			getApplication()->getObjectContentManager()->createObject( getApplication(), b->str() );
+			obj = objectContent->createObject( getApplication(), b->str() );
+			obj->setTransform( pos );
 		}
 	}
 
+	// should send event when destroyed
+	if( !m_eventOnBreak.isEmpty() )
+	{
+		getApplication()->getEventManager()->sendEvent( m_eventOnBreak );
+	}
+
+	// should send message to parent object when destroyed
+	if( !m_messageOnBreak.isEmpty() )
+	{
+
+	}
+
+	// should destroy on break
 	if( m_destroyObjectOnBreak )
 	{
 		getParentObject()->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+	}
+	// otherwise, disable object
+	else
+	{
+		getParentObject()->setEnabled( false );
+	}
+}
+
+void zpBreakableComponent::handleEvent( const zpEvent& e )
+{
+	if( m_breakEventHandler.isHandlerForEvent( e ) )
+	{
+		m_justBroke = true;
+		getApplication()->getEventManager()->removeEventListener( m_breakOnEvent, this, m_breakEventHandler );
 	}
 }
 
@@ -184,17 +241,22 @@ void zpBreakableComponent::onInitialize()
 }
 void zpBreakableComponent::onDestroy()
 {
-
+	if( !m_breakOnEvent.isEmpty() )
+	{
+		getApplication()->getEventManager()->removeEventListener( m_breakOnEvent, this, m_breakEventHandler );
+	}
 }
 
 void zpBreakableComponent::onUpdate()
 {
+	// if decay is set, lose health
 	if( !zp_approximate( m_healthDecayPerSecond, 0.0f ) )
 	{
 		zp_float h = m_healthDecayPerSecond * zpTime::getInstance()->getDeltaSeconds();
 		loseHealth( h );
 	}
 
+	// if the object just broke, perform break
 	if( m_justBroke )
 	{
 		m_justBroke = false;

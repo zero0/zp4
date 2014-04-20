@@ -55,6 +55,8 @@ public:
 #include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
+	zpEventManager* getEventManager() { return &m_eventManager; }
+
 private:
 	void runGarbageCollect();
 	void runReloadAllResources();
@@ -110,6 +112,8 @@ private:
 #undef ZP_COMPONENT_DEF
 
 	zpTextContentManager m_textContent;
+
+	zpEventManager m_eventManager;
 };
 
 #endif

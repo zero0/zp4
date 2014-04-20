@@ -9,7 +9,7 @@ enum zpBreakableSetMaxHealthType
 	ZP_BREAKABLE_SET_MAX_HEALTH_FILL,
 };
 
-class zpBreakableComponent : public zpComponent
+class zpBreakableComponent : public zpComponent, public zpEventListener
 {
 public:
 	zpBreakableComponent( zpObject* obj, const zpBison::Value& def );
@@ -28,6 +28,8 @@ public:
 
 	void gainHealth( zp_float change );
 	void loseHealth( zp_float change );
+
+	void handleEvent( const zpEvent& e );
 
 protected:
 	void onCreate();
@@ -54,8 +56,13 @@ private:
 	zpString m_breakOnMessage;
 	zpString m_messageOnBreak;
 
+	zpString m_breakOnEvent;
+	zpString m_eventOnBreak;
+
 	zpString m_replacementObject;
 	zpArrayList< zpString > m_breakIntoObjects;
+
+	zpEventHandler m_breakEventHandler;
 };
 
 class zpBreakableComponentPool : public zpContentPool< zpBreakableComponent, 8 >

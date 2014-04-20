@@ -74,6 +74,7 @@
     <ClInclude Include="zpCommon.h" />
     <ClInclude Include="zpComponent.h" />
     <ClInclude Include="zpEditorCameraComponent.h" />
+    <ClInclude Include="zpEvent.h" />
     <ClInclude Include="zpGame.h" />
     <ClInclude Include="zpComponentManager.h" />
     <ClInclude Include="zpGameFlow.h" />
@@ -98,6 +99,7 @@
     </ClCompile>
     <ClCompile Include="zpComponent.cpp" />
     <ClCompile Include="zpEditorCameraComponent.cpp" />
+    <ClCompile Include="zpEvent.cpp" />
     <ClCompile Include="zpGame.cpp" />
     <ClCompile Include="zpGUI.cpp" />
     <ClCompile Include="zpMeshRendererComponent.cpp" />

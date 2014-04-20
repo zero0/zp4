@@ -93,7 +93,7 @@ void zpObject::setFlag( zpObjectFlag flag )
 	m_flags.mark( flag );
 	if( flag == ZP_OBJECT_FLAG_SHOULD_DESTROY )
 	{
-		m_flags.unmark( ZP_OBJECT_FLAG_ENABLED );
+		setEnabled( false );
 	}
 }
 void zpObject::unsetFlag( zpObjectFlag flag )
@@ -103,6 +103,16 @@ void zpObject::unsetFlag( zpObjectFlag flag )
 zp_bool zpObject::isFlagSet( zpObjectFlag flag ) const
 {
 	return m_flags.isMarked( flag );
+}
+
+void zpObject::setEnabled( zp_bool enabled )
+{
+	m_flags.setMarked( ZP_OBJECT_FLAG_ENABLED, enabled );
+	m_components.setEnabled( enabled );
+}
+zp_bool zpObject::isEnabled() const
+{
+	return m_flags.isMarked( ZP_OBJECT_FLAG_ENABLED );
 }
 
 const zpString& zpObject::getName() const
