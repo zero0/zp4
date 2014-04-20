@@ -117,25 +117,13 @@ zpJson::zpJson( zpJson&& json )
 }
 zpJson::~zpJson()
 {
-	switch( m_type )
-	{
-	case ZP_JSON_TYPE_STRING:
-	case ZP_JSON_TYPE_DATA:
-		ZP_SAFE_DELETE( m_string );
-		break;
-	case ZP_JSON_TYPE_ARRAY:
-		ZP_SAFE_DELETE( m_array );
-		break;
-	case ZP_JSON_TYPE_OBJECT:
-		ZP_SAFE_DELETE( m_object );
-		break;
-	default:
-		break;
-	}
+	clear();
 }
 
 void zpJson::operator=( const zpJson& json )
 {
+	clear();
+
 	m_type = json.m_type;
 	switch( m_type )
 	{
@@ -156,6 +144,8 @@ void zpJson::operator=( const zpJson& json )
 }
 void zpJson::operator=( zpJson&& json )
 {
+	clear();
+
 	m_type = json.m_type;
 	m_data = json.m_data;
 
@@ -192,6 +182,26 @@ zp_bool zpJson::isEmpty() const
 	default:
 		return false;
 	}
+}
+void zpJson::clear()
+{
+	switch( m_type )
+	{
+	case ZP_JSON_TYPE_STRING:
+	case ZP_JSON_TYPE_DATA:
+		ZP_SAFE_DELETE( m_string );
+		break;
+	case ZP_JSON_TYPE_ARRAY:
+		ZP_SAFE_DELETE( m_array );
+		break;
+	case ZP_JSON_TYPE_OBJECT:
+		ZP_SAFE_DELETE( m_object );
+		break;
+	default:
+		m_data = 0;
+		break;
+	}
+	m_type = ZP_JSON_TYPE_NULL;
 }
 
 zp_bool zpJson::isNull() const
@@ -609,7 +619,7 @@ void zpJson::reserveArray( zp_uint size )
 		m_array = new zpArrayList< zpJson >();
 	}
 
-	m_array->reserve( size);
+	m_array->reserve( size );
 }
 
 

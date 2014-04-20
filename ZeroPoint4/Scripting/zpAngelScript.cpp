@@ -4,6 +4,8 @@
 #include "Common/zpCommon.h"
 #include "Rendering/zpRendering.h"
 
+#include <new>
+
 #if ZP_WIN_32
 #if ZP_DEBUG
 #pragma comment( lib, "angelscriptd.lib" )

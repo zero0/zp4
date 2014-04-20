@@ -1,20 +1,21 @@
 #include "zpCore.h"
 #include <malloc.h>
+#include <new>
 
 #if ZP_USE_MEMORY_SYSTEM
-void* operator new( zp_uint size ) {
-	return zpMemorySystem::getInstance()->allocate( size );
-}
-void* operator new[]( zp_uint size ) {
-	return zpMemorySystem::getInstance()->allocate( size );
-}
-
-void operator delete( void* ptr ) {
-	zpMemorySystem::getInstance()->deallocate( ptr );
-}
-void operator delete[]( void* ptr ) {
-	zpMemorySystem::getInstance()->deallocate( ptr );
-}
+//void* operator new( zp_uint size ) {
+//	return zpMemorySystem::getInstance()->allocate( size );
+//}
+//void* operator new[]( zp_uint size ) {
+//	return zpMemorySystem::getInstance()->allocate( size );
+//}
+//
+//void operator delete( void* ptr ) {
+//	zpMemorySystem::getInstance()->deallocate( ptr );
+//}
+//void operator delete[]( void* ptr ) {
+//	zpMemorySystem::getInstance()->deallocate( ptr );
+//}
 #else
 
 #if ZP_USE_ALIGNMENT

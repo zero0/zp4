@@ -47,6 +47,7 @@ public:
 	zpJsonType type() const;
 	zp_uint size() const;
 	zp_bool isEmpty() const;
+	void clear();
 
 	zp_bool isNull() const;
 	zp_bool isBool() const;

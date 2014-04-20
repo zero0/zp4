@@ -40,6 +40,10 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 			m_resource.m_format = ZP_VERTEX_FORMAT_VERTEX_UV;
 			stride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_UV;
 			break;
+		case ZP_VERTEX_FORMAT_VERTEX_COLOR_UV:
+			m_resource.m_format = ZP_VERTEX_FORMAT_VERTEX_COLOR_UV;
+			stride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR_UV;
+			break;
 		case ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV:
 			m_resource.m_format = ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV;
 			stride = ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV;

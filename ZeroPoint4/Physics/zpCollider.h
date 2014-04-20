@@ -32,6 +32,12 @@ private:
 	friend class zpColliderCache;
 };
 
+struct zpColliderPair
+{
+	zpCollider collider;
+	zp_int refCount;
+};
+
 class zpColliderCache
 {
 public:
@@ -47,8 +53,7 @@ private:
 
 	zp_hash generateColliderHash( const zpBison::Value& v, zpColliderShape& shape, zp_float* p, const zp_float*& d, zp_uint& s ) const;
 
-	zpHashMap< zp_hash, zpCollider > m_colliders;
-	zpHashMap< zp_hash, zp_int > m_colliderRefCounts;
+	zpHashMap< zp_hash, zpColliderPair > m_colliders;
 };
 
 #endif

@@ -19,7 +19,7 @@ protected:
 	void onDisabled();
 
 private:
-	zpArrayList< zpScriptResourceInstance > m_scripts;
+	zpFixedArrayList< zpScriptResourceInstance, 4 > m_scripts;
 };
 
 class zpScriptComponentPool : public zpContentPool< zpScriptComponent, 8 >

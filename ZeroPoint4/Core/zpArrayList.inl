@@ -54,15 +54,11 @@ zpArrayList<T>::zpArrayList( zpArrayList&& arr )
 template<typename T>
 zpArrayList<T>::~zpArrayList()
 {
-	if( m_isFixed )
+	clear();
+
+	if( !m_isFixed )
 	{
-		clear();
-	}
-	else
-	{
-		clear();
 		ZP_SAFE_DELETE_ARRAY( m_array );
-		m_size = 0;
 	}
 }
 
@@ -145,7 +141,9 @@ void zpArrayList<T>::pushBack( const T& val )
 template<typename T>
 T& zpArrayList<T>::pushBackEmpty()
 {
-	pushBack( T() );
+	ensureCapacity( m_size + 1 );
+	m_array[ m_size ] = (T&&)T();
+	++m_size;
 	return back();
 }
 

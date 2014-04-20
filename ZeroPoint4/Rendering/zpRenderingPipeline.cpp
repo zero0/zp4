@@ -99,7 +99,7 @@ void zpRenderingPipeline::initialize()
 	zpCamera* cam;
 	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
-	cam->setPosition( zpVector4f( -10, 10, 10, 1 ) );
+	cam->setPosition( zpVector4f( 10, 10, 10, 1 ) );
 	cam->setLookAt( zpVector4f( 0, 0, 0, 1 ) );
 	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
 	cam->setAspectRatio( viewport.width / viewport.height );

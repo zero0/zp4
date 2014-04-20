@@ -2,8 +2,6 @@
 #ifndef ZP_CORE_H
 #define ZP_CORE_H
 
-#include <new>
-
 #if defined(DEBUG) || defined(_DEBUG)
 #define ZP_DEBUG				1
 #endif
@@ -88,8 +86,15 @@
 
 #define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
 
-
 #include "zpBaseTypes.h"
+
+#if ZP_USE_MEMORY_SYSTEM
+void* operator new( zp_uint size );
+void* operator new[]( zp_uint size );
+
+void operator delete( void* ptr );
+void operator delete[]( void* ptr );
+#endif
 
 
 #if ZP_USE_ASSERTIONS

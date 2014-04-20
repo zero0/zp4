@@ -5,6 +5,27 @@
 #include <string.h>
 #include <memory.h>
 
+
+#if ZP_USE_MEMORY_SYSTEM
+void* operator new( zp_uint size )
+{
+	return zpMemorySystem::getInstance()->allocate( size );
+}
+void* operator new[]( zp_uint size )
+{
+	return zpMemorySystem::getInstance()->allocate( size );
+}
+
+void operator delete( void* ptr )
+{
+	zpMemorySystem::getInstance()->deallocate( ptr );
+}
+void operator delete[]( void* ptr )
+{
+	zpMemorySystem::getInstance()->deallocate( ptr );
+}
+#endif
+
 enum
 {
 	ZP_PRINT_BUFFER_SIZE = 1024,
