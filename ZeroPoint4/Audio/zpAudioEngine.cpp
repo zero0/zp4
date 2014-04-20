@@ -39,6 +39,18 @@ void zpAudioEngine::setListenerOrientation( const zpVector4f& forward, const zpV
 {
 	m_engine->setListenerOrientation( forward, up );
 }
+void zpAudioEngine::setListenerRolloff( zp_float rolloff )
+{
+	m_engine->setListenerRolloff( rolloff );
+}
+void zpAudioEngine::setListenerDistance( zp_float dist )
+{
+	m_engine->setListenerDistance( dist );
+}
+void zpAudioEngine::setListenerDoppler( zp_float dopper )
+{
+	m_engine->setListenerDoppler( dopper );
+}
 
 void zpAudioEngine::getListenerPosition( zpVector4f& pos )
 {
@@ -51,6 +63,18 @@ void zpAudioEngine::getListenerVelocity( zpVector4f& vel )
 void zpAudioEngine::getListenerOrientation( zpVector4f& forward, zpVector4f& up )
 {
 	m_engine->getListenerOrientation( forward, up );
+}
+void zpAudioEngine::getListenerRolloff( zp_float& rolloff )
+{
+	m_engine->getListenerRolloff( rolloff );
+}
+void zpAudioEngine::getListenerDistance( zp_float& dist )
+{
+	m_engine->getListenerDistance( dist );
+}
+void zpAudioEngine::getListenerDoppler( zp_float& doppler )
+{
+	m_engine->getListenerDoppler( doppler );
 }
 
 zp_bool zpAudioEngine::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_uint bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels )

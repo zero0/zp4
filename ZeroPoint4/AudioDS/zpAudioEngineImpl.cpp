@@ -141,6 +141,27 @@ void zpAudioEngineImpl::setListenerOrientation( const zpVector4f& forward, const
 
 	m_isDirty = true;
 }
+void zpAudioEngineImpl::setListenerRolloff( zp_float rolloff )
+{
+	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
+	listener->SetRolloffFactor( rolloff, DS3D_DEFERRED );
+
+	m_isDirty = true;
+}
+void zpAudioEngineImpl::setListenerDistance( zp_float dist )
+{
+	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
+	listener->SetDistanceFactor( dist, DS3D_DEFERRED );
+
+	m_isDirty = true;
+}
+void zpAudioEngineImpl::setListenerDoppler( zp_float doppler )
+{
+	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
+	listener->SetDopplerFactor( doppler, DS3D_DEFERRED );
+
+	m_isDirty = true;
+}
 
 void zpAudioEngineImpl::getListenerPosition( zpVector4f& pos )
 {
@@ -169,6 +190,21 @@ void zpAudioEngineImpl::getListenerOrientation( zpVector4f& forward, zpVector4f&
 
 	forward = zpVector4f( f.x, f.y, f.z );
 	up = zpVector4f( u.x, u.y, u.z );
+}
+void zpAudioEngineImpl::getListenerRolloff( zp_float& rolloff )
+{
+	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
+	listener->GetRolloffFactor( &rolloff );
+}
+void zpAudioEngineImpl::getListenerDistance( zp_float& dist )
+{
+	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
+	listener->GetDistanceFactor( &dist );
+}
+void zpAudioEngineImpl::getListenerDoppler( zp_float& doppler )
+{
+	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
+	listener->GetDopplerFactor( &doppler );
 }
 
 zp_bool zpAudioEngineImpl::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_uint bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels )

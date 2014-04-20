@@ -10,11 +10,6 @@
 #include "Audio\zpAudio.h"
 #include "Physics\zpPhysics.h"
 
-//class zpHealthComponent;
-//
-//#include "zpHealthComponent.h"
-//#include "zpEditorCameraComponent.h"
-
 class zpGUI;
 class zpApplication;
 class zpComponent;
@@ -23,7 +18,9 @@ class zpObject;
 
 class zpEditorCameraComponent;
 class zpScriptComponent;
+
 class zpAudioEmitterComponent;
+class zpAudioListenerComponent;
 
 class zpCameraComponent;
 class zpMeshRendererComponent;
@@ -40,12 +37,16 @@ class zpAttachmentComponent;
 
 #include "zpEditorCameraComponent.h"
 #include "zpScriptComponent.h"
+
+// Audio
 #include "zpAudioEmitterComponent.h"
+#include "zpAudioListenerComponent.h"
 
 // Rendering
 #include "zpCameraComponent.h"
 #include "zpMeshRendererComponent.h"
 
+// Physics
 #include "zpRigidBodyComponent.h"
 
 #include "zpBreakableComponent.h"
@@ -57,8 +58,6 @@ class zpAttachmentComponent;
 #include "zpObject.h"
 #include "zpWorld.h"
 #include "zpApplication.h"
-
-//#include "zpHealthComponent.h"
 
 
 #endif

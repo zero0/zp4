@@ -99,6 +99,9 @@
     <ClInclude Include="zpEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpAudioListenerComponent.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -154,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="zpEvent.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpAudioListenerComponent.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

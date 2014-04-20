@@ -69,6 +69,7 @@
     <ClInclude Include="zpApplication.h" />
     <ClInclude Include="zpAttachmentComponent.h" />
     <ClInclude Include="zpAudioEmitterComponent.h" />
+    <ClInclude Include="zpAudioListenerComponent.h" />
     <ClInclude Include="zpBreakableComponent.h" />
     <ClInclude Include="zpCameraComponent.h" />
     <ClInclude Include="zpCommon.h" />
@@ -91,6 +92,7 @@
     <ClCompile Include="zpApplication.cpp" />
     <ClCompile Include="zpAttachmentComponent.cpp" />
     <ClCompile Include="zpAudioEmitterComponent.cpp" />
+    <ClCompile Include="zpAudioListenerComponent.cpp" />
     <ClCompile Include="zpBreakableComponent.cpp" />
     <ClCompile Include="zpCameraComponent.cpp" />
     <ClCompile Include="zpCommon.cpp">

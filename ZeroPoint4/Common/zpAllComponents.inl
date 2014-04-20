@@ -6,6 +6,7 @@ ZP_COMPONENT_DEF( Script )
 
 // Audio
 ZP_COMPONENT_DEF( AudioEmitter )
+ZP_COMPONENT_DEF( AudioListener )
 
 // Rendering
 ZP_COMPONENT_DEF( Camera )

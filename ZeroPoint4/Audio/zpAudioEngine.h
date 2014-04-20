@@ -21,10 +21,16 @@ public:
 	void setListenerPosition( const zpVector4f& pos );
 	void setListenerVelocity( const zpVector4f& vel );
 	void setListenerOrientation( const zpVector4f& forward, const zpVector4f& up );
+	void setListenerRolloff( zp_float rolloff );
+	void setListenerDistance( zp_float dist );
+	void setListenerDoppler( zp_float dopper );
 
 	void getListenerPosition( zpVector4f& pos );
 	void getListenerVelocity( zpVector4f& vel );
 	void getListenerOrientation( zpVector4f& forward, zpVector4f& up );
+	void getListenerRolloff( zp_float& rolloff );
+	void getListenerDistance( zp_float& dist );
+	void getListenerDoppler( zp_float& doppler );
 
 	zp_bool createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_uint bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels );
 	void cloneSoundBuffer( const zpAudioBuffer& buffer, zpAudioBuffer& copyBuffer );
