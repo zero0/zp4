@@ -567,12 +567,17 @@ void zpApplication::leaveEditMode()
 
 void zpApplication::guiEditMode()
 {
-	zpRectf window( 10, 10, 320, 480 );
+	static zpRectf window( 10, 10, 320, 480 );
 	m_gui.beginWindow( "Application", window, window );
 
-	m_gui.button( 12, "Click Me" );
-	m_gui.button( 12, "Click Me" );
-	m_gui.button( 12, "Click Me" );
+	m_gui.button( 22, "Click Me" );
+	m_gui.button( 22, "Click Me" );
+	m_gui.label( 16, "First Label Here", zpColor4f( 1, 1, 1, 1 ) );
+	if( m_gui.button( 22, "Click Me" ) )
+	{
+		zp_printfln( "Cliekd!" );
+	}
+	m_gui.label( 16, "Label Here", zpColor4f( 1, 1, 1, 1 ) );
 
 	m_gui.endWindow();
 }

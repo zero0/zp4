@@ -29,11 +29,11 @@ public:
 	void beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& outPos );
 	void endWindow();
 
-	void label( zp_float size, const zp_char* text );
+	void label( zp_float size, const zp_char* text, const zpColor4f& color );
 
 	zp_bool button( zp_float size, const zp_char* text );
 
-	zp_bool text( zp_float size, const zp_char* text, zp_char* outText );
+	zp_bool text( zp_float size, const zp_char* text, const zpColor4f& color, zp_char* outText );
 
 	void setApplication( zpApplication* app ) { m_application = app; }
 	zpApplication* getApplication() const { return m_application; }
@@ -54,6 +54,7 @@ private:
 
 		zpRectf localRect;
 		zpColor4f color;
+		zpString text;
 
 		zpGUIWidget* parent;
 		zpArrayList< zpGUIWidget* > children;
@@ -62,8 +63,14 @@ private:
 	zpGUIWidget* addWidget( zp_float height );
 	zpGUIWidget* addChildWidget( zp_float height, zpGUIWidget* parent );
 
-	void getWorldRect( zpGUIWidget* widget, zpRectf& outWorldRect ) const;
-	zp_bool isMouseOverWidget( zpGUIWidget* widget, zpRectf& outWorldRect, zp_bool& isDown ) const;
+	void drawWidgets();
+	void drawWidget( zpGUIWidget* widget );
+
+	void getWorldRect( zpGUIWidget* widget, zpRectf& outWorldRect );
+	zp_bool isMouseOverWidget( zpGUIWidget* widget, zpRectf& outWorldRect, zpVector2i& mousePos, zpVector2i& mouseDelta, zp_bool& isDown, zp_bool& isPressed );
+
+	zp_bool m_isDrawingWidgets;
+	zpGUIWidget* m_currentlySelected;
 
 	zpApplication* m_application;
 	zpRenderingContext* m_renderingContext;
@@ -76,6 +83,7 @@ private:
 	zpColor4f m_backgroundColor;
 
 	zpMaterialResourceInstance m_guiMaterial;
+	zpFontResourceInstance m_guiFont;
 };
 
 #endif
