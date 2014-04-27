@@ -191,6 +191,18 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector2f& uv0
 
 	m_currentCommnad->boundingBox.add( pos );
 }
+void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector2f& uv0, const zpColor4f& color )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, "" );
+
+	m_scratchVertexBuffer.write( pos );
+	m_scratchVertexBuffer.write( color );
+	m_scratchVertexBuffer.write( uv0 );
+	m_currentCommnad->vertexCount += 1;
+
+	m_currentCommnad->boundingBox.add( pos );
+}
 void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 )
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );

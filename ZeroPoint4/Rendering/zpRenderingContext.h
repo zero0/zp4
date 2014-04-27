@@ -40,6 +40,7 @@ public:
 
 	void addVertex( const zpVector4f& pos, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );
+	void addVertex( const zpVector4f& pos, const zpVector2f& uv0, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 );
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0, const zpVector2f& uv1 );
 
@@ -125,6 +126,15 @@ public:
 	void addWrapText( const zp_char* text, zp_float size, const zpRectf& area, zpFontAlignment alignment );
 	void addWrapText( const zp_char* text, zp_float size, const zpVector4f& position, const zpVector4f& direction, const zpVector2f& area, zpFontAlignment alignment );
 	void endDrawFont();
+
+	void addText( const zpString& text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& color )
+	{
+		addText( text.str(), size, position, alignment, color, color );
+	}
+	void addText( const zpString& text, zp_float size, const zpVector2f& position, zpFontAlignment alignment, const zpColor4f& colorTop, const zpColor4f& colorBottom )
+	{
+		addText( text.str(), size, position, alignment, colorTop, colorBottom );
+	}
 
 	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }
 

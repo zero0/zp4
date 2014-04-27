@@ -204,17 +204,14 @@ void zpApplication::update()
 
 	m_physicsEngine.update( m_timer->getDeltaSeconds() );
 
-	m_gui.startGUI();
-
-	if( m_inEditMode ) guiEditMode();
-
 	// update all components
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) m_componentPool##cmp.update();
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
-
+	m_gui.startGUI();
+	if( m_inEditMode ) guiEditMode();
 	m_gui.endGUI();
 
 	// update object, delete any etc

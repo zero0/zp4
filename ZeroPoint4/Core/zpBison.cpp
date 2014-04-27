@@ -222,7 +222,7 @@ zp_int zpBison::Value::asInt() const
 	case ZP_BISON_TYPE_BOOL_FALSE:
 		return 0;
 	case ZP_BISON_TYPE_SBYTE:
-		return (zp_int)*val;
+		return (zp_int)*(zp_sbyte*)val;
 	case ZP_BISON_TYPE_SHORT:
 		return (zp_int)*(zp_short*)val;
 	case ZP_BISON_TYPE_INT:
@@ -250,7 +250,7 @@ zp_float zpBison::Value::asFloat() const
 	case ZP_BISON_TYPE_BOOL_FALSE:
 		return 0.0f;
 	case ZP_BISON_TYPE_SBYTE:
-		return (zp_float)*val;
+		return (zp_float)*(zp_sbyte*)val;
 	case ZP_BISON_TYPE_SHORT:
 		return (zp_float)*(zp_short*)val;
 	case ZP_BISON_TYPE_INT:

@@ -13,21 +13,18 @@ template<typename Resource>
 class zpResourceInstance
 {
 public:
-	zpResourceInstance() : m_resource( ZP_NULL ) {}
+	zpResourceInstance()
+		: m_resource( ZP_NULL )
+	{}
 	virtual ~zpResourceInstance()
 	{
 		release();
 	}
 
 	zpResourceInstance( const zpResourceInstance< Resource >& other )
+		: m_resource( other.m_resource )
 	{
-		release();
-
-		m_resource = other.m_resource;
-		if( m_resource )
-		{
-			m_resource->addRef();
-		}
+		addReference();
 	}
 	zpResourceInstance( zpResourceInstance< Resource >&& other )
 		: m_resource( other.m_resource )
@@ -40,10 +37,7 @@ public:
 		release();
 
 		m_resource = other.m_resource;
-		if( m_resource )
-		{
-			m_resource->addRef();
-		}
+		addReference();
 	}
 	void operator=( zpResourceInstance< Resource >&& other )
 	{
@@ -54,21 +48,31 @@ public:
 	}
 
 	const Resource* getResource() const { return m_resource; }
-	//Resource* getResource() { return m_resource; }
 
 	zp_bool isVaild() const { return m_resource != ZP_NULL; }
 
-	void release()
+	zp_uint release()
 	{
+		zp_uint refCount = 0;
 		if( m_resource )
 		{
 			m_resource->releaseRef();
+			refCount = m_resource->getRefCount();
 		}
 		m_resource = ZP_NULL;
+		return refCount;
 	}
 
 private:
 	Resource* m_resource;
+
+	void addReference()
+	{
+		if( m_resource )
+		{
+			m_resource->addRef();
+		}
+	}
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;
@@ -84,6 +88,11 @@ class zpContentManager
 public:
 	zpContentManager();
 	virtual ~zpContentManager();
+
+	//zp_bool getResource(  const zp_char* filename, ResourceInstance* outInstance ) {
+	//	return getResource( filename, *outInstance ); }
+	//zp_bool getResource(  const zpString& filename, ResourceInstance* outInstance ) {
+	//	return getResource( filename.str(), *outInstance ); }
 
 	zp_bool getResource( const zpString& filename, ResourceInstance& outInstance );
 	zp_bool getResource( const zp_char* filename, ResourceInstance& outInstance );

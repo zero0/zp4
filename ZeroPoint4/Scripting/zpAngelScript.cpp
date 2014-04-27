@@ -20,7 +20,8 @@
 #endif
 #endif
 
-#define AS_ASSERT( r )	if( (r) < asSUCCESS ) { zpLog::debug() << "Assert Failed: (" << r << ") " << __FILE__ << ':' << __LINE__ << zpLog::endl; }
+#define AS_ASSERT( r )	ZP_ASSERT( (r) >= asSUCCESS, "AngelScript Assert Failed (%d): %s:%d", (r), __FILE__, __LINE__ )
+//if( (r) < asSUCCESS ) { zpLog::debug() << "Assert Failed: (" << r << ") " << __FILE__ << ':' << __LINE__ << zpLog::endl; }
 
 #pragma region Register Core
 void as_MessageCallback( const asSMessageInfo& info )
@@ -59,6 +60,7 @@ void as_Register_zpVector4f( asIScriptEngine* engine );
 void as_Register_zpVector2f( asIScriptEngine* engine );
 void as_Register_zpColor4f( asIScriptEngine* engine );
 void as_Register_zpMatrix4f( asIScriptEngine* engine );
+void as_Register_zpBoundingAABB( asIScriptEngine* engine );
 
 void as_Register_Core( asIScriptEngine* engine )
 {
@@ -69,10 +71,11 @@ void as_Register_Core( asIScriptEngine* engine )
 	as_Register_zpVector2f( engine );
 	as_Register_zpColor4f( engine );
 	as_Register_zpMatrix4f( engine );
+	as_Register_zpBoundingAABB( engine );
 
 	zp_int r;
-	r = engine->RegisterGlobalFunction( "void print(const string &in)", asFUNCTION( as_zp_printf ), asCALL_CDECL );  AS_ASSERT( r );
-	r = engine->RegisterGlobalFunction( "void println(const string &in)", asFUNCTION( as_zp_printfln ), asCALL_CDECL );  AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void print(const string &in)", asFUNCTION( as_zp_printf ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void println(const string &in)", asFUNCTION( as_zp_printfln ), asCALL_CDECL ); AS_ASSERT( r );
 }
 #pragma endregion
 
@@ -600,7 +603,7 @@ void as_Register_zpMatrix4f( asIScriptEngine* engine )
 {
 	zp_int r;
 
-	r = engine->RegisterObjectType(      "matrix", sizeof( zpMatrix4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectType( "matrix", sizeof( zpMatrix4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( "matrix", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( "matrix", asBEHAVE_CONSTRUCT, "void f( const matrix& in )", asFUNCTION( as_zpMatrix4f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( "matrix", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
@@ -618,9 +621,40 @@ void as_Register_zpMatrix4f( asIScriptEngine* engine )
 }
 #pragma endregion
 
+#pragma region Register zpBoundingAABB
+void as_zpBoundingAABB_Constructor( zpBoundingAABB* self )
+{
+	*self = zp_move( zpBoundingAABB() );
+}
+void as_zpBoundingAABB_CopyConstructor( zpBoundingAABB* self, const zpBoundingAABB& copy )
+{
+	*self = copy;
+}
+void as_zpBoundingAABB_Deconstructor( zpBoundingAABB* self )
+{
+	self->~zpBoundingAABB();
+}
+
+void as_Register_zpBoundingAABB( asIScriptEngine* engine )
+{
+	zp_int r;
+	zpBoundingAABB f;
+
+	r = engine->RegisterObjectType(      "box", sizeof( zpBoundingAABB ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "box", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpBoundingAABB_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "box", asBEHAVE_CONSTRUCT, "void f( const box& in )", asFUNCTION( as_zpBoundingAABB_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "box", asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpBoundingAABB_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "box", "void opAssign( const box& in )", asMETHODPR( zpBoundingAABB, operator=, ( const zpBoundingAABB& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( "box", "const vec4& get_min() const", asMETHODPR( zpBoundingAABB, getMin, () const, const zpVector4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "box", "void set_min( const vec4& in )", asMETHODPR( zpBoundingAABB, setMin, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "box", "const vec4& get_max() const", asMETHODPR( zpBoundingAABB, getMax, () const, const zpVector4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "box", "void set_max( const vec4& in )", asMETHODPR( zpBoundingAABB, setMax, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+}
+#pragma endregion
 
 #pragma region Register zpGameObject
-
 void as_zpGameObject_Register( asIScriptEngine* engine ) {
 	//if( !engine ) return;
 	//zp_int r;
@@ -637,19 +671,86 @@ void as_zpGameObject_Register( asIScriptEngine* engine ) {
 #pragma endregion
 
 #pragma region Register Rendering
+template< typename T >
+class zpRefObject
+{
+public:
+	zpRefObject()
+		: m_refCount( 1 )
+	{}
+	~zpRefObject()
+	{}
+
+	void addRef()
+	{
+		++m_refCount;
+	}
+	void release()
+	{
+		if( --m_refCount == 0 ) delete this;
+	}
+
+	operator T*()
+	{
+		return &m_value;
+	}
+	operator const T*() const
+	{
+		return &m_value;
+	}
+
+	operator T&()
+	{
+		return m_value;
+	}
+	operator const T&() const
+	{
+		return m_value;
+	}
+
+private:
+	T m_value;
+	zp_int m_refCount;
+};
+
+zpRefObject< zpMaterialResourceInstance >* as_Material_Factory()
+{
+	return new zpRefObject< zpMaterialResourceInstance >;
+}
+
+zpRefObject< zpFontResourceInstance >* as_Font_Factory()
+{
+	return new zpRefObject< zpFontResourceInstance >;
+}
+
 void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 {
 	zp_int r;
 	zpRenderingContext* i = app->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
+	zpMaterialContentManager* mat = app->getRenderPipeline()->getMaterialContentManager();
+	zpFontContentManager* font = app->getRenderPipeline()->getFontContentManager();
 
-	r = engine->RegisterEnum( "RenderingLayer" ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "Opaque",				ZP_RENDERING_QUEUE_OPAQUE ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "OpaqueDebug",			ZP_RENDERING_QUEUE_OPAQUE_DEBUG ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "Skybox",				ZP_RENDERING_QUEUE_SKYBOX ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "Transparent",			ZP_RENDERING_QUEUE_TRANSPARENT ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "TransparentDebug",	ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "UI",					ZP_RENDERING_QUEUE_UI ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( "RenderingLayer", "UIDebug",				ZP_RENDERING_QUEUE_UI_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterObjectType( "Material", sizeof( zpRefObject< zpMaterialResourceInstance > ), asOBJ_REF ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "Material", asBEHAVE_FACTORY, "Material@ f()", asFUNCTION( as_Material_Factory ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "Material", asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject< zpMaterialResourceInstance >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "Material", asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject< zpMaterialResourceInstance >, release ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "bool GetMaterial( const string& in, Material& )", asMETHODPR( zpMaterialContentManager, getResource, ( const zpString&, zpMaterialResourceInstance& ), zp_bool ), asCALL_THISCALL_ASGLOBAL, mat ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectType( "Font", sizeof( zpRefObject< zpFontResourceInstance > ), asOBJ_REF ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "Font", asBEHAVE_FACTORY, "Font@ f()", asFUNCTION( as_Font_Factory ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "Font", asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject< zpFontResourceInstance >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( "Font", asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject< zpFontResourceInstance >, release ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "bool GetFont( const string& in, Font& )", asMETHODPR( zpFontContentManager, getResource, ( const zpString&, zpFontResourceInstance& ), zp_bool ), asCALL_THISCALL_ASGLOBAL, font ); AS_ASSERT( r );
+
+	r = engine->RegisterEnum( "RenderingQueue" ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "Opaque",				ZP_RENDERING_QUEUE_OPAQUE ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "OpaqueDebug",			ZP_RENDERING_QUEUE_OPAQUE_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "Skybox",				ZP_RENDERING_QUEUE_SKYBOX ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "Transparent",			ZP_RENDERING_QUEUE_TRANSPARENT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "TransparentDebug",	ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "Overlay",				ZP_RENDERING_QUEUE_OVERLAY ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "UI",					ZP_RENDERING_QUEUE_UI ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "RenderingQueue", "UIDebug",				ZP_RENDERING_QUEUE_UI_DEBUG ); AS_ASSERT( r );
 
 	r = engine->RegisterEnum( "Topology" ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "Topology", "Unknown",		ZP_TOPOLOGY_UNKNOWN ); AS_ASSERT( r );
@@ -662,15 +763,39 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	r = engine->RegisterEnum( "VertexFormat" ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexColor",		ZP_VERTEX_FORMAT_VERTEX_COLOR ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexUV",			ZP_VERTEX_FORMAT_VERTEX_UV ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "VertexFormat", "VertexColorUV",		ZP_VERTEX_FORMAT_VERTEX_COLOR_UV ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( "VertexFormat", "VertexNormalUV2",	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2 ); AS_ASSERT( r );
 
-	r = engine->RegisterGlobalFunction( "void BeginDraw( uint, RenderingLayer, Topology, VertexFormat, int )", asMETHODPR( zpRenderingContext, beginDrawImmediate, ( zp_uint, zpRenderingQueue layer, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* material ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void BeginDraw( uint, RenderingQueue, Topology, VertexFormat, const Material& )", asMETHODPR( zpRenderingContext, beginDrawImmediate, ( zp_uint, zpRenderingQueue, zpTopology, zpVertexFormat, const zpMaterialResourceInstance* ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void EndDraw()", asMETHODPR( zpRenderingContext, endDrawImmediate, (), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 
-	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const color& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void SetBoundingBox( const box& in )", asMETHODPR( zpRenderingContext, setBoundingBox, ( const zpBoundingAABB& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void SetBoundingBoxCenter( const vec4& in )", asMETHODPR( zpRenderingContext, setBoundingBoxCenter, ( const zpVector4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void SetMatrix( const matrix& in )", asMETHODPR( zpRenderingContext, setMatrix, ( const zpMatrix4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void SetSortBias( int )", asMETHODPR( zpRenderingContext, setSortBias, ( zp_ushort ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 
+	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const color& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const vec2f& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpVector2f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const vec2f& in, const color& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpVector2f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const vec4& in, const vec2f& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpVector4f&, const zpVector2f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void AddVertex( const vec4& in, const vec4& in, const vec2f& in, const vec2f& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpVector4f&, const zpVector2f&, const zpVector2f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "void AddLineIndex( int, int )", asMETHODPR( zpRenderingContext, addLineIndex, ( zp_ushort, zp_ushort ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void AddTriangleIndex( int, int, int )", asMETHODPR( zpRenderingContext, addTriangleIndex, ( zp_ushort, zp_ushort, zp_ushort ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void AddQuadIndex( int, int, int, int )", asMETHODPR( zpRenderingContext, addQuadIndex, ( zp_ushort, zp_ushort, zp_ushort, zp_ushort ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+
+	r = engine->RegisterEnum( "FontAlignment" ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "FontAlignment", "Left",		ZP_FONT_ALIGNMENT_LEFT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "FontAlignment", "Center",	ZP_FONT_ALIGNMENT_CENTER ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( "FontAlignment", "Right",	ZP_FONT_ALIGNMENT_RIGHT ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "void BeginFont( uint, RenderingQueue, const Font& )", asMETHODPR( zpRenderingContext, beginDrawFont, ( zp_uint, zpRenderingQueue, const zpFontResourceInstance* ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void EndFont()", asMETHODPR( zpRenderingContext, endDrawFont, (), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "void AddText( const string& in, float, const vec2f& in, FontAlignment, const color& in )", asMETHODPR( zpRenderingContext, addText, ( const zpString&, zp_float, const zpVector2f&, zpFontAlignment, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void AddText( const string& in, float, const vec2f& in, FontAlignment, const color& in, const color& in )", asMETHODPR( zpRenderingContext, addText, ( const zpString&, zp_float, const zpVector2f&, zpFontAlignment, const zpColor4f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+
 }
 #pragma endregion
 
@@ -694,7 +819,8 @@ zp_bool zpAngelScript::createEngine( zpApplication* app )
 	
 	asIScriptEngine* engine = (asIScriptEngine*)m_engine;
 
-	engine->SetMessageCallback( asFUNCTION( as_MessageCallback ), 0, asCALL_CDECL );
+	zp_int r;
+	r = engine->SetMessageCallback( asFUNCTION( as_MessageCallback ), 0, asCALL_CDECL ); AS_ASSERT( r );
 
 	as_Register_Core( engine );
 	as_Register_Rendering( engine, app );

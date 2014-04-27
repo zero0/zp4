@@ -22,7 +22,7 @@
 #define ZP_USE_ALIGNMENT		0
 #define ZP_USE_LOGGING			1
 #define ZP_USE_ASSERTIONS		1
-#define ZP_USE_MEMORY_SYSTEM	1
+#define ZP_USE_MEMORY_SYSTEM	0
 #define ZP_USE_HOT_RELOAD		1
 
 //#ifdef _WIN32
