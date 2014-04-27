@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,6 +59,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	Map<String, Class<? extends ArcCompiler>> compilers;
 	Map<String, String> extensionToCompiler;
 	Map<String, String> compilerOutExtension;
+	Map<String, String[]> compilerInExtension;
 	Properties properties;
 	boolean autoCompile;
 
@@ -80,6 +83,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		compilers = new HashMap<String, Class<? extends ArcCompiler>>();
 		extensionToCompiler = new HashMap<String, String>();
 		compilerOutExtension = new HashMap<String, String>();
+		compilerInExtension = new HashMap<String, String[]>();
 	}
 
 	public final void initialize()
@@ -150,9 +154,16 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 
 						// get the extensions for this compiler
 						String exts = compilersProp.getProperty( key + ".ext", "" ).toLowerCase();
-						for( String ext : exts.split( "," ) )
+						String[] extsArr = exts.split( "," );
+						for( int i = 0; i < extsArr.length; ++i )
 						{
-							String extension = ext.trim();
+							extsArr[i] = extsArr[i].trim();
+						}
+						compilerInExtension.put( key, extsArr );
+						
+						// add extensions to file watcher
+						for( String extension : extsArr )
+						{
 							extensionToCompiler.put( extension, key );
 							fileWatcher.addAcceptedFileExtension( extension );
 						}
@@ -235,10 +246,15 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	{
 		return Collections.unmodifiableCollection( compilers.values() );
 	}
+	
+	public final String[] getCompilerExtentions( String compiler )
+	{
+		return compilerInExtension.get( compiler );
+	}
 
 	public final Properties getCompilerProperties( Class<? extends ArcCompiler> clazz )
 	{
-		return new Properties(); //compilerProperties.get( clazz );
+		return null; //new Properties(); //compilerProperties.get( clazz );
 	}
 
 	public final String getProject()
@@ -322,6 +338,42 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	{
 		return fileWatcher.getNumFiles();
 	}
+	
+	public final List<String> getFilesByExtension( String extension )
+	{
+		List<String> allFiles = getFiles();
+		List<String> files = new ArrayList<String>();
+		
+		for( String file : allFiles )
+		{
+			if( file.endsWith( "." + extension ) )
+			{
+				files.add( file );
+			}
+		}
+		
+		return files;
+	}
+	
+	public final List<String> getFilesByExtensions( String[] extensions )
+	{
+		List<String> allFiles = getFiles();
+		List<String> files = new ArrayList<String>();
+		
+		for( String file : allFiles )
+		{
+			for( String ext : extensions )
+			{
+				if( file.endsWith( "." + ext ) )
+				{
+					files.add( file );
+					break;
+				}
+			}
+		}
+		
+		return files;
+	}
 
 	public final void executeCompiler( String compiler )
 	{
@@ -367,7 +419,12 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 
 	public final void addCompilerTasks( String... filePaths )
 	{
-		numTasks = filePaths.length;
+		addCompilerTasks( Arrays.asList( filePaths ) );
+	}
+	
+	public final void addCompilerTasks( List<String> filePaths )
+	{
+		numTasks = filePaths.size();
 		numErrored = 0;
 		numSuccess = 0;
 
@@ -558,6 +615,11 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		numSuccess++;
 		out( OutputLevel.Compact, "Compile Success " + filePath );
 		fireArcProcessUpdate( true, compiler.getCompileTime() );
+		
+		if( numTasks == 0 )
+		{
+			fireArcProcessEnd();
+		}
 	}
 
 	public final void onCompileFailed( String filePath, String msg, ArcCompiler compiler )
@@ -566,6 +628,11 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		numErrored++;
 		err( "Compile Failed " + filePath );
 		fireArcProcessUpdate( false, compiler.getCompileTime() );
+		
+		if( numTasks == 0 )
+		{
+			fireArcProcessEnd();
+		}
 	}
 
 	void fireArcProcessStart()

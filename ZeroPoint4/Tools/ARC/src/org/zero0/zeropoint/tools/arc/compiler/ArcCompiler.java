@@ -233,14 +233,14 @@ public abstract class ArcCompiler implements Runnable
 			}
 			
 			if( sb.length() > 0 ) Arc.getInstance().err( sb.toString() );
+			
+			if( listener != null ) listener.onCompileSuccess( this.getFileToCompile(), "Success", this );
 		}
-		catch( IOException e )
+		catch( Exception e )
 		{
 			e.printStackTrace();
-		}
-		catch( InterruptedException e )
-		{
-			e.printStackTrace();
+			
+			if( listener != null ) listener.onCompileFailed( this.getFileToCompile(), "Failed", this );
 		}
 	}
 	

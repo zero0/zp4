@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.zero0.zeropoint.tools.arc.Arc;
+import org.zero0.zeropoint.tools.arc.ArcListener;
 import org.zero0.zeropoint.tools.arc.ExecutableMode;
 import org.zero0.zeropoint.tools.arc.OutputLevel;
 import org.zero0.zeropoint.tools.arc.Platform;
@@ -73,7 +74,7 @@ import org.zero0.zeropoint.tools.arc.util.PrintErrWrapper;
 import org.zero0.zeropoint.tools.arc.util.PrintOutAppender;
 import org.zero0.zeropoint.tools.arc.util.PrintOutWrapper;
 
-public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender, FileWatcherListener
+public class Workspace extends Composite implements PrintOutAppender, PrintErrAppender, OutputAppender, FileWatcherListener, ArcListener
 {
 	static Map<String, Image> cachedImages = new HashMap<String, Image>();
 	static Map<Integer, Color> cachedColors = new HashMap<Integer, Color>();
@@ -188,6 +189,7 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	boolean showAllFilesInRoot = false;
 
 	private static final String workspacePropertyFile = "workspace.properties";
+	private final int progressMax = 100;
 	
 	public Workspace( Composite parent )
 	{
@@ -660,8 +662,19 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 				}
 				
 				TreeItem item = (TreeItem) event.item;
-
-				String filename = allFiles.get( tree.indexOf( item ) );
+				int index = tree.indexOf( item );
+				int count = allFiles.size() - 1;
+				
+				if( index < count )
+				{
+					setProgress( (float)index / (float)count );
+				}
+				else
+				{
+					setProgress( 0 );
+				}
+				
+				String filename = allFiles.get( index );
 				String shortFilename = trimFront( filename, Arc.getInstance().getBaseDirectory() );
 				String text = shortFilename.substring( shortFilename.lastIndexOf( File.separator ) + 1 );
 
@@ -720,7 +733,8 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 							{
 								files.add( (String) i.getData() );
 							}
-							Arc.getInstance().addCompilerTasks( files.toArray( new String[ files.size() ] ) );
+							String[] f = files.toArray( new String[ files.size() ] );
+							Arc.getInstance().addCompilerTasks( f );
 						}
 					} );
 
@@ -883,6 +897,8 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		optionsLabel.setText( "Options" );
 
 		progress = new ProgressBar( bottomComp, SWT.HORIZONTAL | SWT.SMOOTH );
+		progress.setMaximum( progressMax );
+		setProgress( 0 );
 
 		FormData fd;
 
@@ -1161,19 +1177,24 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		int index = 0;
 		for( Class<? extends ArcCompiler> clazz : compilers )
 		{
+			final String compiler = clazz.getSimpleName();
+			
 			++index;
 			item = new MenuItem( subMenu, SWT.CASCADE );
-			item.setText( clazz.getSimpleName() + "\tCtrl+" + (char) ( '0' + index ) );
+			item.setText( compiler + "\tCtrl+" + (char) ( '0' + index ) );
 			item.setAccelerator( SWT.MOD1 + (char) ( '0' + index ) );
 			item.addListener( SWT.Selection, new Listener()
 			{
 				public void handleEvent( Event event )
 				{
-
+					String[] exts = Arc.getInstance().getCompilerExtentions( compiler );
+					List<String> files = Arc.getInstance().getFilesByExtensions( exts );
+					
+					Arc.getInstance().addCompilerTasks( files );
 				}
 			} );
 
-			Properties props = Arc.getInstance().getCompilerProperties( clazz );
+			final Properties props = Arc.getInstance().getCompilerProperties( clazz );
 			if( props != null )
 			{
 				Menu compilerMenu = new Menu( item );
@@ -1288,6 +1309,18 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		optionsLabel.setText( options.toString() );
 	}
 
+	void setProgress( final float percent )
+	{
+		Display.getCurrent().asyncExec( new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				progress.setSelection( (int)( percent * progressMax ) );
+			}
+		});		
+	}
+
 	@Override
 	public void printOut( String str )
 	{
@@ -1320,5 +1353,23 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	public void fileListChanged()
 	{
 		refreshTree();
+	}
+
+	@Override
+	public void onArcProcessStart( int numTasks )
+	{
+		setProgress( 0 );
+	}
+
+	@Override
+	public void onArcProcessUpdate( boolean success, int completeTime, int numTasks, int numSucces, int numError )
+	{
+		setProgress( (float)( numSucces + numError  ) / (float)numTasks );
+	}
+
+	@Override
+	public void onArcProcessEnd()
+	{
+		setProgress( 0 );
 	}
 }
