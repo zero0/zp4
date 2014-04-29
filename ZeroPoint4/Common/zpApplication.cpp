@@ -119,6 +119,9 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 		m_nextWorldFilename = world.asCString();
 		m_hasNextWorld = true;
 	}
+
+	m_protoDBManager.initialize( appOptions[ "ProtoDB" ].asCString() );
+	m_protoDBManager.setup();
 }
 void zpApplication::run()
 {
@@ -147,6 +150,9 @@ zp_int zpApplication::shutdown()
 
 	zpAngelScript::getInstance()->destroyEngine();
 	zpAngelScript::destroyInstance();
+
+	m_protoDBManager.shutdown();
+	m_protoDBManager.destroy();
 
 	m_audioContent.getAudioEngine()->destroy();
 
@@ -466,6 +472,8 @@ void zpApplication::runReloadAllResources()
 	m_renderingPipeline.getMaterialContentManager()->reloadAllResources();
 	m_renderingPipeline.getShaderContentManager()->reloadAllResources();
 	m_renderingPipeline.getTextureContentManager()->reloadAllResources();
+
+	m_protoDBManager.reloadProtoDB();
 }
 
 #if ZP_USE_HOT_RELOAD
@@ -481,6 +489,8 @@ void zpApplication::runReloadChangedResources()
 	m_renderingPipeline.getMaterialContentManager()->reloadChangedResources();
 	m_renderingPipeline.getShaderContentManager()->reloadChangedResources();
 	m_renderingPipeline.getTextureContentManager()->reloadChangedResources();
+
+	m_protoDBManager.reloadChangedProtoDB();
 }
 #endif
 

@@ -50,12 +50,14 @@ public:
 
 	zpGUI* getGUI() { return &m_gui; }
 
+	zpEventManager* getEventManager() { return &m_eventManager; }
+
+	zpProtoDBManager* getProtoDBManager() { return &m_protoDBManager; }
+
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
 #include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
-
-	zpEventManager* getEventManager() { return &m_eventManager; }
 
 private:
 	void runGarbageCollect();
@@ -103,17 +105,18 @@ private:
 	zpWorldContentManager m_worldContent;
 	zpScriptContentManager m_scriptContent;
 	zpAudioContentManager m_audioContent;
+	zpTextContentManager m_textContent;
 
 	zpPhysicsEngine m_physicsEngine;
+
+	zpEventManager m_eventManager;
+
+	zpProtoDBManager m_protoDBManager;
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )	zp##cmp##ComponentPool m_componentPool##cmp;
 #include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
-
-	zpTextContentManager m_textContent;
-
-	zpEventManager m_eventManager;
 };
 
 #endif

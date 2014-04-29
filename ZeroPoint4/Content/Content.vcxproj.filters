@@ -30,12 +30,18 @@
     <ClInclude Include="zpContentPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpProtoDB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpContent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpTextContentManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpProtoDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,6 +53,9 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpContentPool.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpProtoDB.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

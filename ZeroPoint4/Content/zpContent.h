@@ -10,4 +10,6 @@
 
 #include "zpTextContentManager.h"
 
+#include "zpProtoDB.h"
+
 #endif

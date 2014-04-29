@@ -70,6 +70,7 @@
     <ClInclude Include="zpContent.h" />
     <ClInclude Include="zpContentManager.h" />
     <ClInclude Include="zpContentPool.h" />
+    <ClInclude Include="zpProtoDB.h" />
     <ClInclude Include="zpResource.h" />
     <ClInclude Include="zpTextContentManager.h" />
   </ItemGroup>
@@ -78,6 +79,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="zpProtoDB.cpp" />
     <ClCompile Include="zpTextContentManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +90,7 @@
   <ItemGroup>
     <None Include="zpContentManager.inl" />
     <None Include="zpContentPool.inl" />
+    <None Include="zpProtoDB.inl" />
     <None Include="zpResource.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
