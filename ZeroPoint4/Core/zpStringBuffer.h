@@ -57,23 +57,7 @@ public:
 	void append( zp_float value );
 	void append( zp_double value );
 
-	void prepend( zp_char value );
-	void prepend( const zp_char* value );
-
-	void prepend( zp_sbyte value );
-	void prepend( zp_short value );
-	void prepend( zp_int value );
-	void prepend( zp_long value );
-
-	void prepend( zp_byte value );
-	void prepend( zp_ushort value );
-	void prepend( zp_uint value );
-	void prepend( zp_ulong value );
-
-	void prepend( zp_float value );
-	void prepend( zp_double value );
-
-	void erase( zp_uint start, zp_uint end = npos );
+	void erase( zp_uint start, zp_int length = 0 );
 	void clear();
 
 	zp_int indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;

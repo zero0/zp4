@@ -102,6 +102,9 @@
     <ClInclude Include="zpAudioListenerComponent.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="zpParticleEmitterComponent.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -160,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="zpAudioListenerComponent.cpp">
       <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="zpParticleEmitterComponent.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

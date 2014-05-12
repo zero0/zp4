@@ -120,8 +120,8 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 		m_hasNextWorld = true;
 	}
 
-	m_protoDBManager.initialize( appOptions[ "ProtoDB" ].asCString() );
-	m_protoDBManager.setup();
+	//m_protoDBManager.initialize( appOptions[ "ProtoDB" ].asCString() );
+	//m_protoDBManager.setup();
 }
 void zpApplication::run()
 {
@@ -421,6 +421,9 @@ void zpApplication::processFrame()
 		// individual component render
 		m_componentPoolMeshRenderer.render( i );
 
+		// render particles
+		m_componentPoolParticleEmitter.render( i, m_renderingPipeline.getCamera( ZP_CAMERA_TYPE_MAIN ) );
+
 		// render begin
 		ZP_PROFILE_START( RENDER_BEGIN );
 		m_renderingPipeline.beginFrame( i );
@@ -490,7 +493,7 @@ void zpApplication::runReloadChangedResources()
 	m_renderingPipeline.getShaderContentManager()->reloadChangedResources();
 	m_renderingPipeline.getTextureContentManager()->reloadChangedResources();
 
-	m_protoDBManager.reloadChangedProtoDB();
+	//m_protoDBManager.reloadChangedProtoDB();
 }
 #endif
 

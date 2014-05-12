@@ -24,6 +24,7 @@ class zpAudioListenerComponent;
 
 class zpCameraComponent;
 class zpMeshRendererComponent;
+class zpParticleEmitterComponent;
 
 class zpRigidBodyComponent;
 
@@ -45,6 +46,7 @@ class zpAttachmentComponent;
 // Rendering
 #include "zpCameraComponent.h"
 #include "zpMeshRendererComponent.h"
+#include "zpParticleEmitterComponent.h"
 
 // Physics
 #include "zpRigidBodyComponent.h"

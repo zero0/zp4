@@ -1,55 +1,85 @@
 #include "zpCore.h"
 
-zpRandom::zpRandom() {
+zpRandom::zpRandom()
+{
 	zp_srand( (zp_uint)zpTime::getInstance()->getTime() );
 }
-zpRandom::~zpRandom() {}
+zpRandom::~zpRandom()
+{}
 
-zpRandom* zpRandom::getInstance() {
+zpRandom* zpRandom::getInstance()
+{
 	static zpRandom instance;
 	return &instance;
 }
 
-zp_int zpRandom::randomInt() {
+zp_int zpRandom::randomInt()
+{
 	return zp_rand();
 }
-zp_int zpRandom::randomInt( zp_int low, zp_int high ) {
+zp_int zpRandom::randomInt( zp_int low, zp_int high )
+{
 	return ( randomInt() % high ) + low;
 }
 
-zp_float zpRandom::randomFloat() {
+zp_uint zpRandom::randomUInt()
+{
+	return (zp_uint)zp_rand();
+}
+zp_uint zpRandom::randomUInt( zp_uint low, zp_uint high )
+{
+	return ( randomUInt() % high ) + low;
+}
+
+zp_float zpRandom::randomFloat()
+{
 	return zp_randf();
 }
-zp_float zpRandom::randomFloat( zp_float low, zp_float high ) {
+zp_float zpRandom::randomFloat( zp_float low, zp_float high )
+{
 	return ( randomFloat() * ( high - low ) ) + low; 
 }
 
-void zpRandom::randomUnitSphere( zpVector4f& sphere, zp_float w )
+zpScalar zpRandom::randomScalar( const zpScalar& low, const zpScalar& high )
 {
-	sphere = zpVector4f(
+	return zpScalar( randomFloat( low.getFloat(), high.getFloat() ) );
+}
+
+zpVector4f zpRandom::randomVector( const zpVector4f& low, const zpVector4f& high )
+{
+	return zpVector4f(
+		randomScalar( low.getX(), high.getX() ),
+		randomScalar( low.getY(), high.getY() ),
+		randomScalar( low.getZ(), high.getZ() ),
+		randomScalar( low.getW(), high.getW() ) );
+}
+zpVector4f zpRandom::randomUnitSphere( zp_float w )
+{
+	return zpVector4f(
 		randomFloat( -1.f, 1.f ),
 		randomFloat( -1.f, 1.f ),
 		randomFloat( -1.f, 1.f ),
 		w );
 }
-void zpRandom::randomUnitCircle( zpVector4f& circle, zp_float z, zp_float w )
+zpVector4f zpRandom::randomUnitCircle( zp_float z, zp_float w )
 {
-	circle = zpVector4f(
+	return zpVector4f(
 		randomFloat( -1.f, 1.f ),
 		randomFloat( -1.f, 1.f ),
 		z,
 		w );
 }
-void zpRandom::randomColor( zpColor4f& color, zp_float alpha )
+zpColor4f zpRandom::randomColor( zp_float alpha )
 {
-	color = zpColor4f(
+	return zpColor4f(
 		randomFloat( 0.f, 1.f ),
 		randomFloat( 0.f, 1.f ),
 		randomFloat( 0.f, 1.f ),
 		alpha );
 }
 
-zp_bool zpRandom::randomBoolean() {
+zp_bool zpRandom::randomBoolean()
+{
 	return ( randomInt() % 2 ) == 0;
 }
 

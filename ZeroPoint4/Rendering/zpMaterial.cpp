@@ -21,7 +21,7 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 		ZP_ASSERT( ok, "Failed to load shader '%s' for material '%s'", shaderFile, getFilename().str() );
 
 		// load textures for the material
-		const zpBison::Value textures = root[ "Textures" ];
+		const zpBison::Value& textures = root[ "Textures" ];
 		textures.foreachArray( [ this, pipeline, &ok ]( const zpBison::Value& v )
 		{
 			const zp_char* tex = v.asCString();
@@ -37,10 +37,10 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 		} );
 
 		// load constants from the material
-		const zpBison::Value constants = root[ "Constants" ];
+		const zpBison::Value& constants = root[ "Constants" ];
 
 		// load texture samplers for the material
-		const zpBison::Value samples = root[ "Samplers" ];
+		const zpBison::Value& samples = root[ "Samplers" ];
 		samples.foreachArrayIndexed( [ this, pipeline ]( zp_uint i, const zpBison::Value& v )
 		{
 			zpMaterial::zpMaterialTextureSampler& t = m_resource.textures[ i ];
@@ -49,6 +49,24 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 			pipeline->generateSamplerStateDesc( v, sampler );
 			pipeline->getRenderingEngine()->createSamplerState( t.sampler, sampler );
 		} );
+
+		// load blend mode for the material
+		const zpBison::Value& blendMode = root[ "BlendMode" ];
+		if( !blendMode.isEmpty() )
+		{
+			zpBlendStateDesc blendDesc;
+			pipeline->generateBlendStateDesc( blendMode, blendDesc );
+			pipeline->getRenderingEngine()->createBlendState( m_resource.blend, blendDesc );
+		}
+
+		// load depth stencil for material
+		const zpBison::Value& depth = root[ "Depth" ];
+		if( !depth.isEmpty() )
+		{
+			zpDepthStencilStateDesc depthDesc;
+			pipeline->generateDepthStencilStateDesc( depth, depthDesc );
+			pipeline->getRenderingEngine()->createDepthStencilState( m_resource.depth, depthDesc );
+		}
 	}
 
 	return ok;

@@ -73,7 +73,7 @@ zpBlendTargetDesc::zpBlendTargetDesc()
 	, blendOp( ZP_BLEND_OP_ADD )
 	, srcBlendAlpha( ZP_BLEND_ONE )
 	, destBlendAlpha( ZP_BLEND_ZERO )
-	, blendOpAlpah( ZP_BLEND_OP_ADD )
+	, blendOpAlpha( ZP_BLEND_OP_ADD )
 	, renderTargetWriteMask( ZP_COLOR_WRITE_ENABLE_ALL )
 {}
 

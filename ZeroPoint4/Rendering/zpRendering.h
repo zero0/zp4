@@ -471,7 +471,7 @@ struct zpBlendTargetDesc
 	zpBlendOp blendOp;
 	zpBlend srcBlendAlpha;
 	zpBlend destBlendAlpha;
-	zpBlendOp blendOpAlpah;
+	zpBlendOp blendOpAlpha;
 	zp_byte renderTargetWriteMask;
 
 	zpBlendTargetDesc();

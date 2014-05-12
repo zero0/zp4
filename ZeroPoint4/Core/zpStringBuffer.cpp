@@ -289,23 +289,22 @@ void zpStringBuffer::append( zp_double value )
 	append( buff );
 }
 
-void zpStringBuffer::prepend( zp_char value ) {}
-void zpStringBuffer::prepend( const zp_char* value ) {}
-
-void zpStringBuffer::prepend( zp_sbyte value ) {}
-void zpStringBuffer::prepend( zp_short value ) {}
-void zpStringBuffer::prepend( zp_int value ) {}
-void zpStringBuffer::prepend( zp_long value ) {}
-
-void zpStringBuffer::prepend( zp_byte value ) {}
-void zpStringBuffer::prepend( zp_ushort value ) {}
-void zpStringBuffer::prepend( zp_uint value ) {}
-void zpStringBuffer::prepend( zp_ulong value ) {}
-
-void zpStringBuffer::prepend( zp_float value ) {}
-void zpStringBuffer::prepend( zp_double value ) {}
-
-void zpStringBuffer::erase( zp_uint start, zp_uint end ) {}
+void zpStringBuffer::erase( zp_uint start, zp_int length )
+{
+	zp_uint end = start;
+	if( length < 0 )
+	{
+		end = m_length + length;
+	}
+	else if( length == 0 )
+	{
+		end = m_length - 1;
+	}
+	else
+	{
+		end = start + length;
+	}
+}
 void zpStringBuffer::clear()
 {
 	m_length = 0;

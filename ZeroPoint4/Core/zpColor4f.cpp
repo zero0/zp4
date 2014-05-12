@@ -157,6 +157,11 @@ zp_bool zpColor4f::operator!=( const zpColor4f& color ) const
 	return !( m_red == color.m_red && m_green == color.m_green && m_blue == color.m_blue && m_alpha == color.m_alpha );
 }
 
+void zpColor4f::Lerp( zpColor4f& s, const zpColor4f& a, const zpColor4f& b, const zpScalar& alpha )
+{
+	s = a.lerp( b, alpha.getFloat() );
+}
+
 zpPackedColor::zpPackedColor()
 	: m_argb( 0 )
 {}

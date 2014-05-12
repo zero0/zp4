@@ -90,7 +90,8 @@ zpFile zpFile::createTempFile()
 const zpString& zpFile::getCurrentDirectory()
 {
 	static zpString currentDirectory;
-	if( currentDirectory.isEmpty() ) {
+	if( currentDirectory.isEmpty() )
+	{
 #if ZP_WIN_32 || ZP_WIN_64
 		zp_dword size = GetCurrentDirectory( 0, ZP_NULL );
 		zp_char* buff = new zp_char[ size + 1 ];
@@ -106,7 +107,8 @@ const zpString& zpFile::getCurrentDirectory()
 }
 void zpFile::convertToFilePath( zpString& filepath )
 {
-	filepath.map( []( zp_char ch ) -> zp_char {
+	filepath.map( []( zp_char ch )
+	{
 		return ch == '/' || ch == '\\' ? zpFile::sep : ch;
 	} );
 }
@@ -121,6 +123,44 @@ zp_long zpFile::getFileModificationTime( const zp_char* filepath )
 	return time;
 }
 
+void zpFile::listFiles( const zpString& directory, zpArrayList< zpString >& files )
+{
+	files.clear();
+
+#if ZP_WIN_32 || ZP_WIN_64
+	zpString dir( directory );
+	zpFile::convertToFilePath( dir );
+	zpFixedStringBuffer< 255 > d;
+	d.append( directory );
+
+	if( !dir.endsWith( zpFile::sep ) )
+	{
+		d.append( zpFile::sep );
+	}
+	d.append( '*' );
+
+	WIN32_FIND_DATA findData;
+	HANDLE hFind = FindFirstFile( d.str(), &findData );
+	if( hFind != INVALID_HANDLE_VALUE )
+	{
+		zpFixedStringBuffer< 255 > subdir;
+		do
+		{
+			if( zp_strcmp( findData.cFileName, "." ) == 0 || zp_strcmp( findData.cFileName, ".." ) == 0 )
+			{
+				continue;
+			}
+			subdir.clear();
+			subdir << directory;
+			files.pushBackEmpty() = findData.cFileName;
+		}
+		while( FindNextFile( hFind, &findData ) );
+	}
+
+	FindClose( hFind );
+#endif
+}
+
 
 zpFileMode zpFile::getFileMode() const
 {
@@ -128,7 +168,8 @@ zpFileMode zpFile::getFileMode() const
 }
 zp_long zpFile::getFileSize()
 {
-	if( m_size < 0 && m_file ) {
+	if( m_size < 0 && m_file )
+	{
 		fpos_t pos;
 		FILE* f = (FILE*)m_file;
 		fgetpos( f, &pos );

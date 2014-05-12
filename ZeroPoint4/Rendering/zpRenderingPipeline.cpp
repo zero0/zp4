@@ -1,6 +1,6 @@
 #include "zpRendering.h"
 
-const zp_char* g_cmpFuns[] =
+const zp_char* g_comparisonFunc[] =
 {
 	"None",
 	"Less",
@@ -34,6 +34,117 @@ const zp_char* g_cullMode[] =
 	"Front",
 	"Back",
 };
+const zp_char* g_blend[] =
+{
+	"Zero",
+	"One",
+	"SrcColor",
+	"InvSrcColor",
+	"SrcAlpha",
+	"InvSrcAlpha",
+	"DestAlpha",
+	"InvDestAlpha",
+	"DestColor",
+	"InvDestColor",
+	"SrcAlphaSat",
+	"BlendFactor",
+	"Src1Color",
+	"InvSrc1Color",
+	"Src1Alpha",
+	"InvSrc1Alpha",
+};
+const zp_char* g_blendOp[] =
+{
+	"Add",
+	"Sub",
+	"RevSub",
+	"Min",
+	"Max",
+};
+const zp_char* g_stencilOp[] =
+{
+	"Keep",
+	"Zero",
+	"Replace",
+	"IncrSat",
+	"DecrSat",
+	"Invert",
+	"Incr",
+	"Decr",
+};
+
+
+#define ENUM_COUNT( e ) e##_count
+#define ENUM_STR( e ) g_##e
+
+template< typename T, zp_uint count >
+zp_bool _strToEnum( const zp_char* (&e)[ count ], const zpBison::Value& str, T& t )
+{
+	zp_bool ok = false;
+
+	if( str.isString() )
+	{
+		const zp_char* s = str.asCString();
+		for( zp_uint i = 0; i < count; ++i )
+		{
+			if( zp_strcmp( s, e[ i ] ) == 0 )
+			{
+				t = (T)i;
+				ok = true;
+				break;
+			}
+		}
+	}
+
+	return ok;
+}
+zp_bool _valueToColor( const zpBison::Value& v, zpColor4f& c )
+{
+	zp_bool ok = false;
+
+	if( !v.isEmpty() )
+	{
+		ok = true;
+		if( v.isObject() )
+		{
+			switch( v.size() )
+			{
+			case 4:
+				c.setAlpha( v[ "a" ].asFloat() );
+			case 3:
+				c.setRed( v[ "r" ].asFloat() );
+				c.setGreen( v[ "g" ].asFloat() );
+				c.setBlue( v[ "b" ].asFloat() );
+				break;
+			default:
+				ok = false;
+				break;
+			}
+		}
+		else if( v.isArray() )
+		{
+			switch( v.size() )
+			{
+			case 4:
+				c.setAlpha( v[ 3 ].asFloat() );
+			case 3:
+				c.setRed( v[ 0 ].asFloat() );
+				c.setGreen( v[ 1 ].asFloat() );
+				c.setBlue( v[ 2 ].asFloat() );
+				break;
+			default:
+				ok = false;
+				break;
+			}
+		}
+		else
+		{
+			ok = false;
+		}
+	}
+
+	return ok;
+}
 
 zpRenderingPipeline::zpRenderingPipeline()
 	: m_engine( zpRenderingFactory::getRenderingEngine() )
@@ -354,96 +465,16 @@ void zpRenderingPipeline::generateSamplerStateDesc( const zpBison::Value& sample
 		const zpBison::Value& lodBiasValue = sampler[ "LodBias" ];
 		const zpBison::Value& borderColorValue = sampler[ "BorderColor" ];
 
-		if( cmpFuncValue.isString() )
-		{
-			const zp_char* cmpFunc = cmpFuncValue.asCString();
-			for( zp_uint i = 0; i < zpComparisonFunc_Count; ++i )
-			{
-				if( zp_strcmp( cmpFunc, g_cmpFuns[ i ] ) )
-				{
-					outSamplerDesc.cmpFunc = (zpComparisonFunc)i;
-					break;
-				}
-			}
-		}
-
-		if( minFilterValue.isString() )
-		{
-			const zp_char* minFilter = minFilterValue.asCString();
-			for( zp_uint i = 0; i < zpTextureFilter_Count; ++i )
-			{
-				if( zp_strcmp( minFilter, g_textureFilter[ i ] ) == 0 )
-				{
-					outSamplerDesc.minFilter = (zpTextureFilter)i;
-					break;
-				}
-			}
-		}
-
-		if( magFilterValue.isString() )
-		{
-			const zp_char* magFilter = magFilterValue.asCString();
-			for( zp_uint i = 0; i < zpTextureFilter_Count; ++i )
-			{
-				if( zp_strcmp( magFilter, g_textureFilter[ i ] ) == 0 )
-				{
-					outSamplerDesc.magFilter = (zpTextureFilter)i;
-					break;
-				}
-			}
-		}
-
-		if( mipFilterValue.isString() )
-		{
-			const zp_char* mipFilter = mipFilterValue.asCString();
-			for( zp_uint i = 0; i < zpTextureFilter_Count; ++i )
-			{
-				if( zp_strcmp( mipFilter, g_textureFilter[ i ] ) == 0 )
-				{
-					outSamplerDesc.mipFilter = (zpTextureFilter)i;
-					break;
-				}
-			}
-		}
-
-		if( texWrapUValue.isString() )
-		{
-			const zp_char* texWrapU = texWrapUValue.asCString();
-			for( zp_uint i = 0; i < zpTextureWrap_Count; ++i )
-			{
-				if( zp_strcmp( texWrapU, g_textureWrap[ i ] ) == 0 )
-				{
-					outSamplerDesc.texWrapU = (zpTextureWrap)i;
-					break;
-				}
-			}
-		}
-
-		if( texWrapUValue.isString() )
-		{
-			const zp_char* texWrapV = texWrapVValue.asCString();
-			for( zp_uint i = 0; i < zpTextureWrap_Count; ++i )
-			{
-				if( zp_strcmp( texWrapV, g_textureWrap[ i ] ) == 0 )
-				{
-					outSamplerDesc.texWrapV = (zpTextureWrap)i;
-					break;
-				}
-			}
-		}
-
-		if( texWrapWValue.isString() )
-		{
-			const zp_char* texWrapW = texWrapWValue.asCString();
-			for( zp_uint i = 0; i < zpTextureWrap_Count; ++i )
-			{
-				if( zp_strcmp( texWrapW, g_textureWrap[ i ] ) == 0 )
-				{
-					outSamplerDesc.texWrapU = (zpTextureWrap)i;
-					break;
-				}
-			}
-		}
+		zpTextureWrap wrap;
+		zpTextureFilter filter;
+		zpComparisonFunc cmp;
+		if( _strToEnum( g_comparisonFunc,  cmpFuncValue, cmp ) ) outSamplerDesc.cmpFunc = cmp;
+		if( _strToEnum( g_textureFilter,   minFilterValue, filter ) ) outSamplerDesc.minFilter = filter;
+		if( _strToEnum( g_textureFilter,   magFilterValue, filter ) ) outSamplerDesc.magFilter = filter;
+		if( _strToEnum( g_textureFilter,   mipFilterValue, filter ) ) outSamplerDesc.mipFilter = filter;
+		if( _strToEnum( g_textureWrap,     texWrapUValue, wrap ) ) outSamplerDesc.texWrapU = wrap;
+		if( _strToEnum( g_textureWrap,     texWrapVValue, wrap ) ) outSamplerDesc.texWrapV = wrap;
+		if( _strToEnum( g_textureWrap,     texWrapWValue, wrap ) ) outSamplerDesc.texWrapW = wrap;
 
 		if( maxAnisotrpyValue.isIntegral() )
 		{
@@ -465,38 +496,7 @@ void zpRenderingPipeline::generateSamplerStateDesc( const zpBison::Value& sample
 			outSamplerDesc.lodBias = lodBiasValue.asFloat();
 		}
 
-		zpColor4f c;
-		if( borderColorValue.isObject() )
-		{
-			switch( borderColorValue.size() )
-			{
-			case 4:
-				c.setAlpha( borderColorValue[ "a" ].asFloat() );
-			case 3:
-				c.setRed( borderColorValue[ "r" ].asFloat() );
-				c.setGreen( borderColorValue[ "g" ].asFloat() );
-				c.setBlue( borderColorValue[ "b" ].asFloat() );
-				break;
-			default:
-				break;
-			}
-		}
-		else if( borderColorValue.isArray() )
-		{
-			switch( borderColorValue.size() )
-			{
-			case 4:
-				c.setAlpha( borderColorValue[ 3 ].asFloat() );
-			case 3:
-				c.setRed( borderColorValue[ 0 ].asFloat() );
-				c.setGreen( borderColorValue[ 1 ].asFloat() );
-				c.setBlue( borderColorValue[ 2 ].asFloat() );
-				break;
-			default:
-				break;
-			}
-		}
-		outSamplerDesc.borderColor = c;
+		_valueToColor( borderColorValue, outSamplerDesc.borderColor );
 	}
 }
 void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc )
@@ -517,18 +517,7 @@ void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster,
 		const zpBison::Value& depthBiasClampValue = raster[ "DepthBiasClamp" ];
 		const zpBison::Value& slopeScaledDepthBiasValue = raster[ "SlopeScaledDepthBias" ];
 
-		if( cullModeValue.isString() )
-		{
-			const zp_char* cullMode = cullModeValue.asCString();
-			for( zp_uint i = 0; i < zpCullMode_Count; ++i )
-			{
-				if( zp_strcmp( cullMode, g_cullMode[ i ] ) == 0 )
-				{
-					outRasterDesc.cullMode = (zpCullMode)i;
-					break;
-				}
-			}
-		}
+		_strToEnum( g_cullMode, cullModeValue, outRasterDesc.cullMode );
 
 		if( fillModeSolidValue.isBool() )
 		{
@@ -574,6 +563,86 @@ void zpRenderingPipeline::generateRasterStateDesc( const zpBison::Value& raster,
 		{
 			outRasterDesc.slopeScaledDepthBias = slopeScaledDepthBiasValue.asFloat();
 		}
+	}
+}
+void zpRenderingPipeline::generateBlendStateDesc( const zpBison::Value& blend, zpBlendStateDesc& outBlendStateDesc )
+{
+	outBlendStateDesc = zpBlendStateDesc();
+
+	const zpBison::Value& alphaToConverage = blend[ "AlphaToCoverageEnabled" ];
+	const zpBison::Value& independentBlend = blend[ "IndependentBlendEnabled" ];
+	const zpBison::Value& targets = blend[ "RenderTargets" ];
+	
+	outBlendStateDesc.alphaToConverageEnabled = alphaToConverage.asBool();
+	outBlendStateDesc.independentBlendEnabled = independentBlend.asBool();
+	
+	if( !targets.isEmpty() )
+	{
+		zp_uint count = targets.size();
+		for( zp_uint b = 0; b < count; ++b )
+		{
+			const zpBison::Value& targetDesc = targets[ b ];
+			zpBlendTargetDesc& target = outBlendStateDesc.renderTargets[ b ];
+
+			const zpBison::Value& srcBlend = targetDesc[ "SrcBlend" ];
+			const zpBison::Value& destBlend = targetDesc[ "DestBlend" ];
+			const zpBison::Value& blendOp = targetDesc[ "BlendOp" ];
+			const zpBison::Value& srcBlendAlpha = targetDesc[ "SrcBlendAlpha" ];
+			const zpBison::Value& destBlendAlpha = targetDesc[ "DestBlendAlpha" ];
+			const zpBison::Value& blendOpAlpha = targetDesc[ "BlendOpAlpha" ];
+
+			// enable when defined
+			target.enabled = true;
+
+			_strToEnum( g_blend, srcBlend, target.srcBlend );
+			_strToEnum( g_blend, destBlend, target.destBlend );
+			_strToEnum( g_blendOp, blendOp, target.blendOp );
+
+			_strToEnum( g_blend, srcBlendAlpha, target.srcBlendAlpha );
+			_strToEnum( g_blend, destBlendAlpha, target.destBlendAlpha );
+			_strToEnum( g_blendOp, blendOpAlpha, target.blendOpAlpha );
+
+			// TODO: implement write mask
+			target.renderTargetWriteMask = ZP_COLOR_WRITE_ENABLE_ALL;
+		}
+	}
+}
+void zpRenderingPipeline::generateDepthStencilStateDesc( const zpBison::Value& depthStencil, zpDepthStencilStateDesc& outDepthStencilStateDesc )
+{
+	outDepthStencilStateDesc = zpDepthStencilStateDesc();
+
+	const zpBison::Value& depthEnabled = depthStencil[ "DepthEnabled" ];
+	const zpBison::Value& depthWriteMaskAll = depthStencil[ "DepthWriteMaskAll" ];
+	const zpBison::Value& depthFunc = depthStencil[ "DepthFunc" ];
+	const zpBison::Value& stencilEnabled = depthStencil[ "StencilEnabled" ];
+	const zpBison::Value& stencilReadMask = depthStencil[ "StencilReadMask" ];
+	const zpBison::Value& stencilWriteMask = depthStencil[ "StencilWriteMask" ];
+	const zpBison::Value& frontFace = depthStencil[ "FrontFace" ];
+	const zpBison::Value& backFace = depthStencil[ "BackFace" ];
+
+	if( depthEnabled.isIntegral() ) outDepthStencilStateDesc.depthEnabled = depthEnabled.asBool();
+	if( depthWriteMaskAll.isIntegral() ) outDepthStencilStateDesc.depthWriteMaskAll = depthWriteMaskAll.asBool();
+
+	_strToEnum( g_comparisonFunc, depthFunc, outDepthStencilStateDesc.depthFunc );
+
+	if( stencilEnabled.isIntegral() ) outDepthStencilStateDesc.stencilEnabled = stencilEnabled.asBool();
+	if( stencilReadMask.isIntegral() ) outDepthStencilStateDesc.stencilReadMask = (zp_byte)stencilReadMask.asInt();
+	if( stencilWriteMask.isIntegral() ) outDepthStencilStateDesc.stencilWriteMask = (zp_byte)stencilWriteMask.asInt();
+
+	if( !frontFace.isEmpty() )
+	{
+		_strToEnum( g_stencilOp,      frontFace[ "StencilFail" ],          outDepthStencilStateDesc.frontFace.stencilFail );
+		_strToEnum( g_stencilOp,      frontFace[ "StencilPassDepthFail" ], outDepthStencilStateDesc.frontFace.stencilPassDepthFail );
+		_strToEnum( g_stencilOp,      frontFace[ "StencilPassDepthPass" ], outDepthStencilStateDesc.frontFace.stencilPassDepthPass );
+		_strToEnum( g_comparisonFunc, frontFace[ "StencilFunc" ],          outDepthStencilStateDesc.frontFace.stencilFunc );
+	}
+	
+	if( !backFace.isEmpty() )
+	{
+		_strToEnum( g_stencilOp,      backFace[ "StencilFail" ],          outDepthStencilStateDesc.backFace.stencilFail );
+		_strToEnum( g_stencilOp,      backFace[ "StencilPassDepthFail" ], outDepthStencilStateDesc.backFace.stencilPassDepthFail );
+		_strToEnum( g_stencilOp,      backFace[ "StencilPassDepthPass" ], outDepthStencilStateDesc.backFace.stencilPassDepthPass );
+		_strToEnum( g_comparisonFunc, backFace[ "StencilFunc" ],          outDepthStencilStateDesc.backFace.stencilFunc );
 	}
 }
 

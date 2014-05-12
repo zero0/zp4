@@ -43,6 +43,8 @@ public:
 	zp_bool operator==( const zpColor4f& color ) const;
 	zp_bool operator!=( const zpColor4f& color ) const;
 
+	static void Lerp( zpColor4f& s, const zpColor4f& a, const zpColor4f& b, const zpScalar& alpha );
+
 private:
 	union {
 		struct {

@@ -40,6 +40,8 @@ public:
 
 	void generateSamplerStateDesc( const zpBison::Value& sampler, zpSamplerStateDesc& outSamplerDesc );
 	void generateRasterStateDesc( const zpBison::Value& raster, zpRasterStateDesc& outRasterDesc );
+	void generateBlendStateDesc( const zpBison::Value& blend, zpBlendStateDesc& outBlendStateDesc );
+	void generateDepthStencilStateDesc( const zpBison::Value& depthStencil, zpDepthStencilStateDesc& outDepthStencilStateDesc );
 
 	void enterEditMode();
 	void leaveEditMode();

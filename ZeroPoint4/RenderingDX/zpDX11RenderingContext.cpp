@@ -224,6 +224,13 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 	if( shader->m_geometryShader ) m_context->GSSetShader( shader->m_geometryShader, 0, 0 );
 	if( shader->m_pixelShader )    m_context->PSSetShader( shader->m_pixelShader, 0, 0 );
 
+	const zp_float factor[] = { 1, 1, 1, 1 };
+	const zpBlendStateImpl* blend = material->blend.getBlendStateImpl();
+	m_context->OMSetBlendState( blend ? blend->m_blend : ZP_NULL, factor, -1 );
+
+	const zpDepthStencilStateImpl* depth = material->depth.getDepthStencilStateImpl();
+	m_context->OMSetDepthStencilState( depth ? depth->m_depthStencil : ZP_NULL, 0 );
+
 	const zpMaterial::zpMaterialTextureSampler* b = material->textures.begin();
 	const zpMaterial::zpMaterialTextureSampler* e = material->textures.end();
 	for( zp_uint i = 0; b != e; ++i, ++b )
@@ -247,6 +254,7 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 			m_context->PSSetSamplers( i, 1, &s.getSamplerStateImpl()->m_sampler );
 			m_context->PSSetShaderResources( i, 1, &t->getTextureImpl()->m_textureResourceView );
 		}
+
 	}
 }
 

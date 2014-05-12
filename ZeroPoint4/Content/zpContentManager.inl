@@ -256,15 +256,17 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 	Resource* end = m_resources.end();
 
 	ImplManager *impl = (ImplManager*)this; //dynamic_cast<ImplManager*>( this );
+	zpString filename;
 
 	for( ; res != end; ++res )
 	{
 		if( res->m_isLoadedFromFile && res->getRefCount() > 0 )
 		{
-			const zpString& filename = res->getFilename();
-			mtime = zpFile::getFileModificationTime( filename.str() );
+			mtime = zpFile::getFileModificationTime( res->getFilename().str() );
 			if( res->m_lastTimeLoaded != mtime )
 			{
+				filename = res->getFilename();
+
 				if( res->isLoaded() )
 				{
 					impl->destroyResource( res );

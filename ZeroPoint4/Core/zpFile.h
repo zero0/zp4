@@ -43,6 +43,7 @@ public:
 	static const zpString& getCurrentDirectory();
 	static void convertToFilePath( zpString& filepath );
 	static zp_long getFileModificationTime( const zp_char* filepath );
+	static void listFiles( const zpString& directory, zpArrayList< zpString >& files );
 
 	zpFileMode getFileMode() const;
 	zp_long getFileSize();
@@ -106,7 +107,7 @@ public:
 
 	const zpString& getFilename() const;
 	void getFileExtension( zpString& out ) const;
-	void getFileDirectory( zpString& out ) const;	
+	void getFileDirectory( zpString& out ) const;
 
 private:
 	zpFile( const zpFile& file );

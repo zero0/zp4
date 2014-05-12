@@ -12,6 +12,9 @@ struct zpMaterial
 		zpResourceBindSlotType bindSlots;
 		zpSamplerState sampler;
 	};
+	
+	zpBlendState blend;
+	zpDepthStencilState depth;
 
 	zp_ushort materialId;
 	zpShaderResourceInstance shader;

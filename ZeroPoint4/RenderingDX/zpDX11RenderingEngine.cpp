@@ -753,7 +753,7 @@ zpBlendStateImpl* zpRenderingEngineImpl::createBlendState( const zpBlendStateDes
 			samplerTargetDesc.BlendOp = __zpToDX( targetDesc.blendOp );
 			samplerTargetDesc.SrcBlendAlpha = __zpToDX( targetDesc.srcBlendAlpha );
 			samplerTargetDesc.DestBlendAlpha = __zpToDX( targetDesc.destBlendAlpha );
-			samplerTargetDesc.BlendOpAlpha = __zpToDX( targetDesc.blendOpAlpah );
+			samplerTargetDesc.BlendOpAlpha = __zpToDX( targetDesc.blendOpAlpha );
 			samplerTargetDesc.RenderTargetWriteMask = targetDesc.renderTargetWriteMask;
 		}
 

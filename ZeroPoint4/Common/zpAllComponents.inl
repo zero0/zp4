@@ -11,6 +11,7 @@ ZP_COMPONENT_DEF( AudioListener )
 // Rendering
 ZP_COMPONENT_DEF( Camera )
 ZP_COMPONENT_DEF( MeshRenderer )
+ZP_COMPONENT_DEF( ParticleEmitter )
 
 // Physics
 ZP_COMPONENT_DEF( RigidBody )
