@@ -56,6 +56,8 @@ private:
 	zpRandom* m_random;
 	zpTime* m_time;
 
+	zpVector4f m_prevPosition;
+
 	struct zpParticle
 	{
 		zpVector4f position;
@@ -63,6 +65,7 @@ private:
 		zpVector4f rotation;
 		zpVector4f angularVelocity;
 		zpVector4f scale;
+		zpVector4f normal;
 		zpColor4f color;
 		zp_float life;
 		zp_float maxLife;
@@ -134,6 +137,7 @@ private:
 		zp_bool isWorldSpace;
 		zp_bool isBillboard;
 		zp_bool playOnCreate;
+		zp_bool useDepthSort;
 
 		zpParticleEffectState state;
 
