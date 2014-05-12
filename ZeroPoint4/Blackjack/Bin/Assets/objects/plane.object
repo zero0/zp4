@@ -1,0 +1,32 @@
+{
+    "Name" : "cube",
+    "Tags" : [
+    ],
+    "Layer" : "Default",
+    "Transform" :
+    {
+        "Position" : [ 0, -5, 0 ],
+        "Scale" :    [ 10, 1, 10 ]
+    },
+    "Components" :
+    {
+        "MeshRenderer" :
+        {
+            "Mesh" : "meshes/cube.meshb"
+        },
+        "RigidBody" :
+        {
+            "Mass" : 0,
+            "Group" : "Main",
+            "Mask" : "Main",
+            "Collider" :
+            {
+                "Shape" : "Box",
+                "Size" :
+                {
+                    "Extents" : [ 10, 1, 10 ]
+                }
+            }
+        }
+    }
+}

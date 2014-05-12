@@ -2,7 +2,7 @@
     "Shader" : "shaders/TransparentDiffuse.shaderb",
     "Textures" :
     [
-        "fonts/arial32_0.textureb"
+        "textures/ex_Fire.textureb"
     ],
     "Constants" :
     {},
@@ -18,5 +18,9 @@
                 "BlendOp" : "Add"
             }
         ]
+    },
+    "Depth" :
+    {
+        "DepthEnabled" : false
     }
 }

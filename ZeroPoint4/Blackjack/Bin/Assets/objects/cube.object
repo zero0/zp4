@@ -1,31 +1,78 @@
 {
-	"Name" : "cube",
-	"Tags" : [
-	],
-	"Layer" : "Default",
-	"Transform" :
-	{
-		"Position" : [ 0, 0, 0 ]
-	},
-	"Components" :
-	{
-		"MeshRenderer" :
-		{
-			"Mesh" : "meshes/cube.meshb"
-		},
-		"RigidBody" :
-		{
-			"Mass" : 0,
-			"Group" : "Main",
-			"Mask" : "Main",
-			"Collider" :
-			{
-				"Shape" : "Box",
-				"Size" :
-				{
-					"Extents" : [ 1, 1, 1 ]
-				}
-			}
-		}
-	}
+    "Name" : "cube",
+    "Tags" : [
+    ],
+    "Layer" : "Default",
+    "Transform" :
+    {
+        "Position" : [ 0, 5, 0 ]
+    },
+    "Components" :
+    {
+        "MeshRenderer" :
+        {
+            "Mesh" : "meshes/cube.meshb"
+        },
+        "RigidBody" :
+        {
+            "Mass" : 1,
+            "Group" : "Main",
+            "Mask" : "Main",
+            "Collider" :
+            {
+                "Shape" : "Box",
+                "Size" :
+                {
+                    "Extents" : [ 1, 1, 1 ]
+                }
+            }
+        },
+        "ParticleEmitter" :
+        {
+            "Layer" : 4,
+            "MaxParticles" : 40,
+            "Effects" :
+            {
+                "DefaultEmitter" :
+                {
+                    "Shape" :       "Cone",
+                    "ShapeSize":    [ 0, 1, 0, 0 ],
+                    
+                    "Gravity" :     [ 0, 0, 0 ],
+                    
+                    "StartScale" :  [ 1, 1 ],
+                    "EndScale" :    [ 4, 4 ],
+
+                    "StartColor" :  [ 0, 0, 1, 1 ],
+                    "EndColor" :    [ 0, 1, 0, 0 ],
+
+                    "Delay" : 0,
+                    "Duration" : 1,
+
+                    "MinSpeed":  1,
+                    "MaxSpeed":  5,
+
+                    "InheritVelocityScale" : 1,
+
+                    "MinLife" : 1,
+                    "MaxLife" : 5,
+
+                    "MinEmitRate" : 0.2,
+                    "MaxEmitRate" : 0.2,
+
+                    "EmitFromShell" :   false,
+                    "RandomDirection" : false,
+                    "IsLooping" :       true,
+                    "PreWarm" :         false,
+                    "UseRealTime" :     false,
+                    "IsWorldSpace" :    true,
+                    "IsBillboard" :     true,
+                    "PlayOnCreate" :    true,
+                    "UseDepthSort" :    false,
+
+                    "Material" : "materials/flame.materialb"
+                }
+            }
+        }
+    }
 }
