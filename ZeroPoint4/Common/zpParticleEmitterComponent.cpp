@@ -70,7 +70,7 @@ void zpParticleEmitterComponent::render( zpRenderingContext* i, zpCamera* camera
 	zpParticleEffect* end = m_effects.end();
 	for( ; effect != end; ++effect )
 	{
-		if( effect->state != ZP_PARTICLE_EFFECT_STATE_PLAYING ) continue;
+		if( effect->state != ZP_PARTICLE_EFFECT_STATE_PLAYING && effect->state != ZP_PARTICLE_EFFECT_STATE_FINISHING ) continue;
 
 		// if depth sort enabled, sort particles based on distance to camera
 		if( effect->useDepthSort )
@@ -259,20 +259,27 @@ void zpParticleEmitterComponent::onUpdate()
 			}
 			else
 			{
-				effect->state = ZP_PARTICLE_EFFECT_STATE_DISABLED;
-				continue;
+				if( effect->usedParticles.isEmpty() )
+				{
+					effect->state = ZP_PARTICLE_EFFECT_STATE_DISABLED;
+					continue;
+				}
+				else
+				{
+					effect->state = ZP_PARTICLE_EFFECT_STATE_FINISHING;
+				}
 			}
 		}
 
-		// increment emit time by the emit rate
-		zp_float emitRate = dt * ( effect->minEmitRate == effect->maxEmitRate ? effect->minEmitRate : m_random->randomUInt( effect->minEmitRate, effect->maxEmitRate ) );
-		effect->emitTime += dt;
-
-		// if the time has passed the rate, emit a particle
-		if( effect->emitTime > emitRate )
+		// if not finishing effect, still emit particles
+		if( effect->state != ZP_PARTICLE_EFFECT_STATE_FINISHING )
 		{
-			effect->emitTime = 0.f;
-			emitParticle( effect );
+			effect->emitTime -= dt;
+			if( effect->emitTime < 0.f )
+			{
+				effect->emitTime = m_random->randomFloat( effect->minEmitRate, effect->maxEmitRate );
+				emitParticle( effect );
+			}
 		}
 
 		zpScalar sdt( dt );
@@ -405,8 +412,8 @@ zp_bool zpParticleEmitterComponent::createEffect( const zp_char* name, const zpB
 	effect.maxLife = effectDef[ "MaxLife" ].asFloat();
 
 	effect.sortBias = (zp_ushort)effectDef[ "SortBias" ].asInt();
-	effect.minEmitRate = effectDef[ "MinEmitRate" ].asInt();
-	effect.maxEmitRate = effectDef[ "MaxEmitRate" ].asInt();
+	effect.minEmitRate = effectDef[ "MinEmitRate" ].asFloat();
+	effect.maxEmitRate = effectDef[ "MaxEmitRate" ].asFloat();
 
 	effect.scaleRange = ZP_PARTICLE_EFFECT_RANGE_LIFETIME;
 	effect.colorRange = ZP_PARTICLE_EFFECT_RANGE_LIFETIME;

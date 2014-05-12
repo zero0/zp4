@@ -95,6 +95,7 @@ private:
 		ZP_PARTICLE_EFFECT_STATE_DISABLED,
 		ZP_PARTICLE_EFFECT_STATE_STARTING,
 		ZP_PARTICLE_EFFECT_STATE_PLAYING,
+		ZP_PARTICLE_EFFECT_STATE_FINISHING,
 	};
 
 	struct zpParticleEffect
@@ -122,8 +123,8 @@ private:
 		zp_float maxLife;
 
 		zp_float emitTime;
-		zp_uint minEmitRate;
-		zp_uint maxEmitRate;
+		zp_float minEmitRate;
+		zp_float maxEmitRate;
 
 		zpParticleEffectRange scaleRange;
 		zpParticleEffectRange colorRange;
