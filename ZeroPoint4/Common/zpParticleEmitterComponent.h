@@ -16,18 +16,18 @@ public:
 	void setRenderingQueue( zpRenderingQueue queue );
 	zpRenderingQueue getRenderingQueue() const;
 
-	void play( const zp_char* effectName );
+	void play( const zp_char* effectName, zp_bool force = false );
 	void stop( const zp_char* effectName );
 	void stopAll();
 
 	zp_bool isPlaying( const zp_char* effectName ) const;
 	zp_bool isAnyPlaying() const;
 	zp_bool isPaused() const;
-
-	void pause();
-	void unpause();
+	void pause( zp_bool isPaused );
 
 protected:
+	void onRender( zpRenderingContext* i, zpCamera* camera );
+
 	void onCreate();
 	void onInitialize();
 	void onDestroy();

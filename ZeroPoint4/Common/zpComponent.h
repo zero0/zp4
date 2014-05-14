@@ -46,7 +46,6 @@ protected:
 	virtual void onEnabled() {};
 	virtual void onDisabled() {};
 
-private:
 	zpFlag8 m_flags;
 
 	zpObject* m_parentObject;

@@ -66,6 +66,106 @@ zpParticleEmitterComponent::~zpParticleEmitterComponent()
 
 void zpParticleEmitterComponent::render( zpRenderingContext* i, zpCamera* camera )
 {
+	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) )
+	{
+		onRender( i, camera );
+	}
+}
+
+void zpParticleEmitterComponent::setRenderLayer( zp_uint layer )
+{
+	m_layer = layer;
+}
+zp_uint zpParticleEmitterComponent::getRenderLayer() const
+{
+	return m_layer;
+}
+
+void zpParticleEmitterComponent::setRenderingQueue( zpRenderingQueue queue )
+{
+	m_queue = queue;
+}
+zpRenderingQueue zpParticleEmitterComponent::getRenderingQueue() const
+{
+	return m_queue;
+}
+
+void zpParticleEmitterComponent::play( const zp_char* effectName, zp_bool force )
+{
+	zpParticleEffect* b = m_effects.begin();
+	zpParticleEffect* e = m_effects.end();
+	for( ; b != e; ++b )
+	{
+		if( b->name == effectName )
+		{
+			if( b->state == ZP_PARTICLE_EFFECT_STATE_DISABLED || force )
+			{
+				playEffect( b );
+			}
+			break;
+		}
+	}
+}
+void zpParticleEmitterComponent::stop( const zp_char* effectName )
+{
+	zpParticleEffect* b = m_effects.begin();
+	zpParticleEffect* e = m_effects.end();
+	for( ; b != e; ++b )
+	{
+		if( b->name == effectName )
+		{
+			b->state = ZP_PARTICLE_EFFECT_STATE_FINISHING;
+			break;
+		}
+	}
+}
+void zpParticleEmitterComponent::stopAll()
+{
+	zpParticleEffect* b = m_effects.begin();
+	zpParticleEffect* e = m_effects.end();
+	for( ; b != e; ++b )
+	{
+		b->state = ZP_PARTICLE_EFFECT_STATE_FINISHING;
+	}
+}
+
+zp_bool zpParticleEmitterComponent::isPlaying( const zp_char* effectName ) const
+{
+	zp_bool playing = false;
+
+	const zpParticleEffect* b = m_effects.begin();
+	const zpParticleEffect* e = m_effects.end();
+	for( ; b != e && !playing; ++b )
+	{
+		playing = b->name == effectName;
+	}
+
+	return playing;
+}
+zp_bool zpParticleEmitterComponent::isAnyPlaying() const
+{
+	zp_bool playing = false;
+	
+	const zpParticleEffect* b = m_effects.begin();
+	const zpParticleEffect* e = m_effects.end();
+	for( ; b != e && !playing; ++b )
+	{
+		playing = b->state == ZP_PARTICLE_EFFECT_STATE_PLAYING;
+	}
+
+	return playing;
+}
+zp_bool zpParticleEmitterComponent::isPaused() const
+{
+	return m_isPaused;
+}
+void zpParticleEmitterComponent::pause( zp_bool isPaused )
+{
+	m_isPaused = isPaused;
+}
+
+void zpParticleEmitterComponent::onRender( zpRenderingContext* i, zpCamera* camera )
+{
 	zpParticleEffect* effect = m_effects.begin();
 	zpParticleEffect* end = m_effects.end();
 	for( ; effect != end; ++effect )
@@ -85,7 +185,7 @@ void zpParticleEmitterComponent::render( zpRenderingContext* i, zpCamera* camera
 				zpMath::LengthSquared3( lenA, posA );
 				zpMath::LengthSquared3( lenB, posB );
 				zpMath::Cmp( cmp, lenA, lenB );
-			
+
 				return cmp > 0;
 			} );
 		}
@@ -105,7 +205,7 @@ void zpParticleEmitterComponent::render( zpRenderingContext* i, zpCamera* camera
 			zpParticle* particle = *p;
 
 			zpMatrix4f wvp;
-			
+
 			// scale points out from the center
 			zpVector4f p0( -1,  1, 0, 1 );
 			zpVector4f p1(  1,  1, 0, 1 );
@@ -170,24 +270,6 @@ void zpParticleEmitterComponent::render( zpRenderingContext* i, zpCamera* camera
 	}
 }
 
-void zpParticleEmitterComponent::setRenderLayer( zp_uint layer )
-{
-	m_layer = layer;
-}
-zp_uint zpParticleEmitterComponent::getRenderLayer() const
-{
-	return m_layer;
-}
-
-void zpParticleEmitterComponent::setRenderingQueue( zpRenderingQueue queue )
-{
-	m_queue = queue;
-}
-zpRenderingQueue zpParticleEmitterComponent::getRenderingQueue() const
-{
-	return m_queue;
-}
-
 void zpParticleEmitterComponent::onCreate()
 {
 
@@ -208,7 +290,7 @@ void zpParticleEmitterComponent::onInitialize()
 }
 void zpParticleEmitterComponent::onDestroy()
 {
-
+	// TODO: currently playing effects need to copy to external player in component pool to fade out particles better
 }
 
 void zpParticleEmitterComponent::onUpdate()
