@@ -61,6 +61,11 @@ zp_long zpProfiler::getMaxTime( zpProfilerSteps step )
 	return m_profiles[ step ].maxTime;
 }
 
+zp_float zpProfiler::getPreviousTimeSeconds( zpProfilerSteps step )
+{
+	return getPreviousTime( step ) * m_time->getSecondsPerTick();
+}
+
 void zpProfiler::printProfile( zpProfilerSteps step )
 {
 	zpProfilerPart& part = m_profiles[ step ];

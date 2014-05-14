@@ -146,6 +146,9 @@ private:
 
 	void generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera );
 
+	zp_uint m_numTotalDrawCommands;
+	zp_uint m_numTotalVerticies;
+
 	zpRenderingContextImpl* m_renderContextImpl;
 	zpRenderingEngine* m_renderingEngine;
 

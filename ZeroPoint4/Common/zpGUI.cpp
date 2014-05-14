@@ -106,13 +106,15 @@ zp_bool zpGUI::text( zp_float size, const zp_char* text, const zpColor4f& color,
 
 void zpGUI::startGUI()
 {
-	m_allWidgets.reset();
-	m_renderingContext->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
-	m_isDrawingWidgets = true;
+	
 }
 void zpGUI::endGUI()
 {
 	ZP_ASSERT_WARN( m_widgetStack.isEmpty(), "Widget still on stack" );
+
+	m_renderingContext->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+	m_isDrawingWidgets = true;
+
 	drawWidgets();
 
 	if( m_isDrawingWidgets )
@@ -123,11 +125,19 @@ void zpGUI::endGUI()
 	{
 		m_renderingContext->endDrawFont();
 	}
+
+	m_allWidgets.reset();
 }
 
 zpGUI::zpGUIWidget* zpGUI::addWidget( zp_float height )
 {
-	zpGUIWidget* window = m_widgetStack.back();
+	zpGUIWidget* window = ZP_NULL;
+
+	if( !m_widgetStack.isEmpty() )
+	{
+		window = m_widgetStack.back();
+
+	}
 	return addChildWidget( height, window );
 }
 zpGUI::zpGUIWidget* zpGUI::addChildWidget( zp_float height, zpGUIWidget* parent )
@@ -135,20 +145,24 @@ zpGUI::zpGUIWidget* zpGUI::addChildWidget( zp_float height, zpGUIWidget* parent 
 	zpGUIWidget* widget = &m_allWidgets.pushBackEmpty();
 
 	zpVector2f margin( 2, 2 );
-
 	zpVector2f pos = margin;
-	zpGUIWidget** b = parent->children.begin();
-	zpGUIWidget** e = parent->children.end();
-	for( ; b != e; ++b )
-	{
-		pos.setY( pos.getY() + (*b)->localRect.getSize().getY() + margin.getY() );
-	}
+	zpVector2f size( margin.getX(), height );
 
-	zpVector2f size( parent->localRect.getSize().getX() - ( margin.getX() * 2.f ), height );
-
-	parent->children.pushBack( widget );
-	widget->localRect = zpRectf( pos, size );
 	widget->parent = parent;
+	if( parent != ZP_NULL )
+	{
+		zpGUIWidget** b = parent->children.begin();
+		zpGUIWidget** e = parent->children.end();
+		for( ; b != e; ++b )
+		{
+			pos.setY( pos.getY() + (*b)->localRect.getSize().getY() + margin.getY() );
+		}
+
+		size.setX( parent->localRect.getSize().getX() - ( margin.getX() * 2.f ) );
+
+		parent->children.pushBack( widget );
+	}
+	widget->localRect = zpRectf( pos, size );
 
 	return widget;
 }

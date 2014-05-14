@@ -194,7 +194,7 @@ void zpRenderingPipeline::initialize()
 	blend.renderTargets[0].destBlend = ZP_BLEND_INV_SRC_ALPHA;
 	blend.renderTargets[0].blendOp = ZP_BLEND_OP_ADD;
 
-	m_engine->createBlendState( m_blend, blend );
+	m_engine->createBlendState( m_alphaBlend, blend );
 
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
@@ -301,55 +301,6 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 {
 	zpTexture* t = m_engine->getBackBufferRenderTarget();
 	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
-
-	// 0) render things outside this loop
-	//i->beginDrawImmediate( ZP_RENDERING_LAYER_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
-	////i->addVertex( zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 ) );
-	////i->addVertex( zpVector4f( 0, 1, 0, 1 ), zpVector2f( 0, 0 ) );
-	////i->addVertex( zpVector4f( 1, 1, 0, 1 ), zpVector2f( 1, 0 ) );
-	////i->addVertex( zpVector4f( 1, 0, 0, 1 ), zpVector2f( 1, 1 ) );
-	////i->addQuadIndex( 0, 1, 2, 3 );
-	//
-	//i->addVertex( zpVector4f( -1, -1, 0, 1 ), zpVector2f( 0, 1 ) );
-	//i->addVertex( zpVector4f( -1,  0, 0, 1 ), zpVector2f( 0, 0 ) );
-	//i->addVertex( zpVector4f(  0,  0, 0, 1 ), zpVector2f( 1, 0 ) );
-	//i->addVertex( zpVector4f(  0, -1, 0, 1 ), zpVector2f( 1, 1 ) );
-	//i->addQuadIndex( 0, 1, 2, 3 );
-	//
-	////i->addQuad(
-	////	zpVector4f( -1, -1, 0, 1 ), zpVector2f( 0, 1 ),
-	////	zpVector4f( -1,  0, 0, 1 ), zpVector2f( 0, 0 ),
-	////	zpVector4f(  0,  0, 0, 1 ), zpVector2f( 1, 0 ),
-	////	zpVector4f(  0, -1, 0, 1 ), zpVector2f( 1, 1 )
-	////	);
-	//
-	//i->addQuad(
-	//	zpVector4f( 0, 0, 0, 1 ), zpVector2f( 0, 1 ),
-	//	zpVector4f( 0, 1, 0, 1 ), zpVector2f( 0, 0 ),
-	//	zpVector4f( 1, 1, 0, 1 ), zpVector2f( 1, 0 ),
-	//	zpVector4f( 1, 0, 0, 1 ), zpVector2f( 1, 1 )
-	//	);
-	//i->endDrawImmediate();
-	//
-	//i->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_UV, &m_mat );
-	//i->addQuad(
-	//	zpVector4f( -0.5f, -0.5, 0, 1 ), zpVector2f( 0, 1 ),
-	//	zpVector4f( -0.5f,  0.5, 0, 1 ), zpVector2f( 0, 0 ),
-	//	zpVector4f(  0.5f,  0.5, 0, 1 ), zpVector2f( 1, 0 ),
-	//	zpVector4f(  0.5f, -0.5, 0, 1 ), zpVector2f( 1, 1 )
-	//	);
-	//i->endDrawImmediate();
-	//
-	//zpMatrix4f m;
-	//m.setIdentity();
-	//
-	//i->drawMesh( 1 << 0, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, m );
-
-	i->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI, &m_debugFont );
-	i->addText( "Hello Zero Point Text", 20, zpVector2f( 10, 10 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
-	i->addText( "Hello Zero Point Text", 30, zpVector2f( 40, 50 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
-	i->addText( "Hello Zero Point Text", 40, zpVector2f( 90, 90 ), ZP_FONT_ALIGNMENT_LEFT, zpColor4f( 1, 1, 1, 1 ), zpColor4f( 0.8f, 0.8f, 0.8f, 1 ) );
-	i->endDrawFont();
 	
 	// 1) fill buffers
 	i->fillBuffers();
@@ -358,51 +309,31 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	// 2) process commands, sorting, etc.
 	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
 	i->preprocessCommands( cam, cam->getRenderLayers() );
-
-	// 3) actually render commands
 	useCamera( i, cam, &m_cameraBuffer );
 
+	// 3) render opaque commands
 	i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
 	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
 	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
 
+	// 4) render skybox commands
 	i->processCommands( ZP_RENDERING_QUEUE_SKYBOX );
 
-	i->setBlendState( &m_blend, ZP_NULL, 0xFFFFFFFF );
+	// 5) render transparent commands
+	i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );
 	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT );
 	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
 
+	// 6) render overlay commands
 	i->processCommands( ZP_RENDERING_QUEUE_OVERLAY );
 
+	// 7) render UI commands
 	cam = getCamera( ZP_CAMERA_TYPE_UI );
 	i->preprocessCommands( cam, cam->getRenderLayers() );
 	useCamera( i, cam, &m_cameraBuffer );
 
 	i->processCommands( ZP_RENDERING_QUEUE_UI );
 	i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
-
-	
-	//cam = getCamera( ZP_CAMERA_TYPE_UI );
-	//
-	//// 2) process commands, sorting, etc.
-	//i->preprocessCommands( cam, cam->getRenderLayers() );
-	//
-	//// 3) actually render commands
-	//useCamera( i, cam, &m_cameraBuffer );
-	//
-	//i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
-	//i->processCommands( ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
-	//
-	//i->processCommands( ZP_RENDERING_QUEUE_SKYBOX );
-	//
-	//i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT );
-	//i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
-	//
-	//i->processCommands( ZP_RENDERING_QUEUE_OVERLAY );
-	//
-	//i->processCommands( ZP_RENDERING_QUEUE_UI );
-	//i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
-	
 }
 
 void zpRenderingPipeline::endFrame( zpRenderingContext* i )

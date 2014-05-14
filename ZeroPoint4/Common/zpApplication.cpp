@@ -4,6 +4,17 @@
 #define ZP_APPLICATION_DEFAULT_WINDOW_WIDTH		640
 #define ZP_APPLICATION_DEFAULT_WINDOW_HEIGHT	480
 
+class zpNullPhase : public zpApplicationPhase
+{
+public:
+	~zpNullPhase() {}
+
+	void onEnterPhase( zpApplication* app ) {}
+	void onLeavePhase( zpApplication* app ) {}
+
+	zp_bool onPhaseUpdate( zpApplication* app ) { return false; }
+};
+
 zpApplication::zpApplication()
 	: m_isRunning( false )
 	, m_hasNextWorld( false )
@@ -19,6 +30,7 @@ zpApplication::zpApplication()
 	, m_lastTime( 0 )
 	, m_simulateHz( 10000000 / 60 )
 	, m_renderMsHz( 1000 / 120 )
+	, m_statsTimer( 0 )
 {}
 zpApplication::~zpApplication()
 {}
@@ -30,6 +42,16 @@ void zpApplication::setOptionsFilename( const zp_char* filename )
 const zpString& zpApplication::getOptionsFilename() const
 {
 	return m_optionsFilename;
+}
+
+void zpApplication::popCurrentPhase()
+{
+	if( m_currentPhase != 0 )
+	{
+		m_phases[ m_currentPhase ]->onLeavePhase( this );
+		m_currentPhase--;
+		m_phases[ m_currentPhase ]->onEnterPhase( this );
+	}
 }
 
 void zpApplication::initialize( const zpArrayList< zpString >& args )
@@ -59,14 +81,14 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
 
-	const zpBison::Value console = appOptions[ "Console" ];
+	const zpBison::Value& console = appOptions[ "Console" ];
 	if( console.asBool() )
 	{
 		m_console = zpConsole::getInstance();
 		m_console->create();
 	}
 
-	const zpBison::Value window = appOptions[ "Window" ];
+	const zpBison::Value& window = appOptions[ "Window" ];
 	ZP_ASSERT( window.isObject(), "" );
 
 	zpVector2i pos( window[ "X" ].asInt(), window[ "Y" ].asInt() );
@@ -81,7 +103,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_window.create();
 
-	const zpBison::Value render = appOptions[ "Render" ];
+	const zpBison::Value& render = appOptions[ "Render" ];
 	ZP_ASSERT( render.isObject(), "" );
 
 	zpDisplayMode displayMode;
@@ -96,7 +118,6 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	re->setVSyncEnabled( render[ "VSync" ].asBool() );
 	re->create( m_window.getWindowHandle(), m_window.getScreenSize() );
 
-	m_isRunning = true;
 	m_lastTime = m_timer->getTime();
 
 	m_renderingPipeline.initialize();
@@ -113,11 +134,17 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_window.addFocusListener( &m_inputManager );
 	m_window.addProcListener( &m_inputManager );
 
-	const zpBison::Value world = appOptions[ "World" ];
+	const zpBison::Value& world = appOptions[ "World" ];
 	if( world.isString() )
 	{
 		m_nextWorldFilename = world.asCString();
 		m_hasNextWorld = true;
+	}
+
+	m_currentPhase = 0;
+	if( m_phases.isEmpty() )
+	{
+		addPhase( new zpNullPhase );
 	}
 
 	//m_protoDBManager.initialize( appOptions[ "ProtoDB" ].asCString() );
@@ -125,6 +152,10 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 }
 void zpApplication::run()
 {
+	m_isRunning = true;
+
+	m_phases[ m_currentPhase ]->onEnterPhase( this );
+
 	while( m_isRunning && m_window.processMessages() )
 	{
 		processFrame();
@@ -132,6 +163,12 @@ void zpApplication::run()
 }
 zp_int zpApplication::shutdown()
 {
+	m_phases.foreach( []( zpApplicationPhase* phase )
+	{
+		ZP_SAFE_DELETE( phase );
+	} );
+	m_phases.clear();
+
 	m_gui.destroy();
 
 	m_renderingPipeline.destroy();
@@ -172,6 +209,16 @@ zp_int zpApplication::shutdown()
 
 void zpApplication::update()
 {
+	if( m_phases[ m_currentPhase ]->onPhaseUpdate( this ) )
+	{
+		if( m_currentPhase != ( m_phases.size() - 1 ) )
+		{
+			m_phases[ m_currentPhase ]->onLeavePhase( this );
+			m_currentPhase++;
+			m_phases[ m_currentPhase ]->onEnterPhase( this );
+		}
+	}
+
 	if( m_hasNextWorld && !m_nextWorldFilename.isEmpty() )
 	{
 		// if the next world should be added
@@ -216,10 +263,6 @@ void zpApplication::update()
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
-	m_gui.startGUI();
-	if( m_inEditMode ) guiEditMode();
-	m_gui.endGUI();
-
 	// update object, delete any etc
 	ZP_PROFILE_START( OBJECT_UPDATE );
 	m_objectContent.update();
@@ -235,6 +278,10 @@ void zpApplication::update()
 	m_audioContent.getAudioEngine()->update();
 
 	handleInput();
+
+	m_gui.startGUI();
+	if( m_inEditMode ) guiEditMode();
+	m_gui.endGUI();
 }
 void zpApplication::simulate()
 {
@@ -351,9 +398,19 @@ void zpApplication::handleInput()
 	{
 		reloadAllResources();
 	}
-	else if( keyboard->isKeyPressed( ZP_KEY_CODE_P ) )
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F1 ) )
 	{
-		m_profiler.printProfile( ZP_PROFILER_STEP_FRAME );
+		m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
+	}
+
+
+
+	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
+	{
+		zpFixedStringBuffer< 32 > fps;
+		fps << m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME ) * 1000.f << " ms" ;
+
+		m_gui.label( 24, fps.str(), zpColor4f( 1, 1, 1, 1 ) );
 	}
 }
 
@@ -386,7 +443,6 @@ void zpApplication::processFrame()
 	runReloadChangedResources();
 	ZP_PROFILE_END( HOT_RELOAD );
 #endif
-
 
 	zp_long now = m_timer->getTime();
 	zp_uint numUpdates = 0;
@@ -446,6 +502,13 @@ void zpApplication::processFrame()
 
 	// sleep for the remainder of the frame
 	m_timer->sleep( m_renderMsHz );
+}
+
+
+void zpApplication::addPhase( zpApplicationPhase* phase )
+{
+	ZP_ASSERT( !m_isRunning, "Trying to add Phases to a running application" );
+	m_phases.pushBack( phase );
 }
 
 void zpApplication::runGarbageCollect()

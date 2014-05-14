@@ -22,6 +22,7 @@ public:
 	void unmarkAll( F mask ) { and( ~mask ); }
 
 	void setMarked( zp_uint index, zp_bool marked ) { marked ? mark( index ) : unmark( index ); }
+	zp_bool toggle( zp_uint index ) { xor( (F)( 1 << index ) ); return isMarked( index ); }
 
 	zp_bool isMarked( zp_uint index ) const { return isAllMarked( (F)( 1 << index ) ); }
 	zp_bool isAnyMarked( F mask ) const { return ( m_flag & mask ) != 0; }

@@ -9,7 +9,6 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 {
 	zp_int exitCode = 0;
 
-	//zpMemorySystem::getInstance()->initialize( 0 );
 	{
 		zpApplication app;
 		
@@ -23,7 +22,6 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		app.run();
 		exitCode = app.shutdown();
 	}
-	//zpMemorySystem::getInstance()->shutdown();
 
 	return exitCode;
 }

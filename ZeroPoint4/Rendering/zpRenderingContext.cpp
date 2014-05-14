@@ -642,6 +642,9 @@ void zpRenderingContext::fillBuffers()
 	
 	m_scratchVertexBuffer.reset();
 	m_scratchIndexBuffer.reset();
+
+	m_numTotalDrawCommands = 0;
+	m_numTotalVerticies = 0;
 }
 
 void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
@@ -718,6 +721,8 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 
 void zpRenderingContext::processCommands( zpRenderingQueue layer )
 {
+	m_numTotalDrawCommands += m_filteredCommands[ layer ].size();
+
 	const zpRenderingCommand* const* cmd = m_filteredCommands[ layer ].begin();
 	const zpRenderingCommand* const* end = m_filteredCommands[ layer ].end();
 	
@@ -732,9 +737,10 @@ void zpRenderingContext::processCommands( zpRenderingQueue layer )
 			update( &m_perDratCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
 
 			m_renderContextImpl->processCommand( m_renderingEngine->getRenderingEngineImpl(), *cmd );
+
+			m_numTotalVerticies += (*cmd)->vertexCount;
 		}
 	}
-	//m_renderContextImpl->processCommands( m_renderingEngine->getRenderingEngineImpl(), m_filteredCommands[ layer ] );
 }
 
 void zpRenderingContext::finalizeCommands()

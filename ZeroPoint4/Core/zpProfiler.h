@@ -52,6 +52,8 @@ public:
 	zp_long getAverageTime( zpProfilerSteps step );
 	zp_long getMaxTime( zpProfilerSteps step );
 
+	zp_float getPreviousTimeSeconds( zpProfilerSteps step );
+
 	void printProfile( zpProfilerSteps step );
 
 private:
