@@ -28,7 +28,12 @@ zpMeshRendererComponent::~zpMeshRendererComponent() {}
 
 void zpMeshRendererComponent::render( zpRenderingContext* i )
 {
-	i->drawMesh( m_layer, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, getParentObject()->getTransform(), m_hasMaterialOverride ? &m_materialOverride : ZP_NULL );
+	// get the world transform from the object or the calculated one from the attachment component
+	zpAttachmentComponent* a = getParentObject()->getComponents()->getAttachmentComponent();
+	const zpMatrix4f& transform = a == ZP_NULL ? getParentObject()->getTransform() : a->getWorldTransform();
+
+	// draw mesh
+	i->drawMesh( m_layer, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, transform, m_hasMaterialOverride ? &m_materialOverride : ZP_NULL );
 }
 
 void zpMeshRendererComponent::setRenderLayer( zp_uint layer )
