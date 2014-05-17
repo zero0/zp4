@@ -6,12 +6,15 @@ zpAttachmentComponent::zpAttachmentComponent( zpObject* obj, const zpBison::Valu
 	const zpBison::Value& children = def[ "Children" ];
 	if( children.isArray() && !children.isEmpty() )
 	{
+		zpObjectContentManager* manager = getApplication()->getObjectContentManager();
+
 		m_children.reserve( children.size() );
-		children.foreachArray( [ this ]( const zpBison::Value& child )
+		children.foreachArray( [ this, manager ]( const zpBison::Value& child )
 		{
 			const zp_char* objName = child.asCString();
-			zpObject* o = getApplication()->getObjectContentManager()->createObject( getApplication(), objName );
-			m_children.pushBack( o );
+
+			zpObject* o = manager->createObject( getApplication(), objName );
+			addChild( o );
 		} );
 	}
 }
@@ -38,12 +41,16 @@ void zpAttachmentComponent::onDestroy()
 	
 void zpAttachmentComponent::onUpdate()
 {
-	zpMatrix4f local;
-	m_children.foreach( [ &local, this ]( zpObject* o )
+	m_worldTransform = getParentObject()->getTransform();
+
+	zpObject* p = m_parent;
+	while( p != ZP_NULL )
 	{
-		zpMath::Mul( local, getParentObject()->getTransform(), o->getTransform() );
-		o->setTransform( local );
-	} );
+		zpMath::Mul( m_worldTransform, m_worldTransform, p->getTransform() );
+
+		zpAttachmentComponent* a = p->getComponents()->getAttachmentComponent();
+		p = a == ZP_NULL ? ZP_NULL : a->m_parent;
+	}
 }
 void zpAttachmentComponent::onSimulate()
 {
@@ -51,9 +58,22 @@ void zpAttachmentComponent::onSimulate()
 
 void zpAttachmentComponent::onEnabled()
 {
+	m_children.foreach( []( zpObject* o )
+	{
+		o->setEnabled( true );
+	} );
 }
 void zpAttachmentComponent::onDisabled()
 {
+	m_children.foreach( []( zpObject* o )
+	{
+		o->setEnabled( false );
+	} );
+}
+
+zpObject* zpAttachmentComponent::getParent() const
+{
+	return m_parent;
 }
 
 const zpArrayList< zpObject* >& zpAttachmentComponent::getChildren() const
@@ -65,20 +85,45 @@ zp_uint zpAttachmentComponent::getChildCount() const
 {
 	return m_children.size();
 }
-zpObject* zpAttachmentComponent::getChildAt( zp_uint index ) const
+zpObject* zpAttachmentComponent::getChild( zp_uint index ) const
 {
 	return m_children[ index ];
 }
 
-zpObject* zpAttachmentComponent::removeChild( zp_uint index )
+zpObject* zpAttachmentComponent::removeChild( zp_uint index, zp_bool shouldDestroy )
 {
 	zpObject* o = m_children[ index ];
 	m_children.erase( index );
+
+	zpAttachmentComponent* attachment = o->getComponents()->getAttachmentComponent();
+	if( attachment != ZP_NULL )
+	{
+		attachment->m_parent = ZP_NULL;
+	}
+
+	if( shouldDestroy )
+	{
+		o->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+	}
 	return o;
 }
 void zpAttachmentComponent::addChild( zpObject* child )
 {
 	m_children.pushBack( child );
+
+	// add attachment component to child to set the parent
+	zpAttachmentComponent* attachment = child->getComponents()->addAttachmentComponent( zpBison::null );
+	attachment->m_parent = getParentObject();
+}
+void zpAttachmentComponent::addChild( zpObject* child, const zpMatrix4f& localTransform )
+{
+	child->setTransform( localTransform );
+	addChild( child );
+}
+
+const zpMatrix4f& zpAttachmentComponent::getWorldTransform() const
+{
+	return m_worldTransform;
 }
 
 

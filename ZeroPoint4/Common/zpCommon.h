@@ -31,6 +31,8 @@ class zpRigidBodyComponent;
 class zpBreakableComponent;
 class zpAttachmentComponent;
 
+class zpAllComponents;
+
 #include "zpEvent.h"
 #include "zpGUI.h"
 

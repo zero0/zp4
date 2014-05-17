@@ -2,8 +2,11 @@
 #ifndef ZP_ALL_COMPONENTS_H
 #define ZP_ALL_COMPONENTS_H
 
+class zpApplication;
+class zpObject;
+
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) class zp##cmp;
+#define ZP_COMPONENT_DEF( cmp ) class zp##cmp##Component;
 #include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
@@ -14,7 +17,12 @@ public:
 	~zpAllComponents();
 
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) zp##cmp##Component* get##cmp##Component() { return m_##cmp; }
+#define ZP_COMPONENT_DEF( cmp ) zp##cmp##Component* get##cmp##Component();
+	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
+
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp ) zp##cmp##Component* add##cmp##Component( const zpBison::Value& def );
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
@@ -27,6 +35,7 @@ public:
 
 private:
 	zpApplication* m_app;
+	zpObject* m_object;
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )	zp##cmp##Component* m_##cmp;

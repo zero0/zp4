@@ -21,13 +21,20 @@ protected:
 
 	const zpArrayList< zpObject* >& getChildren() const;
 
-	zp_uint getChildCount() const;
-	zpObject* getChildAt( zp_uint index ) const;
+	zpObject* getParent() const;
 
-	zpObject* removeChild( zp_uint index );
+	zp_uint getChildCount() const;
+	zpObject* getChild( zp_uint index ) const;
+
+	zpObject* removeChild( zp_uint index, zp_bool shouldDestroy = false );
 	void addChild( zpObject* child );
+	void addChild( zpObject* child, const zpMatrix4f& localTransform );
+	
+	const zpMatrix4f& getWorldTransform() const;
 
 private:
+	zpObject* m_parent;
+	zpMatrix4f m_worldTransform;
 	zpArrayList< zpObject* > m_children;
 };
 
