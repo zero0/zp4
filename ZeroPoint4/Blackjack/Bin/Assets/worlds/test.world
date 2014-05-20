@@ -1,7 +1,22 @@
 {
     "Name" : "test world",
     "Objects" : [
-        "objects/cube.objectb",
-        "objects/plane.objectb"
+        {
+            "Object" : "objects/cube.objectb"
+        },
+        {
+            "Object" : "objects/plane.objectb",
+            "Transform" :
+            {
+                "Position" : [ 0, -5, 0 ]
+            }
+        },
+        {
+            "Object" : "objects/player.objectb",
+            "Transform" :
+            {
+                "Position" : [ -5, -5, -5 ]
+            }
+        }
     ]
 }
