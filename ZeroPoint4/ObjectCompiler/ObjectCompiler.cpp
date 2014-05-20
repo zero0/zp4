@@ -2,6 +2,47 @@
 
 #define RESERVED_EXTENDS	"_Extends"
 
+void compileTransform( zpJson& inputObject )
+{
+	// process transform
+	zpJson& transform = inputObject[ "Transform" ];
+	if( transform.isObject() && !transform.isEmpty() )
+	{
+		zpMatrix4f outTransform;
+		outTransform.setIdentity();
+
+		zpJson& translate = transform[ "Position" ];
+		zpJson& rotation = transform[ "Rotation" ];
+		zpJson& scale = transform[ "Scale" ];
+
+		if( !translate.isEmpty() )
+		{
+			zpVector4f pos( translate[ (zp_uint)0 ].asFloat(), translate[ (zp_uint)1 ].asFloat(), translate[ (zp_uint)2 ].asFloat(), 1.0f );
+			outTransform.setRow( 3, pos );
+		}
+		if( !rotation.isEmpty() )
+		{
+
+		}
+		if( !scale.isEmpty() )
+		{
+			zpMatrix4f mat;
+			mat.setIdentity();
+
+			zpVector4f rot;
+			for( zp_uint i = 0; i < 3; ++i )
+			{
+				zpMath::Mul( rot, mat.getRow( i ), zpScalar( scale[ i ].asFloat() ) );
+				mat.setRow( i, rot );
+			}
+
+			zpMath::Mul( outTransform, outTransform, mat );
+		}
+
+		transform = zpJson( &outTransform, sizeof( zpMatrix4f ) );
+	}
+}
+
 zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedFiles, const zpString& srcFile, zpJson& outObject )
 {
 	zp_bool ok = false;
@@ -46,43 +87,8 @@ zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedF
 			};
 		}
 
-		// process transform
-		zpMatrix4f outTransform;
-		outTransform.setIdentity();
-
-		zpJson& transform = inputObject[ "Transform" ];
-		if( transform.isObject() && !transform.isEmpty() )
-		{
-			zpJson& translate = transform[ "Position" ];
-			zpJson& rotation = transform[ "Rotation" ];
-			zpJson& scale = transform[ "Scale" ];
-
-			if( !translate.isEmpty() )
-			{
-				zpVector4f pos( translate[ (zp_uint)0 ].asFloat(), translate[ (zp_uint)1 ].asFloat(), translate[ (zp_uint)2 ].asFloat(), 1.0f );
-				outTransform.setRow( 3, pos );
-			}
-			if( !rotation.isEmpty() )
-			{
-				
-			}
-			if( !scale.isEmpty() )
-			{
-				zpMatrix4f mat;
-				mat.setIdentity();
-
-				zpVector4f rot;
-				for( zp_uint i = 0; i < 3; ++i )
-				{
-					zpMath::Mul( rot, mat.getRow( i ), zpScalar( scale[ i ].asFloat() ) );
-					mat.setRow( i, rot );
-				}
-
-				zpMath::Mul( outTransform, outTransform, mat );
-			}
-		}
-
-		transform = zpJson( &outTransform, sizeof( zpMatrix4f ) );
+		// compile transform
+		compileTransform( inputObject );
 
 		zpJson::mergeJson( outObject, inputObject );
 	}
@@ -97,16 +103,12 @@ zp_bool compileWorld( zpJsonParser& parser, zpArrayList< zpString >& processedFi
 	if( parser.parseFile( srcFile, outWorld ) )
 	{
 		ok = true;
-		/*
-		zpString path;
-		zpArrayList< zpString > members;
+
 		zpJson& objects = outWorld[ "Objects" ];
-		for( zp_int i = 0; i < objects.size(); ++i )
+		objects.foreachArray( []( zpJson& value )
 		{
-			zpJson& obj = objects[ i ];
-			path = obj.asCString();
-		}
-		*/
+			compileTransform( value );
+		} );
 	}
 
 	return ok;

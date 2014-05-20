@@ -7,63 +7,65 @@ enum
 	ZP_PROTODB_INVALID_HANDLE = -1,
 };
 
-template< typename T >
 class zpProtoDB;
+class zpProtoDBManager;
 
-template< typename T >
 class zpProtoDBHandle
 {
 public:
+	zpProtoDBHandle();
 	~zpProtoDBHandle();
 
 	zp_bool isValid() const;
-	const T* getData() const;
+
+	template< typename T >
+	const T* getData() const { return (const T*)getData(); }
+
+	const void* getData() const;
 
 	const zpString& getProtoId() const;
+	const zpString& getCategory() const;
 
 	void invalidate() const;
 
 private:
-	zpProtoDBHandle();
-
+	zpString m_category;
 	zpString m_protoId;
-	zpProtoDB< T >* m_protoDB;
 
+	zpProtoDB* m_protoDB;
 	mutable zp_int m_index;
-	mutable T* m_data;
+	mutable const void* m_data;
 
-	friend class zpProtoDB< T >;
+	friend class zpProtoDB;
+	friend class zpProtoDBManager;
 };
 
-template< typename T >
+typedef void (*zpProtoDBCreateFunc)( void* data, zp_uint stride, const zpBison::Value& def );
+
 class zpProtoDB
 {
 public:
 	zpProtoDB();
 	~zpProtoDB();
 
-	void initialize();
+	void initialize( zpProtoDBCreateFunc create, zp_uint stride );
 	void setup( const zpBison::Value& protoDb );
 	void shutdown();
 	void destroy();
 
-	const zpProtoDBHandle< T >* getHandle( const zp_char* protoId );
-	void releaseHandle( const zpProtoDBHandle< T >*& handle );
-
-	void invalidateHandles();
 
 private:
+	zp_uint m_stride;
 	zpArrayList< zpString > m_entries;
-	zpArrayList< T > m_database;
+	zpDataBuffer m_database;
 
-	zpFixedArrayList< zpProtoDBHandle< T >,  32 > m_handles;
-	zpFixedArrayList< zpProtoDBHandle< T >*, 32 > m_freeHandles;
-	zpFixedArrayList< zpProtoDBHandle< T >*, 32 > m_usedHandles;
+	zpProtoDBCreateFunc m_create;
 
-	friend class zpProtoDBHandle< T >;
+	friend class zpProtoDBHandle;
+	friend class zpProtoDBManager;
 };
 
-#include "zpProtoDB.inl"
+#define ZP_PROTODB_CATEGORY( p, c, create )		(p)->initializeCategory( #c, create, sizeof( c ) )
 
 class zpProtoDBManager
 {
@@ -71,7 +73,8 @@ public:
 	zpProtoDBManager();
 	~zpProtoDBManager();
 
-	void initialize( const zp_char* protoDbFile );
+	void initialize( zp_uint numCatagories );
+	void initializeCategory( const zp_char* category, zpProtoDBCreateFunc create, zp_uint stride );
 	void setup();
 	void shutdown();
 	void destroy();
@@ -82,25 +85,26 @@ public:
 	void reloadChangedProtoDB();
 #endif
 
+	void setProtoDBFile( const zp_char* protoDbFile );
 	const zpString& getProtoDBFile() const;
 
-#ifdef ZP_PROTODB_CATEGORY_FILE
-#undef ZP_PROTODB_CATEGORY
-#define  ZP_PROTODB_CATEGORY( c )	zpProtoDB< c >* get##c##ProtoDB();
-#include ZP_PROTODB_CATEGORY_FILE
-#undef ZP_PROTODB_CATEGORY
-#endif
+	const zpProtoDBHandle* getHandle( const zp_char* category, const zp_char* protoId );
+	void releaseHandle( zpProtoDBHandle*& handle );
+	
+	void invalidateHandles();
 
 private:
 	zpString m_protoDbFile;
 	zp_long m_lastModifyTime;
 
-#ifdef ZP_PROTODB_CATEGORY_FILE
-#undef ZP_PROTODB_CATEGORY
-#define  ZP_PROTODB_CATEGORY( c )	zpProtoDB< c > m_protoDB##c##;
-#include ZP_PROTODB_CATEGORY_FILE
-#undef ZP_PROTODB_CATEGORY
-#endif
+	zpArrayList< zpString > m_catagories;
+	zpArrayList< zpProtoDB > m_protoDBs;
+
+	zpFixedArrayList< zpProtoDBHandle,  64 > m_handles;
+	zpFixedArrayList< zpProtoDBHandle*, 64 > m_freeHandles;
+	zpFixedArrayList< zpProtoDBHandle*, 64 > m_usedHandles;
 };
+
+#include "zpProtoDB.inl"
 
 #endif

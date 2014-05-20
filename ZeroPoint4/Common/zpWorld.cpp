@@ -111,7 +111,7 @@ void zpWorld::unsetFlag( zpWorldFlag flag )
 
 zp_bool zpWorld::createStep()
 {
-	zpBison::Value objects = m_world.getResource()->getData()->root()[ "Objects" ];
+	const zpBison::Value& objects = m_world.getResource()->getData()->root()[ "Objects" ];
 	if( isFlagSet( ZP_WORLD_FLAG_STEP_CREATE ) )
 	{
 		const zp_char* objFile = objects[ m_numObjectsLoaded ].asCString();
@@ -125,8 +125,16 @@ zp_bool zpWorld::createStep()
 
 		objects.foreachArray( [ this ]( const zpBison::Value& v )
 		{
-			const zp_char* objFile = v.asCString();
-			m_application->getObjectContentManager()->createObject( m_application, objFile );
+			zpObject* o;
+			const zp_char* objFile = v[ "Object" ].asCString();
+			o = m_application->getObjectContentManager()->createObject( m_application, objFile );
+
+			const zpBison::Value& transform = v[ "Transform" ];
+			if( !transform.isEmpty() )
+			{
+				const zpMatrix4f& mat = *(const zpMatrix4f*)transform.asData();
+				o->setTransform( mat );
+			}
 		} );
 	}
 

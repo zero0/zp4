@@ -147,8 +147,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 		addPhase( new zpNullPhase );
 	}
 
-	//m_protoDBManager.initialize( appOptions[ "ProtoDB" ].asCString() );
-	//m_protoDBManager.setup();
+	m_protoDBManager.setProtoDBFile( appOptions[ "ProtoDB" ].asCString() );
 }
 void zpApplication::run()
 {
@@ -188,7 +187,6 @@ zp_int zpApplication::shutdown()
 	zpAngelScript::getInstance()->destroyEngine();
 	zpAngelScript::destroyInstance();
 
-	m_protoDBManager.shutdown();
 	m_protoDBManager.destroy();
 
 	m_audioContent.getAudioEngine()->destroy();
@@ -539,7 +537,7 @@ void zpApplication::runReloadAllResources()
 	m_renderingPipeline.getShaderContentManager()->reloadAllResources();
 	m_renderingPipeline.getTextureContentManager()->reloadAllResources();
 
-	m_protoDBManager.reloadProtoDB();
+	//m_protoDBManager.reloadProtoDB();
 }
 
 #if ZP_USE_HOT_RELOAD
