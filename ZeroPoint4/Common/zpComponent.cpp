@@ -39,14 +39,14 @@ zp_bool zpComponent::isCreated() const
 
 void zpComponent::update()
 {
-	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) )
+	if( m_flags.isAllMarked( ZP_COMPONENT_FLAG_CAN_UPDATE ) )
 	{
 		onUpdate();
 	}
 }
 void zpComponent::simulate()
 {
-	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) )
+	if( m_flags.isAllMarked( ZP_COMPONENT_FLAG_CAN_UPDATE ) )
 	{
 		onSimulate();
 	}
@@ -62,8 +62,9 @@ void zpComponent::create()
 }
 void zpComponent::initialize()
 {
-	if( m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) )
+	if( m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) && !m_flags.isMarked( ZP_COMPONENT_FLAG_INITIALIZED ) )
 	{
+		m_flags.mark( ZP_COMPONENT_FLAG_INITIALIZED );
 		onInitialize();
 	}
 }
@@ -72,6 +73,7 @@ void zpComponent::destroy()
 	if( m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED ) )
 	{
 		m_flags.unmark( ZP_COMPONENT_FLAG_CREATED );
+		m_flags.unmark( ZP_COMPONENT_FLAG_INITIALIZED );
 		onDestroy();
 	}
 }

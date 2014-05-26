@@ -23,7 +23,7 @@ zpAllComponents::~zpAllComponents()
 #include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
-void zpAllComponents::load( zpObject* obj, const zp_char* componentName, const zpBison::Value& def )
+void zpAllComponents::create( zpObject* obj, const zp_char* componentName, const zpBison::Value& def )
 {
 	m_object = obj;
 	m_app = obj->getApplication();
@@ -32,12 +32,16 @@ void zpAllComponents::load( zpObject* obj, const zp_char* componentName, const z
 #define ZP_COMPONENT_DEF( cmp ) if( zp_strcmp( componentName, #cmp ) == 0 ) { m_##cmp = m_app->get##cmp##ComponentPool()->create( obj, def ); m_##cmp->create(); }
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
+}
 
+void zpAllComponents::initialize()
+{
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) if( m_##cmp ) { m_##cmp->initialize(); }
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 }
+
 void zpAllComponents::unload()
 {
 #undef ZP_COMPONENT_DEF

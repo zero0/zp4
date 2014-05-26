@@ -25,6 +25,21 @@ zpObject* zpObjectContentManager::createObject( zpApplication* application, cons
 
 	return o;
 }
+
+void zpObjectContentManager::initializeAllObjectsInWorld( zpWorld* world )
+{
+	zpObject** b = m_used.begin();
+	zpObject** e = m_used.end();
+	for( ; b != e; ++b )
+	{
+		zpObject* o = *b;
+		if( o->getWorld() == world )
+		{
+			o->initialize();
+		}
+	}
+}
+
 void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
 {
 	zpObject** b = m_used.begin();
@@ -34,10 +49,24 @@ void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
 		zpObject* o = *b;
 		if( !isWorldSwap || ( isWorldSwap && !o->isFlagSet( ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD ) ) )
 		{
-			o->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+			o->destroy();
 		}
 	}
 }
+void zpObjectContentManager::destroyAllObjectsInWorld( zpWorld* world )
+{
+	zpObject** b = m_used.begin();
+	zpObject** e = m_used.end();
+	for( ; b != e; ++b )
+	{
+		zpObject* o = *b;
+		if( o->getWorld() == world )
+		{
+			o->destroy();
+		}
+	}
+}
+
 void zpObjectContentManager::update()
 {
 	zpObject** b = m_used.begin();
@@ -45,13 +74,26 @@ void zpObjectContentManager::update()
 	for( ; b != e; ++b )
 	{
 		zpObject* o = *b;
-		if( o->isFlagSet( ZP_OBJECT_FLAG_ENABLED ) )
+		if( o->isFlagSet( ZP_OBJECT_FLAG_CAN_UPDATE ) )
 		{
 			o->update();
 		}
 		if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
 		{
 			destroy( o );
+		}
+	}
+}
+void zpObjectContentManager::simulate()
+{
+	zpObject** b = m_used.begin();
+	zpObject** e = m_used.end();
+	for( ; b != e; ++b )
+	{
+		zpObject* o = *b;
+		if( o->isFlagSet( ZP_OBJECT_FLAG_CAN_UPDATE ) )
+		{
+
 		}
 	}
 }
@@ -73,6 +115,7 @@ zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& 
 	, m_lastLoadTime( 0 )
 	, m_components()
 	, m_application( application )
+	, m_world( ZP_NULL )
 	, m_object( res )
 {
 	setFlag( ZP_OBJECT_FLAG_ENABLED );
@@ -91,10 +134,6 @@ zpAllComponents* zpObject::getComponents()
 void zpObject::setFlag( zpObjectFlag flag )
 {
 	m_flags.mark( flag );
-	if( flag == ZP_OBJECT_FLAG_SHOULD_DESTROY )
-	{
-		setEnabled( false );
-	}
 }
 void zpObject::unsetFlag( zpObjectFlag flag )
 {
@@ -130,7 +169,10 @@ const zpMatrix4f& zpObject::getTransform() const
 }
 void zpObject::setTransform( const zpMatrix4f& transform )
 {
-	m_transform = transform;
+	if( !m_flags.isMarked( ZP_OBJECT_FLAG_STATIC ) )
+	{
+		m_transform = transform;
+	}
 }
 
 const zpString& zpObject::getTags() const
@@ -186,6 +228,27 @@ zpApplication* zpObject::getApplication() const
 	return m_application;
 }
 
+zpWorld* zpObject::getWorld() const
+{
+	return m_world;
+}
+void zpObject::setWorld( zpWorld* world )
+{
+	m_world = world;
+}
+
+void zpObject::initialize()
+{
+	if( m_flags.isMarked( ZP_OBJECT_FLAG_CREATED ) && !m_flags.isMarked( ZP_OBJECT_FLAG_INITIALIZED ) )
+	{
+		m_flags.mark( ZP_OBJECT_FLAG_INITIALIZED );
+		m_components.initialize();
+
+		// use object's enabled flag
+		zp_bool en = isFlagSet( ZP_OBJECT_FLAG_ENABLED );
+		m_components.setEnabled( en );
+	}
+}
 void zpObject::update()
 {
 #if ZP_USE_HOT_RELOAD
@@ -195,6 +258,17 @@ void zpObject::update()
 		loadObject( false );
 	}
 #endif
+}
+void zpObject::destroy()
+{
+	m_flags.unmark( ZP_OBJECT_FLAG_CREATED );
+	m_flags.unmark( ZP_OBJECT_FLAG_INITIALIZED );
+
+	m_flags.mark( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+
+	setEnabled( false );
+
+	m_world = ZP_NULL;
 }
 
 void zpObject::loadObject( zp_bool isInitialLoad )
@@ -206,8 +280,8 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 
 		const zpBison::Value& root = m_object.getResource()->getData()->root();
 		
-		const zpBison::Value name = root[ "Name" ];
-		const zpBison::Value components = root[ "Components" ];
+		const zpBison::Value& name = root[ "Name" ];
+		const zpBison::Value& components = root[ "Components" ];
 
 		// set the name of the object if given
 		if( name.isString() )
@@ -218,10 +292,17 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 		// if initial load, setup tags, layers, transform, etc
 		if( isInitialLoad )
 		{
-			const zpBison::Value enabled = root[ "Enabled" ];
-			const zpBison::Value tags = root[ "Tags" ];
-			const zpBison::Value layer = root[ "Layer" ];
-			const zpBison::Value transform = root[ "Transform" ];
+			const zpBison::Value& enabled = root[ "Enabled" ];
+			const zpBison::Value& tags = root[ "Tags" ];
+			const zpBison::Value& layer = root[ "Layer" ];
+			const zpBison::Value& transform = root[ "Transform" ];
+			const zpBison::Value& isStatic = root[ "IsStatic" ];
+
+			// set static flag
+			if( isStatic.isBool() )
+			{
+				m_flags.setMarked( ZP_OBJECT_FLAG_STATIC, isStatic.asBool() );
+			}
 
 			// override default enabled status if given
 			if( enabled.isBool() )
@@ -247,20 +328,21 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 		m_components.setApplication( m_application );
 		components.foreachObject( [ this ]( const zpBison::Value& key, const zpBison::Value& value )
 		{
-			m_components.load( this, key.asCString(), value );
+			m_components.create( this, key.asCString(), value );
 		} );
 
-		// use object's enabled flag
-		zp_bool en = isFlagSet( ZP_OBJECT_FLAG_ENABLED );
-		m_components.setEnabled( en );
+		m_flags.mark( ZP_OBJECT_FLAG_CREATED );
 	}
 	// otherwise, mark this object for delete
 	else
 	{
-		setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+		destroy();
 	}
 }
 void zpObject::unloadObject()
 {
+	m_flags.unmark( ZP_OBJECT_FLAG_CREATED );
+	m_flags.unmark( ZP_OBJECT_FLAG_INITIALIZED );
+
 	m_components.unload();
 }

@@ -213,7 +213,7 @@ void zpBreakableComponent::doBreak()
 	// should destroy on break
 	if( m_destroyObjectOnBreak )
 	{
-		getParentObject()->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+		getParentObject()->destroy();
 	}
 	// otherwise, disable object
 	else

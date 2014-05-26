@@ -14,11 +14,10 @@ zpRigidBodyComponent::~zpRigidBodyComponent()
 
 void zpRigidBodyComponent::onCreate()
 {
-	getParentObject()->getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );
 }
 void zpRigidBodyComponent::onInitialize()
 {
-
+	getParentObject()->getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );
 }
 void zpRigidBodyComponent::onDestroy()
 {

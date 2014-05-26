@@ -88,7 +88,12 @@ zpWorld::zpWorld( zpApplication* application, const zpWorldResourceInstance& res
 {
 	if( m_world.isVaild() )
 	{
-		m_totalObjects = m_world.getResource()->getData()->root()[ "Objects" ].size();
+		m_objects = m_world.getResource()->getData()->root()[ "Objects" ];
+		m_totalObjects = m_objects.size();
+	}
+	else
+	{
+		m_totalObjects = 1;
 	}
 }
 zpWorld::~zpWorld()
@@ -111,11 +116,10 @@ void zpWorld::unsetFlag( zpWorldFlag flag )
 
 zp_bool zpWorld::createStep()
 {
-	const zpBison::Value& objects = m_world.getResource()->getData()->root()[ "Objects" ];
 	if( isFlagSet( ZP_WORLD_FLAG_STEP_CREATE ) )
 	{
-		const zp_char* objFile = objects[ m_numObjectsLoaded ].asCString();
-		m_application->getObjectContentManager()->createObject( m_application, objFile );
+		const zpBison::Value& v = m_objects[ m_numObjectsLoaded ];
+		createWorldObject( v );
 
 		++m_numObjectsLoaded;
 	}
@@ -123,18 +127,9 @@ zp_bool zpWorld::createStep()
 	{
 		m_numObjectsLoaded = m_totalObjects;
 
-		objects.foreachArray( [ this ]( const zpBison::Value& v )
+		m_objects.foreachArray( [ this ]( const zpBison::Value& v )
 		{
-			zpObject* o;
-			const zp_char* objFile = v[ "Object" ].asCString();
-			o = m_application->getObjectContentManager()->createObject( m_application, objFile );
-
-			const zpBison::Value& transform = v[ "Transform" ];
-			if( !transform.isEmpty() )
-			{
-				const zpMatrix4f& mat = *(const zpMatrix4f*)transform.asData();
-				o->setTransform( mat );
-			}
+			createWorldObject( v );
 		} );
 	}
 
@@ -142,6 +137,7 @@ zp_bool zpWorld::createStep()
 }
 void zpWorld::destroy()
 {
+	m_objects = zpBison::null;
 }
 
 const zpString& zpWorld::getName() const
@@ -151,4 +147,44 @@ const zpString& zpWorld::getName() const
 zpApplication* zpWorld::getApplication() const
 {
 	return m_application;
+}
+
+zp_uint zpWorld::getTotalObjects() const
+{
+	return m_totalObjects;
+}
+zp_uint zpWorld::getNumObjectsLoaded() const
+{
+	return m_numObjectsLoaded;
+}
+zp_float zpWorld::getLoadingProgress() const
+{
+	return (zp_float)m_numObjectsLoaded / (zp_float)m_totalObjects;
+}
+
+void zpWorld::createWorldObject( const zpBison::Value& def )
+{
+	zpObject* o;
+	const zp_char* objFile = def[ "Object" ].asCString();
+	o = m_application->getObjectContentManager()->createObject( m_application, objFile );
+
+	if( !isFlagSet( ZP_WORLD_FLAG_DESTROY_AFTER_LOAD ) )
+	{
+		o->setWorld( this );
+	}
+
+	const zpBison::Value& transform = def[ "Transform" ];
+	if( !transform.isEmpty() )
+	{
+		zp_bool isStatic = o->isFlagSet( ZP_OBJECT_FLAG_STATIC );
+		o->unsetFlag( ZP_OBJECT_FLAG_STATIC );
+
+		const zpMatrix4f& mat = *(const zpMatrix4f*)transform.asData();
+		o->setTransform( mat );
+
+		if( isStatic )
+		{
+			o->setFlag( ZP_OBJECT_FLAG_STATIC );
+		}
+	}
 }

@@ -48,11 +48,18 @@ public:
 	const zpString& getName() const;
 	zpApplication* getApplication() const;
 
+	zp_uint getTotalObjects() const;
+	zp_uint getNumObjectsLoaded() const;
+	zp_float getLoadingProgress() const;
+
 private:
+	void createWorldObject( const zpBison::Value& def );
+
 	zpString m_name;
 	zpFlag32 m_flags;
 	zpApplication* m_application;
 
+	zpBison::Value m_objects;
 	zp_uint m_numObjectsLoaded;
 	zp_uint m_totalObjects;
 

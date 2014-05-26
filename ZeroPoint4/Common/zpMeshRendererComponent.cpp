@@ -87,6 +87,6 @@ void zpMeshRendererComponentPool::render( zpRenderingContext* i )
 {
 	m_used.foreach( [ i ]( zpMeshRendererComponent* o )
 	{
-		o->render( i );
+		if( o->isEnabled() ) o->render( i );
 	} );
 }

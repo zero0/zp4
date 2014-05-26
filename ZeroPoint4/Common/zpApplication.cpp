@@ -27,6 +27,7 @@ zpApplication::zpApplication()
 	, m_console( ZP_NULL )
 	, m_timer( zpTime::getInstance() )
 	, m_currentWorld( ZP_NULL )
+	, m_nextWorld( ZP_NULL )
 	, m_lastTime( 0 )
 	, m_simulateHz( 10000000 / 60 )
 	, m_renderMsHz( 1000 / 120 )
@@ -141,6 +142,12 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 		m_hasNextWorld = true;
 	}
 
+	const zpBison::Value& loadingWorld = appOptions[ "LoadingWorld" ];
+	if( loadingWorld.isString() )
+	{
+		m_loadingWorldFilename = loadingWorld.asCString();
+	}
+
 	m_currentPhase = 0;
 	if( m_phases.isEmpty() )
 	{
@@ -217,29 +224,53 @@ void zpApplication::update()
 		}
 	}
 
+	zp_bool initalizeCurrentWorld = false;
 	if( m_hasNextWorld && !m_nextWorldFilename.isEmpty() )
 	{
-		// if the next world should be added
-		if( m_addNextWorld )
-		{
-			zpWorld* addWorld = m_worldContent.createWorld( m_nextWorldFilename.str() );
-			addWorld->setFlag( ZP_WORLD_FLAG_SHOULD_CREATE );
-			addWorld->setFlag( ZP_WORLD_FLAG_DESTROY_AFTER_LOAD );
-		}
-		// otherwise, do a world swap
-		else
-		{
-			// if the current world is set, it's a world swap, unload objects
-			if( m_currentWorld )
-			{
-				m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
-				m_objectContent.destroyAllObjects( true );
-			}
+		//// if the next world should be added
+		//if( m_addNextWorld )
+		//{
+		//	m_worldContent.createWorld( m_nextWorldFilename.str(), true );
+		//}
+		//// otherwise, do a world swap
+		//else
+		//{
+		//	// if the current world is set, it's a world swap, unload objects
+		//	if( m_currentWorld != ZP_NULL )
+		//	{
+		//		m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
+		//		m_objectContent.destroyAllObjects( true );
+		//	}
+		//
+		//	// create the new world and mark for create
+		//	m_currentWorld = m_worldContent.createWorld( m_nextWorldFilename.str(), false );
+		//}
 
-			// create the new world and mark for create
-			m_currentWorld = m_worldContent.createWorld( m_nextWorldFilename.str() );
-			m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_CREATE );
+		// destroy old world and objects
+		if( m_currentWorld != ZP_NULL )
+		{
+			m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
+			m_objectContent.destroyAllObjectsInWorld( m_currentWorld );
 		}
+
+		// load the loading world and create it's objects
+		m_currentWorld = m_worldContent.createWorld( m_loadingWorldFilename.str(), false );
+		initalizeCurrentWorld = true;
+
+		// step load the next world
+		m_nextWorld = m_worldContent.createWorld( m_nextWorldFilename.str(), false );
+		m_nextWorld->setFlag( ZP_WORLD_FLAG_STEP_CREATE );
+
+		/*
+		destroy objects in current world
+		destroy current world
+		current = loading scene
+		next = next scene
+
+		current is done, destroy current
+		current = next
+		next = null
+		*/
 
 		// reset state
 		m_nextWorldFilename.clear();
@@ -247,11 +278,33 @@ void zpApplication::update()
 		m_addNextWorld = false;
 	}
 
+	// if the next world is done loading
+	if( m_nextWorld != ZP_NULL && m_nextWorld->isFlagSet( ZP_WORLD_FLAG_CREATED ) )
+	{
+		// destroy the loading world and it's objects
+		m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
+		m_objectContent.destroyAllObjectsInWorld( m_currentWorld );
+
+		// current world is the world that was loaded
+		m_currentWorld = m_nextWorld;
+		m_nextWorld = ZP_NULL;
+
+		// initialize all objects in the world
+		initalizeCurrentWorld = true;
+
+		// collect garbage next frame
+		garbageCollect();
+	}
 
 	// update world, delete, create objects, etc.
 	ZP_PROFILE_START( WORLD_UPDATE );
 	m_worldContent.update();
 	ZP_PROFILE_END( WORLD_UPDATE );
+
+	if( initalizeCurrentWorld )
+	{
+		m_objectContent.initializeAllObjectsInWorld( m_currentWorld );
+	}
 
 	m_physicsEngine.update( m_timer->getDeltaSeconds() );
 
@@ -349,6 +402,7 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	else if( strFilename.endsWith( ".objectb" ) )
 	{
 		zpObject* o = m_objectContent.createObject( this, filename );
+		o->setWorld( m_currentWorld );
 		loaded = o != ZP_NULL;
 	}
 	else if( strFilename.endsWith( ".worldb" ) )
@@ -396,6 +450,10 @@ void zpApplication::handleInput()
 	{
 		reloadAllResources();
 	}
+	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_1 ) )
+	{
+		loadWorld( "worlds/test.worldb" );
+	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F1 ) )
 	{
 		m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
@@ -410,6 +468,23 @@ void zpApplication::handleInput()
 
 		m_gui.label( 24, fps.str(), zpColor4f( 1, 1, 1, 1 ) );
 	}
+}
+
+void zpApplication::loadWorld( const zp_char* worldFilename )
+{
+	m_addNextWorld = false;
+	m_hasNextWorld = true;
+	m_nextWorldFilename = worldFilename;
+}
+void zpApplication::loadWorldAdditive( const zp_char* worldFilename )
+{
+	m_addNextWorld = true;
+	m_hasNextWorld = true;
+	m_nextWorldFilename = worldFilename;
+}
+zp_float zpApplication::getLoadingWorldProgress() const
+{
+	return m_nextWorld == ZP_NULL ? 1.f : m_nextWorld->getLoadingProgress();
 }
 
 void zpApplication::processFrame()

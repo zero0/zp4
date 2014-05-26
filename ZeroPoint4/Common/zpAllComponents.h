@@ -26,7 +26,8 @@ public:
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
-	void load( zpObject* obj, const zp_char* componentName, const zpBison::Value& cmp );
+	void create( zpObject* obj, const zp_char* componentName, const zpBison::Value& cmp );
+	void initialize();
 	void unload();
 
 	void setEnabled( zp_bool enabled );

@@ -34,7 +34,7 @@ void zpAttachmentComponent::onDestroy()
 {
 	m_children.foreach( []( zpObject* o )
 	{
-		o->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+		o->destroy();
 	} );
 	m_children.clear();
 }
@@ -103,7 +103,7 @@ zpObject* zpAttachmentComponent::removeChild( zp_uint index, zp_bool shouldDestr
 
 	if( shouldDestroy )
 	{
-		o->setFlag( ZP_OBJECT_FLAG_SHOULD_DESTROY );
+		o->destroy();
 	}
 	return o;
 }

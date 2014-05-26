@@ -13,6 +13,22 @@ public:
 	virtual zp_bool onPhaseUpdate( zpApplication* app ) = 0;
 };
 
+class zpPhaseLoadWorld : public zpApplicationPhase
+{
+public:
+	zpPhaseLoadWorld();
+	~zpPhaseLoadWorld() {}
+
+	void onEnterPhase( zpApplication* app );
+	void onLeavePhase( zpApplication* app );
+
+	zp_bool onPhaseUpdate( zpApplication* app );
+
+private:
+	zpString m_loadingWorld;
+	zpString m_nextWorld;
+};
+
 class zpApplication : public zpWindowProcListener, public zpWindowFocusListener, public zpWindowDragDropListener
 {
 public:
@@ -51,6 +67,10 @@ public:
 	zp_bool loadFile( const zp_char* filename );
 	zp_bool handleDragAndDrop( const zp_char* filename, zp_int x, zp_int y );
 	void handleInput();
+
+	void loadWorld( const zp_char* worldFilename );
+	void loadWorldAdditive( const zp_char* worldFilename );
+	zp_float getLoadingWorldProgress() const;
 
 	void processFrame();
 
@@ -103,12 +123,15 @@ private:
 
 	zp_int m_exitCode;
 	zpString m_optionsFilename;
+	zpString m_loadingWorldFilename;
 	zpString m_nextWorldFilename;
 
 	zpProfiler m_profiler;
 	zpConsole* m_console;
 	zpTime* m_timer;
+
 	zpWorld* m_currentWorld;
+	zpWorld* m_nextWorld;
 
 	zp_long m_lastTime;
 	zp_long m_simulateHz;

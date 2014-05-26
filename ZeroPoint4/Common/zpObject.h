@@ -10,12 +10,16 @@ enum zpObjectFlag : zp_uint
 {
 	ZP_OBJECT_FLAG_ENABLED,
 	ZP_OBJECT_FLAG_CREATED,
+	ZP_OBJECT_FLAG_INITIALIZED,
 	ZP_OBJECT_FLAG_SHOULD_DESTROY,
 	ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD,
+	ZP_OBJECT_FLAG_STATIC,
 	zpObjectFlag_Count,
 
 	ZP_OBJECT_FLAG_USER0,
 	zpObjectFlagUser_Count = 31,
+
+	ZP_OBJECT_FLAG_CAN_UPDATE = 1 << ZP_OBJECT_FLAG_ENABLED | 1 << ZP_OBJECT_FLAG_CREATED | 1 << ZP_OBJECT_FLAG_INITIALIZED,
 };
 
 class zpObjectResource : public zpResource< zpBison >
@@ -67,7 +71,12 @@ public:
 
 	zpApplication* getApplication() const;
 
+	zpWorld* getWorld() const;
+	void setWorld( zpWorld* world );
+
+	void initialize();
 	void update();
+	void destroy();
 
 private:
 	void loadObject( zp_bool isInitialLoad );
@@ -82,6 +91,7 @@ private:
 	zpAllComponents m_components;
 
 	zpApplication* m_application;
+	zpWorld* m_world;
 
 	zpObjectResourceInstance m_object;
 };
@@ -91,8 +101,13 @@ class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObje
 public:
 	zpObject* createObject( zpApplication* application, const zp_char* filename );
 
+	void initializeAllObjectsInWorld( zpWorld* world );
+
 	void destroyAllObjects( zp_bool isWorldSwap );
+	void destroyAllObjectsInWorld( zpWorld* world );
+
 	void update();
+	void simulate();
 
 private:
 	zp_bool createResource( zpObjectResource* res, const zp_char* filename );
