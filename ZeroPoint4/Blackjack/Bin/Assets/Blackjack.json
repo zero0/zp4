@@ -11,5 +11,7 @@
         "Refresh" : 60,
         "VSync" : false
     },
-	"World" : "worlds/test.worldb"
+    "World" : "worlds/test.worldb",
+    "LoadingWorld" : "worlds/loading.worldb",
+    "ProtoDB" : "data/protodb.jsonb"
 }
