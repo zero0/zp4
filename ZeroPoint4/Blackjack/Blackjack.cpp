@@ -1,7 +1,8 @@
-#include "Blackjack.h"
-
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #include <Windows.h>
+
+#include "Blackjack.h"
+
 
 #define BLACKJACK_CONFIG	"Blackjack.jsonb"
 
@@ -86,7 +87,7 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		
 		app.setOptionsFilename( BLACKJACK_CONFIG );
 		
-		app.addPhase< bProtoDBPhase >();
+		//app.addPhase< bProtoDBPhase >();
 		app.addPhase< bPlayPhase >();
 
 		app.initialize( args );

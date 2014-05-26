@@ -71,13 +71,15 @@ copy "$(SolutionDir)Rendering\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_MBCS;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Blackjack.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(SolutionDir)Physics\lib\$(ProcessorArchitecture)\;$(SolutionDir)Rendering\lib\$(ProcessorArchitecture)\;$(SolutionDir)Audio\lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetPath)" "$(ProjectDir)$(TargetFileName)"
@@ -91,6 +93,7 @@ copy "$(SolutionDir)Rendering\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\
   <ItemGroup>
     <ClCompile Include="Blackjack.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

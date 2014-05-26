@@ -124,6 +124,7 @@ private:
 	zp_int m_exitCode;
 	zpString m_optionsFilename;
 	zpString m_loadingWorldFilename;
+	zpString m_initialWorldFilename;
 	zpString m_nextWorldFilename;
 
 	zpProfiler m_profiler;

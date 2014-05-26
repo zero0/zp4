@@ -1,6 +1,6 @@
 #include "zpCore.h"
 #include <malloc.h>
-#include <new>
+//#include <new>
 
 #if ZP_USE_MEMORY_SYSTEM
 //void* operator new( zp_uint size ) {

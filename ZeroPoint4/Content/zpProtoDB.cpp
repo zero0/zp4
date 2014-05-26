@@ -95,12 +95,15 @@ void zpProtoDBManager::initialize( zp_uint numCatagories )
 	m_catagories.reserve( numCatagories );
 	m_protoDBs.reserve( numCatagories );
 
-	m_handles.resize( 64 );
-	zpProtoDBHandle* b = m_handles.begin();
-	zpProtoDBHandle* e = m_handles.end();
-	for( ; b != e; ++b )
+	if( m_handles.size() == 0 )
 	{
-		m_freeHandles.pushBack( b );
+		m_handles.resize( 64 );
+		zpProtoDBHandle* b = m_handles.begin();
+		zpProtoDBHandle* e = m_handles.end();
+		for( ; b != e; ++b )
+		{
+			m_freeHandles.pushBack( b );
+		}
 	}
 }
 void zpProtoDBManager::initializeCategory( const zp_char* category, zpProtoDBCreateFunc create, zp_uint stride )

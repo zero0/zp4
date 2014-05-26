@@ -138,8 +138,9 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	const zpBison::Value& world = appOptions[ "World" ];
 	if( world.isString() )
 	{
-		m_nextWorldFilename = world.asCString();
-		m_hasNextWorld = true;
+		m_initialWorldFilename = world.asCString();
+
+		loadWorld( world.asCString() );
 	}
 
 	const zpBison::Value& loadingWorld = appOptions[ "LoadingWorld" ];

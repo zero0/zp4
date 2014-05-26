@@ -1,3 +1,4 @@
+#include <new>
 #include "zpContent.h"
 
 void zpContentRegisterSerializables() {
