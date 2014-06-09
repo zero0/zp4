@@ -2,7 +2,7 @@
     "Shader" : "shaders/LitNormalTextured.shaderb",
     "Textures" :
     [
-		"textures/test.png"
+		"textures/test.textureb"
 	],
     "Constants" :
     {},

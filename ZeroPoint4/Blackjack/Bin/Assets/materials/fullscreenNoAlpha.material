@@ -2,7 +2,7 @@
     "Shader" : "shaders/fullscreenNoAlpha.shaderb",
     "Textures" :
     [
-        "textures/test.png"
+        "textures/test.textureb"
     ],
     "Constants" :
     {
