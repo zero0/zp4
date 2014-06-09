@@ -80,9 +80,6 @@ private:
 	zpBuffer m_cameraBuffer;
 	zpBuffer m_perFrameBuffer;
 
-	zpMaterialResourceInstance m_mat;
-	zpMeshResourceInstance m_mesh;
-
 	zpRasterState m_raster;
 	zpBlendState m_alphaBlend;
 

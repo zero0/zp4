@@ -163,11 +163,6 @@ zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 void zpRenderingPipeline::initialize()
 {
 	zp_bool ok;
-	ok = m_materialContent.getResource( "materials/fullscreenNoAlpha.materialb", m_mat );
-	ZP_ASSERT( ok, "" );
-	
-	ok = m_meshContent.getResource( "meshes/cube.meshb", m_mesh );
-	ZP_ASSERT( ok, "" );
 
 	ok = m_fontContent.getResource( "fonts/arial32.fontb", m_debugFont );
 	ZP_ASSERT( ok, "" );
@@ -248,8 +243,6 @@ void zpRenderingPipeline::initialize()
 }
 void zpRenderingPipeline::destroy()
 {
-	m_mat.release();
-	m_mesh.release();
 	m_debugFont.release();
 
 	m_engine->destroyBuffer( m_cameraBuffer );

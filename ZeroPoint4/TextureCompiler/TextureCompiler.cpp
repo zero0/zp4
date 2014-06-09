@@ -59,55 +59,28 @@ zp_bool BaseTextureCompiler::compile()
 
 struct BC1Block
 {
-	zp_ushort color_0;
-	zp_ushort color_1;
-
 	union
 	{
 		struct
 		{
-			zp_byte dcba;
-			zp_byte hgfe;
-			zp_byte lkji;
-			zp_byte ponm;
-		};
-		zp_byte data[4];
-		zp_uint indices;
-	};
-	
-};
+			zp_ushort color_0;
+			zp_ushort color_1;
 
-struct ColorRGBA
-{
-	union
-	{
-		struct
-		{
-			zp_byte r, g, b, a;
+			union
+			{
+				struct
+				{
+					zp_byte dcba;
+					zp_byte hgfe;
+					zp_byte lkji;
+					zp_byte ponm;
+				};
+				zp_byte data[4];
+				zp_uint indices;
+			};
 		};
-		zp_uint data;
+		zp_long block;
 	};
-
-	zp_bool operator<( const ColorRGBA& c ) const
-	{
-		return r < c.r && g < c.g && b < c.b && a < c.a;
-	}
-};
-struct ColorARGB
-{
-	union
-	{
-		struct
-		{
-			zp_byte a, r, g, b;
-		};
-		zp_uint data;
-	};
-
-	zp_bool operator<( const ColorRGBA& c ) const
-	{
-		return r < c.r && g < c.g && b < c.b && a < c.a;
-	}
 };
 
 zp_int FloatToInt( zp_float a, zp_int l )
@@ -117,106 +90,28 @@ zp_int FloatToInt( zp_float a, zp_int l )
 	return i;
 }
 
-zp_ushort ColorTo565( zp_byte r, zp_byte g, zp_byte b )
+zpVector4f MakeColorRGB( const zp_byte* rgb )
 {
-	zp_int cr = FloatToInt( 31.0f * ( r / 255.f ), 31 );
-	zp_int cg = FloatToInt( 63.0f * ( g / 255.f ), 63 );
-	zp_int cb = FloatToInt( 31.0f * ( b / 255.f ), 31 );
+	zpVector4f c( (zp_float)rgb[0] / 255.f, (zp_float)rgb[1] / 255.f, (zp_float)rgb[2] / 255.f, 1 );
+	return c;
+}
+zp_ushort Vector4To565( const zpVector4f& c )
+{
+	zp_int cr = FloatToInt( 31.0f * c.getX().getFloat(), 31 );
+	zp_int cg = FloatToInt( 63.0f * c.getY().getFloat(), 63 );
+	zp_int cb = FloatToInt( 31.0f * c.getZ().getFloat(), 31 );
 
 	return ( cr << 11 ) | ( cg << 5 ) | cb;
 }
 
-template< typename ColorT >
-ColorT LerpColor( const ColorT& a, const ColorT& b, zp_float alpha )
+zp_float DistanceColor( const zpVector4f& a, const zpVector4f& b )
 {
-	ColorT r;
+	zpVector4f s;
+	zpScalar d;
 
-	zp_lerp( r.r, a.r, b.r, alpha );
-	zp_lerp( r.g, a.g, b.g, alpha );
-	zp_lerp( r.b, a.b, b.b, alpha );
-	zp_lerp( r.a, a.a, b.a, alpha );
-
-	return r;
-};
-
-template< typename ColorT >
-zp_ushort ColorTo565( const ColorT& c )
-{
-	return ColorTo565( c.r, c.g, c.b );
-}
-
-template< typename ColorT >
-void MakeColorRGB( ColorT& c, const zp_byte* rgb )
-{
-	c.r = rgb[0];
-	c.g = rgb[1];
-	c.b = rgb[2];
-	c.a = zp_limit_max< zp_byte >();
-}
-template< typename ColorT >
-void MakeColorRGB( ColorT& c, zp_byte r, zp_byte g, zp_byte b )
-{
-	c.r = r;
-	c.g = g;
-	c.b = b;
-	c.a = zp_limit_max< zp_byte >();
-}
-template< typename ColorT >
-void MakeColorRGBA( ColorT& c, const zp_byte* rgba )
-{
-	c.r = rgba[0];
-	c.g = rgba[1];
-	c.b = rgba[2];
-	c.a = rgba[3];
-}
-template< typename ColorT >
-void MakeColorRGBA( ColorT& c, zp_byte r, zp_byte g, zp_byte b, zp_byte a )
-{
-	c.r = r;
-	c.g = g;
-	c.b = b;
-	c.a = a;
-}
-
-template< typename ColorT >
-void MinColor( ColorT& c, const ColorT& a, const ColorT& b )
-{
-	c.r = ZP_MIN( a.r, b.r );
-	c.g = ZP_MIN( a.g, b.g );
-	c.b = ZP_MIN( a.b, b.b );
-	c.a = ZP_MIN( a.a, b.a );
-}
-template< typename ColorT >
-void MaxColor( ColorT& c, const ColorT& a, const ColorT& b )
-{
-	c.r = ZP_MAX( a.r, b.r );
-	c.g = ZP_MAX( a.g, b.g );
-	c.b = ZP_MAX( a.b, b.b );
-	c.a = ZP_MAX( a.a, b.a );
-}
-
-template< typename ColorT >
-ColorT SubColor( const ColorT& a, const ColorT& b )
-{
-	ColorT c;
-	c.r = ( a.r - b.r );
-	c.g = ( a.g - b.g );
-	c.b = ( a.b - b.b );
-	c.a = zp_limit_max< zp_byte >();
-	return c;
-}
-template< typename ColorT >
-zp_uint DotColor( const ColorT& a, const ColorT& b )
-{
-	zp_uint d = ( a.r * b.r ) + ( a.g * b.g ) + ( a.b * b.b );
-	return d;
-}
-template< typename ColorT >
-zp_uint DistanceColor( const ColorT& a, const ColorT& b )
-{
-	ColorT s = SubColor( a, b );
-	zp_uint d = DotColor( s, s );
-	return d;
+	zpMath::Sub( s, a, b );
+	zpMath::Dot3( d, s, s );
+	return d.getFloat();
 }
 
 void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& compiledImage )
@@ -244,40 +139,83 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 	{
 		for( zp_uint x = 0; x < compiledImage.width; x += COMPRESSED_BLOCK_STRIDE )
 		{
-			ColorRGBA color0, color1, color2, color3;
-			ColorRGBA pixels[ COMPRESSED_BLOCK_SIZE ];
+			zpVector4f color0, color1, color2, color3;
+			zpVector4f pixels[ COMPRESSED_BLOCK_SIZE ];
 
-			color0.data = zp_limit_min< zp_uint >();
-			color1.data = zp_limit_max< zp_uint >();
+			color0 = zpVector4f( 1, 1, 1, 1 );
+			color1 = zpVector4f( 0, 0, 0, 1 );
 
+			// find min and max
 			for( zp_uint py = 0; py < COMPRESSED_BLOCK_STRIDE; ++py )
 			{
 				for( zp_uint px = 0; px < COMPRESSED_BLOCK_STRIDE; ++px )
 				{
-					ColorRGBA& c =  pixels[ px + ( py * COMPRESSED_BLOCK_STRIDE ) ];
+					zpVector4f& c =  pixels[ px + ( py * COMPRESSED_BLOCK_STRIDE ) ];
 
 					if( x + px > inputImage.width || y + py > inputImage.height )
 					{
-						c.r = 0;
-						c.g = 0;
-						c.b = 0;
-						c.a = zp_limit_max< zp_byte >();
+						c = zpVector4f( 0, 0, 0, 1 );
 					}
 					else
 					{
-						MakeColorRGB( c, &image[ stride * ( ( x + px ) + ( ( y + py ) * inputImage.width ) ) ] );
+						c = MakeColorRGB( &image[ stride * ( ( x + px ) + ( ( y + py ) * inputImage.width ) ) ] );
 						
-						MaxColor( color0, color0, c );
-						MinColor( color1, color1, c );
+						zpMath::Max( color0, color0, c );
+						zpMath::Min( color1, color1, c );
 					}
 				}
 			}
 
-			zp_uint index;
-			color2 = LerpColor( color0, color1,  1.f / 3.f );
-			color3 = LerpColor( color0, color1,  2.f / 3.f );
+			// select diagonal
+			zpVector4f center;
+			zpMath::Lerp( center, color0, color1, zpScalar( 0.5f ) );
+			zpVector4f cov( 0, 0 );
+			
+			for( zp_uint i = 0; i < COMPRESSED_BLOCK_SIZE; ++i )
+			{
+				zpVector4f t;
+				zpMath::Sub( t, pixels[i], center );
 
-			ColorRGBA palette[4] =
+				zpMath::Madd( cov, cov, t.xy(), t.getZ() );
+			}
+			
+			zp_float x0 = color0.getX().getFloat();
+			zp_float y0 = color0.getY().getFloat();
+			zp_float x1 = color1.getX().getFloat();
+			zp_float y1 = color1.getY().getFloat();
+			
+			if (zpMath::Cmp0( cov.getX() ) < 0) {
+				zp_move_swap(x0, x1);
+			}
+			if (zpMath::Cmp0( cov.getY() ) < 0) {
+				zp_move_swap(y0, y1);
+			}
+			
+			color0 = zpVector4f( x0, y0, color0.getZ().getFloat() );
+			color1 = zpVector4f( x1, y1, color1.getZ().getFloat() );
+
+			// insert bbox
+			zpVector4f th( ( 8.f / 255.f ) / 16.f );
+			zpVector4f inset;
+			zpMath::Sub( inset, color0, color1 );
+			zpMath::Div( inset, inset, zpScalar( 16.f ) );
+			zpMath::Sub( inset, inset, th );
+
+			zpMath::Sub( color0, color0, inset );
+			zpMath::Add( color1, color1, inset );
+
+			zpMath::Min( color0, color0, zpVector4f( 1, 1, 1, 1 ) );
+			zpMath::Max( color0, color0, zpVector4f( 0, 0, 0, 0 ) );
+
+			zpMath::Min( color1, color1, zpVector4f( 1, 1, 1, 1 ) );
+			zpMath::Max( color1, color1, zpVector4f( 0, 0, 0, 0 ) );
+
+			// calculate indices
+			zp_uint index;
+			zpMath::Lerp( color2, color0, color1, zpScalar( 1.f / 3.f ) );
+			zpMath::Lerp( color3, color0, color1, zpScalar( 1.f / 3.f ) );
+
+			zpVector4f palette[4] =
 			{
 				color0,
 				color1,
@@ -286,16 +224,16 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 			};
 
 			BC1Block block;
-			block.color_0 = ColorTo565( color0 );
-			block.color_1 = ColorTo565( color1 );
+			block.color_0 = Vector4To565( color0 );
+			block.color_1 = Vector4To565( color1 );
 			block.indices = 0;
 
 			for( zp_uint i = 0; i < COMPRESSED_BLOCK_SIZE; ++i )
 			{
-				zp_uint d0 = DistanceColor( palette[0], pixels[i] );
-				zp_uint d1 = DistanceColor( palette[1], pixels[i] );
-				zp_uint d2 = DistanceColor( palette[2], pixels[i] );
-				zp_uint d3 = DistanceColor( palette[3], pixels[i] );
+				zp_float d0 = DistanceColor( palette[0], pixels[i] );
+				zp_float d1 = DistanceColor( palette[1], pixels[i] );
+				zp_float d2 = DistanceColor( palette[2], pixels[i] );
+				zp_float d3 = DistanceColor( palette[3], pixels[i] );
 
 				zp_uint b0 = d0 > d3;
 				zp_uint b1 = d1 > d2;
@@ -310,7 +248,12 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 				block.indices |= (x2 | ((x0 | x1) << 1)) << (2 * i);
 			}
 
-			compiledImage.imageBytes.write( block );
+			compiledImage.imageBytes.write( block.color_0 );
+			compiledImage.imageBytes.write( block.color_1 );
+			compiledImage.imageBytes.write( block.dcba );
+			compiledImage.imageBytes.write( block.hgfe );
+			compiledImage.imageBytes.write( block.lkji );
+			compiledImage.imageBytes.write( block.ponm );
 		}
 	}
 
@@ -330,6 +273,17 @@ void BaseTextureCompiler::shutdown()
 	image[ "Stride" ] = zpJson( s_textureCompressionStride[ m_desiredCompression ] );
 
 	image[ "Data" ] = zpJson( m_compressedImage.imageBytes );
+
+#if 0
+	zpStringBuffer sb;
+	zpDataBuffer db;
+
+	zp_base64_encode( m_compressedImage.imageBytes.getData(), m_compressedImage.imageBytes.size(), sb );
+	zp_base64_decode( sb.str(), sb.length(), db );
+
+	ZP_ASSERT( db.size() == m_compressedImage.imageBytes.size(), "" );
+	ZP_ASSERT( zp_memcmp( db.getData(), m_compressedImage.imageBytes.getData(), m_compressedImage.imageBytes.size() ) == 0, "" );
+#endif
 
 	if( !zpBison::compileToFile( m_outputFile, image ) )
 	{

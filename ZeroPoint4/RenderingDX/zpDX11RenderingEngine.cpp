@@ -363,11 +363,6 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 		ZP_ASSERT_WARN( SUCCEEDED( hr ), "Unable to create render target view for texture" );
 	}
 
-	// remove references so texture now owns pointers
-	ZP_SAFE_RELEASE( texture );
-	ZP_SAFE_RELEASE( srv );
-	ZP_SAFE_RELEASE( rtv );
-
 	tex->m_width = width;
 	tex->m_height = height;
 	tex->m_dimension = dimension;
@@ -380,37 +375,40 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 }
 zpTextureImpl* zpRenderingEngineImpl::createTextureFromFile( const zpString& filename )
 {
-	HRESULT hr;
-	ID3D11Resource* texture;
-	ID3D11ShaderResourceView* srv;
-	D3DX11_IMAGE_INFO info;
-	zpTextureImpl* tex;
+	ZP_ASSERT( false, "Don't use anymore!" );
+	return ZP_NULL;
 
-	ZP_ASSERT( !m_freeTextures.isEmpty(), "Ran out of textures" );
-	if( m_freeTextures.isEmpty() ) return ZP_NULL;
-
-	tex = m_freeTextures.back();
-	m_freeTextures.popBack();
-	m_usedTextures.pushBack( tex );
-
-	hr = D3DX11CreateTextureFromFile( m_d3dDevice, filename.str(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
-	ZP_ASSERT( SUCCEEDED( hr ), "" );
-
-	hr = D3DX11CreateShaderResourceViewFromFile( m_d3dDevice, filename.str(), ZP_NULL, ZP_NULL, &srv, ZP_NULL );
-	ZP_ASSERT( SUCCEEDED( hr ), "" );
-
-	hr = D3DX11GetImageInfoFromFile( filename.str(), ZP_NULL, &info, ZP_NULL );
-	ZP_ASSERT( SUCCEEDED( hr ), "" );
-
-	tex->m_width = info.Width;
-	tex->m_height = info.Height;
-	tex->m_dimension = __dxToZP( info.ResourceDimension );
-	tex->m_type = ZP_TEXTURE_TYPE_TEXTURE;
-	tex->m_texture = texture;
-	tex->m_textureResourceView = srv;
-	tex->m_textureRenderTarget = ZP_NULL;
-
-	return tex;
+	//HRESULT hr;
+	//ID3D11Resource* texture;
+	//ID3D11ShaderResourceView* srv;
+	//D3DX11_IMAGE_INFO info;
+	//zpTextureImpl* tex;
+	//
+	//ZP_ASSERT( !m_freeTextures.isEmpty(), "Ran out of textures" );
+	//if( m_freeTextures.isEmpty() ) return ZP_NULL;
+	//
+	//tex = m_freeTextures.back();
+	//m_freeTextures.popBack();
+	//m_usedTextures.pushBack( tex );
+	//
+	//hr = D3DX11CreateTextureFromFile( m_d3dDevice, filename.str(), ZP_NULL, ZP_NULL, &texture, ZP_NULL );
+	//ZP_ASSERT( SUCCEEDED( hr ), "" );
+	//
+	//hr = D3DX11CreateShaderResourceViewFromFile( m_d3dDevice, filename.str(), ZP_NULL, ZP_NULL, &srv, ZP_NULL );
+	//ZP_ASSERT( SUCCEEDED( hr ), "" );
+	//
+	//hr = D3DX11GetImageInfoFromFile( filename.str(), ZP_NULL, &info, ZP_NULL );
+	//ZP_ASSERT( SUCCEEDED( hr ), "" );
+	//
+	//tex->m_width = info.Width;
+	//tex->m_height = info.Height;
+	//tex->m_dimension = __dxToZP( info.ResourceDimension );
+	//tex->m_type = ZP_TEXTURE_TYPE_TEXTURE;
+	//tex->m_texture = texture;
+	//tex->m_textureResourceView = srv;
+	//tex->m_textureRenderTarget = ZP_NULL;
+	//
+	//return tex;
 }
 zp_bool zpRenderingEngineImpl::destroyTexture( zpTextureImpl* texture )
 {
