@@ -38,8 +38,23 @@ zp_bool zpTextureResource::load( const zp_char* filename, zpRenderingEngine* eng
 {
 	m_filename = filename;
 	
-	zp_bool loaded;
-	loaded = engine->createTextureFromFile( m_resource, m_filename );
+	zp_bool loaded = false;
+	//loaded = engine->createTextureFromFile( m_resource, m_filename );
+
+	zpBison image;
+	if( image.readFromFile( zpString( filename ) ) )
+	{
+		const zpBison::Value& root = image.root();
+
+		zp_uint width = root[ "Width" ].asInt();
+		zp_uint height = root[ "Height" ].asInt();
+		zp_uint stride = root[ "Stride" ].asInt();
+		const void* imageData = root[ "Data" ].asData();
+		zp_uint size = root[ "Data" ].size();
+
+		loaded = engine->createTexture( m_resource, width, height, ZP_TEXTURE_TYPE_TEXTURE, ZP_TEXTURE_DIMENSION_2D, ZP_DISPLAY_FORMAT_DXT1, ZP_CPU_ACCESS_NONE, imageData, stride, 1 );
+	}
+
 
 	ZP_ASSERT( loaded, "Failed to load texture '%s'", m_filename.str() );
 	return loaded;
@@ -62,7 +77,7 @@ zp_bool zpTextureContentManager::getResourceWithoutLoadTexture( zpTextureResourc
 	ok = getResourceWithoutLoad( outInstance, texture );
 	ZP_ASSERT( ok, "Failed to get texture resource without load" );
 
-	ok = getApplication()->getRenderPipeline()->getRenderingEngine()->createTexture( *texture, width, height, type, dimension, format, access, data, mipLevels );
+	//ok = getApplication()->getRenderPipeline()->getRenderingEngine()->createTexture( *texture, width, height, type, dimension, format, access, data, mipLevels );
 	ZP_ASSERT( ok, "Failed to create texture" );
 
 	return ok;

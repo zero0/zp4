@@ -12,12 +12,14 @@ public:
 
 	void operator=( const zpDataBuffer& other );
 
+	zp_byte* getData();
 	const zp_byte* getData() const;
 
 	zp_uint size() const;
 	zp_uint capacity() const;
 
 	void reserve( zp_uint size );
+	void resize( zp_uint size );
 
 	void clear();
 	void reset();

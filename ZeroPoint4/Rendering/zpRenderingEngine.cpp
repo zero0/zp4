@@ -130,13 +130,13 @@ zp_bool zpRenderingEngine::destroyBuffer( zpBuffer& buffer )
 	return m_renderingEngine->destroyBuffer( buffer.m_buffer );
 }
 
-zp_bool zpRenderingEngine::createTexture( zpTexture& texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
+zp_bool zpRenderingEngine::createTexture( zpTexture& texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data, zp_uint strideInBytes, zp_uint mipLevels )
 {
 	if( texture.m_textureImpl )
 	{
 		destroyTexture( texture );
 	}
-	texture.m_textureImpl = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, mipLevels );
+	texture.m_textureImpl = m_renderingEngine->createTexture( width, height, type, dimension, format, access, data, strideInBytes, mipLevels );
 
 	return texture.m_textureImpl != ZP_NULL;
 }

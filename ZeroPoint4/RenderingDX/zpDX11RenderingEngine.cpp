@@ -260,7 +260,7 @@ zp_bool zpRenderingEngineImpl::destroyBuffer( zpBufferImpl* buffer )
 	return buffer == ZP_NULL;
 }
 
-zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data, zp_uint mipLevels )
+zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data, zp_uint strideInBytes, zp_uint mipLevels )
 {
 	HRESULT hr;
 	ID3D11Resource* texture = ZP_NULL;
@@ -291,7 +291,7 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 		break;
 	}
 
-	texDesc.CPUAccessFlags = __zpToDX( ZP_CPU_ACCESS_NONE );
+	texDesc.CPUAccessFlags = __zpToDX( access );
 	texDesc.Format = __zpToDX( format );
 	texDesc.Width = width;
 	texDesc.Height = height;
@@ -299,7 +299,7 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 	texDesc.MiscFlags = 0;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
-	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.Usage = data == ZP_NULL ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
 	
 	// create the texture with or without data
 	if( data )
@@ -307,6 +307,8 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 		D3D11_SUBRESOURCE_DATA subData;
 		zp_zero_memory( &subData );
 		subData.pSysMem = data;
+		subData.SysMemPitch = strideInBytes * ( width >> 2 );
+		subData.SysMemSlicePitch = subData.SysMemPitch * ( height >> 2 );
 
 		hr = m_d3dDevice->CreateTexture2D( &texDesc, &subData, (ID3D11Texture2D**)&texture );
 	}

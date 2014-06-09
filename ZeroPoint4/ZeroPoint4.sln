@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FontCompiler", "FontCompile
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProtoDBCompiler", "ProtoDBCompiler\ProtoDBCompiler.vcxproj", "{D28BE47A-0CF8-460B-B1FC-70F49FAEE1D9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextureCompiler", "TextureCompiler\TextureCompiler.vcxproj", "{CD92D191-BE44-4539-86DD-B6C3BA379F09}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -257,6 +259,16 @@ Global
 		{D28BE47A-0CF8-460B-B1FC-70F49FAEE1D9}.Release_Tools|x64.ActiveCfg = Release|Win32
 		{D28BE47A-0CF8-460B-B1FC-70F49FAEE1D9}.Release|Win32.ActiveCfg = Release|Win32
 		{D28BE47A-0CF8-460B-B1FC-70F49FAEE1D9}.Release|x64.ActiveCfg = Release|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Debug_Tools|Win32.ActiveCfg = Debug|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Debug_Tools|Win32.Build.0 = Debug|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Debug_Tools|x64.ActiveCfg = Debug|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Debug|x64.ActiveCfg = Debug|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Release_Tools|Win32.ActiveCfg = Release|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Release_Tools|Win32.Build.0 = Release|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Release_Tools|x64.ActiveCfg = Release|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Release|Win32.ActiveCfg = Release|Win32
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -280,5 +292,6 @@ Global
 		{A293B9E0-2440-4B87-8FAC-4B838E1EAA5A} = {3A6198CC-A92B-4EBD-8A1D-62C85AFE68B9}
 		{AD3A3BF0-AE1B-4704-AC6F-A8C4D98553F7} = {3A6198CC-A92B-4EBD-8A1D-62C85AFE68B9}
 		{D28BE47A-0CF8-460B-B1FC-70F49FAEE1D9} = {3A6198CC-A92B-4EBD-8A1D-62C85AFE68B9}
+		{CD92D191-BE44-4539-86DD-B6C3BA379F09} = {3A6198CC-A92B-4EBD-8A1D-62C85AFE68B9}
 	EndGlobalSection
 EndGlobal

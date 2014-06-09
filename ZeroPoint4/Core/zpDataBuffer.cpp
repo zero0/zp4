@@ -42,6 +42,10 @@ void zpDataBuffer::operator=( const zpDataBuffer& other )
 	readIn( other );
 }
 
+zp_byte* zpDataBuffer::getData()
+{
+	return m_data;
+}
 const zp_byte* zpDataBuffer::getData() const
 {
 	return m_data;
@@ -85,6 +89,10 @@ void zpDataBuffer::ensureCapacity( zp_uint capacity )
 void zpDataBuffer::reserve( zp_uint size )
 {
 	ensureCapacity( size );
+}
+void zpDataBuffer::resize( zp_uint size )
+{
+	m_size = size;
 }
 
 void zpDataBuffer::clear()
