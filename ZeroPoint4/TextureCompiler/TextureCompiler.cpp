@@ -142,8 +142,8 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 			zpVector4f color0, color1, color2, color3;
 			zpVector4f pixels[ COMPRESSED_BLOCK_SIZE ];
 
-			color0 = zpVector4f( 1, 1, 1, 1 );
-			color1 = zpVector4f( 0, 0, 0, 1 );
+			color0 = zpVector4f( 0, 0, 0, 1 );
+			color1 = zpVector4f( 1, 1, 1, 1 );
 
 			// find min and max
 			for( zp_uint py = 0; py < COMPRESSED_BLOCK_STRIDE; ++py )
@@ -159,13 +159,69 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 					else
 					{
 						c = MakeColorRGB( &image[ stride * ( ( x + px ) + ( ( y + py ) * inputImage.width ) ) ] );
-						
-						zpMath::Max( color0, color0, c );
-						zpMath::Min( color1, color1, c );
+
+						if( Vector4To565( c ) > Vector4To565( color0 ) )
+						{
+							color0 = c;
+						}
+						if( Vector4To565( c ) < Vector4To565( color1 ) )
+						{
+							color1 = c;
+						}
 					}
 				}
 			}
 
+			zpMath::Lerp( color2, color0, color1, zpScalar( 1.f / 3.f ) );
+			zpMath::Lerp( color3, color0, color1, zpScalar( 1.f / 3.f ) );
+
+			BC1Block block;
+			block.color_0 = Vector4To565( color0 );
+			block.color_1 = Vector4To565( color1 );
+			block.indices = 0;
+
+			zpVector4f midColor[3];
+			zpMath::Lerp( midColor[0], color1, color2, zpScalar( 0.5f ) );
+			zpMath::Lerp( midColor[1], color2, color3, zpScalar( 0.5f ) );
+			zpMath::Lerp( midColor[2], color3, color0, zpScalar( 0.5f ) );
+
+			zp_ushort mid[3] =
+			{
+				Vector4To565( midColor[0] ),
+				Vector4To565( midColor[1] ),
+				Vector4To565( midColor[2] )
+			};
+
+			for( zp_uint y = 0; y < COMPRESSED_BLOCK_STRIDE; ++y )
+			{
+				block.data[y] = 0;
+				for( zp_int x = COMPRESSED_BLOCK_STRIDE - 1; x >= 0; --x )
+				{
+					const zpVector4f& c = pixels[ x + ( y * COMPRESSED_BLOCK_STRIDE ) ];
+					zp_ushort p = Vector4To565( c );
+
+					zp_byte index = 0;
+					if( p <= mid[0] )
+					{
+						index = 1;
+					}
+					else if( p <= mid[1] )
+					{
+						index = 2;
+					}
+					else if( p <= mid[2] )
+					{
+						index = 3;
+					}
+					else
+					{
+						index = 0;
+					}
+
+					block.data[y] = ( block.data[y] << 2 ) | ( 0x03 & index );
+				}
+			}
+#if 0
 			// select diagonal
 			zpVector4f center;
 			zpMath::Lerp( center, color0, color1, zpScalar( 0.5f ) );
@@ -247,7 +303,7 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 
 				block.indices |= (x2 | ((x0 | x1) << 1)) << (2 * i);
 			}
-
+#endif
 			compiledImage.imageBytes.write( block.color_0 );
 			compiledImage.imageBytes.write( block.color_1 );
 			compiledImage.imageBytes.write( block.dcba );
