@@ -97,5 +97,4 @@ ZP_FORCE_INLINE zp_ulong zp_limit_max<zp_ulong>() { return 0xFFFFFFFFFFFFFFFFL; 
 template<>
 ZP_FORCE_INLINE zp_ulong zp_limit_min<zp_ulong>() { return 0; }
 
-
 #endif

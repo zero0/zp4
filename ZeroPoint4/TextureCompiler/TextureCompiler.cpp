@@ -180,16 +180,12 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 			block.color_1 = Vector4To565( color1 );
 			block.indices = 0;
 
-			zpVector4f midColor[3];
-			zpMath::Lerp( midColor[0], color1, color2, zpScalar( 0.5f ) );
-			zpMath::Lerp( midColor[1], color2, color3, zpScalar( 0.5f ) );
-			zpMath::Lerp( midColor[2], color3, color0, zpScalar( 0.5f ) );
-
-			zp_ushort mid[3] =
+			zpVector4f allColors[4] =
 			{
-				Vector4To565( midColor[0] ),
-				Vector4To565( midColor[1] ),
-				Vector4To565( midColor[2] )
+				color0,
+				color1,
+				color2,
+				color3,
 			};
 
 			for( zp_uint y = 0; y < COMPRESSED_BLOCK_STRIDE; ++y )
@@ -198,112 +194,36 @@ void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& c
 				for( zp_int x = COMPRESSED_BLOCK_STRIDE - 1; x >= 0; --x )
 				{
 					const zpVector4f& c = pixels[ x + ( y * COMPRESSED_BLOCK_STRIDE ) ];
-					zp_ushort p = Vector4To565( c );
 
 					zp_byte index = 0;
-					if( p <= mid[0] )
+					zp_float dist = ZP_FLT_MAX;
+
+					// find the distance to all colors
+					for( zp_uint i = 0; i < 4; ++i )
 					{
-						index = 1;
-					}
-					else if( p <= mid[1] )
-					{
-						index = 2;
-					}
-					else if( p <= mid[2] )
-					{
-						index = 3;
-					}
-					else
-					{
-						index = 0;
+						zp_float d = DistanceColor( c, allColors[ i ] );
+						zp_abs( d, d );
+
+						// if the difference is 0, break
+						if( zp_approximate( d, 0.f ) )
+						{
+							index = i;
+							break;
+						}
+
+						// otherwise, use the smallest distance index
+						if( d < dist )
+						{
+							index = i;
+							dist = d;
+						}
 					}
 
 					block.data[y] = ( block.data[y] << 2 ) | ( 0x03 & index );
 				}
 			}
-#if 0
-			// select diagonal
-			zpVector4f center;
-			zpMath::Lerp( center, color0, color1, zpScalar( 0.5f ) );
-			zpVector4f cov( 0, 0 );
-			
-			for( zp_uint i = 0; i < COMPRESSED_BLOCK_SIZE; ++i )
-			{
-				zpVector4f t;
-				zpMath::Sub( t, pixels[i], center );
 
-				zpMath::Madd( cov, cov, t.xy(), t.getZ() );
-			}
-			
-			zp_float x0 = color0.getX().getFloat();
-			zp_float y0 = color0.getY().getFloat();
-			zp_float x1 = color1.getX().getFloat();
-			zp_float y1 = color1.getY().getFloat();
-			
-			if (zpMath::Cmp0( cov.getX() ) < 0) {
-				zp_move_swap(x0, x1);
-			}
-			if (zpMath::Cmp0( cov.getY() ) < 0) {
-				zp_move_swap(y0, y1);
-			}
-			
-			color0 = zpVector4f( x0, y0, color0.getZ().getFloat() );
-			color1 = zpVector4f( x1, y1, color1.getZ().getFloat() );
-
-			// insert bbox
-			zpVector4f th( ( 8.f / 255.f ) / 16.f );
-			zpVector4f inset;
-			zpMath::Sub( inset, color0, color1 );
-			zpMath::Div( inset, inset, zpScalar( 16.f ) );
-			zpMath::Sub( inset, inset, th );
-
-			zpMath::Sub( color0, color0, inset );
-			zpMath::Add( color1, color1, inset );
-
-			zpMath::Min( color0, color0, zpVector4f( 1, 1, 1, 1 ) );
-			zpMath::Max( color0, color0, zpVector4f( 0, 0, 0, 0 ) );
-
-			zpMath::Min( color1, color1, zpVector4f( 1, 1, 1, 1 ) );
-			zpMath::Max( color1, color1, zpVector4f( 0, 0, 0, 0 ) );
-
-			// calculate indices
-			zp_uint index;
-			zpMath::Lerp( color2, color0, color1, zpScalar( 1.f / 3.f ) );
-			zpMath::Lerp( color3, color0, color1, zpScalar( 1.f / 3.f ) );
-
-			zpVector4f palette[4] =
-			{
-				color0,
-				color1,
-				color2,
-				color3
-			};
-
-			BC1Block block;
-			block.color_0 = Vector4To565( color0 );
-			block.color_1 = Vector4To565( color1 );
-			block.indices = 0;
-
-			for( zp_uint i = 0; i < COMPRESSED_BLOCK_SIZE; ++i )
-			{
-				zp_float d0 = DistanceColor( palette[0], pixels[i] );
-				zp_float d1 = DistanceColor( palette[1], pixels[i] );
-				zp_float d2 = DistanceColor( palette[2], pixels[i] );
-				zp_float d3 = DistanceColor( palette[3], pixels[i] );
-
-				zp_uint b0 = d0 > d3;
-				zp_uint b1 = d1 > d2;
-				zp_uint b2 = d0 > d2;
-				zp_uint b3 = d1 > d3;
-				zp_uint b4 = d2 > d3;
-
-				zp_uint x0 = b1 & b2;
-				zp_uint x1 = b0 & b3;
-				zp_uint x2 = b0 & b4;
-
-				block.indices |= (x2 | ((x0 | x1) << 1)) << (2 * i);
-			}
-#endif
+			// write block to compiled image data
 			compiledImage.imageBytes.write( block.color_0 );
 			compiledImage.imageBytes.write( block.color_1 );
 			compiledImage.imageBytes.write( block.dcba );
