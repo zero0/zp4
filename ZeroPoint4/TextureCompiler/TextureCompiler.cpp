@@ -1,26 +1,67 @@
-#include "TextureCompiler.h"
-#include <png.h>
+#include "Main.h"
 
-#if ZP_DEBUG
-#pragma comment( lib, "zlibd.lib" )
-#pragma comment( lib, "libpng16d.lib" )
-#else
-#pragma comment( lib, "zlib.lib" )
-#pragma comment( lib, "libpng16.lib" )
-#endif
+const zp_char* s_textureFormat[ TextureFormat_Count ] =
+{
+	"R",
+	"RG",
+	"RGB",
+	"RGBA",
+};
+zp_uint s_textureFormatStride[ TextureFormat_Count ] =
+{
+	1,
+	2,
+	3,
+	4,
+};
 
-#define COMPRESSED_BLOCK_STRIDE		4
-#define COMPRESSED_BLOCK_SIZE		( COMPRESSED_BLOCK_STRIDE * COMPRESSED_BLOCK_STRIDE )
+zp_uint s_textureCompressionStride[ TextureCompression_Count ] =
+{
+	4,
+	8,
+	8,
+	16,
+	8,
+	16,
+	8,
+	8,
+	8,
+	8,
+	8,
+};
 
-BaseTextureCompiler::BaseTextureCompiler()
+const zp_char* s_textureCompression[ TextureCompression_Count ] =
+{
+	"TrueColor",
+	"BC1",
+	"BC2",
+	"BC3",
+	"BC4",
+	"BC5",
+	"PVRTC",
+	"PVRTC2",
+	"ETC1",
+	"ETC2",
+	"ETC2A",
+};
+
+TextureCompiler::TextureCompiler()
 {}
-BaseTextureCompiler::~BaseTextureCompiler()
+TextureCompiler::~TextureCompiler()
 {}
 
-zp_bool BaseTextureCompiler::initialize( const zpArrayList< zpString >& args )
+zp_bool TextureCompiler::initialize( const zpArrayList< zpString >& args )
 {
 	m_compression = args[ 0 ];
-	m_desiredCompression = TEXTURE_COMPRESSION_DXT1;
+
+	if( m_compression.startsWith( "DX" ) )
+	{
+		m_desiredCompression = TEXTURE_COMPRESSION_DXT;
+	}
+	else if( m_compression.startsWith( "GL" ) )
+	{
+		m_desiredCompression = TEXTURE_COMPRESSION_PVR;
+	}
 
 	m_desiredFormat = TEXTURE_FORMAT_NONE;
 	if( args.size() == 4 )
@@ -41,202 +82,64 @@ zp_bool BaseTextureCompiler::initialize( const zpArrayList< zpString >& args )
 
 	return true;
 }
-zp_bool BaseTextureCompiler::compile()
+zp_bool TextureCompiler::compile()
 {
-	zp_bool ok = getTextureBytes( m_rawImage );
-	if( ok )
+	zp_bool ok = false;
+
+	TextureReader* reader = ZP_NULL;
+	TextureCompressor* compressor = ZP_NULL;
+
+	// open texture file
+	zpFile textureFile( m_inputFile );
+	if( textureFile.open( ZP_FILE_MODE_BINARY_READ ) )
 	{
-		switch( m_desiredCompression )
+		// read all bytes of file
+		zpDataBuffer fileData;
+		textureFile.readFileBinary( fileData );
+		textureFile.close();
+
+		// get png reader
+		if( m_inputFile.endsWith( ".png" ) )
 		{
-		case TEXTURE_COMPRESSION_DXT1:
-			compileDXT1( m_rawImage, m_compressedImage );
-			break;
+			reader = new PNGTextureReader;
+		}
+
+		// set the desired format of the image
+		m_rawImage.format = m_desiredFormat;
+
+		// read texture bytes from format to raw
+		zp_bool ok = reader->getTextureBytes( fileData, m_rawImage );
+		if( ok )
+		{
+			// use desired compressor
+			switch( m_desiredCompression )
+			{
+			case TEXTURE_COMPRESSION_DXT:
+				compressor = new DXTTextureCompressor;
+				break;
+			}
+
+			// set stride
+			m_rawImage.stride = s_textureFormatStride[ m_rawImage.format ];
+			m_rawImage.compression = TEXTURE_COMPRESSION_NONE;
+
+			// compress image
+			compressor->compress( m_rawImage, m_compressedImage );
+
+			// set stride from compressed image
+			m_compressedImage.stride = s_textureCompressionStride[ m_compressedImage.compression ];
 		}
 	}
+
+	// delete reader and compressor
+	ZP_SAFE_DELETE( reader );
+	ZP_SAFE_DELETE( compressor );
 
 	return ok;
 }
 
-struct BC1Block
-{
-	union
-	{
-		struct
-		{
-			zp_ushort color_0;
-			zp_ushort color_1;
 
-			union
-			{
-				struct
-				{
-					zp_byte dcba;
-					zp_byte hgfe;
-					zp_byte lkji;
-					zp_byte ponm;
-				};
-				zp_byte data[4];
-				zp_uint indices;
-			};
-		};
-		zp_long block;
-	};
-};
-
-zp_int FloatToInt( zp_float a, zp_int l )
-{
-	zp_int i = (zp_int)( a + 0.5f );
-	zp_clamp( i, i, 0, l );
-	return i;
-}
-
-zpVector4f MakeColorRGB( const zp_byte* rgb )
-{
-	zpVector4f c( (zp_float)rgb[0] / 255.f, (zp_float)rgb[1] / 255.f, (zp_float)rgb[2] / 255.f, 1 );
-	return c;
-}
-zp_ushort Vector4To565( const zpVector4f& c )
-{
-	zp_int cr = FloatToInt( 31.0f * c.getX().getFloat(), 31 );
-	zp_int cg = FloatToInt( 63.0f * c.getY().getFloat(), 63 );
-	zp_int cb = FloatToInt( 31.0f * c.getZ().getFloat(), 31 );
-
-	return ( cr << 11 ) | ( cg << 5 ) | cb;
-}
-
-zp_float DistanceColor( const zpVector4f& a, const zpVector4f& b )
-{
-	zpVector4f s;
-	zpScalar d;
-
-	zpMath::Sub( s, a, b );
-	zpMath::Dot3( d, s, s );
-	return d.getFloat();
-}
-
-void BaseTextureCompiler::compileDXT1( const ImageData& inputImage, ImageData& compiledImage )
-{
-	compiledImage.width = inputImage.width;
-	compiledImage.height = inputImage.height;
-
-	zp_uint wmod = compiledImage.width % COMPRESSED_BLOCK_STRIDE;
-	zp_uint hmod = compiledImage.height % COMPRESSED_BLOCK_STRIDE;
-
-	if( wmod != 0 ) compiledImage.width += COMPRESSED_BLOCK_STRIDE - wmod;
-	if( hmod != 0 ) compiledImage.height += COMPRESSED_BLOCK_STRIDE - hmod;
-
-	compiledImage.format = inputImage.format;
-
-	zp_uint stride = s_textureFormatStride[ inputImage.format ];
-	const zp_byte* image = inputImage.imageBytes.getData();
-
-	zp_uint cw = ( inputImage.width + 3 ) / 4;
-	zp_uint ch = ( inputImage.height + 3 ) / 4;
-	zp_uint compressedSize = ( cw * ch ) * sizeof( BC1Block );
-	compiledImage.imageBytes.reserve( compressedSize );
-
-	for( zp_uint y = 0; y < compiledImage.height; y += COMPRESSED_BLOCK_STRIDE )
-	{
-		for( zp_uint x = 0; x < compiledImage.width; x += COMPRESSED_BLOCK_STRIDE )
-		{
-			zpVector4f color0, color1, color2, color3;
-			zpVector4f pixels[ COMPRESSED_BLOCK_SIZE ];
-
-			color0 = zpVector4f( 0, 0, 0, 1 );
-			color1 = zpVector4f( 1, 1, 1, 1 );
-
-			// find min and max
-			for( zp_uint py = 0; py < COMPRESSED_BLOCK_STRIDE; ++py )
-			{
-				for( zp_uint px = 0; px < COMPRESSED_BLOCK_STRIDE; ++px )
-				{
-					zpVector4f& c =  pixels[ px + ( py * COMPRESSED_BLOCK_STRIDE ) ];
-
-					if( x + px > inputImage.width || y + py > inputImage.height )
-					{
-						c = zpVector4f( 0, 0, 0, 1 );
-					}
-					else
-					{
-						c = MakeColorRGB( &image[ stride * ( ( x + px ) + ( ( y + py ) * inputImage.width ) ) ] );
-
-						if( Vector4To565( c ) > Vector4To565( color0 ) )
-						{
-							color0 = c;
-						}
-						if( Vector4To565( c ) < Vector4To565( color1 ) )
-						{
-							color1 = c;
-						}
-					}
-				}
-			}
-
-			zpMath::Lerp( color2, color0, color1, zpScalar( 1.f / 3.f ) );
-			zpMath::Lerp( color3, color0, color1, zpScalar( 1.f / 3.f ) );
-
-			BC1Block block;
-			block.color_0 = Vector4To565( color0 );
-			block.color_1 = Vector4To565( color1 );
-			block.indices = 0;
-
-			zpVector4f allColors[4] =
-			{
-				color0,
-				color1,
-				color2,
-				color3,
-			};
-
-			for( zp_uint y = 0; y < COMPRESSED_BLOCK_STRIDE; ++y )
-			{
-				block.data[y] = 0;
-				for( zp_int x = COMPRESSED_BLOCK_STRIDE - 1; x >= 0; --x )
-				{
-					const zpVector4f& c = pixels[ x + ( y * COMPRESSED_BLOCK_STRIDE ) ];
-
-					zp_byte index = 0;
-					zp_float dist = ZP_FLT_MAX;
-
-					// find the distance to all colors
-					for( zp_uint i = 0; i < 4; ++i )
-					{
-						zp_float d = DistanceColor( c, allColors[ i ] );
-						zp_abs( d, d );
-
-						// if the difference is 0, break
-						if( zp_approximate( d, 0.f ) )
-						{
-							index = i;
-							break;
-						}
-
-						// otherwise, use the smallest distance index
-						if( d < dist )
-						{
-							index = i;
-							dist = d;
-						}
-					}
-
-					block.data[y] = ( block.data[y] << 2 ) | ( 0x03 & index );
-				}
-			}
-
-			// write block to compiled image data
-			compiledImage.imageBytes.write( block.color_0 );
-			compiledImage.imageBytes.write( block.color_1 );
-			compiledImage.imageBytes.write( block.dcba );
-			compiledImage.imageBytes.write( block.hgfe );
-			compiledImage.imageBytes.write( block.lkji );
-			compiledImage.imageBytes.write( block.ponm );
-		}
-	}
-
-
-}
-
-void BaseTextureCompiler::shutdown()
+void TextureCompiler::shutdown()
 {
 	zpJson image;
 	image[ "RawWidth" ] = zpJson( m_rawImage.width );
@@ -246,7 +149,9 @@ void BaseTextureCompiler::shutdown()
 	image[ "Height" ] = zpJson( m_compressedImage.height );
 
 	image[ "Format" ] = zpJson( s_textureFormat[ m_compressedImage.format ] );
-	image[ "Stride" ] = zpJson( s_textureCompressionStride[ m_desiredCompression ] );
+	image[ "Stride" ] = zpJson( m_compressedImage.stride );
+
+	image[ "Compression" ] = zpJson( s_textureCompression[ m_compressedImage.compression ] );
 
 	image[ "Data" ] = zpJson( m_compressedImage.imageBytes );
 
@@ -269,148 +174,4 @@ void BaseTextureCompiler::shutdown()
 	{
 		zpLog::message() << "Successfully compiled '" << m_outputFile << "'" << zpLog::endl;
 	}
-}
-
-
-
-PNGTextureCompiler::PNGTextureCompiler()
-{}
-PNGTextureCompiler::~PNGTextureCompiler()
-{}
-
-zp_bool PNGTextureCompiler::getTextureBytes( ImageData& imageData )
-{
-	zp_bool ok = false;
-	zpFile file( m_inputFile );
-	if( file.open( ZP_FILE_MODE_BINARY_READ ) )
-	{
-		zp_int r;
-		zpDataBuffer fileData;
-		file.readFileBinary( fileData );
-
-		file.close();
-
-		png_image png;
-		zp_zero_memory( &png );
-		png.version = PNG_IMAGE_VERSION;
-
-		r = png_image_begin_read_from_memory( &png, fileData.getData(), fileData.size() );
-
-		// set width and height of image
-		imageData.width = png.width;
-		imageData.height = png.height;
-
-		// remove color map flag if set
-		png.format = (png.format) & ~PNG_FORMAT_FLAG_COLORMAP;
-
-		// if desired format set, convert png to that type
-		if( m_desiredFormat != TEXTURE_FORMAT_NONE )
-		{
-			switch( m_desiredFormat )
-			{
-			case TEXTURE_FORMAT_R8:
-				imageData.format = TEXTURE_FORMAT_R8;
-				png.format = PNG_FORMAT_GRAY;
-			case TEXTURE_FORMAT_RGB8:
-				imageData.format = TEXTURE_FORMAT_RGB8;
-				png.format = PNG_FORMAT_RGB;
-			case TEXTURE_FORMAT_RGBA8:
-				imageData.format = TEXTURE_FORMAT_RGBA8;
-				png.format = PNG_FORMAT_RGBA;
-				break;
-			}
-		}
-		// otherwise, output the format
-		else
-		{
-			switch( png.format )
-			{
-			case PNG_FORMAT_GRAY:
-				imageData.format = TEXTURE_FORMAT_R8;
-				break;
-			case PNG_FORMAT_RGB:
-				imageData.format = TEXTURE_FORMAT_RGB8;
-				break;
-			case PNG_FORMAT_RGBA:
-				imageData.format = TEXTURE_FORMAT_RGBA8;
-				break;
-			default:
-				imageData.format = TEXTURE_FORMAT_NONE;
-				break;
-			}
-		}
-
-		zp_int stride = PNG_IMAGE_ROW_STRIDE( png );
-		zp_uint size = PNG_IMAGE_SIZE( png );
-
-		imageData.imageBytes.reset();
-		imageData.imageBytes.reserve( size );
-
-		r = png_image_finish_read( &png, ZP_NULL, imageData.imageBytes.getData(), stride, ZP_NULL );
-
-		png_image_free( &png );
-
-		ok = true;
-	}
-
-	return ok;
-}
-
-
-
-zp_int main( zp_int argCount, const zp_char* args[] )
-{
-	zpArrayList< zpString > arguments;
-	if( argCount > 1 )
-	{
-		zp_int c = argCount - 1;
-		arguments.reserve( c );
-		for( zp_int i = 0; i < c; ++i )
-		{
-			arguments.pushBackEmpty() = args[ i + 1 ];
-		}
-	}
-
-	if( arguments.size() < 2 )
-	{
-		zpLog::message()
-			<< "Usage: TextureCompiler.exe "
-			<< zpLog::gray << "DX9/DX10/DX11/GL2 "
-			<< zpLog::gray << "[R8|R16|R32|RGB8|RGBA8] "
-			<< zpLog::gray << "path/to/inputfile.png path/to/outputfile.textureb"
-			<< zpLog::endl
-			;
-	}
-	else
-	{
-		BaseTextureCompiler* compiler = ZP_NULL;
-
-		const zpString& input = arguments[  arguments.size() - 2 ];
-
-		if( input.endsWith( ".png" ) )
-		{
-			compiler = new PNGTextureCompiler;
-		}
-
-		if( compiler != ZP_NULL )
-		{
-			if( compiler->initialize( arguments ) )
-			{
-				compiler->compile();
-				compiler->shutdown();
-			}
-			else
-			{
-				zpLog::error() << "Failed to initialize compiler." << zpLog::endl;
-			}
-		}
-		else
-		{
-			zpLog::error() << "Texture type '" << input << "' undefined." << zpLog::endl;
-		}
-
-		ZP_SAFE_DELETE( compiler );
-	}
-
-	return 0;
 }
