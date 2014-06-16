@@ -51,8 +51,24 @@ zp_bool zpTextureResource::load( const zp_char* filename, zpRenderingEngine* eng
 		zp_uint stride = root[ "Stride" ].asInt();
 		const void* imageData = root[ "Data" ].asData();
 		zp_uint size = root[ "Data" ].size();
+		const zp_char* formatStr = root[ "Compression" ].asCString();
 
-		loaded = engine->createTexture( m_resource, width, height, ZP_TEXTURE_TYPE_TEXTURE, ZP_TEXTURE_DIMENSION_2D, ZP_DISPLAY_FORMAT_DXT1, ZP_CPU_ACCESS_NONE, imageData, stride, 1 );
+		zpDisplayFormat format = ZP_DISPLAY_FORMAT_UNKNOWN;
+		if( zp_strcmp( formatStr, "BC1" ) == 0 )
+		{
+			format = ZP_DISPLAY_FORMAT_BC1;
+		}
+		else if( zp_strcmp( formatStr, "BC2" ) == 0 )
+		{
+			format = ZP_DISPLAY_FORMAT_BC2;
+		}
+		else if( zp_strcmp( formatStr, "BC3" ) == 0 )
+		{
+			format = ZP_DISPLAY_FORMAT_BC3;
+		}
+		ZP_ASSERT( format != ZP_DISPLAY_FORMAT_UNKNOWN, "Unknown texture compression format %s", formatStr );
+
+		loaded = engine->createTexture( m_resource, width, height, ZP_TEXTURE_TYPE_TEXTURE, ZP_TEXTURE_DIMENSION_2D, format, ZP_CPU_ACCESS_NONE, imageData, stride, 1 );
 	}
 
 
