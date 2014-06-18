@@ -26,7 +26,8 @@ import org.zero0.zeropoint.tools.arc.util.OutputAppender;
 public final class Arc implements FileWatcherListener, ArcCompilerListener
 {
 	private static final String arcPropertiesFile = "arc.properties";
-
+	private static final String filesPropertiesFile = "files.properties";
+	
 	private static final String arcDirBase = "arc.dir.base";
 	private static final String arcDirAssets = "arc.dir.assets";
 	private static final String arcDirTemp = "arc.dir.temp";
@@ -61,6 +62,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	Map<String, String> compilerOutExtension;
 	Map<String, String[]> compilerInExtension;
 	Properties properties;
+	Properties filesProperties;
 	boolean autoCompile;
 
 	Platform platform;
@@ -80,6 +82,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	private Arc()
 	{
 		properties = new Properties();
+		filesProperties = new Properties();
 		compilers = new HashMap<String, Class<? extends ArcCompiler>>();
 		extensionToCompiler = new HashMap<String, String>();
 		compilerOutExtension = new HashMap<String, String>();
@@ -113,7 +116,16 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		{
 			err( e.getMessage() );
 		}
-
+		
+		try
+		{
+			filesProperties.load( new FileInputStream( new File( filesPropertiesFile ) ) );
+		}
+		catch( Exception e )
+		{
+			err( e.getMessage() );
+		}
+		
 		rendering = getEnumProperty( properties, arcRendering, Rendering.DX11 );
 		platform = getEnumProperty( properties, arcPlatform, Platform.Win32 );
 		outputLevel = getEnumProperty( properties, arcOutputLevel, OutputLevel.Normal );
@@ -321,6 +333,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 	public final void reloadProperties()
 	{
 		properties.clear();
+		filesProperties.clear();
 		loadProperties();
 	}
 	
@@ -383,7 +396,7 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 			try
 			{
 				ArcCompiler arcCompiler = clazz.newInstance();
-				arcCompiler.setProperties( properties );
+				arcCompiler.addProperties( properties );
 				arcCompiler.setFileToCompile( "" );
 				arcCompiler.setProject( getProject() );
 				arcCompiler.setPlatform( getPlatform() );
@@ -431,7 +444,18 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		fireArcProcessStart();
 		for( String filePath : filePaths )
 		{
-			String extension = filePath.substring( filePath.lastIndexOf( '.' ) + 1 ).toLowerCase();
+			int extensionIndex = filePath.lastIndexOf( '.' );
+			String extension = filePath.substring( extensionIndex + 1 ).toLowerCase();
+
+			String smallFileName = filePath.replace( getAssetsDirectory(), "" );
+			smallFileName = smallFileName.replace( '\\', '/' );
+
+			int smallIndex = smallFileName.lastIndexOf( '.' );
+			char c = smallFileName.charAt( 0 );
+			int startIndex = c == '/' ? 1 : 0;
+			smallFileName = smallFileName.substring( startIndex, smallIndex );
+			
+			Properties fileProperty = getSubProperties( filesProperties, smallFileName );
 
 			try
 			{
@@ -440,7 +464,8 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 				if( clazz != null )
 				{
 					ArcCompiler arcCompiler = clazz.newInstance();
-					arcCompiler.setProperties( properties );
+					arcCompiler.addProperties( properties );
+					arcCompiler.addProperties( fileProperty );
 					arcCompiler.setFileToCompile( filePath );
 					arcCompiler.setProject( getProject() );
 					arcCompiler.setPlatform( getPlatform() );

@@ -2,7 +2,7 @@
     "Shader" : "shaders/LitNormalTextured.shaderb",
     "Textures" :
     [
-		"textures/uv_checker_large.textureb"
+		"textures/helmet.textureb"
 	],
     "Constants" :
     {},

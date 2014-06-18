@@ -39,9 +39,8 @@ public abstract class ArcCompiler implements Runnable
 		return project;
 	}
 
-	public final void setProperties( Properties properties )
+	public final void addProperties( Properties properties )
 	{
-		this.properties.clear();
 		this.properties.putAll( properties );
 	}
 	
@@ -199,12 +198,19 @@ public abstract class ArcCompiler implements Runnable
 		if( !exe.isEmpty() ) params.add( exe );
 		params.addAll( getCompilerParams() );
 		
+		StringBuilder sb = new StringBuilder( "Executing: " );
+		for( String p : params )
+		{
+			sb.append( p ).append( ' ' );
+		}
+		Arc.getInstance().out( OutputLevel.Verbos, sb.toString() );
+		
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.command( params );
 		pb.directory( new File( getWorkingDirectory() ) );
 		//pb.redirectOutput( Redirect.PIPE );
 		//pb.redirectError( Redirect.PIPE );
-		
+
 		Process p = null;
 		try
 		{
@@ -216,7 +222,7 @@ public abstract class ArcCompiler implements Runnable
 			BufferedInputStream bes = new BufferedInputStream( p.getErrorStream() );
 
 			byte[] buff = new byte[64];
-			StringBuilder sb = new StringBuilder();
+			sb = new StringBuilder();
 			int len = -1;
 			while( ( len = bis.read( buff ) ) != -1 )
 			{

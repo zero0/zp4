@@ -11,6 +11,9 @@ public class TextureCompiler extends ArcCompiler
 	@Override
 	protected List<String> getCompilerParams()
 	{
-		return Arrays.asList( getRendering().name(), getFileToCompile(), getOutputFile() );
+		String format = getProperties().getProperty( "format", "RGB" );
+		String compression = getProperties().getProperty( "compression", "BC1" );
+		
+		return Arrays.asList( getRendering().name(), "-F" + format, "-C" + compression, getFileToCompile(), getOutputFile() );
 	}
 }
