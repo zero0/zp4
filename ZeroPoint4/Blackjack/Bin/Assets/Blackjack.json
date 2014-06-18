@@ -2,10 +2,10 @@
     "Console" : false,
     "Window" : {
         "Title" : "Blackjack",
-        "X" : 10,
-        "Y" : 10,
-        "Width" : 960,
-        "Height" : 640
+        "X" : 50,
+        "Y" : 50,
+        "Width" : 1280,
+        "Height" : 720
     },
     "Render" : {
         "Refresh" : 60,
