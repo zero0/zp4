@@ -53,29 +53,44 @@ TextureCompiler::~TextureCompiler()
 zp_bool TextureCompiler::initialize( const zpArrayList< zpString >& args )
 {
 	m_compression = args[ 0 ];
-
 	if( m_compression.startsWith( "DX" ) )
 	{
-		m_desiredCompression = TEXTURE_COMPRESSION_DXT;
+		m_desiredCompressionType = TEXTURE_COMPRESSION_DXT;
 	}
 	else if( m_compression.startsWith( "GL" ) )
 	{
-		m_desiredCompression = TEXTURE_COMPRESSION_PVR;
+		m_desiredCompressionType = TEXTURE_COMPRESSION_PVR;
 	}
 
 	m_desiredFormat = TEXTURE_FORMAT_NONE;
-	if( args.size() == 4 )
-	{
-		const zp_char* desiredformat = args[ 1 ].str();
-		for( zp_uint i = 0; i < TextureFormat_Count; ++i )
+	m_desiredCompression = TEXTURE_COMPRESSION_NONE;
+
+	args.foreach( [ this ]( const zpString& arg ) {
+		if( arg.startsWith( "-F" ) )
 		{
-			if( zp_strcmp( s_textureFormat[ i ], desiredformat ) == 0 )
+			const zp_char* desiredFormat = arg.str() + 2;
+			for( zp_uint i = 0; i < TextureFormat_Count; ++i )
 			{
-				m_desiredFormat = (TextureFormat)i;
-				break;
+				if( zp_strcmp( s_textureFormat[ i ], desiredFormat ) == 0 )
+				{
+					m_desiredFormat = (TextureFormat)i;
+					break;
+				}
 			}
 		}
-	}
+		else if( arg.startsWith( "-C" ) )
+		{
+			const zp_char* desiredCompression = arg.str() + 2;
+			for( zp_uint i = 0; i < TextureCompression_Count; ++i )
+			{
+				if( zp_strcmp( s_textureCompression[ i ], desiredCompression ) == 0 )
+				{
+					m_desiredCompression = (TextureCompression)i;
+					break;
+				}
+			}
+		}
+	} );
 
 	m_inputFile = args[ args.size() - 2 ];
 	m_outputFile = args[ args.size() - 1 ];
@@ -103,6 +118,13 @@ zp_bool TextureCompiler::compile()
 		{
 			reader = new PNGTextureReader;
 		}
+		// get tga reader
+		else if( m_inputFile.endsWith( ".tga" ) )
+		{
+
+		}
+
+		ZP_ASSERT( reader != ZP_NULL, "Unknown image format for image %s", m_inputFile.str() );
 
 		// set the desired format of the image
 		m_rawImage.format = m_desiredFormat;
@@ -112,16 +134,18 @@ zp_bool TextureCompiler::compile()
 		if( ok )
 		{
 			// use desired compressor
-			switch( m_desiredCompression )
+			switch( m_desiredCompressionType )
 			{
 			case TEXTURE_COMPRESSION_DXT:
 				compressor = new DXTTextureCompressor;
 				break;
 			}
 
+			ZP_ASSERT( compressor, "Unknown compression format for image %s", m_inputFile.str() );
+
 			// set stride
 			m_rawImage.stride = s_textureFormatStride[ m_rawImage.format ];
-			m_rawImage.compression = TEXTURE_COMPRESSION_NONE;
+			m_rawImage.compression = m_desiredCompression;
 
 			// compress image
 			compressor->compress( m_rawImage, m_compressedImage );

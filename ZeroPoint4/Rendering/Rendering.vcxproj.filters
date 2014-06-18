@@ -120,6 +120,9 @@
     <ClInclude Include="zpBlendState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpAtlas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">

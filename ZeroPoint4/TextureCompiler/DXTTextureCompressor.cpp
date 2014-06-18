@@ -51,7 +51,7 @@ zp_float DistanceColor( const zpVector4f& a, const zpVector4f& b )
 {
 	zpVector4f s;
 	zpScalar d;
-
+	
 	zpMath::Sub( s, a, b );
 	zpMath::Dot3( d, s, s );
 	return d.getFloat();
@@ -77,7 +77,18 @@ zp_float DistanceAlpha( const zpScalar& a, const zpScalar& b )
 
 void DXTTextureCompressor::compress( const ImageData& inputImage, ImageData& compiledImage )
 {
-	compressBC3( inputImage, compiledImage );
+	switch( inputImage.compression )
+	{
+	case TEXTURE_COMPRESSION_BC1:
+		compressBC1( inputImage, compiledImage );
+		break;
+	case TEXTURE_COMPRESSION_BC3:
+		compressBC3( inputImage, compiledImage );
+		break;
+	default:
+		ZP_ASSERT( false, "DXTTextureCompressor unknown format" );
+		break;
+	}
 }
 
 void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& compiledImage )
@@ -131,15 +142,15 @@ void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& 
 						if( hasAlpha )
 						{
 							c = MakeColorRGBA( &image[ stride * ( ( x + px ) + ( ( y + py ) * inputImage.width ) ) ] );
+							
+							zp_bool transparent = c.getW().getFloat() < 1.f;
+							isTransparent[ px + ( py * COMPRESSED_BLOCK_STRIDE ) ] = transparent;
+							hasTransparentPixel |= transparent;
 						}
 						else
 						{
 							c = MakeColorRGB( &image[ stride * ( ( x + px ) + ( ( y + py ) * inputImage.width ) ) ] );
 						}
-
-						zp_bool transparent = c.getW().getFloat() < 1.f;
-						isTransparent[ px + ( py * COMPRESSED_BLOCK_STRIDE ) ] = transparent;
-						hasTransparentPixel |= transparent;
 
 						// find min color
 						if( Vector4To565( c ) < Vector4To565( color0 ) )
@@ -177,6 +188,7 @@ void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& 
 			if( !hasTransparentPixel )
 			{
 				zp_move_swap( block.color_0, block.color_1 );
+				zp_move_swap( color0, color1 );
 			}
 
 			zpVector4f allColors[4] =

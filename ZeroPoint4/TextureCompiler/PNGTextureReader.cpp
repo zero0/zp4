@@ -37,9 +37,11 @@ zp_bool PNGTextureReader::getTextureBytes( const zpDataBuffer& fileData, ImageDa
 		case TEXTURE_FORMAT_R:
 			imageData.format = TEXTURE_FORMAT_R;
 			png.format = PNG_FORMAT_GRAY;
+			break;
 		case TEXTURE_FORMAT_RGB:
 			imageData.format = TEXTURE_FORMAT_RGB;
 			png.format = PNG_FORMAT_RGB;
+			break;
 		case TEXTURE_FORMAT_RGBA:
 			imageData.format = TEXTURE_FORMAT_RGBA;
 			png.format = PNG_FORMAT_RGBA;

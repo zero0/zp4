@@ -49,9 +49,11 @@ zp_bool zpTextureResource::load( const zp_char* filename, zpRenderingEngine* eng
 		zp_uint width = root[ "Width" ].asInt();
 		zp_uint height = root[ "Height" ].asInt();
 		zp_uint stride = root[ "Stride" ].asInt();
-		const void* imageData = root[ "Data" ].asData();
-		zp_uint size = root[ "Data" ].size();
 		const zp_char* formatStr = root[ "Compression" ].asCString();
+		
+		const zpBison::Value& data = root[ "Data" ];
+		const void* imageData = data.asData();
+		zp_uint size = data.size();
 
 		zpDisplayFormat format = ZP_DISPLAY_FORMAT_UNKNOWN;
 		if( zp_strcmp( formatStr, "BC1" ) == 0 )

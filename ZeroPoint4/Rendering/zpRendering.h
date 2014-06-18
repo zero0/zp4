@@ -572,6 +572,7 @@ class zpDeferredRenderingComponent;
 
 class zpMaterialResourceInstance;
 class zpMeshResourceInstance;
+class zpAtlasResourceInstance;
 
 struct zpRenderingCommand
 {
@@ -621,6 +622,8 @@ struct zpRenderingCommand
 #include "zpMaterial.h"
 #include "zpMesh.h"
 #include "zpFont.h"
+#include "zpAtlas.h"
+
 
 #include "zpCameraState.h"
 #include "zpCamera.h"

@@ -39,6 +39,7 @@ private:
 	zpString m_outputFile;
 
 	TextureFormat m_desiredFormat;
+	TextureCompression m_desiredCompressionType;
 	TextureCompression m_desiredCompression;
 
 	ImageData m_rawImage;
