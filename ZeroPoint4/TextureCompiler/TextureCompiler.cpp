@@ -121,13 +121,14 @@ zp_bool TextureCompiler::compile()
 		// get tga reader
 		else if( m_inputFile.endsWith( ".tga" ) )
 		{
-
+			reader = new TGATextureReader;
 		}
 
 		ZP_ASSERT( reader != ZP_NULL, "Unknown image format for image %s", m_inputFile.str() );
 
 		// set the desired format of the image
 		m_rawImage.format = m_desiredFormat;
+		m_rawImage.compression = m_desiredCompressionType;
 
 		// read texture bytes from format to raw
 		zp_bool ok = reader->getTextureBytes( fileData, m_rawImage );

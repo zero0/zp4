@@ -41,7 +41,7 @@ public:
 	void writeAt( const T& in, zp_uint offset );
 
 	template<typename T>
-	void readAt( T& out, zp_uint offset );
+	void readAt( T& out, zp_uint offset ) const;
 
 	void readIn( const zpDataBuffer& buffer );
 	void writeOut( zpDataBuffer& buffer ) const;
@@ -117,7 +117,7 @@ void zpDataBuffer::writeAt( const T& in, zp_uint offset )
 	*(T*)( m_data + offset ) = in;
 }
 template<typename T>
-void zpDataBuffer::readAt( T& out, zp_uint offset )
+void zpDataBuffer::readAt( T& out, zp_uint offset ) const
 {
 	ZP_ASSERT( offset < m_size, "Buffer overrun" );
 	out = *(T*)( m_data + offset );

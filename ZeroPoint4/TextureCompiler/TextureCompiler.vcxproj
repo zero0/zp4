@@ -74,12 +74,14 @@
     </ClCompile>
     <ClCompile Include="PNGTextureReader.cpp" />
     <ClCompile Include="TextureCompiler.cpp" />
+    <ClCompile Include="TGATextureReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXTTextureCompressor.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="PNGTextureReader.h" />
     <ClInclude Include="TextureCompiler.h" />
+    <ClInclude Include="TGATextureReader.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

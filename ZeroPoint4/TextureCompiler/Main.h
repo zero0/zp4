@@ -61,6 +61,7 @@ struct ImageData
 #include "TextureCompiler.h"
 
 #include "PNGTextureReader.h"
+#include "TGATextureReader.h"
 
 #include "DXTTextureCompressor.h"
 

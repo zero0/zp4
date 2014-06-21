@@ -214,7 +214,7 @@ void zpRenderingPipeline::initialize()
 	cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
 	cam->setViewport( viewport );
 	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
-	cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
+	cam->setClearColor( zpColor4f( 0.39f, 0.58f, 0.93f, 1 ) );
 	cam->setRenderLayers( 1 << 0 );
 	cam->setStencilClear( 0 );
 	cam->setDepthClear( 1.0f );
@@ -233,7 +233,7 @@ void zpRenderingPipeline::initialize()
 	cam->setOrthoRect( zpRecti( 0, 0, size.getX(), size.getY() ) );
 	cam->setViewport( viewport );
 	cam->setClipRect( zpRecti( 0, 0, (zp_int)viewport.width, (zp_int)viewport.height ) );
-	cam->setClearColor( zpColor4f( 1, 0, 0, 1 ) );
+	cam->setClearColor( zpColor4f( 0.39f, 0.58f, 0.93f, 1 ) );
 	cam->setRenderLayers( 1 << 4 );
 	cam->setStencilClear( 0 );
 	cam->setDepthClear( 1.0f );
