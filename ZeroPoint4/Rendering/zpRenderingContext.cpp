@@ -39,8 +39,6 @@ void zpRenderingContext::setup( zpRenderingEngine* engine, zpRenderingContextImp
 
 	m_currentVertexBuffer = &m_immediateVertexBuffers[ m_currentBufferIndex ];
 	m_currentIndexBuffer = &m_immediateIndexBuffers[ m_currentBufferIndex ];
-
-	engine->createBuffer( m_perDratCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
 }
 void zpRenderingContext::destroy()
 {
@@ -49,8 +47,6 @@ void zpRenderingContext::destroy()
 		m_renderingEngine->destroyBuffer( m_immediateVertexBuffers[i] );
 		m_renderingEngine->destroyBuffer( m_immediateIndexBuffers[i] );
 	}
-
-	m_renderingEngine->destroyBuffer( m_perDratCallBuffer );
 }
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture* const* targets, zpDepthStencilBuffer* depthStencilBuffer )
@@ -650,7 +646,7 @@ void zpRenderingContext::fillBuffers()
 void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 {
 	// clear filtered commands
-	for( zp_uint i = 0; i < zpRenderingLayer_Count; ++i )
+	for( zp_uint i = 0; i < zpRenderingQueue_Count; ++i )
 	{
 		m_filteredCommands[ i ].reset();
 	}
@@ -721,26 +717,31 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 
 void zpRenderingContext::processCommands( zpRenderingQueue layer )
 {
-	m_numTotalDrawCommands += m_filteredCommands[ layer ].size();
-
-	const zpRenderingCommand* const* cmd = m_filteredCommands[ layer ].begin();
-	const zpRenderingCommand* const* end = m_filteredCommands[ layer ].end();
-	
-	if( cmd != end )
-	{
-		setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_perDratCallBuffer );
-
-		zpDrawCallBufferData drawCallData;
-		for( ; cmd != end; ++cmd )
-		{
-			drawCallData.world = (*cmd)->matrix;
-			update( &m_perDratCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
-
-			m_renderContextImpl->processCommand( m_renderingEngine->getRenderingEngineImpl(), *cmd );
-
-			m_numTotalVerticies += (*cmd)->vertexCount;
-		}
-	}
+	ZP_ASSERT( false, "don't use" );
+	//m_numTotalDrawCommands += m_filteredCommands[ layer ].size();
+	//
+	//const zpRenderingCommand* const* cmd = m_filteredCommands[ layer ].begin();
+	//const zpRenderingCommand* const* end = m_filteredCommands[ layer ].end();
+	//
+	//if( cmd != end )
+	//{
+	//	setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_perDratCallBuffer );
+	//
+	//	zpDrawCallBufferData drawCallData;
+	//	for( ; cmd != end; ++cmd )
+	//	{
+	//		drawCallData.world = (*cmd)->matrix;
+	//		update( &m_perDratCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
+	//
+	//		m_renderContextImpl->processCommand( m_renderingEngine->getRenderingEngineImpl(), *cmd );
+	//
+	//		m_numTotalVerticies += (*cmd)->vertexCount;
+	//	}
+	//}
+}
+void zpRenderingContext::processCommand( const zpRenderingCommand* cmd )
+{
+	m_renderContextImpl->processCommand( m_renderingEngine->getRenderingEngineImpl(), cmd );
 }
 
 void zpRenderingContext::finalizeCommands()

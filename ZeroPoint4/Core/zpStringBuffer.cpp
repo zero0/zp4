@@ -247,7 +247,7 @@ void zpStringBuffer::append( zp_int value )
 void zpStringBuffer::append( zp_long value )
 {
 	zp_char buff[64];
-	sprintf_s( buff, "%d", value );
+	sprintf_s( buff, "%lld", value );
 	append( buff );
 }
 
@@ -272,7 +272,7 @@ void zpStringBuffer::append( zp_uint value )
 void zpStringBuffer::append( zp_ulong value )
 {
 	zp_char buff[64];
-	sprintf_s( buff, "%u", value );
+	sprintf_s( buff, "%llu", value );
 	append( buff );
 }
 

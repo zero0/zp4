@@ -148,6 +148,7 @@ zp_bool _valueToColor( const zpBison::Value& v, zpColor4f& c )
 
 zpRenderingPipeline::zpRenderingPipeline()
 	: m_engine( zpRenderingFactory::getRenderingEngine() )
+	, m_screenshotType( ZP_SCREENSHOT_TYPE_NONE )
 {}
 zpRenderingPipeline::~zpRenderingPipeline()
 {
@@ -193,6 +194,8 @@ void zpRenderingPipeline::initialize()
 
 	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine->createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
+	m_engine->createBuffer( m_perDrawCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
+	m_engine->createBuffer( m_lightBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
 
 	m_cameras.resize( zpCameraType_Count );
 
@@ -240,13 +243,29 @@ void zpRenderingPipeline::initialize()
 	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_NONE );
 	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
 	cam->setDepthStencilBuffer( ZP_NULL );
+
+	m_lights.resize( 64 );
+	zpLightBufferData* bl = m_lights.begin();
+	zpLightBufferData* el = m_lights.end();
+	for( ; bl != el; ++bl )
+	{
+		m_freeLights.pushBack( bl );
+	}
+
+	m_dirLight = getLight( ZP_LIGHT_TYPE_DIRECTIONAL );
+	zpMath::Normalize3( m_dirLight->direction, zpVector4f( 1, -1, 1 ) );
+	m_dirLight->color = zpColor4f( 1, 0, 0, 1 );
 }
 void zpRenderingPipeline::destroy()
 {
+	releaseLight( m_dirLight );
+
 	m_debugFont.release();
 
 	m_engine->destroyBuffer( m_cameraBuffer );
 	m_engine->destroyBuffer( m_perFrameBuffer );
+	m_engine->destroyBuffer( m_perDrawCallBuffer );
+	m_engine->destroyBuffer( m_lightBuffer );
 
 	m_engine->destroy();
 }
@@ -292,6 +311,8 @@ void zpRenderingPipeline::beginFrame( zpRenderingContext* i )
 
 void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 {
+	m_screenshotTaken = m_screenshotType != ZP_SCREENSHOT_TYPE_NONE;
+
 	zpTexture* t = m_engine->getBackBufferRenderTarget();
 	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
 	
@@ -306,27 +327,31 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 
 	// 3) render opaque commands
 	i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
-	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE );
-	i->processCommands( ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
+	processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE, true );
+	processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE_DEBUG, true );
 
 	// 4) render skybox commands
-	i->processCommands( ZP_RENDERING_QUEUE_SKYBOX );
+	processRenderingQueue( ZP_RENDERING_QUEUE_SKYBOX, false );
 
 	// 5) render transparent commands
 	i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );
-	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT );
-	i->processCommands( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
+	processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT, true );
+	processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, true );
 
 	// 6) render overlay commands
-	i->processCommands( ZP_RENDERING_QUEUE_OVERLAY );
+	processRenderingQueue( ZP_RENDERING_QUEUE_OVERLAY, false );
+
+	if( m_screenshotType == ZP_SCREENSHOT_TYPE_NO_UI ) m_engine->performScreenshot();
 
 	// 7) render UI commands
 	cam = getCamera( ZP_CAMERA_TYPE_UI );
 	i->preprocessCommands( cam, cam->getRenderLayers() );
 	useCamera( i, cam, &m_cameraBuffer );
 
-	i->processCommands( ZP_RENDERING_QUEUE_UI );
-	i->processCommands( ZP_RENDERING_QUEUE_UI_DEBUG );
+	processRenderingQueue( ZP_RENDERING_QUEUE_UI, false );
+	processRenderingQueue( ZP_RENDERING_QUEUE_UI_DEBUG, false );
+
+	if( m_screenshotType == ZP_SCREENSHOT_TYPE_ALL ) m_engine->performScreenshot();
 }
 
 void zpRenderingPipeline::endFrame( zpRenderingContext* i )
@@ -336,6 +361,12 @@ void zpRenderingPipeline::endFrame( zpRenderingContext* i )
 void zpRenderingPipeline::present()
 {
 	m_engine->present();
+
+	if( m_screenshotTaken )
+	{
+		m_screenshotTaken = false;
+		performScreenshot();
+	}
 }
 
 zpMaterialContentManager* zpRenderingPipeline::getMaterialContentManager()
@@ -648,4 +679,180 @@ void zpRenderingPipeline::popCameraState( zpCameraType type )
 			stack.back()->onEnter( camera );
 		}
 	}
+}
+
+zp_bool zpRenderingPipeline::takeScreenshot( zpScreenshotType type, const zp_char* directoryPath )
+{
+	zpFixedStringBuffer< 255 > path;
+	path << directoryPath << zpFile::sep << "Screenshot_" << zpTime::getInstance()->getTime() << ".tga";
+
+	m_screenshotType = type;
+	m_screenshotFilename = path.str();
+
+	return true;
+}
+
+
+zpLightBufferData* zpRenderingPipeline::getLight( zpLightType type )
+{
+	ZP_ASSERT( !m_freeLights.isEmpty(), "" );
+
+	zpLightBufferData* light = m_freeLights.back();
+	m_freeLights.popBack();
+
+	m_usedLights[ type ].pushBack( light );
+	light->type = type;
+
+	return light;
+}
+void zpRenderingPipeline::releaseLight( zpLightBufferData* light )
+{
+	zp_int index = m_usedLights[ light->type ].indexOf( light );
+	ZP_ASSERT( index != -1, "" );
+
+	m_usedLights[ light->type ].erase( index );
+
+	m_freeLights.pushBack( light );
+}
+
+void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool useLighting )
+{
+	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
+
+	const zpArrayList< zpRenderingCommand* >& queue = i->getFilteredCommands( layer );
+
+	//m_numTotalDrawCommands += queue.size();
+	
+	const zpRenderingCommand* const* cmd = queue.begin();
+	const zpRenderingCommand* const* end = queue.end();
+	
+	if( cmd != end )
+	{
+		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_perDrawCallBuffer );
+	
+		if( useLighting )
+		{
+			i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_LIGHT, &m_lightBuffer );
+
+			zpDrawCallBufferData drawCallData;
+			for( ; cmd != end; ++cmd )
+			{
+				drawCallData.world = (*cmd)->matrix;
+				i->update( &m_perDrawCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
+
+				// base pass with 1 directional
+				// additional passes with each other light
+				zpLightBufferData** b, **e;
+
+				// directional light base pass
+				b = m_usedLights[ ZP_LIGHT_TYPE_DIRECTIONAL ].begin();
+				e = m_usedLights[ ZP_LIGHT_TYPE_DIRECTIONAL ].end();
+				if( b != e )
+				{
+					i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+					i->processCommand( *cmd );
+
+					for( ++b; b != e; ++b )
+					{
+						i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+						i->processCommand( *cmd );
+					}
+				}
+				// no directional lights, just render normally
+				else
+				{
+					i->processCommand( *cmd );
+				}
+
+				zpBoundingSphere lightSphere;
+				b = m_usedLights[ ZP_LIGHT_TYPE_POINT ].begin();
+				e = m_usedLights[ ZP_LIGHT_TYPE_POINT ].end();
+				for( ; b != e; ++b )
+				{
+					zpLightBufferData* data = *b;
+
+					lightSphere.setCenter( data->position );
+					lightSphere.setRadius( zpScalar( data->radius ) );
+					if( ZP_IS_COLLISION( (*cmd)->boundingBox, lightSphere ) )
+					{
+						i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+						i->processCommand( *cmd );
+					}
+				}
+
+				b = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].begin();
+				e = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].end();
+				for( ; b != e; ++b )
+				{
+					i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+					i->processCommand( *cmd );
+				}
+
+				//m_numTotalVerticies += (*cmd)->vertexCount;
+			}
+		}
+		else
+		{
+			zpDrawCallBufferData drawCallData;
+			for( ; cmd != end; ++cmd )
+			{
+				drawCallData.world = (*cmd)->matrix;
+				i->update( &m_perDrawCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
+
+				i->processCommand( *cmd );
+			}
+		}
+	}
+}
+
+zp_bool zpRenderingPipeline::performScreenshot()
+{
+	m_screenshotType = ZP_SCREENSHOT_TYPE_NONE;
+
+	const zpVector2i& screenSize = m_engine->getScreenSize();
+
+	zp_bool ok;
+	zpDataBuffer data;
+	zp_uint imageSize = screenSize.getX() * screenSize.getY() * 4;
+	data.reserve( imageSize + 50 );
+
+	const zp_byte TGAHeaderColor[12] =
+	{
+		0,// 0 ID length = no id
+		0,// 1 color map type = no color map
+		2,// 2 image type = uncompressed true color
+		0, 0, 0, 0, 0,// color map spec = empty
+		0, 0,  // x origin of image 
+		0, 0   // y origin of image
+	};
+
+	data.writeBulk( TGAHeaderColor, sizeof( TGAHeaderColor ) );
+	data.write< zp_short >( screenSize.getX() );
+	data.write< zp_short >( screenSize.getY() );
+	data.write< zp_byte >( 32 );
+	data.write< zp_byte >( 0x24 );
+
+	zp_uint index = data.size();
+
+	ok = m_engine->takeScreenshot( data );
+
+	zp_byte* d = data.getData() + index;
+
+	// swap RGB to BGR
+	for( zp_uint i = 0; i < imageSize; i += 4 )
+	{
+		d[ i ] ^= d[ i + 2 ] ^= d[ i ] ^= d[ i + 2 ];
+		d[ i + 3 ] = 0xFF;
+	}
+
+	zpFile screenshot( m_screenshotFilename.str() );
+	if( screenshot.open( ZP_FILE_MODE_BINARY_TRUNCATE_WRITE ) )
+	{
+		screenshot.writeBuffer( data );
+		screenshot.close();
+
+		ok = true;
+	}
+
+	return ok;
 }

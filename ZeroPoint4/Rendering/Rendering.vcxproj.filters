@@ -63,9 +63,6 @@
     <ClInclude Include="zpRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpLightComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpImmediateBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -123,6 +120,9 @@
     <ClInclude Include="zpAtlas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpRendering.cpp">
@@ -144,9 +144,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpRenderingComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="zpLightComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpTextRenderingComponent.cpp">
@@ -207,6 +204,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpBlendState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -207,3 +207,15 @@ zp_bool zpRenderingEngine::destroyShader( zpShader& shader )
 	}
 	return shader.m_shader == ZP_NULL;
 }
+
+zp_bool zpRenderingEngine::performScreenshot( )
+{
+	return m_renderingEngine->performScreenshot();
+}
+
+zp_bool zpRenderingEngine::takeScreenshot( zpDataBuffer& screenBuffer )
+{
+	zp_bool ok;
+	ok = m_renderingEngine->takeScreenshot( m_screenSize.getX(), m_screenSize.getY(), screenBuffer );
+	return ok;
+}

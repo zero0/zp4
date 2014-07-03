@@ -115,6 +115,7 @@ public:
 	void fillBuffers();
 	void preprocessCommands( zpCamera* camera, zp_uint layer );
 	void processCommands( zpRenderingQueue queue );
+	void processCommand( const zpRenderingCommand* cmd );
 	void finalizeCommands();
 
 	void beginDrawFont( zp_uint layer, zpRenderingQueue queue, const zpFontResourceInstance* font );
@@ -137,6 +138,8 @@ public:
 	}
 
 	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }
+
+	const zpArrayList< zpRenderingCommand* >& getFilteredCommands( zpRenderingQueue layer ) const { return m_filteredCommands[ layer ]; }
 
 private:
 	zpRenderingContext();
@@ -163,12 +166,11 @@ private:
 	zp_uint m_currentBufferIndex;
 	zpBuffer* m_currentVertexBuffer;
 	zpBuffer* m_currentIndexBuffer;
-	zpBuffer m_perDratCallBuffer;
 
 	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
 	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
 
-	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingLayer_Count ];
+	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingQueue_Count ];
 
 	const zpFontResourceInstance* m_currentFont;
 

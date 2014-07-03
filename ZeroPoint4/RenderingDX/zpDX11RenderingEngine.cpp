@@ -91,7 +91,7 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.BufferCount = 1;
+	swapChainDesc.BufferCount = 2;
 	swapChainDesc.OutputWindow = (HWND)hWindow;
 	swapChainDesc.Windowed = screenMode == ZP_SCREEN_MODE_WINDOWED;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -146,8 +146,8 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 	ID3D11Texture2D* backBuffer;
 	ID3D11RenderTargetView* backBufferView;
 
-	m_swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer );
-	m_d3dDevice->CreateRenderTargetView( backBuffer, ZP_NULL, &backBufferView );
+	hr = m_swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer );
+	hr = m_d3dDevice->CreateRenderTargetView( backBuffer, ZP_NULL, &backBufferView );
 
 	// remove reference to texture so render target now owns pointer
 	backBuffer->Release();
@@ -164,6 +164,22 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 	outImmediateRenderTarget->m_texture = backBuffer;
 	outImmediateRenderTarget->m_textureResourceView = ZP_NULL;
 	outImmediateRenderTarget->m_textureRenderTarget = backBufferView;
+
+	D3D11_TEXTURE2D_DESC copyDesc;
+	zp_zero_memory( &copyDesc );
+	copyDesc.ArraySize = 1;
+	copyDesc.BindFlags = 0;
+	copyDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	copyDesc.Format = __zpToDX( displayMode.displayFormat );
+	copyDesc.Width = width;
+	copyDesc.Height = height;
+	copyDesc.MipLevels = 1;
+	copyDesc.MiscFlags = 0;
+	copyDesc.SampleDesc.Count = 1;
+	copyDesc.SampleDesc.Quality = 0;
+	copyDesc.Usage = D3D11_USAGE_STAGING;
+
+	hr = m_d3dDevice->CreateTexture2D( &copyDesc, ZP_NULL, &m_screenshotTexture );
 }
 void zpRenderingEngineImpl::destroy()
 {
@@ -914,6 +930,39 @@ void zpRenderingEngineImpl::present( zp_bool vsync )
 {
 	m_swapChain->Present( vsync ? 1 : 0, 0 );
 }
+
+zp_bool zpRenderingEngineImpl::performScreenshot()
+{
+	HRESULT hr;
+	zp_bool ok = true;
+	ID3D11Texture2D* backBuffer;
+	ID3D11DeviceContext* context = m_immidiateContext.get();
+
+	hr = m_swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer );
+	context->CopyResource( m_screenshotTexture, backBuffer );
+
+	return ok;
+}
+
+zp_bool zpRenderingEngineImpl::takeScreenshot( zp_uint width, zp_uint height, zpDataBuffer& screenBuffer )
+{
+	HRESULT hr;
+	zp_bool ok = true;
+	ID3D11DeviceContext* context = m_immidiateContext.get();
+	
+	zp_uint size = width * height;
+
+	screenBuffer.reserve( size );
+
+	D3D11_MAPPED_SUBRESOURCE map;
+	hr = context->Map( m_screenshotTexture, 0, D3D11_MAP_READ, 0, &map );
+	const zp_uint* d = static_cast< const zp_uint* >( map.pData );
+	screenBuffer.writeBulk( d, size );
+	context->Unmap( m_screenshotTexture, 0 );
+	
+	return ok;
+}
+
 
 void zpRenderingEngineImpl::createVertexLayout( zpVertexFormatDesc format, const void* data, zp_uint size )
 {

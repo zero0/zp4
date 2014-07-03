@@ -63,6 +63,9 @@ public:
 
 	const zpVector2i& getScreenSize() const { return m_screenSize; }
 
+	zp_bool performScreenshot();
+	zp_bool takeScreenshot( zpDataBuffer& screenBuffer );
+
 private:
 	zpRenderingEngineImpl* m_renderingEngine;
 	

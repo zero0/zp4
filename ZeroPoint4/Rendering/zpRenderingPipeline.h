@@ -11,6 +11,14 @@ enum zpScreenQuad
 	ZP_SCREEN_QUAD_LOWER_LEFT,
 };
 
+enum zpScreenshotType
+{
+	ZP_SCREENSHOT_TYPE_NONE,
+
+	ZP_SCREENSHOT_TYPE_ALL,
+	ZP_SCREENSHOT_TYPE_NO_UI,
+};
+
 class zpRenderingPipeline
 {
 public:
@@ -62,11 +70,20 @@ public:
 	void setApplication( zpApplication* app ) { m_application = app; };
 	zpApplication* getApplication() const { return m_application; };
 
+	zp_bool takeScreenshot( zpScreenshotType type, const zp_char* directoryPath );
+
+	zpLightBufferData* getLight( zpLightType type );
+	void releaseLight( zpLightBufferData* light );
+
+	void processRenderingQueue( zpRenderingQueue layer, zp_bool useLighting );
+
 private:
 	void pushCameraState( zpCameraType type, zpCameraState* state );
 
 	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );
 	void renderCamera( zpRenderingContext* i, zpCamera* camera );
+
+	zp_bool performScreenshot();
 
 	zpApplication* m_application;
 	zpRenderingEngine* m_engine;
@@ -79,6 +96,8 @@ private:
 
 	zpBuffer m_cameraBuffer;
 	zpBuffer m_perFrameBuffer;
+	zpBuffer m_perDrawCallBuffer;
+	zpBuffer m_lightBuffer;
 
 	zpRasterState m_raster;
 	zpBlendState m_alphaBlend;
@@ -88,6 +107,16 @@ private:
 	zpCamera* m_prevCamera;
 	zpFixedArrayList< zpCamera, zpCameraType_Count > m_cameras;
 	zpFixedArrayList< zpArrayList< zpCameraState* >, zpCameraType_Count > m_cameraStack;
+
+	zpFixedArrayList< zpLightBufferData, 64 > m_lights;
+	zpFixedArrayList< zpLightBufferData*, 64 > m_freeLights;
+	zpArrayList< zpLightBufferData* > m_usedLights[ zpLightType_Count ];
+
+	zpLightBufferData* m_dirLight;
+
+	zp_bool m_screenshotTaken;
+	zpScreenshotType m_screenshotType;
+	zpString m_screenshotFilename;
 };
 
 #endif

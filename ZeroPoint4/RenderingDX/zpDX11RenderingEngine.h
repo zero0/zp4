@@ -45,6 +45,9 @@ public:
 
 	ID3D11InputLayout* getInputLayout( zpVertexFormat format ) const { return m_inputLayouts[ format ]; }
 
+	zp_bool performScreenshot();
+	zp_bool takeScreenshot( zp_uint width, zp_uint height, zpDataBuffer& screenBuffer );
+
 private:
 	void createVertexLayout( zpVertexFormatDesc format, const void* data, zp_uint size );
 
@@ -52,6 +55,8 @@ private:
 	IDXGIAdapter* m_dxgiAdapter;
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_d3dDevice;
+
+	ID3D11Texture2D* m_screenshotTexture;
 
 	zpRenderingContextImpl m_immidiateContext;
 

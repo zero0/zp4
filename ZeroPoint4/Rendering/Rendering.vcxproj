@@ -100,7 +100,7 @@
     <ClInclude Include="zpCamera.h" />
     <ClInclude Include="zpFont.h" />
     <ClInclude Include="zpImmediateBuffer.h" />
-    <ClInclude Include="zpLightComponent.h" />
+    <ClInclude Include="zpLight.h" />
     <ClInclude Include="zpMaterial.h" />
     <ClInclude Include="zpRasterState.h" />
     <ClInclude Include="zpRendering.h" />
@@ -130,7 +130,7 @@
     <ClCompile Include="zpFont.cpp" />
     <ClCompile Include="zpGenerateMesh.cpp" />
     <ClCompile Include="zpImage.cpp" />
-    <ClCompile Include="zpLightComponent.cpp" />
+    <ClCompile Include="zpLight.cpp" />
     <ClCompile Include="zpMaterial.cpp" />
     <ClCompile Include="zpMesh.cpp" />
     <ClCompile Include="zpRasterState.cpp" />

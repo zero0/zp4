@@ -459,7 +459,10 @@ void zpApplication::handleInput()
 	{
 		m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
 	}
-
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F11 ) )
+	{
+		m_renderingPipeline.takeScreenshot( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) ? ZP_SCREENSHOT_TYPE_NO_UI : ZP_SCREENSHOT_TYPE_ALL, "." );
+	}
 
 
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )

@@ -78,7 +78,7 @@ enum zpRenderingQueue : zp_byte
 	ZP_RENDERING_QUEUE_UI,
 	ZP_RENDERING_QUEUE_UI_DEBUG,
 
-	zpRenderingLayer_Count,
+	zpRenderingQueue_Count,
 };
 
 enum zpRenderingEngineType
@@ -277,6 +277,7 @@ enum zpConstantBufferSlot
 	ZP_CONSTANT_BUFFER_SLOT_CAMERA =		0,
 	ZP_CONSTANT_BUFFER_SLOT_PER_FRAME,
 	ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL,
+	ZP_CONSTANT_BUFFER_SLOT_LIGHT,
 };
 
 enum zpTextureWrap : zp_byte
@@ -563,7 +564,6 @@ class zpUIManager;
 template<typename V, typename I> class zpImmediateBuffer;
 
 ZP_ABSTRACT_CLASS zpRenderingComponent;
-class zpLightComponent;
 class zpStaticMeshRenderingComponent;
 class zpTextRenderingComponent;
 class zpUIRenderingComponent;
@@ -597,6 +597,7 @@ struct zpRenderingCommand
 };
 
 #include "zpGenerateMesh.h"
+#include "zpLight.h"
 
 #include "zpImage.h"
 #include "zpBufferData.h"
@@ -639,7 +640,6 @@ struct zpRenderingCommand
 #include "zpImmediateBuffer.h"
 
 #include "zpRenderingComponent.h"
-#include "zpLightComponent.h"
 #include "zpTextRenderingComponent.h"
 #include "zpUIRenderingComponent.h"
 

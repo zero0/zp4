@@ -46,6 +46,9 @@ public:
 	void readIn( const zpDataBuffer& buffer );
 	void writeOut( zpDataBuffer& buffer ) const;
 
+	template<typename T, typename Func >
+	void map( zp_uint start, zp_uint count, Func func );
+
 protected:
 	void ensureCapacity( zp_uint capacity );
 
@@ -123,6 +126,16 @@ void zpDataBuffer::readAt( T& out, zp_uint offset ) const
 	out = *(T*)( m_data + offset );
 }
 
+
+template<typename T, typename Func >
+void zpDataBuffer::map( zp_uint start, zp_uint count, Func func )
+{
+	T* t = (T*)( m_data + start );
+	for( zp_uint i = 0; i < count; ++i, ++t )
+	{
+		*t = func( *t );
+	}
+}
 
 template< zp_uint Size >
 class zpFixedDataBuffer : public zpDataBuffer
