@@ -33,6 +33,17 @@ cbuffer PerDrawCall : register( b2 )
 	float4x4 world;
 };
 
+cbuffer Light0 : register( b3 )
+{
+    float4 light_position;
+    float4 light_direction;
+    float4 light_color;
+    float light_innerAngle;
+    float light_outerAngle;
+    float light_radius;
+    int light_type;
+};
+
 //Camera camera : register( b0 );
 //PerFrame frameData : register( b1 );
 //PerDrawCall drawData : register( b2 );
@@ -57,7 +68,7 @@ PS_Input main_vs( VS_Input input )
 	output.position = input.position;
 	output.position = mul( output.position, world );
 	output.position = mul( output.position, viewProjection );
-	output.normal = input.normal;
+	output.normal = normalize( input.normal );
 	output.texCoord = input.texCoord;
 
 	return output;
@@ -66,5 +77,7 @@ PS_Input main_vs( VS_Input input )
 float4 main_ps( PS_Input input ) : SV_TARGET
 {
 	float4 col = tex.Sample( texSampler, input.texCoord );
+    float diffuse = saturate( dot( input.normal.xyz, light_direction.xyz ) );
+    col.rgb *= light_color.rgb * diffuse;
 	return col;
 }
