@@ -8,28 +8,6 @@ const zp_char* g_shape[] =
 	"Box",
 };
 
-template< typename T, zp_uint count >
-zp_bool _strToEnum( const zp_char* (&e)[ count ], const zpBison::Value& str, T& t )
-{
-	zp_bool ok = false;
-
-	if( str.isString() )
-	{
-		const zp_char* s = str.asCString();
-		for( zp_uint i = 0; i < count; ++i )
-		{
-			if( zp_strcmp( s, e[ i ] ) == 0 )
-			{
-				t = (T)i;
-				ok = true;
-				break;
-			}
-		}
-	}
-
-	return ok;
-}
-
 zpParticleEmitterComponent::zpParticleEmitterComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 	, m_layer( 0 )
@@ -446,23 +424,6 @@ void zpParticleEmitterComponent::onDisabled()
 
 }
 
-ZP_FORCE_INLINE zpVector4f _BisonArray2ToVector4( const zpBison::Value& vec, zp_float z, zp_float w )
-{
-	return zpVector4f( vec[0].asFloat(), vec[1].asFloat(), z, w );
-}
-ZP_FORCE_INLINE zpVector4f _BisonArray3ToVector4( const zpBison::Value& vec, zp_float w )
-{
-	return zpVector4f( vec[0].asFloat(), vec[1].asFloat(), vec[2].asFloat(), w );
-}
-ZP_FORCE_INLINE zpVector4f _BisonArray4ToVector4( const zpBison::Value& vec )
-{
-	return zpVector4f( vec[0].asFloat(), vec[1].asFloat(), vec[2].asFloat(), vec[3].asFloat() );
-}
-ZP_FORCE_INLINE zpColor4f _BisonArray4ToColor4( const zpBison::Value& color )
-{
-	return zpColor4f( color[0].asFloat(), color[1].asFloat(), color[2].asFloat(), color[3].asFloat() );
-}
-
 zp_bool zpParticleEmitterComponent::createEffect( const zp_char* name, const zpBison::Value& effectDef )
 {
 	zp_bool ok = true;
@@ -472,14 +433,14 @@ zp_bool zpParticleEmitterComponent::createEffect( const zp_char* name, const zpB
 
 	effect.name = name;
 
-	effect.gravity = _BisonArray3ToVector4( effectDef[ "Gravity" ], 0.f );
-	effect.shapeSize = _BisonArray4ToVector4( effectDef[ "ShapeSize" ] );
+	effect.gravity = zpBisonArray3ToVector4( effectDef[ "Gravity" ], 0.f );
+	effect.shapeSize = zpBisonArray4ToVector4( effectDef[ "ShapeSize" ] );
 
-	effect.startScale = _BisonArray2ToVector4( effectDef[ "StartScale" ], 1.f, 1.f );
-	effect.endScale = _BisonArray2ToVector4( effectDef[ "EndScale" ], 1.f, 1.f );
+	effect.startScale = zpBisonArray2ToVector4( effectDef[ "StartScale" ], 1.f, 1.f );
+	effect.endScale = zpBisonArray2ToVector4( effectDef[ "EndScale" ], 1.f, 1.f );
 
-	effect.startColor = _BisonArray4ToColor4( effectDef[ "StartColor" ] );
-	effect.endColor = _BisonArray4ToColor4( effectDef[ "EndColor" ] );
+	zpBisonArray4ToColor4( effectDef[ "StartColor" ], effect.startColor );
+	zpBisonArray4ToColor4( effectDef[ "EndColor" ], effect.endColor );
 
 	effect.delay = effectDef[ "Delay" ].asFloat();
 	effect.duration = effectDef[ "Duration" ].asFloat();
@@ -500,7 +461,7 @@ zp_bool zpParticleEmitterComponent::createEffect( const zp_char* name, const zpB
 	effect.scaleRange = ZP_PARTICLE_EFFECT_RANGE_LIFETIME;
 	effect.colorRange = ZP_PARTICLE_EFFECT_RANGE_LIFETIME;
 
-	_strToEnum( g_shape, effectDef[ "Shape" ], effect.shape );
+	zpBisonStringToEnum( g_shape, effectDef[ "Shape" ], effect.shape );
 	effect.emitFromShell = effectDef[ "EmitFromShell" ].asBool();
 	effect.randomDirection = effectDef[ "RandomDirection" ].asBool();
 	effect.isLooping = effectDef[ "IsLooping" ].asBool();

@@ -709,6 +709,7 @@ zpLightBufferData* zpRenderingPipeline::getLight( zpLightType type )
 
 	zpLightBufferData* light = m_freeLights.back();
 	m_freeLights.popBack();
+	zp_zero_memory( light );
 
 	m_usedLights[ type ].pushBack( light );
 	light->type = type;

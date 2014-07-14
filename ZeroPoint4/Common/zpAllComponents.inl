@@ -9,6 +9,7 @@ ZP_COMPONENT_DEF( AudioEmitter )
 ZP_COMPONENT_DEF( AudioListener )
 
 // Rendering
+ZP_COMPONENT_DEF( Light )
 ZP_COMPONENT_DEF( Camera )
 ZP_COMPONENT_DEF( MeshRenderer )
 ZP_COMPONENT_DEF( ParticleEmitter )
