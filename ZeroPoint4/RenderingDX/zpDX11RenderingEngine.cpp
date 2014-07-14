@@ -940,6 +940,7 @@ zp_bool zpRenderingEngineImpl::performScreenshot()
 
 	hr = m_swapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (void**)&backBuffer );
 	context->CopyResource( m_screenshotTexture, backBuffer );
+	context->Flush();
 
 	return ok;
 }
@@ -955,7 +956,7 @@ zp_bool zpRenderingEngineImpl::takeScreenshot( zp_uint width, zp_uint height, zp
 	screenBuffer.reserve( size );
 
 	D3D11_MAPPED_SUBRESOURCE map;
-	hr = context->Map( m_screenshotTexture, 0, D3D11_MAP_READ, 0, &map );
+	hr = context->Map( m_screenshotTexture, 0, D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &map );
 	const zp_uint* d = static_cast< const zp_uint* >( map.pData );
 	screenBuffer.writeBulk( d, size );
 	context->Unmap( m_screenshotTexture, 0 );

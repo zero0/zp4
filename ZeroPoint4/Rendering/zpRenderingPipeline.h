@@ -17,6 +17,10 @@ enum zpScreenshotType
 
 	ZP_SCREENSHOT_TYPE_ALL,
 	ZP_SCREENSHOT_TYPE_NO_UI,
+
+	zpScreenshotType_Count,
+
+	ZP_SCREENSHOT_TYPE_PROCESSING,
 };
 
 class zpRenderingPipeline
@@ -114,7 +118,6 @@ private:
 
 	zpLightBufferData* m_dirLight;
 
-	zp_bool m_screenshotTaken;
 	zpScreenshotType m_screenshotType;
 	zpString m_screenshotFilename;
 };

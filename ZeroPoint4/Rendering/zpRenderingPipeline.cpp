@@ -311,8 +311,6 @@ void zpRenderingPipeline::beginFrame( zpRenderingContext* i )
 
 void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 {
-	m_screenshotTaken = m_screenshotType != ZP_SCREENSHOT_TYPE_NONE;
-
 	zpTexture* t = m_engine->getBackBufferRenderTarget();
 	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
 	
@@ -362,10 +360,16 @@ void zpRenderingPipeline::present()
 {
 	m_engine->present();
 
-	if( m_screenshotTaken )
+	switch( m_screenshotType )
 	{
-		m_screenshotTaken = false;
+	case ZP_SCREENSHOT_TYPE_ALL:
+	case ZP_SCREENSHOT_TYPE_NO_UI:
+		m_screenshotType = ZP_SCREENSHOT_TYPE_PROCESSING;
+		break;
+	case ZP_SCREENSHOT_TYPE_PROCESSING:
+		m_screenshotType = ZP_SCREENSHOT_TYPE_NONE;
 		performScreenshot();
+		break;
 	}
 }
 
@@ -683,13 +687,19 @@ void zpRenderingPipeline::popCameraState( zpCameraType type )
 
 zp_bool zpRenderingPipeline::takeScreenshot( zpScreenshotType type, const zp_char* directoryPath )
 {
-	zpFixedStringBuffer< 255 > path;
-	path << directoryPath << zpFile::sep << "Screenshot_" << zpTime::getInstance()->getTime() << ".tga";
+	zp_bool ok = false;
 
-	m_screenshotType = type;
-	m_screenshotFilename = path.str();
+	if( m_screenshotType == ZP_SCREENSHOT_TYPE_NONE )
+	{
+		ok = true;
+		zpFixedStringBuffer< 255 > path;
+		path << directoryPath << zpFile::sep << "Screenshot_" << zpTime::getInstance()->getTime() << ".tga";
 
-	return true;
+		m_screenshotType = type;
+		m_screenshotFilename = path.str();
+	}
+
+	return ok;
 }
 
 
@@ -722,7 +732,7 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 	const zpArrayList< zpRenderingCommand* >& queue = i->getFilteredCommands( layer );
 
 	//m_numTotalDrawCommands += queue.size();
-	
+
 	const zpRenderingCommand* const* cmd = queue.begin();
 	const zpRenderingCommand* const* end = queue.end();
 	
@@ -807,8 +817,6 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 
 zp_bool zpRenderingPipeline::performScreenshot()
 {
-	m_screenshotType = ZP_SCREENSHOT_TYPE_NONE;
-
 	const zpVector2i& screenSize = m_engine->getScreenSize();
 
 	zp_bool ok;
