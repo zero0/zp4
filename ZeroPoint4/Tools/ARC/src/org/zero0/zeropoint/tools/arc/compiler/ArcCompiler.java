@@ -1,8 +1,11 @@
 package org.zero0.zeropoint.tools.arc.compiler;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -208,38 +211,47 @@ public abstract class ArcCompiler implements Runnable
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.command( params );
 		pb.directory( new File( getWorkingDirectory() ) );
-		//pb.redirectOutput( Redirect.PIPE );
-		//pb.redirectError( Redirect.PIPE );
 
 		Process p = null;
 		try
 		{
 			p = pb.start();
+
+			class StreamGobbler extends Thread
+			{
+				private InputStream is;
+				
+				public StreamGobbler( InputStream in )
+				{
+					is = in;
+				}
+
+				public void run()
+				{
+					try
+					{
+						BufferedReader br = new BufferedReader( new InputStreamReader( is ) );
+						String line = null;
+						while( ( line = br.readLine() ) != null )
+						{
+							Arc.getInstance().out( OutputLevel.Normal, line );
+						}
+					}
+					catch( IOException ioe )
+					{
+						ioe.printStackTrace();
+					}
+				}
+			}
+			
+			StreamGobbler bis = new StreamGobbler( p.getInputStream() );
+			StreamGobbler bes = new StreamGobbler( p.getErrorStream() );
+
+			bis.start();
+			bes.start();
 			
 			p.waitFor();
-			
-			BufferedInputStream bis = new BufferedInputStream( p.getInputStream() );
-			BufferedInputStream bes = new BufferedInputStream( p.getErrorStream() );
-
-			byte[] buff = new byte[64];
-			sb = new StringBuilder();
-			int len = -1;
-			while( ( len = bis.read( buff ) ) != -1 )
-			{
-				sb.append( new String( buff, 0, len ) );
-			}
-			
-			if( sb.length() > 0 ) Arc.getInstance().out( OutputLevel.Normal, sb.toString() );
-			
-			sb = new StringBuilder();
-			len = -1;
-			while( ( len = bes.read( buff ) ) != -1 )
-			{
-				sb.append( new String( buff, 0, len ) );
-			}
-			
-			if( sb.length() > 0 ) Arc.getInstance().err( sb.toString() );
-			
+						
 			if( listener != null ) listener.onCompileSuccess( this.getFileToCompile(), "Success", this );
 		}
 		catch( Exception e )

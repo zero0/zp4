@@ -1,4 +1,6 @@
 #include "Main.h"
+
+#if 0
 #include <fbxsdk.h>
 
 #pragma comment( lib, "libfbxsdk.lib" )
@@ -174,3 +176,4 @@ zp_bool FbxMessCompiler::compileMesh()
 
 	return ok;
 }
+#endif

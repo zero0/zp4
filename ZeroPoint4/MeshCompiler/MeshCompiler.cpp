@@ -66,8 +66,14 @@ void BaseMeshCompiler::formatToString( VertexFormat fmt, zpString& outFormat ) c
 	case VF_VERTEX:
 		outFormat = "V";
 		break;
+	case VF_VERTEX_COLOR:
+		outFormat = "VC";
+		break;
 	case VF_VERTEX_NORMAL:
 		outFormat = "VN";
+		break;
+	case VF_VERTEX_TEXUTRE:
+		outFormat = "VU";
 		break;
 	case VF_VERTEX_NORMAL_TEXTURE:
 		outFormat = "VNU";
