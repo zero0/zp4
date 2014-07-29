@@ -7,9 +7,9 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 	if( xmlParser.parseFile( inputFile, true ) )
 	{
 		ok = true;
-		if( xmlParser.push( zpString( "font" ) ) )
+		if( xmlParser.push( "font" ) )
 		{
-			if( xmlParser.push( zpString( "info" ) ) )
+			if( xmlParser.push( "info" ) )
 			{
 				zpXmlNode* info = xmlParser.getCurrentNode();
 				outputJson[ "face" ] =		zpJson( info->attributes.getString( "face" ) );
@@ -43,7 +43,7 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 			}
 
 			zp_int pageCount = 0;
-			if( xmlParser.push( zpString( "common" ) ) )
+			if( xmlParser.push( "common" ) )
 			{
 				zpXmlNode* common = xmlParser.getCurrentNode();
 				pageCount = common->attributes.getInt( "pages" );
@@ -61,9 +61,9 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 				xmlParser.pop();
 			}
 
-			if( xmlParser.push( zpString( "pages" ) ) )
+			if( xmlParser.push( "pages" ) )
 			{
-				if( xmlParser.push( zpString( "page" ) ) )
+				if( xmlParser.push( "page" ) )
 				{
 					zpString outFilePath;
 					zp_int indexSep = outputFile.lastIndexOf( zpFile::sep );
@@ -84,7 +84,7 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 						const zpString& file = page->attributes.getString( "file" );
 						zp_int indexDot = file.lastIndexOf( '.' );
 
-						zpStringBuffer buff;
+						zpFixedStringBuffer< 255 > buff;
 						buff.append( outFilePath );
 						buff.append( file.substring( 0, indexDot + 1 ) );
 						buff.append( "materialb" );
@@ -98,12 +98,12 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 				xmlParser.pop();
 			}
 
-			if( xmlParser.push( zpString( "chars" ) ) )
+			if( xmlParser.push( "chars" ) )
 			{
 				zpXmlNode* cs = xmlParser.getCurrentNode();
 				zp_int count = cs->attributes.getInt( "count" );
 
-				if( xmlParser.push( zpString( "char" ) ) )
+				if( xmlParser.push( "char" ) )
 				{
 					zpJson& chars = outputJson[ "chars" ];
 					chars.reserveArray( count );
@@ -129,12 +129,12 @@ zp_bool compileBitmapFontXML( const zpString& inputFile, const zpString& outputF
 				xmlParser.pop();
 			}
 
-			if( xmlParser.push( zpString( "kernings" ) ) )
+			if( xmlParser.push( "kernings" ) )
 			{
 				zpXmlNode* kernings = xmlParser.getCurrentNode();
 				zp_int count = kernings->attributes.getInt( "count" );
 
-				if( xmlParser.push( zpString( "kerning" ) ) )
+				if( xmlParser.push( "kerning" ) )
 				{
 					zpJson& kernings = outputJson[ "kernings" ];
 					kernings.reserveArray( count );

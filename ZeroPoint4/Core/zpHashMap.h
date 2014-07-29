@@ -2,8 +2,8 @@
 #ifndef ZP_HASH_MAP_H
 #define ZP_HASH_MAP_H
 
-#define ZP_HASH_MAP_DEFAULT_LOAD_FACTOR		0.75f
-#define ZP_HASH_MAP_DEFAULT_CAPACITY		8
+#define ZP_HASH_MAP_DEFAULT_LOAD_FACTOR		0.85f
+#define ZP_HASH_MAP_DEFAULT_CAPACITY		16
 
 template<typename Key, typename Value>
 class zpHashMap {

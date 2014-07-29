@@ -12,6 +12,41 @@ enum zpXmlNodeType
 	ZP_XML_NODE_TYPE_PROCESS_INSTRUCTION,
 };
 
+struct zpXmlAttribute
+{
+	zpString name;
+	zpString value;
+};
+
+struct zpXmlAttributes
+{
+	zpArrayList< zpXmlAttribute > attributes;
+
+	void setString( const zpString& name, const zpString& value )
+	{
+		zpXmlAttribute& attr = attributes.pushBackEmpty();
+		attr.name = name;
+		attr.value = value;
+	}
+
+	const zpString& getString( const zp_char* key ) const;
+
+	zp_int getInt( const zp_char* key ) const;
+
+	zp_float getFloat( const zp_char* key ) const;
+
+	template<typename Func>
+	void foreach( Func func ) const
+	{
+		const zpXmlAttribute* b = attributes.begin();
+		const zpXmlAttribute* e = attributes.end();
+		for( ; b != e; ++b )
+		{
+			func( b->name, b->value );
+		}
+	}
+};
+
 struct zpXmlNode
 {
 	zpXmlNodeType type;
@@ -22,8 +57,8 @@ struct zpXmlNode
 	zpString name;
 	zpString value;
 
-	zpProperties attributes;
-	zpArrayList<zpXmlNode*> children;
+	zpXmlAttributes attributes;
+	zpArrayList< zpXmlNode* > children;
 
 	zpXmlNode();
 	~zpXmlNode();
@@ -45,7 +80,7 @@ public:
 	zpXmlNode* getRootNode() const;
 	zpXmlNode* getCurrentNode() const;
 
-	zp_bool push( const zpString& nodeName );
+	zp_bool push( const zp_char* nodeName );
 	zp_bool next();
 	zp_bool pop();
 

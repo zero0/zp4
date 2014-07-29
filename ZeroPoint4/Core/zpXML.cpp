@@ -85,10 +85,13 @@ void __xmlNodeToString( zpXmlNode* node, zp_int i, zpStringBuffer& buffer )
 	case ZP_XML_NODE_TYPE_ELEMENT:
 		{
 			buffer << tabs << '<' << node->name;
-			node->attributes.foreach( [ &buffer ]( const zpString& key, const zpString& val ) {
-				buffer << ' ' << key << "=\"" << val << '"';
-			} );
-
+			//if( node->attributes != ZP_NULL )
+			//{
+			//	node->attributes.foreach( [ &buffer ]( const zpString& key, const zpString& val ) {
+			//		buffer << ' ' << key << "=\"" << val << '"';
+			//	} );
+			//}
+			
 			zp_bool isBlockElement = false;
 			if( !node->children.isEmpty() )
 			{
@@ -130,13 +133,56 @@ void __xmlNodeToString( zpXmlNode* node, zp_int i, zpStringBuffer& buffer )
 		break;
 	case ZP_XML_NODE_TYPE_PROCESS_INSTRUCTION:
 		buffer << tabs << "<?" << node->name;
-		node->attributes.foreach( [ &buffer ]( const zpString& key, const zpString& val ) {
-			buffer << ' ' << key << "=\"" << val << '"';
-		} );
+		//if( node->attributes != ZP_NULL )
+		//{
+		//	node->attributes.foreach( [ &buffer ]( const zpString& key, const zpString& val ) {
+		//		buffer << ' ' << key << "=\"" << val << '"';
+		//	} );
+		//}
 		buffer << " ?>" << endl;
 		break;
 	}
 
+}
+
+const zpString& zpXmlAttributes::getString( const zp_char* key ) const
+{
+	const zpXmlAttribute* attr;
+	if( attributes.findIf( [ key ]( const zpXmlAttribute& a ) {
+		return a.name == key;
+	}, &attr ) )
+	{
+		return attr->value;
+	}
+	
+	static const zpString empty( "" );
+	return empty;
+}
+zp_int zpXmlAttributes::getInt( const zp_char* key ) const
+{
+	const zpXmlAttribute* attr;
+	if( attributes.findIf( [ key ]( const zpXmlAttribute& a ) {
+		return a.name == key;
+	}, &attr ) )
+	{
+		zp_int val = zp_atoi( attr->value.str() );
+		return val;
+	}
+
+	return 0;
+}
+zp_float zpXmlAttributes::getFloat( const zp_char* key ) const
+{
+	const zpXmlAttribute* attr;
+	if( attributes.findIf( [ key ]( const zpXmlAttribute& a ) {
+		return a.name == key;
+	}, &attr ) )
+	{
+		zp_float val = zp_atof( attr->value.str() );
+		return val;
+	}
+
+	return 0;
 }
 
 zpXmlNode::zpXmlNode()
@@ -151,7 +197,6 @@ zpXmlNode::zpXmlNode()
 {}
 zpXmlNode::~zpXmlNode()
 {
-	attributes.clear();
 	children.foreach( []( zpXmlNode* node ) {
 		ZP_SAFE_DELETE( node );
 	} );
@@ -374,7 +419,7 @@ zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSibling
 				delim = xml_null;
 				c = xml[ ++k ];
 
-				current->attributes[ attrName ] = attrValue;
+				current->attributes.setString( attrName, attrValue );
 			}
 
 			if( c == xml_slash )
@@ -487,7 +532,7 @@ zpXmlNode* zpXmlParser::getCurrentNode() const
 	return m_current;
 }
 
-zp_bool zpXmlParser::push( const zpString& nodeName )
+zp_bool zpXmlParser::push( const zp_char* nodeName )
 {
 	zpXmlNode** found = ZP_NULL;
 	if( m_current->children.findIf( [ &nodeName ]( zpXmlNode* node ) {
@@ -495,7 +540,7 @@ zp_bool zpXmlParser::push( const zpString& nodeName )
 	}, &found ) )
 	{
 		m_nodeStack.pushBack( m_current );
-		m_nodeNameStack.pushBack( nodeName );
+		m_nodeNameStack.pushBack( zpString( nodeName ) );
 		m_current = *found;
 		return true;
 	}

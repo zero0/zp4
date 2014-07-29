@@ -10,6 +10,7 @@
 //#define ZP_MEMORY_TABLE_INDEX( s )	ZP_MIN( ( (s) >> ZP_MEMORY_INCREMENT_SHIFT ), ( ZP_MEMORY_BLOCK_TABLE_SIZE - 1 ) )
 #define ZP_MEMORY_TABLE_INDEX( s )	( (s) % ZP_MEMORY_BLOCK_TABLE_SIZE )
 #define ZP_MEMORY_TRACK_POINTERS	1
+#define ZP_MEMORY_SYSTEM_TRACKED_POINTERS	( 5 * 1024 )
 
 class zpMemorySystem
 {
@@ -21,8 +22,9 @@ public:
 	void shutdown();
 
 	void* allocate( zp_uint size );
-
 	void deallocate( void* ptr );
+
+	void printAllocatedMemoryStackTrace();
 
 private:
 	zpMemorySystem();
@@ -43,8 +45,8 @@ private:
 	zp_uint m_memDeallocated;
 	zp_uint m_memUsed;
 #if ZP_MEMORY_TRACK_POINTERS
-	zpFixedArrayList< void*,        2 * 1024 > m_allocedPointers;
-	zpFixedArrayList< zpStackTrace, 2 * 1024 > m_stackTraces;
+	zpFixedArrayList< void*,        ZP_MEMORY_SYSTEM_TRACKED_POINTERS > m_allocedPointers;
+	zpFixedArrayList< zpStackTrace, ZP_MEMORY_SYSTEM_TRACKED_POINTERS > m_stackTraces;
 #endif
 	zp_byte* m_allMemory;
 	zp_byte* m_alignedMemory;

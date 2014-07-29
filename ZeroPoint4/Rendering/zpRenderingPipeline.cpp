@@ -254,7 +254,7 @@ void zpRenderingPipeline::initialize()
 
 	m_dirLight = getLight( ZP_LIGHT_TYPE_DIRECTIONAL );
 	zpMath::Normalize3( m_dirLight->direction, zpVector4f( 1, -1, 1 ) );
-	m_dirLight->color = zpColor4f( 1, 0, 0, 1 );
+	m_dirLight->color = zpColor4f( 1, 1, 1, 1 );
 }
 void zpRenderingPipeline::destroy()
 {

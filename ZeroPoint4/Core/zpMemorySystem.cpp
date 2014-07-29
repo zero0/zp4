@@ -176,6 +176,17 @@ void zpMemorySystem::deallocate( void* ptr )
 }
 #endif
 
+
+void zpMemorySystem::printAllocatedMemoryStackTrace()
+{
+#if ZP_MEMORY_TRACK_POINTERS
+	if( !m_stackTraces.isEmpty() )
+	{
+		m_stackTraces.foreach( []( const zpStackTrace& t ) { t.print(); zp_printfln( "" ); } );
+	}
+#endif
+}
+
 void zpMemorySystem::initialize( zp_uint size ) 
 {
 	zpStackTrace::Initialize();
