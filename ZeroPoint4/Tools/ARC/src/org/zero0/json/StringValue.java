@@ -13,7 +13,7 @@ final class StringValue extends BaseValue
 	
 	public boolean isString() { return true; }
 	
-	public boolean asBoolean() { return value.isEmpty(); }
+	public boolean asBoolean() { return !value.isEmpty(); }
 	public String asString() { return value; }
 	
 	public boolean isEmpty() { return value.isEmpty(); }

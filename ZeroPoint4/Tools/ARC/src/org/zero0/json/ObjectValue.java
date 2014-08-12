@@ -22,7 +22,7 @@ final class ObjectValue extends BaseValue
 	
 	public boolean isObject() { return true; }
 	
-	public boolean asBoolean() { return value.isEmpty(); }
+	public boolean asBoolean() { return !value.isEmpty(); }
 	
 	public boolean isEmpty() { return value.isEmpty(); }
 	public int getSize() { return value.size(); }
