@@ -215,18 +215,18 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		createDbTab();
 
 		Arc.getInstance().addFileWatcherListener( this );
-		// printOut = new PrintOutWrapper( this );
-		// printErr = new PrintErrWrapper( this );
-		// System.setOut( printOut );
-		// System.setErr( printErr );
-		// OutputStream out = new OutputStream() {
-		// @Override
-		// public void write( int b ) throws IOException {
-		// text.append( Character.toString( (char)b ) );
-		// }
-		// };
-		// System.setOut( new PrintStream( out ) );
-		// System.setErr( new PrintStream( out ) );
+		printOut = new PrintOutWrapper( this );
+		printErr = new PrintErrWrapper( this );
+		System.setOut( printOut );
+		System.setErr( printErr );
+		//OutputStream out = new OutputStream() {
+		//@Override
+		//public void write( int b ) throws IOException {
+		//text.append( Character.toString( (char)b ) );
+		//}
+		//};
+		//System.setOut( new PrintStream( out ) );
+		//System.setErr( new PrintStream( out ) );
 	}
 
 	void createMainTab()
@@ -928,12 +928,14 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 		TabItem i;
 		i = new TabItem( textTabs, SWT.NONE );
 		i.setText( "Console" );
-		console = new StyledText( textTabs, SWT.VERTICAL | SWT.READ_ONLY );
+		console = new StyledText( textTabs, SWT.V_SCROLL | SWT.H_SCROLL | SWT.READ_ONLY );
+		console.setAlwaysShowScrollBars( false );
 		i.setControl( console );
 
 		i = new TabItem( textTabs, SWT.NONE );
 		i.setText( "File" );
-		fileContent = new StyledText( textTabs, SWT.VERTICAL | SWT.READ_ONLY );
+		fileContent = new StyledText( textTabs,  SWT.V_SCROLL | SWT.H_SCROLL | SWT.READ_ONLY );
+		fileContent.setAlwaysShowScrollBars( false );
 		i.setControl( fileContent );
 	}
 
@@ -1258,16 +1260,33 @@ public class Workspace extends Composite implements PrintOutAppender, PrintErrAp
 	@Override
 	public void appendFromPrintOut( String text )
 	{
-		this.console.append( text );
+		final String txt = text;
+		Display d = Display.getDefault();
+		d.asyncExec( new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				console.append( txt );
+			}
+		} );
 	}
 
 	@Override
 	public void appendFromPrintErr( String text )
 	{
-		int offset = this.console.getText().length();
+		final String txt = text;
+		Display.getDefault().asyncExec( new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				int offset = console.getText().length();
 
-		this.console.append( text );
-		this.console.setStyleRange( new StyleRange( offset, text.length(), CreateColor( getDisplay(), 255, 0, 0 ), null ) );
+				console.append( txt );
+				console.setStyleRange( new StyleRange( offset, txt.length(), CreateColor( getDisplay(), 255, 0, 0 ), null ) );
+			}
+		} );
 	}
 
 	void filterTree( String filter )

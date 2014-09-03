@@ -33,7 +33,7 @@ public final class Writer
 			sb.append( value.asString() );
 			break;
 		case String:
-			sb.append( '"' ).append( value.asString() ).append( '"' );
+			sb.append( '"' ).append( value.asString().replace( "\\", "\\\\" ) ).append( '"' );
 			break;
 		case Array:
 			sb.append( '[' );
