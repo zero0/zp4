@@ -27,6 +27,9 @@ public final class Main
 	 */
 	public static void main( String[] args )
 	{
+		org.zero0.json.Value v = org.zero0.json.Parser.parse( "[ 10, 123.455, false, null, \"hello world\", { \"test\" : -234 } ]" );
+		System.out.println( org.zero0.json.Writer.write( v, true, "    " ) );
+		
 		Arc.getInstance().initialize();
 
 		final Display display = new Display();
