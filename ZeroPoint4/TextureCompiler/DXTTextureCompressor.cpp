@@ -262,7 +262,7 @@ void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& 
 						}
 					}
 
-					block.data[y] = ( block.data[y] ) | ( ( 0x03 & index ) << x * 2 );
+					block.data[y] = ( block.data[y] ) | ( ( 0x03 & index ) << ( x * 2 ) );
 				}
 			}
 
@@ -477,12 +477,12 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 				{
 					zp_float d = DistanceAlpha( c, allAlphas[ i ] );
 
-					//// if the difference is 0, break
-					//if( zp_approximate( d, 0.f ) )
-					//{
-					//	index = i;
-					//	break;
-					//}
+					// if the difference is 0, break
+					if( zp_approximate( d, 0.f ) )
+					{
+						index = i;
+						break;
+					}
 
 					// otherwise, use the smallest distance index
 					if( d < dist )
@@ -492,11 +492,11 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 					}
 				}
 
-				block.alpha_indeces = ( block.alpha_indeces ) | ( ( 0x07L & (zp_ulong)index ) << 3 * j );
+				block.alpha_indeces = ( block.alpha_indeces ) | ( ( 0x07L & (zp_ulong)index ) << ( 3 * j ) );
 			}
 
 			// write block to compiled image data
-			zp_ulong alpha_data = ( (zp_ulong)block.alpha_1 ) | ( (zp_ulong)block.alpha_0 << 8 ) | ( 0x0000FFFFFFL & block.alpha_indeces ) << 16;
+			zp_ulong alpha_data = ( (zp_ulong)block.alpha_1 ) | ( (zp_ulong)block.alpha_0 << 8 ) | ( block.alpha_indeces << 16 );
 
 			compiledImage.imageBytes.write( alpha_data );
 			compiledImage.imageBytes.write( block.color_0 );
