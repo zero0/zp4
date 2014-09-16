@@ -13,5 +13,6 @@
     },
     "World" : "worlds/test.worldb",
     "LoadingWorld" : "worlds/loading.worldb",
-    "ProtoDB" : "data/protodb.jsonb"
+    "ProtoDB" : "data/protodb.jsonb",
+    "DefaultMaterial" : "materials/DiffuseColor.materialb"
 }
