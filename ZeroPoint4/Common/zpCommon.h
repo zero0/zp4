@@ -31,6 +31,7 @@ class zpRigidBodyComponent;
 
 class zpBreakableComponent;
 class zpAttachmentComponent;
+class zpProjectileComponent;
 
 class zpAllComponents;
 
@@ -57,6 +58,7 @@ class zpAllComponents;
 
 #include "zpBreakableComponent.h"
 #include "zpAttachmentComponent.h"
+#include "zpProjectileComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"

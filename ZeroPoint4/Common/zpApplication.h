@@ -29,6 +29,23 @@ private:
 	zpString m_nextWorld;
 };
 
+class zpPhysicsDebugDrawer : public zpIDebugPhysicsDebugDrawer
+{
+public:
+	zpPhysicsDebugDrawer() : m_app( ZP_NULL ) {}
+	virtual ~zpPhysicsDebugDrawer() { m_app = ZP_NULL; }
+
+	void setRenderingContext( zpRenderingContext* app ) { m_app = app; }
+
+	void drawLine( const zpVector4f& from, const zpVector4f& to, const zpColor4f& fromColor, const zpColor4f& toColor )
+	{
+		m_app->addLine( from, fromColor, to, toColor );
+	}
+
+private:
+	zpRenderingContext* m_app;
+};
+
 class zpApplication : public zpWindowProcListener, public zpWindowFocusListener, public zpWindowDragDropListener
 {
 public:
@@ -144,6 +161,8 @@ private:
 
 	zpGUI m_gui;
 
+	zpMaterialResourceInstance m_defaultMaterial;
+
 	zpTextResourceInstance m_appOptions;
 
 	zpInputManager m_inputManager;
@@ -170,9 +189,12 @@ private:
 	{
 		ZP_APPLICATION_STATS_FPS = 0,
 		ZP_APPLICATION_STATS_FRAME_TIME,
+		ZP_APPLICATION_STATS_DRAW_PHYSICS,
 	};
-	zpFlag16 m_displayStats;
+	zpFlag32 m_displayStats;
 	zp_uint m_statsTimer;
+
+	zpPhysicsDebugDrawer m_debugPhysicsDrawer;
 };
 
 #endif

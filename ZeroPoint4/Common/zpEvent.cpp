@@ -58,10 +58,7 @@ void zpEventManager::removeAllEventListeners( const zp_char* eventName )
 	zp_uint e;
 	if( findEvent( eventName, e ) )
 	{
-		m_eventListeners[ e ].foreach( [ &e ]( zpEventListener* listener )
-		{
-			listener->handleEvent( e );
-		} );
+		m_eventListeners[ e ].clear();
 	}
 }
 void zpEventManager::removeAllEventListeners( const zpString& eventName )
@@ -73,25 +70,25 @@ void zpEventManager::removeAllEventListeners( const zpString& eventName )
 	}
 }
 
-void zpEventManager::sendEvent( const zp_char* eventName )
+void zpEventManager::sendEvent( const zp_char* eventName, zpObject* sender )
 {
 	zp_uint e;
 	if( findEvent( eventName, e ) )
 	{
-		m_eventListeners[ e ].foreach( [ &e ]( zpEventListener* listener )
+		m_eventListeners[ e ].foreach( [ &e, sender ]( zpEventListener* listener )
 		{
-			listener->handleEvent( e );
+			listener->handleEvent( e, sender );
 		} );
 	}
 }
-void zpEventManager::sendEvent( const zpString& eventName )
+void zpEventManager::sendEvent( const zpString& eventName, zpObject* sender )
 {
 	zp_uint e;
 	if( findEvent( eventName, e ) )
 	{
-		m_eventListeners[ e ].foreach( [ &e ]( zpEventListener* listener )
+		m_eventListeners[ e ].foreach( [ &e, sender ]( zpEventListener* listener )
 		{
-			listener->handleEvent( e );
+			listener->handleEvent( e, sender );
 		} );
 	}
 }

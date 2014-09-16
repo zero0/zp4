@@ -110,6 +110,7 @@ void zpDataBuffer::reset()
 void zpDataBuffer::destroy()
 {
 	m_size = 0;
+	m_capacity = 0;
 	if( !m_isFixed )
 	{
 		ZP_SAFE_FREE( m_data );

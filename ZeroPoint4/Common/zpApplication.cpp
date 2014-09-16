@@ -156,6 +156,8 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	}
 
 	m_protoDBManager.setProtoDBFile( appOptions[ "ProtoDB" ].asCString() );
+
+	m_renderingPipeline.getMaterialContentManager()->getResource( appOptions[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
 }
 void zpApplication::run()
 {
@@ -177,6 +179,8 @@ zp_int zpApplication::shutdown()
 	m_phases.clear();
 
 	m_gui.destroy();
+
+	m_defaultMaterial.release();
 
 	m_renderingPipeline.destroy();
 
@@ -459,18 +463,43 @@ void zpApplication::handleInput()
 	{
 		m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
+	{
+		zp_bool wasSet = m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS );
+		zp_bool isSet = m_displayStats.toggle( ZP_APPLICATION_STATS_DRAW_PHYSICS );
+		
+		m_debugPhysicsDrawer.setRenderingContext( getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext() );
+
+		if( !wasSet && isSet )
+		{
+			m_physicsEngine.setDebugDrawer( &m_debugPhysicsDrawer );
+		}
+		else if( wasSet && !isSet )
+		{
+			m_physicsEngine.setDebugDrawer( ZP_NULL );
+		}
+	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F11 ) )
 	{
 		m_renderingPipeline.takeScreenshot( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) ? ZP_SCREENSHOT_TYPE_NO_UI : ZP_SCREENSHOT_TYPE_ALL, "." );
 	}
 
-
+	// draw FPS
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
 	{
 		zpFixedStringBuffer< 32 > fps;
 		fps << m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME ) * 1000.f << " ms" ;
 
 		m_gui.label( 24, fps.str(), zpColor4f( 1, 1, 1, 1 ) );
+	}
+
+	// draw physics debug
+	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS ) )
+	{
+		zpRenderingContext* context = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
+		context->beginDrawImmediate( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE_DEBUG, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_defaultMaterial );
+		m_physicsEngine.debugDraw();
+		context->endDrawImmediate();
 	}
 }
 

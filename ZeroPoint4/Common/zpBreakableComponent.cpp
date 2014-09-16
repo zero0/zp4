@@ -201,7 +201,7 @@ void zpBreakableComponent::doBreak()
 	// should send event when destroyed
 	if( !m_eventOnBreak.isEmpty() )
 	{
-		getApplication()->getEventManager()->sendEvent( m_eventOnBreak );
+		getApplication()->getEventManager()->sendEvent( m_eventOnBreak, m_destroyObjectOnBreak ? ZP_NULL : getParentObject() );
 	}
 
 	// should send message to parent object when destroyed
@@ -222,7 +222,7 @@ void zpBreakableComponent::doBreak()
 	}
 }
 
-void zpBreakableComponent::handleEvent( const zpEvent& e )
+void zpBreakableComponent::handleEvent( const zpEvent& e, zpObject* sender )
 {
 	if( m_breakEventHandler.isHandlerForEvent( e ) )
 	{

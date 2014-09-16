@@ -29,7 +29,7 @@ public:
 	void gainHealth( zp_float change );
 	void loseHealth( zp_float change );
 
-	void handleEvent( const zpEvent& e );
+	void handleEvent( const zpEvent& e, zpObject* sender );
 
 protected:
 	void onCreate();

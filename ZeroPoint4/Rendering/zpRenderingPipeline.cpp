@@ -326,7 +326,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	// 3) render opaque commands
 	i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
 	processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE, true );
-	processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE_DEBUG, true );
+	processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE_DEBUG, false );
 
 	// 4) render skybox commands
 	processRenderingQueue( ZP_RENDERING_QUEUE_SKYBOX, false );
@@ -334,7 +334,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	// 5) render transparent commands
 	i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );
 	processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT, true );
-	processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, true );
+	processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, false );
 
 	// 6) render overlay commands
 	processRenderingQueue( ZP_RENDERING_QUEUE_OVERLAY, false );

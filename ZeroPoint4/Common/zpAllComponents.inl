@@ -16,8 +16,11 @@ ZP_COMPONENT_DEF( ParticleEmitter )
 
 // Physics
 ZP_COMPONENT_DEF( RigidBody )
+
+// Common
 ZP_COMPONENT_DEF( Breakable )
 ZP_COMPONENT_DEF( Attachment )
+ZP_COMPONENT_DEF( Projectile )
 
 //#include "Audio/zpAudioComponents.inl"
 //#include "Physics/zpPhysicsComponents.inl"

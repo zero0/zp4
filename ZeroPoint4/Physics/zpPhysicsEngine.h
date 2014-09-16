@@ -9,6 +9,12 @@ struct zpCollisionHitResult
 	void* hitObject;
 };
 
+ZP_PURE_INTERFACE zpIDebugPhysicsDebugDrawer
+{
+public:
+	virtual void drawLine( const zpVector4f& from, const zpVector4f& to, const zpColor4f& fromColor, const zpColor4f& toColor ) = 0;
+};
+
 class zpPhysicsEngine
 {
 	ZP_NON_COPYABLE( zpPhysicsEngine );
@@ -32,6 +38,9 @@ public:
 
 	zp_bool raycast( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const;
 
+	void setDebugDrawer( zpIDebugPhysicsDebugDrawer* drawer );
+	void debugDraw();
+
 private:
 	zp_handle m_dynamicsWorld;
 
@@ -39,6 +48,7 @@ private:
 	zp_handle m_collisionConfig;
 	zp_handle m_dispatcher;
 	zp_handle m_solver;
+	zp_handle m_debugDrawer;
 
 	zp_float m_timestep;
 	zp_float m_fixedTimestep;

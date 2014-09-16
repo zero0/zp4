@@ -25,7 +25,7 @@ private:
 ZP_PURE_INTERFACE zpEventListener
 {
 public:
-	virtual void handleEvent( const zpEvent& e ) = 0;
+	virtual void handleEvent( const zpEvent& e, zpObject* sender ) = 0;
 };
 
 class zpEventManager
@@ -44,8 +44,8 @@ public:
 	void removeAllEventListeners( const zp_char* eventName );
 	void removeAllEventListeners( const zpString& eventName );
 
-	void sendEvent( const zp_char* eventName );
-	void sendEvent( const zpString& eventName );
+	void sendEvent( const zp_char* eventName, zpObject* sender );
+	void sendEvent( const zpString& eventName, zpObject* sender );
 
 private:
 	zp_bool findEvent( const zp_char* eventName, zp_uint& index );
