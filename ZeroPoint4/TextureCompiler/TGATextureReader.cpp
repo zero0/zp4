@@ -132,7 +132,7 @@ zp_bool TGATextureReader::getUncompressedTextureBytes( const TGA& tga,const zpDa
 	zp_byte* d = imageData.imageBytes.getData();
 
 	// tga stores texture like GL, flip if incoming compression is DXT
-	if( imageData.compression == TEXTURE_COMPRESSION_DXT )
+	if( imageData.compression != TEXTURE_COMPRESSION_DXT )
 	{
 		zp_uint stride = tga.bytesPerPixel * tga.Width;
 		zp_byte* buff = new zp_byte[ stride ];
