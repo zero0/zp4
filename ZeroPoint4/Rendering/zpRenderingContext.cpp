@@ -115,14 +115,18 @@ void zpRenderingContext::setConstantBuffer( zp_uint bindSlots, zp_uint index, zp
 	m_renderContextImpl->setConstantBuffer( bindSlots, index, buffer );
 }
 
-void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* material )
+void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* materialInstance )
+{
+	beginDrawImmediate( layer, queue, topology, vertexFormat, materialInstance == ZP_NULL ? ZP_NULL : materialInstance->getResource() );
+}
+void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResource* material )
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 	m_currentCommnad = &m_renderingCommands.pushBackEmpty();
 	m_currentCommnad->type = ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE;
 	m_currentCommnad->layer = layer;
 	m_currentCommnad->queue = queue;
-	m_currentCommnad->sortKey = material ? material->getResource()->getData()->materialId : 0;
+	m_currentCommnad->sortKey = material != ZP_NULL ? material->getData()->materialId : 0;
 	m_currentCommnad->sortBias = 0;
 
 	m_currentCommnad->topology = topology;
@@ -584,7 +588,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.topology = ZP_TOPOLOGY_TRIANGLE_LIST;
 		command.vertexBuffer = m->m_vertex.getBufferImpl();
 		command.indexBuffer = m->m_index.getBufferImpl();
-		command.material = material == ZP_NULL ? &b->m_material : material;
+		command.material = material == ZP_NULL ? b->m_material.getResource() : material->getResource();
 		command.vertexFormat = m->m_format;
 		command.vertexCount = b->m_vertexCount;
 		command.indexCount = b->m_vertexCount;
@@ -593,7 +597,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.boundingBox = b->m_boundingBox;
 		command.matrix = matrix;
 
-		command.sortKey = command.material->getResource()->getData()->materialId;
+		command.sortKey = command.material->getData()->materialId;
 		command.sortBias = 0;
 
 		b->m_boundingBox.getCenter( c );

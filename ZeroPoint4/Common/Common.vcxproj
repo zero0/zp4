@@ -89,6 +89,9 @@
     <ClInclude Include="zpProjectileComponent.h" />
     <ClInclude Include="zpRigidBodyComponent.h" />
     <ClInclude Include="zpScriptComponent.h" />
+    <ClInclude Include="zpUIComponent.h" />
+    <ClInclude Include="zpUIPanel.h" />
+    <ClInclude Include="zpUIWidget.h" />
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +120,7 @@
     <ClCompile Include="zpProjectileComponent.cpp" />
     <ClCompile Include="zpRigidBodyComponent.cpp" />
     <ClCompile Include="zpScriptComponent.cpp" />
+    <ClCompile Include="zpUIComponent.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
   <ItemGroup>

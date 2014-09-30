@@ -173,13 +173,13 @@ void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, cons
 
 	case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
 	case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
-		if( command->material )
+		if( command->material != ZP_NULL )
 		{
 			ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
 			ID3D11Buffer* index = command->indexBuffer->m_buffer;
 			ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
 
-			const zpMaterial* mat = command->material->getResource()->getData();
+			const zpMaterial* mat = command->material->getData();
 			if( m_prevMaterial != mat )
 			{
 				m_prevMaterial = mat;

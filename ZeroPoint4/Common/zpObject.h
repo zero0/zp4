@@ -69,6 +69,10 @@ public:
 	void addTag( const zpString& tag );
 	void removeTag( const zpString& tag );
 
+	const zpFlag32& getLayers() const;
+	void setLayers( const zpFlag32& layers );
+	zp_bool isOnLayer( zp_uint layer ) const;
+
 	zpApplication* getApplication() const;
 
 	zpWorld* getWorld() const;
@@ -100,6 +104,7 @@ class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObje
 {
 public:
 	zpObject* createObject( zpApplication* application, const zp_char* filename );
+	zpObject* createObject( zpApplication* application, const zpBison::Value& def );
 
 	void initializeAllObjectsInWorld( zpWorld* world );
 

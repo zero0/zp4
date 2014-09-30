@@ -2,6 +2,10 @@
 #ifndef ZP_ATLAS_H
 #define ZP_ATLAS_H
 
+class zpAtlasContentManager;
+class zpAtlasResourceInstance;
+class zpAtlasResource;
+
 class zpSprite
 {
 public:
@@ -32,45 +36,53 @@ private:
 	zpString m_name;
 };
 
+//////////////////////////////////////////////////////////////////////////
+
+struct zpAtlasSprite
+{
+	zpString name;
+	zpRectf outer;
+	zpRectf inner;
+	zpVector4f padding;
+	zp_bool rotated;
+};
+
 class zpAtlas
 {
 public:
 	zpAtlas();
 	~zpAtlas();
 
-	void create( zp_uint width, zp_uint height, zp_uint padding, zpDisplayFormat format, zpRenderingPipeline* pipeline );
-
-	void loadSprites( const zpArrayList< zpString >& textureNames );
-	const zpSprite* getSprite( const zp_char* textureName );
-	void removeSprite( const zp_char* textureName );
+	const zpMaterialResourceInstance& getMaterial() const;
+	const zpAtlasSprite* getSprite( const zp_char* spriteName ) const;
 
 private:
-	zpTextureResourceInstance m_atlas;
-	zp_int m_padding;
-	zpSpriteNode m_root;
+	zpBison m_atlasData;
+	zpMaterialResourceInstance m_materialAtlas;
+	zpArrayList< zpAtlasSprite > m_sprites;
+
+	friend class zpAtlasResource;
 };
 
-
-class zpAtlasContentManager;
+//////////////////////////////////////////////////////////////////////////
 
 class zpAtlasResource : public zpResource< zpAtlas >
 {
 private:
-	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline ) { return true; }
-	void unload( zpRenderingEngine* engine ) {}
+	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline );
+	void unload( zpRenderingPipeline* pipeline );
 
 	friend class zpAtlasContentManager;
 };
+
 
 class zpAtlasResourceInstance : public zpResourceInstance< zpAtlasResource >
 {
 };
 
+
 class zpAtlasContentManager : public zpContentManager< zpAtlasResource, zpAtlasResourceInstance, zpAtlasContentManager, 2 >
 {
-public:
-	zp_bool getResourceWithoutLoadAtlas( zpAtlasResourceInstance& outInstance, zp_uint width, zp_uint height, zpDisplayFormat format );
-
 private:
 	zp_bool createResource( zpAtlasResource* res, const zp_char* filename );
 	void destroyResource( zpAtlasResource* res );

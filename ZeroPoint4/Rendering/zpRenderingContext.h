@@ -30,7 +30,8 @@ public:
 	void setSamplerState( zp_uint bindSlots, zp_uint index, zpSamplerState* sampler );
 	void setConstantBuffer( zp_uint bindSlots, zp_uint index, zpBuffer* buffer );
 
-	void beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* material );
+	void beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResourceInstance* materialInstance );
+	void beginDrawImmediate( zp_uint layer, zpRenderingQueue queue, zpTopology topology, zpVertexFormat vertexFormat, const zpMaterialResource* material );
 
 	void setBoundingBox( const zpBoundingAABB& bounding );
 	void setBoundingBoxCenter( const zpVector4f& center );

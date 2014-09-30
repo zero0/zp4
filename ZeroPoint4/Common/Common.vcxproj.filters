@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Physics">
       <UniqueIdentifier>{a495d763-fa63-421a-8ec0-bc46ce0b78ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{8fdecbf0-ed40-4d8b-a2d3-83f522bf0a54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{b5f8f76f-99d6-4f68-8ce8-b613d44312a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h">
@@ -111,6 +117,15 @@
     <ClInclude Include="zpProjectileComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpUIWidget.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="zpUIPanel.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="zpUIComponent.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -178,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="zpProjectileComponent.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpUIComponent.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

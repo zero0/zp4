@@ -33,6 +33,8 @@ class zpBreakableComponent;
 class zpAttachmentComponent;
 class zpProjectileComponent;
 
+class zpUIComponent;
+
 class zpAllComponents;
 
 #include "zpEvent.h"
@@ -59,6 +61,8 @@ class zpAllComponents;
 #include "zpBreakableComponent.h"
 #include "zpAttachmentComponent.h"
 #include "zpProjectileComponent.h"
+
+#include "zpUIComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"

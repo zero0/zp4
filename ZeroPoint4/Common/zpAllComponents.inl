@@ -22,6 +22,9 @@ ZP_COMPONENT_DEF( Breakable )
 ZP_COMPONENT_DEF( Attachment )
 ZP_COMPONENT_DEF( Projectile )
 
+// UI
+ZP_COMPONENT_DEF( UI )
+
 //#include "Audio/zpAudioComponents.inl"
 //#include "Physics/zpPhysicsComponents.inl"
 //#include "Rendering/zpRenderingComponents.inl"

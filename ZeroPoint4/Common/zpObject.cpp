@@ -25,6 +25,16 @@ zpObject* zpObjectContentManager::createObject( zpApplication* application, cons
 
 	return o;
 }
+zpObject* zpObjectContentManager::createObject( zpApplication* application, const zpBison::Value& def )
+{
+	zpObject* o = ZP_NULL;
+
+	zpBison* f;
+	zpObjectResourceInstance obj;
+	getResourceWithoutLoad( obj, f );
+
+	return o;
+}
 
 void zpObjectContentManager::initializeAllObjectsInWorld( zpWorld* world )
 {
@@ -223,6 +233,19 @@ void zpObject::removeTag( const zpString& tag )
 	removeTag( tag.str() );
 }
 
+const zpFlag32& zpObject::getLayers() const
+{
+	return m_layers;
+}
+void zpObject::setLayers( const zpFlag32& layers )
+{
+	m_layers = layers;
+}
+zp_bool zpObject::isOnLayer( zp_uint layer ) const
+{
+	return m_layers.isMarked( layer );
+}
+
 zpApplication* zpObject::getApplication() const
 {
 	return m_application;
@@ -314,6 +337,15 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 			if( tags.isString() )
 			{
 				m_tags = tags.asCString();
+			}
+			else if( tags.isArray() )
+			{
+				zpFixedStringBuffer< 255 > tagsBuff;
+				tags.foreachArray( [ this, &tagsBuff ]( const zpBison::Value& value ) {
+					tagsBuff.append( value.asCString() );
+					tagsBuff.append( ' ' );
+				} );
+				m_tags = tagsBuff.str();
 			}
 
 			// set transform

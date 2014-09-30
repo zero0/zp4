@@ -570,6 +570,7 @@ class zpUIRenderingComponent;
 
 class zpDeferredRenderingComponent;
 
+class zpMaterialResource;
 class zpMaterialResourceInstance;
 class zpMeshResourceInstance;
 class zpAtlasResourceInstance;
@@ -585,7 +586,7 @@ struct zpRenderingCommand
 	zpTopology topology;
 	const zpBufferImpl* vertexBuffer;
 	const zpBufferImpl* indexBuffer;
-	const zpMaterialResourceInstance* material;
+	const zpMaterialResource* material;
 	zpVertexFormat vertexFormat;
 	zp_uint vertexStride;
 	zp_uint vertexCount;
@@ -624,7 +625,7 @@ struct zpRenderingCommand
 #include "zpMesh.h"
 #include "zpFont.h"
 #include "zpAtlas.h"
-
+#include "zpDynamicAtlas.h"
 
 #include "zpCameraState.h"
 #include "zpCamera.h"

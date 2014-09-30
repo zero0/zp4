@@ -27,6 +27,7 @@ public:
 	T getBottom() const;
 
 	zp_bool contains( const zpVector2<T>& pos ) const;
+	zp_bool contains( const zpRect<T>& rect ) const;
 
 	zpVector2<T> getTopLeft() const;
 	zpVector2<T> getTopRight() const;

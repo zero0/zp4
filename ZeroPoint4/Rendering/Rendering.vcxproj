@@ -87,6 +87,7 @@
     <ClInclude Include="zpBlendState.h" />
     <ClInclude Include="zpCameraState.h" />
     <ClInclude Include="zpDepthStencilState.h" />
+    <ClInclude Include="zpDynamicAtlas.h" />
     <ClInclude Include="zpGenerateMesh.h" />
     <ClInclude Include="zpImage.h" />
     <ClInclude Include="zpMesh.h" />
@@ -121,6 +122,7 @@
     <ClInclude Include="zpViewport.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpAtlas.cpp" />
     <ClCompile Include="zpBlendState.cpp" />
     <ClCompile Include="zpBuffer.cpp" />
     <ClCompile Include="zpCamera.cpp" />
