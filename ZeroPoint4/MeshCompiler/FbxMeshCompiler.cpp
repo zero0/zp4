@@ -439,7 +439,9 @@ VertexFormat _fbxToMesh( FbxMeshData* data, MeshData* mesh )
 					zp_int idx = part.vertIndecies[ i ];
 					zpVector4f& vert = part.verts[ idx ];
 					zpVector4f& norm = part.normals[ i ];
-					zpVector2f& uv   = part.uvs[ i ];
+					zpVector2f uv   = part.uvs[ i ];
+
+					uv.setY( 1.f - uv.getY() );
 
 					mesh->vertex.write( vert );
 					mesh->vertex.write( norm );
