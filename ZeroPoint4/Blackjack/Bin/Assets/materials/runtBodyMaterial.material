@@ -1,0 +1,11 @@
+{
+    "Shader" : "shaders/LitNormalTextured.shaderb",
+    "Textures" :
+    [
+		"textures/goonCardTex.textureb"
+	],
+    "Constants" :
+    {},
+    "Samplers" :
+    []
+}

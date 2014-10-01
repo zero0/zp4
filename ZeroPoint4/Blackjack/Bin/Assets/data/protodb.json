@@ -1,0 +1,30 @@
+{
+    "Character" :
+    {
+        "proto_blackjack0" :
+        {
+            "num" : 10
+        },
+        "proto_blackjack1" :
+        {
+            "num" : 20
+        },
+        "proto_blackjack2" :
+        {
+            "num" : 33
+        },
+        "proto_blackjack3" :
+        {
+            "num" : 45
+        },
+        "proto_blackjack4" :
+        {
+            "num" : 56
+        },
+        "proto_blackjack5" :
+        {
+            "num" : 78
+        },
+        
+    }
+}

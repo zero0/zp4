@@ -2,7 +2,7 @@
     "Name" : "test world",
     "Objects" : [
         {
-            "Object" : "objects/cube.objectb"
+            "Object" : "objects/runt.objectb"
         },
         {
             "Object" : "objects/plane.objectb",
