@@ -591,7 +591,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.material = material == ZP_NULL ? b->m_material.getResource() : material->getResource();
 		command.vertexFormat = m->m_format;
 		command.vertexCount = b->m_vertexCount;
-		command.indexCount = b->m_vertexCount;
+		command.indexCount = b->m_indexCount;
 		command.vertexOffset = b->m_vertexOffset;
 		command.indexOffset = b->m_indexOffset;
 		command.boundingBox = b->m_boundingBox;

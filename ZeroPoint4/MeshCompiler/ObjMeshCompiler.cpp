@@ -302,7 +302,7 @@ zp_bool ObjMessCompiler::compileMesh()
 				m_data.vertex.write( v->t );
 				++vertexCount;
 
-				m_data.index.write< zp_short >( indexCount );
+				m_data.index.write< zp_ushort >( indexCount );
 				++indexCount;
 
 				part.boundingBox.add( v->v );

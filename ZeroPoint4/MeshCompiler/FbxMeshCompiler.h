@@ -3,26 +3,26 @@
 
 class BaseMeshCompiler;
 
-struct FbxMeshDataPart
+struct FbxMaterialData
 {
-	zpString material;
-	zp_int indexOffset;
-	zp_int indexCount;
-	zp_int vertexOffset;
-	zp_int vertexCount;
-	zpBoundingAABB boundingBox;
+	zpArrayList< zpString > materialNames;
+	zpArrayList< zp_int > polygonIndexToMaterialName;
 };
 
-struct FbxMeshData
+struct FbxMeshDataPart
 {
+	FbxMaterialData materialData;
 	zpArrayList< zpVector4f > verts;
+	zpArrayList< zp_int > vertIndecies;
 	zpArrayList< zpVector4f > normals;
 	zpArrayList< zpVector4f > tangents;
 	zpArrayList< zpVector4f > binormals;
 	zpArrayList< zpVector2f > uvs;
 	zpArrayList< zpColor4f > colors;
-	zpArrayList< zp_int > indecies;
+};
 
+struct FbxMeshData
+{
 	zpArrayList< FbxMeshDataPart > parts;
 };
 
