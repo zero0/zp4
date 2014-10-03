@@ -15,9 +15,11 @@ struct FbxMeshDataPart
 	zpArrayList< zpVector4f > verts;
 	zpArrayList< zp_int > vertIndecies;
 	zpArrayList< zpVector4f > normals;
+	zpArrayList< zp_int > normIndecies;
 	zpArrayList< zpVector4f > tangents;
 	zpArrayList< zpVector4f > binormals;
 	zpArrayList< zpVector2f > uvs;
+	zpArrayList< zp_int > uvIndecies;
 	zpArrayList< zpColor4f > colors;
 };
 

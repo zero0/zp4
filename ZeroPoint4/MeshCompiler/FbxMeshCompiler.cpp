@@ -8,7 +8,7 @@ FbxMessCompiler::~FbxMessCompiler()
 {
 }
 
-void _getFbxInfo( FbxMeshData* data, FbxNode* node )
+void _getFbxInfo( FbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 {
 	zp_int numChildren = node->GetChildCount();
 	for( zp_int i = 0; i < numChildren; ++i )
@@ -61,6 +61,7 @@ void _getFbxInfo( FbxMeshData* data, FbxNode* node )
 				case FbxGeometryElement::eByControlPoint:
 					{
 						meshPart.uvs.reserve( controlPointCount );
+						meshPart.uvIndecies.reserve( controlPointCount );
 						for( zp_int i = 0; i < controlPointCount; ++i )
 						{
 							switch( elemUv->GetReferenceMode() )
@@ -73,26 +74,46 @@ void _getFbxInfo( FbxMeshData* data, FbxNode* node )
 								break;
 							}
 
-							FbxVector2 uv = elemUv->GetDirectArray().GetAt( index );
+							meshPart.uvIndecies.pushBack( index );
+
+							FbxVector2 uv = elemUv->GetDirectArray().GetAt( i );
 							meshPart.uvs.pushBack( zpVector2f( (zp_float)uv.mData[0], (zp_float)uv.mData[1] ) );
 						}
 					}
 					break;
 				case FbxGeometryElement::eByPolygonVertex:
 					{
-						meshPart.uvs.reserve( polygonCount * mesh->GetPolygonSize( 0 ) );
+						zp_int uvCount = elemUv->GetDirectArray().GetCount();
+						meshPart.uvs.reserve( uvCount );
+						for( zp_int u = 0; u < uvCount; ++u )
+						{
+							FbxVector2 uv = elemUv->GetDirectArray().GetAt( u );
+							meshPart.uvs.pushBack( zpVector2f( (zp_float)uv.mData[0], (zp_float)uv.mData[1] ) );
+						}
+
+						meshPart.uvIndecies.reserve( polygonCount * mesh->GetPolygonSize( 0 ) );
 						for( zp_int p = 0; p < polygonCount; ++p )
 						{
 							zp_int polygonSize = mesh->GetPolygonSize( p );
 							for( zp_int s = 0; s < polygonSize; ++s )
 							{
 								index = mesh->GetTextureUVIndex( p, s );
-								FbxVector2 uv = elemUv->GetDirectArray().GetAt( index );
-								meshPart.uvs.pushBack( zpVector2f( (zp_float)uv.mData[0], (zp_float)uv.mData[1] ) );
+								meshPart.uvIndecies.pushBack( index );
 							}
 						}
 					}
 					break;
+				}
+			}
+
+			// flip uvs
+			if( flipUVs )
+			{
+				zpVector2f* b = meshPart.uvs.begin();
+				zpVector2f* e = meshPart.uvs.end();
+				for( ; b != e; ++b )
+				{
+					b->setY( 1.0f - b->getY() );
 				}
 			}
 
@@ -106,6 +127,7 @@ void _getFbxInfo( FbxMeshData* data, FbxNode* node )
 				case FbxGeometryElement::eByControlPoint:
 					{
 						meshPart.normals.reserve( controlPointCount );
+						meshPart.normIndecies.reserve( controlPointCount );
 						for( zp_int i = 0; i < controlPointCount; ++i )
 						{
 							switch( elemNormal->GetReferenceMode() )
@@ -118,22 +140,35 @@ void _getFbxInfo( FbxMeshData* data, FbxNode* node )
 								break;
 							}
 
-							FbxVector4 norm = elemNormal->GetDirectArray().GetAt( index );
+							meshPart.normIndecies.pushBack( index );
+
+							FbxVector4 norm = elemNormal->GetDirectArray().GetAt( i );
 							meshPart.normals.pushBack( zpVector4f( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
 						}
 					}
 					break;
 				case FbxGeometryElement::eByPolygonVertex:
 					{
+						//zp_int normCount = elemNormal->GetDirectArray().GetCount();
+						//meshPart.normals.reserve( normCount );
+						//for( zp_int u = 0; u < normCount; ++u )
+						//{
+						//	FbxVector4 norm = elemNormal->GetDirectArray().GetAt( u );
+						//	meshPart.normals.pushBack( zpVector4f( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
+						//}
+
+						meshPart.normIndecies.reserve( meshPart.vertIndecies.size() );
 						meshPart.normals.reserve( polygonCount * mesh->GetPolygonSize( 0 ) );
+						meshPart.normals.resize( meshPart.verts.size() );
 						for( zp_int p = 0; p < polygonCount; ++p )
 						{
 							zp_int polygonSize = mesh->GetPolygonSize( p );
 							for( zp_int s = 0; s < polygonSize; ++s )
 							{
 								FbxVector4 norm;
+								zp_int idx = mesh->GetPolygonVertex( p, s );
 								mesh->GetPolygonVertexNormal( p, s, norm );
-								meshPart.normals.pushBack( zpVector4f( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
+								meshPart.normals[ idx ] = ( zpVector4f( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
 							}
 						}
 					}
@@ -351,7 +386,7 @@ void _getFbxInfo( FbxMeshData* data, FbxNode* node )
 			}
 		}
 
-		_getFbxInfo( data, child );
+		_getFbxInfo( data, child, flipUVs );
 	}
 }
 
@@ -382,6 +417,12 @@ VertexFormat _fbxToMesh( FbxMeshData* data, MeshData* mesh )
 
 	mesh->parts.reserve( data->parts.size() );
 
+	zp_int materialIndex = -1;
+	zp_int vertexOffset = 0;
+	zp_int vertexCount = 0;
+	zp_int indexOffset = 0;
+	zp_int indexCount = 0;
+
 	for( zp_int p = 0, pmax = data->parts.size(); p < pmax; ++p )
 	{
 		switch( fmt )
@@ -400,11 +441,39 @@ VertexFormat _fbxToMesh( FbxMeshData* data, MeshData* mesh )
 			break;
 		case VF_VERTEX_NORMAL_TEXTURE:
 			{
-				zp_int materialIndex = -1;
-				zp_int vertexCount = 0;
-				zp_int indexCount = 0;
+				zp_int stride = sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f );
 
 				mesh->parts.reserve( part.materialData.materialNames.size() );
+
+				for( zp_int i = 0, imax = part.vertIndecies.size(); i < imax; ++i )
+				{
+					zp_int idx = part.vertIndecies[ i ];
+					mesh->index.write< zp_ushort >( idx );
+				}
+
+				for( zp_int i = 0, imax = part.verts.size(); i < imax; ++i )
+				{
+					zpVector4f& vert = part.verts[ i ];
+					zpVector4f& norm = part.normals[ i ];
+					zpVector2f& uv   = part.uvs[ i ];
+
+					mesh->vertex.write( vert );
+					mesh->vertex.write( norm );
+					mesh->vertex.write( zpVector2f( 0, 0 ) );
+				}
+
+				part.normIndecies.sort( []( zp_int a, zp_int b ) { return a < b; } );
+				for( zp_int i = 0, imax = part.normIndecies.size(); i < imax; ++i )
+				{
+					zp_int offset = part.normIndecies[ i ];
+					mesh->vertex.writeAt( part.normals[ offset ], offset * stride + sizeof( zpVector4f ) );
+				}
+
+				//for( zp_int i = 0, imax = part.uvIndecies.size(); i < imax; ++i )
+				//{
+				//	zp_int offset = part.uvIndecies[ i ];
+				//	mesh->vertex.writeAt( part.uvs[ offset ], offset * stride + sizeof( zpVector4f ) + sizeof( zpVector4f ) );
+				//}
 
 				for( zp_int i = 0, imax = part.vertIndecies.size(); i < imax; ++i )
 				{
@@ -421,13 +490,14 @@ VertexFormat _fbxToMesh( FbxMeshData* data, MeshData* mesh )
 						MeshDataPart& dp = mesh->parts.pushBackEmpty();
 
 						zpFixedStringBuffer< 255 > mat;
-						mat.append( "materials/" );
+						mat.append( "materials" );
+						mat.append( zpFile::sep );
 						mat.append( part.materialData.materialNames[ matIdx ] );
 						mat.append( ".materialb" );
 
 						dp.material = mat.str();
 
-						dp.indexOffset = mesh->index.size();
+						dp.indexOffset = indexOffset * sizeof( zp_ushort );//mesh->index.size();
 						dp.vertexOffset = 0;//mesh->vertex.size();
 
 						vertexCount = 0;
@@ -436,21 +506,19 @@ VertexFormat _fbxToMesh( FbxMeshData* data, MeshData* mesh )
 						materialIndex = matIdx;
 					}
 
-					zp_int idx = part.vertIndecies[ i ];
-					zpVector4f& vert = part.verts[ idx ];
-					zpVector4f& norm = part.normals[ i ];
-					zpVector2f uv   = part.uvs[ i ];
+					//zp_uint offset = vertexOffset * stride;
+					//mesh->vertex.writeAt( part.normals[ part.normIndecies[ i ] ], offset + sizeof( zpVector4f ) );
+					//mesh->vertex.writeAt( part.uvs[ part.uvIndecies[ i ] ], offset + sizeof( zpVector4f ) + sizeof( zpVector4f ) );
 
-					uv.setY( 1.f - uv.getY() );
-
-					mesh->vertex.write( vert );
-					mesh->vertex.write( norm );
-					mesh->vertex.write( uv );
 					++vertexCount;
 
-					mesh->index.write< zp_ushort >( i );
+					++vertexOffset;
+
 					++indexCount;
 
+					++indexOffset;
+
+					zpVector4f& vert = part.verts[ part.vertIndecies[ i ] ];
 					mesh->parts.back().boundingBox.add( vert );
 				}
 
@@ -500,7 +568,7 @@ zp_bool FbxMessCompiler::compileMesh()
 
 	FbxNode* rootNode = scene->GetRootNode();
 	m_fbxData.parts.reserve( 10 );
-	_getFbxInfo( &m_fbxData, rootNode );
+	_getFbxInfo( &m_fbxData, rootNode, true );
 
 	VertexFormat fmt = _fbxToMesh( &m_fbxData, &m_data );
 	formatToString( fmt, m_data.format );
