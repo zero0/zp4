@@ -165,6 +165,9 @@
     <ClInclude Include="zpStackTrace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpQuaternion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -238,6 +241,12 @@
     </None>
     <None Include="zpMathSimd.inl">
       <Filter>Source Files\Simd</Filter>
+    </None>
+    <None Include="zpQuaterionFpu.inl">
+      <Filter>Source Files\Fpu</Filter>
+    </None>
+    <None Include="zpQuaternion.inl">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

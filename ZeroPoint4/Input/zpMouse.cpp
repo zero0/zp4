@@ -76,6 +76,10 @@ void zpMouse::poll()
 
 		m_locationBuffer.zero();
 	}
+	else
+	{
+		m_delta.zero();
+	}
 }
 void zpMouse::create()
 {

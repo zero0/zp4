@@ -36,6 +36,16 @@ struct zpScalar
 	friend void zpMath::Mul( zpVector4f& s, const zpScalar& a, const zpVector4f& b );
 	friend void zpMath::Div( zpVector4f& s, const zpScalar& a, const zpVector4f& b );
 
+	friend void zpMath::Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	friend void zpMath::Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	friend void zpMath::Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	friend void zpMath::Div( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+
+	friend void zpMath::Add( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	friend void zpMath::Sub( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	friend void zpMath::Mul( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	friend void zpMath::Div( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+
 	friend void zpMath::Mul( zpMatrix4f& s, const zpScalar& a, const zpMatrix4f& b );
 
 	friend void zpMath::Madd( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& c );
@@ -44,12 +54,17 @@ struct zpScalar
 	friend void zpMath::Dot2( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
 	friend void zpMath::Dot3( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
 	friend void zpMath::Dot4( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
+	friend void zpMath::Dot4( zpScalar& s, const zpQuaternion4f& a, const zpQuaternion4f& b );
 
 	friend void zpMath::LengthSquared2( zpScalar& s, const zpVector4f& a );
 	friend void zpMath::LengthSquared3( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::LengthSquared4( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::LengthSquared4( zpScalar& s, const zpQuaternion4f& a );
 
 	friend void zpMath::Length2( zpScalar& s, const zpVector4f& a );
 	friend void zpMath::Length3( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::Length4( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::Length4( zpScalar& s, const zpQuaternion4f& a );
 
 	friend void zpMath::Abs( zpScalar& s, const zpScalar& a );
 	friend void zpMath::Neg( zpScalar& s, const zpScalar& a );

@@ -2,7 +2,8 @@
 #ifndef ZP_VECTOR4F_H
 #define ZP_VECTOR4F_H
 
-ZP_ALIGN16 class zpVector4f {
+ZP_ALIGN16 class zpVector4f
+{
 public:
 	ZP_FORCE_INLINE zpVector4f();
 
@@ -759,6 +760,16 @@ public:
 	friend void zpMath::Mul( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 	friend void zpMath::Div( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 
+	friend void zpMath::Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+	friend void zpMath::Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+	friend void zpMath::Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+	friend void zpMath::Div( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+
+	friend void zpMath::Add( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+	friend void zpMath::Sub( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+	friend void zpMath::Mul( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+	friend void zpMath::Div( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+
 	friend void zpMath::Madd( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& c );
 	friend void zpMath::Madd( zpVector4f& s, const zpVector4f& a, const zpScalar& b, const zpVector4f& c );
 	
@@ -770,12 +781,15 @@ public:
 
 	friend void zpMath::LengthSquared2( zpScalar& s, const zpVector4f& a );
 	friend void zpMath::LengthSquared3( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::LengthSquared4( zpScalar& s, const zpVector4f& a );
 
 	friend void zpMath::Length2( zpScalar& s, const zpVector4f& a );
 	friend void zpMath::Length3( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::Length4( zpScalar& s, const zpVector4f& a );
 
 	friend void zpMath::Normalize2( zpVector4f& s, const zpVector4f& a );
 	friend void zpMath::Normalize3( zpVector4f& s, const zpVector4f& a );
+	friend void zpMath::Normalize4( zpVector4f& s, const zpVector4f& a );
 
 	friend void zpMath::Mul( zpVector4f& s, const zpVector4f& a, const zpMatrix4f& b );
 	friend void zpMath::Mul( zpMatrix4f& s, const zpMatrix4f& a, const zpMatrix4f& b );

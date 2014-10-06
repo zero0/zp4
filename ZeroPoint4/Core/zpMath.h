@@ -70,6 +70,7 @@ class zpVector4f;
 class zpMatrix4f;
 class zpPlane;
 class zpFrustum;
+class zpQuaternion4f;
 
 class zpRay;
 class zpBoundingAABB;
@@ -105,24 +106,55 @@ namespace zpMath
 	ZP_FORCE_INLINE void Mul( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 	ZP_FORCE_INLINE void Div( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 
+	ZP_FORCE_INLINE void Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	ZP_FORCE_INLINE void Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	ZP_FORCE_INLINE void Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	ZP_FORCE_INLINE void Div( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+
+	ZP_FORCE_INLINE void Add( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Sub( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Mul( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Div( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+
+	ZP_FORCE_INLINE void Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+	ZP_FORCE_INLINE void Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+	ZP_FORCE_INLINE void Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+	ZP_FORCE_INLINE void Div( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+
+	ZP_FORCE_INLINE void Add( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Sub( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Mul( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Div( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b );
+
+	ZP_FORCE_INLINE void Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpQuaternion4f& b );
+	ZP_FORCE_INLINE void Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpQuaternion4f& b );
+
 	ZP_FORCE_INLINE void Madd( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& c );
 	ZP_FORCE_INLINE void Madd( zpVector4f& s, const zpVector4f& a, const zpScalar& b, const zpVector4f& c );
 
 	ZP_FORCE_INLINE void Dot2( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
 	ZP_FORCE_INLINE void Dot3( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
 	ZP_FORCE_INLINE void Dot4( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
+	ZP_FORCE_INLINE void Dot4( zpScalar& s, const zpQuaternion4f& a, const zpQuaternion4f& b );
 	
 	ZP_FORCE_INLINE void Cross3( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 	ZP_FORCE_INLINE void Perpendicular3( zpVector4f& s, const zpVector4f& a );
 
 	ZP_FORCE_INLINE void LengthSquared2( zpScalar& s, const zpVector4f& a );
 	ZP_FORCE_INLINE void LengthSquared3( zpScalar& s, const zpVector4f& a );
+	ZP_FORCE_INLINE void LengthSquared4( zpScalar& s, const zpVector4f& a );
+	ZP_FORCE_INLINE void LengthSquared4( zpScalar& s, const zpQuaternion4f& a );
 
 	ZP_FORCE_INLINE void Length2( zpScalar& s, const zpVector4f& a );
 	ZP_FORCE_INLINE void Length3( zpScalar& s, const zpVector4f& a );
+	ZP_FORCE_INLINE void Length4( zpScalar& s, const zpVector4f& a );
+	ZP_FORCE_INLINE void Length4( zpScalar& s, const zpQuaternion4f& a );
 
 	ZP_FORCE_INLINE void Normalize2( zpVector4f& s, const zpVector4f& a );
 	ZP_FORCE_INLINE void Normalize3( zpVector4f& s, const zpVector4f& a );
+	ZP_FORCE_INLINE void Normalize4( zpVector4f& s, const zpVector4f& a );
+	ZP_FORCE_INLINE void Normalize4( zpQuaternion4f& s, const zpQuaternion4f& a );
 
 	ZP_FORCE_INLINE void Mul( zpVector4f& s, const zpVector4f& a, const zpMatrix4f& b );
 	ZP_FORCE_INLINE void Mul( zpMatrix4f& s, const zpMatrix4f& a, const zpMatrix4f& b );
@@ -185,6 +217,22 @@ namespace zpMath
 	ZP_FORCE_INLINE void Lerp( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& alpha );
 	ZP_FORCE_INLINE void Lerp( zpScalar& s, const zpScalar& a, const zpScalar& b, const zpScalar& alpha );
 
+	ZP_FORCE_INLINE void RotateX( zpVector4f& s, const zpVector4f& a, const zpScalar& rad );
+	ZP_FORCE_INLINE void RotateY( zpVector4f& s, const zpVector4f& a, const zpScalar& rad );
+	ZP_FORCE_INLINE void RotateZ( zpVector4f& s, const zpVector4f& a, const zpScalar& rad );
+
+	ZP_FORCE_INLINE void SetEulerAngle( zpQuaternion4f& s, const zpScalar& yaw, const zpScalar& pitch, const zpScalar& roll );
+
+	ZP_FORCE_INLINE void GetRoll( zpScalar& s, const zpQuaternion4f& a );
+	ZP_FORCE_INLINE void GetPitch( zpScalar& s, const zpQuaternion4f& a );
+	ZP_FORCE_INLINE void GetYaw( zpScalar& s, const zpQuaternion4f& a );
+
+	ZP_FORCE_INLINE void Conjugate( zpQuaternion4f& s, const zpQuaternion4f& a );
+	ZP_FORCE_INLINE void Transform( zpVector4f& s, const zpQuaternion4f& a, const zpVector4f& b );
+	ZP_FORCE_INLINE void AxisAngle( zpQuaternion4f& s, const zpVector4f& a, const zpScalar& b );
+
+	ZP_FORCE_INLINE void ToMatrix( zpMatrix4f& s, const zpQuaternion4f& a );
+
 };
 
 #if ZP_USE_SIMD
@@ -195,12 +243,15 @@ namespace zpMath
 
 #include "zpVector4.h"
 #include "zpVector2.h"
+#include "zpQuaternion.h"
 
 //#include "zpInteger.h"
 #include "zpMatrix4.h"
 
 #include "zpVector4.inl"
 #include "zpMatrix4f.inl"
+#include "zpQuaternion.inl"
+
 #include "zpPlane.h"
 #include "zpFrustum.h"
 
@@ -219,6 +270,7 @@ namespace zpMath
 #include "zpVector4Fpu.inl"
 //#include "zpIntegerFpu.inl"
 #include "zpMatrix4Fpu.inl"
+#include "zpQuaterionFpu.inl"
 #endif
 
 #endif

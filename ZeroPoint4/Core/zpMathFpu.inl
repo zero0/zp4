@@ -125,6 +125,149 @@ ZP_FORCE_INLINE void zpMath::Div( zpVector4f& s, const zpVector4f& a, const zpVe
 	s.m_xyzw.w = a.m_xyzw.w / b.m_xyzw.w;
 }
 
+ZP_FORCE_INLINE void zpMath::Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x + b.m_x;
+	s.m_xyzw.y = a.m_xyzw.y + b.m_x;
+	s.m_xyzw.z = a.m_xyzw.z + b.m_x;
+	s.m_xyzw.w = a.m_xyzw.w + b.m_x;
+}
+ZP_FORCE_INLINE void zpMath::Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x - b.m_x;
+	s.m_xyzw.y = a.m_xyzw.y - b.m_x;
+	s.m_xyzw.z = a.m_xyzw.z - b.m_x;
+	s.m_xyzw.w = a.m_xyzw.w - b.m_x;
+}
+ZP_FORCE_INLINE void zpMath::Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x * b.m_x;
+	s.m_xyzw.y = a.m_xyzw.y * b.m_x;
+	s.m_xyzw.z = a.m_xyzw.z * b.m_x;
+	s.m_xyzw.w = a.m_xyzw.w * b.m_x;
+}
+ZP_FORCE_INLINE void zpMath::Div( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x / b.m_x;
+	s.m_xyzw.y = a.m_xyzw.y / b.m_x;
+	s.m_xyzw.z = a.m_xyzw.z / b.m_x;
+	s.m_xyzw.w = a.m_xyzw.w / b.m_x;
+}
+
+ZP_FORCE_INLINE void zpMath::Add( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_x + b.m_xyzw.x;
+	s.m_xyzw.y = a.m_x + b.m_xyzw.y;
+	s.m_xyzw.z = a.m_x + b.m_xyzw.z;
+	s.m_xyzw.w = a.m_x + b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Sub( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_x - b.m_xyzw.x;
+	s.m_xyzw.y = a.m_x - b.m_xyzw.y;
+	s.m_xyzw.z = a.m_x - b.m_xyzw.z;
+	s.m_xyzw.w = a.m_x - b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Mul( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_x * b.m_xyzw.x;
+	s.m_xyzw.y = a.m_x * b.m_xyzw.y;
+	s.m_xyzw.z = a.m_x * b.m_xyzw.z;
+	s.m_xyzw.w = a.m_x * b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Div( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_x / b.m_xyzw.x;
+	s.m_xyzw.y = a.m_x / b.m_xyzw.y;
+	s.m_xyzw.z = a.m_x / b.m_xyzw.z;
+	s.m_xyzw.w = a.m_x / b.m_xyzw.w;
+}
+
+ZP_FORCE_INLINE void zpMath::Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x + b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y + b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z + b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w + b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x - b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y - b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z - b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w - b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x * b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y * b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z * b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w * b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Div( zpQuaternion4f& s, const zpQuaternion4f& a, const zpVector4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x / b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y / b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z / b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w / b.m_xyzw.w;
+}
+
+ZP_FORCE_INLINE void zpMath::Add( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x + b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y + b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z + b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w + b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Sub( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x - b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y - b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z - b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w - b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Mul( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x * b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y * b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z * b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w * b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Div( zpQuaternion4f& s, const zpVector4f& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x / b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y / b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z / b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w / b.m_xyzw.w;
+}
+
+ZP_FORCE_INLINE void zpMath::Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x + b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y + b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z + b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w + b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpQuaternion4f& b )
+{
+	s.m_xyzw.x = a.m_xyzw.x - b.m_xyzw.x;
+	s.m_xyzw.y = a.m_xyzw.y - b.m_xyzw.y;
+	s.m_xyzw.z = a.m_xyzw.z - b.m_xyzw.z;
+	s.m_xyzw.w = a.m_xyzw.w - b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpQuaternion4f& b )
+{
+	zp_float nx = a.m_xyzw.w * b.m_xyzw.x + a.m_xyzw.y * b.m_xyzw.w + a.m_xyzw.y * b.m_xyzw.z - a.m_xyzw.z * b.m_xyzw.y;
+	zp_float ny = a.m_xyzw.w * b.m_xyzw.y + a.m_xyzw.x * b.m_xyzw.w + a.m_xyzw.z * b.m_xyzw.x - a.m_xyzw.x * b.m_xyzw.z;
+	zp_float nz = a.m_xyzw.w * b.m_xyzw.z + a.m_xyzw.z * b.m_xyzw.w + a.m_xyzw.x * b.m_xyzw.y - a.m_xyzw.y * b.m_xyzw.x;
+	zp_float nw = a.m_xyzw.w * b.m_xyzw.w - a.m_xyzw.x * b.m_xyzw.x - a.m_xyzw.y * b.m_xyzw.y - a.m_xyzw.z * b.m_xyzw.z;
+	s.m_xyzw.x = nx;
+	s.m_xyzw.y = ny;
+	s.m_xyzw.z = nz;
+	s.m_xyzw.w = nw;
+}
+
+
 ZP_FORCE_INLINE void zpMath::Madd( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& c )
 {
 	s.m_xyzw.x = a.m_xyzw.x + ( b.m_xyzw.x * c.m_x );
@@ -150,6 +293,10 @@ ZP_FORCE_INLINE void zpMath::Dot3( zpScalar& s, const zpVector4f& a, const zpVec
 	s.m_x = a.m_xyzw.x * b.m_xyzw.x + a.m_xyzw.y * b.m_xyzw.y + a.m_xyzw.z * b.m_xyzw.z;
 }
 ZP_FORCE_INLINE void zpMath::Dot4( zpScalar& s, const zpVector4f& a, const zpVector4f& b )
+{
+	s.m_x = a.m_xyzw.x * b.m_xyzw.x + a.m_xyzw.y * b.m_xyzw.y + a.m_xyzw.z * b.m_xyzw.z + a.m_xyzw.w * b.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::Dot4( zpScalar& s, const zpQuaternion4f& a, const zpQuaternion4f& b )
 {
 	s.m_x = a.m_xyzw.x * b.m_xyzw.x + a.m_xyzw.y * b.m_xyzw.y + a.m_xyzw.z * b.m_xyzw.z + a.m_xyzw.w * b.m_xyzw.w;
 }
@@ -181,6 +328,14 @@ ZP_FORCE_INLINE void zpMath::LengthSquared3( zpScalar& s, const zpVector4f& a )
 {
 	s.m_x = a.m_xyzw.x * a.m_xyzw.x + a.m_xyzw.y * a.m_xyzw.y + a.m_xyzw.z * a.m_xyzw.z;
 }
+ZP_FORCE_INLINE void zpMath::LengthSquared4( zpScalar& s, const zpVector4f& a )
+{
+	s.m_x = a.m_xyzw.x * a.m_xyzw.x + a.m_xyzw.y * a.m_xyzw.y + a.m_xyzw.z * a.m_xyzw.z + a.m_xyzw.w * a.m_xyzw.w;
+}
+ZP_FORCE_INLINE void zpMath::LengthSquared4( zpScalar& s, const zpQuaternion4f& a )
+{
+	s.m_x = a.m_xyzw.x * a.m_xyzw.x + a.m_xyzw.y * a.m_xyzw.y + a.m_xyzw.z * a.m_xyzw.z + a.m_xyzw.w * a.m_xyzw.w;
+}
 
 ZP_FORCE_INLINE void zpMath::Length2( zpScalar& s, const zpVector4f& a )
 {
@@ -189,6 +344,14 @@ ZP_FORCE_INLINE void zpMath::Length2( zpScalar& s, const zpVector4f& a )
 ZP_FORCE_INLINE void zpMath::Length3( zpScalar& s, const zpVector4f& a )
 {
 	s.m_x = zp_sqrt( a.m_xyzw.x * a.m_xyzw.x + a.m_xyzw.y * a.m_xyzw.y + a.m_xyzw.z * a.m_xyzw.z );
+}
+ZP_FORCE_INLINE void zpMath::Length4( zpScalar& s, const zpVector4f& a )
+{
+	s.m_x = zp_sqrt( a.m_xyzw.x * a.m_xyzw.x + a.m_xyzw.y * a.m_xyzw.y + a.m_xyzw.z * a.m_xyzw.z + a.m_xyzw.w * a.m_xyzw.w );
+}
+ZP_FORCE_INLINE void zpMath::Length4( zpScalar& s, const zpQuaternion4f& a )
+{
+	s.m_x = zp_sqrt( a.m_xyzw.x * a.m_xyzw.x + a.m_xyzw.y * a.m_xyzw.y + a.m_xyzw.z * a.m_xyzw.z + a.m_xyzw.w * a.m_xyzw.w );
 }
 
 ZP_FORCE_INLINE void zpMath::Normalize2( zpVector4f& s, const zpVector4f& a )
@@ -201,6 +364,18 @@ ZP_FORCE_INLINE void zpMath::Normalize3( zpVector4f& s, const zpVector4f& a )
 {
 	zpScalar l;
 	zpMath::Length3( l, a );
+	zpMath::Div( s, a, l );
+}
+ZP_FORCE_INLINE void zpMath::Normalize4( zpVector4f& s, const zpVector4f& a )
+{
+	zpScalar l;
+	zpMath::Length4( l, a );
+	zpMath::Div( s, a, l );
+}
+ZP_FORCE_INLINE void zpMath::Normalize4( zpQuaternion4f& s, const zpQuaternion4f& a )
+{
+	zpScalar l;
+	zpMath::Length4( l, a );
 	zpMath::Div( s, a, l );
 }
 
@@ -258,6 +433,7 @@ ZP_FORCE_INLINE void zpMath::Mul( zpMatrix4f& s, const zpScalar& a, const zpMatr
 	s.setRow( 2, row3 );
 	s.setRow( 3, row4 );
 }
+
 
 ZP_FORCE_INLINE void zpMath::Abs( zpScalar& s, const zpScalar& a )
 {
@@ -570,4 +746,165 @@ ZP_FORCE_INLINE void zpMath::Lerp( zpScalar& s, const zpScalar& a, const zpScala
 	zpMath::Sub( s, b, a );
 	zpMath::Mul( s, s, alpha );
 	zpMath::Add( s, s, a );
+}
+
+ZP_FORCE_INLINE void zpMath::RotateX( zpVector4f& s, const zpVector4f& a, const zpScalar& rad )
+{
+	zpScalar angle, y, z, co, si, t0, t1;
+
+	zpMath::Sin( si, rad );
+	zpMath::Cos( co, rad );
+
+	zpMath::Mul( t0, a.getY(), co );
+	zpMath::Mul( t1, a.getZ(), si );
+	zpMath::Sub( y, t0, t1 );
+
+	zpMath::Mul( t0, a.getY(), si );
+	zpMath::Mul( t1, a.getZ(), co );
+	zpMath::Add( z, t0, t1 );
+
+	s.setY( y );
+	s.setZ( z );
+}
+ZP_FORCE_INLINE void zpMath::RotateY( zpVector4f& s, const zpVector4f& a, const zpScalar& rad )
+{
+	zpScalar angle, x, z, co, si, t0, t1, nsi;
+
+	zpMath::Sin( si, rad );
+	zpMath::Cos( co, rad );
+	zpMath::Neg( nsi, si );
+
+	zpMath::Mul( t0, a.getX(), co );
+	zpMath::Mul( t1, a.getZ(), si );
+	zpMath::Add( x, t0, t1 );
+
+	zpMath::Mul( t0, a.getX(), nsi );
+	zpMath::Mul( t1, a.getZ(), co );
+	zpMath::Add( z, t0, t1 );
+
+	s.setX( x );
+	s.setZ( z );
+}
+ZP_FORCE_INLINE void zpMath::RotateZ( zpVector4f& s, const zpVector4f& a, const zpScalar& rad )
+{
+	zpScalar angle, y, x, co, si, t0, t1;
+
+	zpMath::Sin( si, rad );
+	zpMath::Cos( co, rad );
+
+	zpMath::Mul( t0, a.getX(), co );
+	zpMath::Mul( t1, a.getY(), si );
+	zpMath::Sub( y, t0, t1 );
+
+	zpMath::Mul( t0, a.getX(), si );
+	zpMath::Mul( t1, a.getY(), co );
+	zpMath::Add( x, t0, t1 );
+
+	s.setX( x );
+	s.setY( y );
+}
+
+
+
+void zpMath::SetEulerAngle( zpQuaternion4f& s, const zpScalar& yaw, const zpScalar& pitch, const zpScalar& roll )
+{
+	zp_float hr = roll.getFloat() * 0.5f;
+	zp_float shr = zp_sin(hr);
+	zp_float chr = zp_cos(hr);
+	zp_float hp = pitch.getFloat() * 0.5f;
+	zp_float shp = zp_sin(hp);
+	zp_float chp = zp_cos(hp);
+	zp_float hy = yaw.getFloat() * 0.5f;
+	zp_float shy = zp_sin(hy);
+	zp_float chy = zp_cos(hy);
+	zp_float chy_shp = chy * shp;
+	zp_float shy_chp = shy * chp;
+	zp_float chy_chp = chy * chp;
+	zp_float shy_shp = shy * shp;
+
+	s.m_xyzw.x = (chy_shp * chr) + (shy_chp * shr); // cos(yaw/2) * sin(pitch/2) * cos(roll/2) + sin(yaw/2) * cos(pitch/2) * sin(roll/2)
+	s.m_xyzw.y = (shy_chp * chr) - (chy_shp * shr); // sin(yaw/2) * cos(pitch/2) * cos(roll/2) - cos(yaw/2) * sin(pitch/2) * sin(roll/2)
+	s.m_xyzw.z = (chy_chp * shr) - (shy_shp * chr); // cos(yaw/2) * cos(pitch/2) * sin(roll/2) - sin(yaw/2) * sin(pitch/2) * cos(roll/2)
+	s.m_xyzw.w = (chy_chp * chr) + (shy_shp * shr); // cos(yaw/2) * cos(pitch/2) * cos(roll/2) + sin(yaw/2) * sin(pitch/2) * sin(roll/2)
+}
+
+void zpMath::GetRoll( zpScalar& s, const zpQuaternion4f& a )
+{
+
+}
+void zpMath::GetPitch( zpScalar& s, const zpQuaternion4f& a )
+{
+
+}
+void zpMath::GetYaw( zpScalar& s, const zpQuaternion4f& a )
+{
+
+}
+
+void zpMath::Conjugate( zpQuaternion4f& s, const zpQuaternion4f& a )
+{
+	s.m_xyzw.x = -a.m_xyzw.x;
+	s.m_xyzw.y = -a.m_xyzw.y;
+	s.m_xyzw.z = -a.m_xyzw.z;
+}
+void zpMath::Transform( zpVector4f& s, const zpQuaternion4f& a, const zpVector4f& b )
+{
+
+}
+void zpMath::AxisAngle( zpQuaternion4f& s, const zpVector4f& a, const zpScalar& b )
+{
+	zpScalar d, si, co, halfB;
+	zpMath::Mul( halfB, b, zpScalar( 0.5f ) );
+
+	zpMath::Length4( d, a );
+	zpMath::Rcp( d, d );
+
+	zpMath::Sin( si, halfB );
+	zpMath::Cos( co, halfB );
+
+	zpVector4f t;
+	zpVector4f dv( d, d, d, zpScalar( 1.f ) );
+	zpVector4f av( si, si, si, co );
+
+	zpMath::Mul( t, a, dv );
+	zpMath::Mul( t, t, av );
+
+	zp_float buff[4];
+	t.store4( buff );
+	s.load4( buff );
+}
+
+void zpMath::ToMatrix( zpMatrix4f& s, const zpQuaternion4f& a )
+{
+	zp_float x = a.getX().getFloat();
+	zp_float y = a.getY().getFloat();
+	zp_float z = a.getZ().getFloat();
+	zp_float w = a.getW().getFloat();
+
+	zp_float xx = x * x;
+	zp_float xy = x * y;
+	zp_float xz = x * z;
+	zp_float xw = x * w;
+	zp_float yy = y * y;
+	zp_float yz = y * z;
+	zp_float yw = y * w;
+	zp_float zz = z * z;
+	zp_float zw = z * w;
+
+	s.m_matrix[0][0] = 1 - 2 * (yy + zz);
+	s.m_matrix[0][1] = 2 * (xy - zw);
+	s.m_matrix[0][2] = 2 * (xz + yw);
+	s.m_matrix[0][3] = 0;
+	s.m_matrix[1][0] = 2 * (xy + zw);
+	s.m_matrix[1][1] = 1 - 2 * (xx + zz);
+	s.m_matrix[1][2] = 2 * (yz - xw);
+	s.m_matrix[1][3] = 0;
+	s.m_matrix[2][0] = 2 * (xz - yw);
+	s.m_matrix[2][1] = 2 * (yz + xw);
+	s.m_matrix[2][2] = 1 - 2 * (xx + yy);
+	s.m_matrix[2][3] = 0;
+	s.m_matrix[3][0] = 0;
+	s.m_matrix[3][1] = 0;
+	s.m_matrix[3][2] = 0;
+	s.m_matrix[3][3] = 1;
 }

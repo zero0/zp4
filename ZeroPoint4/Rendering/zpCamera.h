@@ -50,6 +50,7 @@ public:
 
 	const zpVector4f& getPosition() const;
 	const zpVector4f& getLookTo() const;
+	const zpVector4f& getLookAt() const;
 	const zpVector4f& getUp() const;
 
 	const zpFrustum& getFrustum() const;
@@ -105,6 +106,8 @@ private:
 	zpRecti m_orthoRect;
 	zpRecti m_clipRect;
 	zpViewport m_viewport;
+
+	zpVector4f m_lookAt;
 
 	zpColor4f m_clearColor;
 	zp_float m_clearDepth;

@@ -152,6 +152,7 @@
     <ClInclude Include="zpPlane.h" />
     <ClInclude Include="zpProfiler.h" />
     <ClInclude Include="zpProperties.h" />
+    <ClInclude Include="zpQuaternion.h" />
     <ClInclude Include="zpRandom.h" />
     <ClInclude Include="zpRay.h" />
     <ClInclude Include="zpRect.h" />
@@ -190,6 +191,8 @@
     <None Include="zpMessageTypes.inc" />
     <None Include="zpPair.inl" />
     <None Include="zpBaseTypesSimd.inl" />
+    <None Include="zpQuaternion.inl" />
+    <None Include="zpQuaterionFpu.inl" />
     <None Include="zpRect.inl" />
     <None Include="zpTween.inl" />
     <None Include="zpVector2.inl" />

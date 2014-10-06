@@ -8,6 +8,7 @@ zpCamera::zpCamera()
 	, m_orthoRect()
 	, m_clipRect()
 	, m_viewport()
+	, m_lookAt( 0, 0, 0, 1 )
 	, m_clearColor( 0, 0, 0, 0 )
 	, m_clearDepth( 1.0f )
 	, m_clearStencil( 0 )
@@ -118,15 +119,29 @@ void zpCamera::setPosition( const zpVector4f& position )
 }
 void zpCamera::setLookTo( const zpVector4f& lookTo )
 {
+	// set look to
 	zpMath::Normalize3( m_bufferData.lookTo, lookTo );
+
+	// calc new look at
+	zpVector4f len;
+	zpScalar d;
+	zpMath::Sub( len, m_lookAt, m_bufferData.position );
+	zpMath::Length3( d, len );
+	zpMath::Madd( m_lookAt, m_bufferData.position, m_bufferData.lookTo, d );
+
 	m_isViewDirty = true;
 }
 void zpCamera::setLookAt( const zpVector4f& lookAt )
 {
+	// set look at
+	m_lookAt = lookAt;
+
+	// calc new look to
 	zpVector4f dir;
 	zpMath::Sub( dir, lookAt, m_bufferData.position );
+	zpMath::Normalize3( m_bufferData.lookTo, dir );
 
-	setLookTo( dir );
+	m_isViewDirty = true;
 }
 void zpCamera::setUp( const zpVector4f& up )
 {
@@ -154,6 +169,10 @@ const zpVector4f& zpCamera::getPosition() const
 const zpVector4f& zpCamera::getLookTo() const
 {
 	return m_bufferData.lookTo;
+}
+const zpVector4f& zpCamera::getLookAt() const
+{
+	return m_lookAt;
 }
 const zpVector4f& zpCamera::getUp() const
 {

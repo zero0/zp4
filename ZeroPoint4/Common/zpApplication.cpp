@@ -701,6 +701,8 @@ void zpApplication::enterEditMode()
 			zpMath::Cross3( right, forward, up );
 
 			zp_int w = mouse->getScrollWheelDelta();
+			const zpVector2i& mouseDelta = mouse->getDelta();
+
 			if( w != 0 )
 			{
 				if( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) )
@@ -717,15 +719,37 @@ void zpApplication::enterEditMode()
 			
 			if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) )
 			{
-				if( mouse->isButtonDown( ZP_MOUSE_BUTTON_LEFT ) )
+				zp_bool leftButton = mouse->isButtonDown( ZP_MOUSE_BUTTON_LEFT );
+				zp_bool rightButton = mouse->isButtonDown( ZP_MOUSE_BUTTON_RIGHT );
+				if( leftButton && !rightButton )
 				{
+					zpVector4f lootTo( camera->getLookTo() );
+
 					zpVector4f r, u;
-					zpMath::Mul( r, right, zpScalar( dt * mouse->getDelta().getX() ) );
-					zpMath::Mul( u, up, zpScalar( dt * mouse->getDelta().getY() ) );
+					zpMath::Mul( r, right, zpScalar( dt * mouseDelta.getX() ) );
+					zpMath::Mul( u, up, zpScalar( dt * mouseDelta.getY() ) );
 					zpMath::Add( r, r, u );
 					zpMath::Add( r, r, pos );
-
+					
 					camera->setPosition( r );
+					camera->setLookTo( lootTo );
+				}
+				else if( rightButton && !leftButton )
+				{
+					zpVector4f lootAt( camera->getLookAt() );
+
+					zpVector4f camPos( pos );
+					zpMath::Sub( camPos, camPos, lootAt );
+					zpMath::RotateY( camPos, camPos, zpScalar( ZP_DEG_TO_RAD( mouseDelta.getX() ) ) );
+					zpMath::RotateX( camPos, camPos, zpScalar( ZP_DEG_TO_RAD( -mouseDelta.getY() ) ) );
+					zpMath::Add( camPos, camPos, lootAt );
+
+					camera->setPosition( camPos );
+					camera->setLookAt( lootAt );
+				}
+				else if( rightButton && leftButton )
+				{
+
 				}
 			}
 

@@ -78,6 +78,8 @@ public:
 	friend void zpMath::Determinant( zpScalar& s, const zpMatrix4f& a );
 	friend void zpMath::Invert( zpMatrix4f& s, const zpMatrix4f& a );
 
+	friend void zpMath::ToMatrix( zpMatrix4f& s, const zpQuaternion4f& a );
+
 private:
 	union
 	{
