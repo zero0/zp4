@@ -2,21 +2,18 @@
     "Name" : "test world",
     "Objects" : [
         {
-            "Object" : "objects/runt.objectb"
+            "Object" : "objects/runt.objectb",
+			"Transform" :
+			{
+				"Position" : [ -5, -500, 5 ]
+			}
         },
-        {
-            "Object" : "objects/plane.objectb",
-            "Transform" :
-            {
-                "Position" : [ 0, -5, 0 ]
-            }
-        },
-        {
-            "Object" : "objects/player.objectb",
-            "Transform" :
-            {
-                "Position" : [ -5, -5, -5 ]
-            }
+		{
+            "Object" : "objects/juggernaut.objectb",
+			"Transform" :
+			{
+				"Position" : [ 0, 2, 0 ]
+			}
         }
     ]
 }

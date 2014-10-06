@@ -1,0 +1,13 @@
+{
+    "Name" : "juggernaut",
+    "Tags" : [
+    ],
+    "Layer" : "Default",
+    "Components" :
+    {
+        "MeshRenderer" :
+        {
+            "Mesh" : "meshes/juggernaut.meshb"
+        }
+    }
+}
