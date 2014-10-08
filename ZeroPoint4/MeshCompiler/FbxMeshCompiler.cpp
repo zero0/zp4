@@ -585,6 +585,8 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
 				mat.append( ".materialb" );
 
 				dp.material = mat.str();
+				dp.boundingBox.setMin( zpVector4f( ZP_FLT_MAX, ZP_FLT_MAX, ZP_FLT_MAX, 1.0f ) );
+				dp.boundingBox.setMax( zpVector4f( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN, 1.0f ) );
 
 				dp.indexOffset = compPart.indexOffset + i * sizeof( zp_ushort );//mesh->index.size();
 				dp.vertexOffset = 0;

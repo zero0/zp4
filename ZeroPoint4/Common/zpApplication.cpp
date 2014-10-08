@@ -335,9 +335,9 @@ void zpApplication::update()
 
 	handleInput();
 
-	m_gui.startGUI();
-	if( m_inEditMode ) guiEditMode();
-	m_gui.endGUI();
+	//m_gui.startGUI();
+	//if( m_inEditMode ) guiEditMode();
+	//m_gui.endGUI();
 }
 void zpApplication::simulate()
 {
