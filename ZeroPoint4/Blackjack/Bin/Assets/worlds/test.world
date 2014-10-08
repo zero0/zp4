@@ -2,10 +2,10 @@
     "Name" : "test world",
     "Objects" : [
         {
-            "Object" : "objects/runt.objectb",
+            "Object" : "objects/player.objectb",
 			"Transform" :
 			{
-				"Position" : [ -5, -500, 5 ]
+				"Position" : [ -5, -10, 5 ]
 			}
         },
 		{

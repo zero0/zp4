@@ -17,7 +17,7 @@
 		},
 		"MeshRenderer" :
 		{
-			"Mesh" : "meshes/orig_helmet.meshb"
+			"Mesh" : "meshes/helmet.meshb"
 		}
 	}
 }
