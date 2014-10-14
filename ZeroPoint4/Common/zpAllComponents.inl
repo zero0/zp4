@@ -16,6 +16,7 @@ ZP_COMPONENT_DEF( ParticleEmitter )
 
 // Physics
 ZP_COMPONENT_DEF( RigidBody )
+ZP_COMPONENT_DEF( KinematicBody )
 
 // Common
 ZP_COMPONENT_DEF( Breakable )

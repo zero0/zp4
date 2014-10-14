@@ -17,6 +17,7 @@ struct zpMaterial
 	zpDepthStencilState depth;
 
 	zp_ushort materialId;
+	zp_ushort sortBias;
 	zpShaderResourceInstance shader;
 	zpFixedArrayList< zpMaterialTextureSampler, zpMaterialTextureSlot_Count > textures;
 };

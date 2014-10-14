@@ -126,8 +126,8 @@ void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue que
 	m_currentCommnad->type = ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE;
 	m_currentCommnad->layer = layer;
 	m_currentCommnad->queue = queue;
-	m_currentCommnad->sortKey = material != ZP_NULL ? material->getData()->materialId : 0;
-	m_currentCommnad->sortBias = 0;
+	m_currentCommnad->sortKey = material->getData()->materialId;
+	m_currentCommnad->sortBias = material->getData()->sortBias;
 
 	m_currentCommnad->topology = topology;
 	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->getBufferImpl();
@@ -598,7 +598,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.matrix = matrix;
 
 		command.sortKey = command.material->getData()->materialId;
-		command.sortBias = 0;
+		command.sortBias = command.material->getData()->sortBias;
 
 		b->m_boundingBox.getCenter( c );
 		zpMath::Add( c, c, center );

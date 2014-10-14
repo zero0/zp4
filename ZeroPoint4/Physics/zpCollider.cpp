@@ -10,6 +10,7 @@ const zp_char* s_colliderNames[] =
 	"Sphere",
 	"Cylinder",
 	"Hull",
+	"Mesh",
 };
 
 zpColliderShape _strToCollider( const zp_char* str )
@@ -110,6 +111,10 @@ zpCollider* zpColliderCache::getCollider( const zpBison::Value& v )
 		case ZP_COLLIDER_SHAPE_HULL:
 			{
 				collider = new btConvexHullShape( d, s, sizeof( btVector3 ) );
+			}
+			break;
+		case ZP_COLLIDER_SHAPE_MESH:
+			{
 			}
 			break;
 		}

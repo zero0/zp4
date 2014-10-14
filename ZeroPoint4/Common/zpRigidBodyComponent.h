@@ -21,6 +21,7 @@ protected:
 private:
 	zp_bool m_addOnEnable;
 	zp_bool m_addOnCreate;
+	zp_bool m_isAdded;
 
 	zpRigidBody m_rigidBody;
 };

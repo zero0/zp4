@@ -20,8 +20,13 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 		ok = pipeline->getShaderContentManager()->getResource( shaderFile, m_resource.shader );
 		ZP_ASSERT( ok, "Failed to load shader '%s' for material '%s'", shaderFile, getFilename().str() );
 
+		// load sort bias
+		zp_ushort sortBias = root[ "SortBias" ].asInt();
+		m_resource.sortBias = sortBias;
+
 		// load textures for the material
 		const zpBison::Value& textures = root[ "Textures" ];
+		m_resource.textures.reserve( textures.size() );
 		textures.foreachArray( [ this, pipeline, &ok ]( const zpBison::Value& v )
 		{
 			const zp_char* tex = v.asCString();

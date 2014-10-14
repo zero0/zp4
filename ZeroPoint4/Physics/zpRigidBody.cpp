@@ -46,23 +46,29 @@ void zpRigidBody::create( const zpMatrix4f& transform, const zpBison::Value& v )
 		btRigidBody::btRigidBodyConstructionInfo info( m_mass, ZP_NULL, shape, inertia );
 		info.m_startWorldTransform = trans;
 
-		m_rigidBody = new btRigidBody( info );
+		btRigidBody* body = new btRigidBody( info );
+		body->setCollisionFlags( btRigidBody::CF_STATIC_OBJECT );
+
+		m_rigidBody = body;
 		m_motionState = ZP_NULL;
 	}
 	else
 	{
 		shape->calculateLocalInertia( m_mass, inertia );
-		
+
 		btMotionState* motion = new btDefaultMotionState( trans );
 		btRigidBody::btRigidBodyConstructionInfo info( m_mass, motion, shape, inertia );
 
-		m_rigidBody = new btRigidBody( info );
+		btRigidBody* body = new btRigidBody( info );
+
+		m_rigidBody = body;
 		m_motionState = motion;
 	}
 }
 void zpRigidBody::destroy()
 {
 	zpColliderCache::getInstance()->removeCollider( (zpCollider*)m_collider );
+	m_collider = ZP_NULL;
 
 	btMotionState* motion = (btMotionState*)m_motionState;
 	btRigidBody* rigidBody = (btRigidBody*)m_rigidBody;

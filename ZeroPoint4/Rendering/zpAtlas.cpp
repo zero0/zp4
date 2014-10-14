@@ -42,14 +42,13 @@ zp_bool zpAtlasResource::load( const zp_char* filename, zpRenderingPipeline* pip
 	zp_bool ok = false;
 	if( m_resource.m_atlasData.readFromFile( zpString( filename ) ) )
 	{
-		ok = true;
-
 		const zpBison::Value& root = m_resource.m_atlasData.root();
-		const zpBison::Value& materialFilename = root[ "Material" ];
-		const zpBison::Value& sprites = root[ "Sprites" ];
 
-		zp_uint size = sprites.size();
-		m_resource.m_sprites.reserve( size );
+		const zpBison::Value& materialFilename = root[ "Material" ];
+		ok = pipeline->getMaterialContentManager()->getResource( materialFilename.asCString(), m_resource.m_materialAtlas );
+
+		const zpBison::Value& sprites = root[ "Sprites" ];
+		m_resource.m_sprites.reserve( sprites.size() );
 		sprites.foreachObject( [ this ]( const zpBison::Value& k, const zpBison::Value& v ) {
 			const zpBison::Value& outer = v[ "Outer" ];
 			const zpBison::Value& inner = v[ "Inner" ];

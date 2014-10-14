@@ -32,18 +32,18 @@ private:
 class zpPhysicsDebugDrawer : public zpIDebugPhysicsDebugDrawer
 {
 public:
-	zpPhysicsDebugDrawer() : m_app( ZP_NULL ) {}
-	virtual ~zpPhysicsDebugDrawer() { m_app = ZP_NULL; }
+	zpPhysicsDebugDrawer() : m_renderContext( ZP_NULL ) {}
+	virtual ~zpPhysicsDebugDrawer() { m_renderContext = ZP_NULL; }
 
-	void setRenderingContext( zpRenderingContext* app ) { m_app = app; }
+	void setRenderingContext( zpRenderingContext* renderContext ) { m_renderContext = renderContext; }
 
 	void drawLine( const zpVector4f& from, const zpVector4f& to, const zpColor4f& fromColor, const zpColor4f& toColor )
 	{
-		m_app->addLine( from, fromColor, to, toColor );
+		m_renderContext->addLine( from, fromColor, to, toColor );
 	}
 
 private:
-	zpRenderingContext* m_app;
+	zpRenderingContext* m_renderContext;
 };
 
 class zpApplication : public zpWindowProcListener, public zpWindowFocusListener, public zpWindowDragDropListener

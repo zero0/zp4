@@ -34,6 +34,9 @@ public:
 	void addRigidBody( zpRigidBody* body );
 	void removeRigidBody( zpRigidBody* body );
 
+	void addKinematicBody( zpKinematicBody* body );
+	void removeKinematicBody( zpKinematicBody* body );
+
 	void setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps );
 
 	zp_bool raycast( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const;

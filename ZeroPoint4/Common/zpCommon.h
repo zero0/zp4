@@ -28,6 +28,7 @@ class zpMeshRendererComponent;
 class zpParticleEmitterComponent;
 
 class zpRigidBodyComponent;
+class zpKinematicBodyComponent;
 
 class zpBreakableComponent;
 class zpAttachmentComponent;
@@ -57,11 +58,14 @@ class zpAllComponents;
 
 // Physics
 #include "zpRigidBodyComponent.h"
+#include "zpKinematicBodyComponent.h"
 
+// Common
 #include "zpBreakableComponent.h"
 #include "zpAttachmentComponent.h"
 #include "zpProjectileComponent.h"
 
+// GUI
 #include "zpUIComponent.h"
 
 #include "zpAllComponents.h"

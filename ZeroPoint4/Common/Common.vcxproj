@@ -82,6 +82,7 @@
     <ClInclude Include="zpComponentManager.h" />
     <ClInclude Include="zpGameFlow.h" />
     <ClInclude Include="zpGUI.h" />
+    <ClInclude Include="zpKinematicBodyComponent.h" />
     <ClInclude Include="zpLightComponent.h" />
     <ClInclude Include="zpMeshRendererComponent.h" />
     <ClInclude Include="zpObject.h" />
@@ -113,6 +114,7 @@
     <ClCompile Include="zpEvent.cpp" />
     <ClCompile Include="zpGame.cpp" />
     <ClCompile Include="zpGUI.cpp" />
+    <ClCompile Include="zpKinematicBodyComponent.cpp" />
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpMeshRendererComponent.cpp" />
     <ClCompile Include="zpObject.cpp" />

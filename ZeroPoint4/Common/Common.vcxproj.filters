@@ -43,6 +43,9 @@
     <Filter Include="Source Files\GUI">
       <UniqueIdentifier>{b5f8f76f-99d6-4f68-8ce8-b613d44312a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{e8e85f5b-66a9-4022-ac9f-30383b0af109}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="zpCommon.h">
@@ -67,9 +70,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="zpObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpComponentManager.h">
@@ -125,6 +125,12 @@
     </ClInclude>
     <ClInclude Include="zpUIComponent.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="zpObject.h">
+      <Filter>Source Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="zpKinematicBodyComponent.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="zpUIComponent.cpp">
       <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="zpKinematicBodyComponent.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -112,7 +112,13 @@ void zpAttachmentComponent::addChild( zpObject* child )
 	m_children.pushBack( child );
 
 	// add attachment component to child to set the parent
-	zpAttachmentComponent* attachment = child->getComponents()->addAttachmentComponent( zpBison::null );
+	zpAttachmentComponent* attachment = ZP_NULL;
+	attachment = child->getComponents()->getAttachmentComponent();
+	if( attachment == ZP_NULL )
+	{
+		attachment = child->getComponents()->addAttachmentComponent( zpBison::null );
+	}
+
 	attachment->m_parent = getParentObject();
 }
 void zpAttachmentComponent::addChild( zpObject* child, const zpMatrix4f& localTransform )

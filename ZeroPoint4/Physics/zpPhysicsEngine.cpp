@@ -138,6 +138,20 @@ void zpPhysicsEngine::removeRigidBody( zpRigidBody* body )
 	dynamicsWorld->removeRigidBody( rigidBody );
 }
 
+void zpPhysicsEngine::addKinematicBody( zpKinematicBody* body )
+{
+	btActionInterface* action = (btActionInterface*)body->getKinematicController();
+	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+	dynamicsWorld->addAction( action );
+}
+void zpPhysicsEngine::removeKinematicBody( zpKinematicBody* body )
+{
+	btActionInterface* action = (btActionInterface*)body->getKinematicController();
+	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+	dynamicsWorld->removeAction( action );
+}
+
+
 void zpPhysicsEngine::setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps )
 {
 	m_fixedTimestep = fixedTimeStep;
@@ -158,7 +172,7 @@ zp_bool zpPhysicsEngine::raycast( const zpVector4f& fromWorld, const zpVector4f&
 	if( cb.hasHit() )
 	{
 		hit.position.load4( cb.m_hitPointWorld.m_floats );
-		hit.normal.load4( cb.m_hitPointWorld.m_floats );
+		hit.normal.load4( cb.m_hitNormalWorld.m_floats );
 		hit.hitObject = cb.m_collisionObject ? cb.m_collisionObject->getUserPointer() : ZP_NULL;
 		return true;
 	}

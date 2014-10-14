@@ -71,6 +71,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="zpCollider.h" />
+    <ClInclude Include="zpKinematicBody.h" />
     <ClInclude Include="zpPhysics.h" />
     <ClInclude Include="zpPhysicsEngine.h" />
     <ClInclude Include="zpRigidBody.h" />
@@ -82,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCollider.cpp" />
+    <ClCompile Include="zpKinematicBody.cpp" />
     <ClCompile Include="zpPhysics.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>

@@ -335,9 +335,9 @@ void zpApplication::update()
 
 	handleInput();
 
-	//m_gui.startGUI();
+	m_gui.startGUI();
 	//if( m_inEditMode ) guiEditMode();
-	//m_gui.endGUI();
+	m_gui.endGUI();
 }
 void zpApplication::simulate()
 {
@@ -468,10 +468,10 @@ void zpApplication::handleInput()
 		zp_bool wasSet = m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS );
 		zp_bool isSet = m_displayStats.toggle( ZP_APPLICATION_STATS_DRAW_PHYSICS );
 		
-		m_debugPhysicsDrawer.setRenderingContext( getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext() );
 
 		if( !wasSet && isSet )
 		{
+			m_debugPhysicsDrawer.setRenderingContext( getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext() );
 			m_physicsEngine.setDebugDrawer( &m_debugPhysicsDrawer );
 		}
 		else if( wasSet && !isSet )

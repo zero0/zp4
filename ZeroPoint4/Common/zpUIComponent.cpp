@@ -76,7 +76,7 @@ void zpUIComponent::render( zpRenderingContext* context )
 		{
 			zpVector4f tl, tr, bl, br;
 			getDrawingDimensions( tl, tr, bl, br );
-			zpRectf uvs;
+			zpRectf uvs( 0, 0, 1, 1 );
 
 			context->addQuad(
 				tl, uvs.getTopLeft(), m_color0,
@@ -175,7 +175,7 @@ void zpUIComponent::onAnchor()
 void zpUIComponent::getLocalCorners( zpVector4f& topLeft, zpVector4f& topRight, zpVector4f& bottomLeft, zpVector4f& bottomRight ) const
 {
 	const zpVector4f& offset = getPivotOffset();
-	zpScalar x0, y0, x1, y1, w( m_width ), h( m_height ), nx, ny, ox( offset.getX() ), oy( offset.getY() );
+	zpScalar x0, y0, x1, y1, w( (zp_float)m_width ), h( (zp_float)m_height ), nx, ny, ox( offset.getX() ), oy( offset.getY() );
 
 	zpMath::Neg( nx, ox );
 	zpMath::Neg( nx, oy );
@@ -194,7 +194,7 @@ void zpUIComponent::getLocalCorners( zpVector4f& topLeft, zpVector4f& topRight, 
 void zpUIComponent::getWorldCorners( zpVector4f& topLeft, zpVector4f& topRight, zpVector4f& bottomLeft, zpVector4f& bottomRight ) const
 {
 	const zpVector4f& offset = getPivotOffset();
-	zpScalar x0, y0, x1, y1, w( m_width ), h( m_height ), nx, ny, ox( offset.getX() ), oy( offset.getY() );
+	zpScalar x0, y0, x1, y1, w( (zp_float)m_width ), h((zp_float) m_height ), nx, ny, ox( offset.getX() ), oy( offset.getY() );
 
 	zpMath::Neg( nx, ox );
 	zpMath::Neg( nx, oy );
@@ -214,7 +214,7 @@ void zpUIComponent::getWorldCorners( zpVector4f& topLeft, zpVector4f& topRight, 
 void zpUIComponent::getDrawingDimensions( zpVector4f& topLeft, zpVector4f& topRight, zpVector4f& bottomLeft, zpVector4f& bottomRight ) const
 {
 	const zpVector4f& offset = getPivotOffset();
-	zpScalar x0, y0, x1, y1, w( m_width ), h( m_height ), nx, ny, ox( offset.getX() ), oy( offset.getY() );
+	zpScalar x0, y0, x1, y1, w( (zp_float)m_width ), h( (zp_float)m_height ), nx, ny, ox( offset.getX() ), oy( offset.getY() );
 
 	zpMath::Neg( nx, ox );
 	zpMath::Neg( nx, oy );
