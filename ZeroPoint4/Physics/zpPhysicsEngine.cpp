@@ -3,7 +3,9 @@
 #include "zpPhysicsLib.inc"
 #include "src/btBulletCollisionCommon.h"
 #include "src/btBulletDynamicsCommon.h"
+
 #include "src/LinearMath/btIDebugDraw.h"
+#include "src/BulletCollision/CollisionDispatch/btGhostObject.h"
 
 class zpPhysicsDebugDrawerWrapper : public btIDebugDraw
 {
@@ -56,6 +58,18 @@ zpPhysicsEngine::zpPhysicsEngine()
 zpPhysicsEngine::~zpPhysicsEngine()
 {}
 
+struct zpFilterCallback : public btOverlapFilterCallback
+{
+	// return true when pairs need collision
+	bool needBroadphaseCollision( btBroadphaseProxy* proxy0, btBroadphaseProxy* proxy1 ) const
+	{
+		bool collides = (proxy0->m_collisionFilterGroup & proxy1->m_collisionFilterMask) &&
+			(proxy1->m_collisionFilterGroup & proxy0->m_collisionFilterMask);
+		//add some additional logic here that modified 'collides'
+		return collides;
+	}
+};
+
 void zpPhysicsEngine::create()
 {
 	btBroadphaseInterface* broadphase = new btDbvtBroadphase;
@@ -65,14 +79,21 @@ void zpPhysicsEngine::create()
 
 	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
 
+	btGhostPairCallback* ghostCallback = new btGhostPairCallback;
+	btOverlapFilterCallback* filterCallback = new zpFilterCallback;
+
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
 	dynamicsWorld->setGravity( btVector3( m_gravity.getX().getFloat(), m_gravity.getY().getFloat(), m_gravity.getZ().getFloat() ) );
+	dynamicsWorld->getPairCache()->setInternalGhostPairCallback( ghostCallback );
+	dynamicsWorld->getPairCache()->setOverlapFilterCallback( filterCallback );
 
 	m_broardphase = broadphase;
 	m_collisionConfig = collisionConfiguration;
 	m_dispatcher = dispatcher;
 	m_solver = solver;
 	m_dynamicsWorld = dynamicsWorld;
+	m_ghostPairCallback = ghostCallback;
+	m_filterCallback = filterCallback;
 }
 void zpPhysicsEngine::destroy()
 {
@@ -82,6 +103,8 @@ void zpPhysicsEngine::destroy()
 	btSequentialImpulseConstraintSolver* solver = (btSequentialImpulseConstraintSolver*)m_solver;
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
 	zpPhysicsDebugDrawerWrapper* debugDrawer = (zpPhysicsDebugDrawerWrapper*)m_debugDrawer;
+	btGhostPairCallback* ghostCallback = (btGhostPairCallback*)m_ghostPairCallback;
+	btOverlapFilterCallback* filterCallback = (zpFilterCallback*)m_filterCallback;
 
 	dynamicsWorld->setDebugDrawer( ZP_NULL );
 
@@ -90,6 +113,9 @@ void zpPhysicsEngine::destroy()
 	ZP_SAFE_DELETE( dispatcher );
 	ZP_SAFE_DELETE( solver );
 	ZP_SAFE_DELETE( dynamicsWorld );
+	ZP_SAFE_DELETE( ghostCallback );
+	ZP_SAFE_DELETE( filterCallback );
+
 	ZP_SAFE_DELETE( debugDrawer );
 
 	m_broardphase = ZP_NULL;
@@ -151,6 +177,20 @@ void zpPhysicsEngine::removeKinematicBody( zpKinematicBody* body )
 	dynamicsWorld->removeAction( action );
 }
 
+void zpPhysicsEngine::addPhantom( zpPhantom* phanton )
+{
+	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+	btGhostObject* ghost = (btGhostObject*)phanton->getPhantom();
+
+	dynamicsWorld->addCollisionObject( ghost, phanton->getGroup(), phanton->getMask() );
+}
+void zpPhysicsEngine::removePhantom( zpPhantom* phanton )
+{
+	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+	btGhostObject* ghost = (btGhostObject*)phanton->getPhantom();
+
+	dynamicsWorld->removeCollisionObject( ghost );
+}
 
 void zpPhysicsEngine::setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps )
 {

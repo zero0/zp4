@@ -7,7 +7,8 @@ public:
 	zpRigidBody();
 	~zpRigidBody();
 
-	void create( const zpMatrix4f& transform, const zpBison::Value& v );
+	void create( const zpBison::Value& v );
+	void initialize( const zpMatrix4f& transform );
 	void destroy();
 
 	zp_bool getMatrix( zpMatrix4f& transform );

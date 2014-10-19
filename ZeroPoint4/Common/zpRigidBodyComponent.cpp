@@ -6,7 +6,7 @@ zpRigidBodyComponent::zpRigidBodyComponent( zpObject* obj, const zpBison::Value&
 	, m_addOnCreate( true )
 	, m_isAdded( false )
 {
-	m_rigidBody.create( obj->getTransform(), def );
+	m_rigidBody.create( def );
 }
 zpRigidBodyComponent::~zpRigidBodyComponent()
 {
@@ -18,6 +18,7 @@ void zpRigidBodyComponent::onCreate()
 }
 void zpRigidBodyComponent::onInitialize()
 {
+	m_rigidBody.initialize( getParentObject()->getTransform() );
 	if( m_addOnCreate )
 	{
 		getParentObject()->getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );

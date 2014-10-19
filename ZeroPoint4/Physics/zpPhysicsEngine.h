@@ -37,6 +37,9 @@ public:
 	void addKinematicBody( zpKinematicBody* body );
 	void removeKinematicBody( zpKinematicBody* body );
 
+	void addPhantom( zpPhantom* phanton );
+	void removePhantom( zpPhantom* phanton );
+
 	void setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps );
 
 	zp_bool raycast( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const;
@@ -52,6 +55,8 @@ private:
 	zp_handle m_dispatcher;
 	zp_handle m_solver;
 	zp_handle m_debugDrawer;
+	zp_handle m_ghostPairCallback;
+	zp_handle m_filterCallback;
 
 	zp_float m_timestep;
 	zp_float m_fixedTimestep;

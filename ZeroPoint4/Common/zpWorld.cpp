@@ -180,7 +180,11 @@ void zpWorld::createWorldObject( const zpBison::Value& def )
 		o->unsetFlag( ZP_OBJECT_FLAG_STATIC );
 
 		const zpMatrix4f& mat = *(const zpMatrix4f*)transform.asData();
-		o->setTransform( mat );
+
+		zpMatrix4f transform;
+		zpMath::Mul( transform, o->getTransform(), mat );
+
+		o->setTransform( transform );
 
 		if( isStatic )
 		{

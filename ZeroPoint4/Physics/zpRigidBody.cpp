@@ -20,7 +20,7 @@ zpRigidBody::~zpRigidBody()
 {
 }
 
-void zpRigidBody::create( const zpMatrix4f& transform, const zpBison::Value& v )
+void zpRigidBody::create( const zpBison::Value& v )
 {
 	m_mass = v[ "Mass" ].asFloat();
 
@@ -30,6 +30,9 @@ void zpRigidBody::create( const zpMatrix4f& transform, const zpBison::Value& v )
 
 	m_isStatic = m_mass < ZP_RIGID_BODY_STATIC_MASS;
 
+}
+void zpRigidBody::initialize( const zpMatrix4f& transform )
+{
 	btCollisionShape* shape = (btCollisionShape*)m_collider->getCollider();
 	btVector3 inertia( 0, 0, 0 );
 

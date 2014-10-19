@@ -8,10 +8,12 @@ class zpRigidBody;
 class zpKinematicBody;
 class zpCollider;
 class zpPhysicsEngine;
+class zpPhantom;
 
 #include "zpRigidBody.h"
 #include "zpKinematicBody.h"
 #include "zpCollider.h"
 #include "zpPhysicsEngine.h"
+#include "zpPhantom.h"
 
 #endif
