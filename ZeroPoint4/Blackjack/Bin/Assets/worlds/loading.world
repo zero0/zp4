@@ -1,12 +1,5 @@
 {
     "Name" : "loading",
     "Objects" : [
-        {
-            "Object" : "objects/player.objectb",
-            "Transform" :
-            {
-                "Position" : [ 0, 3, 0 ]
-            }
-        }
     ]
 }

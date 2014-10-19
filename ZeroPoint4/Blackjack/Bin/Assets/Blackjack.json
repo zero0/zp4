@@ -11,7 +11,7 @@
         "Refresh" : 60,
         "VSync" : false
     },
-    "World" : "worlds/test.worldb",
+    "World" : "worlds/physics.worldb",
     "LoadingWorld" : "worlds/loading.worldb",
     "ProtoDB" : "data/protodb.jsonb",
     "DefaultMaterial" : "materials/DiffuseColor.materialb"

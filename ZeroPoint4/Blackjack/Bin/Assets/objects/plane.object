@@ -1,12 +1,11 @@
 {
-    "Name" : "cube",
+    "Name" : "plane",
     "Tags" : [
     ],
     "Layer" : "Default",
     "Transform" :
     {
-        "Position" : [ 0, -5, 0 ],
-        "Scale" :    [ 10, 1, 10 ]
+        "Scale" :    [ 20, 2, 20 ]
     },
     "Components" :
     {
