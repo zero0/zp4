@@ -40,6 +40,9 @@ public:
 	void store3( zp_float* rgb ) const;
 	void store4( zp_float* rgba ) const;
 
+	void load3( const zp_float* rgb );
+	void load4( const zp_float* rgba );
+
 	zp_bool operator==( const zpColor4f& color ) const;
 	zp_bool operator!=( const zpColor4f& color ) const;
 

@@ -6,7 +6,7 @@ zpKinematicBodyComponent::zpKinematicBodyComponent( zpObject* obj, const zpBison
 	, m_addOnEnable( true )
 	, m_isAdded( false )
 {
-	m_kinematicBody.create( obj->getTransform(), def );
+	m_kinematicBody.create( def );
 }
 zpKinematicBodyComponent::~zpKinematicBodyComponent()
 {
@@ -19,6 +19,7 @@ void zpKinematicBodyComponent::onCreate()
 }
 void zpKinematicBodyComponent::onInitialize()
 {
+	m_kinematicBody.initialize( getParentObject()->getTransform() );
 	if( m_addOnCreate )
 	{
 		getParentObject()->getApplication()->getPhysicsEngine()->addKinematicBody( &m_kinematicBody );
@@ -36,10 +37,27 @@ void zpKinematicBodyComponent::onDestroy()
 
 void zpKinematicBodyComponent::onUpdate()
 {
-	zpMatrix4f mat;
-	if( m_isAdded && m_kinematicBody.getMatrix( mat ) )
+	if( m_isAdded )
 	{
-		getParentObject()->setTransform( mat );
+		zpMatrix4f mat;
+		if( m_kinematicBody.getMatrix( mat ) )
+		{
+			getParentObject()->setTransform( mat );
+		}
+
+		const zpKeyboard* k = getApplication()->getInputManager()->getKeyboard();
+		if( k->isKeyDown(ZP_KEY_CODE_W))
+		{
+			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 1 ) );
+		}
+		else if( k->isKeyDown(ZP_KEY_CODE_S))
+		{
+			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, -1 ) );
+		}
+		else
+		{
+			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 0 ) );
+		}
 	}
 }
 void zpKinematicBodyComponent::onSimulate()

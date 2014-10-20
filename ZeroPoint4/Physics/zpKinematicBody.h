@@ -8,7 +8,8 @@ public:
 	zpKinematicBody();
 	~zpKinematicBody();
 
-	void create( const zpMatrix4f& transform, const zpBison::Value& v );
+	void create( const zpBison::Value& v );
+	void initialize( const zpMatrix4f& transform );
 	void destroy();
 
 	zp_bool getMatrix( zpMatrix4f& transform );
@@ -25,13 +26,11 @@ public:
 	void setWalkDirection( const zpVector4f& direction );
 
 	zp_handle getKinematicController() const;
-	zp_handle getKinematicBody() const;
-	zp_handle getMotionState() const;
+	zp_handle getCollisionGhost() const;
 
 private:
 	zp_handle m_controller;
-	zp_handle m_kinematicBody;
-	zp_handle m_motionState;
+	zp_handle m_ghost;
 	zpCollider* m_collider;
 
 	zp_float m_mass;

@@ -15,19 +15,25 @@ public:
 
 	void drawLine( const btVector3& from, const btVector3& to, const btVector3& color )
 	{
-		zpVector4f f( from.getX(), from.getY(), from.getZ(), 1.f );
-		zpVector4f t( to.getX(), to.getY(), to.getZ(), 1.f );
-		zpColor4f c( color.getX(), color.getY(), color.getZ(), 1.f );
+		zpVector4f f( 0, 0, 0, 1 ), t( 0, 0, 0, 1 );
+		zpColor4f c( 0, 0, 0, 1 );
+
+		f.load3( from.m_floats );
+		t.load3( to.m_floats );
+		c.load3( color.m_floats );
 
 		m_drawer->drawLine( f, t, c, c );
 	}
 
 	void drawLine( const btVector3& from,const btVector3& to, const btVector3& fromColor, const btVector3& toColor )
 	{
-		zpVector4f f( from.getX(), from.getY(), from.getZ(), 1.f );
-		zpVector4f t( to.getX(), to.getY(), to.getZ(), 1.f );
-		zpColor4f fc( fromColor.getX(), fromColor.getY(), fromColor.getZ(), 1.f );
-		zpColor4f tc( toColor.getX(), toColor.getY(), toColor.getZ(), 1.f );
+		zpVector4f f( 0, 0, 0, 1 ), t( 0, 0, 0, 1 );
+		zpColor4f fc( 0, 0, 0, 1 ), tc( 0, 0, 0, 1 );
+
+		f.load3( from.m_floats );
+		t.load3( to.m_floats );
+		fc.load3( fromColor.m_floats );
+		tc.load3( toColor.m_floats );
 
 		m_drawer->drawLine( f, t, fc, tc );
 	}
@@ -167,14 +173,20 @@ void zpPhysicsEngine::removeRigidBody( zpRigidBody* body )
 void zpPhysicsEngine::addKinematicBody( zpKinematicBody* body )
 {
 	btActionInterface* action = (btActionInterface*)body->getKinematicController();
+	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)body->getCollisionGhost();
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+
 	dynamicsWorld->addAction( action );
+	dynamicsWorld->addCollisionObject( ghost, body->getGroup(), body->getMask() );
 }
 void zpPhysicsEngine::removeKinematicBody( zpKinematicBody* body )
 {
 	btActionInterface* action = (btActionInterface*)body->getKinematicController();
+	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)body->getCollisionGhost();
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
+	
 	dynamicsWorld->removeAction( action );
+	dynamicsWorld->removeCollisionObject( ghost );
 }
 
 void zpPhysicsEngine::addPhantom( zpPhantom* phanton )
