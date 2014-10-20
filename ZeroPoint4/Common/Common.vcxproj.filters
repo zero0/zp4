@@ -130,7 +130,7 @@
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="zpObject.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
