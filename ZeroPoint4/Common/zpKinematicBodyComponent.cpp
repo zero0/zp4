@@ -46,13 +46,29 @@ void zpKinematicBodyComponent::onUpdate()
 		}
 
 		const zpKeyboard* k = getApplication()->getInputManager()->getKeyboard();
-		if( k->isKeyDown(ZP_KEY_CODE_W))
+		if( k->isKeyDown( ZP_KEY_CODE_W ) )
 		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 1 ) );
+			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 1.f ) );
 		}
-		else if( k->isKeyDown(ZP_KEY_CODE_S))
+		else if( k->isKeyDown( ZP_KEY_CODE_S ) )
 		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, -1 ) );
+			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, -1.f ) );
+		}
+		else if( k->isKeyDown( ZP_KEY_CODE_A ) )
+		{
+			m_kinematicBody.setWalkDirection( zpVector4f( 1.f, 0, 0 ) );
+		}
+		else if( k->isKeyDown( ZP_KEY_CODE_D ) )
+		{
+			m_kinematicBody.setWalkDirection( zpVector4f( -1.f, 0, 0 ) );
+		}
+		else if( k->isKeyPressed( ZP_KEY_CODE_SPACE ) )
+		{
+			m_kinematicBody.jump();
+		}
+		else if( k->isKeyPressed( ZP_KEY_CODE_R ) )
+		{
+			m_kinematicBody.warp( zpVector4f( 0, 10, 0 ) );
 		}
 		else
 		{

@@ -79,13 +79,13 @@ public:
 		m_useGhostObjectSweepTest = true;
 		m_touchingContact = false;
 
-		m_halfHeight = 1.f;
+		m_mass = 1.f;
 		m_jumpVelocity = 10.f;
 		m_fallVelocity = 55.f;
 		m_maxSlopeHeight = 0.7071f;
-		m_walkVelocity = 1.f;
+		m_walkVelocity = .5f;
 		m_turnVelocity = 1.f;
-		m_velocityTimeInterval;
+		m_velocityTimeInterval = 0.f;
 		m_gravity = 9.8f;
 		m_verticalVelocity = 0.f;
 		m_verticalOffset = 0.f;
@@ -97,6 +97,8 @@ public:
 	}
 	void destroy()
 	{
+		m_ghost = ZP_NULL;
+		m_shape = ZP_NULL;
 	}
 
 	void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep )
@@ -107,6 +109,11 @@ public:
 
 	void debugDraw( btIDebugDraw* debugDrawer )
 	{
+		if( !m_walkDirection.isZero() )
+		{
+			const btVector3& pos = m_ghost->getWorldTransform().getOrigin();
+			debugDrawer->drawLine( pos, pos + m_walkDirection, btVector3( 0, 1, 0 ) );
+		}
 	}
 
 	void setWalkDirection( const btVector3& walkDirection )
@@ -127,6 +134,9 @@ public:
 	}
 	void reset()
 	{
+		m_walkDirection.setZero();
+		m_verticalVelocity = 0.f;
+		m_verticalOffset = 0.f;
 	}
 	void warp( const btVector3& origin )
 	{
@@ -144,6 +154,7 @@ public:
 		while( recoverFromPenetration( collisionWorld ) && numPentrationLoops-- > 0 )
 		{
 			m_touchingContact = true;
+			break;
 		}
 
 		m_currentPosition = m_ghost->getWorldTransform().getOrigin();
@@ -159,7 +170,7 @@ public:
 
 		m_wasOnGround = onGround();
 
-		m_verticalVelocity -= m_gravity * dt;
+		m_verticalVelocity -= m_gravity * m_mass * dt;
 		if( m_verticalVelocity > 0.f && m_verticalVelocity > m_jumpVelocity )
 		{
 			m_verticalVelocity = m_jumpVelocity;
@@ -177,7 +188,7 @@ public:
 		stepUp( collisionWorld, dt );
 
 		// 2 walk forward
-		btVector3 move = m_walkDirection;
+		btVector3 move = m_walkDirection * m_walkVelocity;
 		if( !m_useWalkDirection )
 		{
 			btScalar time = ( dt < m_velocityTimeInterval ) ? dt : m_velocityTimeInterval;
@@ -187,10 +198,8 @@ public:
 		}
 		stepForwardAndStrafe( collisionWorld, dt, move );
 
-
 		// 3 stepDown
 		stepDown( collisionWorld, dt );
-
 
 		xform.setOrigin( m_currentPosition );
 		m_ghost->setWorldTransform( xform );
@@ -214,7 +223,7 @@ public:
 
 	bool onGround() const
 	{
-		return zp_approximate( m_verticalVelocity, 0.f );
+		return zp_approximate( m_verticalVelocity, 0.f ) && zp_approximate( m_verticalOffset, 0.f );
 	}
 
 	zp_bool recoverFromPenetration( btCollisionWorld* collisionWorld )
@@ -225,13 +234,11 @@ public:
 
 		m_currentPosition = m_ghost->getWorldTransform().getOrigin();
 
-		btManifoldArray manifoldArray;
-
 		btScalar maxPen = 0;
 		btBroadphasePairArray& overlappingPairs = m_ghost->getOverlappingPairCache()->getOverlappingPairArray();
 		for( zp_int i = 0; i < overlappingPairs.size(); ++i )
 		{
-			manifoldArray.resize( 0 );
+			m_manifoldArray.resize( 0 );
 
 			btBroadphasePair& collisionPair = overlappingPairs[ i ];
 
@@ -244,13 +251,14 @@ public:
 
 			if( collisionPair.m_algorithm )
 			{
-				collisionPair.m_algorithm->getAllContactManifolds( manifoldArray );
+				collisionPair.m_algorithm->getAllContactManifolds( m_manifoldArray );
 			}
 
-			for( zp_int j = 0; j < manifoldArray.size(); ++j )
+			for( zp_int j = 0; j < m_manifoldArray.size(); ++j )
 			{
-				btPersistentManifold* manifold = manifoldArray[ j ];
-				btScalar directionSign = manifold->getBody0() == m_ghost ? btScalar( -1.0f ) : btScalar( 1.0f );
+				btPersistentManifold* manifold = m_manifoldArray[ j ];
+				btScalar directionSign = manifold->getBody0() == m_ghost ? -1.f : 1.f;
+
 				for( zp_int p = 0; p < manifold->getNumContacts(); ++p )
 				{
 					const btManifoldPoint& pt = manifold->getContactPoint( p );
@@ -263,6 +271,7 @@ public:
 						{
 							maxPen = dist;
 							m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+							m_touchingNormal.normalize();
 						}
 						m_currentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar( 0.2f );
 						penetration = true;
@@ -326,6 +335,11 @@ public:
 
 	void stepForwardAndStrafe( btCollisionWorld* collisionWorld, btScalar dt, const btVector3& move )
 	{
+		if( move.isZero() )
+		{
+			return;
+		}
+
 		btTransform start, end;
 		start.setIdentity();
 		end.setIdentity();
@@ -336,7 +350,8 @@ public:
 
 		if( m_touchingContact )
 		{
-			if( m_normalizedWalkDirection.dot( m_touchingNormal ) > 0.f )
+			btScalar d = m_normalizedWalkDirection.dot( m_touchingNormal );
+			if( d > 0.1f )
 			{
 				updateTargetPositionBasedOnCollision( m_touchingNormal );
 			}
@@ -348,7 +363,10 @@ public:
 			start.setOrigin( m_currentPosition );
 			end.setOrigin( m_targetPosition );
 
-			zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, m_currentPosition - m_targetPosition, 0.f );
+			btVector3 negDirection = m_currentPosition - m_targetPosition;
+			negDirection.normalize();
+
+			zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, negDirection, 0.f );
 			if( m_useGhostObjectSweepTest )
 			{
 				m_ghost->convexSweepTest( m_shape, start, end, cb );
@@ -368,7 +386,9 @@ public:
 				if( len > ZP_EPSILON )
 				{
 					currentDir /= len;
-					if( currentDir.dot( m_normalizedWalkDirection ) < ZP_EPSILON )
+
+					btScalar d = currentDir.dot( m_normalizedWalkDirection );
+					if( d < ZP_EPSILON )
 					{
 						break;
 					}
@@ -437,11 +457,15 @@ public:
 		if( movementLength > ZP_EPSILON )
 		{
 			movementDirection /= movementLength;
-			btVector3 reflectionDir = movementDirection - (btScalar(2.0) * movementDirection.dot(hitNormal)) * hitNormal;
+
+			btVector3 reflectionDir = movementDirection - (btScalar(2.0f) * movementDirection.dot(hitNormal)) * hitNormal;
+			reflectionDir.normalize();
+
 			btVector3 parallelDir = hitNormal * reflectionDir.dot( hitNormal );
 			btVector3 perpendicularDir = reflectionDir - parallelDir;
 
 			m_targetPosition = m_currentPosition;
+
 			btVector3 perpComop = perpendicularDir * movementLength;
 			m_targetPosition += perpendicularDir;
 		}
@@ -454,7 +478,7 @@ private:
 	zp_bool m_useGhostObjectSweepTest;
 	zp_bool m_touchingContact;
 
-	zp_float m_halfHeight;
+	zp_float m_mass;
 	zp_float m_jumpVelocity;
 	zp_float m_fallVelocity;
 	zp_float m_maxSlopeHeight;
@@ -473,6 +497,8 @@ private:
 	btVector3 m_targetPosition;
 	btVector3 m_up;
 	btVector3 m_touchingNormal;
+
+	btManifoldArray m_manifoldArray;
 
 	btPairCachingGhostObject* m_ghost;
 	btConvexShape* m_shape;
