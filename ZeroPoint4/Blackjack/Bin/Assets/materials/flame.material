@@ -21,6 +21,7 @@
     },
     "Depth" :
     {
-        "DepthEnabled" : false
+        "DepthEnabled" : true,
+		"DepthWriteMaskAll" : false
     }
 }

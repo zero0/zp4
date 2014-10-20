@@ -35,6 +35,13 @@
 			{
 				"Position" : [ 5, 5, 5 ]
 			}
-        }
+        },
+		{
+			"Object" : "objects/player.objectb",
+			"Transform" :
+			{
+				"Position" : [ 0, 10, 0 ]
+			}
+		}
     ]
 }

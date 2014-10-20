@@ -1,23 +1,32 @@
 {
 	"Name" : "player",
-	"_Extends" : [ "objects/base.object" ],
 	"Tags" : [
 		"Player"
 	],
 	"Layer" : "Default",
 	"Transform" :
 	{
-		"Position" : [ 0, 0, 0 ]
 	},
 	"Components" :
 	{
-		"Script" :
-		{
-			"Scripts" : [ "scripts/Test.scriptb" ]
-		},
 		"MeshRenderer" :
 		{
-			"Mesh" : "meshes/helmet.meshb"
+			"Mesh" : "meshes/cube.meshb"
+		},
+		"KinematicBody" :
+		{
+			"Mass" : 1,
+			"Group" : "Main",
+			"Mask" : "Main",
+			"Collider" :
+			{
+				"Shape" : "Capsule",
+				"Size" :
+				{
+					"Radius" : 1,
+					"Height" : 2
+				}
+			}
 		}
 	}
 }
