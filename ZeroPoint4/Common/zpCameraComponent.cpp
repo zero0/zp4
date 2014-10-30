@@ -13,13 +13,19 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 	zp_float fovy = 45.0f;
 	zpCameraProjection projection = ZP_CAMERA_PROJECTION_PERSPECTIVE;
 	zpViewport viewport;
-	zpVector4f up( 0, 1, 0, 0 );
-	zpVector4f lookTo( 0, 0, -1, 0 );
 
 	zpBison::Value proj = def[ "Projection" ];
-	if( proj.isInt() )
+	if( proj.isString() )
 	{
-		projection = (zpCameraProjection)proj.asInt();
+		const zp_char* projectionType = proj.asCString();
+		if( zp_strcmp( projectionType, "Ortho" ) == 0 )
+		{
+			projection = ZP_CAMERA_PROJECTION_ORTHO;
+		}
+		else if( zp_strcmp( projectionType, "OrthoCenter" ) == 0 )
+		{
+			projection = ZP_CAMERA_PROJECTION_ORTHO_CENTERED;
+		}
 	}
 
 	zpBison::Value size = def[ "ScreenSize" ];
@@ -36,11 +42,16 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 		screenPosition.setY( position[ 1 ].asInt() );
 	}
 
-	zpBison::Value depthValues = def[ "NearFarZ" ];
-	if( depthValues.isArray() && !size.isEmpty() )
+	zpBison::Value nearDepth = def[ "NearZ" ];
+	if( nearDepth.isFloat() )
 	{
-		nearZ = depthValues[ 0 ].asFloat();
-		farZ = depthValues[ 1 ].asFloat();
+		nearZ = nearDepth.asFloat();
+	}
+
+	zpBison::Value farDepth = def[ "FarZ" ];
+	if( farDepth.isFloat() )
+	{
+		farZ = farDepth.asFloat();
 	}
 
 	zpBison::Value fov = def[ "FOV" ];
@@ -49,17 +60,10 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 		fovy = fov.asFloat();
 	}
 
-	zpBison::Value upValue = def[ "Up" ];
-	if( upValue.isArray() && !size.isEmpty() )
-	{
-		up = zpVector4f( upValue[ 0 ].asFloat(), upValue[ 1 ].asFloat(), upValue[ 2 ].asFloat(), 0.0f );
-	}
-
-	zpBison::Value lookToValue = def[ "LookTo" ];
-	if( lookToValue.isArray() && !size.isEmpty() )
-	{
-		lookTo = zpVector4f( lookToValue[ 0 ].asFloat(), lookToValue[ 1 ].asFloat(), lookToValue[ 2 ].asFloat() );
-	}
+	const zpMatrix4f& transform = getParentObject()->getTransform();
+	const zpVector4f& pos = transform.getRow( 3 );
+	const zpVector4f& lookTo = transform.getRow( 2 );
+	const zpVector4f& up = transform.getRow( 1 );
 
 	viewport.topX = (zp_float)screenPosition.getX();
 	viewport.topY = (zp_float)screenPosition.getY();
@@ -69,8 +73,9 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 	viewport.maxDepth = farZ;
 
 	m_camera = pipeline->getCamera( ZP_CAMERA_TYPE_MAIN );
+	m_camera->setActive( getParentObject()->isEnabled() );
 	m_camera->setProjectionType( projection );
-	m_camera->setPosition( getParentObject()->getTransform().getRow( 3 ) );
+	m_camera->setPosition( pos );
 	m_camera->setLookTo( lookTo );
 	m_camera->setAspectRatio( viewport.width / viewport.height );
 	m_camera->setUp( up );
@@ -84,13 +89,38 @@ zpCameraComponent::~zpCameraComponent() {}
 
 void zpCameraComponent::onCreate() {}
 void zpCameraComponent::onInitialize() {}
-void zpCameraComponent::onDestroy() {}
+void zpCameraComponent::onDestroy()
+{
+	zpRenderingPipeline* pipeline = getParentObject()->getApplication()->getRenderPipeline();
+	pipeline->releaseCamera( m_camera );
+	m_camera = ZP_NULL;
+}
 
-void zpCameraComponent::onUpdate() {}
+void zpCameraComponent::onUpdate()
+{
+	zpObject* parent = getParentObject();
+	if( parent->isFlagSet( ZP_OBJECT_FLAG_TRANFORM_DIRTY ) )
+	{
+		const zpMatrix4f& transform = getParentObject()->getTransform();
+		const zpVector4f& pos = transform.getRow( 3 );
+		const zpVector4f& lookTo = transform.getRow( 2 );
+		const zpVector4f& up = transform.getRow( 1 );
+
+		m_camera->setPosition( pos );
+		m_camera->setLookTo( lookTo );
+		m_camera->setUp( up );
+	}
+}
 void zpCameraComponent::onSimulate() {}
 
-void zpCameraComponent::onEnabled() {}
-void zpCameraComponent::onDisabled() {}
+void zpCameraComponent::onEnabled()
+{
+	m_camera->setActive( true );
+}
+void zpCameraComponent::onDisabled()
+{
+	m_camera->setActive( false );
+}
 
 
 zpCameraComponentPool::zpCameraComponentPool() {}

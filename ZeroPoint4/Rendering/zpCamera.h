@@ -29,6 +29,12 @@ public:
 
 	zp_bool update();
 
+	void setActive( zp_bool active );
+	zp_bool isActive() const;
+
+	void setCameraType( zpCameraType type );
+	zpCameraType getCameraType() const;
+
 	void setProjectionType( zpCameraProjection type );
 
 	void setOrthoRect( const zpRecti& rect ) { m_orthoRect = rect; }
@@ -96,10 +102,12 @@ public:
 
 private:
 	zpCameraProjection m_projectionType;
+	zpCameraType m_type;
 
 	zpFixedArrayList< zpTexture*, 4 > m_renderTargets;
 	zpDepthStencilBuffer* m_depthStencil;
 
+	zp_bool m_isActive;
 	zp_bool m_isViewDirty;
 	zp_bool m_isProjectionDirty;
 

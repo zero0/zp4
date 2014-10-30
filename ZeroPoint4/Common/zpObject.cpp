@@ -213,6 +213,7 @@ void zpObject::setTransform( const zpMatrix4f& transform )
 	if( !m_flags.isMarked( ZP_OBJECT_FLAG_INITIALIZED ) || !m_flags.isMarked( ZP_OBJECT_FLAG_STATIC ) )
 	{
 		m_transform = transform;
+		m_flags.mark( ZP_OBJECT_FLAG_TRANFORM_DIRTY );
 	}
 }
 
@@ -295,6 +296,7 @@ void zpObject::initialize()
 }
 void zpObject::update()
 {
+	m_flags.unmark( ZP_OBJECT_FLAG_TRANFORM_DIRTY );
 #if ZP_USE_HOT_RELOAD
 	if( m_object.isVaild() && m_lastLoadTime != m_object.getResource()->getLastTimeLoaded() )
 	{

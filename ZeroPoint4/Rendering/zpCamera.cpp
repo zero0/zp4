@@ -2,7 +2,9 @@
 
 zpCamera::zpCamera()
 	: m_projectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE )
+	, m_type( ZP_CAMERA_TYPE_CUSTOM )
 	, m_depthStencil( ZP_NULL )
+	, m_isActive( false )
 	, m_isViewDirty( true )
 	, m_isProjectionDirty( true )
 	, m_orthoRect()
@@ -87,6 +89,24 @@ zp_bool zpCamera::update()
 	}
 
 	return isViewProjectionDirty;
+}
+
+void zpCamera::setActive( zp_bool active )
+{
+	m_isActive = active;
+}
+zp_bool zpCamera::isActive() const
+{
+	return m_isActive;
+}
+
+void zpCamera::setCameraType( zpCameraType type )
+{
+	m_type = type;
+}
+zpCameraType zpCamera::getCameraType() const
+{
+	return m_type;
 }
 
 void zpCamera::setProjectionType( zpCameraProjection type )

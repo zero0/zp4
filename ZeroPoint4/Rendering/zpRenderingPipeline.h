@@ -58,9 +58,9 @@ public:
 	void enterEditMode();
 	void leaveEditMode();
 
-	zp_uint getNumCameras() const { return m_cameras.size(); }
+	zp_uint getNumCameras( zpCameraType type ) const { return m_usedCameras[ type ].size(); }
 	zpCamera* getCamera( zpCameraType type );
-	void setCameraActive( zpCameraType type, zp_bool active );
+	void releaseCamera( zpCamera* camera );
 
 	template< typename T >
 	T* pushCameraState( zpCameraType type )
@@ -109,7 +109,13 @@ private:
 	zpFontResourceInstance m_debugFont;
 
 	zpCamera* m_prevCamera;
-	zpFixedArrayList< zpCamera, zpCameraType_Count > m_cameras;
+	zpCamera* m_debugCamera;
+	zpCamera* m_debugUICamera;
+
+	zpFixedArrayList< zpCamera, 8 > m_cameras;
+	zpFixedArrayList< zpCamera*, 8 > m_freeCameras;
+	zpArrayList< zpCamera* > m_usedCameras[ zpCameraType_Count ];
+
 	zpFixedArrayList< zpArrayList< zpCameraState* >, zpCameraType_Count > m_cameraStack;
 
 	zpFixedArrayList< zpLightBufferData, 64 > m_lights;

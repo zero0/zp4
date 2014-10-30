@@ -584,7 +584,7 @@ void zpApplication::processFrame()
 		m_componentPoolMeshRenderer.render( i );
 
 		// render particles
-		m_componentPoolParticleEmitter.render( i, m_renderingPipeline.getCamera( ZP_CAMERA_TYPE_MAIN ) );
+		//m_componentPoolParticleEmitter.render( i, ZP_NULL );
 
 		// render begin
 		ZP_PROFILE_START( RENDER_BEGIN );

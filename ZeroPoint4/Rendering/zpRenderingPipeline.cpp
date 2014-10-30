@@ -197,16 +197,24 @@ void zpRenderingPipeline::initialize()
 	m_engine->createBuffer( m_perDrawCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
 	m_engine->createBuffer( m_lightBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
 
-	m_cameras.resize( zpCameraType_Count );
-
 	m_cameraStack.reserve( zpCameraType_Count );
 	for( zp_uint i = 0; i < zpCameraType_Count; ++i )
 	{
 		m_cameraStack.pushBackEmpty().reserve( 5 );
 	}
 
+	// fill free camera buffer
+	m_cameras.resize( 8 );
+	zpCamera* bc = m_cameras.begin();
+	zpCamera* ec = m_cameras.end();
+	for( ; bc != ec; ++bc )
+	{
+		m_freeCameras.pushBack( bc );
+	}
+
 	zpCamera* cam;
 	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
+	cam->setActive( true );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
 	cam->setPosition( zpVector4f( 20, 20, 20, 1 ) );
 	cam->setLookAt( zpVector4f( 0, 0, 0, 1 ) );
@@ -224,8 +232,10 @@ void zpRenderingPipeline::initialize()
 	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_DEFAULT );
 	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
 	cam->setDepthStencilBuffer( m_engine->getBackBufferDepthStencilBuffer() );
+	m_debugCamera = cam;
 
 	cam = getCamera( ZP_CAMERA_TYPE_UI );
+	cam->setActive( true );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
 	cam->setPosition( zpVector4f( 0, 0, -1, 1 ) );
 	cam->setLookTo( zpVector4f( 0, 0, 1, 0 ) );
@@ -240,10 +250,12 @@ void zpRenderingPipeline::initialize()
 	cam->setRenderLayers( 1 << 4 );
 	cam->setStencilClear( 0 );
 	cam->setDepthClear( 1.0f );
-	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_NONE );
+	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_DEPTH );
 	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
 	cam->setDepthStencilBuffer( ZP_NULL );
+	m_debugUICamera = cam;
 
+	// fill free light buffer
 	m_lights.resize( 64 );
 	zpLightBufferData* bl = m_lights.begin();
 	zpLightBufferData* el = m_lights.end();
@@ -259,6 +271,9 @@ void zpRenderingPipeline::initialize()
 void zpRenderingPipeline::destroy()
 {
 	releaseLight( m_dirLight );
+
+	releaseCamera( m_debugCamera );
+	releaseCamera( m_debugUICamera );
 
 	m_debugFont.release();
 
@@ -318,37 +333,66 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	i->fillBuffers();
 
 	zpCamera* cam;
-	// 2) process commands, sorting, etc.
-	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
-	i->preprocessCommands( cam, cam->getRenderLayers() );
-	useCamera( i, cam, &m_cameraBuffer );
 
-	// 3) render opaque commands
-	i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
-	processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE, true );
-	processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE_DEBUG, false );
+	// 1.a) render each active 3D camera
+	for( zp_int t = 0; t < ZP_CAMERA_TYPE_UI; ++t )
+	{
+		zpArrayList< zpCamera* >& cameraList = m_usedCameras[ t ];
 
-	// 4) render skybox commands
-	processRenderingQueue( ZP_RENDERING_QUEUE_SKYBOX, false );
+		zpCamera** b = cameraList.begin();
+		zpCamera** e = cameraList.end();
+		for( ; b != e; ++b )
+		{
+			cam = *b;
+			// only process active cameras
+			if( !cam->isActive() ) continue;
 
-	// 5) render transparent commands
-	i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );
-	processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT, true );
-	processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, false );
+			// 2) process commands, sorting, etc.
+			i->preprocessCommands( cam, cam->getRenderLayers() );
+			useCamera( i, cam, &m_cameraBuffer );
 
-	// 6) render overlay commands
-	processRenderingQueue( ZP_RENDERING_QUEUE_OVERLAY, false );
+			// 3) render opaque commands
+			i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
+			processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE, true );
+			processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE_DEBUG, false );
 
+			// 4) render skybox commands
+			processRenderingQueue( ZP_RENDERING_QUEUE_SKYBOX, false );
+
+			// 5) render transparent commands
+			i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );
+			processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT, true );
+			processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, false );
+
+			// 6) render overlay commands
+			processRenderingQueue( ZP_RENDERING_QUEUE_OVERLAY, false );
+		}
+	}
+
+	// perform no UI screenshot
 	if( m_screenshotType == ZP_SCREENSHOT_TYPE_NO_UI ) m_engine->performScreenshot();
 
 	// 7) render UI commands
-	cam = getCamera( ZP_CAMERA_TYPE_UI );
-	i->preprocessCommands( cam, cam->getRenderLayers() );
-	useCamera( i, cam, &m_cameraBuffer );
+	//for( zp_int t = 0; t < ZP_CAMERA_TYPE_UI; ++t )
+	{
+		zpArrayList< zpCamera* >& cameraList = m_usedCameras[ ZP_CAMERA_TYPE_UI ];
 
-	processRenderingQueue( ZP_RENDERING_QUEUE_UI, false );
-	processRenderingQueue( ZP_RENDERING_QUEUE_UI_DEBUG, false );
+		zpCamera** b = cameraList.begin();
+		zpCamera** e = cameraList.end();
+		for( ; b != e; ++b )
+		{
+			cam = *b;
+			if( !cam->isActive() ) continue;
 
+			i->preprocessCommands( cam, cam->getRenderLayers() );
+			useCamera( i, cam, &m_cameraBuffer );
+
+			processRenderingQueue( ZP_RENDERING_QUEUE_UI, false );
+			processRenderingQueue( ZP_RENDERING_QUEUE_UI_DEBUG, false );
+		}
+	}
+
+	// perform full screenshot
 	if( m_screenshotType == ZP_SCREENSHOT_TYPE_ALL ) m_engine->performScreenshot();
 }
 
@@ -607,8 +651,26 @@ void zpRenderingPipeline::generateDepthStencilStateDesc( const zpBison::Value& d
 
 zpCamera* zpRenderingPipeline::getCamera( zpCameraType type )
 {
-	return &m_cameras[ type ];
+	ZP_ASSERT( !m_freeCameras.isEmpty(), "Ran out of cameras" );
+	
+	zpCamera* camera = m_freeCameras.back();
+	m_freeCameras.popBack();
+	
+	m_usedCameras[ type ].pushBack( camera );
+	camera->setCameraType( type );
+
+	return camera;
 }
+void zpRenderingPipeline::releaseCamera( zpCamera* camera )
+{
+	zp_uint count = m_usedCameras[ camera->getCameraType() ].eraseAll( camera );
+
+	ZP_UNUSED( count );
+	ZP_ASSERT( count != 0, "Unknown camera being removed from queue" );
+
+	m_freeCameras.pushBack( camera );
+}
+
 void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer )
 {
 	zpTexture* const* rts = camera->getRenderTargets();
@@ -701,7 +763,6 @@ zp_bool zpRenderingPipeline::takeScreenshot( zpScreenshotType type, const zp_cha
 
 	return ok;
 }
-
 
 zpLightBufferData* zpRenderingPipeline::getLight( zpLightType type )
 {

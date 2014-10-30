@@ -57,8 +57,8 @@ enum
 enum zpCameraType : zp_byte
 {
 	ZP_CAMERA_TYPE_MAIN,
-	ZP_CAMERA_TYPE_UI,
 	ZP_CAMERA_TYPE_CUSTOM,
+	ZP_CAMERA_TYPE_UI,
 
 	zpCameraType_Count,
 };
