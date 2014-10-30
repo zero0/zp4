@@ -3,6 +3,7 @@
     "Tags" : [
     ],
     "Layer" : "Default",
+	"IsStatic" : true,
     "Transform" :
     {
         "Scale" :    [ 20, 2, 20 ]
