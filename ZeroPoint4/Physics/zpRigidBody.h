@@ -7,7 +7,7 @@ public:
 	zpRigidBody();
 	~zpRigidBody();
 
-	void create( const zpBison::Value& v );
+	void create( const zpBison::Value& v, zp_bool isStatic );
 	void initialize( const zpMatrix4f& transform );
 	void destroy();
 

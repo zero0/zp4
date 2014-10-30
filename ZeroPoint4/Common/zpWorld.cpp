@@ -176,19 +176,11 @@ void zpWorld::createWorldObject( const zpBison::Value& def )
 	const zpBison::Value& transform = def[ "Transform" ];
 	if( !transform.isEmpty() )
 	{
-		zp_bool isStatic = o->isFlagSet( ZP_OBJECT_FLAG_STATIC );
-		o->unsetFlag( ZP_OBJECT_FLAG_STATIC );
-
 		const zpMatrix4f& mat = *(const zpMatrix4f*)transform.asData();
 
 		zpMatrix4f transform;
 		zpMath::Mul( transform, o->getTransform(), mat );
 
 		o->setTransform( transform );
-
-		if( isStatic )
-		{
-			o->setFlag( ZP_OBJECT_FLAG_STATIC );
-		}
 	}
 }

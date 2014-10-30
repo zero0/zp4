@@ -6,7 +6,7 @@ zpRigidBodyComponent::zpRigidBodyComponent( zpObject* obj, const zpBison::Value&
 	, m_addOnCreate( true )
 	, m_isAdded( false )
 {
-	m_rigidBody.create( def );
+	m_rigidBody.create( def, obj->isFlagSet( ZP_OBJECT_FLAG_STATIC ) );
 }
 zpRigidBodyComponent::~zpRigidBodyComponent()
 {

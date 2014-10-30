@@ -210,7 +210,7 @@ const zpMatrix4f& zpObject::getTransform() const
 }
 void zpObject::setTransform( const zpMatrix4f& transform )
 {
-	if( !m_flags.isMarked( ZP_OBJECT_FLAG_STATIC ) )
+	if( !m_flags.isMarked( ZP_OBJECT_FLAG_INITIALIZED ) || !m_flags.isMarked( ZP_OBJECT_FLAG_STATIC ) )
 	{
 		m_transform = transform;
 	}

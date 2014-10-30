@@ -20,7 +20,7 @@ zpRigidBody::~zpRigidBody()
 {
 }
 
-void zpRigidBody::create( const zpBison::Value& v )
+void zpRigidBody::create( const zpBison::Value& v, zp_bool isStatic )
 {
 	m_mass = v[ "Mass" ].asFloat();
 
@@ -28,8 +28,7 @@ void zpRigidBody::create( const zpBison::Value& v )
 	m_mask = zpCollisionMask::getInstance()->getCollisionMask( v[ "Mask" ].asCString() );
 	m_collider = zpColliderCache::getInstance()->getCollider( v[ "Collider" ] );
 
-	m_isStatic = m_mass < ZP_RIGID_BODY_STATIC_MASS;
-
+	m_isStatic = m_mass < ZP_RIGID_BODY_STATIC_MASS || isStatic;
 }
 void zpRigidBody::initialize( const zpMatrix4f& transform )
 {
