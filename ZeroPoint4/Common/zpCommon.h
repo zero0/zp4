@@ -10,6 +10,8 @@
 #include "Audio\zpAudio.h"
 #include "Physics\zpPhysics.h"
 
+class zpTags;
+
 class zpGUI;
 class zpApplication;
 class zpComponent;
@@ -37,6 +39,8 @@ class zpProjectileComponent;
 class zpUIComponent;
 
 class zpAllComponents;
+
+#include "zpTags.h"
 
 #include "zpEvent.h"
 #include "zpGUI.h"

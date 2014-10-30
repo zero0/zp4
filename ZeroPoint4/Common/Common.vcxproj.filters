@@ -132,6 +132,9 @@
     <ClInclude Include="zpObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpTags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -205,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="zpKinematicBodyComponent.cpp">
       <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="zpTags.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

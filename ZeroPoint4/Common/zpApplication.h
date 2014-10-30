@@ -109,6 +109,8 @@ public:
 
 	zpProtoDBManager* getProtoDBManager() { return &m_protoDBManager; }
 
+	zpTags* getTags() { return &m_tags; }
+
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp ) zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
 #include "zpAllComponents.inl"
@@ -160,6 +162,8 @@ private:
 	zpWindow m_window;
 
 	zpGUI m_gui;
+
+	zpTags m_tags;
 
 	zpMaterialResourceInstance m_defaultMaterial;
 

@@ -77,6 +77,37 @@ void zpObjectContentManager::destroyAllObjectsInWorld( zpWorld* world )
 	}
 }
 
+void zpObjectContentManager::getAllObjectsInLayer( zp_uint layer, zpArrayList< zpObject* >& objects ) const
+{
+	objects.clear();
+
+	zpObject*const * b = m_used.begin();
+	zpObject*const * e = m_used.end();
+	for( ; b != e; ++b )
+	{
+		zpObject* o = *b;
+		if( o->getLayers().isMarked( layer ) )
+		{
+			objects.pushBack( o );
+		}
+	}
+}
+void zpObjectContentManager::getAllObjectsWithTag( zp_int tag, zpArrayList< zpObject* >& objects ) const
+{
+	objects.clear();
+
+	zpObject*const * b = m_used.begin();
+	zpObject*const * e = m_used.end();
+	for( ; b != e; ++b )
+	{
+		zpObject* o = *b;
+		if( o->getTags().isMarked( tag ) )
+		{
+			objects.pushBack( o );
+		}
+	}
+}
+
 void zpObjectContentManager::update()
 {
 	zpObject** b = m_used.begin();
@@ -185,7 +216,7 @@ void zpObject::setTransform( const zpMatrix4f& transform )
 	}
 }
 
-const zpString& zpObject::getTags() const
+const zpFlag64& zpObject::getTags() const
 {
 	return m_tags;
 }
@@ -196,28 +227,18 @@ void zpObject::clearTags()
 
 zp_bool zpObject::hasTag( const zp_char* tag ) const
 {
-	zp_int index = m_tags.indexOf( tag );
-	return index != zpString::npos;
+	zp_int index = m_application->getTags()->getTag( tag );
+	return m_tags.isMarked( index );
 }
 void zpObject::addTag( const zp_char* tag )
 {
-	if( !hasTag( tag ) )
-	{
-		m_tags.append( tag );
-		m_tags.append( ' ' );
-	}
+	zp_int index = m_application->getTags()->getTag( tag );
+	m_tags.mark( index );
 }
 void zpObject::removeTag( const zp_char* tag )
 {
-	zp_int index = m_tags.indexOf( tag );
-	if( index != zpString::npos )
-	{
-		zp_int end = m_tags.indexOf( ' ', index );
-		if( end != zpString::npos )
-		{
-			m_tags.erase( index, end - index );
-		}
-	}
+	zp_int index = m_application->getTags()->getTag( tag );
+	m_tags.unmark( index );
 }
 
 zp_bool zpObject::hasTag( const zpString& tag ) const
@@ -333,19 +354,20 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 				m_flags.setMarked( ZP_OBJECT_FLAG_ENABLED, enabled.asBool() );
 			}
 
-			// set tags
+			// set tag
 			if( tags.isString() )
 			{
-				m_tags = tags.asCString();
+				addTag( tags.asCString() );
 			}
+			// set tag array
 			else if( tags.isArray() )
 			{
-				zpFixedStringBuffer< 255 > tagsBuff;
-				tags.foreachArray( [ this, &tagsBuff ]( const zpBison::Value& value ) {
-					tagsBuff.append( value.asCString() );
-					tagsBuff.append( ' ' );
+				tags.foreachArray( [ this ]( const zpBison::Value& v ) {
+					if( v.isString() )
+					{
+						addTag( v.asCString() );
+					}
 				} );
-				m_tags = tagsBuff.str();
 			}
 
 			// set transform

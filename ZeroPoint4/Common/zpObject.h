@@ -58,7 +58,7 @@ public:
 	const zpMatrix4f& getTransform() const;
 	void setTransform( const zpMatrix4f& transform );
 
-	const zpString& getTags() const;
+	const zpFlag64& getTags() const;
 	void clearTags();
 
 	zp_bool hasTag( const zp_char* tag ) const;
@@ -88,7 +88,7 @@ private:
 
 	zpMatrix4f m_transform;
 	zpString m_name;
-	zpString m_tags;
+	zpFlag64 m_tags;
 	zpFlag32 m_layers;
 	zpFlag32 m_flags;
 	zp_long m_lastLoadTime;
@@ -110,6 +110,9 @@ public:
 
 	void destroyAllObjects( zp_bool isWorldSwap );
 	void destroyAllObjectsInWorld( zpWorld* world );
+
+	void getAllObjectsInLayer( zp_uint layer, zpArrayList< zpObject* >& objects ) const;
+	void getAllObjectsWithTag( zp_int tag, zpArrayList< zpObject* >& objects ) const;
 
 	void update();
 	void simulate();
