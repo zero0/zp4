@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT x64"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/SWT x86"/>
 	<classpathentry kind="lib" path="lib/swt-x64.jar" sourcepath="lib/swt-src.zip"/>
@@ -10,5 +9,18 @@
 	<classpathentry kind="lib" path="lib/jackson-core-2.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/ant-launcher.jar"/>
+	<classpathentry kind="lib" path="lib/lib/winstone-1.0.5.jar"/>
+	<classpathentry kind="lib" path="lib/winstone-1.0.5-boot.jar"/>
+	<classpathentry kind="lib" path="lib/lib/jndi-1.0.5.jar"/>
+	<classpathentry kind="lib" path="lib/lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/lib/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/lib/slf4j-log4j12-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-el.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-api.jar"/>
+	<classpathentry kind="lib" path="lib/jasper-compiler.jar"/>
+	<classpathentry kind="lib" path="lib/jasper-runtime.jar"/>
+	<classpathentry kind="lib" path="lib/jsp-api.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_21"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

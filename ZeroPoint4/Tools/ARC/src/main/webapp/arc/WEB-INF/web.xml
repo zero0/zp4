@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<display-name>Servlet 2.4 Examples</display-name>
+	<description>
+		Servlet 2.4 Examples.
+	</description>
+
+	<servlet>
+		<servlet-name>ArcServlet</servlet-name>
+		<servlet-class>org.zero0.zeropoint.tools.arc.webapp.servlet.ArcServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ArcServlet</servlet-name>
+		<url-pattern>/arc</url-pattern>
+	</servlet-mapping>
+</web-app>

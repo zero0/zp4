@@ -178,7 +178,7 @@ public final class Parser
 			ParserToken token = new ParserToken();
 			readToken( token );
 			
-			boolean ok = false;
+			boolean ok = true;
 			switch( token.type )
 			{
 			case ZP_JSON_TOKEN_OBJECT_OPEN:
@@ -206,7 +206,7 @@ public final class Parser
 				break;
 			}
 			
-			return true;
+			return ok;
 		}
 		
 		private void pushNewValue( Value jsonValue )
