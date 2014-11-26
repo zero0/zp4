@@ -73,10 +73,12 @@ struct zpVertexNormalTexture
 };
 
 
-class FbxMessCompiler : public BaseMeshCompiler
+class FbxMeshCompiler : public BaseMeshCompiler
 {
 public:
-	virtual ~FbxMessCompiler();
+	virtual ~FbxMeshCompiler();
+
+	zp_bool importCallback( zp_float percent, const zp_char* status );
 
 protected:
 	zp_bool compileMesh();

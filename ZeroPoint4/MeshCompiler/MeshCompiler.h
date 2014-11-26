@@ -42,6 +42,18 @@ struct MeshData
 	zpArrayList< MeshDataPart > parts;
 };
 
+struct MeshJoint
+{
+	zpString name;
+	zp_int parent;
+	zpMatrix4f transform;
+};
+
+struct MeshAnimationData
+{
+	zpArrayList< MeshJoint > joints;
+};
+
 class BaseMeshCompiler
 {
 public:

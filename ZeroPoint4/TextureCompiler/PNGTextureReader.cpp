@@ -1,13 +1,8 @@
 #include "Main.h"
 #include <png.h>
 
-#if ZP_DEBUG
-#pragma comment( lib, "zlibd.lib" )
-#pragma comment( lib, "libpng16d.lib" )
-#else
 #pragma comment( lib, "zlib.lib" )
 #pragma comment( lib, "libpng16.lib" )
-#endif
 
 zp_bool PNGTextureReader::getTextureBytes( const zpDataBuffer& fileData, ImageData& imageData )
 {

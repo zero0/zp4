@@ -4,7 +4,7 @@
 
 #pragma comment( lib, "libfbxsdk-md" )
 
-FbxMessCompiler::~FbxMessCompiler()
+FbxMeshCompiler::~FbxMeshCompiler()
 {
 }
 
@@ -614,7 +614,7 @@ bool _ProgressCallback( void* pArgs, float pPercentage, const char* pStatus )
 	return true;
 }
 
-zp_bool FbxMessCompiler::compileMesh()
+zp_bool FbxMeshCompiler::compileMesh()
 {
 	zp_bool ok = false;
 

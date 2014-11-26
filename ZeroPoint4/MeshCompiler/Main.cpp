@@ -29,7 +29,7 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		}
 		else if( inputFilename.endsWith( ".fbx" ) )
 		{
-			compiler = new FbxMessCompiler;
+			compiler = new FbxMeshCompiler;
 		}
 
 		if( compiler )
