@@ -54,12 +54,7 @@ zpArrayList<T>::zpArrayList( zpArrayList&& arr )
 template<typename T>
 zpArrayList<T>::~zpArrayList()
 {
-	clear();
-
-	if( !m_isFixed )
-	{
-		ZP_SAFE_DELETE_ARRAY( m_array );
-	}
+	destroy();
 }
 
 template<typename T>
@@ -241,6 +236,18 @@ void zpArrayList<T>::resize( zp_uint size )
 {
 	ensureCapacity( size );
 	m_size = size;
+}
+
+template<typename T>
+void zpArrayList<T>::destroy()
+{
+	clear();
+
+	if( !m_isFixed )
+	{
+		ZP_SAFE_DELETE_ARRAY( m_array );
+		m_capacity = 0;
+	}
 }
 
 template<typename T>

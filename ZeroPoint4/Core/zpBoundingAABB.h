@@ -24,6 +24,7 @@ public:
 	void getCenter( zpVector4f& outCenter ) const;
 	void setCenter( const zpVector4f& center );
 	void getExtents( zpVector4f& outExtents ) const;
+	void setExtents( const zpVector4f& extents );
 
 	void generateBoundingSphere( zpBoundingSphere& sphere, zp_bool isSphereContained = false ) const;
 

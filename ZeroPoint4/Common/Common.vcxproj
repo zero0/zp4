@@ -86,6 +86,7 @@
     <ClInclude Include="zpLightComponent.h" />
     <ClInclude Include="zpMeshRendererComponent.h" />
     <ClInclude Include="zpObject.h" />
+    <ClInclude Include="zpOctree.h" />
     <ClInclude Include="zpParticleEmitterComponent.h" />
     <ClInclude Include="zpProjectileComponent.h" />
     <ClInclude Include="zpRigidBodyComponent.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="zpLightComponent.cpp" />
     <ClCompile Include="zpMeshRendererComponent.cpp" />
     <ClCompile Include="zpObject.cpp" />
+    <ClCompile Include="zpOctree.cpp" />
     <ClCompile Include="zpParticleEmitterComponent.cpp" />
     <ClCompile Include="zpProjectileComponent.cpp" />
     <ClCompile Include="zpRigidBodyComponent.cpp" />
@@ -151,6 +153,7 @@
     <None Include="zpAllComponents.inl" />
     <None Include="zpAllGameManagers.inl" />
     <None Include="zpComponentManager.inl" />
+    <None Include="zpOctree.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

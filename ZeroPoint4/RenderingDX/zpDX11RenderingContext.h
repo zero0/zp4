@@ -17,6 +17,7 @@ public:
 	void clearDepthBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_float clearDepth );
 	void clearStencilBuffer( zpDepthStencilBuffer* depthStencilBuffer, zp_uint clearStencil );
 	void clearState();
+	void flush();
 
 	void setViewport( const zpViewport& viewport );
 	void setScissorRect( const zpRecti& rect );

@@ -53,6 +53,10 @@ void zpRenderingContextImpl::clearState()
 	m_prevMaterial = ZP_NULL;
 	m_context->ClearState();
 }
+void zpRenderingContextImpl::flush()
+{
+	m_context->Flush();
+}
 
 void zpRenderingContextImpl::setViewport( const zpViewport& viewport )
 {

@@ -523,6 +523,7 @@ zp_float zpApplication::getLoadingWorldProgress() const
 void zpApplication::processFrame()
 {
 	m_timer->tick();
+	zp_long now = m_timer->getTime();
 
 	ZP_PROFILE_START( FRAME );
 
@@ -550,8 +551,7 @@ void zpApplication::processFrame()
 	ZP_PROFILE_END( HOT_RELOAD );
 #endif
 
-	zp_long now = m_timer->getTime();
-	zp_uint numUpdates = 0;
+	zp_int numUpdates = 0;
 
 	// update
 	ZP_PROFILE_START( UPDATE );

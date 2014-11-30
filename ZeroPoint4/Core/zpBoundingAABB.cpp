@@ -71,6 +71,14 @@ void zpBoundingAABB::getExtents( zpVector4f& outExtense ) const
 	zpMath::Sub( outExtense, m_max, m_min );
 	zpMath::Mul( outExtense, outExtense, zpScalar( 0.5f ) );
 }
+void zpBoundingAABB::setExtents( const zpVector4f& extents )
+{
+	zpVector4f c;
+	getCenter( c );
+
+	zpMath::Add( m_max, c, extents );
+	zpMath::Sub( m_min, c, extents );
+}
 
 void zpBoundingAABB::generateBoundingSphere( zpBoundingSphere& sphere, zp_bool isSphereContained ) const
 {

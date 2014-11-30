@@ -135,6 +135,9 @@
     <ClInclude Include="zpTags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpOctree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -212,6 +215,9 @@
     <ClCompile Include="zpTags.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpOctree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpAllComponents.inl">
@@ -221,6 +227,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="zpComponentManager.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="zpOctree.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

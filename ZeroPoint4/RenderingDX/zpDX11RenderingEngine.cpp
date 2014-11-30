@@ -128,8 +128,6 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 	}
 
 	// create the immediate context wrapper
-	//m_immediateContext = new zpDX11RenderingContext( immediate, zpString( "immediate" ) );
-	//outImmediateContext = new zpRenderingContextImpl( immediate );
 	m_immidiateContext.set( immediate );
 	outImmediateContext = &m_immidiateContext;
 
@@ -189,6 +187,13 @@ void zpRenderingEngineImpl::destroy()
 	} );
 	m_inputLayouts.clear();
 
+	m_samplerStates.clear();
+	m_rasterStates.clear();
+	m_depthStencilStates.clear();
+	m_blendStates.clear();
+
+	ZP_SAFE_RELEASE( m_screenshotTexture );
+
 	ZP_SAFE_RELEASE( m_swapChain );
 	ZP_SAFE_RELEASE( m_d3dDevice );
 }
@@ -197,6 +202,10 @@ void zpRenderingEngineImpl::shutdown()
 	ZP_ASSERT( m_usedTextures.isEmpty(), "Texture still in use" );
 	ZP_ASSERT( m_usedBuffers.isEmpty(), "Buffer still in use" );
 	ZP_ASSERT( m_usedShaders.isEmpty(), "Shader still in use" );
+
+	m_textures.clear();
+	m_buffers.clear();
+	m_shaders.clear();
 
 	ZP_SAFE_RELEASE( m_dxgiAdapter );
 	ZP_SAFE_RELEASE( m_dxgiFactory );

@@ -40,6 +40,9 @@ class zpUIComponent;
 
 class zpAllComponents;
 
+class zpOctree;
+class zpOctreeNode;
+
 #include "zpTags.h"
 
 #include "zpEvent.h"
@@ -79,6 +82,7 @@ class zpAllComponents;
 #include "zpWorld.h"
 #include "zpApplication.h"
 
+#include "zpOctree.h"
 
 template< typename T, zp_uint count >
 zp_bool zpBisonStringToEnum( const zp_char* (&e)[ count ], const zpBison::Value& str, T& t )

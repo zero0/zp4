@@ -47,6 +47,9 @@ void zpRenderingContext::destroy()
 		m_renderingEngine->destroyBuffer( m_immediateVertexBuffers[i] );
 		m_renderingEngine->destroyBuffer( m_immediateIndexBuffers[i] );
 	}
+
+	clearState();
+	flush();
 }
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture* const* targets, zpDepthStencilBuffer* depthStencilBuffer )
@@ -75,6 +78,10 @@ void zpRenderingContext::clearStencilBuffer( zpDepthStencilBuffer* depthStencilB
 void zpRenderingContext::clearState()
 {
 	m_renderContextImpl->clearState();
+}
+void zpRenderingContext::flush()
+{
+	m_renderContextImpl->flush();
 }
 
 void zpRenderingContext::setViewport( const zpViewport& viewport )
