@@ -669,7 +669,7 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 	{
 		for( ; cmd != end; ++cmd )
 		{
-			// if the command has no vertices, don't add it
+			// if the command has no verts, don't add it
 			if( cmd->vertexCount == 0 ) continue;
 
 			// if the camera does not support any layer the command is not, don't add it
@@ -684,9 +684,10 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 			case ZP_RENDERING_QUEUE_UI_DEBUG:
 				m_filteredCommands[ cmd->queue ].pushBack( cmd );
 				break;
+
 				// otherwise, sort and cull commands based on the camera and its frustum
 			default:
-				//if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
+				if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
 				{
 					generateSortKeyForCommand( cmd, camera );
 					m_filteredCommands[ cmd->queue ].pushBack( cmd );
@@ -699,7 +700,7 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 	{
 		for( ; cmd != end; ++cmd )
 		{
-			// if the command has no vertices, don't add it
+			// if the command has no verts, don't add it
 			if( cmd->vertexCount == 0 ) continue;
 
 			// if the camera does not support any layer the command is not, don't add it

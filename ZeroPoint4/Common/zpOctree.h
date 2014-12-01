@@ -27,6 +27,8 @@ public:
 	template<typename Func>
 	void foreach( Func foreachFunc ) const;
 
+	const zpBoundingAABB& getBounds() const;
+
 private:
 	enum zpOctreeNodeSide
 	{
@@ -60,6 +62,7 @@ class zpOctree
 {
 public:
 	zpOctree();
+	zpOctree( const zpBoundingAABB& bounds );
 	~zpOctree();
 
 	void update();

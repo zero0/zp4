@@ -2,11 +2,13 @@
 
 zpOctree::zpOctree()
 {
-
+}
+zpOctree::zpOctree( const zpBoundingAABB& bounds )
+	: m_root( bounds )
+{
 }
 zpOctree::~zpOctree()
 {
-
 }
 
 void zpOctree::update()
@@ -173,6 +175,11 @@ zp_bool zpOctreeNode::insert( zpObject* obj )
 	if( m_children[ BSE ]->insert( obj ) ) return true;
 
 	return false;
+}
+
+const zpBoundingAABB& zpOctreeNode::getBounds() const
+{
+	return m_bounds;
 }
 
 zp_bool zpOctreeNode::add( zpObject* obj )

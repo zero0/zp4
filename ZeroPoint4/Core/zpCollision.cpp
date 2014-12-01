@@ -234,7 +234,8 @@ zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBounding
 
 	zpVector4f absP;
 	zpScalar d, r;
-	zpScalar n, v;
+	zpScalar nd;
+	zpScalar dpr, dmr;
 	zp_int c;
 
 	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
@@ -242,22 +243,23 @@ zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBounding
 	{
 		const zpVector4f& p = a.getPlane( (zpFrustumPlane)i ).getVector();
 		zpMath::Abs( absP, p );
-
+		
 		zpMath::Dot3( d, center, p );
 		zpMath::Dot3( r, extence, absP );
+		
+		zpMath::Neg( nd, p.getW() );
+		
+		zpMath::Add( dpr, d, r );
+		zpMath::Sub( dmr, d, r );
 
-		zpMath::Neg( n, p.getW() );
-
-		zpMath::Add( v, d, r );
-		zpMath::Cmp( c, v, n );
+		zpMath::Cmp( c, dpr, nd );
 		if( c < 0 )
 		{
 			type = ZP_COLLISION_TYPE_NONE;
 			break;
 		}
-
-		zpMath::Sub( v, d, r );
-		zpMath::Cmp( c, v, n );
+		
+		zpMath::Cmp( c, dmr, nd );
 		if( c < 0 )
 		{
 			type = ZP_COLLISION_TYPE_INTERSECT;
