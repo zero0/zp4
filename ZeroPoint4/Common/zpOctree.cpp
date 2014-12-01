@@ -51,7 +51,6 @@ zpOctreeNode::~zpOctreeNode()
 	m_children.foreach( []( zpOctreeNode* node ) {
 		delete node;
 	} );
-	m_children.clear();
 }
 
 zp_uint zpOctreeNode::update( zpArrayList< zpObject* >& updatedObjects )
@@ -85,19 +84,19 @@ zp_uint zpOctreeNode::update( zpArrayList< zpObject* >& updatedObjects )
 	{
 		zp_uint numChildObjects = 0;
 
-		numChildObjects += m_children[ TNW ]->update( updatedObjects );
-		numChildObjects += m_children[ TNE ]->update( updatedObjects );
-		numChildObjects += m_children[ TSW ]->update( updatedObjects );
-		numChildObjects += m_children[ TSE ]->update( updatedObjects );
+		// update children
+		m_children.foreach( [ &numChildObjects, &updatedObjects ]( zpOctreeNode* node ) {
+			numChildObjects += node->update( updatedObjects );
+		} );
 
-		numChildObjects += m_children[ BNW ]->update( updatedObjects );
-		numChildObjects += m_children[ BNE ]->update( updatedObjects );
-		numChildObjects += m_children[ BSW ]->update( updatedObjects );
-		numChildObjects += m_children[ BSE ]->update( updatedObjects );
-
+		// if there are no more objects in the child nodes, become a leaf again
 		if( numChildObjects == 0 )
 		{
-			m_children.clear();
+			m_children.foreach( []( zpOctreeNode* node ) {
+				delete node;
+			} );
+			m_children.destroy();
+
 			m_type = ZP_OCTREE_NODE_TYPE_LEAF;
 		}
 	}
