@@ -21,7 +21,7 @@ public final class Main
 	public static void main( String[] args )
 	{
 		IArcProcessor p = new ArcSequentialProcessor();
-		p.run();
+		//p.run();
 		
 		String endorsed = System.getProperty("java.endorsed.dirs");
 		System.out.println( endorsed );
@@ -32,7 +32,7 @@ public final class Main
 		//serverArgs.put( "webroot", "./www/servlets-examples" );
 		serverArgs.put( "webroot", "./src/main/webapp/arc" );
 		serverArgs.put( "useJasper", null );
-		serverArgs.put( "javaHome", System.getenv( "JAVA_HOME" ).replace( " ", "%20" ) );
+		//serverArgs.put( "javaHome", System.getenv( "JAVA_HOME" ).replace( " ", "%20" ) );
 		
 		BootStrap b = new BootStrap( serverArgs );
 		Server s = b.boot();

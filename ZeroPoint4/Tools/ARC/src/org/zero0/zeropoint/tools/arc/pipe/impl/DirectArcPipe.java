@@ -7,7 +7,6 @@ import org.zero0.zeropoint.tools.arc.pipe.IArcTarget;
 
 public class DirectArcPipe extends AbstractArcPipe
 {
-	@Override
 	public boolean process()
 	{
 		IArcResource resource = produceResouce();
@@ -23,14 +22,12 @@ public class DirectArcPipe extends AbstractArcPipe
 	{
 	}
 
-	@Override
 	public boolean visit( IArcSource source )
 	{
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public boolean visit( IArcTarget target )
 	{
 		// TODO Auto-generated method stub
