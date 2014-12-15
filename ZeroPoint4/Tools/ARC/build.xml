@@ -29,7 +29,11 @@
 	<property name="world-compiler.exe" value="${exe.dir}/ObjectCompiler.exe" />
 
 	<property name="build-number.file" value="${ant.project.name}.buildnumber" />
-
+	
+	<property name="arc.tool.dir" value="${base.dir}/Tools/ARC" />
+	<property name="arc.src.dir" value="${arc.tool.dir}/src" />
+	<property name="arc.bin.dir" value="${arc.tool.dir}/bin" />
+	
 	<mapper id="shader.map" type="glob" from="*.shader" to="*.shaderb" />
 	<mapper id="material.map" type="glob" from="*.material" to="*.materialb" />
 	<mapper id="texture.map" type="glob" from="*.png" to="*.png" />
@@ -49,6 +53,26 @@
 	<fileset id="world.files" dir="${assets.dir}" includes="**/*.world" casesensitive="true" />
 	<fileset id="script.files" dir="${assets.dir}" includes="**/*.script" casesensitive="true" />
 	<fileset id="sound.files" dir="${assets.dir}" includes="**/*.wav" casesensitive="true" />
+	
+	<fileset id="arc.src.files" dir="${arc.src.dir}" includes="**/*.java" casesensitive="true" />
+	
+	<target name="arc">
+		<javac srcdir="${arc.src.dir}" destdir="${arc.bin.dir}" includeAntRuntime="false">
+			<classpath>
+                <fileset dir="${arc.tool.dir}/lib">
+                    <include name="**/*.jar" />
+                </fileset>
+            </classpath>
+		</javac>
+		<java classname="org.zero0.zeropoint.tools.arc.workspace.Main" fork="true" dir="${arc.tool.dir}">
+			<classpath>
+                <pathelement path="${arc.bin.dir}" />
+				<fileset dir="${arc.tool.dir}/lib">
+                    <include name="**/*.jar" />
+                </fileset>
+            </classpath>
+		</java>
+	</target>
 	
 	<target name="usage">
 		<echo message="base = ${base.dir}" />
