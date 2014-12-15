@@ -1,208 +1,162 @@
 #include "zpCore.h"
 
 zpBoundingAABB::zpBoundingAABB()
-	: m_min( ZP_FLT_MAX, ZP_FLT_MAX, ZP_FLT_MAX, 1.0f )
-	, m_max( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN, 1.0f )
+	: m_center( 0.f, 0.f, 0.f )
+	, m_extent( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN )
 {}
 zpBoundingAABB::zpBoundingAABB( zp_float width, zp_float height, zp_float depth )
-	: m_min( width * -0.5f, height * -0.5f, depth * -0.5f )
-	, m_max( width * 0.5f, height * 0.5f, depth * 0.5f )
-{}
-zpBoundingAABB::zpBoundingAABB( const zpVector4f& min, const zpVector4f& max )
-	: m_min( min )
-	, m_max( max )
+	: m_center( 0.f, 0.f, 0.f )
+	, m_extent( width * 0.5f, height * 0.5f, depth * 0.5f )
 {}
 zpBoundingAABB::zpBoundingAABB( const zpBoundingAABB& box )
-	: m_min( box.m_min )
-	, m_max( box.m_max )
+	: m_center( box.m_center )
+	, m_extent( box.m_extent )
 {}
 zpBoundingAABB::zpBoundingAABB( zpBoundingAABB&& box )
-	: m_min( box.m_min )
-	, m_max( box.m_max )
+	: m_center( box.m_center )
+	, m_extent( box.m_extent )
 {}
 zpBoundingAABB::~zpBoundingAABB()
 {}
 
 void zpBoundingAABB::operator=( const zpBoundingAABB& box )
 {
-	m_min = box.m_min;
-	m_max = box.m_max;
+	m_center = box.m_center;
+	m_extent = box.m_extent;
 }
 void zpBoundingAABB::operator=( zpBoundingAABB&& box )
 {
-	m_min = box.m_min;
-	m_max = box.m_max;
+	m_center = box.m_center;
+	m_extent = box.m_extent;
 }
 
-const zpVector4f& zpBoundingAABB::getMin() const
+void zpBoundingAABB::reset()
 {
-	return m_min;
+	m_center = zpVector4f( 0.f, 0.f, 0.f );
+	m_extent = zpVector4f( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN );
 }
-const zpVector4f& zpBoundingAABB::getMax() const
+
+zpVector4f zpBoundingAABB::getMin() const
 {
-	return m_max;
+	zpVector4f min;
+	zpMath::Sub( min, m_center, m_extent );
+	return min;
+}
+zpVector4f zpBoundingAABB::getMax() const
+{
+	zpVector4f max;
+	zpMath::Add( max, m_center, m_extent );
+	return max;
 }
 void zpBoundingAABB::setMin( const zpVector4f& min )
 {
-	m_min = min;
+	setMinMax( min, getMax() );
 }
 void zpBoundingAABB::setMax( const zpVector4f& max )
 {
-	m_max = max;
+	setMinMax( getMin(), max );
+}
+void zpBoundingAABB::setMinMax( const zpVector4f& min, const zpVector4f& max )
+{
+	zpMath::Sub( m_extent, max, min );
+	zpMath::Mul( m_extent, m_extent, zpScalar( 0.5f ) );
+	zpMath::Add( m_center, min, m_extent );
 }
 
-void zpBoundingAABB::getCenter( zpVector4f& outCenter ) const
+const zpVector4f& zpBoundingAABB::getCenter() const
 {
-	zpMath::Add( outCenter, m_min, m_max );
-	zpMath::Mul( outCenter, outCenter, zpScalar( 0.5f ) );
+	return m_center;
 }
 void zpBoundingAABB::setCenter( const zpVector4f& center )
 {
-	zpVector4f t;
-	zpVector4f c;
-	getCenter( c );
-
-	zpMath::Sub( t, center, c );
-
-	translate( t );
+	m_center = center;
 }
-void zpBoundingAABB::getExtents( zpVector4f& outExtense ) const
+const zpVector4f& zpBoundingAABB::getExtents() const
 {
-	zpMath::Sub( outExtense, m_max, m_min );
-	zpMath::Mul( outExtense, outExtense, zpScalar( 0.5f ) );
+	return m_extent;
 }
 void zpBoundingAABB::setExtents( const zpVector4f& extents )
 {
-	zpVector4f c;
-	getCenter( c );
-
-	zpMath::Add( m_max, c, extents );
-	zpMath::Sub( m_min, c, extents );
+	m_extent = extents;
 }
 
-void zpBoundingAABB::generateBoundingSphere( zpBoundingSphere& sphere, zp_bool isSphereContained ) const
+void zpBoundingAABB::generateBoundingSphere( zpBoundingSphere& sphere ) const
 {
-	zpScalar r, a, b;
-	zpVector4f center;
-	getCenter( center );
+	zpScalar r;
+	zpMath::Length3( r, m_extent );
 
-	if( isSphereContained )
-	{
-		zpMath::Sub( a, m_max.getX(), m_min.getX() );
-		zpMath::Sub( b, m_max.getY(), m_min.getY() );
-
-		zpMath::Min( r, a, b );
-
-		zpMath::Sub( a, m_max.getZ(), m_min.getZ() );
-		zpMath::Min( r, a, r );
-
-		zpMath::Mul( r, r, zpScalar( 0.5f ) );
-	}
-	else
-	{
-		zpVector4f maxLength( m_max );
-		zpVector4f minLength( m_min );
-
-		zpMath::Sub( maxLength, maxLength, center );
-		zpMath::Sub( minLength, minLength, center );
-		
-		zpMath::Length3( a, minLength );
-		zpMath::Length3( b, maxLength );
-
-		zpMath::Max( r, a, b );
-	}
-
-	sphere.setCenter( center );
+	sphere.setCenter( m_center );
 	sphere.setRadius( r );
 }
 
 zpScalar zpBoundingAABB::getWidth() const
 {
 	zpScalar s;
-	zpMath::Sub( s, m_max.getX(), m_min.getX() );
+	zpMath::Mul( s, m_extent.getX(), zpScalar( 2.f ) );
 	return s;
 }
 zpScalar zpBoundingAABB::getHeight() const
 {
 	zpScalar s;
-	zpMath::Sub( s, m_max.getY(), m_min.getY() );
+	zpMath::Mul( s, m_extent.getY(), zpScalar( 2.f ) );
 	return s;
 }
 zpScalar zpBoundingAABB::getDepth() const
 {
 	zpScalar s;
-	zpMath::Sub( s, m_max.getZ(), m_min.getZ() );
+	zpMath::Mul( s, m_extent.getZ(), zpScalar( 2.f ) );
+	return s;
+}
+zpVector4f zpBoundingAABB::getSize() const
+{
+	zpVector4f s;
+	zpMath::Mul( s, m_extent, zpVector4f( 2.f, 2.f, 2.f ) );
 	return s;
 }
 
 void zpBoundingAABB::translate( const zpVector4f& translate )
 {
-	zpMath::Add( m_min, m_min, translate );
-	zpMath::Add( m_max, m_max, translate );
+	zpMath::Add( m_center, m_center, translate );
 }
 void zpBoundingAABB::scale( const zpScalar& scale )
 {
-	zpMath::Mul( m_min, m_min, scale );
-	zpMath::Mul( m_max, m_max, scale );
+	zpMath::Mul( m_extent, m_extent, scale );
 }
 void zpBoundingAABB::scale( const zpVector4f& scale )
 {
-	zpMath::Mul( m_min, m_min, scale );
-	zpMath::Mul( m_max, m_max, scale );
+	zpMath::Mul( m_extent, m_extent, scale );
 }
 void zpBoundingAABB::pad( const zpScalar& padding )
 {
-	zpMath::Sub( m_min, m_min, padding );
-	zpMath::Add( m_max, m_max, padding );
+	zpMath::Add( m_extent, m_extent, padding );
 }
 void zpBoundingAABB::pad( const zpVector4f& padding )
 {
-	zpMath::Sub( m_min, m_min, padding );
-	zpMath::Add( m_max, m_max, padding );
+	zpMath::Add( m_extent, m_extent, padding );
 }
 
 void zpBoundingAABB::add( zp_float x, zp_float y, zp_float z )
 {
-	//add( zpScalar( x ), zpScalar( y ), zpScalar( z ) );
 	add( zpVector4f( x, y, z, 1.0f ) );
 }
 void zpBoundingAABB::add( const zpScalar& x, const zpScalar& y, const zpScalar& z )
 {
-	//zpScalar r;
-	//
-	//// x
-	//zpMath::Max( r, x, m_max.getX() );
-	//m_max.setX( r );
-	//
-	//zpMath::Min( r, x, m_min.getX() );
-	//m_min.setX( r );
-	//
-	//// y
-	//zpMath::Max( r, y, m_max.getY() );
-	//m_max.setY( r );
-	//
-	//zpMath::Min( r, y, m_min.getY() );
-	//m_min.setY( r );
-	//
-	//// z
-	//zpMath::Max( r, z, m_max.getZ() );
-	//m_max.setZ( r );
-	//
-	//zpMath::Min( r, z, m_min.getZ() );
-	//m_min.setZ( r );
-	add( zpVector4f( x, y, z, zpScalar( 1.0f ) ) );
+	add( zpVector4f( x, y, z ) );
 }
 void zpBoundingAABB::add( const zpVector4f& point )
 {
-	zpMath::Max( m_max, point, m_max );
-	zpMath::Min( m_min, point, m_min );
+	zpVector4f& min = getMin();
+	zpVector4f& max = getMax();
 
-	//add( point.getX(), point.getY(), point.getZ() );
+	zpMath::Max( max, point, max );
+	zpMath::Min( min, point, min );
+
+	setMinMax( min, max );
 }
 void zpBoundingAABB::add( const zpBoundingAABB& box )
 {
-	add( box.m_min );
-	add( box.m_max );
+	add( box.getMin() );
+	add( box.getMax() );
 }
 void zpBoundingAABB::add( const zpBoundingSphere& sphere )
 {

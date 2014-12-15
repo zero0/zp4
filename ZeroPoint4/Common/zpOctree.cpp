@@ -201,12 +201,12 @@ void zpOctreeNode::subdivide()
 		m_children.pushBack( new zpOctreeNode );
 	}
 
-	zpVector4f center;
-	zpVector4f halfSize;
+	zpVector4f center = m_bounds.getCenter();
+	zpVector4f halfSize = m_bounds.getExtents();
 	zpVector4f quartSize;
 	zpVector4f c;
 
-	zpVector4f offsets[] =
+	static const zpVector4f offsets[] =
 	{
 		zpVector4f(  1,  1,  1 ),
 		zpVector4f( -1,  1,  1 ),
@@ -218,8 +218,6 @@ void zpOctreeNode::subdivide()
 		zpVector4f( -1, -1, -1 ),
 	};
 
-	m_bounds.getCenter( center );
-	m_bounds.getExtents( halfSize );
 	zpMath::Mul( quartSize, halfSize, zpScalar( 0.5f ) );
 
 	for( zp_int i = 0; i < zpOctreeNodeSide_Count; ++i )

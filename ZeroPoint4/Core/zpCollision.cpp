@@ -9,13 +9,16 @@ zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpVec
 	zpScalar y( b.getY() );
 	zpScalar z( b.getZ() );
 	
+	zpVector4f min = a.getMin();
+	zpVector4f max = a.getMax();
+
 	return
-		zpMath::Cmp( x, a.getMin().getX() ) > 0 &&
-		zpMath::Cmp( y, a.getMin().getY() ) > 0 &&
-		zpMath::Cmp( z, a.getMin().getZ() ) > 0 &&
-		zpMath::Cmp( x, a.getMax().getX() ) < 0 &&
-		zpMath::Cmp( y, a.getMax().getY() ) < 0 &&
-		zpMath::Cmp( z, a.getMax().getZ() ) < 0 ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
+		zpMath::Cmp( x, min.getX() ) > 0 &&
+		zpMath::Cmp( y, min.getY() ) > 0 &&
+		zpMath::Cmp( z, min.getZ() ) > 0 &&
+		zpMath::Cmp( x, max.getX() ) < 0 &&
+		zpMath::Cmp( y, max.getY() ) < 0 &&
+		zpMath::Cmp( z, max.getZ() ) < 0 ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpRay& b )
 {
@@ -32,85 +35,6 @@ zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpRay
 	zpMath::Min( tmin, t1, t2 );
 	zpMath::Max( tmax, t1, t2 );
 
-	//zpVector4f inv( 1, 1, 1, 1 );
-	//inv.div4( b.getDirection() );
-	//
-	//zpScalar tx1( ( a.getMin().getX() - b.getOrigin().getX() ) * inv.getX() );
-	//zpScalar tx2( ( a.getMax().getX() - b.getOrigin().getX() ) * inv.getX() );
-	//
-	//zpScalar txmin;
-	//zpScalar txmax;
-	//zpScalarMin( txmin, tx1, tx2 );
-	//zpScalarMax( txmax, tx1, tx2 );
-	//
-	//zpScalar ty1( ( a.getMin().getY() - b.getOrigin().getY() ) * inv.getY() );
-	//zpScalar ty2( ( a.getMax().getY() - b.getOrigin().getY() ) * inv.getY() );
-	//
-	//zpScalar tymin;
-	//zpScalar tymax;
-	//zpScalarMin( tymin, ty1, ty2 );
-	//zpScalarMax( tymax, ty1, ty2 );
-	//
-	//if( zpScalarGt( txmin, tymax ) || zpScalarGt( tymin, txmax ) ) return ZP_COLLISION_TYPE_NONE;
-	//if( zpScalarGt( tymin, txmin ) ) txmin = tymin;
-	//if( zpScalarLt( tymax, txmax ) ) txmax = tymax;
-	//
-	//zpScalar tz1( ( a.getMin().getZ() - b.getOrigin().getZ() ) * inv.getZ() );
-	//zpScalar tz2( ( a.getMax().getZ() - b.getOrigin().getZ() ) * inv.getZ() );
-	//
-	//zpScalar tzmin;
-	//zpScalar tzmax;
-	//zpScalarMin( tzmin, tz1, tz2 );
-	//zpScalarMax( tzmax, tz1, tz2 );
-	//
-	//if( zpScalarGt( txmin, tzmax ) || zpScalarGt( tzmin, txmax ) ) return ZP_COLLISION_TYPE_NONE;
-	//if( zpScalarGt( tzmin, txmin ) ) txmin = tzmin;
-	//if( zpScalarLt( tzmax, txmax ) ) txmax = tzmax;
-	//
-	//if( zpScalarGte( txmax, txmin ) ) {
-	//	if( testCollision( a, b.getOrigin() ) != ZP_COLLISION_TYPE_NONE ) return ZP_COLLISION_TYPE_CONTAINS;
-	//	return ZP_COLLISION_TYPE_INTERSECT;
-	//}
-	/*
-	zpVector4f inv( 1, 1, 1 ), minDir( a.getMin() ), maxDir( a.getMax() ), t1, t2, tmin, tmax;
-	inv.div3( b.getDirection() );
-	minDir.sub3( b.getOrigin() );
-	maxDir.sub3( b.getOrigin() );
-
-	t1.set3( minDir );
-	t1.div3( inv );
-
-	t2.set3( maxDir );
-	t2.div3( inv );
-
-
-	zpVector4fDiv( inv, zpScalar( 1.0f ), r.m_direction );
-	zpVector4fSub( minDir, b.m_min, r.m_origin );
-	zpVector4fSub( maxDir, b.m_max, r.m_origin );
-
-	zpVector4fMul( t1, minDir, inv );
-	zpVector4fMul( t2, maxDir, inv );
-
-	zpVector4fMin( tmin, t1, t2 );
-	zpVector4fMax( tmax, t1, t2 );
-
-	// check x and y
-	zpVector4f tmin0( tmin.m_y, tmin.m_z, tmin.m_w, tmin.m_x );
-	zpVector4f tmax0( tmax.m_y, tmax.m_z, tmax.m_w, tmax.m_x );
-	zpVector4fMinX( tmax, tmax, tmax0 );
-	zpVector4fMaxX( tmin, tmin, tmin0 );
-
-	// check x and z
-	zpVector4f tmin1( tmin.m_z, tmin.m_y, tmin.m_z, tmin.m_y );
-	zpVector4f tmax1( tmax.m_z, tmax.m_y, tmax.m_z, tmax.m_y );
-	zpVector4fMinX( tmax, tmax, tmax0 );
-	zpVector4fMaxX( tmin, tmin, tmin0 );
-
-	tNear.m_x = tmin.m_x;
-	tFar.m_x = tmax.m_x;
-
-	return tmax.m_x >= 0.0f && tmax.m_x >= tmin.m_x;
-	*/
 	return ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBoundingAABB& b )
@@ -227,10 +151,8 @@ zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpRay& b )
 }
 zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingAABB& b )
 {
-	zpVector4f center;
-	zpVector4f extence;
-	b.getCenter( center );
-	b.getExtents( extence );
+	const zpVector4f& center = b.getCenter();
+	const zpVector4f& extence = b.getExtents();
 
 	zpVector4f absP;
 	zpScalar d, r;

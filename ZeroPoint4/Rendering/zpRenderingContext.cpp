@@ -607,9 +607,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.sortKey = command.material->getData()->materialId;
 		command.sortBias = command.material->getData()->sortBias;
 
-		b->m_boundingBox.getCenter( c );
-		zpMath::Add( c, c, center );
-		command.boundingBox.setCenter( c );
+		command.boundingBox.add( b->m_boundingBox );
 
 		command.vertexStride = VertexFormatStrides[ command.vertexFormat ];
 	}
@@ -858,8 +856,7 @@ void zpRenderingContext::endDrawFont()
 void zpRenderingContext::generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera )
 {
 	zpScalar len, dist( camera->getFar() );
-	zpVector4f center;
-	command->boundingBox.getCenter( center );
+	zpVector4f center = command->boundingBox.getCenter();
 
 	zpMath::Sub( center, center, camera->getPosition() );
 	zpMath::LengthSquared3( len, center );

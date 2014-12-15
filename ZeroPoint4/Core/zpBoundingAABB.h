@@ -8,7 +8,6 @@ class zpBoundingAABB {
 public:
 	zpBoundingAABB();
 	zpBoundingAABB( zp_float width, zp_float height, zp_float depth );
-	zpBoundingAABB( const zpVector4f& min, const zpVector4f& max );
 	zpBoundingAABB( const zpBoundingAABB& box );
 	zpBoundingAABB( zpBoundingAABB&& box );
 	~zpBoundingAABB();
@@ -16,21 +15,26 @@ public:
 	void operator=( const zpBoundingAABB& box );
 	void operator=( zpBoundingAABB&& box );
 
-	const zpVector4f& getMin() const;
-	const zpVector4f& getMax() const;
+	void reset();
+
+	zpVector4f getMin() const;
+	zpVector4f getMax() const;
 	void setMin( const zpVector4f& min );
 	void setMax( const zpVector4f& max );
+	void setMinMax( const zpVector4f& min, const zpVector4f& max );
 
-	void getCenter( zpVector4f& outCenter ) const;
+	const zpVector4f& getCenter() const;
+	const zpVector4f& getExtents() const;
+
 	void setCenter( const zpVector4f& center );
-	void getExtents( zpVector4f& outExtents ) const;
 	void setExtents( const zpVector4f& extents );
 
-	void generateBoundingSphere( zpBoundingSphere& sphere, zp_bool isSphereContained = false ) const;
+	void generateBoundingSphere( zpBoundingSphere& sphere ) const;
 
 	zpScalar getWidth() const;
 	zpScalar getHeight() const;
 	zpScalar getDepth() const;
+	zpVector4f getSize() const;
 
 	void translate( const zpVector4f& translate );
 	void scale( const zpScalar& scale );
@@ -45,8 +49,8 @@ public:
 	void add( const zpBoundingSphere& sphere );
 
 private:
-	zpVector4f m_min;
-	zpVector4f m_max;
+	zpVector4f m_center;
+	zpVector4f m_extent;
 };
 
 #endif

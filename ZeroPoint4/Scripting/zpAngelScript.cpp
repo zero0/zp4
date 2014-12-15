@@ -647,9 +647,9 @@ void as_Register_zpBoundingAABB( asIScriptEngine* engine )
 
 	r = engine->RegisterObjectMethod( "box", "void opAssign( const box& in )", asMETHODPR( zpBoundingAABB, operator=, ( const zpBoundingAABB& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( "box", "const vec4& get_min() const", asMETHODPR( zpBoundingAABB, getMin, () const, const zpVector4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "box", "vec4 get_min() const", asMETHODPR( zpBoundingAABB, getMin, () const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( "box", "void set_min( const vec4& in )", asMETHODPR( zpBoundingAABB, setMin, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( "box", "const vec4& get_max() const", asMETHODPR( zpBoundingAABB, getMax, () const, const zpVector4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( "box", "vec4 get_max() const", asMETHODPR( zpBoundingAABB, getMax, () const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( "box", "void set_max( const vec4& in )", asMETHODPR( zpBoundingAABB, setMax, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 }
 #pragma endregion
