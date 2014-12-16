@@ -40,7 +40,16 @@ void zpPhantom::destroy()
 
 }
 
-zp_bool zpPhantom::getMatrix( zpMatrix4f& transform )
+void zpPhantom::setMatrix( const zpMatrix4f& transform )
+{
+	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
+
+	btTransform t;
+	t.setFromOpenGLMatrix( transform.getData() );
+
+	ghost->setWorldTransform( t );
+}
+zp_bool zpPhantom::getMatrix( zpMatrix4f& transform ) const
 {
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
 
@@ -86,10 +95,11 @@ zp_bool zpPhantom::rayTest( const zpVector4f& fromWorld, const zpVector4f& toWor
 
 void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 {
-	btDynamicsWorld* world = (btDynamicsWorld*)dymaicsWorld;
+	btDynamicsWorld* world = static_cast< btDynamicsWorld* >( dymaicsWorld );
+	btOverlappingPairCache* cache = world->getPairCache();
 
 	btManifoldArray manifolds;
-	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
+	btPairCachingGhostObject* ghost = static_cast< btPairCachingGhostObject* >( m_phantom );
 
 	const btBroadphasePairArray& pairs = ghost->getOverlappingPairCache()->getOverlappingPairArray();
 	for( zp_int i = 0; i < pairs.size(); ++i )
@@ -97,7 +107,7 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 		manifolds.resize( 0 );
 
 		const btBroadphasePair& pair = pairs[ i ];
-		const btBroadphasePair* p = world->getPairCache()->findPair( pair.m_pProxy0, pair.m_pProxy1 );
+		const btBroadphasePair* p = cache->findPair( pair.m_pProxy0, pair.m_pProxy1 );
 		if( p == ZP_NULL )
 		{
 			p = &pair;

@@ -31,11 +31,11 @@ class zpParticleEmitterComponent;
 
 class zpRigidBodyComponent;
 class zpKinematicBodyComponent;
+class zpPhantomComponent;
 
 class zpBreakableComponent;
 class zpAttachmentComponent;
 class zpProjectileComponent;
-class zpTriggerComponent;
 
 class zpUIComponent;
 
@@ -67,12 +67,12 @@ class zpOctreeNode;
 // Physics
 #include "zpRigidBodyComponent.h"
 #include "zpKinematicBodyComponent.h"
+#include "zpPhantomComponent.h"
 
 // Common
 #include "zpBreakableComponent.h"
 #include "zpAttachmentComponent.h"
 #include "zpProjectileComponent.h"
-#include "zpTriggerComponent.h"
 
 // GUI
 #include "zpUIComponent.h"

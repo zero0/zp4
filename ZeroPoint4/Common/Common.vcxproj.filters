@@ -138,8 +138,8 @@
     <ClInclude Include="zpOctree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpTriggerComponent.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="zpPhantomComponent.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -221,8 +221,8 @@
     <ClCompile Include="zpOctree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpTriggerComponent.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="zpPhantomComponent.cpp">
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

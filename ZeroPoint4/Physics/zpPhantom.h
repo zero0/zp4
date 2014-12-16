@@ -11,7 +11,8 @@ public:
 	void create( const zpMatrix4f& transform, const zpBison::Value& v );
 	void destroy();
 
-	zp_bool getMatrix( zpMatrix4f& transform );
+	void setMatrix( const zpMatrix4f& transform );
+	zp_bool getMatrix( zpMatrix4f& transform ) const;
 
 	zp_short getGroup() const;
 	zp_short getMask() const;

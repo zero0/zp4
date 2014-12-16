@@ -47,6 +47,8 @@ public:
 	void setDebugDrawer( zpIDebugPhysicsDebugDrawer* drawer );
 	void debugDraw();
 
+	void fixedTimeStep( zp_float timeStep );
+
 private:
 	zp_handle m_dynamicsWorld;
 
@@ -63,6 +65,8 @@ private:
 	zp_int m_numSubStep;
 
 	zpVector4f m_gravity;
+
+	zpArrayList< zpPhantom* > m_phantoms;
 };
 
 #endif

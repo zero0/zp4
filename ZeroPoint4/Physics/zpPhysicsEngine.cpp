@@ -49,6 +49,12 @@ private:
 	zp_int m_debugMode;
 };
 
+void zpPhysicTimeStepCallback( btDynamicsWorld *world, btScalar timeStep )
+{
+	zpPhysicsEngine* engine = static_cast< zpPhysicsEngine* >( world->getWorldUserInfo() );
+	engine->fixedTimeStep( timeStep );
+}
+
 zpPhysicsEngine::zpPhysicsEngine()
 	: m_dynamicsWorld( ZP_NULL )
 	, m_broardphase( ZP_NULL )
@@ -92,6 +98,7 @@ void zpPhysicsEngine::create()
 	dynamicsWorld->setGravity( btVector3( m_gravity.getX().getFloat(), m_gravity.getY().getFloat(), m_gravity.getZ().getFloat() ) );
 	dynamicsWorld->getPairCache()->setInternalGhostPairCallback( ghostCallback );
 	dynamicsWorld->getPairCache()->setOverlapFilterCallback( filterCallback );
+	dynamicsWorld->setInternalTickCallback( zpPhysicTimeStepCallback, this, false );
 
 	m_broardphase = broadphase;
 	m_collisionConfig = collisionConfiguration;
@@ -189,19 +196,21 @@ void zpPhysicsEngine::removeKinematicBody( zpKinematicBody* body )
 	dynamicsWorld->removeCollisionObject( ghost );
 }
 
-void zpPhysicsEngine::addPhantom( zpPhantom* phanton )
+void zpPhysicsEngine::addPhantom( zpPhantom* phantom )
 {
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
-	btGhostObject* ghost = (btGhostObject*)phanton->getPhantom();
+	btGhostObject* ghost = (btGhostObject*)phantom->getPhantom();
 
-	dynamicsWorld->addCollisionObject( ghost, phanton->getGroup(), phanton->getMask() );
+	dynamicsWorld->addCollisionObject( ghost, phantom->getGroup(), phantom->getMask() );
+	m_phantoms.pushBack( phantom );
 }
-void zpPhysicsEngine::removePhantom( zpPhantom* phanton )
+void zpPhysicsEngine::removePhantom( zpPhantom* phantom )
 {
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
-	btGhostObject* ghost = (btGhostObject*)phanton->getPhantom();
+	btGhostObject* ghost = (btGhostObject*)phantom->getPhantom();
 
 	dynamicsWorld->removeCollisionObject( ghost );
+	m_phantoms.eraseAll( phantom );
 }
 
 void zpPhysicsEngine::setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps )
@@ -264,4 +273,11 @@ void zpPhysicsEngine::debugDraw()
 		btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
 		dynamicsWorld->debugDrawWorld();
 	}
+}
+
+void zpPhysicsEngine::fixedTimeStep( zp_float timeStep )
+{
+	m_phantoms.foreach( [ this ]( zpPhantom* p ) {
+		p->processCollisions( m_dynamicsWorld );
+	} );
 }
