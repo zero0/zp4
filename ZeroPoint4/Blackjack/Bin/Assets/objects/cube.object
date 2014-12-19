@@ -27,9 +27,22 @@
                 }
             }
         },
+		"Phantom" :
+        {
+            "Group" : "Main",
+            "Mask" : "Main",
+            "Collider" :
+            {
+                "Shape" : "Box",
+                "Size" :
+                {
+                    "Extents" : [ 2, 2, 2 ]
+                }
+            }
+        },
         "ParticleEmitter" :
         {
-            "Layer" : 4,
+            "Layer" : 0,
             "MaxParticles" : 40,
             "Effects" :
             {
