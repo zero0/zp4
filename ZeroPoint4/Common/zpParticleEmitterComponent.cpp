@@ -16,7 +16,7 @@ zpParticleEmitterComponent::zpParticleEmitterComponent( zpObject* obj, const zpB
 	, m_random( zpRandom::getInstance() )
 	, m_time( zpTime::getInstance() )
 {
-	m_layer = ZP_RENDERING_LAYER_DEFAULT; //1 << def[ "Layer" ].asInt();
+	m_layer = def[ "Layer" ].asInt();
 
 	m_maxParticles = def[ "MaxParticles" ].asInt();
 	m_allParticles.reserve( m_maxParticles );
@@ -42,9 +42,9 @@ zpParticleEmitterComponent::zpParticleEmitterComponent( zpObject* obj, const zpB
 zpParticleEmitterComponent::~zpParticleEmitterComponent()
 {}
 
-void zpParticleEmitterComponent::render( zpRenderingContext* i, zpCamera* camera )
+void zpParticleEmitterComponent::render( zpRenderingContext* i, const zpCamera* camera )
 {
-	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) )
+	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) && camera->getRenderLayers().isMarked( m_layer ) )
 	{
 		onRender( i, camera );
 	}
@@ -142,7 +142,7 @@ void zpParticleEmitterComponent::pause( zp_bool isPaused )
 	m_isPaused = isPaused;
 }
 
-void zpParticleEmitterComponent::onRender( zpRenderingContext* i, zpCamera* camera )
+void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera* camera )
 {
 	zpParticleEffect* effect = m_effects.begin();
 	zpParticleEffect* end = m_effects.end();
@@ -168,7 +168,7 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, zpCamera* came
 			} );
 		}
 
-		i->beginDrawImmediate( m_layer, m_queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &effect->material );
+		i->beginDrawImmediate( 1 << m_layer, m_queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &effect->material );
 
 		if( !effect->isWorldSpace )
 		{
@@ -581,7 +581,7 @@ void zpParticleEmitterComponentPool::simulate()
 	} );
 }
 
-void zpParticleEmitterComponentPool::render( zpRenderingContext* i, zpCamera* camera )
+void zpParticleEmitterComponentPool::render( zpRenderingContext* i, const zpCamera* camera )
 {
 	m_used.foreach( [ i, camera ]( zpParticleEmitterComponent* o )
 	{

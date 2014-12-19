@@ -583,9 +583,18 @@ void zpApplication::processFrame()
 		// individual component render
 		m_componentPoolMeshRenderer.render( i );
 
-		// render particles
-		//m_componentPoolParticleEmitter.render( i, ZP_NULL );
-
+		// render particles for each camera
+		ZP_PROFILE_START( RENDER_PARTICLES );
+		for( zp_uint p = 0; p < zpCameraType_Count; ++p )
+		{
+			const zpArrayList< zpCamera* >& cameras = m_renderingPipeline.getUsedCameras( (zpCameraType)p );
+			cameras.foreach( [ i, this ]( const zpCamera* camera ) 
+			{
+				m_componentPoolParticleEmitter.render( i, camera );
+			} );
+		}
+		ZP_PROFILE_END( RENDER_PARTICLES );
+		
 		// render begin
 		ZP_PROFILE_START( RENDER_BEGIN );
 		m_renderingPipeline.beginFrame( i );

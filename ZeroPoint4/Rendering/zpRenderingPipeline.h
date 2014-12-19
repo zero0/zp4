@@ -58,7 +58,9 @@ public:
 	void enterEditMode();
 	void leaveEditMode();
 
-	zp_uint getNumCameras( zpCameraType type ) const { return m_usedCameras[ type ].size(); }
+	zp_uint getNumCameras( zpCameraType type ) const;
+	const zpArrayList< zpCamera* >& getUsedCameras( zpCameraType type ) const;
+
 	zpCamera* getCamera( zpCameraType type );
 	void releaseCamera( zpCamera* camera );
 

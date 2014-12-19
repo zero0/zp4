@@ -649,6 +649,16 @@ void zpRenderingPipeline::generateDepthStencilStateDesc( const zpBison::Value& d
 	}
 }
 
+zp_uint zpRenderingPipeline::getNumCameras( zpCameraType type ) const
+{
+	return m_usedCameras[ type ].size();
+}
+const zpArrayList< zpCamera* >& zpRenderingPipeline::getUsedCameras( zpCameraType type ) const
+{
+	return m_usedCameras[ type ];
+}
+
+
 zpCamera* zpRenderingPipeline::getCamera( zpCameraType type )
 {
 	ZP_ASSERT( !m_freeCameras.isEmpty(), "Ran out of cameras" );

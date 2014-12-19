@@ -8,7 +8,7 @@ public:
 	zpParticleEmitterComponent( zpObject* obj, const zpBison::Value& def );
 	virtual ~zpParticleEmitterComponent();
 
-	void render( zpRenderingContext* i, zpCamera* camera );
+	void render( zpRenderingContext* i, const zpCamera* camera );
 
 	void setRenderLayer( zp_uint layer );
 	zp_uint getRenderLayer() const;
@@ -26,7 +26,7 @@ public:
 	void pause( zp_bool isPaused );
 
 protected:
-	void onRender( zpRenderingContext* i, zpCamera* camera );
+	void onRender( zpRenderingContext* i, const zpCamera* camera );
 
 	void onCreate();
 	void onInitialize();
@@ -164,7 +164,7 @@ public:
 	void update();
 	void simulate();
 
-	void render( zpRenderingContext* i, zpCamera* camera );
+	void render( zpRenderingContext* i, const zpCamera* camera );
 };
 
 #endif

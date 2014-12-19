@@ -21,16 +21,12 @@ void zpPhantom::create( const zpMatrix4f& transform, const zpBison::Value& v )
 	m_collider = zpColliderCache::getInstance()->getCollider( v[ "Collider" ] );
 	btCollisionShape* shape = (btCollisionShape*)m_collider->getCollider();
 
-	btQuaternion rot( btQuaternion::getIdentity() );
-	btVector3 pos;
-	transform.getRow( 3 ).store4( pos.m_floats );
-
-	btTransform trans( rot, pos );
-
 	btPairCachingGhostObject* ghost = new btPairCachingGhostObject();
 	ghost->setCollisionShape( shape );
 	ghost->setCollisionFlags( ghost->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE );
 
+	btTransform trans;
+	trans.setFromOpenGLMatrix( transform.getData() );
 	ghost->setWorldTransform( trans );
 
 	m_phantom = ghost;
@@ -101,6 +97,8 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 	btManifoldArray manifolds;
 	btPairCachingGhostObject* ghost = static_cast< btPairCachingGhostObject* >( m_phantom );
 
+	// @TODO: look at ghost->getOverlappingObject
+
 	const btBroadphasePairArray& pairs = ghost->getOverlappingPairCache()->getOverlappingPairArray();
 	for( zp_int i = 0; i < pairs.size(); ++i )
 	{
@@ -122,7 +120,7 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 				btCollisionObject* b0 = static_cast< btCollisionObject* >( manifold->getBody0() );
 				btCollisionObject* b1 = static_cast< btCollisionObject* >( manifold->getBody1() );
 
-				zp_printfln( "%d contacts ", manifold->getNumContacts() );
+				//zp_printfln( "this-%p 0-%p 1-%p %d contacts ", m_phantom, manifold->getBody0(), manifold->getBody1(), manifold->getNumContacts() );
 			}
 		}
 	}
