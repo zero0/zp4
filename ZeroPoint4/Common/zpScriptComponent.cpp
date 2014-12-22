@@ -4,15 +4,15 @@ zpScriptComponent::zpScriptComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 {
 	const zpBison::Value scripts = def[ "Scripts" ];
+	zpScriptContentManager* scriptContent = getApplication()->getScriptContentManager();
+	zp_bool ok;
 
 	if( scripts.isArray() )
 	{
 		zp_uint count = scripts.size();
 		if( count > 0 )
 		{
-			zp_bool ok;
-			zpScriptContentManager* scriptContent = getApplication()->getScriptContentManager();
-
+			m_scripts.reserve( count );
 			scripts.foreachArray( [ this, scriptContent, &ok ]( const zpBison::Value& script )
 			{
 				const zp_char* scriptFile = script.asCString();
@@ -20,6 +20,13 @@ zpScriptComponent::zpScriptComponent( zpObject* obj, const zpBison::Value& def )
 				ZP_ASSERT( ok, "Failed to build script %s", scriptFile );
 			} );
 		}
+	}
+	else if( scripts.isString() )
+	{
+		m_scripts.reserve( 1 );
+		const zp_char* scriptFile = scripts.asCString();
+		ok = scriptContent->getResource( scriptFile, m_scripts.pushBackEmpty() );
+		ZP_ASSERT( ok, "Failed to build script %s", scriptFile );
 	}
 }
 zpScriptComponent::~zpScriptComponent()

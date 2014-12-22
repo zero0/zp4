@@ -29,6 +29,7 @@
 #define ZP_SCRIPT_BOUNDBOXAABB "BoundingBox"
 
 #define ZP_SCRIPT_OBJECT "Object"
+#define ZP_SCRIPT_BEHAVIOR "Behavior"
 
 #define ZP_SCRIPT_MATERIAL "Material"
 #define ZP_SCRIPT_FONT "Font"
@@ -41,13 +42,13 @@
 //if( (r) < asSUCCESS ) { zpLog::debug() << "Assert Failed: (" << r << ") " << __FILE__ << ':' << __LINE__ << zpLog::endl; }
 
 template< typename T >
-class zpRefObject
+class zpRef
 {
 public:
-	zpRefObject()
+	zpRef()
 		: m_refCount( 1 )
 	{}
-	~zpRefObject()
+	~zpRef()
 	{}
 
 	void addRef()
@@ -83,6 +84,40 @@ private:
 	zp_int m_refCount;
 };
 
+class zpRefObject
+{
+public:
+	zpRefObject( zpObject* obj )
+		: m_object( obj )
+		, m_refCount( 1 )
+	{}
+	~zpRefObject()
+	{}
+
+	void addRef()
+	{
+		++m_refCount;
+	}
+	void release()
+	{
+		--m_refCount;
+		if( m_refCount == 0 )
+		{
+			m_object->destroy();
+			m_object = ZP_NULL;
+		}
+	}
+
+private:
+	zpObject* m_object;
+	zp_int m_refCount;
+};
+
+struct zpScriptBehavior
+{
+	zpObject* m_object;
+};
+
 #pragma region Register Core
 void as_MessageCallback( const asSMessageInfo& info )
 {
@@ -113,6 +148,11 @@ void as_zp_printfln( const zpString& str )
 	zp_printfln( str.str() );
 }
 
+void as_zp_assert( zp_bool test, const zpString& str )
+{
+	ZP_ASSERT( test, str.str() );
+}
+
 void as_Register_zpString( asIScriptEngine* engine );
 void as_Register_zpArray( asIScriptEngine* engine );
 void as_Register_zpScalar( asIScriptEngine* engine );
@@ -134,8 +174,10 @@ void as_Register_Core( asIScriptEngine* engine )
 	as_Register_zpBoundingAABB( engine );
 
 	zp_int r;
-	r = engine->RegisterGlobalFunction( "void print(const " ZP_SCRIPT_STRING " &in)", asFUNCTION( as_zp_printf ), asCALL_CDECL ); AS_ASSERT( r );
-	r = engine->RegisterGlobalFunction( "void println(const " ZP_SCRIPT_STRING " &in)", asFUNCTION( as_zp_printfln ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void print( const " ZP_SCRIPT_STRING " &in )", asFUNCTION( as_zp_printf ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void println( const " ZP_SCRIPT_STRING " &in )", asFUNCTION( as_zp_printfln ), asCALL_CDECL ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( "void assert( bool test, const " ZP_SCRIPT_STRING " &in )", asFUNCTION( as_zp_assert ), asCALL_CDECL ); AS_ASSERT( r );
 }
 #pragma endregion
 
@@ -443,29 +485,51 @@ void as_zpVector4f_SetW( zpVector4f* self, zp_float value )
 	self->setW( zpScalar( value ) );
 }
 
-zpScalar as_zpVector4f_Dot2( const zpVector4f& a, const zpVector4f& b )
+zpScalar as_zpVector4f_Dot2( zpVector4f* self, const zpVector4f& b )
 {
 	zpScalar s;
-	zpMath::Dot2( s, a, b );
+	zpMath::Dot2( s, *self, b );
 	return s;
 }
-zpScalar as_zpVector4f_Dot3( const zpVector4f& a, const zpVector4f& b )
+zpScalar as_zpVector4f_Dot3( zpVector4f* self, const zpVector4f& b )
 {
 	zpScalar s;
-	zpMath::Dot3( s, a, b );
+	zpMath::Dot3( s, *self, b );
 	return s;
 }
-zpScalar as_zpVector4f_Dot4( const zpVector4f& a, const zpVector4f& b )
+zpScalar as_zpVector4f_Dot4(  zpVector4f* self, const zpVector4f& b )
 {
 	zpScalar s;
-	zpMath::Dot4( s, a, b );
+	zpMath::Dot4( s, *self, b );
 	return s;
 }
-zpVector4f as_zpVector4f_Cross3( const zpVector4f& a, const zpVector4f& b )
+zpVector4f as_zpVector4f_Cross3( zpVector4f* self, const zpVector4f& b )
 {
 	zpVector4f s;
-	zpMath::Cross3( s, a, b );
+	zpMath::Cross3( s, *self, b );
 	return s;
+}
+
+zpVector4f as_zpVector4f_Normalize2( zpVector4f* self )
+{
+	zpVector4f s;
+	zpMath::Normalize3( s, *self );
+	return s;
+}
+zpVector4f as_zpVector4f_Normalize3( zpVector4f* self )
+{
+	zpVector4f s;
+	zpMath::Normalize3( s, *self );
+	return s;
+}
+
+void as_zpVector4f_NormalizeSelf2( zpVector4f* self )
+{
+	zpMath::Normalize3( *self, *self );
+}
+void as_zpVector4f_NormalizeSelf3( zpVector4f* self )
+{
+	zpMath::Normalize3( *self, *self );
 }
 
 zpScalar as_zpVector4f_Length2( zpVector4f* self )
@@ -523,32 +587,17 @@ void as_Register_zpVector4f( asIScriptEngine* engine )
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_SCALAR " get_lengthSqr2() const", asFUNCTION( as_zpVector4f_LengthSqr2 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_SCALAR " get_lengthSqr3() const", asFUNCTION( as_zpVector4f_LengthSqr3 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterGlobalFunction( "" ZP_SCRIPT_SCALAR " dot2( const " ZP_SCRIPT_VECTOR4 "& in, const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Dot2 ), asCALL_CDECL ); AS_ASSERT( r );
-	r = engine->RegisterGlobalFunction( "" ZP_SCRIPT_SCALAR " dot3( const " ZP_SCRIPT_VECTOR4 "& in, const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Dot3 ), asCALL_CDECL ); AS_ASSERT( r );
-	r = engine->RegisterGlobalFunction( "" ZP_SCRIPT_SCALAR " dot4( const " ZP_SCRIPT_VECTOR4 "& in, const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Dot4 ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_SCALAR " dot2( const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Dot2 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_SCALAR " dot3( const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Dot3 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_SCALAR " dot4( const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Dot4 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	r = engine->RegisterGlobalFunction( "" ZP_SCRIPT_VECTOR4 " cross3( const " ZP_SCRIPT_VECTOR4 "& in, const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Cross3 ), asCALL_CDECL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_VECTOR4 " cross3( const " ZP_SCRIPT_VECTOR4 "& in )", asFUNCTION( as_zpVector4f_Cross3 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 
-	//
-	//r = engine->RegisterObjectMethod( "Vector4f", "void zero3()", asMETHODPR( zpVector4f, zero3, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "Vector4f", "void zero4()", asMETHODPR( zpVector4f, zero4, (), void ), asCALL_THISCALL ); AS_ASSERT( r );
-	//
-	//r = engine->RegisterObjectMethod( "Vector4f", "bool isZero3() const", asMETHODPR( zpVector4f, isZero3, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "Vector4f", "bool isZero4() const", asMETHODPR( zpVector4f, isZero4, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
-	//
-	//r = engine->RegisterObjectMethod( "Vector4f", "real dot3( const Vector4f& in ) const", asMETHODPR( zpVector4f, dot3, ( const zpVector4f& ) const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "Vector4f", "real dot4( const Vector4f& in ) const", asMETHODPR( zpVector4f, dot4, ( const zpVector4f& ) const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	//
-	//r = engine->RegisterObjectMethod( "Vector4f", "Vector4f cross3( const Vector4f& in ) const", asMETHODPR( zpVector4f, cross3, ( const zpVector4f& ) const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "Vector4f", "Vector4f cross4( const Vector4f& in ) const", asMETHODPR( zpVector4f, cross4, ( const zpVector4f& ) const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
-	//
-	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitude3() const", asMETHODPR( zpVector4f, magnitude3, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitude4() const", asMETHODPR( zpVector4f, magnitude4, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	//
-	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitudeSquared3() const", asMETHODPR( zpVector4f, magnitudeSquared3, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	//r = engine->RegisterObjectMethod( "Vector4f", "real magnitudeSquared4() const", asMETHODPR( zpVector4f, magnitudeSquared4, () const, zpScalar ), asCALL_THISCALL ); AS_ASSERT( r );
-	//
-	//r = engine->RegisterObjectMethod( "Vector4f", "bool opEquals( const Vector4f& in ) const", asMETHODPR( zpVector4f, operator==, ( const zpVector4f& ) const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_VECTOR4 " get_normalized2() const", asFUNCTION( as_zpVector4f_Normalize2 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "" ZP_SCRIPT_VECTOR4 " get_normalized3() const", asFUNCTION( as_zpVector4f_Normalize3 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "void normalize2()", asFUNCTION( as_zpVector4f_NormalizeSelf2 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_VECTOR4, "void normalize3()", asFUNCTION( as_zpVector4f_NormalizeSelf3 ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 }
 #pragma endregion
 
@@ -715,29 +764,46 @@ void as_Register_zpBoundingAABB( asIScriptEngine* engine )
 #pragma endregion
 
 #pragma region Register zpObject
-void as_zpObject_Register( asIScriptEngine* engine, zpApplication* app )
+void as_Register_Object( asIScriptEngine* engine, zpApplication* app )
 {
 	zp_int r;
+	zpObjectContentManager* objManager = app->getObjectContentManager();
 
-	r = engine->RegisterObjectType(      ZP_SCRIPT_OBJECT, sizeof( zpRefObject< zpObject* > ), asOBJ_REF ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      ZP_SCRIPT_OBJECT, sizeof( zpRefObject ), asOBJ_REF ); AS_ASSERT( r );
 //	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_FACTORY, "" ZP_SCRIPT_OBJECT "@ f()", asFUNCTION( as_Object_Factory ), asCALL_CDECL ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject< zpObject* >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject< zpObject* >, release ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject, release ), asCALL_THISCALL ); AS_ASSERT( r );
 
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "const " ZP_SCRIPT_MATRIX4 "& get_transform() const", asMETHODPR( zpObject, getTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "void set_transform( const " ZP_SCRIPT_MATRIX4 "& in )", asMETHODPR( zpObject, setTransform, ( const zpMatrix4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterGlobalFunction( ""ZP_SCRIPT_OBJECT"@ CreateObject()", asMETHODPR( zpObjectContentManager, createObject, (), zpObject* ), asCALL_THISCALL_ASGLOBAL, objManager ); AS_ASSERT( r );
+
+}
+#pragma endregion
+
+#pragma region Register Behavior
+void as_Register_Behavior( asIScriptEngine* engine, zpApplication* app )
+{
+	zp_int r;
+
+	//r = engine->RegisterObjectType(      ZP_SCRIPT_BEHAVIOR, sizeof( zpScriptBehavior ),  asOBJ_ASHANDLE ); AS_ASSERT( r );
+
+	//r = engine->RegisterInterface(       ZP_SCRIPT_BEHAVIOR ); AS_ASSERT( r );
+	//r = engine->RegisterInterfaceMethod( ZP_SCRIPT_BEHAVIOR, "" ZP_SCRIPT_OBJECT "@ get_object()" ); AS_ASSERT( r );
+	
 }
 #pragma endregion
 
 #pragma region Register Rendering
-zpRefObject< zpMaterialResourceInstance >* as_Material_Factory()
+zpRef< zpMaterialResourceInstance >* as_Material_Factory()
 {
-	return new zpRefObject< zpMaterialResourceInstance >;
+	return new zpRef< zpMaterialResourceInstance >;
 }
 
-zpRefObject< zpFontResourceInstance >* as_Font_Factory()
+zpRef< zpFontResourceInstance >* as_Font_Factory()
 {
-	return new zpRefObject< zpFontResourceInstance >;
+	return new zpRef< zpFontResourceInstance >;
 }
 
 void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
@@ -748,17 +814,17 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	zpFontContentManager* font = app->getRenderPipeline()->getFontContentManager();
 
 	// Material
-	r = engine->RegisterObjectType(      ZP_SCRIPT_MATERIAL, sizeof( zpRefObject< zpMaterialResourceInstance > ), asOBJ_REF ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      ZP_SCRIPT_MATERIAL, sizeof( zpRef< zpMaterialResourceInstance > ), asOBJ_REF ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATERIAL, asBEHAVE_FACTORY, "" ZP_SCRIPT_MATERIAL "@ f()", asFUNCTION( as_Material_Factory ), asCALL_CDECL ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATERIAL, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject< zpMaterialResourceInstance >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATERIAL, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject< zpMaterialResourceInstance >, release ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATERIAL, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRef< zpMaterialResourceInstance >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATERIAL, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRef< zpMaterialResourceInstance >, release ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "bool GetMaterial( const " ZP_SCRIPT_STRING "& in, " ZP_SCRIPT_MATERIAL "& )", asMETHODPR( zpMaterialContentManager, getResource, ( const zpString&, zpMaterialResourceInstance& ), zp_bool ), asCALL_THISCALL_ASGLOBAL, mat ); AS_ASSERT( r );
 
 	// Font
-	r = engine->RegisterObjectType(      ZP_SCRIPT_FONT, sizeof( zpRefObject< zpFontResourceInstance > ), asOBJ_REF ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      ZP_SCRIPT_FONT, sizeof( zpRef< zpFontResourceInstance > ), asOBJ_REF ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_FONT, asBEHAVE_FACTORY, "" ZP_SCRIPT_FONT "@ f()", asFUNCTION( as_Font_Factory ), asCALL_CDECL ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_FONT, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject< zpFontResourceInstance >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_FONT, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject< zpFontResourceInstance >, release ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_FONT, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRef< zpFontResourceInstance >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_FONT, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRef< zpFontResourceInstance >, release ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "bool GetFont( const " ZP_SCRIPT_STRING "& in, " ZP_SCRIPT_FONT "& )", asMETHODPR( zpFontContentManager, getResource, ( const zpString&, zpFontResourceInstance& ), zp_bool ), asCALL_THISCALL_ASGLOBAL, font ); AS_ASSERT( r );
 
 	// Rendering Queue
@@ -849,12 +915,9 @@ zp_bool zpAngelScript::createEngine( zpApplication* app )
 
 	as_Register_Core( engine );
 	as_Register_Rendering( engine, app );
-	//as_zpScalar_Register( s_engine );
-	//as_zpArray_Register( s_engine );
-	//as_zpVector4f_Register( s_engine );
-	//as_zpMatrix4f_Register( s_engine );
 
-	//as_zpGameObject_Register( s_engine );
+	as_Register_Object( engine, app );
+	as_Register_Behavior( engine, app );
 
 	m_immidiateContext = engine->CreateContext();
 
