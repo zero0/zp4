@@ -2,7 +2,7 @@
 
 zpCamera::zpCamera()
 	: m_projectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE )
-	, m_type( ZP_CAMERA_TYPE_CUSTOM )
+	, m_type( ZP_CAMERA_TYPE_MAIN )
 	, m_depthStencil( ZP_NULL )
 	, m_isActive( false )
 	, m_isViewDirty( true )
@@ -20,6 +20,7 @@ zpCamera::zpCamera()
 	, m_clearMode( ZP_CAMERA_CLEAR_MODE_DEFAULT )
 	, m_layers( ZP_RENDERING_LAYER_DEFAULT )
 	, m_bufferData()
+	, m_order( 0 )
 {}
 zpCamera::~zpCamera()
 {}
@@ -321,7 +322,16 @@ zpDepthStencilBuffer* zpCamera::getDepthStencilBuffer() const
 {
 	return m_depthStencil;
 }
-void zpCamera:: setDepthStencilBuffer( zpDepthStencilBuffer* depthStencil )
+void zpCamera::setDepthStencilBuffer( zpDepthStencilBuffer* depthStencil )
 {
 	m_depthStencil = depthStencil;
+}
+
+void zpCamera::setOrder( zp_int order )
+{
+	m_order = order;
+}
+zp_int zpCamera::getOrder() const
+{
+	return m_order;
 }

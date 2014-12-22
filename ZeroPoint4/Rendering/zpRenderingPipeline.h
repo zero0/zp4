@@ -64,15 +64,6 @@ public:
 	zpCamera* getCamera( zpCameraType type );
 	void releaseCamera( zpCamera* camera );
 
-	template< typename T >
-	T* pushCameraState( zpCameraType type )
-	{
-		T* state = new T;
-		pushCameraState( type, state );
-		return state;
-	};
-	void popCameraState( zpCameraType type );
-
 	void setApplication( zpApplication* app ) { m_application = app; };
 	zpApplication* getApplication() const { return m_application; };
 
@@ -84,10 +75,7 @@ public:
 	void processRenderingQueue( zpRenderingQueue layer, zp_bool useLighting );
 
 private:
-	void pushCameraState( zpCameraType type, zpCameraState* state );
-
 	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );
-	void renderCamera( zpRenderingContext* i, zpCamera* camera );
 
 	zp_bool performScreenshot();
 
@@ -117,8 +105,6 @@ private:
 	zpFixedArrayList< zpCamera, 8 > m_cameras;
 	zpFixedArrayList< zpCamera*, 8 > m_freeCameras;
 	zpArrayList< zpCamera* > m_usedCameras[ zpCameraType_Count ];
-
-	zpFixedArrayList< zpArrayList< zpCameraState* >, zpCameraType_Count > m_cameraStack;
 
 	zpFixedArrayList< zpLightBufferData, 64 > m_lights;
 	zpFixedArrayList< zpLightBufferData*, 64 > m_freeLights;

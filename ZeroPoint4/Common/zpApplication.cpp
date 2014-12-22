@@ -678,6 +678,7 @@ void zpApplication::runReloadChangedResources()
 void zpApplication::enterEditMode()
 {
 	zp_printfln( "enter edit" );
+#if 0
 	class EditorCameraController : public zpCameraState
 	{
 	public:
@@ -769,15 +770,16 @@ void zpApplication::enterEditMode()
 		zpVector4f startPos, startLook, startUp;
 	};
 
-	m_timer->setTimeScale( 0.f );
 	m_renderingPipeline.pushCameraState< EditorCameraController >( ZP_CAMERA_TYPE_MAIN );
+#endif
+
+	m_timer->setTimeScale( 0.f );
 }
 void zpApplication::leaveEditMode()
 {
 	m_timer->setTimeScale( 1.f );
 
 	zp_printfln( "leave edit" );
-	m_renderingPipeline.popCameraState( ZP_CAMERA_TYPE_MAIN );
 }
 
 void zpApplication::guiEditMode()

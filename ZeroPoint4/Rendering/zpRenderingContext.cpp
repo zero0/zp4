@@ -663,48 +663,31 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 	// filter all commands into layer buckets if camera is present
 	zpRenderingCommand* cmd = m_renderingCommands.begin();
 	zpRenderingCommand* end = m_renderingCommands.end();
-	if( camera )
+	for( ; cmd != end; ++cmd )
 	{
-		for( ; cmd != end; ++cmd )
+		// if the command has no verts, don't add it
+		if( cmd->vertexCount == 0 ) continue;
+
+		// if the camera does not support any layer the command is not, don't add it
+		if( ( layer & cmd->layer ) == 0 ) continue;
+
+		// filter commands into buckets
+		switch( cmd->queue )
 		{
-			// if the command has no verts, don't add it
-			if( cmd->vertexCount == 0 ) continue;
-
-			// if the camera does not support any layer the command is not, don't add it
-			if( ( layer & cmd->layer ) == 0 ) continue;
-
-			// filter commands into buckets
-			switch( cmd->queue )
-			{
-				// no sort key needed for non-sorted queues
-			case ZP_RENDERING_QUEUE_SKYBOX:
-			case ZP_RENDERING_QUEUE_UI:
-			case ZP_RENDERING_QUEUE_UI_DEBUG:
-				m_filteredCommands[ cmd->queue ].pushBack( cmd );
-				break;
-
-				// otherwise, sort and cull commands based on the camera and its frustum
-			default:
-				if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
-				{
-					generateSortKeyForCommand( cmd, camera );
-					m_filteredCommands[ cmd->queue ].pushBack( cmd );
-				}
-			}
-		}
-	}
-	// otherwise, no filtering needs to take place
-	else
-	{
-		for( ; cmd != end; ++cmd )
-		{
-			// if the command has no verts, don't add it
-			if( cmd->vertexCount == 0 ) continue;
-
-			// if the camera does not support any layer the command is not, don't add it
-			if( ( layer & cmd->layer ) == 0 ) continue;
-			
+			// no sort key needed for non-sorted queues
+		case ZP_RENDERING_QUEUE_SKYBOX:
+		case ZP_RENDERING_QUEUE_UI:
+		case ZP_RENDERING_QUEUE_UI_DEBUG:
 			m_filteredCommands[ cmd->queue ].pushBack( cmd );
+			break;
+
+			// otherwise, sort and cull commands based on the camera and its frustum
+		default:
+			if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
+			{
+				generateSortKeyForCommand( cmd, camera );
+				m_filteredCommands[ cmd->queue ].pushBack( cmd );
+			}
 		}
 	}
 

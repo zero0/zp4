@@ -76,10 +76,10 @@ public:
 
 	const zpBison::Value& getOptions() const;
 
-	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam );
-	virtual void onFocusGained();
-	virtual void onFocusLost();
-	virtual void onDragDrop( const zp_char* filename, zp_int x, zp_int y );
+	void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam );
+	void onFocusGained();
+	void onFocusLost();
+	void onDragDrop( const zp_char* filename, zp_int x, zp_int y );
 
 	zp_bool loadFile( const zp_char* filename );
 	zp_bool handleDragAndDrop( const zp_char* filename, zp_int x, zp_int y );

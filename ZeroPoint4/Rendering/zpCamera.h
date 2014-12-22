@@ -100,6 +100,9 @@ public:
 	zpDepthStencilBuffer* getDepthStencilBuffer() const;
 	void setDepthStencilBuffer( zpDepthStencilBuffer* depthStencil );
 
+	void setOrder( zp_int order );
+	zp_int getOrder() const;
+
 private:
 	zpCameraProjection m_projectionType;
 	zpCameraType m_type;
@@ -128,6 +131,8 @@ private:
 
 	zpFlag8 m_clearMode;
 	zpFlag32 m_layers;
+
+	zp_int m_order;
 
 	zpCameraBufferData m_bufferData;
 };

@@ -197,12 +197,6 @@ void zpRenderingPipeline::initialize()
 	m_engine->createBuffer( m_perDrawCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
 	m_engine->createBuffer( m_lightBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
 
-	m_cameraStack.reserve( zpCameraType_Count );
-	for( zp_uint i = 0; i < zpCameraType_Count; ++i )
-	{
-		m_cameraStack.pushBackEmpty().reserve( 5 );
-	}
-
 	// fill free camera buffer
 	m_cameras.resize( 8 );
 	zpCamera* bc = m_cameras.begin();
@@ -287,21 +281,6 @@ void zpRenderingPipeline::destroy()
 
 void zpRenderingPipeline::update()
 {
-	zp_bool shouldPop;
-	for( zp_uint i = 0; i < zpCameraType_Count; ++i )
-	{
-		zpCamera* camera = &m_cameras[ i ];
-		zpArrayList< zpCameraState* >& stack = m_cameraStack[ i ];
-		
-		if( !stack.isEmpty() )
-		{
-			shouldPop = stack.back()->onUpdate( m_application, camera );
-			if( shouldPop )
-			{
-				popCameraState( (zpCameraType)i );
-			}
-		}
-	}
 }
 
 void zpRenderingPipeline::beginFrame( zpRenderingContext* i )
@@ -332,24 +311,39 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	// 1) fill buffers
 	i->fillBuffers();
 
-	zpCamera* cam;
+	zpCamera* camera;
+	zpFixedArrayList< zpCamera*, 8 > activeCameras;
 
-	// 1.a) render each active 3D camera
-	for( zp_int t = 0; t < ZP_CAMERA_TYPE_UI; ++t )
+	// 3D Cameras
 	{
-		zpArrayList< zpCamera* >& cameraList = m_usedCameras[ t ];
+		zpArrayList< zpCamera* >& cameraList = m_usedCameras[ ZP_CAMERA_TYPE_MAIN ];
+		activeCameras.clear();
 
 		zpCamera** b = cameraList.begin();
 		zpCamera** e = cameraList.end();
 		for( ; b != e; ++b )
 		{
-			cam = *b;
-			// only process active cameras
-			if( !cam->isActive() ) continue;
+			camera = *b;
 
+			// only process active cameras
+			if( camera->isActive() )
+			{
+				activeCameras.pushBack( camera );
+			}
+		}
+
+		activeCameras.sort( []( zpCamera* a, zpCamera* b ) {
+			return a->getOrder() < b->getOrder();
+		} );
+
+		b = activeCameras.begin();
+		e = activeCameras.end();
+		for( ; b != e; ++b )
+		{
+			camera = *b;
 			// 2) process commands, sorting, etc.
-			i->preprocessCommands( cam, cam->getRenderLayers() );
-			useCamera( i, cam, &m_cameraBuffer );
+			i->preprocessCommands( camera, camera->getRenderLayers() );
+			useCamera( i, camera, &m_cameraBuffer );
 
 			// 3) render opaque commands
 			i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
@@ -372,20 +366,34 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	// perform no UI screenshot
 	if( m_screenshotType == ZP_SCREENSHOT_TYPE_NO_UI ) m_engine->performScreenshot();
 
-	// 7) render UI commands
-	//for( zp_int t = 0; t < ZP_CAMERA_TYPE_UI; ++t )
+	// 2D Cameras
 	{
 		zpArrayList< zpCamera* >& cameraList = m_usedCameras[ ZP_CAMERA_TYPE_UI ];
+		activeCameras.clear();
 
 		zpCamera** b = cameraList.begin();
 		zpCamera** e = cameraList.end();
 		for( ; b != e; ++b )
 		{
-			cam = *b;
-			if( !cam->isActive() ) continue;
+			camera = *b;
 
-			i->preprocessCommands( cam, cam->getRenderLayers() );
-			useCamera( i, cam, &m_cameraBuffer );
+			// only process active cameras
+			if( camera->isActive() )
+			{
+				activeCameras.pushBack( camera );
+			}
+		}
+
+		activeCameras.sort( []( zpCamera* a, zpCamera* b ) {
+			return a->getOrder() < b->getOrder();
+		} );
+
+		b = activeCameras.begin();
+		e = activeCameras.end();
+		for( ; b != e; ++b )
+		{
+			i->preprocessCommands( camera, camera->getRenderLayers() );
+			useCamera( i, camera, &m_cameraBuffer );
 
 			processRenderingQueue( ZP_RENDERING_QUEUE_UI, false );
 			processRenderingQueue( ZP_RENDERING_QUEUE_UI_DEBUG, false );
@@ -717,44 +725,6 @@ void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zp
 
 	i->setViewport( camera->getViewport() );
 	i->setScissorRect( camera->getClipRect() );
-}
-
-void zpRenderingPipeline::pushCameraState( zpCameraType type, zpCameraState* state )
-{
-	if( state != ZP_NULL )
-	{
-		zpArrayList< zpCameraState* >& stack = m_cameraStack[ type ];
-		zpCamera* camera = &m_cameras[ type ];
-
-		if( !stack.isEmpty() )
-		{
-			stack.back()->onLeave( camera );
-		}
-
-		m_cameraStack[ type ].pushBackEmpty() = state;
-
-		state->onEnter( camera );
-	}
-}
-void zpRenderingPipeline::popCameraState( zpCameraType type )
-{
-	zpArrayList< zpCameraState* >& stack = m_cameraStack[ type ];
-
-	if( !stack.isEmpty() )
-	{
-		zpCamera* camera = &m_cameras[ type ];
-
-		zpCameraState* old = stack.back();
-		old->onLeave( camera );
-		delete old;
-		
-		stack.popBack();
-
-		if( !stack.isEmpty() )
-		{
-			stack.back()->onEnter( camera );
-		}
-	}
 }
 
 zp_bool zpRenderingPipeline::takeScreenshot( zpScreenshotType type, const zp_char* directoryPath )

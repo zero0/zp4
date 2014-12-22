@@ -57,7 +57,6 @@ enum
 enum zpCameraType : zp_byte
 {
 	ZP_CAMERA_TYPE_MAIN,
-	ZP_CAMERA_TYPE_CUSTOM,
 	ZP_CAMERA_TYPE_UI,
 
 	zpCameraType_Count,
@@ -550,7 +549,6 @@ enum zpRenderingCommandType : zp_uint
 	zpRenderingCommandType_Force32 = ZP_FORECE_32BIT,
 };
 
-ZP_ABSTRACT_CLASS zpCameraState;
 class zpCamera;
 
 class zpRenderingContext;
@@ -627,7 +625,6 @@ struct zpRenderingCommand
 #include "zpAtlas.h"
 #include "zpDynamicAtlas.h"
 
-#include "zpCameraState.h"
 #include "zpCamera.h"
 
 #include "zpRenderingContext.h"

@@ -85,7 +85,6 @@
   <ItemGroup>
     <ClInclude Include="zpAtlas.h" />
     <ClInclude Include="zpBlendState.h" />
-    <ClInclude Include="zpCameraState.h" />
     <ClInclude Include="zpDepthStencilState.h" />
     <ClInclude Include="zpDynamicAtlas.h" />
     <ClInclude Include="zpGenerateMesh.h" />
