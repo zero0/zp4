@@ -177,7 +177,7 @@ void zpBreakableComponent::doBreak()
 	// replace object with same transform
 	if( !m_replacementObject.isEmpty() )
 	{
-		zpObject* replacement = objectContent->createObject( getApplication(), m_replacementObject.str() );
+		zpObject* replacement = objectContent->createObject( m_replacementObject.str() );
 		replacement->setTransform( transform );
 	}
 
@@ -193,7 +193,7 @@ void zpBreakableComponent::doBreak()
 		zpString* e = m_breakIntoObjects.end();
 		for( ; b != e; ++b )
 		{
-			obj = objectContent->createObject( getApplication(), b->str() );
+			obj = objectContent->createObject( b->str() );
 			obj->setTransform( pos );
 		}
 	}

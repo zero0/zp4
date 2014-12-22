@@ -406,7 +406,7 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	}
 	else if( strFilename.endsWith( ".objectb" ) )
 	{
-		zpObject* o = m_objectContent.createObject( this, filename );
+		zpObject* o = m_objectContent.createObject( filename );
 		o->setWorld( m_currentWorld );
 		loaded = o != ZP_NULL;
 	}

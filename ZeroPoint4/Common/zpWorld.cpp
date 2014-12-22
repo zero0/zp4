@@ -166,7 +166,7 @@ void zpWorld::createWorldObject( const zpBison::Value& def )
 {
 	zpObject* o;
 	const zp_char* objFile = def[ "Object" ].asCString();
-	o = m_application->getObjectContentManager()->createObject( m_application, objFile );
+	o = m_application->getObjectContentManager()->createObject( objFile );
 
 	if( !isFlagSet( ZP_WORLD_FLAG_DESTROY_AFTER_LOAD ) )
 	{

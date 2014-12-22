@@ -13,19 +13,24 @@ void zpObjectResource::unload()
 	m_filename.clear();
 }
 
-zpObject* zpObjectContentManager::createObject( zpApplication* application, const zp_char* filename )
+zpObject* zpObjectContentManager::createObject()
+{
+	zpObject* o = create( getApplication() );
+	return o;
+}
+zpObject* zpObjectContentManager::createObject( const zp_char* filename )
 {
 	zpObject* o = ZP_NULL;
 
 	zpObjectResourceInstance obj;
 	if( getResource( filename, obj ) )
 	{
-		o = create( application, obj );
+		o = create( getApplication(), obj );
 	}
 
 	return o;
 }
-zpObject* zpObjectContentManager::createObject( zpApplication* application, const zpBison::Value& def )
+zpObject* zpObjectContentManager::createObject( const zpBison::Value& def )
 {
 	zpObject* o = ZP_NULL;
 
@@ -148,6 +153,20 @@ void zpObjectContentManager::destroyResource( zpObjectResource* res )
 	res->unload();
 }
 
+zpObject::zpObject( zpApplication* application )
+	: m_transform()
+	, m_name()
+	, m_tags()
+	, m_flags()
+	, m_lastLoadTime( 0 )
+	, m_components()
+	, m_application( application )
+	, m_world( ZP_NULL )
+	, m_object()
+{
+	setFlag( ZP_OBJECT_FLAG_ENABLED );
+	loadObject( true );
+}
 zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& res )
 	: m_transform()
 	, m_name()
@@ -388,11 +407,6 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 		} );
 
 		m_flags.mark( ZP_OBJECT_FLAG_CREATED );
-	}
-	// otherwise, mark this object for delete
-	else
-	{
-		destroy();
 	}
 }
 void zpObject::unloadObject()

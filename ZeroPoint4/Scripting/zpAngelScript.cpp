@@ -40,6 +40,49 @@
 #define AS_ASSERT( r )	ZP_ASSERT( (r) >= asSUCCESS, "AngelScript Assert Failed (%d): %s:%d", (r), __FILE__, __LINE__ )
 //if( (r) < asSUCCESS ) { zpLog::debug() << "Assert Failed: (" << r << ") " << __FILE__ << ':' << __LINE__ << zpLog::endl; }
 
+template< typename T >
+class zpRefObject
+{
+public:
+	zpRefObject()
+		: m_refCount( 1 )
+	{}
+	~zpRefObject()
+	{}
+
+	void addRef()
+	{
+		++m_refCount;
+	}
+	void release()
+	{
+		--m_refCount;
+		if( m_refCount == 0 ) delete this;
+	}
+
+	operator T*()
+	{
+		return &m_value;
+	}
+	operator const T*() const
+	{
+		return &m_value;
+	}
+
+	operator T&()
+	{
+		return m_value;
+	}
+	operator const T&() const
+	{
+		return m_value;
+	}
+
+private:
+	T m_value;
+	zp_int m_refCount;
+};
+
 #pragma region Register Core
 void as_MessageCallback( const asSMessageInfo& info )
 {
@@ -319,7 +362,7 @@ void as_Register_zpScalar( asIScriptEngine* engine )
 {
 	zp_int r;
 
-	r = engine->RegisterObjectType( ZP_SCRIPT_SCALAR, sizeof( zpScalar ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectType( ZP_SCRIPT_SCALAR, sizeof( zpScalar ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK | asOBJ_APP_CLASS_ALLFLOATS ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_SCALAR, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpScalar_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_SCALAR, asBEHAVE_CONSTRUCT, "void f( const float )", asFUNCTION( as_zpScalar_ConstructorX ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_SCALAR, asBEHAVE_CONSTRUCT, "void f( const " ZP_SCRIPT_SCALAR "& in )", asFUNCTION( as_zpScalar_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
@@ -454,7 +497,7 @@ void as_Register_zpVector4f( asIScriptEngine* engine )
 {
 	zp_int r;
 
-	r = engine->RegisterObjectType(      ZP_SCRIPT_VECTOR4, sizeof( zpVector4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      ZP_SCRIPT_VECTOR4, sizeof( zpVector4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK | asOBJ_APP_CLASS_ALLFLOATS ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_VECTOR4, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpVector4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_VECTOR4, asBEHAVE_CONSTRUCT, "void f( float, float )", asFUNCTION( as_zpVector4f_ConstructorXY ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_VECTOR4, asBEHAVE_CONSTRUCT, "void f( float, float, float )", asFUNCTION( as_zpVector4f_ConstructorXYZ ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
@@ -531,7 +574,7 @@ void as_Register_zpVector2f( asIScriptEngine* engine )
 {
 	zp_int r;
 
-	r = engine->RegisterObjectType(      ZP_SCRIPT_VECTOR2, sizeof( zpVector2f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      ZP_SCRIPT_VECTOR2, sizeof( zpVector2f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK | asOBJ_APP_CLASS_ALLFLOATS ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_VECTOR2, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpVector2f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_VECTOR2, asBEHAVE_CONSTRUCT, "void f( float, float )", asFUNCTION( as_zpVector2f_ConstructorXY ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_VECTOR2, asBEHAVE_CONSTRUCT, "void f( const " ZP_SCRIPT_VECTOR2 "& in )", asFUNCTION( as_zpVector2f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
@@ -573,7 +616,7 @@ void as_Register_zpColor4f( asIScriptEngine* engine )
 {
 	zp_int r;
 
-	r = engine->RegisterObjectType(      ZP_SCRIPT_COLOR, sizeof( zpColor4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      ZP_SCRIPT_COLOR, sizeof( zpColor4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK | asOBJ_APP_CLASS_ALLFLOATS ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_COLOR, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpColor4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_COLOR, asBEHAVE_CONSTRUCT, "void f( float, float, float )", asFUNCTION( as_zpColor4f_ConstructorRGB ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_COLOR, asBEHAVE_CONSTRUCT, "void f( float, float, float, float )", asFUNCTION( as_zpColor4f_ConstructorRGBA ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
@@ -620,7 +663,7 @@ void as_Register_zpMatrix4f( asIScriptEngine* engine )
 {
 	zp_int r;
 
-	r = engine->RegisterObjectType(      ZP_SCRIPT_MATRIX4, sizeof( zpMatrix4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK ); AS_ASSERT( r );
+	r = engine->RegisterObjectType(      ZP_SCRIPT_MATRIX4, sizeof( zpMatrix4f ), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK | asOBJ_APP_CLASS_ALLFLOATS ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATRIX4, asBEHAVE_CONSTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Constructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATRIX4, asBEHAVE_CONSTRUCT, "void f( const " ZP_SCRIPT_MATRIX4 "& in )", asFUNCTION( as_zpMatrix4f_CopyConstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_MATRIX4, asBEHAVE_DESTRUCT, "void f()", asFUNCTION( as_zpMatrix4f_Deconstructor ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
@@ -671,68 +714,22 @@ void as_Register_zpBoundingAABB( asIScriptEngine* engine )
 }
 #pragma endregion
 
-#pragma region Register zpGameObject
-//zpRefObject< zpObject >* as_Object_Factory()
-//{
-//	return new zpRefObject< zpObject >;
-//}
-//
-//void as_zpGameObject_Register( asIScriptEngine* engine, zpApplication* app )
-//{
-//	zp_int r;
-//
-//	r = engine->RegisterObjectType(      ZP_SCRIPT_OBJECT, sizeof( zpRefObject< zpObject > ), asOBJ_REF ); AS_ASSERT( r );
+#pragma region Register zpObject
+void as_zpObject_Register( asIScriptEngine* engine, zpApplication* app )
+{
+	zp_int r;
+
+	r = engine->RegisterObjectType(      ZP_SCRIPT_OBJECT, sizeof( zpRefObject< zpObject* > ), asOBJ_REF ); AS_ASSERT( r );
 //	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_FACTORY, "" ZP_SCRIPT_OBJECT "@ f()", asFUNCTION( as_Object_Factory ), asCALL_CDECL ); AS_ASSERT( r );
-//	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject< zpObject >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
-//	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject< zpObject >, release ), asCALL_THISCALL ); AS_ASSERT( r );
-//
-//}
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject< zpObject* >, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject< zpObject* >, release ), asCALL_THISCALL ); AS_ASSERT( r );
+
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "const " ZP_SCRIPT_MATRIX4 "& get_transform() const", asMETHODPR( zpObject, getTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "void set_transform( const " ZP_SCRIPT_MATRIX4 "& in )", asMETHODPR( zpObject, setTransform, ( const zpMatrix4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+}
 #pragma endregion
 
 #pragma region Register Rendering
-template< typename T >
-class zpRefObject
-{
-public:
-	zpRefObject()
-		: m_refCount( 1 )
-	{}
-	~zpRefObject()
-	{}
-
-	void addRef()
-	{
-		++m_refCount;
-	}
-	void release()
-	{
-		--m_refCount;
-		if( m_refCount == 0 ) delete this;
-	}
-
-	operator T*()
-	{
-		return &m_value;
-	}
-	operator const T*() const
-	{
-		return &m_value;
-	}
-
-	operator T&()
-	{
-		return m_value;
-	}
-	operator const T&() const
-	{
-		return m_value;
-	}
-
-private:
-	T m_value;
-	zp_int m_refCount;
-};
-
 zpRefObject< zpMaterialResourceInstance >* as_Material_Factory()
 {
 	return new zpRefObject< zpMaterialResourceInstance >;

@@ -41,6 +41,7 @@ class zpObject
 	friend class zpObjectContentManager;
 
 public:
+	zpObject( zpApplication* application );
 	zpObject( zpApplication* application, const zpObjectResourceInstance& res );
 	~zpObject();
 
@@ -104,8 +105,9 @@ private:
 class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 4 >, private zpContentPool< zpObject, 8 >
 {
 public:
-	zpObject* createObject( zpApplication* application, const zp_char* filename );
-	zpObject* createObject( zpApplication* application, const zpBison::Value& def );
+	zpObject* createObject();
+	zpObject* createObject( const zp_char* filename );
+	zpObject* createObject( const zpBison::Value& def );
 
 	void initializeAllObjectsInWorld( zpWorld* world );
 

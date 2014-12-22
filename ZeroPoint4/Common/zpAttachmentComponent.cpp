@@ -13,7 +13,7 @@ zpAttachmentComponent::zpAttachmentComponent( zpObject* obj, const zpBison::Valu
 		{
 			const zp_char* objName = child.asCString();
 
-			zpObject* o = manager->createObject( getApplication(), objName );
+			zpObject* o = manager->createObject( objName );
 			addChild( o );
 		} );
 	}
