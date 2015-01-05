@@ -18,11 +18,12 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		zpLog::message()
 			<< "Usage: ShaderCompiler.exe "
 			<< zpLog::gray << "DX9/DX10/DX11/GL2 "
-			<< zpLog::dark_gray << "[-O#|-Mkey=value] "
+			<< zpLog::dark_gray << "[-O#|-Mkey=value|-Ipath/to/sys/include] "
 			<< zpLog::gray << "path/to/inputfile.shader path/to/outputfile.shaderb"
 			<< zpLog::endl
 			<< "    -O# - Optimization Level  [dD]012345" << zpLog::endl
-			<< "    -Mkey=value - key = value macro"
+			<< "    -Ipath/to/sys/include - System Include Dir" << zpLog::endl
+			<< "    -Mkey=value - key = value Macro"
 			;
 	}
 	else
@@ -50,7 +51,8 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 
 		if( compiler != ZP_NULL )
 		{
-			if( compiler->initialize( arguments ) )
+			compiler->initialize( arguments );
+			if( compiler->readInputFile() )
 			{
 				compiler->compile();
 				compiler->shutdown();

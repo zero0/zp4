@@ -807,6 +807,30 @@ void zpString::split( zp_char delim, zpArrayList< zpString >& parts ) const
 		from = to + 1;
 	}
 }
+void zpString::split( zp_char delim, zpArrayList< zpString >& parts, zp_int maxSplits ) const
+{
+	zp_uint from = 0;
+	zp_uint to = 0;
+
+	parts.clear();
+	while( to != npos )
+	{
+		to = maxSplits == 0 ? npos : indexOf( delim, from );
+		if( from < m_length && from != to )
+		{
+			if( to == npos )
+			{
+				parts.pushBackEmpty() = zp_move( substring( from ) );
+			}
+			else
+			{
+				parts.pushBackEmpty() = zp_move( substring( from, to ) );
+				--maxSplits;
+			}
+		}
+		from = to + 1;
+	}
+}
 
 void zpString::ensureCapacity( zp_uint size )
 {

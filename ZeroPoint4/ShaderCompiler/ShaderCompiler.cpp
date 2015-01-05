@@ -6,13 +6,25 @@ BaseShaderCompiler::BaseShaderCompiler()
 BaseShaderCompiler::~BaseShaderCompiler()
 {}
 
-zp_bool BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
+void BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 {
+	// use last two args as input and output files
+	m_inputFile = args[ args.size() - 2 ];
+	m_outputFile = args[ args.size() - 1 ];
+
+	zpFile::convertToFilePath( m_inputFile );
+	zpFile::convertToFilePath( m_outputFile );
+
+	// find local include dir from input file and by default use the local as the system include path
+	m_localIncludeDir = m_inputFile.substring( 0, m_inputFile.lastIndexOf( zpFile::sep ) );
+	m_systemIncludeDir = m_localIncludeDir;
+
 	// process args for optional params
 	if( args.size() > 3 )
 	{
 		args.foreach( [ this ]( const zpString& arg )
 		{
+			// set optimization level
 			if( arg.startsWith( "-O" ) )
 			{
 				zp_char level = arg.charAt( arg.length() - 1 );
@@ -25,75 +37,51 @@ zp_bool BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 					m_optimizationLevel = -1;
 				}
 			}
+			// add any external macros
 			else if( arg.startsWith( "-M" ) )
 			{
-				zpString macro( arg.substring( 2 ) );
 				zpFixedArrayList< zpString, 2 > parts;
-				macro.split( '=', parts );
+				 arg.substring( 2 ).split( '=', parts );
 
 				m_macros.put( parts[ 0 ], parts[ 1 ] );
+			}
+			// set system include dir
+			else if( arg.startsWith( "-I" ) )
+			{
+				m_systemIncludeDir = arg.substring( 2 );
+				zpFile::convertToFilePath( m_systemIncludeDir );
 			}
 		} );
 	}
 
-	// use last two args as input and output files
-	m_inputFile = args[ args.size() - 2 ];
-	m_outputFile = args[ args.size() - 1 ];
+	initializePlatform();
+}
 
-	zpFile::convertToFilePath( m_inputFile );
-	zpFile::convertToFilePath( m_outputFile );
-
+zp_bool BaseShaderCompiler::readInputFile()
+{
 	zp_bool success = false;
 
+	// read input file
 	zpFile input( m_inputFile );
 	if( input.open( ZP_FILE_MODE_ASCII_READ ) )
 	{
-		success = true;
 		input.readFile( m_shaderText );
 		input.close();
 
 		parsePragmas();
-	}
 
-	//zpJsonParser parser;
-	//
-	//// parse input file and read in shader file text
-	//if( parser.parseFile( m_inputFile, m_shaderDesc ) )
-	//{
-	//	const zp_char* filenameStr = m_shaderDesc[ "File" ].asCString();
-	//
-	//	zp_int lastSlash = m_inputFile.lastIndexOf( zpFile::sep );
-	//	
-	//	zpString filename = m_inputFile.substring( 0, lastSlash + 1 );
-	//	filename.append( filenameStr );
-	//
-	//	zpFile shaderFile( filename );
-	//	if( shaderFile.open( ZP_FILE_MODE_ASCII_READ ) )
-	//	{
-	//		shaderFile.readFile( m_shaderText );
-	//		shaderFile.close();
-	//
-	//		success = true;
-	//
-	//		prepareShaderMacros( m_shaderDesc[ "Macros" ], m_globalMacros );
-	//	}
-	//	else
-	//	{
-	//		zpLog::error() << "Failed to read file '" << filename << "'" << zpLog::endl;
-	//	}
-	//}
-	//else
-	//{
-	//	zpLog::error() << "Failed to parse file '" << m_inputFile << "'" << zpLog::endl;
-	//}
+		success = true;
+	}
 
 	return success;
 }
 
 void BaseShaderCompiler::compile()
 {
-	compileShaderPS();
 	compileShaderVS();
+	compileShaderPS();
+	compileShaderGS();
+	compileShaderCS();
 }
 
 void BaseShaderCompiler::shutdown()
@@ -128,28 +116,6 @@ void BaseShaderCompiler::compileShaderVS()
 	zpJson& vs = m_compiledShaderDesc[ "VS" ];
 	vs[ "Shader" ] = zpJson( data );
 	vs[ "Format" ] = zpJson( m_pragmas[ zpString( PRAGMA_FORMAT ) ] );
-
-	//const zpJson& vs = m_shaderDesc[ "VS" ];
-	//if( vs.isObject() && !vs.isEmpty() )
-	//{
-	//	// copy global macros
-	//	ShaderMacros localMacros = m_globalMacros;
-	//	prepareShaderMacros( vs[ "Macros" ], localMacros );
-	//
-	//	// add shader specific flags
-	//	ShaderMacro& macro = localMacros.pushBackEmpty();
-	//	macro.first() = SHADER_COMPILE_VS;
-	//	macro.second() = "1";
-	//
-	//	// compile platform shader
-	//	zpDataBuffer data;
-	//	if( compileShaderVSPlatform( vs, localMacros, data ) )
-	//	{
-	//		zpJson& cvs = m_compiledShaderDesc[ "VS" ];
-	//		cvs[ "Shader" ] = zpJson( data );
-	//		cvs[ "Format" ] = vs[ "Format" ];
-	//	}
-	//}
 }
 
 void BaseShaderCompiler::compileShaderPS()
@@ -163,33 +129,19 @@ void BaseShaderCompiler::compileShaderPS()
 	m_macros.erase( key );
 
 	m_compiledShaderDesc[ "PS" ][ "Shader" ] = zpJson( data );
-	//const zpJson& ps = m_shaderDesc[ "PS" ];
-	//if( ps.isObject() && !ps.isEmpty() )
-	//{
-	//	// copy global macros
-	//	ShaderMacros localMacros = m_globalMacros;
-	//	prepareShaderMacros( ps[ "Macros" ], localMacros );
-	//
-	//	// add shader specific flags
-	//	ShaderMacro& macro = localMacros.pushBackEmpty();
-	//	macro.first() = SHADER_COMPILE_PS;
-	//	macro.second() = "1";
-	//
-	//	// compile platform shader
-	//	zpDataBuffer data;
-	//	if( compileShaderPSPlatform( ps, localMacros, data ) )
-	//	{
-	//		zpJson& ps = m_compiledShaderDesc[ "PS" ];
-	//		ps[ "Shader" ] = zpJson( data );
-	//	}
-	//}
 }
+
+void BaseShaderCompiler::compileShaderGS()
+{}
+
+void BaseShaderCompiler::compileShaderCS()
+{}
 
 void BaseShaderCompiler::parsePragmas()
 {
-	zpString allText( m_shaderText.str(), m_shaderText.size() );
+	zpString allText = m_shaderText.toString();
 	zpArrayList< zpString > lines;
-	zpArrayList< zpString > parts;
+	zpFixedArrayList< zpString, 3 > parts;
 
 	allText.split( '\n', lines );
 
@@ -197,10 +149,14 @@ void BaseShaderCompiler::parsePragmas()
 	{
 		if( line.startsWith( "#pragma " ) )
 		{
-			line.split( ' ', parts );
-			if( parts.size() > 2 )
+			line.split( ' ', parts, 2 );
+			if( parts.size() == 3 )
 			{
 				m_pragmas.put( parts[ 1 ], parts[ 2 ] );
+			}
+			else if( parts.size() == 2 )
+			{
+				m_pragmas.put( parts[ 1 ], zpString( "" ) );
 			}
 		}
 	} );

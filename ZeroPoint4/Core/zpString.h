@@ -80,6 +80,7 @@ public:
 	zpString trim() const;
 
 	void split( zp_char delim, zpArrayList< zpString >& parts ) const;
+	void split( zp_char delim, zpArrayList< zpString >& parts, zp_int maxSplits ) const;
 	
 	template<typename Func>
 	void foreach( Func func )

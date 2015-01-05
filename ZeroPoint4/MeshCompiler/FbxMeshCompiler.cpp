@@ -393,7 +393,6 @@ void _getFbxMeshData( zpFbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 					break;
 				}
 			}
-			int i = 0;i++;
 
 			_getFbxMeshSkinData( data, mesh );
 		}
