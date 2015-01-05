@@ -1,0 +1,53 @@
+#ifndef ZERO_POINT_HLSL_SHADER_INC
+#define ZERO_POINT_HLSL_SHADER_INC
+
+#if ZP_SHADER_API_HLSL
+
+#pragma pack_matrix( row_major )
+
+#if ZP_SHADER_DX9
+
+#define ZP_CBUFFER_START( name, index )	ConstantBuffer name {
+#define ZP_CBUFFER_END					};
+
+#else // ZP_SHADER_DX10 || ZP_SHADER_DX11
+
+#pragma warning( disable : 3568 ) // unknown pragma ignored
+
+#define ZP_CBUFFER_START( name, index )	cbuffer name : register( b##index ) {
+#define ZP_CBUFFER_END					};
+
+#endif // ZP_SHADER_DX9
+
+#define COLOR	SV_TARGET
+
+struct zpSampler1D
+{
+	Texture1D		t;
+	SamplerState	s;
+};
+struct zpSampler2D
+{
+	Texture2D		t;
+	SamplerState	s;
+};
+struct zpSampler3D
+{
+	Texture3D		t;
+	SamplerState	s;
+};
+struct zpSamplerCUBE
+{
+	TextureCube		t;
+	SamplerState	s;
+};
+
+inline float4 tex1D( zpSampler1D x, float v )		{ return x.t.Sample( x.s, v ); }
+inline float4 tex2D( zpSampler2D x, float2 v )		{ return x.t.Sample( x.s, v ); }
+inline float4 tex3D( zpSampler3D x, float3 v )		{ return x.t.Sample( x.s, v ); }
+inline float4 texCUBE( zpSamplerCUBE x, float3 v )	{ return x.t.Sample( x.s, v ); }
+
+#endif
+
+#endif
+ 

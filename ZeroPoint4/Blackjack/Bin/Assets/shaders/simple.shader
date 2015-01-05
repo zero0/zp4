@@ -1,26 +1,27 @@
-#pragma pack_matrix( row_major )
+#include <ZeroPoint.shaderinc>
+
 #pragma vertex main_vs
 #pragma fragment main_ps
 #pragma format VC
 
-struct VS_Input {
-	float4 position : POSITION;
-	float4 color : COLOR;
-};
-
-struct PS_Input {
+struct v2f
+{
 	float4 position : SV_POSITION;
 	float4 color : COLOR;
 };
 
-PS_Input main_vs( VS_Input input ) {
-	PS_Input output = (PS_Input)0;
-	output.position = input.position;
-	output.color = input.color;
+v2f main_vs( vs_input_color v )
+{
+	v2f o = (v2f)0;
+	o.position = v.position;
+	o.position = mul( o.position, world );
+	o.position = mul( o.position, viewProjection );
+	o.color = v.color;
 	
-	return output;
+	return o;
 }
 
-float4 main_ps( PS_Input input ) : SV_TARGET {
+float4 main_ps( v2f input ) : COLOR
+{
 	return input.color;
 }

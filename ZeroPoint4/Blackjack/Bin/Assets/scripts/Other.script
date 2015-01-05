@@ -17,9 +17,4 @@ class Other
 	void update()
 	{
 	}
-	
-	public void testCrosscall()
-	{
-		println( "Test Cross Call!" );
-	}
 }
