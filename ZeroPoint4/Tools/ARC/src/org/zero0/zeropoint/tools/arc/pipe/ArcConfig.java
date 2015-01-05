@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.zero0.zeropoint.tools.arc.util.FileUtil;
+
 public class ArcConfig
 {
 	private Map< String, String > options;
@@ -11,7 +13,7 @@ public class ArcConfig
 	
 	public void load( String configFile )
 	{
-		String configData = ArcUtil.readFile( configFile );
+		String configData = FileUtil.readFileText( configFile );
 		config = org.zero0.json.Parser.parse( configData );
 		
 		options = new HashMap< String, String >();

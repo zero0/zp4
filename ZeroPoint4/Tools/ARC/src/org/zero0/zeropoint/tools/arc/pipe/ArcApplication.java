@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.zero0.zeropoint.tools.arc.util.FileUtil;
+
 public class ArcApplication
 {
 	private ArcConfig config;
@@ -69,12 +71,73 @@ public class ArcApplication
 		{
 			String filename = proc.getName();
 			
-			String txt = ArcUtil.readFile( proc.getAbsolutePath() );
+			String txt = FileUtil.readFileText( proc.getAbsolutePath() );
 			org.zero0.json.Value json = org.zero0.json.Parser.parse( txt );
 			
-			IArcProcessor arcProc = ArcUtil.createArcProcessor( json );
+			IArcProcessor arcProc = createArcProcessor( json );
 			
 			processors.put( filename, arcProc );
 		}
+	}
+	
+
+	private static < T extends IArcConfig > T createArcConfig( org.zero0.json.Value value )
+	{
+		T source = null;
+		
+		String sourceClass = value.get( "class" ).asString();
+		
+		try
+		{
+			Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass( sourceClass );
+			
+			@SuppressWarnings( "unchecked" )
+			Class< ? extends T > c = (Class< ? extends T >)clazz;
+			
+			source = c.newInstance();
+			source.config( value.get( "params" ) );
+		}
+		catch( Exception e )
+		{
+			e.printStackTrace();
+		}
+		
+		return source;
+	}
+	
+	public static IArcSource createArcSource( org.zero0.json.Value value )
+	{
+		IArcSource source = null;
+
+		source = createArcConfig( value );
+		
+		return source;
+	}
+	
+	public static IArcTarget createArcTarget( org.zero0.json.Value value )
+	{
+		IArcTarget target = null;
+		
+		target = createArcConfig( value );
+		
+		return target;
+	}
+	
+	public static IArcPipe createArcPipe( org.zero0.json.Value value )
+	{
+		IArcPipe pipe = null;
+		
+		pipe = createArcConfig( value );
+		
+		return pipe;
+	}
+	
+	public static IArcProcessor createArcProcessor( org.zero0.json.Value value )
+	{
+		IArcProcessor processor = null;
+		
+		processor = createArcConfig( value );
+		
+		return processor;
 	}
 }

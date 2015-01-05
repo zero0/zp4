@@ -8,35 +8,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class FileWatcher implements Runnable, FilenameFilter
 {
-	final Object lock = new Object();
+	private final Object lock = new Object();
 
-	Map<String, Long> filesToWatch;
-	List<FileWatcherListener> listeners;
-	List<String> includeExtensions;
-	List<String> filesChanged;
-	List<String> filesAdded;
-	List<String> filesRemoved;
+	private Map< String, Long > filesToWatch;
+	private List< FileWatcherListener > listeners;
+	private List< String > includeExtensions;
+	private List< String > filesChanged;
+	private List< String > filesAdded;
+	private List< String > filesRemoved;
 
-	File rootDir;
-	String rootPath;
-	Thread thread;
+	private File rootDir;
+	private String rootPath;
+	private Thread thread;
 
-	boolean isRunning;
-	boolean isEnabled;
-	long delay;
+	private boolean isRunning;
+	private boolean isEnabled;
+	private long delay;
 
 	public FileWatcher()
 	{
 		thread = null;
-		filesToWatch = new HashMap<String, Long>();
-		listeners = new ArrayList<FileWatcherListener>();
-		includeExtensions = new ArrayList<String>();
-		filesChanged = new ArrayList<String>();
-		filesAdded = new ArrayList<String>();
-		filesRemoved = new ArrayList<String>();
+		filesToWatch = new HashMap< String, Long >();
+		listeners = new ArrayList< FileWatcherListener >();
+		includeExtensions = new ArrayList< String >();
+		filesChanged = new ArrayList< String >();
+		filesAdded = new ArrayList< String >();
+		filesRemoved = new ArrayList< String >();
 
 		isRunning = false;
 		isEnabled = false;
@@ -54,7 +53,12 @@ public class FileWatcher implements Runnable, FilenameFilter
 	public void setRootDir( String root )
 	{
 		rootDir = new File( root );
-		rootPath = root;
+		rootPath = getStandardPathForFile( rootDir );
+	}
+	
+	public String getRootDir()
+	{
+		return rootPath;
 	}
 
 	public void start()
@@ -68,7 +72,10 @@ public class FileWatcher implements Runnable, FilenameFilter
 	}
 	public void clean( boolean full )
 	{
-		filesToWatch.clear();
+		synchronized( filesToWatch )
+		{
+			filesToWatch.clear();
+		}
 	}
 	
 	public long getFileModificationTime( String filename )
@@ -77,34 +84,39 @@ public class FileWatcher implements Runnable, FilenameFilter
 		return modTime == null ? -1 : modTime.longValue();
 	}
 	
-	public List<String> getFiles()
+	public List< String > getFiles()
 	{
-		return Collections.unmodifiableList( new ArrayList<String>( filesToWatch.keySet() ) );
+		List< String > allFiles = null;
+		synchronized( filesToWatch )
+		{
+			allFiles = Collections.unmodifiableList( new ArrayList< String >( filesToWatch.keySet() ) );
+		}
+
+		return allFiles;
 	}
 	
 	public int getNumFiles()
 	{
-		return filesToWatch.size();
-	}
-
-	public void addFile( File file )
-	{
-		if( file.isDirectory() )
+		int size = 0;
+		synchronized( filesToWatch )
 		{
-			for( File f : file.listFiles( this ) )
-			{
-				addFile( f );
-			}
+			size = filesToWatch.size();
 		}
-		else
-		{
-			filesAdded.add( getStandardPathForFile( file ) );
-		}
+		
+		return size;
 	}
 
 	public void addAcceptedFileExtension( String extension )
 	{
 		includeExtensions.add( "." + extension );
+	}
+	
+	public void addAccaptedFileExtensions( String ... extensions )
+	{
+		for( String ext : extensions )
+		{
+			includeExtensions.add( "." + ext );
+		}
 	}
 
 	public void addListener( FileWatcherListener listener )
@@ -122,7 +134,7 @@ public class FileWatcher implements Runnable, FilenameFilter
 		listeners.clear();
 	}
 
-	void fireChangeListeners( String filePath )
+	private void fireChangeListeners( String filePath )
 	{
 		for( FileWatcherListener l : listeners )
 		{
@@ -130,7 +142,7 @@ public class FileWatcher implements Runnable, FilenameFilter
 		}
 	}
 
-	void fireAddListeners( String filePath )
+	private void fireAddListeners( String filePath )
 	{
 		for( FileWatcherListener l : listeners )
 		{
@@ -138,7 +150,7 @@ public class FileWatcher implements Runnable, FilenameFilter
 		}
 	}
 	
-	void fireRemovedListeners( String filePath )
+	private void fireRemovedListeners( String filePath )
 	{
 		for( FileWatcherListener l : listeners )
 		{
@@ -146,7 +158,7 @@ public class FileWatcher implements Runnable, FilenameFilter
 		}
 	}
 	
-	void fireFileListChanged()
+	private void fireFileListChanged()
 	{
 		for( FileWatcherListener l : listeners )
 		{
@@ -179,7 +191,7 @@ public class FileWatcher implements Runnable, FilenameFilter
 
 	private void checkUpdateFiles()
 	{
-		for( Map.Entry<String, Long> e : filesToWatch.entrySet() )
+		for( Map.Entry< String, Long > e : filesToWatch.entrySet() )
 		{
 			long lastModified = e.getValue();
 			long currentModified = new File( e.getKey() ).lastModified();
@@ -193,9 +205,10 @@ public class FileWatcher implements Runnable, FilenameFilter
 	
 	private void checkForAddedRemovedFiles( File file )
 	{
+		List< String > trackedFiles = new ArrayList< String >( filesToWatch.keySet() );
+		List< String > allFilePaths = new ArrayList< String >();
+
 		// get all the files in the directory
-		List<String> trackedFiles = new ArrayList<String>( filesToWatch.keySet() );
-		List<String> allFilePaths = new ArrayList<String>();
 		getListOfAcceptableFiles( file, allFilePaths );
 		
 		// unknown files found, should add
@@ -220,7 +233,7 @@ public class FileWatcher implements Runnable, FilenameFilter
 		}
 	}
 	
-	private void getListOfAcceptableFiles( File file, List<String> filePaths )
+	private void getListOfAcceptableFiles( File file, List< String > filePaths )
 	{
 		if( file.isDirectory() )
 		{
@@ -266,11 +279,15 @@ public class FileWatcher implements Runnable, FilenameFilter
 			}
 			if( !isRunning ) break;
 
-			// check for file updates
-			checkUpdateFiles();
-
-			// check for new or removed files
-			checkForAddedRemovedFiles( rootDir );
+			// lock around files to watch
+			synchronized( filesToWatch )
+			{
+				// check for file updates
+				checkUpdateFiles();
+	
+				// check for new or removed files
+				checkForAddedRemovedFiles( rootDir );
+			}
 			
 			// file changed
 			if( !filesChanged.isEmpty() )
