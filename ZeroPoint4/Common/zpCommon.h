@@ -34,7 +34,7 @@ class zpKinematicBodyComponent;
 class zpPhantomComponent;
 
 class zpBreakableComponent;
-class zpAttachmentComponent;
+class zpTransformComponent;
 class zpProjectileComponent;
 
 class zpUIComponent;
@@ -71,7 +71,7 @@ class zpOctreeNode;
 
 // Common
 #include "zpBreakableComponent.h"
-#include "zpAttachmentComponent.h"
+#include "zpTransformComponent.h"
 #include "zpProjectileComponent.h"
 
 // GUI

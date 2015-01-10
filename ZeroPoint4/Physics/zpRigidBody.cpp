@@ -82,17 +82,26 @@ void zpRigidBody::destroy()
 	m_motionState = ZP_NULL;
 }
 
-zp_bool zpRigidBody::getMatrix( zpMatrix4f& transform )
+void zpRigidBody::getMatrix( zpMatrix4f& transform )
 {
-	if( m_isStatic ) return false;
-
 	btMotionState* motion = (btMotionState*)m_motionState;
 
 	btTransform t;
 	motion->getWorldTransform( t );
 
 	t.getOpenGLMatrix( transform.getData() );
-	return true;
+}
+void zpRigidBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation )
+{
+	btMotionState* motion = (btMotionState*)m_motionState;
+
+	btTransform t;
+	motion->getWorldTransform( t );
+
+	const btVector3& o = t.getOrigin();
+	position = zpVector4f( o.x(), o.y(), o.z(), 1.f );
+
+	rotation.load4( t.getRotation() );
 }
 
 zp_bool zpRigidBody::isStatic() const

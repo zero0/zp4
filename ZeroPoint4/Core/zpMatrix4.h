@@ -80,6 +80,9 @@ public:
 
 	friend void zpMath::ToMatrix( zpMatrix4f& s, const zpQuaternion4f& a );
 
+	friend void zpMath::TRS( zpMatrix4f& m, const zpVector4f& p, const zpQuaternion4f& r, const zpVector4f& s );
+
+
 private:
 	union
 	{

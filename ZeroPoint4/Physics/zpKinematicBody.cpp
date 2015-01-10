@@ -552,14 +552,24 @@ void zpKinematicBody::destroy()
 	m_ghost = ZP_NULL;
 }
 
-zp_bool zpKinematicBody::getMatrix( zpMatrix4f& transform )
+void zpKinematicBody::getMatrix( zpMatrix4f& transform )
 {
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_ghost;
 
 	const btTransform& t = ghost->getWorldTransform();
 
 	t.getOpenGLMatrix( transform.getData() );
-	return true;
+}
+void zpKinematicBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation )
+{
+	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_ghost;
+
+	const btTransform& t = ghost->getWorldTransform();
+
+	const btVector3& o = t.getOrigin();
+	position = zpVector4f( o.x(), o.y(), o.z(), 1.f );
+
+	rotation.load4( t.getRotation() );
 }
 
 zp_short zpKinematicBody::getGroup() const

@@ -233,6 +233,7 @@ namespace zpMath
 
 	ZP_FORCE_INLINE void ToMatrix( zpMatrix4f& s, const zpQuaternion4f& a );
 
+	ZP_FORCE_INLINE void TRS( zpMatrix4f& m, const zpVector4f& p, const zpQuaternion4f& r, const zpVector4f& s );
 };
 
 #if ZP_USE_SIMD

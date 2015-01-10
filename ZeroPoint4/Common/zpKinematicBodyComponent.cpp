@@ -19,7 +19,7 @@ void zpKinematicBodyComponent::onCreate()
 }
 void zpKinematicBodyComponent::onInitialize()
 {
-	m_kinematicBody.initialize( getParentObject()->getTransform() );
+	m_kinematicBody.initialize( getParentObject()->getComponents()->getTransformComponent()->getLocalTransform() );
 	if( m_addOnCreate )
 	{
 		getParentObject()->getApplication()->getPhysicsEngine()->addKinematicBody( &m_kinematicBody );
@@ -39,11 +39,11 @@ void zpKinematicBodyComponent::onUpdate()
 {
 	if( m_isAdded )
 	{
-		zpMatrix4f mat;
-		if( m_kinematicBody.getMatrix( mat ) )
-		{
-			getParentObject()->setTransform( mat );
-		}
+		zpVector4f pos;
+		zpQuaternion4f rot;
+		m_kinematicBody.getPositionRotation( pos, rot );
+
+		getParentObject()->getComponents()->getTransformComponent()->setLocalTransform( pos, rot, zpVector4f( 1, 1, 1, 1 ) );
 
 		const zpKeyboard* k = getApplication()->getInputManager()->getKeyboard();
 		if( k->isKeyDown( ZP_KEY_CODE_W ) )

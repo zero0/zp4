@@ -60,7 +60,7 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 		fovy = fov.asFloat();
 	}
 
-	const zpMatrix4f& transform = getParentObject()->getTransform();
+	const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 	const zpVector4f& pos = transform.getRow( 3 );
 	const zpVector4f& lookTo = transform.getRow( 2 );
 	const zpVector4f& up = transform.getRow( 1 );
@@ -101,7 +101,7 @@ void zpCameraComponent::onUpdate()
 	zpObject* parent = getParentObject();
 	if( parent->isFlagSet( ZP_OBJECT_FLAG_TRANFORM_DIRTY ) )
 	{
-		const zpMatrix4f& transform = getParentObject()->getTransform();
+		const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 		const zpVector4f& pos = transform.getRow( 3 );
 		const zpVector4f& lookTo = transform.getRow( 2 );
 		const zpVector4f& up = transform.getRow( 1 );

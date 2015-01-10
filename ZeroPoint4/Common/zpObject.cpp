@@ -154,8 +154,7 @@ void zpObjectContentManager::destroyResource( zpObjectResource* res )
 }
 
 zpObject::zpObject( zpApplication* application )
-	: m_transform()
-	, m_name()
+	: m_name()
 	, m_tags()
 	, m_flags()
 	, m_lastLoadTime( 0 )
@@ -168,8 +167,7 @@ zpObject::zpObject( zpApplication* application )
 	loadObject( true );
 }
 zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& res )
-	: m_transform()
-	, m_name()
+	: m_name()
 	, m_tags()
 	, m_flags()
 	, m_lastLoadTime( 0 )
@@ -221,19 +219,6 @@ const zpString& zpObject::getName() const
 void zpObject::setName( const zpString& name )
 {
 	m_name = name;
-}
-
-const zpMatrix4f& zpObject::getTransform() const
-{
-	return m_transform;
-}
-void zpObject::setTransform( const zpMatrix4f& transform )
-{
-	if( !m_flags.isMarked( ZP_OBJECT_FLAG_INITIALIZED ) || !m_flags.isMarked( ZP_OBJECT_FLAG_STATIC ) )
-	{
-		m_transform = transform;
-		m_flags.mark( ZP_OBJECT_FLAG_TRANFORM_DIRTY );
-	}
 }
 
 const zpFlag64& zpObject::getTags() const
@@ -360,7 +345,6 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 			const zpBison::Value& enabled = root[ "Enabled" ];
 			const zpBison::Value& tags = root[ "Tags" ];
 			const zpBison::Value& layer = root[ "Layer" ];
-			const zpBison::Value& transform = root[ "Transform" ];
 			const zpBison::Value& isStatic = root[ "IsStatic" ];
 
 			// set static flag
@@ -389,13 +373,6 @@ void zpObject::loadObject( zp_bool isInitialLoad )
 						addTag( v.asCString() );
 					}
 				} );
-			}
-
-			// set transform
-			m_transform.setIdentity();
-			if( !transform.isEmpty() )
-			{
-				m_transform = *(zpMatrix4f*)transform.asData();
 			}
 		}
 

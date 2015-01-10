@@ -69,7 +69,7 @@
     <ClInclude Include="zpAllComponents.h" />
     <ClInclude Include="zpAllGameManagers.h" />
     <ClInclude Include="zpApplication.h" />
-    <ClInclude Include="zpAttachmentComponent.h" />
+    <ClInclude Include="zpTransformComponent.h" />
     <ClInclude Include="zpAudioEmitterComponent.h" />
     <ClInclude Include="zpAudioListenerComponent.h" />
     <ClInclude Include="zpBreakableComponent.h" />
@@ -102,7 +102,7 @@
     <ClCompile Include="zpAllComponents.cpp" />
     <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpApplication.cpp" />
-    <ClCompile Include="zpAttachmentComponent.cpp" />
+    <ClCompile Include="zpTransformComponent.cpp" />
     <ClCompile Include="zpAudioEmitterComponent.cpp" />
     <ClCompile Include="zpAudioListenerComponent.cpp" />
     <ClCompile Include="zpBreakableComponent.cpp" />

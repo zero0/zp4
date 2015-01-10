@@ -1,4 +1,8 @@
 
+// Transform
+ZP_COMPONENT_DEF( Transform )
+
+// Editor
 ZP_COMPONENT_DEF( EditorCamera )
 
 // Scrpting
@@ -21,7 +25,6 @@ ZP_COMPONENT_DEF( Phantom )
 
 // Common
 ZP_COMPONENT_DEF( Breakable )
-ZP_COMPONENT_DEF( Attachment )
 ZP_COMPONENT_DEF( Projectile )
 
 // UI

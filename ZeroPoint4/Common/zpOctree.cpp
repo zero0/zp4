@@ -63,7 +63,7 @@ zp_uint zpOctreeNode::update( zpArrayList< zpObject* >& updatedObjects )
 		{
 			zpObject* obj = m_objects[ i ];
 
-			const zpVector4f& pos = obj->getTransform().getRow( 3 );
+			const zpVector4f& pos = obj->getComponents()->getTransformComponent()->getWorldPosition();
 
 			// if the object should be destroyed, remove it from being tracked
 			if( obj->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
@@ -114,7 +114,7 @@ zp_uint zpOctreeNode::getNumObjects() const
 
 zp_bool zpOctreeNode::insert( zpObject* obj )
 {
-	const zpVector4f& pos = obj->getTransform().getRow( 3 );
+	const zpVector4f& pos = obj->getComponents()->getTransformComponent()->getWorldPosition();
 
 	// if there is no collision in with the node, return false
 	if( !ZP_IS_COLLISION( m_bounds, pos ) )

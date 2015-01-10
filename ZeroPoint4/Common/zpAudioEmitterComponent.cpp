@@ -56,7 +56,7 @@ void zpAudioEmitterComponent::onCreate()
 {}
 void zpAudioEmitterComponent::onInitialize()
 {
-	m_prevPosition = getParentObject()->getTransform().getRow( 3 );
+	m_prevPosition = getParentObject()->getComponents()->getTransformComponent()->getWorldPosition();
 }
 void zpAudioEmitterComponent::onDestroy()
 {}
@@ -69,7 +69,7 @@ void zpAudioEmitterComponent::onUpdate()
 		{
 			zp_float dt = zpTime::getInstance()->getDeltaSeconds();
 
-			zpVector4f pos( getParentObject()->getTransform().getRow( 3 ) );
+			zpVector4f pos( getParentObject()->getComponents()->getTransformComponent()->getWorldPosition() );
 			zpVector4f vel;
 
 			zpMath::Sub( vel, pos, m_prevPosition );

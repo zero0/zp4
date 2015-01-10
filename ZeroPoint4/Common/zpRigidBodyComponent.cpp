@@ -18,7 +18,7 @@ void zpRigidBodyComponent::onCreate()
 }
 void zpRigidBodyComponent::onInitialize()
 {
-	m_rigidBody.initialize( getParentObject()->getTransform() );
+	m_rigidBody.initialize( getParentObject()->getComponents()->getTransformComponent()->getLocalTransform() );
 	if( m_addOnCreate )
 	{
 		getParentObject()->getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );
@@ -36,10 +36,13 @@ void zpRigidBodyComponent::onDestroy()
 
 void zpRigidBodyComponent::onUpdate()
 {
-	zpMatrix4f transform;
-	if( m_isAdded && m_rigidBody.getMatrix( transform ) )
+	if( m_isAdded && !m_rigidBody.isStatic() )
 	{
-		getParentObject()->setTransform( transform );
+		zpVector4f pos;
+		zpQuaternion4f rot;
+		m_rigidBody.getPositionRotation( pos, rot );
+	
+		getParentObject()->getComponents()->getTransformComponent()->setLocalTransform( pos, rot, zpVector4f( 1, 1, 1, 1 ) );
 	}
 }
 void zpRigidBodyComponent::onSimulate()

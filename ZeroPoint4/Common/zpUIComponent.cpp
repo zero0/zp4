@@ -185,7 +185,8 @@ void zpUIComponent::getLocalCorners( zpVector4f& topLeft, zpVector4f& topRight, 
 	zpMath::Add( x1, x0, w );
 	zpMath::Add( y1, y0, h );
 
-	const zpMatrix4f& transform = getParentObject()->getTransform();
+	zpTransformComponent* attachment = getParentObject()->getComponents()->getTransformComponent();
+	const zpMatrix4f& transform = attachment->getWorldTransform();
 	zpMath::Mul( topLeft, zpVector4f( x0, y1 ), transform );
 	zpMath::Mul( topRight, zpVector4f( x1, y1 ), transform );
 	zpMath::Mul( bottomRight, zpVector4f( x1, y0 ), transform );
@@ -204,8 +205,8 @@ void zpUIComponent::getWorldCorners( zpVector4f& topLeft, zpVector4f& topRight, 
 	zpMath::Add( x1, x0, w );
 	zpMath::Add( y1, y0, h );
 
-	zpAttachmentComponent* attachment = getParentObject()->getComponents()->getAttachmentComponent();
-	const zpMatrix4f& transform = attachment == ZP_NULL ? getParentObject()->getTransform() : attachment->getWorldTransform();
+	zpTransformComponent* attachment = getParentObject()->getComponents()->getTransformComponent();
+	const zpMatrix4f& transform = attachment->getWorldTransform();
 	zpMath::Mul( topLeft, zpVector4f( x0, y1 ), transform );
 	zpMath::Mul( topRight, zpVector4f( x1, y1 ), transform );
 	zpMath::Mul( bottomRight, zpVector4f( x1, y0 ), transform );

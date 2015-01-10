@@ -774,8 +774,8 @@ void as_Register_Object( asIScriptEngine* engine, zpApplication* app )
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_ADDREF, "void f()", asMETHOD( zpRefObject, addRef ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectBehaviour( ZP_SCRIPT_OBJECT, asBEHAVE_RELEASE, "void f()", asMETHOD( zpRefObject, release ), asCALL_THISCALL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "const " ZP_SCRIPT_MATRIX4 "& get_transform() const", asMETHODPR( zpObject, getTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "void set_transform( const " ZP_SCRIPT_MATRIX4 "& in )", asMETHODPR( zpObject, setTransform, ( const zpMatrix4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "const " ZP_SCRIPT_MATRIX4 "& get_transform() const", asMETHODPR( zpObject, getTransform, () const, const zpMatrix4f& ), asCALL_THISCALL ); AS_ASSERT( r );
+	//r = engine->RegisterObjectMethod( ZP_SCRIPT_OBJECT, "void set_transform( const " ZP_SCRIPT_MATRIX4 "& in )", asMETHODPR( zpObject, setTransform, ( const zpMatrix4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 
 	r = engine->RegisterGlobalFunction( ""ZP_SCRIPT_OBJECT"@ CreateObject()", asMETHODPR( zpObjectContentManager, createObject, (), zpObject* ), asCALL_THISCALL_ASGLOBAL, objManager ); AS_ASSERT( r );
 

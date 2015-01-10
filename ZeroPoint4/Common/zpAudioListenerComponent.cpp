@@ -41,15 +41,14 @@ void zpAudioListenerComponent::onCreate()
 {}
 void zpAudioListenerComponent::onInitialize()
 {
-	const zpMatrix4f& transform = getParentObject()->getTransform();
-	m_oldPosition = transform.getRow( 3 );
+	m_oldPosition = getParentObject()->getComponents()->getTransformComponent()->getWorldPosition();
 }
 void zpAudioListenerComponent::onDestroy()
 {}
 
 void zpAudioListenerComponent::onUpdate()
 {
-	const zpMatrix4f& transform = getParentObject()->getTransform();
+	const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 
 	zpScalar dt( zpTime::getInstance()->getDeltaSeconds() );
 

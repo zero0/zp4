@@ -99,9 +99,6 @@
     <ClInclude Include="zpGUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpAttachmentComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -140,6 +137,9 @@
     </ClInclude>
     <ClInclude Include="zpPhantomComponent.h">
       <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="zpTransformComponent.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -191,9 +191,6 @@
     <ClCompile Include="zpGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpAttachmentComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zpEvent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -223,6 +220,9 @@
     </ClCompile>
     <ClCompile Include="zpPhantomComponent.cpp">
       <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="zpTransformComponent.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

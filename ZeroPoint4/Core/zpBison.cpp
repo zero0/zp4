@@ -334,7 +334,6 @@ const zpBison::Value zpBison::Value::operator[]( zp_int index ) const
 }
 const zpBison::Value zpBison::Value::operator[]( const zp_char* key ) const
 {
-	ZP_ASSERT( isObject(), "" );
 	if( isObject() )
 	{
 		const zp_uint* arr = (const zp_uint*)( m_data + m_offset + sizeof( zpBisonType ) );

@@ -908,3 +908,22 @@ void zpMath::ToMatrix( zpMatrix4f& s, const zpQuaternion4f& a )
 	s.m_matrix[3][2] = 0;
 	s.m_matrix[3][3] = 1;
 }
+
+void zpMath::TRS( zpMatrix4f& m, const zpVector4f& p, const zpQuaternion4f& r, const zpVector4f& s )
+{
+	zpMatrix4f pm;
+	pm.setIdentity();
+	pm.m_m4 = p;
+
+	zpMatrix4f rm;
+	ToMatrix( rm, r );
+
+	zpMatrix4f sm;
+	sm.setIdentity();
+	zpMath::Mul( sm.m_m1, sm.m_m1, s );
+	zpMath::Mul( sm.m_m2, sm.m_m2, s );
+	zpMath::Mul( sm.m_m3, sm.m_m3, s );
+
+	zpMath::Mul( m, sm, rm );
+	zpMath::Mul( m, m, pm );
+}

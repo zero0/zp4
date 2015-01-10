@@ -177,10 +177,6 @@ void zpWorld::createWorldObject( const zpBison::Value& def )
 	if( !transform.isEmpty() )
 	{
 		const zpMatrix4f& mat = *(const zpMatrix4f*)transform.asData();
-
-		zpMatrix4f transform;
-		zpMath::Mul( transform, o->getTransform(), mat );
-
-		o->setTransform( transform );
+		o->getComponents()->getTransformComponent()->setLocalPosition( mat.getRow( 3 ) );
 	}
 }

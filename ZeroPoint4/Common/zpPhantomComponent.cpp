@@ -6,7 +6,7 @@ zpPhantomComponent::zpPhantomComponent( zpObject* obj, const zpBison::Value& def
 	, m_addOnCreate( true )
 	, m_isAdded( false )
 {
-	m_phantom.create( obj->getTransform(), def );
+	m_phantom.create( obj->getComponents()->getTransformComponent()->getWorldTransform(), def );
 }
 zpPhantomComponent::~zpPhantomComponent()
 {
@@ -38,7 +38,7 @@ void zpPhantomComponent::onUpdate()
 {
 	if( m_isAdded )
 	{
-		const zpMatrix4f& transform = getParentObject()->getTransform();
+		const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 		m_phantom.setMatrix( transform );
 	}
 }

@@ -61,25 +61,27 @@ void zpLightComponent::onDestroy()
 
 void zpLightComponent::onUpdate()
 {
+	const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
+
 	switch( m_light->type )
 	{
 	case ZP_LIGHT_TYPE_DIRECTIONAL:
 		{
-			zpMath::Mul( m_light->direction, zpVector4f( 0, 0, 1, 0 ), getParentObject()->getTransform() );
+			zpMath::Mul( m_light->direction, zpVector4f( 0, 0, 1, 0 ), transform );
 			zpMath::Normalize3( m_light->direction, m_light->direction );
 		}
 		break;
 	case ZP_LIGHT_TYPE_POINT:
 		{
-			m_light->position = getParentObject()->getTransform().getRow( 3 );
+			m_light->position = transform.getRow( 3 );
 		}
 		break;
 	case ZP_LIGHT_TYPE_SPOT:
 		{
-			zpMath::Mul( m_light->direction, zpVector4f( 0, 0, 1, 0 ), getParentObject()->getTransform() );
+			zpMath::Mul( m_light->direction, zpVector4f( 0, 0, 1, 0 ), transform );
 			zpMath::Normalize3( m_light->direction, m_light->direction );
 
-			m_light->position = getParentObject()->getTransform().getRow( 3 );
+			m_light->position = transform.getRow( 3 );
 		}
 		break;
 	}

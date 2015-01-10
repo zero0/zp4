@@ -11,7 +11,8 @@ public:
 	void initialize( const zpMatrix4f& transform );
 	void destroy();
 
-	zp_bool getMatrix( zpMatrix4f& transform );
+	void getMatrix( zpMatrix4f& transform );
+	void getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation );
 
 	zp_bool isStatic() const;
 	zp_short getGroup() const;

@@ -21,7 +21,7 @@ void zpProjectileComponent::handleEvent( const zpEvent& e, zpObject* sender )
 void zpProjectileComponent::fire( zpObject* target )
 {
 	m_endTarget = target;
-	m_endPosition = target->getTransform().getRow( 3 );
+	m_endPosition = target->getComponents()->getTransformComponent()->getWorldPosition();
 
 	onFire();
 
@@ -62,12 +62,12 @@ void zpProjectileComponent::onUpdate()
 		zpVector4f ang( 0.f );
 		zpVector4f dis;
 
-		zpMatrix4f mat( getParentObject()->getTransform() );
+		zpMatrix4f mat( getParentObject()->getComponents()->getTransformComponent()->getWorldTransform() );
 		const zpVector4f& p = mat.getRow( 3 );
 
 		if( m_followTarget && m_endTarget != ZP_NULL )
 		{
-			const zpVector4f& e = m_endTarget->getTransform().getRow( 3 );
+			const zpVector4f& e = m_endTarget->getComponents()->getTransformComponent()->getWorldPosition();
 
 			zpMath::Mul( angVel, angVel, dt );
 			zpMath::Sub( ang, m_endPosition, e );
@@ -95,7 +95,7 @@ void zpProjectileComponent::onUpdate()
 		mat.setRow( 3, pos );
 		m_projectileSphere.setCenter( pos );
 
-		getParentObject()->setTransform( mat );
+		getParentObject()->getComponents()->getTransformComponent()->setLocalPosition( pos );
 
 		zpMath::Sub( dis, pos, m_startPosition );
 		zpMath::Dot3( dist, dis, dis );
@@ -127,7 +127,7 @@ void zpProjectileComponent::onFire()
 {
 	m_isRunning = true;
 
-	const zpVector4f& s = getParentObject()->getTransform().getRow( 3 );
+	const zpVector4f& s = getParentObject()->getComponents()->getTransformComponent()->getWorldPosition();
 
 	m_startPosition = s;
 

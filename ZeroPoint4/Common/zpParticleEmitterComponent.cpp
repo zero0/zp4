@@ -170,10 +170,10 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 
 		i->beginDrawImmediate( 1 << m_layer, m_queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &effect->material );
 
-		if( !effect->isWorldSpace )
-		{
-			i->setMatrix( getParentObject()->getTransform() );
-		}
+		//if( !effect->isWorldSpace )
+		//{
+		//	i->setMatrix( getParentObject()->getComponents()->getTransformComponent()->getWorldTransform() );
+		//}
 		i->setSortBias( effect->sortBias );
 
 		zpParticle** p = effect->usedParticles.begin();
@@ -254,7 +254,7 @@ void zpParticleEmitterComponent::onCreate()
 }
 void zpParticleEmitterComponent::onInitialize()
 {
-	m_prevPosition = getParentObject()->getTransform().getRow( 3 );
+	m_prevPosition = getParentObject()->getComponents()->getTransformComponent()->getWorldPosition();
 
 	zpParticleEffect* b = m_effects.begin();
 	zpParticleEffect* e = m_effects.end();
@@ -275,7 +275,7 @@ void zpParticleEmitterComponent::onUpdate()
 {
 	if( m_isPaused ) return;
 
-	zpVector4f position( getParentObject()->getTransform().getRow( 3 ) ), pos, velocity;
+	zpVector4f position( getParentObject()->getComponents()->getTransformComponent()->getWorldPosition() ), pos, velocity;
 
 	zpMath::Sub( pos, position, m_prevPosition );
 	m_prevPosition = position;
@@ -495,7 +495,8 @@ void zpParticleEmitterComponent::emitParticle( zpParticleEffect* effect )
 	effect->usedParticles.pushBack( particle );
 
 	zpVector4f pos, norm;
-	pos = effect->isWorldSpace ? getParentObject()->getTransform().getRow( 3 ) : zpVector4f( 0, 0, 0, 1 );
+	zpTransformComponent* transform = getParentObject()->getComponents()->getTransformComponent();
+	pos = effect->isWorldSpace ? transform->getWorldPosition() : transform->getLocalPosition();
 
 	switch( effect->shape )
 	{

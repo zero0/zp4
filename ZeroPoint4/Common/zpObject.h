@@ -57,9 +57,6 @@ public:
 	const zpString& getName() const;
 	void setName( const zpString& name );
 
-	const zpMatrix4f& getTransform() const;
-	void setTransform( const zpMatrix4f& transform );
-
 	const zpFlag64& getTags() const;
 	void clearTags();
 
@@ -88,7 +85,6 @@ private:
 	void loadObject( zp_bool isInitialLoad );
 	void unloadObject();
 
-	zpMatrix4f m_transform;
 	zpString m_name;
 	zpFlag64 m_tags;
 	zpFlag32 m_layers;
