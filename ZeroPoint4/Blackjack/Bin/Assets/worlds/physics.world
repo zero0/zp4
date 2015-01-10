@@ -1,47 +1,65 @@
 {
-    "Name" : "physics world",
-    "Objects" : [
+    "Name": "physics world",
+    "Objects": [
         {
-            "Object" : "objects/plane.objectb",
-			"Transform" :
-			{
-				"Position" : [ 0, 0, 0 ]
-			}
+            "Object": "objects/plane.objectb",
+            "Transform": {
+                "Position": [
+                    0,
+                    0,
+                    0
+                ]
+            }
         },
-		{
-            "Object" : "objects/cube.objectb",
-			"Transform" :
-			{
-				"Position" : [ -5, 5, -5 ]
-			}
+        {
+            "Object": "objects/cube.objectb",
+            "Transform": {
+                "Position": [
+                    -5,
+                    5,
+                    -5
+                ]
+            }
         },
-		{
-            "Object" : "objects/cube.objectb",
-			"Transform" :
-			{
-				"Position" : [ 5, 5, -5 ]
-			}
+        {
+            "Object": "objects/cube.objectb",
+            "Transform": {
+                "Position": [
+                    5,
+                    5,
+                    -5
+                ]
+            }
         },
-		{
-            "Object" : "objects/cube.objectb",
-			"Transform" :
-			{
-				"Position" : [ -5, 5, 5 ]
-			}
+        {
+            "Object": "objects/cube.objectb",
+            "Transform": {
+                "Position": [
+                    -5,
+                    5,
+                    5
+                ]
+            }
         },
-		{
-            "Object" : "objects/cube.objectb",
-			"Transform" :
-			{
-				"Position" : [ 5, 5, 5 ]
-			}
+        {
+            "Object": "objects/cube.objectb",
+            "Transform": {
+                "Position": [
+                    5,
+                    5,
+                    5
+                ]
+            }
         },
-		{
-			"Object" : "objects/player.objectb",
-			"Transform" :
-			{
-				"Position" : [ 0, 10, 0 ]
-			}
-		}
+        {
+            "Object": "objects/player.objectb",
+            "Transform": {
+                "Position": [
+                    0,
+                    10,
+                    0
+                ]
+            }
+        }
     ]
 }

@@ -1,36 +1,28 @@
 {
-	"Name" : "player",
-	"Tags" : [
-		"Player"
-	],
-	"Layer" : "Default",
-	"Transform" :
-	{
-	},
-	"Components" :
-	{
-		"MeshRenderer" :
-		{
-			"Mesh" : "meshes/cube.meshb"
-		},
-		"KinematicBody" :
-		{
-			"Mass" : 1,
-			"Group" : "Main",
-			"Mask" : "Main",
-			"Collider" :
-			{
-				"Shape" : "Capsule",
-				"Size" :
-				{
-					"Radius" : 1,
-					"Height" : 2
-				}
-			}
-		},
-		"Script" :
-		{
-			"Scripts" : "scripts/Other.scriptb"
-		}
-	}
+    "Name": "player",
+    "Tags": [
+        "Player"
+    ],
+    "Layer": "Default",
+    "Components": {
+        "Transform": {},
+        "MeshRenderer": {
+            "Mesh": "meshes/cube.meshb"
+        },
+        "KinematicBody": {
+            "Mass": 1,
+            "Group": "Main",
+            "Mask": "Main",
+            "Collider": {
+                "Shape": "Capsule",
+                "Size": {
+                    "Radius": 1,
+                    "Height": 2
+                }
+            }
+        },
+        "Script": {
+            "Scripts": "scripts/Other.scriptb"
+        }
+    }
 }

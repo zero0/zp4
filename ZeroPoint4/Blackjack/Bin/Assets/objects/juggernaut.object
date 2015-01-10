@@ -5,6 +5,7 @@
     "Layer" : "Default",
     "Components" :
     {
+        "Transform" : {}
         "MeshRenderer" :
         {
             "Mesh" : "meshes/juggernaut.meshb"

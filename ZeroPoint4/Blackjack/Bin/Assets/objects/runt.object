@@ -1,17 +1,17 @@
 {
-    "Name" : "runt",
-    "Tags" : [
-    ],
-    "Layer" : "Default",
-    "Transform" :
-    {
-        "Position" : [ 0, 5, 0 ]
-    },
-    "Components" :
-    {
-        "MeshRenderer" :
-        {
-            "Mesh" : "meshes/runt.meshb"
+    "Name": "runt",
+    "Tags": [],
+    "Layer": "Default",
+    "Components": {
+        "Transform": {
+            "Position": [
+                0,
+                5,
+                0
+            ]
+        },
+        "MeshRenderer": {
+            "Mesh": "meshes/runt.meshb"
         }
     }
 }

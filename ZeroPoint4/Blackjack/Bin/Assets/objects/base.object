@@ -1,7 +1,6 @@
 {
-	"Name" : "base",
-	"Transform" : { "x" : 10 },
-	"Components" :
-	{
-	}
+    "Name": "base",
+    "Components": {
+        "Transform": {}
+    }
 }
