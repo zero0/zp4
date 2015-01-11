@@ -2,68 +2,81 @@
 
 zpTransformComponent::zpTransformComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
+	, m_localPosition( 0, 0, 0, 1 )
+	, m_localRotation( 0, 0, 0, 1 )
+	, m_localScale( 1, 1, 1, 1 )
+	, m_parent( ZP_NULL )
 {
-	const zpBison::Value& position = def[ "Position" ];
-	const zpBison::Value& rotation = def[ "Rotation" ];
-	const zpBison::Value& scale = def[ "Scale" ];
-
 	m_localTransform.setIdentity();
+	m_worldTransform.setIdentity();
 
-	zpVector4f pos( 0, 0, 0, 1 );
-	zpVector4f scl( 1, 1, 1, 0 );
-	zpQuaternion4f rot( 0, 0, 0, 1 );
-
-	// position
-	if( position.isArray() && !position.isEmpty() )
+	if( !def.isNull() )
 	{
-		pos = zpVector4f( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
-	}
+		const zpBison::Value& position = def[ "Position" ];
+		const zpBison::Value& rotation = def[ "Rotation" ];
+		const zpBison::Value& scale = def[ "Scale" ];
 
-	// rotation
-	if( rotation.isArray() && !rotation.isEmpty() )
-	{
-		zpScalar yaw(   rotation[ 0 ].asFloat() );
-		zpScalar pitch( rotation[ 1 ].asFloat() );
-		zpScalar roll(  rotation[ 2 ].asFloat() );
-		zpMath::SetEulerAngle( rot, yaw, pitch, roll );
-	}
+		zpVector4f pos( 0, 0, 0, 1 );
+		zpVector4f scl( 1, 1, 1, 0 );
+		zpQuaternion4f rot( 0, 0, 0, 1 );
 
-	// scale
-	if( scale.isArray() && !scale.isEmpty() )
-	{
-		scl = zpVector4f( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
-	}
-
-	// build local matrix
-	setLocalTransform( pos, rot, scl );
-	
-	// build world matrix
-	onUpdate();
-
-	// add children
-	const zpBison::Value& children = def[ "Children" ];
-	if( children.isArray() && !children.isEmpty() )
-	{
-		zpObjectContentManager* manager = getApplication()->getObjectContentManager();
-	
-		m_children.reserve( children.size() );
-		children.foreachArray( [ this, manager ]( const zpBison::Value& child )
+		// position
+		if( position.isArray() && !position.isEmpty() )
 		{
-			const zp_char* objName = child.asCString();
+			pos = zpVector4f( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
+		}
+
+		// rotation
+		if( rotation.isArray() && !rotation.isEmpty() )
+		{
+			zpScalar yaw(   rotation[ 0 ].asFloat() );
+			zpScalar pitch( rotation[ 1 ].asFloat() );
+			zpScalar roll(  rotation[ 2 ].asFloat() );
+			zpMath::SetEulerAngle( rot, yaw, pitch, roll );
+		}
+
+		// scale
+		if( scale.isArray() && !scale.isEmpty() )
+		{
+			scl = zpVector4f( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
+		}
+
+		// build local matrix
+		setLocalTransform( pos, rot, scl );
 	
-			zpObject* o = manager->createObject( objName );
-			addChild( o->getComponents()->getTransformComponent() );
-		} );
+		// build world matrix so it's correct on the same frame of creation
+		onUpdate();
+
+		// add children
+		const zpBison::Value& children = def[ "Children" ];
+		if( children.isArray() && !children.isEmpty() )
+		{
+			zpObjectContentManager* manager = getApplication()->getObjectContentManager();
+	
+			m_children.reserve( children.size() );
+			children.foreachArray( [ this, manager ]( const zpBison::Value& child )
+			{
+				const zp_char* objName = child.asCString();
+	
+				zpObject* o = manager->createObject( objName );
+				addChild( o->getComponents()->getTransformComponent() );
+			} );
+		}
 	}
 }
 zpTransformComponent::~zpTransformComponent()
 {
 }
 
-//void zpTransformComponent::setLocalTransform( const zpMatrix4f& localTransform )
-//{
-//	m_localTransform = localTransform;
-//}
+void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, const zpQuaternion4f& localRotation )
+{
+	m_localPosition = localPosition;
+	m_localRotation = localRotation;
+
+	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
+
+}
 void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, const zpQuaternion4f& localRotation, const zpVector4f& localScale )
 {
 	m_localPosition = localPosition;
@@ -71,6 +84,7 @@ void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, c
 	m_localScale = localScale;
 
 	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 
 void zpTransformComponent::setLocalPosition( const zpVector4f& localPosition )
@@ -78,18 +92,39 @@ void zpTransformComponent::setLocalPosition( const zpVector4f& localPosition )
 	m_localPosition = localPosition;
 
 	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 void zpTransformComponent::setLocalScale( const zpVector4f& localScale )
 {
 	m_localScale = localScale;
 
 	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 void zpTransformComponent::setLocalRotation( const zpQuaternion4f& localRotation )
 {
 	m_localRotation = localRotation;
 
 	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
+}
+
+const zpVector4f& zpTransformComponent::getLocalPosition() const
+{
+	return m_localPosition;
+}
+const zpQuaternion4f& zpTransformComponent::getLocalRotation() const
+{
+	return m_localRotation;
+}
+const zpVector4f& zpTransformComponent::getLocalScale() const
+{
+	return m_localScale;
+}
+
+const zpVector4f& zpTransformComponent::getWorldPosition() const
+{
+	return m_worldTransform.getRow( 3 );
 }
 
 const zpMatrix4f& zpTransformComponent::getWorldTransform() const
@@ -106,6 +141,25 @@ const zpArrayList< zpTransformComponent* >& zpTransformComponent::getChildren() 
 	return m_children;
 }
 
+void zpTransformComponent::setParent( zpTransformComponent* parent )
+{
+	// if parent defined, add this as a child (handles old parent removal)
+	if( parent != ZP_NULL )
+	{
+		parent->addChild( this );
+	}
+	// otherwise, remove child of old parent and clear parent
+	else if( m_parent != ZP_NULL )
+	{
+		zp_int i = m_parent->findChildDirect( this );
+		m_parent->removeChild( i );
+
+		m_parent = ZP_NULL;
+	}
+
+	// mark that the world transform changed
+	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
+}
 zpTransformComponent* zpTransformComponent::getParent() const
 {
 	return m_parent;
@@ -120,58 +174,49 @@ zpTransformComponent* zpTransformComponent::getChild( zp_uint index ) const
 	return m_children[ index ];
 }
 
-zpTransformComponent* zpTransformComponent::removeChild( zp_uint index, zp_bool shouldDestroy )
+zpTransformComponent* zpTransformComponent::removeChild( zp_uint index )
 {
-	zpTransformComponent* o = m_children[ index ];
+	zpTransformComponent* child = m_children[ index ];
 	m_children.erase( index );
 
-	zpTransformComponent* attachment = o->getParentObject()->getComponents()->getTransformComponent();
-	if( attachment != ZP_NULL )
-	{
-		attachment->m_parent = ZP_NULL;
-	}
+	child->m_parent = ZP_NULL;
 
-	if( shouldDestroy )
-	{
-		o->destroy();
-	}
-	return o;
+	return child;
 }
 
 void zpTransformComponent::addChild( zpTransformComponent* child )
 {
-	m_children.pushBack( child );
-
-	// add attachment component to child to set the parent
-	zpTransformComponent* attachment = ZP_NULL;
-	attachment = child->getParentObject()->getComponents()->getTransformComponent();
-	if( attachment == ZP_NULL )
+	if( child->m_parent != ZP_NULL )
 	{
-		attachment = child->getParentObject()->getComponents()->addTransformComponent( zpBison::null );
+		zp_int i = child->m_parent->findChildDirect( child );
+		child->m_parent->removeChild( i );
 	}
 
-	attachment->m_parent = this;
+	m_children.pushBack( child );
+
+	child->m_parent = this;
 }
-void zpTransformComponent::addChild( zpTransformComponent* child, const zpMatrix4f& localTransform )
+void zpTransformComponent::addChild( zpTransformComponent* child, const zpVector4f& localPosition )
 {
-	m_localTransform = localTransform;
 	addChild( child );
+	child->setLocalPosition( localPosition );
+}
+void zpTransformComponent::addChild( zpTransformComponent* child, const zpVector4f& localPosition, const zpQuaternion4f& localRotation )
+{
+	addChild( child );
+	child->setLocalTransform( localPosition, localRotation );
+}
+void zpTransformComponent::addChild( zpTransformComponent* child, const zpVector4f& localPosition, const zpQuaternion4f& localRotation, const zpVector4f& localScale )
+{
+	addChild( child );
+	child->setLocalTransform( localPosition, localRotation, localScale );
 }
 
 void zpTransformComponent::translate( const zpVector4f& dir )
 {
-	zpVector4f pos( m_localTransform.getRow( 3 ) );
-	zpMath::Add( pos, pos, dir );
-	m_localTransform.setRow( 3, pos );
-}
-
-const zpVector4f& zpTransformComponent::getLocalPosition() const
-{
-	return m_localTransform.getRow( 3 );
-}
-const zpVector4f& zpTransformComponent::getWorldPosition() const
-{
-	return m_worldTransform.getRow( 3 );
+	zpVector4f pos;
+	zpMath::Add( pos, m_localPosition, dir );
+	setLocalPosition( pos );
 }
 
 void zpTransformComponent::onCreate()
@@ -193,15 +238,19 @@ void zpTransformComponent::onDestroy()
 
 void zpTransformComponent::onUpdate()
 {
-	m_worldTransform = m_localTransform;
-
-	zpTransformComponent* p = m_parent;
-	while( p != ZP_NULL )
+	if( getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
 	{
-		zpMath::Mul( m_worldTransform, m_worldTransform, p->getLocalTransform() );
+		m_worldTransform = m_localTransform;
 
-		zpTransformComponent* a = p->getParentObject()->getComponents()->getTransformComponent();
-		p = a == ZP_NULL ? ZP_NULL : a->m_parent;
+		// calculate world position based on parents
+		zpTransformComponent* p = m_parent;
+		while( p != ZP_NULL )
+		{
+			zpMath::Mul( m_worldTransform, m_worldTransform, p->getLocalTransform() );
+
+			zpTransformComponent* a = p->getParentObject()->getComponents()->getTransformComponent();
+			p = a == ZP_NULL ? ZP_NULL : a->m_parent;
+		}
 	}
 }
 void zpTransformComponent::onSimulate()
@@ -221,6 +270,12 @@ void zpTransformComponent::onDisabled()
 	{
 		o->getParentObject()->setEnabled( false );
 	} );
+}
+
+zp_int zpTransformComponent::findChildDirect( zpTransformComponent* child )
+{
+	zp_int i = m_children.indexOf( child );
+	return i;
 }
 
 zpTransformComponentPool::zpTransformComponentPool()

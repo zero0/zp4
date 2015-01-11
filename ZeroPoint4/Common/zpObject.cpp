@@ -300,7 +300,7 @@ void zpObject::initialize()
 }
 void zpObject::update()
 {
-	m_flags.unmark( ZP_OBJECT_FLAG_TRANFORM_DIRTY );
+	m_flags.unmark( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 #if ZP_USE_HOT_RELOAD
 	if( m_object.isVaild() && m_lastLoadTime != m_object.getResource()->getLastTimeLoaded() )
 	{

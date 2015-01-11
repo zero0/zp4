@@ -42,7 +42,7 @@ void zpRigidBodyComponent::onUpdate()
 		zpQuaternion4f rot;
 		m_rigidBody.getPositionRotation( pos, rot );
 	
-		getParentObject()->getComponents()->getTransformComponent()->setLocalTransform( pos, rot, zpVector4f( 1, 1, 1, 1 ) );
+		getParentObject()->getComponents()->getTransformComponent()->setLocalTransform( pos, rot );
 	}
 }
 void zpRigidBodyComponent::onSimulate()

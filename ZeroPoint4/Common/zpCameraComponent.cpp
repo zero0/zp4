@@ -98,10 +98,10 @@ void zpCameraComponent::onDestroy()
 
 void zpCameraComponent::onUpdate()
 {
-	zpObject* parent = getParentObject();
-	if( parent->isFlagSet( ZP_OBJECT_FLAG_TRANFORM_DIRTY ) )
+	zpTransformComponent* t = getParentObject()->getComponents()->getTransformComponent();
+	if( t->getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
 	{
-		const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
+		const zpMatrix4f& transform = t->getWorldTransform();
 		const zpVector4f& pos = transform.getRow( 3 );
 		const zpVector4f& lookTo = transform.getRow( 2 );
 		const zpVector4f& up = transform.getRow( 1 );

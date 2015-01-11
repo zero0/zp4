@@ -82,7 +82,7 @@ void zpRigidBody::destroy()
 	m_motionState = ZP_NULL;
 }
 
-void zpRigidBody::getMatrix( zpMatrix4f& transform )
+void zpRigidBody::getMatrix( zpMatrix4f& transform ) const
 {
 	btMotionState* motion = (btMotionState*)m_motionState;
 
@@ -91,7 +91,7 @@ void zpRigidBody::getMatrix( zpMatrix4f& transform )
 
 	t.getOpenGLMatrix( transform.getData() );
 }
-void zpRigidBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation )
+void zpRigidBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation ) const
 {
 	btMotionState* motion = (btMotionState*)m_motionState;
 
