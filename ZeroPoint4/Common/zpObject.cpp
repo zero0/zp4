@@ -23,10 +23,10 @@ zpObject* zpObjectContentManager::createObject( const zp_char* filename )
 	zpObject* o = ZP_NULL;
 
 	zpObjectResourceInstance obj;
-	if( getResource( filename, obj ) )
-	{
-		o = create( getApplication(), obj );
-	}
+	zp_bool ok = getResource( filename, obj );
+	ZP_ASSERT( ok, "Failed to get %s", filename );
+
+	o = create( getApplication(), obj );
 
 	return o;
 }
@@ -53,18 +53,11 @@ void zpObjectContentManager::initializeAllObjectsInWorld( zpWorld* world )
 	}
 }
 
-void zpObjectContentManager::destroyAllObjects( zp_bool isWorldSwap )
+void zpObjectContentManager::destroyAllObjects()
 {
-	zpObject** b = m_used.begin();
-	zpObject** e = m_used.end();
-	for( ; b != e; ++b )
-	{
-		zpObject* o = *b;
-		if( !isWorldSwap || ( isWorldSwap && !o->isFlagSet( ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD ) ) )
-		{
-			o->destroy();
-		}
-	}
+	m_used.foreach( []( zpObject* o ) {
+		o->destroy();
+	} );
 }
 void zpObjectContentManager::destroyAllObjectsInWorld( zpWorld* world )
 {
@@ -73,7 +66,7 @@ void zpObjectContentManager::destroyAllObjectsInWorld( zpWorld* world )
 	for( ; b != e; ++b )
 	{
 		zpObject* o = *b;
-		if( o->getWorld() == world )
+		if( o->getWorld() == world && !o->isFlagSet( ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD ) )
 		{
 			o->destroy();
 		}

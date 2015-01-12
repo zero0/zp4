@@ -2,31 +2,62 @@
 #ifndef ZP_APPLICATION_H
 #define ZP_APPLICATION_H
 
+enum zpApplicationPhaseResult
+{
+	ZP_APPLICATION_PHASE_NORMAL,
+	ZP_APPLICATION_PHASE_COMPLETE,
+	ZP_APPLICATION_PHASE_FAILURE,
+};
+
 ZP_PURE_INTERFACE zpApplicationPhase
 {
 public:
 	virtual ~zpApplicationPhase() {}
 
+	virtual const zp_char* getPhaseName() const = 0;
+
 	virtual void onEnterPhase( zpApplication* app ) = 0;
 	virtual void onLeavePhase( zpApplication* app ) = 0;
 
-	virtual zp_bool onPhaseUpdate( zpApplication* app ) = 0;
+	virtual zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) = 0;
 };
 
 class zpPhaseLoadWorld : public zpApplicationPhase
 {
 public:
-	zpPhaseLoadWorld();
+	zpPhaseLoadWorld() {}
 	~zpPhaseLoadWorld() {}
 
-	void onEnterPhase( zpApplication* app );
-	void onLeavePhase( zpApplication* app );
+	const zp_char* getPhaseName() const { return "LoadWorld"; }
 
-	zp_bool onPhaseUpdate( zpApplication* app );
+	void setup( const zp_char* loadingWorld, const zp_char* nextWorld )
+	{
+		m_loadingWorld = loadingWorld;
+		m_nextWorld = nextWorld;
+	}
+
+	void onEnterPhase( zpApplication* app ) {}
+	void onLeavePhase( zpApplication* app ) {}
+
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) { return ZP_APPLICATION_PHASE_NORMAL; }
 
 private:
 	zpString m_loadingWorld;
 	zpString m_nextWorld;
+};
+
+class zpEmptyPhase : public zpApplicationPhase
+{
+public:
+	zpEmptyPhase() {}
+	~zpEmptyPhase() {}
+
+	const zp_char* getPhaseName() const { return "Empty"; }
+
+	void onEnterPhase( zpApplication* app ) {}
+	void onLeavePhase( zpApplication* app ) {}
+
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) { return ZP_APPLICATION_PHASE_NORMAL; }
 };
 
 class zpPhysicsDebugDrawer : public zpIDebugPhysicsDebugDrawer
@@ -55,15 +86,16 @@ public:
 	void setOptionsFilename( const zp_char* filename );
 	const zpString& getOptionsFilename() const;
 
-	template< typename T >
-	void addPhase()
-	{
-		addPhase( new T );
-	}
+	void addPhase( zpApplicationPhase* phase );
+
 	void popCurrentPhase();
+	void updatePhase();
+	void pushNextPhase();
 
 	void initialize( const zpArrayList< zpString >& args );
+	void setup();
 	void run();
+	void teardown();
 	zp_int shutdown();
 
 	void update();
@@ -117,7 +149,6 @@ public:
 #undef ZP_COMPONENT_DEF
 
 private:
-	void addPhase( zpApplicationPhase* phase );
 
 	void runGarbageCollect();
 	void runReloadAllResources();
@@ -138,7 +169,7 @@ private:
 	zp_bool m_shouldReloadAllResources;
 	zp_bool m_inEditMode;
 
-	zp_uint m_currentPhase;
+	zp_int m_currentPhase;
 
 	zp_int m_exitCode;
 	zpString m_optionsFilename;

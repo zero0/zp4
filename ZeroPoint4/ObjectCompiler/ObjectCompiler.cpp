@@ -88,7 +88,7 @@ zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedF
 		}
 
 		// compile transform
-		compileTransform( inputObject );
+		//compileTransform( inputObject );
 
 		zpJson::mergeJson( outObject, inputObject );
 	}
@@ -104,11 +104,11 @@ zp_bool compileWorld( zpJsonParser& parser, zpArrayList< zpString >& processedFi
 	{
 		ok = true;
 
-		zpJson& objects = outWorld[ "Objects" ];
-		objects.foreachArray( []( zpJson& value )
-		{
-			compileTransform( value );
-		} );
+		//zpJson& objects = outWorld[ "Objects" ];
+		//objects.foreachArray( []( zpJson& value )
+		//{
+		//	compileTransform( value );
+		//} );
 	}
 
 	return ok;

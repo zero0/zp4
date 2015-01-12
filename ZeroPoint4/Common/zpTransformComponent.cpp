@@ -66,10 +66,10 @@ zpTransformComponent::zpTransformComponent( zpObject* obj, const zpBison::Value&
 				{
 					o = manager->createObject( child );
 				}
+				ZP_ASSERT( o != ZP_NULL, "Failed to create child object" );
 
 				o->initialize();
 
-				ZP_ASSERT( o != ZP_NULL, "Failed to create child object" );
 				addChild( o->getComponents()->getTransformComponent() );
 			} );
 		}

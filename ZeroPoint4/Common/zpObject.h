@@ -108,7 +108,7 @@ public:
 
 	void initializeAllObjectsInWorld( zpWorld* world );
 
-	void destroyAllObjects( zp_bool isWorldSwap );
+	void destroyAllObjects();
 	void destroyAllObjectsInWorld( zpWorld* world );
 
 	void getAllObjectsInLayer( zp_uint layer, zpArrayList< zpObject* >& objects ) const;

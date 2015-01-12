@@ -4,17 +4,6 @@
 #define ZP_APPLICATION_DEFAULT_WINDOW_WIDTH		640
 #define ZP_APPLICATION_DEFAULT_WINDOW_HEIGHT	480
 
-class zpNullPhase : public zpApplicationPhase
-{
-public:
-	~zpNullPhase() {}
-
-	void onEnterPhase( zpApplication* app ) {}
-	void onLeavePhase( zpApplication* app ) {}
-
-	zp_bool onPhaseUpdate( zpApplication* app ) { return false; }
-};
-
 zpApplication::zpApplication()
 	: m_isRunning( false )
 	, m_hasNextWorld( false )
@@ -22,6 +11,7 @@ zpApplication::zpApplication()
 	, m_shouldGarbageCollect( false )
 	, m_shouldReloadAllResources( false )
 	, m_inEditMode( false )
+	, m_currentPhase( 0 )
 	, m_exitCode( 0 )
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
 	, m_console( ZP_NULL )
@@ -47,12 +37,30 @@ const zpString& zpApplication::getOptionsFilename() const
 
 void zpApplication::popCurrentPhase()
 {
-	if( m_currentPhase != 0 )
+	ZP_ASSERT( m_currentPhase >= 0, "Trying to pop an empty phase stack" );
+
+	m_phases[ m_currentPhase ]->onLeavePhase( this );
+	m_currentPhase--;
+}
+void zpApplication::updatePhase()
+{
+	zpApplicationPhaseResult r = m_phases[ m_currentPhase ]->onUpdatePhase( this );
+	switch( r )
 	{
-		m_phases[ m_currentPhase ]->onLeavePhase( this );
-		m_currentPhase--;
-		m_phases[ m_currentPhase ]->onEnterPhase( this );
+	case ZP_APPLICATION_PHASE_NORMAL:
+		break;
+	case ZP_APPLICATION_PHASE_COMPLETE:
+		pushNextPhase();
+		break;
+	case ZP_APPLICATION_PHASE_FAILURE:
+		popCurrentPhase();
+		break;
 	}
+}
+void zpApplication::pushNextPhase()
+{
+	++m_currentPhase;
+	m_phases[ m_currentPhase ]->onEnterPhase( this );
 }
 
 void zpApplication::initialize( const zpArrayList< zpString >& args )
@@ -71,7 +79,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_renderingPipeline.getTextureContentManager()->setApplication( this );
 	m_renderingPipeline.getMeshContentManager()->setApplication( this );
 	m_renderingPipeline.getFontContentManager()->setApplication( this );
-
+	
 	zp_bool ok;
 	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
 	ZP_ASSERT( ok, "Failed to load Options '%s'", m_optionsFilename.str() );
@@ -134,8 +142,12 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	// register input with window
 	m_window.addFocusListener( &m_inputManager );
 	m_window.addProcListener( &m_inputManager );
+}
+void zpApplication::setup()
+{
+	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
 
-	const zpBison::Value& world = appOptions[ "World" ];
+	const zpBison::Value& world = appOptions[ "InitialWorld" ];
 	if( world.isString() )
 	{
 		m_initialWorldFilename = world.asCString();
@@ -149,50 +161,52 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 		m_loadingWorldFilename = loadingWorld.asCString();
 	}
 
-	m_currentPhase = 0;
-	if( m_phases.isEmpty() )
-	{
-		addPhase( new zpNullPhase );
-	}
+	m_currentPhase = -1;
 
 	m_protoDBManager.setProtoDBFile( appOptions[ "ProtoDB" ].asCString() );
 
 	m_renderingPipeline.getMaterialContentManager()->getResource( appOptions[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
 }
+
 void zpApplication::run()
 {
 	m_isRunning = true;
 
-	m_phases[ m_currentPhase ]->onEnterPhase( this );
+	pushNextPhase();
 
 	while( m_isRunning && m_window.processMessages() )
 	{
 		processFrame();
 	}
 }
-zp_int zpApplication::shutdown()
-{
-	m_phases.foreach( []( zpApplicationPhase* phase )
-	{
-		ZP_SAFE_DELETE( phase );
-	} );
-	m_phases.clear();
 
-	m_gui.destroy();
+void zpApplication::teardown()
+{
+	m_appOptions.release();
 
 	m_defaultMaterial.release();
+	m_gui.destroy();
 
-	m_renderingPipeline.destroy();
-
-	m_objectContent.destroyAllObjects( false );
+	m_objectContent.destroyAllObjects();
 	m_objectContent.update();
 
 	m_worldContent.destroyAllWorlds();
 	m_worldContent.update();
-	
-	m_physicsEngine.destroy();
 
-	m_appOptions.release();
+	// pop all phases
+	while( m_currentPhase >= 0 )
+	{
+		popCurrentPhase();
+	}
+
+	garbageCollect();
+}
+zp_int zpApplication::shutdown()
+{
+	m_phases.clear();
+
+	m_renderingPipeline.destroy();
+	m_physicsEngine.destroy();
 
 	runGarbageCollect();
 
@@ -219,15 +233,7 @@ zp_int zpApplication::shutdown()
 
 void zpApplication::update()
 {
-	if( m_phases[ m_currentPhase ]->onPhaseUpdate( this ) )
-	{
-		if( m_currentPhase != ( m_phases.size() - 1 ) )
-		{
-			m_phases[ m_currentPhase ]->onLeavePhase( this );
-			m_currentPhase++;
-			m_phases[ m_currentPhase ]->onEnterPhase( this );
-		}
-	}
+	updatePhase();
 
 	zp_bool initalizeCurrentWorld = false;
 	if( m_hasNextWorld && !m_nextWorldFilename.isEmpty() )
@@ -301,6 +307,11 @@ void zpApplication::update()
 		garbageCollect();
 	}
 
+	// update object, delete any etc
+	ZP_PROFILE_START( OBJECT_UPDATE );
+	m_objectContent.update();
+	ZP_PROFILE_END( OBJECT_UPDATE );
+
 	// update world, delete, create objects, etc.
 	ZP_PROFILE_START( WORLD_UPDATE );
 	m_worldContent.update();
@@ -318,11 +329,6 @@ void zpApplication::update()
 #define ZP_COMPONENT_DEF( cmp ) m_componentPool##cmp.update();
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
-
-	// update object, delete any etc
-	ZP_PROFILE_START( OBJECT_UPDATE );
-	m_objectContent.update();
-	ZP_PROFILE_END( OBJECT_UPDATE );
 
 	// update input
 	ZP_PROFILE_START( INPUT_UPDATE );
@@ -457,7 +463,7 @@ void zpApplication::handleInput()
 	}
 	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_1 ) )
 	{
-		loadWorld( "worlds/test.worldb" );
+		loadWorld( "worlds/physics.worldb" );
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F1 ) )
 	{
@@ -618,7 +624,6 @@ void zpApplication::processFrame()
 	// sleep for the remainder of the frame
 	m_timer->sleep( m_renderMsHz );
 }
-
 
 void zpApplication::addPhase( zpApplicationPhase* phase )
 {

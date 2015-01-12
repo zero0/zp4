@@ -20,7 +20,10 @@ void bProtoDBCreateCharacter( void* data, zp_uint stride, const zpBison::Value& 
 class bProtoDBPhase : public zpApplicationPhase
 {
 public:
+	bProtoDBPhase() {}
 	~bProtoDBPhase() {}
+
+	const zp_char* getPhaseName() const { return "ProtoDB"; }
 
 	void onEnterPhase( zpApplication* app )
 	{
@@ -41,10 +44,10 @@ public:
 		p->shutdown();
 	}
 
-	zp_bool onPhaseUpdate( zpApplication* app )
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app )
 	{
 		--m_count;
-		return m_count == 0;
+		return m_count == 0 ? ZP_APPLICATION_PHASE_COMPLETE : ZP_APPLICATION_PHASE_NORMAL;
 	}
 
 private:
@@ -55,6 +58,8 @@ class bPlayPhase : public zpApplicationPhase
 public:
 	~bPlayPhase() {}
 
+	const zp_char* getPhaseName() const { return "Play"; }
+
 	void onEnterPhase( zpApplication* app )
 	{
 		zp_printfln( "Enter Play Phase..." );
@@ -64,13 +69,13 @@ public:
 		zp_printfln( "Leave Play Phase..." );
 	}
 
-	zp_bool onPhaseUpdate( zpApplication* app )
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app )
 	{
 		if( app->getInputManager()->getKeyboard()->isKeyPressed( ZP_KEY_CODE_P ) )
 		{
 			app->popCurrentPhase();
 		}
-		return false;
+		return ZP_APPLICATION_PHASE_NORMAL;
 	}
 };
 
@@ -79,6 +84,10 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	zp_int exitCode = 0;
 
 	{
+		bProtoDBPhase protoDBPhase;
+		zpPhaseLoadWorld loadWorld;
+		bPlayPhase playPhase;
+
 		zpApplication app;
 		
 		zpString cmdLine( lpCmdLine );
@@ -87,11 +96,16 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		
 		app.setOptionsFilename( BLACKJACK_CONFIG );
 		
-		//app.addPhase< bProtoDBPhase >();
-		app.addPhase< bPlayPhase >();
+		//app.addPhase( &loadWorld );
+		app.addPhase( &protoDBPhase );
+		app.addPhase( &playPhase );
 
 		app.initialize( args );
+		app.setup();
+		
 		app.run();
+
+		app.teardown();
 		exitCode = app.shutdown();
 	}
 

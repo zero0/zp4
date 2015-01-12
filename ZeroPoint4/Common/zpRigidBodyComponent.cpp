@@ -21,7 +21,7 @@ void zpRigidBodyComponent::onInitialize()
 	m_rigidBody.initialize( getParentObject()->getComponents()->getTransformComponent()->getLocalTransform() );
 	if( m_addOnCreate )
 	{
-		getParentObject()->getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );
+		getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );
 		m_isAdded = true;
 	}
 }
@@ -29,7 +29,7 @@ void zpRigidBodyComponent::onDestroy()
 {
 	if( m_isAdded )
 	{
-		getParentObject()->getApplication()->getPhysicsEngine()->removeRigidBody( &m_rigidBody );
+		getApplication()->getPhysicsEngine()->removeRigidBody( &m_rigidBody );
 		m_isAdded = false;
 	}
 }
@@ -54,7 +54,7 @@ void zpRigidBodyComponent::onEnabled()
 {
 	if( m_addOnEnable && !m_isAdded )
 	{
-		getParentObject()->getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );
+		getApplication()->getPhysicsEngine()->addRigidBody( &m_rigidBody );
 		m_isAdded = true;
 	}
 }
@@ -62,7 +62,7 @@ void zpRigidBodyComponent::onDisabled()
 {
 	if( m_addOnEnable && m_isAdded )
 	{
-		getParentObject()->getApplication()->getPhysicsEngine()->removeRigidBody( &m_rigidBody );
+		getApplication()->getPhysicsEngine()->removeRigidBody( &m_rigidBody );
 		m_isAdded = false;
 	}
 }
