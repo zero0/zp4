@@ -26,13 +26,13 @@ public:
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
-	void create( zpObject* obj, const zp_char* componentName, const zpBison::Value& cmp );
+	void create( const zp_char* componentName, const zpBison::Value& cmp );
 	void initialize();
 	void unload();
 
 	void setEnabled( zp_bool enabled );
 
-	void setApplication( zpApplication* app ) { m_app = app; }
+	void setup( zpApplication* app, zpObject* obj );
 
 private:
 	zpApplication* m_app;

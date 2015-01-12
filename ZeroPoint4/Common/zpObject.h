@@ -43,6 +43,7 @@ class zpObject
 public:
 	zpObject( zpApplication* application );
 	zpObject( zpApplication* application, const zpObjectResourceInstance& res );
+	zpObject( zpApplication* application, const zpBison::Value& root );
 	~zpObject();
 
 	zpAllComponents* getComponents();
@@ -82,8 +83,8 @@ public:
 	void destroy();
 
 private:
-	void loadObject( zp_bool isInitialLoad );
-	void unloadObject();
+	void load( zp_bool isInitialLoad, const zpBison::Value& root );
+	void unload();
 
 	zpString m_name;
 	zpFlag64 m_tags;

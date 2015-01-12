@@ -56,9 +56,20 @@ zpTransformComponent::zpTransformComponent( zpObject* obj, const zpBison::Value&
 			m_children.reserve( children.size() );
 			children.foreachArray( [ this, manager ]( const zpBison::Value& child )
 			{
-				const zp_char* objName = child.asCString();
-	
-				zpObject* o = manager->createObject( objName );
+				zpObject* o = ZP_NULL;
+				if( child.isString() )
+				{
+					const zp_char* objName = child.asCString();
+					o = manager->createObject( objName );
+				}
+				else if( child.isObject() )
+				{
+					o = manager->createObject( child );
+				}
+
+				o->initialize();
+
+				ZP_ASSERT( o != ZP_NULL, "Failed to create child object" );
 				addChild( o->getComponents()->getTransformComponent() );
 			} );
 		}
@@ -238,7 +249,7 @@ void zpTransformComponent::onDestroy()
 
 void zpTransformComponent::onUpdate()
 {
-	if( getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
+	//if( getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
 	{
 		m_worldTransform = m_localTransform;
 
