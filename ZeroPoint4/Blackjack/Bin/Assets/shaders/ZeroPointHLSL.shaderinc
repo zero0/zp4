@@ -13,6 +13,7 @@
 #else // ZP_SHADER_DX10 || ZP_SHADER_DX11
 
 #pragma warning( disable : 3568 ) // unknown pragma ignored
+#pragma warning( disable : 4502 ) // invalid input semantic SV_TARGET
 
 #define ZP_CBUFFER_START( name, index )	cbuffer name : register( b##index ) {
 #define ZP_CBUFFER_END					};
@@ -50,4 +51,3 @@ inline float4 texCUBE( zpSamplerCUBE x, float3 v )	{ return x.t.Sample( x.s, v )
 #endif
 
 #endif
- 

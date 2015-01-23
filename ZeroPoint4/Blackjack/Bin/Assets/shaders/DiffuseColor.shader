@@ -14,7 +14,7 @@ cbuffer Camera : register( b0 )
 	float4 up;
 	float4 lookTo;
 	float4 position;
-    
+
 	float zNear;
 	float zFar;
 	float fovy;
