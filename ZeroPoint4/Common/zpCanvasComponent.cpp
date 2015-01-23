@@ -1,5 +1,126 @@
 #include "zpCommon.h"
 
+zpCanvasComponent::zpCanvasComponent( zpObject* obj, const zpBison::Value& def )
+	: zpComponent( obj )
+	, m_layer( 0 )
+	, m_backgroundColor( 0, 0, 0, 0 )
+	, m_queue( ZP_RENDERING_QUEUE_UI )
+	, m_canvasType( ZP_CANVAS_RENDER_TYPE_2D_UI )
+{
+	const zpBison::Value& layer = def[ "Layer" ];
+	const zpBison::Value& backgroundColor = def[ "BackgroundColor" ];
+	const zpBison::Value& material = def[ "Material" ];
+
+	if( layer.isInt() )
+	{
+		m_layer = layer.asInt();
+	}
+
+	if( !backgroundColor.isEmpty() )
+	{
+		m_backgroundColor = zpColor4f( backgroundColor[ 0 ].asFloat(), backgroundColor[ 1 ].asFloat(), backgroundColor[ 2 ].asFloat(), backgroundColor[ 3 ].asFloat() );
+	}
+
+	if( material.isString() )
+	{
+		zp_bool ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( material.asCString(), m_material );
+		ZP_ASSERT( ok, "Failed to get material %s", material.asCString() );
+	}
+}
+zpCanvasComponent::~zpCanvasComponent()
+{
+
+}
+
+void zpCanvasComponent::render( zpRenderingContext* context )
+{
+	zpVector4f corners[4];
+	zpRectf uvs( 0, 0, 1, 1 );
+
+	zpRectTransformComponent* rect = getParentObject()->getComponents()->getRectTransformComponent();
+
+	rect->getWorldCorners( corners );
+
+	context->beginDrawImmediate( m_layer, m_queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &m_material );
+	context->addQuad(
+		corners[ 0 ], uvs.getBottomLeft(), m_backgroundColor,
+		corners[ 1 ], uvs.getTopLeft(), m_backgroundColor,
+		corners[ 2 ], uvs.getTopRight(), m_backgroundColor,
+		corners[ 3 ], uvs.getBottomRight(), m_backgroundColor
+		);
+	context->endDrawImmediate();
+}
+
+void zpCanvasComponent::addWidget( zpWidgetComponent* w )
+{
+	m_widgets.pushBack( w );
+}
+void zpCanvasComponent::removeWidget( zpWidgetComponent* w )
+{
+	m_widgets.eraseAll( w );
+}
+void zpCanvasComponent::removeAllWidgets()
+{
+	m_widgets.clear();
+}
+
+void zpCanvasComponent::onCreate()
+{
+	
+}
+void zpCanvasComponent::onInitialize()
+{
+
+}
+void zpCanvasComponent::onDestroy()
+{
+
+}
+
+void zpCanvasComponent::onUpdate()
+{
+
+}
+void zpCanvasComponent::onSimulate()
+{
+
+}
+
+void zpCanvasComponent::onEnabled()
+{
+
+}
+void zpCanvasComponent::onDisabled()
+{
+
+}
+
+
+
+zpCanvasComponentPool::zpCanvasComponentPool()
+{
+
+}
+zpCanvasComponentPool::~zpCanvasComponentPool()
+{
+
+}
+
+void zpCanvasComponentPool::render( zpRenderingContext* context )
+{
+	m_used.foreach( [ context ]( zpCanvasComponent* o ) {
+		o->render( context );
+	} );
+}
+
+void zpCanvasComponentPool::update()
+{
+	m_used.foreach( []( zpCanvasComponent* o ) {
+		o->update();
+	} );
+}
+
+#if 0
 zpUIComponent::zpUIComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 	, m_type( ZP_UI_COMPONENT_TYPE_CONTAINER )
@@ -288,3 +409,4 @@ void zpUIComponentPool::simulate()
 	} );
 }
 
+#endif

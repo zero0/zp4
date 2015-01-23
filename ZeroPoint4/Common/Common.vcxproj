@@ -69,6 +69,7 @@
     <ClInclude Include="zpAllComponents.h" />
     <ClInclude Include="zpAllGameManagers.h" />
     <ClInclude Include="zpApplication.h" />
+    <ClInclude Include="zpRectTransformComponent.h" />
     <ClInclude Include="zpTransformComponent.h" />
     <ClInclude Include="zpAudioEmitterComponent.h" />
     <ClInclude Include="zpAudioListenerComponent.h" />
@@ -93,15 +94,15 @@
     <ClInclude Include="zpScriptComponent.h" />
     <ClInclude Include="zpTags.h" />
     <ClInclude Include="zpPhantomComponent.h" />
-    <ClInclude Include="zpUIComponent.h" />
-    <ClInclude Include="zpUIPanel.h" />
-    <ClInclude Include="zpUIWidget.h" />
+    <ClInclude Include="zpCanvasComponent.h" />
+    <ClInclude Include="zpWidgetComponent.h" />
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpAllComponents.cpp" />
     <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpApplication.cpp" />
+    <ClCompile Include="zpRectTransformComponent.cpp" />
     <ClCompile Include="zpTransformComponent.cpp" />
     <ClCompile Include="zpAudioEmitterComponent.cpp" />
     <ClCompile Include="zpAudioListenerComponent.cpp" />
@@ -128,7 +129,8 @@
     <ClCompile Include="zpScriptComponent.cpp" />
     <ClCompile Include="zpTags.cpp" />
     <ClCompile Include="zpPhantomComponent.cpp" />
-    <ClCompile Include="zpUIComponent.cpp" />
+    <ClCompile Include="zpCanvasComponent.cpp" />
+    <ClCompile Include="zpWidgetComponent.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>
   <ItemGroup>

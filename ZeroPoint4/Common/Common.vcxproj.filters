@@ -114,15 +114,6 @@
     <ClInclude Include="zpProjectileComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpUIWidget.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="zpUIPanel.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="zpUIComponent.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
     <ClInclude Include="zpKinematicBodyComponent.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
@@ -140,6 +131,15 @@
     </ClInclude>
     <ClInclude Include="zpTransformComponent.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpRectTransformComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpCanvasComponent.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="zpWidgetComponent.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,9 +206,6 @@
     <ClCompile Include="zpProjectileComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="zpUIComponent.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="zpKinematicBodyComponent.cpp">
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
@@ -223,6 +220,15 @@
     </ClCompile>
     <ClCompile Include="zpTransformComponent.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpRectTransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpCanvasComponent.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="zpWidgetComponent.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

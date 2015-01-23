@@ -150,6 +150,11 @@ zp_bool zpAudioEngine::isPlaying( const zpAudioBuffer& buffer )
 	return m_engine->isSoundBufferPlaying( buffer );
 }
 
+void zpAudioEngine::getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_uint& writePosition )
+{
+	m_engine->getCurrentPlayWritePosition( buffer, playPosition, writePosition );
+}
+
 void zpAudioEngine::update()
 {
 	m_engine->update();

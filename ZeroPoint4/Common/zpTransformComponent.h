@@ -41,7 +41,6 @@ public:
 
 	void translate( const zpVector4f& dir );
 
-
 protected:
 	void onCreate();
 	void onInitialize();

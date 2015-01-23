@@ -148,6 +148,8 @@ public:
 #include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
+	zp_uint getFrameCount() const { return m_frameCount; }
+
 private:
 
 	void runGarbageCollect();
@@ -161,6 +163,7 @@ private:
 	void leaveEditMode();
 
 	void guiEditMode();
+	void onGUI();
 
 	zp_bool m_isRunning;
 	zp_bool m_hasNextWorld;
@@ -186,7 +189,7 @@ private:
 
 	zp_long m_lastTime;
 	zp_long m_simulateHz;
-	zp_int m_renderMsHz;
+	zp_long m_renderHz;
 
 	zpArrayList< zpApplicationPhase* > m_phases;
 
@@ -220,14 +223,17 @@ private:
 #include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
-	enum zpApplicationStats
+	enum zpApplicationStats : zp_uint
 	{
 		ZP_APPLICATION_STATS_FPS = 0,
-		ZP_APPLICATION_STATS_FRAME_TIME,
+		ZP_APPLICATION_STATS_RENDERING,
 		ZP_APPLICATION_STATS_DRAW_PHYSICS,
+		ZP_APPLICATION_STATS_UPDATE,
 	};
 	zpFlag32 m_displayStats;
 	zp_uint m_statsTimer;
+
+	zp_uint m_frameCount;
 
 	zpPhysicsDebugDrawer m_debugPhysicsDrawer;
 };

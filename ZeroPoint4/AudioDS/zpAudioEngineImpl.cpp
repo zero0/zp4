@@ -245,6 +245,7 @@ zp_bool zpAudioEngineImpl::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType
 	h = dsound->CreateSoundBuffer( &desc, &soundBuffer, ZP_NULL );
 	ZP_ASSERT( SUCCEEDED( h ), "" );
 
+	buffer.bufferSize = desc.dwBufferBytes;
 	buffer.soundBuffer = soundBuffer;
 
 	switch( type )
@@ -414,6 +415,17 @@ zp_bool zpAudioEngineImpl::isSoundBufferPlaying( const zpAudioBuffer& buffer )
 	soundBuffer->GetStatus( &status );
 
 	return ( status & DSBSTATUS_PLAYING ) == DSBSTATUS_PLAYING;
+}
+
+void zpAudioEngineImpl::getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_uint& writePosition )
+{
+	LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)buffer.soundBuffer;
+	DWORD cp, cw;
+
+	soundBuffer->GetCurrentPosition( &cp, &cw );
+
+	playPosition = cp;
+	writePosition = cw;
 }
 
 void zpAudioEngineImpl::update()

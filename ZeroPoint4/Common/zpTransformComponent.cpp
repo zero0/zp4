@@ -164,8 +164,13 @@ void zpTransformComponent::setParent( zpTransformComponent* parent )
 	{
 		zp_int i = m_parent->findChildDirect( this );
 		m_parent->removeChild( i );
+	}
 
-		m_parent = ZP_NULL;
+	m_parent = parent;
+
+	if( m_parent != ZP_NULL )
+	{
+		m_parent->addChild( this );
 	}
 
 	// mark that the world transform changed
@@ -249,7 +254,7 @@ void zpTransformComponent::onDestroy()
 
 void zpTransformComponent::onUpdate()
 {
-	//if( getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
+	if( getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
 	{
 		m_worldTransform = m_localTransform;
 

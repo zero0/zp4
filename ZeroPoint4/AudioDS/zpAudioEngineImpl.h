@@ -48,6 +48,8 @@ public:
 	void stopSoundBuffer( const zpAudioBuffer& buffer );
 	zp_bool isSoundBufferPlaying( const zpAudioBuffer& buffer );
 
+	void getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_uint& writePosition );
+
 	void update();
 
 private:

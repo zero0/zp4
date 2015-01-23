@@ -10,6 +10,7 @@ struct zpAudioBuffer
 	zp_handle soundBuffer;
 	zp_handle soundBuffer3D;
 	zp_hash soundFilenameHash;
+	zp_uint bufferSize;
 };
 
 enum zpAudioChannelGroup

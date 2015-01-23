@@ -24,11 +24,10 @@ public:
 	zp_long getDeltaTime() const;
 	zp_long getTimeSinceStart() const;
 	zp_long getWallClockDeltaTime() const;
+	zp_long getCountsPerSecond() const;
 
 	zp_float getInterpolation() const;
 	void setInterpolation( zp_float interpolation );
-
-	void sleep( zp_int milliseconds );
 
 	void setPaused( zp_bool paused ) { m_isPaused = paused; }
 	zp_bool isPaused() const { return m_isPaused; }
@@ -44,6 +43,7 @@ private:
 	zp_long m_deltaTime;
 	zp_long m_timeSinceStart;
 	zp_long m_wallClockDeltaTime;
+	zp_long m_countsPerSecond;
 
 	zp_float m_secondsPerTick;
 	zp_float m_timeScale;

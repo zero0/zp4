@@ -9,15 +9,15 @@ zpTime::zpTime()
 	, m_deltaTime( 0 )
 	, m_timeSinceStart( 0 )
 	, m_wallClockDeltaTime( 0 )
+	, m_countsPerSecond( 0 )
 	, m_secondsPerTick( 0.f )
 	, m_timeScale( 1.f )
 	, m_deltaSeconds( 0.f )
 	, m_actualDeltaSeconds( 0.f )
 	, m_interpolation( 0.f )
 {
-	zp_long countsPerSecond;
-	QueryPerformanceFrequency( (LARGE_INTEGER*)&countsPerSecond );
-	m_secondsPerTick = 1.f / countsPerSecond;
+	QueryPerformanceFrequency( (LARGE_INTEGER*)&m_countsPerSecond );
+	m_secondsPerTick = 1.f / (zp_float)m_countsPerSecond;
 
 	resetTimer();
 }
@@ -49,6 +49,11 @@ zp_float zpTime::getWallClockDeltaSeconds() const
 {
 	return m_wallClockDeltaTime * m_secondsPerTick;
 }
+zp_long zpTime::getCountsPerSecond() const
+{
+	return m_countsPerSecond;
+}
+
 
 void zpTime::setTimeScale( zp_float timeScale )
 {
@@ -112,9 +117,4 @@ zp_float zpTime::getInterpolation() const
 void zpTime::setInterpolation( zp_float interpolation )
 {
 	m_interpolation = interpolation;
-}
-
-void zpTime::sleep( zp_int milliseconds )
-{
-	Sleep( milliseconds );
 }

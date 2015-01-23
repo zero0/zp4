@@ -20,8 +20,9 @@ zpApplication::zpApplication()
 	, m_nextWorld( ZP_NULL )
 	, m_lastTime( 0 )
 	, m_simulateHz( 10000000 / 60 )
-	, m_renderMsHz( 1000 / 120 )
+	, m_renderHz(   10000000 / 120 )
 	, m_statsTimer( 0 )
+	, m_frameCount( 0 )
 {}
 zpApplication::~zpApplication()
 {}
@@ -337,11 +338,14 @@ void zpApplication::update()
 
 	m_renderingPipeline.update();
 
+	ZP_PROFILE_START( AUDIO_UPDATE );
 	m_audioContent.getAudioEngine()->update();
+	ZP_PROFILE_END( AUDIO_UPDATE );
 
 	handleInput();
 
 	m_gui.startGUI();
+	onGUI();
 	//if( m_inEditMode ) guiEditMode();
 	m_gui.endGUI();
 }
@@ -469,6 +473,14 @@ void zpApplication::handleInput()
 	{
 		m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F2 ) )
+	{
+		m_displayStats.toggle( ZP_APPLICATION_STATS_RENDERING );
+	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F3 ) )
+	{
+		m_displayStats.toggle( ZP_APPLICATION_STATS_UPDATE );
+	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
 	{
 		zp_bool wasSet = m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS );
@@ -488,15 +500,6 @@ void zpApplication::handleInput()
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F11 ) )
 	{
 		m_renderingPipeline.takeScreenshot( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) ? ZP_SCREENSHOT_TYPE_NO_UI : ZP_SCREENSHOT_TYPE_ALL, "." );
-	}
-
-	// draw FPS
-	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
-	{
-		zpFixedStringBuffer< 32 > fps;
-		fps << m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME ) * 1000.f << " ms" ;
-
-		m_gui.label( 24, fps.str(), zpColor4f( 1, 1, 1, 1 ) );
 	}
 
 	// draw physics debug
@@ -557,8 +560,6 @@ void zpApplication::processFrame()
 	ZP_PROFILE_END( HOT_RELOAD );
 #endif
 
-	zp_int numUpdates = 0;
-
 	// update
 	ZP_PROFILE_START( UPDATE );
 	update();
@@ -566,6 +567,7 @@ void zpApplication::processFrame()
 
 	// simulate
 	ZP_PROFILE_START( SIMULATE );
+	zp_int numUpdates = 0;
 	while( ( now - m_lastTime ) > m_simulateHz && numUpdates < 5 )
 	{
 		simulate();
@@ -587,7 +589,9 @@ void zpApplication::processFrame()
 		zpRenderingContext* i = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
 
 		// individual component render
+		ZP_PROFILE_START( RENDER_MESHES );
 		m_componentPoolMeshRenderer.render( i );
+		ZP_PROFILE_END( RENDER_MESHES );
 
 		// render particles for each camera
 		ZP_PROFILE_START( RENDER_PARTICLES );
@@ -621,8 +625,17 @@ void zpApplication::processFrame()
 
 	ZP_PROFILE_END( FRAME );
 
+	ZP_PROFILE_START( SLEEP );
 	// sleep for the remainder of the frame
-	m_timer->sleep( m_renderMsHz );
+	zp_long endTime = m_timer->getTime();
+
+	zp_long diff = ( endTime - now );
+	zp_long sleepTime = ( ( m_renderHz - diff ) * 1000L ) / ( m_timer->getCountsPerSecond() );
+	zp_sleep( (zp_uint)sleepTime );
+	ZP_PROFILE_END( SLEEP );
+
+	// increment frame counter
+	++m_frameCount;
 }
 
 void zpApplication::addPhase( zpApplicationPhase* phase )
@@ -797,9 +810,113 @@ void zpApplication::guiEditMode()
 	m_gui.label( 16, "First Label Here", zpColor4f( 1, 1, 1, 1 ) );
 	if( m_gui.button( 22, "Click Me" ) )
 	{
-		zp_printfln( "Cliekd!" );
+		zp_printfln( "Clicked!" );
 	}
 	m_gui.label( 16, "Label Here", zpColor4f( 1, 1, 1, 1 ) );
 
 	m_gui.endWindow();
+}
+void zpApplication::onGUI()
+{
+	// draw FPS
+	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
+	{
+		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME );
+		zpFixedStringBuffer< 64 > fps;
+		fps << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
+
+		m_gui.label( 24, fps.str(), zpColor4f( 1, 1, 1, 1 ) );
+	}
+
+	// draw rendering stats
+	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_RENDERING ) )
+	{
+		zp_float renderAllMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER );
+		zp_float renderBeginMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_BEGIN );
+		zp_float renderFrameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_FRAME );
+		zp_float renderMeshesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_MESHES );
+		zp_float renderParticlesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PARTICLES );
+		zp_float renderPresentMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT );
+		zp_float renderDebugMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER );
+		zpFixedStringBuffer< 64 > buff;
+
+		zpRectf rect( 5, 5, 320, 200 );
+		m_gui.beginWindow( "Rendering", rect, rect );
+
+		buff << "Submit    " << renderAllMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "Begin     " << renderBeginMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "Frame     " << renderFrameMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "Mesh      " << renderMeshesMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "Particles " << renderParticlesMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "Present   " << renderPresentMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "Debug     " << renderDebugMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		m_gui.endWindow();
+	}
+
+	// draw update stats
+	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_UPDATE ) )
+	{
+		zp_float updateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE );
+		zp_float simulateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SIMULATE );
+		zp_float objectUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_OBJECT_UPDATE );
+		zp_float worldUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_WORLD_UPDATE );
+		zp_float scriptUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE );
+		zp_float inputUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE );
+		zp_float audioUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE );
+		zpFixedStringBuffer< 64 > buff;
+
+		zpRectf rect( 5, 5, 320, 200 );
+		m_gui.beginWindow( "Update", rect, rect );
+
+		buff << "Update   " << updateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Simulate " << simulateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Object   " << objectUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "World    " << worldUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Script   " << scriptUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Input    " << inputUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Audio    " << audioUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		m_gui.endWindow();
+	}
 }
