@@ -1,5 +1,6 @@
 package org.zero0.zeropoint.tools.arc.webapp.servlet;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -18,8 +19,33 @@ public class ArcServlet extends HttpServlet
 	protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException
 	{
 		PrintWriter out = resp.getWriter();
-		out.println( "hello, world" );
-		out.println( Arc.getInstance().getAssetsDirectory() );
+
+		String file = req.getParameter( "file" );
+		String compile = req.getParameter( "compile" );
+		
+		if( file != null && !file.isEmpty() && file != "null" )
+		{
+			String fullFilePath = Arc.getInstance().getAssetsDirectory() + file;
+			try
+			{
+				FileReader fr = new FileReader( fullFilePath );
+				
+				char[] buff = new char[ 256 ];
+				int length;
+				while( ( length = fr.read( buff ) ) != -1 )
+				{
+					out.write( buff, 0, length );
+				}
+			}
+			catch( Exception e )
+			{
+			}
+		}
+		else if( compile != null && !compile.isEmpty() && compile != "null" )
+		{
+			Arc.getInstance().addCompilerTask( Arc.getInstance().getAssetsDirectory() + compile );
+		}
+		
 		out.close();
 	}
 }

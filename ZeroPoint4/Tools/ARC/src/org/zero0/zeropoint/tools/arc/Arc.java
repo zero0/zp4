@@ -347,6 +347,18 @@ public final class Arc implements FileWatcherListener, ArcCompilerListener
 		return fileWatcher.getFiles();
 	}
 	
+	public final List<String> getLocalFiles()
+	{
+		List<String> files = new ArrayList<String>( getFiles() );
+
+		for( int i = 0, imax = files.size(); i < imax; ++i )
+		{
+			files.set( i, files.get( i ).replace( getAssetsDirectory(), "" ) );
+		}
+		
+		return files;
+	}
+	
 	public final int getNumFiles()
 	{
 		return fileWatcher.getNumFiles();
