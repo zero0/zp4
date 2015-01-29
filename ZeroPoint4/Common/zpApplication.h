@@ -212,7 +212,7 @@ private:
 
 	zp_long m_lastTime;
 	zp_long m_simulateHz;
-	zp_long m_renderHz;
+	zp_float m_totalFrameTimeMs;
 
 	zpArrayList< zpApplicationPhase* > m_phases;
 

@@ -7,6 +7,7 @@
 
 zpApplication::zpApplication()
 	: m_isRunning( false )
+	, m_restartApplication( false )
 	, m_hasNextWorld( false )
 	, m_addNextWorld( false )
 	, m_shouldGarbageCollect( false )
@@ -21,8 +22,8 @@ zpApplication::zpApplication()
 	, m_currentWorld( ZP_NULL )
 	, m_nextWorld( ZP_NULL )
 	, m_lastTime( 0 )
-	, m_simulateHz( 10000000 / 60 )
-	, m_renderHz(   10000000 / 120 )
+	, m_simulateHz( 1000000 / 60 )
+	, m_totalFrameTimeMs( 1000.f / 60.f )
 	, m_statsTimer( 0 )
 	, m_frameCount( 0 )
 {}
@@ -742,18 +743,24 @@ void zpApplication::processFrame()
 
 	ZP_PROFILE_END( FRAME );
 
+	// increment frame counter
+	++m_frameCount;
+
 	ZP_PROFILE_START( SLEEP );
 	// sleep for the remainder of the frame
 	zp_long endTime = m_timer.getTime();
 
 	zp_long diff = ( endTime - now );
-	zp_long sleepTime = ( ( m_renderHz - diff ) * 1000L ) / ( m_timer.getCountsPerSecond() );
-	sleepTime = ZP_MAX( sleepTime, 1 );
+	zp_float d = m_timer.getSecondsPerTick() * (zp_float)diff * 1000.f;
+	zp_int sleepTime = (zp_int)( m_totalFrameTimeMs - d );
+	while( sleepTime < 0 )
+	{
+		zp_sleep( m_totalFrameTimeMs );
+		sleepTime += m_totalFrameTimeMs;
+	}
+
 	zp_sleep( (zp_uint)sleepTime );
 	ZP_PROFILE_END( SLEEP );
-
-	// increment frame counter
-	++m_frameCount;
 }
 
 void zpApplication::addPhase( zpApplicationPhase* phase )
@@ -1002,6 +1009,7 @@ void zpApplication::onGUI()
 	{
 		zp_float updateMs =			 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE			, m_timer.getSecondsPerTick() );
 		zp_float simulateMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SIMULATE		, m_timer.getSecondsPerTick() );
+		zp_float sleepMs =			 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SLEEP			, m_timer.getSecondsPerTick() );
 		zp_float objectUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_OBJECT_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float worldUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_WORLD_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float scriptUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE	, m_timer.getSecondsPerTick() );
@@ -1009,7 +1017,7 @@ void zpApplication::onGUI()
 		zp_float audioUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE	, m_timer.getSecondsPerTick() );
 		zpFixedStringBuffer< 64 > buff;
 
-		zpRectf rect( 5, 5, 320, 200 );
+		zpRectf rect( 5, 5, 320, 230 );
 		m_gui.beginWindow( "Update", rect, rect );
 
 		buff << "Update   " << updateMs * 1000.f << " ms";
@@ -1017,6 +1025,10 @@ void zpApplication::onGUI()
 		buff.clear();
 
 		buff << "Simulate " << simulateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Sleep    " << sleepMs * 1000.f << " ms";
 		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
 		buff.clear();
 
