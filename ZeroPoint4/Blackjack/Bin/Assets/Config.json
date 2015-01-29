@@ -1,0 +1,10 @@
+{
+    "InitialWorld" : "worlds/physics.worldb",
+    "LoadingWorld" : "worlds/loading.worldb",
+
+    "ProtoDB" : "data/protodb.jsonb",
+
+    "DefaultMaterial" : "materials/DiffuseColor.materialb",
+
+    "EditorStateName" : "Editor"
+}

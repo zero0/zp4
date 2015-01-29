@@ -1,5 +1,6 @@
 {
     "Console" : false,
+
     "Window" : {
         "Title" : "Blackjack",
         "X" : 50,
@@ -7,12 +8,9 @@
         "Width" : 1280,
         "Height" : 720
     },
+
     "Render" : {
         "Refresh" : 60,
         "VSync" : false
-    },
-    "InitialWorld" : "worlds/physics.worldb",
-    "LoadingWorld" : "worlds/loading.worldb",
-    "ProtoDB" : "data/protodb.jsonb",
-    "DefaultMaterial" : "materials/DiffuseColor.materialb"
+    }
 }
