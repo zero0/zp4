@@ -96,7 +96,7 @@ void zpCameraComponent::onDestroy()
 	m_camera = ZP_NULL;
 }
 
-void zpCameraComponent::onUpdate()
+void zpCameraComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	zpTransformComponent* t = getParentObject()->getComponents()->getTransformComponent();
 	if( t->getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
@@ -125,11 +125,11 @@ void zpCameraComponent::onDisabled()
 
 zpCameraComponentPool::zpCameraComponentPool() {}
 zpCameraComponentPool::~zpCameraComponentPool() {}
-void zpCameraComponentPool::update()
+void zpCameraComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpCameraComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpCameraComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpCameraComponentPool::simulate() {}

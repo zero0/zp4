@@ -64,7 +64,7 @@ void zpMeshRendererComponent::onCreate() {}
 void zpMeshRendererComponent::onInitialize() {}
 void zpMeshRendererComponent::onDestroy() {}
 
-void zpMeshRendererComponent::onUpdate() {}
+void zpMeshRendererComponent::onUpdate( zp_float deltaTime, zp_float realTime ) {}
 void zpMeshRendererComponent::onSimulate() {}
 
 void zpMeshRendererComponent::onEnabled() {}
@@ -74,11 +74,11 @@ void zpMeshRendererComponent::onDisabled() {}
 zpMeshRendererComponentPool::zpMeshRendererComponentPool() {}
 zpMeshRendererComponentPool::~zpMeshRendererComponentPool() {}
 
-void zpMeshRendererComponentPool::update()
+void zpMeshRendererComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpMeshRendererComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpMeshRendererComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpMeshRendererComponentPool::simulate() {}

@@ -6,11 +6,11 @@ zpPhantomComponent::zpPhantomComponent( zpObject* obj, const zpBison::Value& def
 	, m_addOnCreate( true )
 	, m_isAdded( false )
 {
-	m_phantom.create( obj->getComponents()->getTransformComponent()->getWorldTransform(), def );
+	m_phantom.create( getApplication()->getPhysicsEngine(), obj->getComponents()->getTransformComponent()->getWorldTransform(), def );
 }
 zpPhantomComponent::~zpPhantomComponent()
 {
-	m_phantom.destroy();
+	m_phantom.destroy( getApplication()->getPhysicsEngine() );
 }
 
 void zpPhantomComponent::onCreate()
@@ -34,7 +34,7 @@ void zpPhantomComponent::onDestroy()
 	}
 }
 
-void zpPhantomComponent::onUpdate()
+void zpPhantomComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isAdded )
 	{
@@ -74,10 +74,10 @@ zpPhantomComponentPool::~zpPhantomComponentPool()
 
 }
 
-void zpPhantomComponentPool::update()
+void zpPhantomComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpPhantomComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpPhantomComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }

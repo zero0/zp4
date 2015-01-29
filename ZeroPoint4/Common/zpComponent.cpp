@@ -37,11 +37,11 @@ zp_bool zpComponent::isCreated() const
 	return m_flags.isMarked( ZP_COMPONENT_FLAG_CREATED );
 }
 
-void zpComponent::update()
+void zpComponent::update( zp_float deltaTime, zp_float realTime )
 {
 	if( m_flags.isAllMarked( ZP_COMPONENT_FLAG_CAN_UPDATE ) )
 	{
-		onUpdate();
+		onUpdate( deltaTime, realTime );
 	}
 }
 void zpComponent::simulate()

@@ -8,9 +8,9 @@ public:
 	zpKinematicBody();
 	~zpKinematicBody();
 
-	void create( const zpBison::Value& v );
+	void create( zpPhysicsEngine* engine, const zpBison::Value& v );
 	void initialize( const zpMatrix4f& transform );
-	void destroy();
+	void destroy(zpPhysicsEngine* engine );
 
 	void getMatrix( zpMatrix4f& transform ) const;
 	void getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation ) const;

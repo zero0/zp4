@@ -45,7 +45,7 @@ zpTransformComponent::zpTransformComponent( zpObject* obj, const zpBison::Value&
 		setLocalTransform( pos, rot, scl );
 	
 		// build world matrix so it's correct on the same frame of creation
-		onUpdate();
+		onUpdate( 0.f, 0.f );
 
 		// add children
 		const zpBison::Value& children = def[ "Children" ];
@@ -252,7 +252,7 @@ void zpTransformComponent::onDestroy()
 	m_children.clear();
 }
 
-void zpTransformComponent::onUpdate()
+void zpTransformComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
 	{
@@ -301,10 +301,10 @@ zpTransformComponentPool::~zpTransformComponentPool()
 {
 }
 
-void zpTransformComponentPool::update()
+void zpTransformComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpTransformComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpTransformComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }

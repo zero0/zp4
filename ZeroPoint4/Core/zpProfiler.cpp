@@ -1,7 +1,6 @@
 #include "zpCore.h"
 
 zpProfiler::zpProfiler()
-	: m_time( zpTime::getInstance() )
 {
 	m_profiles.resize( zpProfilerSteps_Count );
 	reset();
@@ -11,14 +10,14 @@ zpProfiler::~zpProfiler()
 	reset();
 }
 
-void zpProfiler::start( zpProfilerSteps step )
+void zpProfiler::start( zpProfilerSteps step, zp_long time )
 {
-	m_profiles[ step ].currentStartTime = m_time->getTime();
+	m_profiles[ step ].currentStartTime = time;
 }
-void zpProfiler::end( zpProfilerSteps step )
+void zpProfiler::end( zpProfilerSteps step, zp_long time )
 {
 	zpProfilerPart& part = m_profiles[ step ];
-	part.currentEndTime = m_time->getTime();
+	part.currentEndTime = time;
 	part.samples++;
 
 	part.prevStartTime = part.currentStartTime;
@@ -61,16 +60,15 @@ zp_long zpProfiler::getMaxTime( zpProfilerSteps step )
 	return m_profiles[ step ].maxTime;
 }
 
-zp_float zpProfiler::getPreviousTimeSeconds( zpProfilerSteps step )
+zp_float zpProfiler::getPreviousTimeSeconds( zpProfilerSteps step, zp_float secondsPerTick )
 {
-	return getPreviousTime( step ) * m_time->getSecondsPerTick();
+	return getPreviousTime( step ) * secondsPerTick;
 }
 
-void zpProfiler::printProfile( zpProfilerSteps step )
+void zpProfiler::printProfile( zpProfilerSteps step, zp_float secondsPerTick )
 {
 	zpProfilerPart& part = m_profiles[ step ];
 
-	zp_float t = (zp_float)( part.prevEndTime - part.prevStartTime );
-	t *= zpTime::getInstance()->getSecondsPerTick();
+	zp_float t = (zp_float)( part.prevEndTime - part.prevStartTime ) * secondsPerTick;
 	zp_printfln( "   sec duration max_time avg_time\n%1.4f %8d %8d %8d", t, ( part.prevEndTime - part.prevStartTime ), part.maxTime, part.averageTime );
 }

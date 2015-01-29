@@ -77,7 +77,7 @@ void zpCanvasComponent::onDestroy()
 
 }
 
-void zpCanvasComponent::onUpdate()
+void zpCanvasComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 
 }
@@ -113,10 +113,10 @@ void zpCanvasComponentPool::render( zpRenderingContext* context )
 	} );
 }
 
-void zpCanvasComponentPool::update()
+void zpCanvasComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpCanvasComponent* o ) {
-		o->update();
+	m_used.foreach( [ &deltaTime, &realTime ]( zpCanvasComponent* o ) {
+		o->update( deltaTime, realTime );
 	} );
 }
 

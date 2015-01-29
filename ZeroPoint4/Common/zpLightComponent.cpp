@@ -48,7 +48,7 @@ zpLightComponent::~zpLightComponent() {}
 void zpLightComponent::onCreate() {}
 void zpLightComponent::onInitialize()
 {
-	onUpdate();
+	onUpdate( 0.f, 0.f );
 }
 void zpLightComponent::onDestroy()
 {
@@ -59,7 +59,7 @@ void zpLightComponent::onDestroy()
 	}
 }
 
-void zpLightComponent::onUpdate()
+void zpLightComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 
@@ -95,11 +95,11 @@ void zpLightComponent::onDisabled() {}
 zpLightComponentPool::zpLightComponentPool() {}
 zpLightComponentPool::~zpLightComponentPool() {}
 
-void zpLightComponentPool::update()
+void zpLightComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpLightComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpLightComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpLightComponentPool::simulate() {}

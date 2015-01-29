@@ -109,7 +109,7 @@ void zpWidgetComponent::onDestroy()
 	removeFromCanvas();
 }
 
-void zpWidgetComponent::onUpdate()
+void zpWidgetComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 
 }
@@ -181,7 +181,7 @@ void zpWidgetComponentPool::render( zpRenderingContext* context )
 
 }
 
-void zpWidgetComponentPool::update()
+void zpWidgetComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
 
 }

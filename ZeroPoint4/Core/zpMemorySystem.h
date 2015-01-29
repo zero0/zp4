@@ -39,6 +39,8 @@ private:
 	void addBlock( zpMemoryBlock* block );
 	void removeBlock( zpMemoryBlock* block );
 
+	zp_uint m_totalMemory;
+
 	zp_uint m_numAllocs;
 	zp_uint m_numDeallocs;
 	zp_uint m_memAllocated;

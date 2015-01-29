@@ -30,7 +30,7 @@ protected:
 	void onCreate();
 	void onDestroy();
 
-	void onUpdate();
+	void onUpdate( zp_float deltaTime, zp_float realTime );
 
 	void onEnabled();
 	void onDisabled();
@@ -51,7 +51,7 @@ public:
 	zpEditorCameraComponentPool();
 	virtual ~zpEditorCameraComponentPool();
 
-	void update();
+	void update( zp_float deltaTime, zp_float realTime );
 	void simulate();
 };
 

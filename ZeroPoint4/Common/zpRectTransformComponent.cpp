@@ -192,7 +192,7 @@ void zpRectTransformComponent::onDestroy()
 
 }
 
-void zpRectTransformComponent::onUpdate()
+void zpRectTransformComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	zp_uint frame = getApplication()->getFrameCount();
 	if( frame != m_frameUpdate )
@@ -204,25 +204,25 @@ void zpRectTransformComponent::onUpdate()
 		if( m_leftAnchor.rect != ZP_NULL )
 		{
 			anchored = true;
-			m_leftAnchor.rect->update();
+			m_leftAnchor.rect->update( deltaTime, realTime );
 		}
 
 		if( m_bottomAnchor.rect != ZP_NULL )
 		{
 			anchored = true;
-			m_bottomAnchor.rect->update();
+			m_bottomAnchor.rect->update( deltaTime, realTime );
 		}
 
 		if( m_rightAnchor.rect != ZP_NULL )
 		{
 			anchored = true;
-			m_rightAnchor.rect->update();
+			m_rightAnchor.rect->update( deltaTime, realTime );
 		}
 
 		if( m_topAnchor.rect != ZP_NULL )
 		{
 			anchored = true;
-			m_topAnchor.rect->update();
+			m_topAnchor.rect->update( deltaTime, realTime );
 		}
 
 		if( anchored )
@@ -347,9 +347,9 @@ zpRectTransformComponentPool::zpRectTransformComponentPool()
 zpRectTransformComponentPool::~zpRectTransformComponentPool()
 {}
 
-void zpRectTransformComponentPool::update()
+void zpRectTransformComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpRectTransformComponent* o ) {
-		o->update();
+	m_used.foreach( [ &deltaTime, &realTime ]( zpRectTransformComponent* o ) {
+		o->update( deltaTime, realTime );
 	} );
 }

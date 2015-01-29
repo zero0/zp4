@@ -283,13 +283,12 @@ void zpRenderingPipeline::update()
 {
 }
 
-void zpRenderingPipeline::beginFrame( zpRenderingContext* i )
+void zpRenderingPipeline::beginFrame( zpRenderingContext* i, zpTime* time )
 {
 	i->clearState();
 
 	i->setRasterState( &m_raster );
 
-	zpTime* time = zpTime::getInstance();
 	zpFrameBufferData perFrameData;
 	perFrameData.deltaTime = time->getDeltaSeconds();
 	perFrameData.actualDeltaTime = time->getActualDeltaSeconds();
@@ -727,7 +726,7 @@ void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zp
 	i->setScissorRect( camera->getClipRect() );
 }
 
-zp_bool zpRenderingPipeline::takeScreenshot( zpScreenshotType type, const zp_char* directoryPath )
+zp_bool zpRenderingPipeline::takeScreenshot( zpScreenshotType type, const zp_char* directoryPath, zp_long time )
 {
 	zp_bool ok = false;
 
@@ -735,7 +734,7 @@ zp_bool zpRenderingPipeline::takeScreenshot( zpScreenshotType type, const zp_cha
 	{
 		ok = true;
 		zpFixedStringBuffer< 255 > path;
-		path << directoryPath << zpFile::sep << "Screenshot_" << zpTime::getInstance()->getTime() << ".tga";
+		path << directoryPath << zpFile::sep << "Screenshot_" << time << ".tga";
 
 		m_screenshotType = type;
 		m_screenshotFilename = path.str();

@@ -32,7 +32,7 @@ protected:
 	void onInitialize();
 	void onDestroy();
 
-	void onUpdate();
+	void onUpdate( zp_float deltaTime, zp_float realTime );
 	void onSimulate();
 
 	void onEnabled();
@@ -54,7 +54,6 @@ private:
 	zp_uint m_maxParticles;
 
 	zpRandom* m_random;
-	zpTime* m_time;
 
 	zpVector4f m_prevPosition;
 
@@ -161,7 +160,7 @@ public:
 	zpParticleEmitterComponentPool();
 	virtual ~zpParticleEmitterComponentPool();
 
-	void update();
+	void update( zp_float deltaTime, zp_float realTime );
 	void simulate();
 
 	void render( zpRenderingContext* i, const zpCamera* camera );

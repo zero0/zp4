@@ -244,12 +244,12 @@ void zpBreakableComponent::onDestroy()
 	}
 }
 
-void zpBreakableComponent::onUpdate()
+void zpBreakableComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	// if decay is set, lose health
 	if( !zp_approximate( m_healthDecayPerSecond, 0.0f ) )
 	{
-		zp_float h = m_healthDecayPerSecond * zpTime::getInstance()->getDeltaSeconds();
+		zp_float h = m_healthDecayPerSecond * deltaTime;
 		loseHealth( h );
 	}
 
@@ -279,10 +279,10 @@ zpBreakableComponentPool::~zpBreakableComponentPool()
 {
 }
 
-void zpBreakableComponentPool::update()
+void zpBreakableComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpBreakableComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpBreakableComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }

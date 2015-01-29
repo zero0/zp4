@@ -7,9 +7,9 @@ public:
 	zpRigidBody();
 	~zpRigidBody();
 
-	void create( const zpBison::Value& v, zp_bool isStatic );
+	void create( zpPhysicsEngine* engine, const zpBison::Value& v, zp_bool isStatic );
 	void initialize( const zpMatrix4f& transform );
-	void destroy();
+	void destroy( zpPhysicsEngine* engine );
 
 	void getMatrix( zpMatrix4f& transform ) const;
 	void getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation ) const;
@@ -31,21 +31,4 @@ private:
 	zp_short m_mask;
 };
 
-class zpCollisionMask
-{
-public:
-	~zpCollisionMask();
-
-	static zpCollisionMask* getInstance();
-
-	zp_short getCollisionMask( const zpString& maskName );
-	zp_short getCollisionMask( const zp_char* maskName );
-
-	void getCollisionMaskNames( zpArrayList< zpString >& names ) const;
-
-private:
-	zpCollisionMask();
-
-	zpHashMap< zpString, zp_short> m_collisionMasks;
-};
 #endif

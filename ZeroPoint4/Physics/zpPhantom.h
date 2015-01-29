@@ -8,8 +8,8 @@ public:
 	zpPhantom();
 	~zpPhantom();
 
-	void create( const zpMatrix4f& transform, const zpBison::Value& v );
-	void destroy();
+	void create( zpPhysicsEngine* engine, const zpMatrix4f& transform, const zpBison::Value& v );
+	void destroy( zpPhysicsEngine* engine );
 
 	void setMatrix( const zpMatrix4f& transform );
 	zp_bool getMatrix( zpMatrix4f& transform ) const;

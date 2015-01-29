@@ -145,7 +145,7 @@ zp_bool zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>
 		empty->m_isLoaded = true;
 		empty->m_isLoadedFromFile = false;
 		resource = &empty->m_resource;
-		empty->m_lastTimeLoaded = zpTime::getInstance()->getTime();
+		empty->m_lastTimeLoaded = 0; // TODO: fix by actually get the time
 
 		//outInstance.initialized();
 		impl->initializeInstance( outInstance );

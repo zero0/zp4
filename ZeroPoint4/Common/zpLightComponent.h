@@ -15,7 +15,7 @@ protected:
 	void onInitialize();
 	void onDestroy();
 
-	void onUpdate();
+	void onUpdate( zp_float deltaTime, zp_float realTime );
 	void onSimulate();
 
 	void onEnabled();
@@ -32,7 +32,7 @@ public:
 	zpLightComponentPool();
 	virtual ~zpLightComponentPool();
 
-	void update();
+	void update( zp_float deltaTime, zp_float realTime );
 	void simulate();
 };
 

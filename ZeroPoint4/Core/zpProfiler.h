@@ -31,8 +31,8 @@ enum zpProfilerSteps
 };
 
 #if ZP_USE_PROFILER
-#define ZP_PROFILE_START( step )	m_profiler.start( ZP_PROFILER_STEP_##step )
-#define ZP_PROFILE_END( step )		m_profiler.end( ZP_PROFILER_STEP_##step )
+#define ZP_PROFILE_START( step )	m_profiler.start( ZP_PROFILER_STEP_##step, m_timer.getTime() )
+#define ZP_PROFILE_END( step )		m_profiler.end( ZP_PROFILER_STEP_##step, m_timer.getTime() )
 #define ZP_PROFILE_FINALIZE()		m_profiler.finalize()
 #else
 #define ZP_PROFILE_START( step )	(void)0
@@ -47,8 +47,8 @@ public:
 	zpProfiler();
 	~zpProfiler();
 
-	void start( zpProfilerSteps step );
-	void end( zpProfilerSteps step );
+	void start( zpProfilerSteps step, zp_long time );
+	void end( zpProfilerSteps step, zp_long time );
 
 	void reset();
 	void finalize();
@@ -57,13 +57,11 @@ public:
 	zp_long getAverageTime( zpProfilerSteps step );
 	zp_long getMaxTime( zpProfilerSteps step );
 
-	zp_float getPreviousTimeSeconds( zpProfilerSteps step );
+	zp_float getPreviousTimeSeconds( zpProfilerSteps step, zp_float secondsPerTick );
 
-	void printProfile( zpProfilerSteps step );
+	void printProfile( zpProfilerSteps step, zp_float secondsPerTick );
 
 private:
-	zpTime* m_time;
-
 	struct zpProfilerPart
 	{
 		zp_long prevStartTime;

@@ -107,6 +107,9 @@ void zpPhysicsEngine::create()
 	m_dynamicsWorld = dynamicsWorld;
 	m_ghostPairCallback = ghostCallback;
 	m_filterCallback = filterCallback;
+
+	m_colliderCache.create();
+	m_collisionMask.create();
 }
 void zpPhysicsEngine::destroy()
 {
@@ -131,12 +134,19 @@ void zpPhysicsEngine::destroy()
 
 	ZP_SAFE_DELETE( debugDrawer );
 
+	CProfileManager::CleanupMemory();
+
+	m_colliderCache.destroy();
+	m_collisionMask.destroy();
+
 	m_broardphase = ZP_NULL;
 	m_collisionConfig = ZP_NULL;
 	m_dispatcher = ZP_NULL;
 	m_solver = ZP_NULL;
 	m_dynamicsWorld = ZP_NULL;
 	m_debugDrawer = ZP_NULL;
+	m_ghostPairCallback = ZP_NULL;
+	m_filterCallback = ZP_NULL;
 }
 
 void zpPhysicsEngine::update( zp_float dt )
@@ -280,4 +290,13 @@ void zpPhysicsEngine::fixedTimeStep( zp_float timeStep )
 	m_phantoms.foreach( [ this ]( zpPhantom* p ) {
 		p->processCollisions( m_dynamicsWorld );
 	} );
+}
+
+zpColliderCache* zpPhysicsEngine::getColliderCache()
+{
+	return &m_colliderCache;
+}
+zpCollisionMask* zpPhysicsEngine::getCollisionMask()
+{
+	return &m_collisionMask;
 }

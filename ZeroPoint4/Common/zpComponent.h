@@ -25,7 +25,7 @@ public:
 	zp_bool isEnabled() const;
 	zp_bool isCreated() const;
 
-	void update();
+	void update( zp_float deltaTime, zp_float realTime );
 	void simulate();
 
 	void create();
@@ -43,7 +43,7 @@ protected:
 	virtual void onInitialize() {};
 	virtual void onDestroy() {};
 
-	virtual void onUpdate() {};
+	virtual void onUpdate( zp_float deltaTime, zp_float realTime ) {};
 	virtual void onSimulate() {};
 
 	virtual void onEnabled() {};

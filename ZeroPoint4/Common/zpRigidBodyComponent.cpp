@@ -6,11 +6,11 @@ zpRigidBodyComponent::zpRigidBodyComponent( zpObject* obj, const zpBison::Value&
 	, m_addOnCreate( true )
 	, m_isAdded( false )
 {
-	m_rigidBody.create( def, obj->isFlagSet( ZP_OBJECT_FLAG_STATIC ) );
+	m_rigidBody.create( getApplication()->getPhysicsEngine(), def, obj->isFlagSet( ZP_OBJECT_FLAG_STATIC ) );
 }
 zpRigidBodyComponent::~zpRigidBodyComponent()
 {
-	m_rigidBody.destroy();
+	m_rigidBody.destroy( getApplication()->getPhysicsEngine() );
 }
 
 void zpRigidBodyComponent::onCreate()
@@ -34,7 +34,7 @@ void zpRigidBodyComponent::onDestroy()
 	}
 }
 
-void zpRigidBodyComponent::onUpdate()
+void zpRigidBodyComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isAdded && !m_rigidBody.isStatic() )
 	{
@@ -71,11 +71,11 @@ void zpRigidBodyComponent::onDisabled()
 zpRigidBodyComponentPool::zpRigidBodyComponentPool() {}
 zpRigidBodyComponentPool::~zpRigidBodyComponentPool() {}
 
-void zpRigidBodyComponentPool::update()
+void zpRigidBodyComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpRigidBodyComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpRigidBodyComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpRigidBodyComponentPool::simulate()

@@ -39,7 +39,8 @@ void operator delete( void* ptr ) {
 #endif
 
 zpMemorySystem::zpMemorySystem()
-	: m_numAllocs( 0 )
+	: m_totalMemory( 0 )
+	, m_numAllocs( 0 )
 	, m_numDeallocs( 0 )
 	, m_memAllocated( 0 )
 	, m_memDeallocated( 0 )
@@ -47,11 +48,9 @@ zpMemorySystem::zpMemorySystem()
 	, m_allMemory( ZP_NULL )
 	, m_alignedMemory( ZP_NULL )
 {
-	initialize( ZP_MEMORY_MB( 10 ) );
 }
 zpMemorySystem::~zpMemorySystem()
 {
-	shutdown();
 }
 zpMemorySystem zpMemorySystem::s_memory;
 
@@ -74,6 +73,8 @@ void zpMemorySystem::deallocate( void* ptr ) {
 #else
 void* zpMemorySystem::allocate( zp_uint size )
 {
+	if( m_totalMemory == 0 ) return zp_malloc( size );
+
 	++m_numAllocs;
 	m_memAllocated += size;
 	m_memUsed += size;
@@ -127,11 +128,15 @@ void* zpMemorySystem::allocate( zp_uint size )
 
 void zpMemorySystem::deallocate( void* ptr )
 {
+	if( m_totalMemory == 0 )
+	{
+		zp_free( ptr );
+		return;
+	}
+
 	++m_numDeallocs;
 	zp_uint* i = (zp_uint*)ptr;
 	--i;
-	m_memDeallocated += *i;
-	m_memUsed -= *i;
 
 #if ZP_MEMORY_TRACK_POINTERS
 	zp_int p = m_allocedPointers.indexOf( i );
@@ -139,6 +144,9 @@ void zpMemorySystem::deallocate( void* ptr )
 	m_allocedPointers.erase( p );
 	m_stackTraces.erase( p );
 #endif
+
+	m_memDeallocated += *i;
+	m_memUsed -= *i;
 
 	zp_free( i );
 	return;
@@ -189,6 +197,8 @@ void zpMemorySystem::printAllocatedMemoryStackTrace()
 
 void zpMemorySystem::initialize( zp_uint size ) 
 {
+	m_totalMemory = size;
+
 	zpStackTrace::Initialize();
 
 	return;
@@ -214,6 +224,7 @@ void zpMemorySystem::initialize( zp_uint size )
 }
 void zpMemorySystem::shutdown()
 {
+
 #if ZP_MEMORY_TRACK_POINTERS
 	if( !m_stackTraces.isEmpty() )
 	{
@@ -229,6 +240,8 @@ void zpMemorySystem::shutdown()
 	ZP_SAFE_FREE( m_allMemory );
 
 	zpStackTrace::Shutdown();
+
+	m_totalMemory = 0;
 }
 
 void zpMemorySystem::addBlock( zpMemoryBlock* block )

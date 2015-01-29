@@ -1,6 +1,7 @@
 #include "zpCommon.h"
 
-#define ZP_APPLICATION_DEFAULT_OPTIONS_FILE		"zp.json"
+#define ZP_APPLICATION_DEFAULT_OPTIONS_FILE		"ZeroPoint.jsonb"
+#define ZP_APPLICATION_DEFAULT_CONFIG_FILE		"Config.jsonb"
 #define ZP_APPLICATION_DEFAULT_WINDOW_WIDTH		640
 #define ZP_APPLICATION_DEFAULT_WINDOW_HEIGHT	480
 
@@ -10,12 +11,13 @@ zpApplication::zpApplication()
 	, m_addNextWorld( false )
 	, m_shouldGarbageCollect( false )
 	, m_shouldReloadAllResources( false )
-	, m_inEditMode( false )
+	, m_isApplicationPaused( false )
 	, m_currentPhase( 0 )
 	, m_exitCode( 0 )
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
+	, m_configFilename( ZP_APPLICATION_DEFAULT_CONFIG_FILE )
 	, m_console( ZP_NULL )
-	, m_timer( zpTime::getInstance() )
+	, m_timer()
 	, m_currentWorld( ZP_NULL )
 	, m_nextWorld( ZP_NULL )
 	, m_lastTime( 0 )
@@ -34,6 +36,15 @@ void zpApplication::setOptionsFilename( const zp_char* filename )
 const zpString& zpApplication::getOptionsFilename() const
 {
 	return m_optionsFilename;
+}
+
+void zpApplication::setConfigFilename( const zp_char* filename )
+{
+	m_configFilename = filename;
+}
+const zpString& zpApplication::getConfigFilename() const
+{
+	return m_configFilename;
 }
 
 void zpApplication::popCurrentPhase()
@@ -62,6 +73,76 @@ void zpApplication::pushNextPhase()
 {
 	++m_currentPhase;
 	m_phases[ m_currentPhase ]->onEnterPhase( this );
+}
+
+void zpApplication::swapState( const zp_char* stateName )
+{
+	if( !m_stateStack.isEmpty() )
+	{
+		m_stateStack.back()->onLeaveState( this );
+		m_stateStack.popBack();
+	}
+
+	zpApplicationState** state;
+	if( m_allStates.findIf( [ stateName ]( zpApplicationState* s ) { return zp_strcmp( s->getStateName(), stateName ) == 0; }, &state ) )
+	{
+		zpApplicationState* s = *state;
+		ZP_ASSERT( m_stateStack.indexOf( s ) < 0, "State '%s' already in stack", stateName );
+
+		s->onEnterState( this );
+
+		m_stateStack.pushBack( s );
+	}
+	else
+	{
+		ZP_ASSERT( false, "State '%s' not found", stateName );
+	}
+}
+void zpApplication::pushState( const zp_char* stateName )
+{
+	if( !m_stateStack.isEmpty() )
+	{
+		m_stateStack.back()->onLeaveState( this );
+	}
+
+	zpApplicationState** state;
+	if( m_allStates.findIf( [ stateName ]( zpApplicationState* s ) { return zp_strcmp( s->getStateName(), stateName ) == 0; }, &state ) )
+	{
+		zpApplicationState* s = *state;
+		ZP_ASSERT( m_stateStack.indexOf( s ) < 0, "State '%s' already in stack", stateName );
+
+		s->onEnterState( this );
+
+		m_stateStack.pushBack( s );
+	}
+	else
+	{
+		ZP_ASSERT( false, "State '%s' not found", stateName );
+	}
+}
+void zpApplication::popState()
+{
+	if( !m_stateStack.isEmpty() )
+	{
+		m_stateStack.back()->onLeaveState( this );
+		m_stateStack.popBack();
+	}
+
+	if( !m_stateStack.isEmpty() )
+	{
+		m_stateStack.back()->onEnterState( this );
+	}
+}
+void zpApplication::updateState( zp_float deltaTime, zp_float realTime )
+{
+	if( !m_stateStack.isEmpty() )
+	{
+		m_stateStack.back()->onUpdateState( this, deltaTime, realTime );
+	}
+}
+zpApplicationState* zpApplication::getCurrentState() const
+{
+	return m_stateStack.isEmpty() ? ZP_NULL : m_stateStack.back();
 }
 
 void zpApplication::initialize( const zpArrayList< zpString >& args )
@@ -128,7 +209,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	re->setVSyncEnabled( render[ "VSync" ].asBool() );
 	re->create( m_window.getWindowHandle(), m_window.getScreenSize() );
 
-	m_lastTime = m_timer->getTime();
+	m_lastTime = m_timer.getTime();
 
 	m_renderingPipeline.initialize();
 
@@ -146,9 +227,13 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 }
 void zpApplication::setup()
 {
-	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
+	zp_bool ok;
+	ok = m_textContent.getResource( m_configFilename, m_appConfig );
+	ZP_ASSERT( ok, "Failed to load Config '%s'", m_configFilename.str() );
 
-	const zpBison::Value& world = appOptions[ "InitialWorld" ];
+	const zpBison::Value& appConfig = m_appConfig.getResource()->getData()->root();
+
+	const zpBison::Value& world = appConfig[ "InitialWorld" ];
 	if( world.isString() )
 	{
 		m_initialWorldFilename = world.asCString();
@@ -156,7 +241,7 @@ void zpApplication::setup()
 		loadWorld( world.asCString() );
 	}
 
-	const zpBison::Value& loadingWorld = appOptions[ "LoadingWorld" ];
+	const zpBison::Value& loadingWorld = appConfig[ "LoadingWorld" ];
 	if( loadingWorld.isString() )
 	{
 		m_loadingWorldFilename = loadingWorld.asCString();
@@ -164,26 +249,37 @@ void zpApplication::setup()
 
 	m_currentPhase = -1;
 
-	m_protoDBManager.setProtoDBFile( appOptions[ "ProtoDB" ].asCString() );
+	m_protoDBManager.setProtoDBFile( appConfig[ "ProtoDB" ].asCString() );
 
-	m_renderingPipeline.getMaterialContentManager()->getResource( appOptions[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
+	m_renderingPipeline.getMaterialContentManager()->getResource( appConfig[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
+
+	m_editorStateName = appConfig[ "EditorStateName" ].asCString();
 }
 
 void zpApplication::run()
 {
-	m_isRunning = true;
-
-	pushNextPhase();
-
-	while( m_isRunning && m_window.processMessages() )
+	do
 	{
-		processFrame();
-	}
+		m_restartApplication = false;
+		m_isRunning = true;
+
+		setup();
+
+		pushNextPhase();
+
+		while( m_isRunning && m_window.processMessages() )
+		{
+			processFrame();
+		}
+
+		teardown();
+	} while ( m_restartApplication );
 }
 
 void zpApplication::teardown()
 {
 	m_appOptions.release();
+	m_appConfig.release();
 
 	m_defaultMaterial.release();
 	m_gui.destroy();
@@ -200,11 +296,21 @@ void zpApplication::teardown()
 		popCurrentPhase();
 	}
 
+	// leave all states
+	while ( !m_stateStack.isEmpty() )
+	{
+		m_stateStack.back()->onLeaveState( this );
+		m_stateStack.popBack();
+	}
+
 	garbageCollect();
 }
 zp_int zpApplication::shutdown()
 {
 	m_phases.clear();
+
+	m_stateStack.clear();
+	m_allStates.clear();
 
 	m_renderingPipeline.destroy();
 	m_physicsEngine.destroy();
@@ -234,7 +340,12 @@ zp_int zpApplication::shutdown()
 
 void zpApplication::update()
 {
+	zp_float deltaTime = m_isApplicationPaused ? 0.f : m_timer.getDeltaSeconds();
+	zp_float realTime = m_timer.getWallClockDeltaSeconds();
+
 	updatePhase();
+
+	updateState( deltaTime, realTime );
 
 	zp_bool initalizeCurrentWorld = false;
 	if( m_hasNextWorld && !m_nextWorldFilename.isEmpty() )
@@ -323,18 +434,18 @@ void zpApplication::update()
 		m_objectContent.initializeAllObjectsInWorld( m_currentWorld );
 	}
 
-	m_physicsEngine.update( m_timer->getDeltaSeconds() );
-
-	// update all components
-#undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) m_componentPool##cmp.update();
-	#include "zpAllComponents.inl"
-#undef ZP_COMPONENT_DEF
+	m_physicsEngine.update( deltaTime );
 
 	// update input
 	ZP_PROFILE_START( INPUT_UPDATE );
 	m_inputManager.update();
 	ZP_PROFILE_END( INPUT_UPDATE );
+
+	// update all components
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp ) m_componentPool##cmp.update( deltaTime, realTime );
+	#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
 
 	m_renderingPipeline.update();
 
@@ -351,7 +462,7 @@ void zpApplication::update()
 }
 void zpApplication::simulate()
 {
-	if( !m_inEditMode )
+	if( !m_isApplicationPaused )
 	{
 		//m_componentPoolEditorCamera.simulate();
 		m_physicsEngine.simulate();
@@ -373,6 +484,11 @@ void zpApplication::exit( zp_int exitCode )
 {
 	m_isRunning = false;
 	m_exitCode = exitCode;
+}
+void zpApplication::restart()
+{
+	m_isRunning = false;
+	m_restartApplication = true;
 }
 
 const zpBison::Value& zpApplication::getOptions() const
@@ -447,14 +563,15 @@ void zpApplication::handleInput()
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_TAB ) )
 	{
-		m_inEditMode = !m_inEditMode;
-		if( m_inEditMode )
+		zpApplicationState* currentState = getCurrentState();
+		zp_bool inEditorState = currentState != ZP_NULL && currentState->getStateName() == m_editorStateName ;
+		if( inEditorState )
 		{
-			enterEditMode();
+			popState();
 		}
 		else
 		{
-			leaveEditMode();
+			pushState( m_editorStateName.str() );
 		}
 	}
 	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_G ) )
@@ -499,7 +616,7 @@ void zpApplication::handleInput()
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F11 ) )
 	{
-		m_renderingPipeline.takeScreenshot( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) ? ZP_SCREENSHOT_TYPE_NO_UI : ZP_SCREENSHOT_TYPE_ALL, "." );
+		m_renderingPipeline.takeScreenshot( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) ? ZP_SCREENSHOT_TYPE_NO_UI : ZP_SCREENSHOT_TYPE_ALL, ".", m_timer.getTime() );
 	}
 
 	// draw physics debug
@@ -531,8 +648,8 @@ zp_float zpApplication::getLoadingWorldProgress() const
 
 void zpApplication::processFrame()
 {
-	m_timer->tick();
-	zp_long now = m_timer->getTime();
+	m_timer.tick();
+	zp_long now = m_timer.getTime();
 
 	ZP_PROFILE_START( FRAME );
 
@@ -582,7 +699,7 @@ void zpApplication::processFrame()
 		m_lastTime = now - m_simulateHz;
 	}
 
-	m_timer->setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
+	m_timer.setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
 
 	ZP_PROFILE_START( RENDER_FRAME );
 	{
@@ -607,7 +724,7 @@ void zpApplication::processFrame()
 		
 		// render begin
 		ZP_PROFILE_START( RENDER_BEGIN );
-		m_renderingPipeline.beginFrame( i );
+		m_renderingPipeline.beginFrame( i, &m_timer );
 		ZP_PROFILE_END( RENDER_BEGIN );
 
 		// render commands
@@ -627,10 +744,11 @@ void zpApplication::processFrame()
 
 	ZP_PROFILE_START( SLEEP );
 	// sleep for the remainder of the frame
-	zp_long endTime = m_timer->getTime();
+	zp_long endTime = m_timer.getTime();
 
 	zp_long diff = ( endTime - now );
-	zp_long sleepTime = ( ( m_renderHz - diff ) * 1000L ) / ( m_timer->getCountsPerSecond() );
+	zp_long sleepTime = ( ( m_renderHz - diff ) * 1000L ) / ( m_timer.getCountsPerSecond() );
+	sleepTime = ZP_MAX( sleepTime, 1 );
 	zp_sleep( (zp_uint)sleepTime );
 	ZP_PROFILE_END( SLEEP );
 
@@ -642,6 +760,11 @@ void zpApplication::addPhase( zpApplicationPhase* phase )
 {
 	ZP_ASSERT( !m_isRunning, "Trying to add Phases to a running application" );
 	m_phases.pushBack( phase );
+}
+void zpApplication::addState( zpApplicationState* state )
+{
+	ZP_ASSERT( !m_isRunning, "Trying to add States to a running application" );
+	m_allStates.pushBack( state );
 }
 
 void zpApplication::runGarbageCollect()
@@ -791,11 +914,11 @@ void zpApplication::enterEditMode()
 	m_renderingPipeline.pushCameraState< EditorCameraController >( ZP_CAMERA_TYPE_MAIN );
 #endif
 
-	m_timer->setTimeScale( 0.f );
+	m_timer.setTimeScale( 0.f );
 }
 void zpApplication::leaveEditMode()
 {
-	m_timer->setTimeScale( 1.f );
+	m_timer.setTimeScale( 1.f );
 
 	zp_printfln( "leave edit" );
 }
@@ -821,7 +944,7 @@ void zpApplication::onGUI()
 	// draw FPS
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
 	{
-		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME );
+		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME, m_timer.getSecondsPerTick() );
 		zpFixedStringBuffer< 64 > fps;
 		fps << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
 
@@ -831,13 +954,13 @@ void zpApplication::onGUI()
 	// draw rendering stats
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_RENDERING ) )
 	{
-		zp_float renderAllMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER );
-		zp_float renderBeginMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_BEGIN );
-		zp_float renderFrameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_FRAME );
-		zp_float renderMeshesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_MESHES );
-		zp_float renderParticlesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PARTICLES );
-		zp_float renderPresentMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT );
-		zp_float renderDebugMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER );
+		zp_float renderAllMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER				, m_timer.getSecondsPerTick() );
+		zp_float renderBeginMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_BEGIN		, m_timer.getSecondsPerTick() );
+		zp_float renderFrameMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_FRAME		, m_timer.getSecondsPerTick() );
+		zp_float renderMeshesMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_MESHES		, m_timer.getSecondsPerTick() );
+		zp_float renderParticlesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PARTICLES	, m_timer.getSecondsPerTick() );
+		zp_float renderPresentMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT		, m_timer.getSecondsPerTick() );
+		zp_float renderDebugMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER		, m_timer.getSecondsPerTick() );
 		zpFixedStringBuffer< 64 > buff;
 
 		zpRectf rect( 5, 5, 320, 200 );
@@ -877,13 +1000,13 @@ void zpApplication::onGUI()
 	// draw update stats
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_UPDATE ) )
 	{
-		zp_float updateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE );
-		zp_float simulateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SIMULATE );
-		zp_float objectUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_OBJECT_UPDATE );
-		zp_float worldUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_WORLD_UPDATE );
-		zp_float scriptUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE );
-		zp_float inputUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE );
-		zp_float audioUpdateMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE );
+		zp_float updateMs =			 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE			, m_timer.getSecondsPerTick() );
+		zp_float simulateMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SIMULATE		, m_timer.getSecondsPerTick() );
+		zp_float objectUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_OBJECT_UPDATE	, m_timer.getSecondsPerTick() );
+		zp_float worldUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_WORLD_UPDATE	, m_timer.getSecondsPerTick() );
+		zp_float scriptUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE	, m_timer.getSecondsPerTick() );
+		zp_float inputUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE	, m_timer.getSecondsPerTick() );
+		zp_float audioUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE	, m_timer.getSecondsPerTick() );
 		zpFixedStringBuffer< 64 > buff;
 
 		zpRectf rect( 5, 5, 320, 200 );

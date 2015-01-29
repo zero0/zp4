@@ -22,7 +22,7 @@ public:
 	zp_bool createEngine( zpApplication* app );
 	void destroyEngine();
 
-	void processThreads();
+	void processThreads( zp_long time );
 
 	zp_handle createScriptObject( zp_handle objectType );
 	void destroyScriptObject( zp_handle object, zp_handle objectType );

@@ -6,11 +6,11 @@ zpKinematicBodyComponent::zpKinematicBodyComponent( zpObject* obj, const zpBison
 	, m_addOnEnable( true )
 	, m_isAdded( false )
 {
-	m_kinematicBody.create( def );
+	m_kinematicBody.create( getApplication()->getPhysicsEngine(), def );
 }
 zpKinematicBodyComponent::~zpKinematicBodyComponent()
 {
-	m_kinematicBody.destroy();
+	m_kinematicBody.destroy( getApplication()->getPhysicsEngine() );
 }
 	
 void zpKinematicBodyComponent::onCreate()
@@ -35,7 +35,7 @@ void zpKinematicBodyComponent::onDestroy()
 	}
 }
 
-void zpKinematicBodyComponent::onUpdate()
+void zpKinematicBodyComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isAdded )
 	{
@@ -109,17 +109,17 @@ zpKinematicBodyComponentPool::~zpKinematicBodyComponentPool()
 
 }
 
-void zpKinematicBodyComponentPool::update()
+void zpKinematicBodyComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpKinematicBodyComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpKinematicBodyComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpKinematicBodyComponentPool::simulate()
 {
 	m_used.foreach( []( zpKinematicBodyComponent* o )
 	{
-		o->update();
+		o->simulate();
 	} );
 }

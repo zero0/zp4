@@ -61,13 +61,13 @@ void zpAudioEmitterComponent::onInitialize()
 void zpAudioEmitterComponent::onDestroy()
 {}
 	
-void zpAudioEmitterComponent::onUpdate()
+void zpAudioEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isMoving )
 	{
 		if( !m_sounds.isEmpty() )
 		{
-			zp_float dt = zpTime::getInstance()->getDeltaSeconds();
+			zp_float dt = deltaTime;
 
 			zpVector4f pos( getParentObject()->getComponents()->getTransformComponent()->getWorldPosition() );
 			zpVector4f vel;
@@ -97,11 +97,11 @@ void zpAudioEmitterComponent::onDisabled()
 zpAudioEmitterComponentPool::zpAudioEmitterComponentPool() {}
 zpAudioEmitterComponentPool::~zpAudioEmitterComponentPool() {}
 
-void zpAudioEmitterComponentPool::update()
+void zpAudioEmitterComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpAudioEmitterComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpAudioEmitterComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpAudioEmitterComponentPool::simulate()

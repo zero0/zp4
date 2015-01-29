@@ -17,7 +17,7 @@ protected:
 	void onInitialize();
 	void onDestroy(); 
 
-	void onUpdate();
+	void onUpdate( zp_float deltaTime, zp_float realTime );
 	void onSimulate();
 
 	void onEnabled();
@@ -35,7 +35,7 @@ public:
 	zpAudioListenerComponentPool();
 	virtual ~zpAudioListenerComponentPool();
 
-	void update();
+	void update( zp_float deltaTime, zp_float realTime );
 	void simulate();
 };
 

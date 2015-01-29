@@ -50,12 +50,6 @@ zpColliderShape zpCollider::getColliderShape() const
 zpColliderCache::zpColliderCache() {}
 zpColliderCache::~zpColliderCache() {}
 
-zpColliderCache* zpColliderCache::getInstance()
-{
-	static zpColliderCache instance;
-	return &instance;
-}
-
 zpCollider* zpColliderCache::getCollider( const zpBison::Value& v )
 {
 	zpColliderShape shape;
@@ -147,6 +141,16 @@ void zpColliderCache::removeCollider( zpCollider* collider )
 	}
 }
 
+void zpColliderCache::create()
+{
+	m_colliders.clear();
+}
+void zpColliderCache::destroy()
+{
+	ZP_ASSERT( m_colliders.isEmpty(), "Not all colliders destroyed" );
+	m_colliders.clear();
+}
+
 zp_hash zpColliderCache::generateColliderHash( const zpBison::Value& v, zpColliderShape& shape, zp_float* p, const zp_float*& d, zp_uint& s ) const
 {
 	const zpBison::Value& size = v[ "Size" ];
@@ -227,4 +231,64 @@ zp_hash zpColliderCache::generateColliderHash( const zpBison::Value& v, zpCollid
 	h = zp_fnv1_32_string( buff.str(), h );
 
 	return h;
+}
+
+
+
+zpCollisionMask::zpCollisionMask() {}
+zpCollisionMask::~zpCollisionMask() {}
+
+zp_short zpCollisionMask::getCollisionMask( const zp_char* maskName )
+{
+	zp_short mask = 0;
+	if( maskName != ZP_NULL )
+	{
+		mask = getCollisionMask( zpString( maskName ) );
+	}
+	return mask;
+}
+zp_short zpCollisionMask::getCollisionMask( const zpString& maskName )
+{
+	zp_short mask = 0;
+	if( !maskName.isEmpty() )
+	{
+		zpFixedArrayList< zpString, 8 > parts;
+		maskName.split( '|', parts );
+
+		if( !parts.isEmpty() )
+		{
+			zp_short* foundMask;
+			zpString part;
+			for( zp_uint i = 0; i < parts.size(); ++i )
+			{
+				part = parts[i].trim();
+
+				if( m_collisionMasks.find( part, &foundMask ) )
+				{
+					mask |= *foundMask;
+				}
+				else
+				{
+					zp_short newMask = 1 << m_collisionMasks.size();
+					m_collisionMasks.put( part, newMask );
+					mask |= newMask;
+				}
+			}
+		}
+	}
+	return mask;
+}
+
+void zpCollisionMask::getCollisionMaskNames( zpArrayList< zpString >& names ) const
+{
+	m_collisionMasks.keys( names );
+}
+
+void zpCollisionMask::create()
+{
+	m_collisionMasks.clear();
+}
+void zpCollisionMask::destroy()
+{
+	m_collisionMasks.clear();
 }

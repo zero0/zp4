@@ -20,13 +20,13 @@ zpRigidBody::~zpRigidBody()
 {
 }
 
-void zpRigidBody::create( const zpBison::Value& v, zp_bool isStatic )
+void zpRigidBody::create( zpPhysicsEngine* engine, const zpBison::Value& v, zp_bool isStatic )
 {
 	m_mass = v[ "Mass" ].asFloat();
 
-	m_group = zpCollisionMask::getInstance()->getCollisionMask( v[ "Group" ].asCString() );
-	m_mask = zpCollisionMask::getInstance()->getCollisionMask( v[ "Mask" ].asCString() );
-	m_collider = zpColliderCache::getInstance()->getCollider( v[ "Collider" ] );
+	m_group = engine->getCollisionMask()->getCollisionMask( v[ "Group" ].asCString() );
+	m_mask =  engine->getCollisionMask()->getCollisionMask( v[ "Mask" ].asCString() );
+	m_collider = engine->getColliderCache()->getCollider( v[ "Collider" ] );
 
 	m_isStatic = m_mass < ZP_RIGID_BODY_STATIC_MASS || isStatic;
 }
@@ -67,9 +67,9 @@ void zpRigidBody::initialize( const zpMatrix4f& transform )
 		m_motionState = motion;
 	}
 }
-void zpRigidBody::destroy()
+void zpRigidBody::destroy( zpPhysicsEngine* engine )
 {
-	zpColliderCache::getInstance()->removeCollider( (zpCollider*)m_collider );
+	engine->getColliderCache()->removeCollider( m_collider );
 	m_collider = ZP_NULL;
 
 	btMotionState* motion = (btMotionState*)m_motionState;
@@ -120,59 +120,4 @@ zp_short zpRigidBody::getMask() const
 zp_handle zpRigidBody::getRigidBody() const
 {
 	return m_rigidBody;
-}
-
-zpCollisionMask::zpCollisionMask() {}
-zpCollisionMask::~zpCollisionMask() {}
-
-zpCollisionMask* zpCollisionMask::getInstance()
-{
-	static zpCollisionMask instance;
-	return &instance;
-}
-
-zp_short zpCollisionMask::getCollisionMask( const zp_char* maskName )
-{
-	zp_short mask = 0;
-	if( maskName != ZP_NULL )
-	{
-		mask = getCollisionMask( zpString( maskName ) );
-	}
-	return mask;
-}
-zp_short zpCollisionMask::getCollisionMask( const zpString& maskName )
-{
-	zp_short mask = 0;
-	if( !maskName.isEmpty() )
-	{
-		zpFixedArrayList< zpString, 8 > parts;
-		maskName.split( '|', parts );
-
-		if( !parts.isEmpty() )
-		{
-			zp_short* foundMask;
-			zpString part;
-			for( zp_uint i = 0; i < parts.size(); ++i )
-			{
-				part = parts[i].trim();
-				
-				if( m_collisionMasks.find( part, &foundMask ) )
-				{
-					mask |= *foundMask;
-				}
-				else
-				{
-					zp_short newMask = 1 << m_collisionMasks.size();
-					m_collisionMasks.put( part, newMask );
-					mask |= newMask;
-				}
-			}
-		}
-	}
-	return mask;
-}
-
-void zpCollisionMask::getCollisionMaskNames( zpArrayList< zpString >& names ) const
-{
-	m_collisionMasks.keys( names );
 }

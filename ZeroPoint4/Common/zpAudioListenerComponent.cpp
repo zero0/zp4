@@ -46,11 +46,11 @@ void zpAudioListenerComponent::onInitialize()
 void zpAudioListenerComponent::onDestroy()
 {}
 
-void zpAudioListenerComponent::onUpdate()
+void zpAudioListenerComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 
-	zpScalar dt( zpTime::getInstance()->getDeltaSeconds() );
+	zpScalar dt( deltaTime );
 
 	zpVector4f fwd( transform.getRow( 2 ) ), up( transform.getRow( 1 ) ), pos( transform.getRow( 3 ) ), vel;
 	zpMath::Sub( vel, pos, m_oldPosition );
@@ -76,11 +76,11 @@ zpAudioListenerComponentPool::zpAudioListenerComponentPool()
 zpAudioListenerComponentPool::~zpAudioListenerComponentPool()
 {}
 
-void zpAudioListenerComponentPool::update()
+void zpAudioListenerComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpAudioListenerComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpAudioListenerComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpAudioListenerComponentPool::simulate()

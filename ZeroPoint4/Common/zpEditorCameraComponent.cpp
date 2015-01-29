@@ -32,7 +32,8 @@ void zpEditorCameraComponent::onDestroy() {
 	zp_printfln( "destroy editor camera component" );
 }
 
-void zpEditorCameraComponent::onUpdate() {
+void zpEditorCameraComponent::onUpdate( zp_float deltaTime, zp_float realTime )
+{
 }
 
 void zpEditorCameraComponent::onEnabled() {}
@@ -42,11 +43,11 @@ void zpEditorCameraComponent::onDisabled() {}
 zpEditorCameraComponentPool::zpEditorCameraComponentPool() {}
 zpEditorCameraComponentPool::~zpEditorCameraComponentPool() {}
 
-void zpEditorCameraComponentPool::update()
+void zpEditorCameraComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpEditorCameraComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpEditorCameraComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpEditorCameraComponentPool::simulate()

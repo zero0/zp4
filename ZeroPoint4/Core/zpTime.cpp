@@ -23,12 +23,6 @@ zpTime::zpTime()
 }
 zpTime::~zpTime() {}
 
-zpTime* zpTime::getInstance()
-{
-	static zpTime instance;
-	return &instance;
-}
-
 zp_float zpTime::getDeltaSeconds() const
 {
 	return m_deltaSeconds;

@@ -951,10 +951,9 @@ void zpAngelScript::destroyEngine()
 	}
 }
 
-void zpAngelScript::processThreads()
+void zpAngelScript::processThreads( zp_long time )
 {
 	asIScriptEngine* engine = (asIScriptEngine*)m_engine;
-	zp_long time = zpTime::getInstance()->getTime();
 
 	zp_uint gc1, gc2;
 	zp_int r;
@@ -1083,7 +1082,8 @@ void zpAngelScript::sleep( zp_uint milliseconds )
 		zpScriptThreadContext* threadContext = (zpScriptThreadContext*)context->GetUserData();
 		if( threadContext )
 		{
-			zp_long time = zpTime::getInstance()->getTime();
+			// TODO: fix by using actual time
+			zp_long time = 0; //zpTime::getInstance()->getTime();
 
 			threadContext->sleepUntil = time + ( milliseconds * 1000 );
 			threadContext->currentCoRoutine = ( threadContext->currentCoRoutine + 1 ) % threadContext->coRoutines.size();

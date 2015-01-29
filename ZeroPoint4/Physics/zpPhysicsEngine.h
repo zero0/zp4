@@ -49,6 +49,9 @@ public:
 
 	void fixedTimeStep( zp_float timeStep );
 
+	zpColliderCache* getColliderCache();
+	zpCollisionMask* getCollisionMask();
+
 private:
 	zp_handle m_dynamicsWorld;
 
@@ -67,6 +70,9 @@ private:
 	zpVector4f m_gravity;
 
 	zpArrayList< zpPhantom* > m_phantoms;
+
+	zpColliderCache m_colliderCache;
+	zpCollisionMask m_collisionMask;
 };
 
 #endif

@@ -2,7 +2,6 @@
 
 zpRandom::zpRandom()
 {
-	zp_srand( (zp_uint)zpTime::getInstance()->getTime() );
 }
 zpRandom::~zpRandom()
 {}

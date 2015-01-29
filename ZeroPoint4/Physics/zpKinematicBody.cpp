@@ -504,13 +504,13 @@ private:
 	btConvexShape* m_shape;
 };
 
-void zpKinematicBody::create( const zpBison::Value& v )
+void zpKinematicBody::create( zpPhysicsEngine* engine, const zpBison::Value& v )
 {
 	m_mass = v[ "Mass" ].asFloat();
 
-	m_group = zpCollisionMask::getInstance()->getCollisionMask( v[ "Group" ].asCString() );
-	m_mask = zpCollisionMask::getInstance()->getCollisionMask( v[ "Mask" ].asCString() );
-	m_collider = zpColliderCache::getInstance()->getCollider( v[ "Collider" ] );
+	m_group = engine->getCollisionMask()->getCollisionMask( v[ "Group" ].asCString() );
+	m_mask =  engine->getCollisionMask()->getCollisionMask( v[ "Mask" ].asCString() );
+	m_collider = engine->getColliderCache()->getCollider( v[ "Collider" ] );
 	zp_float stepHeight = v[ "StepHeight" ].asFloat();
 
 }
@@ -535,9 +535,9 @@ void zpKinematicBody::initialize( const zpMatrix4f& transform )
 	m_controller = controller;
 	m_ghost = ghost;
 }
-void zpKinematicBody::destroy()
+void zpKinematicBody::destroy( zpPhysicsEngine* engine )
 {
-	zpColliderCache::getInstance()->removeCollider( (zpCollider*)m_collider );
+	engine->getColliderCache()->removeCollider( m_collider );
 	m_collider = ZP_NULL;
 
 	zpKinematicCharacterController* controller = (zpKinematicCharacterController*)m_controller;

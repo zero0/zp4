@@ -22,28 +22,17 @@ public:
 	virtual zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) = 0;
 };
 
-class zpPhaseLoadWorld : public zpApplicationPhase
+ZP_PURE_INTERFACE zpApplicationState
 {
 public:
-	zpPhaseLoadWorld() {}
-	~zpPhaseLoadWorld() {}
+	virtual ~zpApplicationState() {}
 
-	const zp_char* getPhaseName() const { return "LoadWorld"; }
+	virtual const zp_char* getStateName() const = 0;
 
-	void setup( const zp_char* loadingWorld, const zp_char* nextWorld )
-	{
-		m_loadingWorld = loadingWorld;
-		m_nextWorld = nextWorld;
-	}
+	virtual void onEnterState( zpApplication* app ) = 0;
+	virtual void onLeaveState( zpApplication* app ) = 0;
 
-	void onEnterPhase( zpApplication* app ) {}
-	void onLeavePhase( zpApplication* app ) {}
-
-	zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) { return ZP_APPLICATION_PHASE_NORMAL; }
-
-private:
-	zpString m_loadingWorld;
-	zpString m_nextWorld;
+	virtual void onUpdateState( zpApplication* app, zp_float deltaTime, zp_float realTime ) = 0;
 };
 
 class zpEmptyPhase : public zpApplicationPhase
@@ -58,6 +47,20 @@ public:
 	void onLeavePhase( zpApplication* app ) {}
 
 	zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) { return ZP_APPLICATION_PHASE_NORMAL; }
+};
+
+class zpEmptyState : public zpApplicationState
+{
+public:
+	zpEmptyState() {}
+	~zpEmptyState() {}
+
+	const zp_char* getStateName() const { return "Empty"; }
+
+	void onEnterState( zpApplication* app ) {}
+	void onLeaveState( zpApplication* app ) {}
+
+	void onUpdateState( zpApplication* app, zp_float deltaTime, zp_float readTime ) {}
 };
 
 class zpPhysicsDebugDrawer : public zpIDebugPhysicsDebugDrawer
@@ -83,14 +86,24 @@ public:
 	zpApplication();
 	virtual ~zpApplication();
 
+	void setConfigFilename( const zp_char* filename );
+	const zpString& getConfigFilename() const;
+
 	void setOptionsFilename( const zp_char* filename );
 	const zpString& getOptionsFilename() const;
 
 	void addPhase( zpApplicationPhase* phase );
+	void addState( zpApplicationState* state );
 
 	void popCurrentPhase();
 	void updatePhase();
 	void pushNextPhase();
+
+	void swapState( const zp_char* stateName );
+	void pushState( const zp_char* stateName );
+	void popState();
+	void updateState( zp_float deltaTime, zp_float realTime );
+	zpApplicationState* getCurrentState() const;
 
 	void initialize( const zpArrayList< zpString >& args );
 	void setup();
@@ -105,6 +118,7 @@ public:
 	void reloadAllResources();
 
 	void exit( zp_int exitCode = 0 );
+	void restart();
 
 	const zpBison::Value& getOptions() const;
 
@@ -149,6 +163,12 @@ public:
 #undef ZP_COMPONENT_DEF
 
 	zp_uint getFrameCount() const { return m_frameCount; }
+	
+	const zpTime& getTime() const { return m_timer; }
+	zpTime& getTime() { return m_timer; }
+
+	zp_bool isApplicationPaused() const { return m_isApplicationPaused; }
+	void setApplicationPaused( zp_bool applicationPaused ) { m_isApplicationPaused = applicationPaused; }
 
 private:
 
@@ -166,23 +186,26 @@ private:
 	void onGUI();
 
 	zp_bool m_isRunning;
+	zp_bool m_restartApplication;
 	zp_bool m_hasNextWorld;
 	zp_bool m_addNextWorld;
 	zp_bool m_shouldGarbageCollect;
 	zp_bool m_shouldReloadAllResources;
-	zp_bool m_inEditMode;
+	zp_bool m_isApplicationPaused;
 
 	zp_int m_currentPhase;
 
 	zp_int m_exitCode;
 	zpString m_optionsFilename;
+	zpString m_configFilename;
 	zpString m_loadingWorldFilename;
 	zpString m_initialWorldFilename;
 	zpString m_nextWorldFilename;
+	zpString m_editorStateName;
 
 	zpProfiler m_profiler;
 	zpConsole* m_console;
-	zpTime* m_timer;
+	zpTime m_timer;
 
 	zpWorld* m_currentWorld;
 	zpWorld* m_nextWorld;
@@ -193,6 +216,9 @@ private:
 
 	zpArrayList< zpApplicationPhase* > m_phases;
 
+	zpArrayList< zpApplicationState* > m_allStates;
+	zpArrayList< zpApplicationState* > m_stateStack;
+
 	zpWindow m_window;
 
 	zpGUI m_gui;
@@ -201,6 +227,7 @@ private:
 
 	zpMaterialResourceInstance m_defaultMaterial;
 
+	zpTextResourceInstance m_appConfig;
 	zpTextResourceInstance m_appOptions;
 
 	zpInputManager m_inputManager;

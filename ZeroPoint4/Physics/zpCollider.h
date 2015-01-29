@@ -42,19 +42,38 @@ struct zpColliderPair
 class zpColliderCache
 {
 public:
+	zpColliderCache();
 	~zpColliderCache();
-
-	static zpColliderCache* getInstance();
 
 	zpCollider* getCollider( const zpBison::Value& v );
 	void removeCollider( zpCollider* collider );
 
+	void create();
+	void destroy();
+
 private:
-	zpColliderCache();
 
 	zp_hash generateColliderHash( const zpBison::Value& v, zpColliderShape& shape, zp_float* p, const zp_float*& d, zp_uint& s ) const;
 
 	zpHashMap< zp_hash, zpColliderPair > m_colliders;
+};
+
+class zpCollisionMask
+{
+public:
+	zpCollisionMask();
+	~zpCollisionMask();
+
+	zp_short getCollisionMask( const zpString& maskName );
+	zp_short getCollisionMask( const zp_char* maskName );
+
+	void getCollisionMaskNames( zpArrayList< zpString >& names ) const;
+
+	void create();
+	void destroy();
+
+private:
+	zpHashMap< zpString, zp_short > m_collisionMasks;
 };
 
 #endif

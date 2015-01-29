@@ -54,7 +54,7 @@ void zpScriptComponent::onDestroy()
 	} );
 }
 
-void zpScriptComponent::onUpdate()
+void zpScriptComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	m_scripts.foreach( []( zpScriptResourceInstance& script )
 	{
@@ -88,14 +88,14 @@ void zpScriptComponent::onDisabled()
 zpScriptComponentPool::zpScriptComponentPool() {}
 zpScriptComponentPool::~zpScriptComponentPool() {}
 
-void zpScriptComponentPool::update()
+void zpScriptComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpScriptComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpScriptComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 
-	zpAngelScript::getInstance()->processThreads();
+	zpAngelScript::getInstance()->processThreads( 0 );
 }
 void zpScriptComponentPool::simulate()
 {

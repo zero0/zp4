@@ -14,7 +14,6 @@ zpParticleEmitterComponent::zpParticleEmitterComponent( zpObject* obj, const zpB
 	, m_queue( ZP_RENDERING_QUEUE_TRANSPARENT )
 	, m_maxParticles( 0 )
 	, m_random( zpRandom::getInstance() )
-	, m_time( zpTime::getInstance() )
 {
 	m_layer = def[ "Layer" ].asInt();
 
@@ -271,7 +270,7 @@ void zpParticleEmitterComponent::onDestroy()
 	// TODO: currently playing effects need to copy to external player in component pool to fade out particles better
 }
 
-void zpParticleEmitterComponent::onUpdate()
+void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isPaused ) return;
 
@@ -280,7 +279,7 @@ void zpParticleEmitterComponent::onUpdate()
 	zpMath::Sub( pos, position, m_prevPosition );
 	m_prevPosition = position;
 
-	zpMath::Mul( velocity, pos, zpScalar( m_time->getDeltaSeconds() ) );
+	zpMath::Mul( velocity, pos, zpScalar( deltaTime ) );
 
 	zpParticleEffect* effect = m_effects.begin();
 	zpParticleEffect* end = m_effects.end();
@@ -289,7 +288,7 @@ void zpParticleEmitterComponent::onUpdate()
 		if( effect->state == ZP_PARTICLE_EFFECT_STATE_DISABLED ) continue;
 
 		// use either dt or rt based on the delta time flag
-		zp_float dt = effect->useRealTime ? m_time->getActualDeltaSeconds() : m_time->getDeltaSeconds();
+		zp_float dt = effect->useRealTime ? realTime : deltaTime;
 
 		// increment effect time
 		effect->time += dt;
@@ -567,11 +566,11 @@ zpParticleEmitterComponentPool::zpParticleEmitterComponentPool()
 {}
 zpParticleEmitterComponentPool::~zpParticleEmitterComponentPool()
 {}
-void zpParticleEmitterComponentPool::update()
+void zpParticleEmitterComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpParticleEmitterComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpParticleEmitterComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }
 void zpParticleEmitterComponentPool::simulate()

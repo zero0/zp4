@@ -46,7 +46,7 @@ protected:
 	void onInitialize();
 	void onDestroy();
 
-	void onUpdate();
+	void onUpdate( zp_float deltaTime, zp_float realTime );
 	void onSimulate();
 
 	void onEnabled();
@@ -72,7 +72,7 @@ public:
 	zpTransformComponentPool();
 	virtual ~zpTransformComponentPool();
 
-	void update();
+	void update( zp_float deltaTime, zp_float realTime );
 };
 
 #endif

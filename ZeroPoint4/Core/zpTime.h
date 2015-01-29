@@ -4,9 +4,8 @@
 
 class zpTime {
 public:
+	zpTime();
 	~zpTime();
-
-	static zpTime* getInstance();
 
 	zp_float getDeltaSeconds() const;
 	zp_float getActualDeltaSeconds() const;
@@ -33,7 +32,6 @@ public:
 	zp_bool isPaused() const { return m_isPaused; }
 
 private:
-	zpTime();
 	
 	zp_bool m_isPaused;
 

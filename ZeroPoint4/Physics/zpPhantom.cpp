@@ -14,11 +14,11 @@ zpPhantom::~zpPhantom()
 	
 }
 
-void zpPhantom::create( const zpMatrix4f& transform, const zpBison::Value& v )
+void zpPhantom::create( zpPhysicsEngine* engine, const zpMatrix4f& transform, const zpBison::Value& v )
 {
-	m_group = zpCollisionMask::getInstance()->getCollisionMask( v[ "Group" ].asCString() );
-	m_mask = zpCollisionMask::getInstance()->getCollisionMask( v[ "Mask" ].asCString() );
-	m_collider = zpColliderCache::getInstance()->getCollider( v[ "Collider" ] );
+	m_group = engine->getCollisionMask()->getCollisionMask( v[ "Group" ].asCString() );
+	m_mask =  engine->getCollisionMask()->getCollisionMask( v[ "Mask" ].asCString() );
+	m_collider = engine->getColliderCache()->getCollider( v[ "Collider" ] );
 	btCollisionShape* shape = (btCollisionShape*)m_collider->getCollider();
 
 	btPairCachingGhostObject* ghost = new btPairCachingGhostObject();
@@ -31,9 +31,15 @@ void zpPhantom::create( const zpMatrix4f& transform, const zpBison::Value& v )
 
 	m_phantom = ghost;
 }
-void zpPhantom::destroy()
+void zpPhantom::destroy( zpPhysicsEngine* engine )
 {
+	engine->getColliderCache()->removeCollider( m_collider );
+	m_collider = ZP_NULL;
 
+	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
+	ZP_SAFE_DELETE( ghost );
+
+	m_phantom = ZP_NULL;
 }
 
 void zpPhantom::setMatrix( const zpMatrix4f& transform )

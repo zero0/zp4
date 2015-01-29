@@ -47,11 +47,11 @@ void zpProjectileComponent::onDestroy()
 
 }
 
-void zpProjectileComponent::onUpdate()
+void zpProjectileComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isRunning )
 	{
-		zpScalar dt( zpTime::getInstance()->getDeltaSeconds() );
+		zpScalar dt( deltaTime );
 		zpScalar speed( m_speed );
 		zpScalar accel( m_acceleration );
 		zpScalar angVel( m_angularVelocity );
@@ -166,10 +166,10 @@ zpProjectileComponentPool::~zpProjectileComponentPool()
 {
 }
 
-void zpProjectileComponentPool::update()
+void zpProjectileComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( []( zpProjectileComponent* o )
+	m_used.foreach( [ &deltaTime, &realTime ]( zpProjectileComponent* o )
 	{
-		o->update();
+		o->update( deltaTime, realTime );
 	} );
 }

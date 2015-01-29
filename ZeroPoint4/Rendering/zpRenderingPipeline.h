@@ -36,7 +36,7 @@ public:
 
 	void update();
 
-	void beginFrame( zpRenderingContext* i );
+	void beginFrame( zpRenderingContext* i, zpTime* time );
 	void submitRendering( zpRenderingContext* i );
 	void endFrame( zpRenderingContext* i );
 	void present();
@@ -67,7 +67,7 @@ public:
 	void setApplication( zpApplication* app ) { m_application = app; };
 	zpApplication* getApplication() const { return m_application; };
 
-	zp_bool takeScreenshot( zpScreenshotType type, const zp_char* directoryPath );
+	zp_bool takeScreenshot( zpScreenshotType type, const zp_char* directoryPath, zp_long time );
 
 	zpLightBufferData* getLight( zpLightType type );
 	void releaseLight( zpLightBufferData* light );
