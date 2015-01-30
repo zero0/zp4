@@ -1,4 +1,8 @@
 <%@ page import="java.util.*,java.text.*,org.zero0.zeropoint.tools.arc.*" %>
+<%
+Arc arc = Arc.getInstance();
+DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
+%>
 <html>
 	<head>
 		<title>ARC</title>
@@ -114,61 +118,80 @@
 					}
 				});
 				
+				$("#auto-compile").button({
+					icons: {
+						primary: 'ui-icon-file'
+					}
+				}).click(function() {
+					var isChecked = $(this).is(":checked");
+					if( isChecked )
+					{
+						<% arc.setAutoCompile( true ); %>
+					}
+					else
+					{
+						<% arc.setAutoCompile( false ); %>
+					}
+				});
 			});
 		</script>
 	</head>
 	<body>
-		<%
-			Arc arc = Arc.getInstance();
-			DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
-		%>
 		<div id="tabs">
 			<ul>
 				<li><a href="#tabs-1">Files</a></li>
-				<li><a href="#tabs-2">Dependencies</a></li>
+				<li><a href="#tabs-2">Options</a></li>
 				<li><a href="#tabs-3">View</a></li>
 			</ul>
 			<div id="tabs-1">
-				<div class="ui-widget">
-					<button id="refresh">Refresh</button>
-					<button id="rescan">Rescan</button>
-				</div>
-				<br/>
-				<table>
-					<thead class="ui-widget-header">
-						<tr>
-							<th></th>
-							<th>File</th>
-							<th>Last Modified</th>
-						</tr>
-					</thead>
-					<tfoot>
-					</tfoot>
-					<tbody class="ui-widget-content">
-					<%
-						List<String> allFiles = new ArrayList<String>( arc.getFiles() );
-						Collections.sort( allFiles );
-						int i = -1;
-						for( String file : allFiles ) {
-							++i;
-							String localFile = file.replace( arc.getAssetsDirectory(), "" );
-					%>
-						<tr>
-							<td>
-								<span>
-									<button id="compile-<%=i%>" data-file-name="<%=file%>" data-local-file-name="<%=localFile%>"></button>
-									<button id="view-<%=i%>" data-file-name="<%=file%>" data-local-file-name="<%=localFile%>"></button>
-								</span>
-							</td>
-							<td><%=localFile%></td>
-							<td><%=df.format( new Date( arc.getFileModificationTime( file ) ) )%></td>
-						</tr>
-					<% } %>
-					</tbody>
-				</table>
+				<button id="refresh">Refresh</button>
+				<button id="rescan">Rescan</button>
 			</div>
-			<div id="tabs-2"></div>
+			<div id="tabs-2">
+				<input type="checkbox" id="auto-compile"/><label for="auto-compile">Auto-Compile</label>
+				<span>
+					<input type="checkbox" id="rendering-dx11"/><label for="rendering-dx11">DX11</label>
+					<input type="checkbox" id="rendering-dx10"/><label for="rendering-dx10">DX10</label>
+					<input type="checkbox" id="rendering-gl"/><label for="rendering-gl">GL</label>
+				</span>
+			</div>
 			<div id="tabs-3"></div>
+		</div>
+
+		<div class="ui-widget">
+			<table class="ui-widget-content" width="100%">
+				<thead class="ui-widget-header">
+					<tr>
+						<th></th>
+						<th>File</th>
+						<th>Last Modified</th>
+					</tr>
+				</thead>
+				<tfoot>
+				</tfoot>
+				<tbody class="ui-widget-content">
+				<%
+					List<String> allFiles = new ArrayList<String>( arc.getFiles() );
+					Collections.sort( allFiles );
+					int i = -1;
+					for( String file : allFiles )
+					{
+						++i;
+						String localFile = file.replace( arc.getAssetsDirectory(), "" );
+				%>
+					<tr>
+						<td>
+							<span>
+								<button id="compile-<%=i%>" data-file-name="<%=file%>" data-local-file-name="<%=localFile%>"></button>
+								<button id="view-<%=i%>" data-file-name="<%=file%>" data-local-file-name="<%=localFile%>"></button>
+							</span>
+						</td>
+						<td><%=localFile%></td>
+						<td><%=df.format( new Date( arc.getFileModificationTime( file ) ) )%></td>
+					</tr>
+				<% } %>
+				</tbody>
+			</table>
 		</div>
 		
 		<div id="view-file-dialog">
