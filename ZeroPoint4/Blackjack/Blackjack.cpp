@@ -4,7 +4,8 @@
 #include "Blackjack.h"
 
 
-#define BLACKJACK_CONFIG	"Blackjack.jsonb"
+#define BLACKJACK_CONFIG	"BlackjackConfig.jsonb"
+#define BLACKJACK_OPTIONS	"BlackjackOptions.jsonb"
 
 struct Character
 {
@@ -32,16 +33,16 @@ public:
 
 		zpProtoDBManager* p = app->getProtoDBManager();
 
-		p->initialize( 10 );
-		ZP_PROTODB_CATEGORY( p, Character, bProtoDBCreateCharacter );
+		//p->initialize( 10 );
+		//ZP_PROTODB_CATEGORY( p, Character, bProtoDBCreateCharacter );
 		
-		p->setup();
+		//p->setup();
 	}
 	void onLeavePhase( zpApplication* app )
 	{
 		zp_printfln( "Leave ProtoDB Phase..." );
 		zpProtoDBManager* p = app->getProtoDBManager();
-		p->shutdown();
+		//p->shutdown();
 	}
 
 	zpApplicationPhaseResult onUpdatePhase( zpApplication* app )
@@ -114,7 +115,14 @@ public:
 
 	void onEnterState( zpApplication* app )
 	{
+		const zpArrayList< zpCamera* >& cameras = app->getRenderPipeline()->getUsedCameras( ZP_CAMERA_TYPE_MAIN );
+		cameras.foreach( []( zpCamera* c ) { c->setActive( false ); } );
+
 		m_editorCamera = app->getRenderPipeline()->getCamera( ZP_CAMERA_TYPE_MAIN );
+		m_editorCamera->cloneCamera( cameras[ 0 ] );
+		m_editorCamera->setActive( true );
+		m_editorCamera->setRenderTarget( 0, app->getRenderPipeline()->getRenderingEngine()->getBackBufferRenderTarget() );
+		m_editorCamera->setDepthStencilBuffer( app->getRenderPipeline()->getRenderingEngine()->getBackBufferDepthStencilBuffer() );
 
 		app->setApplicationPaused( true );
 	}
@@ -122,6 +130,9 @@ public:
 	{
 		app->getRenderPipeline()->releaseCamera( m_editorCamera );
 		m_editorCamera = ZP_NULL;
+
+		const zpArrayList< zpCamera* >& cameras = app->getRenderPipeline()->getUsedCameras( ZP_CAMERA_TYPE_MAIN );
+		cameras.foreach( []( zpCamera* c ) { c->setActive( true ); } );
 
 		app->setApplicationPaused( false );
 	}
@@ -208,24 +219,28 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 		bEditorState editorState;
 
-		zpApplication app;
-		
 		zpString cmdLine( lpCmdLine );
 		zpArrayList< zpString > args;
 		cmdLine.split( ' ', args );
-		
-		app.setOptionsFilename( BLACKJACK_CONFIG );
-		
+
+		zpApplication app;
+		app.setConfigFilename( BLACKJACK_CONFIG );
+		app.setOptionsFilename( BLACKJACK_OPTIONS );
+
+		// add phases
 		app.addPhase( &protoDBPhase );
 		//app.addPhase( &loadWorld );
 		app.addPhase( &playPhase );
 
+		// add states
 		app.addState( &editorState );
 
-		app.initialize( args );
+		// process command line
+		app.processCommandLine( args );
 		
+		// init, run, and shutdown
+		app.initialize();
 		app.run();
-
 		exitCode = app.shutdown();
 	}
 	zpMemorySystem::getInstance()->shutdown();

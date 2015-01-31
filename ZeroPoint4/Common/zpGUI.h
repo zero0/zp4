@@ -24,6 +24,8 @@ class zpGUI
 public:
 
 	void create();
+	void setup();
+	void teardown();
 	void destroy();
 
 	void beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& outPos );

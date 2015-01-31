@@ -335,3 +335,30 @@ zp_int zpCamera::getOrder() const
 {
 	return m_order;
 }
+
+void zpCamera::cloneCamera( zpCamera* camera )
+{
+	m_projectionType = camera->m_projectionType;
+	m_type = camera->m_type;
+
+	m_orthoRect = camera->m_orthoRect;
+	m_clipRect = camera->m_clipRect;
+
+	m_viewport = camera->m_viewport;
+	m_lookAt = camera->m_lookAt;
+
+	m_clearColor = camera->m_clearColor;
+	m_clearDepth = camera->m_clearDepth;
+	m_clearStencil = camera->m_clearStencil;
+
+	m_view = camera->m_view;
+	m_projection = camera->m_projection;
+
+	m_clearMode = camera->m_clearMode;
+	m_layers = camera->m_layers;
+
+	m_bufferData = camera->m_bufferData;
+
+	m_isViewDirty = true;
+	m_isProjectionDirty = true;
+}

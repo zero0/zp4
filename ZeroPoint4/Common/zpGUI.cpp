@@ -2,21 +2,27 @@
 
 void zpGUI::create()
 {
-	m_application->getRenderPipeline()->getMaterialContentManager()->getResource( "materials/gui.materialb", m_guiMaterial );
-	m_application->getRenderPipeline()->getFontContentManager()->getResource( "fonts/arial32.fontb", m_guiFont );
-
 	m_renderingContext = m_application->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
-
-	m_mainColor.set( 0.1f, 0.1f, 0.1f, 1 );
-	m_backgroundColor.set( 0.8f, 0.8f, 0.8f, 1 );
 
 	m_isDrawingWidgets = false;
 	m_currentlySelected = ZP_NULL;
 }
-void zpGUI::destroy()
+void zpGUI::setup()
+{
+	m_application->getRenderPipeline()->getMaterialContentManager()->getResource( "materials/gui.materialb", m_guiMaterial );
+	m_application->getRenderPipeline()->getFontContentManager()->getResource( "fonts/arial32.fontb", m_guiFont );
+
+	m_mainColor.set( 0.1f, 0.1f, 0.1f, 1 );
+	m_backgroundColor.set( 0.8f, 0.8f, 0.8f, 1 );
+}
+void zpGUI::teardown()
 {
 	m_guiMaterial.release();
 	m_guiFont.release();
+}
+void zpGUI::destroy()
+{
+	
 }
 
 void zpGUI::beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& outPos )

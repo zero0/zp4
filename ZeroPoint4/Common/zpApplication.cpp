@@ -1,7 +1,7 @@
 #include "zpCommon.h"
 
-#define ZP_APPLICATION_DEFAULT_OPTIONS_FILE		"ZeroPoint.jsonb"
-#define ZP_APPLICATION_DEFAULT_CONFIG_FILE		"Config.jsonb"
+#define ZP_APPLICATION_DEFAULT_OPTIONS_FILE		"AppOptions.jsonb"
+#define ZP_APPLICATION_DEFAULT_CONFIG_FILE		"AppConfig.jsonb"
 #define ZP_APPLICATION_DEFAULT_WINDOW_WIDTH		640
 #define ZP_APPLICATION_DEFAULT_WINDOW_HEIGHT	480
 
@@ -146,7 +146,12 @@ zpApplicationState* zpApplication::getCurrentState() const
 	return m_stateStack.isEmpty() ? ZP_NULL : m_stateStack.back();
 }
 
-void zpApplication::initialize( const zpArrayList< zpString >& args )
+void zpApplication::processCommandLine( const zpArrayList< zpString >& args )
+{
+
+}
+
+void zpApplication::initialize()
 {
 	m_textContent.setApplication( this );
 	m_objectContent.setApplication( this );
@@ -164,23 +169,19 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 	m_renderingPipeline.getFontContentManager()->setApplication( this );
 	
 	zp_bool ok;
-	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
-	ZP_ASSERT( ok, "Failed to load Options '%s'", m_optionsFilename.str() );
-	if( !ok )
-	{
-		return;
-	}
+	ok = m_textContent.getResource( m_configFilename, m_appConfig );
+	ZP_ASSERT( ok, "Failed to load app config '%s'", m_configFilename.str() );
 
-	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
+	const zpBison::Value& appConfig = m_appConfig.getResource()->getData()->root();
 
-	const zpBison::Value& console = appOptions[ "Console" ];
+	const zpBison::Value& console = appConfig[ "Console" ];
 	if( console.asBool() )
 	{
 		m_console = zpConsole::getInstance();
 		m_console->create();
 	}
 
-	const zpBison::Value& window = appOptions[ "Window" ];
+	const zpBison::Value& window = appConfig[ "Window" ];
 	ZP_ASSERT( window.isObject(), "" );
 
 	zpVector2i pos( window[ "X" ].asInt(), window[ "Y" ].asInt() );
@@ -195,7 +196,7 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 
 	m_window.create();
 
-	const zpBison::Value& render = appOptions[ "Render" ];
+	const zpBison::Value& render = appConfig[ "Render" ];
 	ZP_ASSERT( render.isObject(), "" );
 
 	zpDisplayMode displayMode;
@@ -228,13 +229,16 @@ void zpApplication::initialize( const zpArrayList< zpString >& args )
 }
 void zpApplication::setup()
 {
+	m_renderingPipeline.setup();
+	m_gui.setup();
+
 	zp_bool ok;
-	ok = m_textContent.getResource( m_configFilename, m_appConfig );
-	ZP_ASSERT( ok, "Failed to load Config '%s'", m_configFilename.str() );
+	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
+	ZP_ASSERT( ok, "Failed to load app options '%s'", m_optionsFilename.str() );
 
-	const zpBison::Value& appConfig = m_appConfig.getResource()->getData()->root();
+	const zpBison::Value& appOptions = m_appOptions.getResource()->getData()->root();
 
-	const zpBison::Value& world = appConfig[ "InitialWorld" ];
+	const zpBison::Value& world = appOptions[ "InitialWorld" ];
 	if( world.isString() )
 	{
 		m_initialWorldFilename = world.asCString();
@@ -242,7 +246,7 @@ void zpApplication::setup()
 		loadWorld( world.asCString() );
 	}
 
-	const zpBison::Value& loadingWorld = appConfig[ "LoadingWorld" ];
+	const zpBison::Value& loadingWorld = appOptions[ "LoadingWorld" ];
 	if( loadingWorld.isString() )
 	{
 		m_loadingWorldFilename = loadingWorld.asCString();
@@ -250,11 +254,11 @@ void zpApplication::setup()
 
 	m_currentPhase = -1;
 
-	m_protoDBManager.setProtoDBFile( appConfig[ "ProtoDB" ].asCString() );
+	m_protoDBManager.setProtoDBFile( appOptions[ "ProtoDB" ].asCString() );
 
-	m_renderingPipeline.getMaterialContentManager()->getResource( appConfig[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
+	m_renderingPipeline.getMaterialContentManager()->getResource( appOptions[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
 
-	m_editorStateName = appConfig[ "EditorStateName" ].asCString();
+	m_editorStateName = appOptions[ "EditorStateName" ].asCString();
 }
 
 void zpApplication::run()
@@ -303,6 +307,9 @@ void zpApplication::teardown()
 		m_stateStack.back()->onLeaveState( this );
 		m_stateStack.popBack();
 	}
+
+	m_renderingPipeline.teardown();
+	m_gui.teardown();
 
 	garbageCollect();
 }
@@ -527,7 +534,7 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	zpString strFilename( filename );
 	zp_bool loaded = false;
 
-	if( strFilename.endsWith( ".json" ) || strFilename.endsWith( ".jsonb" ) )
+	if( strFilename.endsWith( ".jsonb" ) )
 	{
 		loaded = m_textContent.reloadResource( filename );
 	}
@@ -562,10 +569,14 @@ void zpApplication::handleInput()
 	{
 		exit( 0 );
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
+	{
+		restart();
+	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_TAB ) )
 	{
 		zpApplicationState* currentState = getCurrentState();
-		zp_bool inEditorState = currentState != ZP_NULL && currentState->getStateName() == m_editorStateName ;
+		zp_bool inEditorState = currentState != ZP_NULL && currentState->getStateName() == m_editorStateName;
 		if( inEditorState )
 		{
 			popState();
@@ -752,10 +763,10 @@ void zpApplication::processFrame()
 
 	zp_long diff = ( endTime - now );
 	zp_float d = m_timer.getSecondsPerTick() * (zp_float)diff * 1000.f;
-	zp_int sleepTime = (zp_int)( m_totalFrameTimeMs - d );
-	while( sleepTime < 0 )
+	zp_float sleepTime = m_totalFrameTimeMs - d;
+	while( sleepTime < 0.f )
 	{
-		zp_sleep( m_totalFrameTimeMs );
+		zp_sleep( (zp_uint)m_totalFrameTimeMs );
 		sleepTime += m_totalFrameTimeMs;
 	}
 

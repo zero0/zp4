@@ -105,7 +105,9 @@ public:
 	void updateState( zp_float deltaTime, zp_float realTime );
 	zpApplicationState* getCurrentState() const;
 
-	void initialize( const zpArrayList< zpString >& args );
+	void processCommandLine( const zpArrayList< zpString >& args );
+	
+	void initialize();
 	void setup();
 	void run();
 	void teardown();

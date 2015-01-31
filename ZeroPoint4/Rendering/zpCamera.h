@@ -103,6 +103,8 @@ public:
 	void setOrder( zp_int order );
 	zp_int getOrder() const;
 
+	void cloneCamera( zpCamera* camera );
+
 private:
 	zpCameraProjection m_projectionType;
 	zpCameraType m_type;

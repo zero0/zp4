@@ -32,6 +32,8 @@ public:
 	zpRenderingEngine* getRenderingEngine() const;
 
 	void initialize();
+	void setup();
+	void teardown();
 	void destroy();
 
 	void update();

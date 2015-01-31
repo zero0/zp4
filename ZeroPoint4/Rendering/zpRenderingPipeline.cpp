@@ -163,19 +163,6 @@ zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 
 void zpRenderingPipeline::initialize()
 {
-	zp_bool ok;
-
-	ok = m_fontContent.getResource( "fonts/arial32.fontb", m_debugFont );
-	ZP_ASSERT( ok, "" );
-
-	const zpVector2i& size = m_engine->getScreenSize();
-
-	zpViewport viewport;
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-	viewport.width = (zp_float)size.getX();
-	viewport.height = (zp_float)size.getY();
-
 	zpRasterStateDesc raster;
 	raster.cullMode = ZP_CULL_MODE_BACK;
 	raster.frontFace = ZP_FRONT_FACE_CW;
@@ -205,6 +192,31 @@ void zpRenderingPipeline::initialize()
 	{
 		m_freeCameras.pushBack( bc );
 	}
+
+	// fill free light buffer
+	m_lights.resize( 64 );
+	zpLightBufferData* bl = m_lights.begin();
+	zpLightBufferData* el = m_lights.end();
+	for( ; bl != el; ++bl )
+	{
+		m_freeLights.pushBack( bl );
+	}
+
+}
+void zpRenderingPipeline::setup()
+{
+	zp_bool ok;
+
+	ok = m_fontContent.getResource( "fonts/arial32.fontb", m_debugFont );
+	ZP_ASSERT( ok, "" );
+
+	const zpVector2i& size = m_engine->getScreenSize();
+
+	zpViewport viewport;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+	viewport.width = (zp_float)size.getX();
+	viewport.height = (zp_float)size.getY();
 
 	zpCamera* cam;
 	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
@@ -249,20 +261,11 @@ void zpRenderingPipeline::initialize()
 	cam->setDepthStencilBuffer( ZP_NULL );
 	m_debugUICamera = cam;
 
-	// fill free light buffer
-	m_lights.resize( 64 );
-	zpLightBufferData* bl = m_lights.begin();
-	zpLightBufferData* el = m_lights.end();
-	for( ; bl != el; ++bl )
-	{
-		m_freeLights.pushBack( bl );
-	}
-
 	m_dirLight = getLight( ZP_LIGHT_TYPE_DIRECTIONAL );
 	zpMath::Normalize3( m_dirLight->direction, zpVector4f( 1, -1, 1 ) );
 	m_dirLight->color = zpColor4f( 1, 1, 1, 1 );
 }
-void zpRenderingPipeline::destroy()
+void zpRenderingPipeline::teardown()
 {
 	releaseLight( m_dirLight );
 
@@ -271,6 +274,10 @@ void zpRenderingPipeline::destroy()
 
 	m_debugFont.release();
 
+	m_engine->getImmediateRenderingContext()->finalizeCommands();
+}
+void zpRenderingPipeline::destroy()
+{
 	m_engine->destroyBuffer( m_cameraBuffer );
 	m_engine->destroyBuffer( m_perFrameBuffer );
 	m_engine->destroyBuffer( m_perDrawCallBuffer );
@@ -316,7 +323,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	// 3D Cameras
 	{
 		zpArrayList< zpCamera* >& cameraList = m_usedCameras[ ZP_CAMERA_TYPE_MAIN ];
-		activeCameras.clear();
+		activeCameras.reset();
 
 		zpCamera** b = cameraList.begin();
 		zpCamera** e = cameraList.end();
@@ -368,7 +375,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	// 2D Cameras
 	{
 		zpArrayList< zpCamera* >& cameraList = m_usedCameras[ ZP_CAMERA_TYPE_UI ];
-		activeCameras.clear();
+		activeCameras.reset();
 
 		zpCamera** b = cameraList.begin();
 		zpCamera** e = cameraList.end();
