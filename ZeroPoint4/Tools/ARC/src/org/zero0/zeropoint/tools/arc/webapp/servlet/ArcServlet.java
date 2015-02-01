@@ -20,16 +20,20 @@ public class ArcServlet extends HttpServlet
 	{
 		PrintWriter out = resp.getWriter();
 
+		String readFile = req.getParameter( "read" );
 		String file = req.getParameter( "file" );
+		String fullFile = req.getParameter( "fullfile" );
+
 		String compile = req.getParameter( "compile" );
-		
-		if( file != null && !file.isEmpty() && file != "null" )
+
+
+		if( readFile != null && !readFile.isEmpty() )
 		{
-			String fullFilePath = Arc.getInstance().getAssetsDirectory() + file;
+			String fullFilePath = ( fullFile == null || fullFile.isEmpty() ) ? Arc.getInstance().getAssetsDirectory() + file : fullFile;
 			try
 			{
 				FileReader fr = new FileReader( fullFilePath );
-				
+
 				char[] buff = new char[ 256 ];
 				int length;
 				while( ( length = fr.read( buff ) ) != -1 )
@@ -45,7 +49,7 @@ public class ArcServlet extends HttpServlet
 		{
 			Arc.getInstance().addCompilerTask( Arc.getInstance().getAssetsDirectory() + compile );
 		}
-		
+
 		out.close();
 	}
 }
