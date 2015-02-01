@@ -1,33 +1,26 @@
-#pragma pack_matrix( row_major )
-#pragma vertex main_vs
-#pragma fragment main_ps
+#include <ZeroPoint.shaderinc>
+
 #pragma format VU
 
-Texture2D<float4> colorMap : register( t0 );
-SamplerState pointSampler : register( s0 );
+zpSampler2D _MainTex;
 
-struct VS_Input
-{
-    float4 position : POSITION;
-    float2 tex0 : TEXCOORD0;
-};
-
-struct PS_Input
+struct v2f
 {
     float4 position : SV_POSITION;
-    float2 tex0 : TEXCOORD0;
+    float2 uv : TEXCOORD0;
 };
 
-PS_Input main_vs( VS_Input input )
+v2f main_vs( vs_input_img input )
 {
-    PS_Input output = (PS_Input)0;
+    v2f output = (v2f)0;
     output.position = input.position;
-    output.tex0 = input.tex0;
+    output.uv = input.texcoord;
     
     return output;
 }
 
-float4 main_ps( PS_Input input ) : SV_TARGET
+float4 main_ps( v2f input ) : SV_TARGET
 {
-    return float4( colorMap.Sample( pointSampler, input.tex0 ).rgb, 1.f );
+	float4 col = tex2D( _MainTex, input.uv );
+    return float4( col.rgb, 1.0f );
 }

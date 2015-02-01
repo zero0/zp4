@@ -20,8 +20,6 @@
 
 #endif // ZP_SHADER_DX9
 
-#define COLOR	SV_TARGET
-
 struct zpSampler1D
 {
 	Texture1D		t;

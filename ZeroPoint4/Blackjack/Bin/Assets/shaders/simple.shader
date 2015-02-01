@@ -1,7 +1,5 @@
 #include <ZeroPoint.shaderinc>
 
-#pragma vertex main_vs
-#pragma fragment main_ps
 #pragma format VC
 
 struct v2f
@@ -21,7 +19,7 @@ v2f main_vs( vs_input_color v )
 	return o;
 }
 
-float4 main_ps( v2f input ) : COLOR
+float4 main_ps( v2f input ) : SV_TARGET
 {
 	return input.color;
 }
