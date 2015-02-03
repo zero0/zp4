@@ -2,7 +2,7 @@
 
 #pragma format VU
 
-zpSampler2D _MainTex;
+ZP_SAMPLER_2D( _MainTex );
 
 struct v2f
 {
@@ -15,7 +15,7 @@ v2f main_vs( vs_input_img input )
     v2f output = (v2f)0;
     output.position = input.position;
     output.uv = input.texcoord;
-    
+
     return output;
 }
 

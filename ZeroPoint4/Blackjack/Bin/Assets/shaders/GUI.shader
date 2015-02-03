@@ -2,7 +2,7 @@
 
 #pragma format VCU
 
-zpSampler2D _MainTex;
+ZP_SAMPLER_2D( _MainTex );
 
 struct v2f
 {

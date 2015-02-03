@@ -7,44 +7,49 @@
 
 #if ZP_SHADER_DX9
 
-#define ZP_CBUFFER_START( name, index )	ConstantBuffer name {
-#define ZP_CBUFFER_END					};
+#define ZP_CBUFFER_START( name, index ) ConstantBuffer name {
+#define ZP_CBUFFER_END                  };
 
 #else // ZP_SHADER_DX10 || ZP_SHADER_DX11
 
 #pragma warning( disable : 3568 ) // unknown pragma ignored
 #pragma warning( disable : 4502 ) // invalid input semantic SV_TARGET
 
-#define ZP_CBUFFER_START( name, index )	cbuffer name : register( b##index ) {
-#define ZP_CBUFFER_END					};
+#define ZP_CBUFFER_START( name, index ) cbuffer name : register( b##index ) {
+#define ZP_CBUFFER_END                  };
 
 #endif // ZP_SHADER_DX9
 
+#define ZP_SAMPLER_1D( name )       Texture1D name; SamplerState name##_Sampler
+#define ZP_SAMPLER_2D( name )       Texture2D name; SamplerState name##_Sampler
+#define ZP_SAMPLER_3D( name )       Texture3D name; SamplerState name##_Sampler
+#define ZP_SAMPLER_CUBE( name )     TextureCube name; SamplerState name##_Sampler
+
+#define tex1D( name, uv )       ( name.Sample( name##_Sampler, (uv) ) )
+#define tex2D( name, uv )       ( name.Sample( name##_Sampler, (uv) ) )
+#define tex3D( name, uv )       ( name.Sample( name##_Sampler, (uv) ) )
+#define texCUBE( name, uv )     ( name.Sample( name##_Sampler, (uv) ) )
+
 struct zpSampler1D
 {
-	Texture1D		t;
-	SamplerState	s;
+    Texture1D       t;
+    SamplerState    s;
 };
 struct zpSampler2D
 {
-	Texture2D		t;
-	SamplerState	s;
+    Texture2D       t;
+    SamplerState    s;
 };
 struct zpSampler3D
 {
-	Texture3D		t;
-	SamplerState	s;
+    Texture3D       t;
+    SamplerState    s;
 };
 struct zpSamplerCUBE
 {
-	TextureCube		t;
-	SamplerState	s;
+    TextureCube     t;
+    SamplerState    s;
 };
-
-inline float4 tex1D( zpSampler1D x, float v )		{ return x.t.Sample( x.s, v ); }
-inline float4 tex2D( zpSampler2D x, float2 v )		{ return x.t.Sample( x.s, v ); }
-inline float4 tex3D( zpSampler3D x, float3 v )		{ return x.t.Sample( x.s, v ); }
-inline float4 texCUBE( zpSamplerCUBE x, float3 v )	{ return x.t.Sample( x.s, v ); }
 
 #endif
 

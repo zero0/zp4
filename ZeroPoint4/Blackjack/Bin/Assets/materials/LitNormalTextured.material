@@ -1,11 +1,16 @@
 {
     "Shader" : "shaders/LitNormalTextured.shaderb",
     "Textures" :
-    [
-		"textures/test.textureb"
-	],
+    {
+        "_MainTex" : "textures/test.textureb",
+        "_Normal" : "textures/test.textureb"
+    },
     "Constants" :
-    {},
+    {
+        "_Color" : [ 0, 0, 0, 0 ]
+    },
     "Samplers" :
-    []
+    {
+        "_MainTex" : null
+    }
 }
