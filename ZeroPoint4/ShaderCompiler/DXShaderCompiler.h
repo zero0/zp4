@@ -20,13 +20,13 @@ public:
 protected:
 	void initializePlatform();
 
-	zp_bool compileShaderVSPlatform( zpDataBuffer& data );
-	zp_bool compileShaderPSPlatform( zpDataBuffer& data );
-	zp_bool compileShaderGSPlatform( zpDataBuffer& data );
-	zp_bool compileShaderCSPlatform( zpDataBuffer& data );
+	zp_bool compileShaderVSPlatform( zpShaderInfo& info );
+	zp_bool compileShaderPSPlatform( zpShaderInfo& info );
+	zp_bool compileShaderGSPlatform( zpShaderInfo& info );
+	zp_bool compileShaderCSPlatform( zpShaderInfo& info );
 
 private:
-	zp_bool compileShaderPlatform( const zp_char* mainFunc, const zp_char* profile, zpDataBuffer& data ) const;
+	zp_bool compileShaderPlatform( const zp_char* mainFunc, const zp_char* profile, zpShaderInfo& info, zpShaderCompilerType compileType ) const;
 
 	DXShaderCompilerPlatform m_platform;
 };

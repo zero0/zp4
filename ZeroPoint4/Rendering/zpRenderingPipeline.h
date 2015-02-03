@@ -29,12 +29,13 @@ public:
 	zpRenderingPipeline();
 	~zpRenderingPipeline();
 
-	zpRenderingEngine* getRenderingEngine() const;
+	const zpRenderingEngine* getRenderingEngine() const;
+	zpRenderingEngine* getRenderingEngine();
 
 	void initialize();
 	void setup();
 	void teardown();
-	void destroy();
+	void shutdown();
 
 	void update();
 
@@ -82,7 +83,7 @@ private:
 	zp_bool performScreenshot();
 
 	zpApplication* m_application;
-	zpRenderingEngine* m_engine;
+	zpRenderingEngine m_engine;
 
 	zpMaterialContentManager m_materialContent;
 	zpShaderContentManager m_shaderContent;

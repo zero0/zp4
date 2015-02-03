@@ -2,6 +2,7 @@
 #ifndef ZP_RENDERING_FACTORY_H
 #define ZP_RENDERING_FACTORY_H
 
+#if 0
 class zpRenderingFactory {
 public:
 	~zpRenderingFactory();
@@ -15,5 +16,6 @@ private:
 
 	zpRenderingFactory();
 };
+#endif
 
 #endif

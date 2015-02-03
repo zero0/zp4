@@ -1,5 +1,34 @@
 #include "zpOpenGL.h"
 
+zpDepthStencilBufferImpl::zpDepthStencilBufferImpl()
+	: m_depthStencilView( 0 )
+	, m_depthTexture( 0 )
+	, m_format( ZP_DISPLAY_FORMAT_UNKNOWN )
+	, m_width( 0 )
+	, m_height( 0 )
+{}
+zpDepthStencilBufferImpl::~zpDepthStencilBufferImpl()
+{
+	glDeleteTextures( 1, & m_depthTexture );
+	
+	m_depthTexture = 0;
+}
+
+zp_uint zpDepthStencilBufferImpl::getWidth() const
+{
+	return m_width;
+}
+zp_uint zpDepthStencilBufferImpl::getHeight() const
+{
+	return m_height;
+}
+
+zpDisplayFormat zpDepthStencilBufferImpl::getDisplayFormat() const
+{
+	return m_format;
+}
+
+#if 0
 zpOpenGLDepthStencilBuffer::zpOpenGLDepthStencilBuffer() :
 	m_format( ZP_DISPLAY_FORMAT_UNKNOWN ),
 	m_referenceCount( 1 ),
@@ -54,3 +83,4 @@ zp_uint zpOpenGLDepthStencilBuffer::getFramebuffer() const {
 zp_uint zpOpenGLDepthStencilBuffer::getTexture() const {
 	return m_texture;
 }
+#endif

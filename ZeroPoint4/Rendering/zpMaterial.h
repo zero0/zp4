@@ -16,10 +16,62 @@ struct zpMaterial
 	zpBlendState blend;
 	zpDepthStencilState depth;
 
+	zpBuffer globalVariables;
+
 	zp_ushort materialId;
 	zp_ushort sortBias;
 	zpShaderResourceInstance shader;
 	zpFixedArrayList< zpMaterialTextureSampler, zpMaterialTextureSlot_Count > textures;
+};
+
+struct zpMaterialConstantBufferSlot
+{
+	zp_uint index;
+	zpResourceBindSlotType bindSlots;
+	zpString name;
+};
+struct zpTextureBindSlot
+{
+	zp_uint index;
+	zpString bindName;
+	zpTextureResourceInstance texture;
+	zpSamplerState sampler;
+};
+struct zpMaterialGlobalVariable
+{
+	zpString name;
+	zp_uint offset;
+	zp_uint size;
+};
+class zpNewMaterial
+{
+public:
+	zpNewMaterial();
+	~zpNewMaterial();
+
+	zp_bool setGlobal( const zp_char* name, zp_float value );
+	zp_bool setGlobal( const zp_char* name, const zpVector2f& value );
+	zp_bool setGlobal( const zp_char* name, const zpVector4f& value );
+	zp_bool setGlobal( const zp_char* name, const zpColor4f& value );
+	zp_bool setGlobal( const zp_char* name, const zpMatrix4f& value );
+
+	zp_bool setTexture( const zp_char* name, const zpTextureResourceInstance& texture );
+	zp_bool setSampler( const zp_char* name, const zpSamplerStateDesc& samplerDesc );
+
+private:
+	zpShaderResourceInstance shader;
+
+	zpBlendState blend;
+	zpDepthStencilState depth;
+
+	zpBuffer globalVariables; //per-material shader $Globals constant buffer
+
+
+
+	zpArrayList< zpMaterialGlobalVariable > globalVaraiblesDef;
+
+	zp_ushort materialId;
+	zp_ushort sortBias;
 };
 
 class zpMaterialResource : public zpResource< zpMaterial >

@@ -19,11 +19,14 @@ public:
 	~zpShader();
 
 	zpShaderImpl* getShaderImpl() const;
+	const zpBison& getShaderData() const;
 
 protected:
 	zpShaderImpl* m_shader;
+	zpBison m_shaderData;
 
 	friend class zpRenderingEngine;
+	friend class zpShaderResource;
 };
 
 class zpShaderResource : public zpResource< zpShader >

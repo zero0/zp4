@@ -168,6 +168,7 @@ void zpApplication::initialize()
 	m_renderingPipeline.getMeshContentManager()->setApplication( this );
 	m_renderingPipeline.getFontContentManager()->setApplication( this );
 	
+
 	zp_bool ok;
 	ok = m_textContent.getResource( m_configFilename, m_appConfig );
 	ZP_ASSERT( ok, "Failed to load app config '%s'", m_configFilename.str() );
@@ -205,15 +206,15 @@ void zpApplication::initialize()
 	displayMode.refreshRate = render[ "Refresh" ].asInt();
 	displayMode.displayFormat = ZP_DISPLAY_FORMAT_RGBA8_UNORM;
 
+	m_renderingPipeline.initialize();
+
 	zpRenderingEngine* re = m_renderingPipeline.getRenderingEngine();
 	re->setScreenMode( ZP_SCREEN_MODE_WINDOWED );
 	re->setDisplayMode( displayMode );
 	re->setVSyncEnabled( render[ "VSync" ].asBool() );
-	re->create( m_window.getWindowHandle(), m_window.getScreenSize() );
+	re->setup( m_window.getWindowHandle(), m_window.getScreenSize() );
 
 	m_lastTime = m_timer.getTime();
-
-	m_renderingPipeline.initialize();
 
 	m_gui.setApplication( this );
 	m_gui.create();
@@ -265,19 +266,26 @@ void zpApplication::run()
 {
 	do
 	{
+		// rest loop booleans
 		m_restartApplication = false;
 		m_isRunning = true;
 
+		// setup app
 		setup();
 
+		// push next phase, starting the phase update
 		pushNextPhase();
 
+		// loop while app is running and window is processing messages
 		while( m_isRunning && m_window.processMessages() )
 		{
 			processFrame();
 		}
 
+		// teardown app
 		teardown();
+
+		// if the app should restart, restart the loop
 	} while ( m_restartApplication );
 }
 
@@ -320,10 +328,10 @@ zp_int zpApplication::shutdown()
 	m_stateStack.clear();
 	m_allStates.clear();
 
-	m_renderingPipeline.destroy();
-	m_physicsEngine.destroy();
-
 	runGarbageCollect();
+
+	m_renderingPipeline.shutdown();
+	m_physicsEngine.destroy();
 
 	zpAngelScript::getInstance()->destroyEngine();
 	zpAngelScript::destroyInstance();

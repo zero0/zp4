@@ -13,8 +13,8 @@ public:
 	~zpRenderingEngine();
 
 	void initialize();
-	void create( zp_handle hWindow, const zpVector2i& size );
-	void destroy();
+	void setup( zp_handle hWindow, const zpVector2i& size );
+	void teardown();
 	void shutdown();
 
 	zpRenderingEngineType getEngineType() const;

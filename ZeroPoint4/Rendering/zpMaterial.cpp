@@ -20,6 +20,8 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 		ok = pipeline->getShaderContentManager()->getResource( shaderFile, m_resource.shader );
 		ZP_ASSERT( ok, "Failed to load shader '%s' for material '%s'", shaderFile, getFilename().str() );
 
+		const zpBison::Value& shaderData = m_resource.shader.getResource()->getData()->getShaderData().root();
+
 		// load sort bias
 		zp_ushort sortBias = root[ "SortBias" ].asInt();
 		m_resource.sortBias = sortBias;
@@ -43,6 +45,14 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 
 		// load constants from the material
 		const zpBison::Value& constants = root[ "Constants" ];
+
+		const zpBison::Value& shaderGlobals = shaderData[ "Globals" ];
+		if( !shaderGlobals.isEmpty() )
+		{
+			zp_uint globalVariablesSize = shaderData[ "GlobalsSize" ].asInt();
+
+			pipeline->getRenderingEngine()->createBuffer( m_resource.globalVariables, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DYNAMIC, globalVariablesSize );
+		}
 
 		// load texture samplers for the material
 		const zpBison::Value& samples = root[ "Samplers" ];

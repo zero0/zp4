@@ -4,6 +4,27 @@
 
 #include "Core/zpCore.h"
 
+enum zpShaderCompilerType
+{
+	ZP_SHADER_COMPILE_VS,
+	ZP_SHADER_COMPILE_PS,
+	ZP_SHADER_COMPILE_GS,
+	ZP_SHADER_COMPILE_CS,
+
+	zpShaderCompilerType_Count
+};
+
+enum zpShaderInputSigniture : zp_uint
+{
+	ZP_SHADER_INPUT_SIG_POSITION	= ( 1 << 0 ),
+	ZP_SHADER_INPUT_SIG_NORMAL		= ( 1 << 1 ),
+	ZP_SHADER_INPUT_SIG_BINORMAL	= ( 1 << 2 ),
+	ZP_SHADER_INPUT_SIG_TANGENT		= ( 1 << 3 ),
+	ZP_SHADER_INPUT_SIG_COLOR		= ( 1 << 4 ),
+	ZP_SHADER_INPUT_SIG_TEXCOORD0	= ( 1 << 5 ),
+	ZP_SHADER_INPUT_SIG_TEXCOORD1	= ( 1 << 6 ),
+};
+
 #define SHADER_D3D			"D3D"
 #define SHADER_DX9			"DX9"
 #define SHADER_DX10			"DX10"

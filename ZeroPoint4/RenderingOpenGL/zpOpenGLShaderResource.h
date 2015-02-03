@@ -2,32 +2,26 @@
 #ifndef ZP_OPENGL_SHADER_RESOURCE_H
 #define ZP_OPENGL_SHADER_RESOURCE_H
 
-class zpOpenGLShaderResource : public zpShaderResource {
+class zpShaderImpl
+{
 public:
-	virtual ~zpOpenGLShaderResource();
+	zpShaderImpl();
+	~zpShaderImpl();
 
-	zp_bool load();
+	zp_bool load( zpRenderingEngineImpl* engine, const zpBison::Value& shaderFile );
 	void unload();
 
-	zpVertexLayout* getVertexLayout();
-
 private:
-	zpOpenGLShaderResource();
-
-	zp_uint getShaderProgram();
-	zp_uint getVertexShader();
-	zp_uint getFragmentShader();
-	zp_uint getGeometryShader();
-
 	zp_uint m_shaderProgram;
 	zp_uint m_vertexShader;
 	zp_uint m_fragmentShader;
 	zp_uint m_geometryShader;
+	zp_uint m_computeShader;
 
-	zpVertexLayout* m_vertexLayout;
+	zpVertexFormatDesc m_vertexLayout;
 
-	friend class zpOpenGLRenderingEngine;
-	friend class zpOpenGLRenderingContext;
+	friend class zpRenderingEngineImpl;
+	friend class zpRenderingContextImpl;
 };
 
 #endif

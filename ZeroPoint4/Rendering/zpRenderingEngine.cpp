@@ -13,7 +13,7 @@ void zpRenderingEngine::initialize()
 {
 	m_renderingEngine->initialize();
 }
-void zpRenderingEngine::create( zp_handle hWindow, const zpVector2i& size )
+void zpRenderingEngine::setup( zp_handle hWindow, const zpVector2i& size )
 {
 	m_screenSize = size;
 
@@ -29,7 +29,7 @@ void zpRenderingEngine::create( zp_handle hWindow, const zpVector2i& size )
 
 	//m_renderingContexts.pushBack( new zpRenderingContext( this, immediateContext ) );
 }
-void zpRenderingEngine::destroy()
+void zpRenderingEngine::teardown()
 {
 	destroyTexture( m_immediateRenderTarget );
 	

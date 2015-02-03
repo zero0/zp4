@@ -5,10 +5,7 @@
 #include "Core/zpCore.h"
 
 zpRenderingEngineImpl::zpRenderingEngineImpl()
-	: m_dxgiFactory( ZP_NULL )
-	, m_dxgiAdapter( ZP_NULL )
-	, m_swapChain( ZP_NULL )
-	, m_d3dDevice( ZP_NULL )
+	: m_d3dDevice( ZP_NULL )
 {}
 zpRenderingEngineImpl::~zpRenderingEngineImpl()
 {}
@@ -17,17 +14,12 @@ void zpRenderingEngineImpl::initialize()
 {
 	HRESULT hr;
 
-	hr = CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)&m_dxgiFactory );
-	ZP_ASSERT( SUCCEEDED( hr ), "Unable to Create DXGI Factory" );
-
-	hr = m_dxgiFactory->EnumAdapters( 0, &m_dxgiAdapter );
-	ZP_ASSERT( SUCCEEDED( hr ), "Unable to Get Adapter 0" );
-
 	while( m_inputLayouts.size() < zpVertexFormat_Count )
 	{
 		m_inputLayouts.pushBack( ZP_NULL );
 	}
 
+	// cached textures
 	m_textures.resize( ZP_RENDERING_MAX_TEXTURES );
 	zpTextureImpl* tb = m_textures.begin();
 	zpTextureImpl* te = m_textures.end();
@@ -36,6 +28,7 @@ void zpRenderingEngineImpl::initialize()
 		m_freeTextures.pushBack( tb );
 	}
 
+	// cached buffers
 	m_buffers.resize( ZP_RENDERING_MAX_BUFFERS );
 	zpBufferImpl* bb = m_buffers.begin();
 	zpBufferImpl* be = m_buffers.end();
@@ -44,6 +37,7 @@ void zpRenderingEngineImpl::initialize()
 		m_freeBuffers.pushBack( bb );
 	}
 
+	// cached shaders
 	m_shaders.resize( ZP_RENDERING_MAX_SHADERS );
 	zpShaderImpl* sb = m_shaders.begin();
 	zpShaderImpl* eb = m_shaders.end();
@@ -51,7 +45,47 @@ void zpRenderingEngineImpl::initialize()
 	{
 		m_freeShaders.pushBack( sb );
 	}
-	
+
+	D3D_FEATURE_LEVEL actualFeatureLevel;
+	D3D_FEATURE_LEVEL featureLevels[] =
+	{
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0
+	};
+	zp_uint featureLevelCount = ZP_ARRAY_LENGTH( featureLevels );
+	ID3D11DeviceContext* immediate = ZP_NULL;
+
+	zp_uint flags = 0;
+#if ZP_DEBUG
+	flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+	hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+	if( FAILED( hr ) )
+	{
+		hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+		if( FAILED( hr ) )
+		{
+			hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_WARP, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+			if( FAILED( hr ) )
+			{
+				hr = D3D11CreateDevice( ZP_NULL, D3D_DRIVER_TYPE_REFERENCE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
+
+				ZP_ASSERT( SUCCEEDED( hr ), "Unable to create D3D11 device. %d", hr );
+			}
+		}
+	}
+
+	// get the actual feature level of the rendering engine
+	switch( actualFeatureLevel )
+	{
+		case D3D_FEATURE_LEVEL_11_0: m_actualRenderingEngineType = ZP_RENDERING_ENGINE_DX11; break;
+		case D3D_FEATURE_LEVEL_10_1: m_actualRenderingEngineType = ZP_RENDERING_ENGINE_DX10_1; break;
+		case D3D_FEATURE_LEVEL_10_0: m_actualRenderingEngineType = ZP_RENDERING_ENGINE_DX10; break;
+	}
+
+	m_immidiateContext.set( immediate );
 }
 void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint height, zpDisplayMode& displayMode, zpScreenMode screenMode, zpRenderingEngineType& outEngineType, zpRenderingContextImpl*& outImmediateContext, zpTextureImpl*& outImmediateRenderTarget )
 {
@@ -97,16 +131,23 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swapChainDesc.Flags = 0;//DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	D3D_FEATURE_LEVEL actualFeatureLevel;
-	D3D_FEATURE_LEVEL featureLevels[] =
-	{
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0
-	};
-	zp_uint featureLevelCount = ZP_ARRAY_LENGTH( featureLevels );
-	ID3D11DeviceContext* immediate = ZP_NULL;
+	IDXGIDevice * pDXGIDevice;
+	hr = m_d3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void **)&pDXGIDevice);
 
+	IDXGIAdapter * pDXGIAdapter;
+	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&pDXGIAdapter);
+
+	IDXGIFactory * pFactory;
+	pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void **)&pFactory);
+
+	hr = pFactory->CreateSwapChain( m_d3dDevice, &swapChainDesc, &m_swapChain );
+	ZP_ASSERT( SUCCEEDED( hr ), "Failed to create swap chain" );
+
+	ZP_SAFE_RELEASE( pDXGIDevice );
+	ZP_SAFE_RELEASE( pDXGIAdapter );
+	ZP_SAFE_RELEASE( pFactory );
+
+	/*
 	//hr = D3D11CreateDevice( m_dxgiAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &m_d3dDevice, &actualFeatureLevel, &immediate );
 	hr = D3D11CreateDeviceAndSwapChain( ZP_NULL, D3D_DRIVER_TYPE_HARDWARE, 0, flags, featureLevels, featureLevelCount, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_d3dDevice, &actualFeatureLevel, &immediate );
 	if( FAILED( hr ) )
@@ -126,19 +167,11 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 			}
 		}
 	}
-
+	*/
 	// create the immediate context wrapper
-	m_immidiateContext.set( immediate );
+	//m_immidiateContext.set( immediate );
 	outImmediateContext = &m_immidiateContext;
-
-	// get the actual feature level of the rendering engine
-	switch( actualFeatureLevel )
-	{
-		case D3D_FEATURE_LEVEL_11_0: outEngineType = ZP_RENDERING_ENGINE_DX11; break;
-		case D3D_FEATURE_LEVEL_10_1: outEngineType = ZP_RENDERING_ENGINE_DX10_1; break;
-		case D3D_FEATURE_LEVEL_10_0: outEngineType = ZP_RENDERING_ENGINE_DX10; break;
-	}
-
+	outEngineType = m_actualRenderingEngineType;
 
 	// get the back buffer
 	ID3D11Texture2D* backBuffer;
@@ -195,7 +228,6 @@ void zpRenderingEngineImpl::destroy()
 	ZP_SAFE_RELEASE( m_screenshotTexture );
 
 	ZP_SAFE_RELEASE( m_swapChain );
-	ZP_SAFE_RELEASE( m_d3dDevice );
 }
 void zpRenderingEngineImpl::shutdown()
 {
@@ -207,8 +239,7 @@ void zpRenderingEngineImpl::shutdown()
 	m_buffers.clear();
 	m_shaders.clear();
 
-	ZP_SAFE_RELEASE( m_dxgiAdapter );
-	ZP_SAFE_RELEASE( m_dxgiFactory );
+	ZP_SAFE_RELEASE( m_d3dDevice );
 }
 
 zpBufferImpl* zpRenderingEngineImpl::createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, const void* data )
@@ -938,6 +969,10 @@ zp_bool zpRenderingEngineImpl::destroyShader( zpShaderImpl* shader )
 void zpRenderingEngineImpl::present( zp_bool vsync )
 {
 	m_swapChain->Present( vsync ? 1 : 0, 0 );
+}
+ID3D11InputLayout* zpRenderingEngineImpl::getInputLayout( zpVertexFormat format ) const
+{
+	return m_inputLayouts[ format ];
 }
 
 zp_bool zpRenderingEngineImpl::performScreenshot()

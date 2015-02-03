@@ -147,29 +147,34 @@ zp_bool _valueToColor( const zpBison::Value& v, zpColor4f& c )
 }
 
 zpRenderingPipeline::zpRenderingPipeline()
-	: m_engine( zpRenderingFactory::getRenderingEngine() )
+	: m_engine()
 	, m_screenshotType( ZP_SCREENSHOT_TYPE_NONE )
 {}
 zpRenderingPipeline::~zpRenderingPipeline()
 {
-	m_engine = ZP_NULL;
-	zpRenderingFactory::destroyRenderingEngine();
+	
 }
 
-zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
+const zpRenderingEngine* zpRenderingPipeline::getRenderingEngine() const
 {
-	return m_engine;
+	return &m_engine;
+}
+zpRenderingEngine* zpRenderingPipeline::getRenderingEngine()
+{
+	return &m_engine;
 }
 
 void zpRenderingPipeline::initialize()
 {
+	m_engine.initialize();
+
 	zpRasterStateDesc raster;
 	raster.cullMode = ZP_CULL_MODE_BACK;
 	raster.frontFace = ZP_FRONT_FACE_CW;
 	raster.fillMode = ZP_FILL_MODE_SOLID;
 	//raster.depthClipEnable = true;
 	
-	m_engine->createRasterState( m_raster, raster );
+	m_engine.createRasterState( m_raster, raster );
 
 	zpBlendStateDesc blend;
 	blend.renderTargets[0].enabled = true;
@@ -177,12 +182,12 @@ void zpRenderingPipeline::initialize()
 	blend.renderTargets[0].destBlend = ZP_BLEND_INV_SRC_ALPHA;
 	blend.renderTargets[0].blendOp = ZP_BLEND_OP_ADD;
 
-	m_engine->createBlendState( m_alphaBlend, blend );
+	m_engine.createBlendState( m_alphaBlend, blend );
 
-	m_engine->createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
-	m_engine->createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
-	m_engine->createBuffer( m_perDrawCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
-	m_engine->createBuffer( m_lightBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
+	m_engine.createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
+	m_engine.createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
+	m_engine.createBuffer( m_perDrawCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
+	m_engine.createBuffer( m_lightBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
 
 	// fill free camera buffer
 	m_cameras.resize( 8 );
@@ -210,7 +215,7 @@ void zpRenderingPipeline::setup()
 	ok = m_fontContent.getResource( "fonts/arial32.fontb", m_debugFont );
 	ZP_ASSERT( ok, "" );
 
-	const zpVector2i& size = m_engine->getScreenSize();
+	const zpVector2i& size = m_engine.getScreenSize();
 
 	zpViewport viewport;
 	viewport.minDepth = 0.0f;
@@ -236,8 +241,8 @@ void zpRenderingPipeline::setup()
 	cam->setStencilClear( 0 );
 	cam->setDepthClear( 1.0f );
 	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_DEFAULT );
-	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
-	cam->setDepthStencilBuffer( m_engine->getBackBufferDepthStencilBuffer() );
+	cam->setRenderTarget( 0, m_engine.getBackBufferRenderTarget() );
+	cam->setDepthStencilBuffer( m_engine.getBackBufferDepthStencilBuffer() );
 	m_debugCamera = cam;
 
 	cam = getCamera( ZP_CAMERA_TYPE_UI );
@@ -257,7 +262,7 @@ void zpRenderingPipeline::setup()
 	cam->setStencilClear( 0 );
 	cam->setDepthClear( 1.0f );
 	cam->setClearMode( ZP_CAMERA_CLEAR_MODE_DEPTH );
-	cam->setRenderTarget( 0, m_engine->getBackBufferRenderTarget() );
+	cam->setRenderTarget( 0, m_engine.getBackBufferRenderTarget() );
 	cam->setDepthStencilBuffer( ZP_NULL );
 	m_debugUICamera = cam;
 
@@ -274,16 +279,19 @@ void zpRenderingPipeline::teardown()
 
 	m_debugFont.release();
 
-	m_engine->getImmediateRenderingContext()->finalizeCommands();
-}
-void zpRenderingPipeline::destroy()
-{
-	m_engine->destroyBuffer( m_cameraBuffer );
-	m_engine->destroyBuffer( m_perFrameBuffer );
-	m_engine->destroyBuffer( m_perDrawCallBuffer );
-	m_engine->destroyBuffer( m_lightBuffer );
+	m_engine.getImmediateRenderingContext()->finalizeCommands();
 
-	m_engine->destroy();
+	m_engine.teardown();
+
+}
+void zpRenderingPipeline::shutdown()
+{
+	m_engine.destroyBuffer( m_cameraBuffer );
+	m_engine.destroyBuffer( m_perFrameBuffer );
+	m_engine.destroyBuffer( m_perDrawCallBuffer );
+	m_engine.destroyBuffer( m_lightBuffer );
+
+	m_engine.shutdown();
 }
 
 void zpRenderingPipeline::update()
@@ -311,8 +319,8 @@ void zpRenderingPipeline::beginFrame( zpRenderingContext* i, zpTime* time )
 
 void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 {
-	zpTexture* t = m_engine->getBackBufferRenderTarget();
-	zpDepthStencilBuffer* d = m_engine->getBackBufferDepthStencilBuffer();
+	zpTexture* t = m_engine.getBackBufferRenderTarget();
+	zpDepthStencilBuffer* d = m_engine.getBackBufferDepthStencilBuffer();
 	
 	// 1) fill buffers
 	i->fillBuffers();
@@ -370,7 +378,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	}
 
 	// perform no UI screenshot
-	if( m_screenshotType == ZP_SCREENSHOT_TYPE_NO_UI ) m_engine->performScreenshot();
+	if( m_screenshotType == ZP_SCREENSHOT_TYPE_NO_UI ) m_engine.performScreenshot();
 
 	// 2D Cameras
 	{
@@ -407,7 +415,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 	}
 
 	// perform full screenshot
-	if( m_screenshotType == ZP_SCREENSHOT_TYPE_ALL ) m_engine->performScreenshot();
+	if( m_screenshotType == ZP_SCREENSHOT_TYPE_ALL ) m_engine.performScreenshot();
 }
 
 void zpRenderingPipeline::endFrame( zpRenderingContext* i )
@@ -416,7 +424,7 @@ void zpRenderingPipeline::endFrame( zpRenderingContext* i )
 }
 void zpRenderingPipeline::present()
 {
-	m_engine->present();
+	m_engine.present();
 
 	switch( m_screenshotType )
 	{
@@ -775,7 +783,7 @@ void zpRenderingPipeline::releaseLight( zpLightBufferData* light )
 
 void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool useLighting )
 {
-	zpRenderingContext* i = m_engine->getImmediateRenderingContext();
+	zpRenderingContext* i = m_engine.getImmediateRenderingContext();
 
 	const zpArrayList< zpRenderingCommand* >& queue = i->getFilteredCommands( layer );
 
@@ -865,7 +873,7 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 
 zp_bool zpRenderingPipeline::performScreenshot()
 {
-	const zpVector2i& screenSize = m_engine->getScreenSize();
+	const zpVector2i& screenSize = m_engine.getScreenSize();
 
 	zp_bool ok;
 	zpDataBuffer data;
@@ -890,7 +898,7 @@ zp_bool zpRenderingPipeline::performScreenshot()
 
 	zp_uint index = data.size();
 
-	ok = m_engine->takeScreenshot( data );
+	ok = m_engine.takeScreenshot( data );
 
 	zp_byte* d = data.getData() + index;
 

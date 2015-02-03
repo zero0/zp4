@@ -51,6 +51,11 @@ void BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 				m_systemIncludeDir = arg.substring( 2 );
 				zpFile::convertToFilePath( m_systemIncludeDir );
 			}
+			// set preview file
+			else if( arg.startsWith( "-P" ) )
+			{
+				m_previewFile = arg.substring( 2 );
+			}
 		} );
 	}
 
@@ -88,6 +93,23 @@ void BaseShaderCompiler::shutdown()
 {
 	if( !m_compiledShaderDesc.isEmpty() )
 	{
+		if( !m_previewFile.isEmpty() )
+		{
+			zpJsonWriter writer;
+			const zp_char* previewText = writer.styleWrite( m_compiledShaderDesc );
+
+			zpStringBuffer previewFilename;
+			previewFilename.append( m_outputFile.substring( 0, m_outputFile.lastIndexOf( zpFile::sep ) + 1 ) );
+			previewFilename.append( m_previewFile );
+
+			zpFile previewFile( previewFilename.str() );
+			if( previewFile.open( ZP_FILE_MODE_ASCII_TRUNCATE_WRITE ) )
+			{
+				previewFile.writeFormat( previewText );
+				previewFile.close();
+			}
+		}
+
 		if( !zpBison::compileToFile( m_outputFile, m_compiledShaderDesc ) )
 		{
 			zpLog::error() << "Unable to compile output file '" << m_outputFile << "'" << zpLog::endl;
@@ -108,14 +130,18 @@ void BaseShaderCompiler::compileShaderVS()
 	zpString key( SHADER_COMPILE_VS );
 	m_macros.put( key, zpString( "1" ) );
 
-	zpDataBuffer data;
-	compileShaderVSPlatform( data );
+	zpShaderInfo info;
+	compileShaderVSPlatform( info );
 
 	m_macros.erase( key );
 
 	zpJson& vs = m_compiledShaderDesc[ "VS" ];
-	vs[ "Shader" ] = zpJson( data );
+	vs[ "Shader" ] = zpJson( info.data );
 	vs[ "Format" ] = zpJson( m_pragmas[ zpString( PRAGMA_FORMAT ) ] );
+
+	parseShaderInfo( vs, info );
+
+	parseGlobalShaderInfo( m_compiledShaderDesc, info );
 }
 
 void BaseShaderCompiler::compileShaderPS()
@@ -123,12 +149,18 @@ void BaseShaderCompiler::compileShaderPS()
 	zpString key( SHADER_COMPILE_PS );
 	m_macros.put( key, zpString( "1" ) );
 
-	zpDataBuffer data;
-	compileShaderPSPlatform( data );
+	zpShaderInfo info;
+	compileShaderPSPlatform( info );
 
 	m_macros.erase( key );
 
-	m_compiledShaderDesc[ "PS" ][ "Shader" ] = zpJson( data );
+	zpJson& ps = m_compiledShaderDesc[ "PS" ];
+	ps[ "Shader" ] = zpJson( info.data );
+
+	parseShaderInfo( ps, info );
+
+	parseGlobalShaderInfo( m_compiledShaderDesc, info );
+
 }
 
 void BaseShaderCompiler::compileShaderGS()
@@ -160,4 +192,49 @@ void BaseShaderCompiler::parsePragmas()
 			}
 		}
 	} );
+}
+
+void BaseShaderCompiler::parseShaderInfo( zpJson& shaderJson, zpShaderInfo& info )
+{
+	if( !info.shaderInput.textures.isEmpty() )
+	{
+		zpJson& textures = shaderJson[ "Textures" ];
+		info.shaderInput.textures.foreachIndexed( [ &textures ]( zp_uint index, zpTextureShaderInput& t ) {
+			zpJson& tex = textures[ index ];
+			tex[ "Name" ] = zpJson( t.name );
+			tex[ "Slot" ] = zpJson( t.index );
+			tex[ "Type" ] = zpJson( t.dimension );
+		} );
+	}
+
+	if( !info.shaderInput.constantBuffers.isEmpty() )
+	{
+		zpJson& constantBuffers = shaderJson[ "ConstantBuffers" ];
+		info.shaderInput.constantBuffers.foreachIndexed( [ &constantBuffers ]( zp_uint index, zpConstantBufferShaderInput& c ) {
+			zpJson& cb = constantBuffers[ index ];
+			cb[ "Name" ] = zpJson( c.name );
+			cb[ "Size" ] = zpJson( c.size );
+			cb[ "Slot" ] = zpJson( c.slot );
+		} );
+	}
+}
+
+void BaseShaderCompiler::parseGlobalShaderInfo( zpJson& shaderJson, zpShaderInfo& info )
+{
+	if( !info.shaderInput.globalVariables.isEmpty() )
+	{
+		zpJson& globals = shaderJson[ "Globals" ];
+		if( globals.isEmpty() )
+		{
+			shaderJson[ "GlobalsSize" ] = zpJson( info.shaderInput.globalVariablesSize );
+			info.shaderInput.globalVariables.foreachIndexed( [ &globals ]( zp_uint index, zpGlobalVariableInput& g ) {
+				zpJson& gv = globals[ index ];
+				gv[ "Name" ] = zpJson( g.name );
+				gv[ "Size" ] = zpJson( g.size );
+				gv[ "Type" ] = zpJson( g.type );
+				gv[ "Offset" ] = zpJson( g.offset );
+			} );
+	
+		}
+	}
 }

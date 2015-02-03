@@ -1,14 +1,40 @@
 #include "zpOpenGL.h"
 
-zpOpenGLShaderResource::zpOpenGLShaderResource() :
-	m_shaderProgram( 0 ),
-	m_vertexShader( 0 ),
-	m_fragmentShader( 0 ),
-	m_geometryShader( 0 ),
-	m_vertexLayout( ZP_NULL )
+zpShaderImpl::zpShaderImpl()
+	: m_shaderProgram( 0 )
+	, m_vertexShader( 0 )
+	, m_fragmentShader( 0 )
+	, m_geometryShader( 0 )
+	, m_vertexLayout( ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR )
 {}
-zpOpenGLShaderResource::~zpOpenGLShaderResource() {}
+zpShaderImpl::~zpShaderImpl()
+{
+	unload();
+}
 
+zp_bool zpShaderImpl::load( zpRenderingEngineImpl* engine, const zpBison::Value& shaderFile )
+{
+	return engine->loadShader( this, shaderFile );
+}
+void zpShaderImpl::unload()
+{
+	glUseProgram( 0 );
+
+	glDetachShader( m_shaderProgram, m_fragmentShader );
+	glDetachShader( m_shaderProgram, m_vertexShader );
+
+	glDeleteShader( m_fragmentShader );
+	glDeleteShader( m_vertexShader );
+
+	glDeleteProgram( m_shaderProgram );
+
+	m_shaderProgram = 0;
+	m_fragmentShader = 0;
+	m_vertexShader = 0;
+	m_geometryShader = 0;
+}
+
+#if 0
 zp_bool zpOpenGLShaderResource::load() {
 	zpProperties shaderProperties( getFilename() );
 	if( shaderProperties.isEmpty() ) return false;
@@ -155,3 +181,5 @@ zp_uint zpOpenGLShaderResource::getFragmentShader() {
 zp_uint zpOpenGLShaderResource::getGeometryShader() {
 	return m_geometryShader;
 }
+
+#endif

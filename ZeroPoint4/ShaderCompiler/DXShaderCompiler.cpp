@@ -17,9 +17,13 @@
 #define DX10_PIXEL_SHADER	DX_PIXEL_SHADER "_" SHADER_MODEL_4_0
 #define DX11_PIXEL_SHADER	DX_PIXEL_SHADER "_" SHADER_MODEL_5_0
 
+#define DX_GLOBAL_CBUFFER	"$Globals"
+#define DX_PARAMS_CBUFFER	"$Params"
+
 #pragma comment( lib, "d3d11" )
 #pragma comment( lib, "dxgi" )
 #pragma comment( lib, "dxguid" )
+#pragma comment( lib, "d3dcompiler" )
 
 #if ZP_DEBUG
 #pragma comment( lib, "d3dx11d" )
@@ -113,7 +117,7 @@ void DXShaderCompiler::initializePlatform()
 	}
 }
 
-zp_bool DXShaderCompiler::compileShaderVSPlatform( zpDataBuffer& data )
+zp_bool DXShaderCompiler::compileShaderVSPlatform( zpShaderInfo& info )
 {
 	const zp_char* profile;
 	switch( m_platform )
@@ -136,10 +140,10 @@ zp_bool DXShaderCompiler::compileShaderVSPlatform( zpDataBuffer& data )
 		mainFunc = f->str();
 	}
 
-	zp_bool ok = compileShaderPlatform( mainFunc, profile, data );
+	zp_bool ok = compileShaderPlatform( mainFunc, profile, info, ZP_SHADER_COMPILE_VS );
 	return ok;
 }
-zp_bool DXShaderCompiler::compileShaderPSPlatform( zpDataBuffer& data )
+zp_bool DXShaderCompiler::compileShaderPSPlatform( zpShaderInfo& info )
 {
 	const zp_char* profile;
 	switch( m_platform )
@@ -162,20 +166,20 @@ zp_bool DXShaderCompiler::compileShaderPSPlatform( zpDataBuffer& data )
 		mainFunc = f->str();
 	}
 
-	zp_bool ok = compileShaderPlatform( mainFunc, profile, data );
+	zp_bool ok = compileShaderPlatform( mainFunc, profile, info, ZP_SHADER_COMPILE_PS );
 	return ok;
 }
 
-zp_bool DXShaderCompiler::compileShaderGSPlatform( zpDataBuffer& data )
+zp_bool DXShaderCompiler::compileShaderGSPlatform( zpShaderInfo& info )
 {
 	return false;
 }
-zp_bool DXShaderCompiler::compileShaderCSPlatform( zpDataBuffer& data )
+zp_bool DXShaderCompiler::compileShaderCSPlatform( zpShaderInfo& info )
 {
 	return false;
 }
 
-zp_bool DXShaderCompiler::compileShaderPlatform( const zp_char* mainFunc, const zp_char* profile, zpDataBuffer& data ) const
+zp_bool DXShaderCompiler::compileShaderPlatform( const zp_char* mainFunc, const zp_char* profile, zpShaderInfo& info, zpShaderCompilerType compileType ) const
 {
 	// get the shader text and size
 	const zp_char* shaderText = m_shaderText.str();
@@ -228,8 +232,192 @@ zp_bool DXShaderCompiler::compileShaderPlatform( const zp_char* mainFunc, const 
 	// write the shader data into the out buffer
 	if( shaderBlob )
 	{
-		data.reset();
-		data.writeBulk( (const zp_byte*)shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize() );
+		const void* shaderPtr = shaderBlob->GetBufferPointer();
+		zp_uint shaderSize = shaderBlob->GetBufferSize();
+
+		info.data.reset();
+		info.data.writeBulk( (const zp_byte*)shaderPtr, shaderSize );
+
+		ID3D11ShaderReflection* reflection;
+		hr = D3DReflect( shaderPtr, shaderSize, IID_ID3D11ShaderReflection, (void**)&reflection );
+
+		D3D11_SHADER_DESC desc;
+		reflection->GetDesc( &desc );
+
+		// store instruction counts
+		info.totalInstructions = desc.InstructionCount;
+		info.floatInstructions = desc.FloatInstructionCount;
+		info.intInstructions =   desc.IntInstructionCount;
+		info.dynamicFlowInstructions = desc.DynamicFlowControlCount;
+		info.textureInstructions = desc.TextureLoadInstructions;
+
+		// TODO: implement vertex format
+		// determine vertex format
+		for( zp_uint ins = 0; ins < desc.InputParameters; ++ins )
+		{
+			D3D11_SIGNATURE_PARAMETER_DESC param;
+			reflection->GetInputParameterDesc( ins, &param );
+
+			zp_printfln( "input %s", param.SemanticName );
+		}
+
+
+		// determine input resources (textures, cbuffers)
+		for ( zp_uint r = 0; r < desc.BoundResources; ++r )
+		{
+			D3D11_SHADER_INPUT_BIND_DESC rescDesc;
+			reflection->GetResourceBindingDesc( r, &rescDesc );
+
+			if( rescDesc.Type == D3D_SIT_TEXTURE )
+			{
+				zp_printfln( "tex  %s bind %d %d", rescDesc.Name, rescDesc.BindPoint, rescDesc.BindCount );
+				zpTextureShaderInput& t = info.shaderInput.textures.pushBackEmpty();
+				t.name = rescDesc.Name;
+				t.index = rescDesc.BindPoint;
+				
+				switch( rescDesc.Dimension )
+				{
+				case D3D_SRV_DIMENSION_TEXTURE1D:
+					t.dimension = 1;
+					break;
+				case D3D_SRV_DIMENSION_TEXTURE2D:
+					t.dimension = 2;
+					break;
+				case D3D_SRV_DIMENSION_TEXTURE3D:
+					t.dimension = 3;
+					break;
+				case D3D_SRV_DIMENSION_TEXTURECUBE:
+					t.dimension = 4;
+					break;
+				default:
+					t.dimension = 2;
+				}
+			}
+			else if( rescDesc.Type == D3D_SIT_CBUFFER )
+			{
+				D3D11_SHADER_BUFFER_DESC constDesc;
+
+				ID3D11ShaderReflectionConstantBuffer* constantBuffer = reflection->GetConstantBufferByName( rescDesc.Name );
+				constantBuffer->GetDesc( &constDesc );
+				
+				if( zp_strcmp( rescDesc.Name, DX_GLOBAL_CBUFFER ) == 0 )
+				{
+					info.shaderInput.globalVariablesSize = constDesc.Size;
+
+					for( zp_uint v = 0; v < constDesc.Variables; ++v )
+					{
+						zpGlobalVariableInput& g = info.shaderInput.globalVariables.pushBackEmpty();
+
+						D3D11_SHADER_VARIABLE_DESC varDesc;
+						D3D11_SHADER_TYPE_DESC typeDesc;
+
+						ID3D11ShaderReflectionVariable* variable = constantBuffer->GetVariableByIndex( v );
+						variable->GetDesc( &varDesc );
+
+						g.name = varDesc.Name;
+						g.size = varDesc.Size;
+						g.offset = varDesc.StartOffset;
+
+						variable->GetType()->GetDesc( &typeDesc );
+						g.type = typeDesc.Name;
+
+#if 0
+						if( typeDesc.Class == D3D_SVC_SCALAR )
+						{
+							switch( typeDesc.Type )
+							{
+							case D3D_SVT_INT:
+								g.type = ZP_GLOBAL_VARIABLE_INT;
+								break;
+							case D3D_SVT_UINT:
+								g.type = ZP_GLOBAL_VARIABLE_UINT;
+								break;
+							case D3D_SVT_FLOAT:
+								g.type = ZP_GLOBAL_VARIABLE_FLOAT;
+								break;
+							}
+						}
+						else if( typeDesc.Class == D3D_SVC_VECTOR )
+						{
+							if( typeDesc.Columns == 2 )
+							{
+								switch( typeDesc.Type )
+								{
+								case D3D_SVT_INT:
+									g.type = ZP_GLOBAL_VARIABLE_INT2;
+									break;
+								case D3D_SVT_UINT:
+									g.type = ZP_GLOBAL_VARIABLE_UINT2;
+									break;
+								case D3D_SVT_FLOAT:
+									g.type = ZP_GLOBAL_VARIABLE_FLOAT2;
+									break;
+								}
+							}
+							else if( typeDesc.Columns == 3 )
+							{
+								switch( typeDesc.Type )
+								{
+								case D3D_SVT_INT:
+									g.type = ZP_GLOBAL_VARIABLE_INT3;
+									break;
+								case D3D_SVT_UINT:
+									g.type = ZP_GLOBAL_VARIABLE_UINT3;
+									break;
+								case D3D_SVT_FLOAT:
+									g.type = ZP_GLOBAL_VARIABLE_FLOAT3;
+									break;
+								}
+							}
+							else if( typeDesc.Columns == 4 )
+							{
+								if( typeDesc.Rows == 1 )
+								{
+									switch( typeDesc.Type )
+									{
+									case D3D_SVT_INT:
+										g.type = ZP_GLOBAL_VARIABLE_INT4;
+										break;
+									case D3D_SVT_UINT:
+										g.type = ZP_GLOBAL_VARIABLE_UINT4;
+										break;
+									case D3D_SVT_FLOAT:
+										g.type = ZP_GLOBAL_VARIABLE_FLOAT4;
+										break;
+									}
+								}
+								else if( typeDesc.Rows == 4 )
+								{
+									switch( typeDesc.Type )
+									{
+									case D3D_SVT_INT:
+										g.type = ZP_GLOBAL_VARIABLE_INT4x4;
+										break;
+									case D3D_SVT_UINT:
+										g.type = ZP_GLOBAL_VARIABLE_UINT4x4;
+										break;
+									case D3D_SVT_FLOAT:
+										g.type = ZP_GLOBAL_VARIABLE_FLOAT4x4;
+										break;
+									}
+								}
+								
+							}
+						}
+#endif
+						zp_printfln( "global %s type %s", varDesc.Name, typeDesc.Name );
+					}
+				}
+				
+				zp_printfln( "cbuf %s bind %d", rescDesc.Name, rescDesc.BindPoint );
+				zpConstantBufferShaderInput& c = info.shaderInput.constantBuffers.pushBackEmpty();
+				c.name = constDesc.Name;
+				c.size = constDesc.Size;
+				c.slot = rescDesc.BindPoint;
+			}
+		}
+
+		zp_int p = 0;p++;
 	}
 
 	// release blobs

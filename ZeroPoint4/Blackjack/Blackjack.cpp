@@ -210,6 +210,7 @@ private:
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
 	zp_int exitCode = 0;
+	zp_printfln( "App size %d", sizeof( zpApplication ) );
 
 	zpMemorySystem::getInstance()->initialize( ZP_MEMORY_MB( 10 ) );
 	{
@@ -223,7 +224,9 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		zpArrayList< zpString > args;
 		cmdLine.split( ' ', args );
 
-		zpApplication app;
+		zpApplication* application = new zpApplication;
+		zpApplication& app = *application;
+
 		app.setConfigFilename( BLACKJACK_CONFIG );
 		app.setOptionsFilename( BLACKJACK_OPTIONS );
 
@@ -242,6 +245,8 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		app.initialize();
 		app.run();
 		exitCode = app.shutdown();
+
+		delete application;
 	}
 	zpMemorySystem::getInstance()->shutdown();
 

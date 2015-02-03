@@ -75,6 +75,7 @@
     <ClInclude Include="zpOpenGLRenderingEngine.h" />
     <ClInclude Include="zpOpenGLRenderTarget.h" />
     <ClInclude Include="zpOpenGLShaderResource.h" />
+    <ClInclude Include="zpOpenGLTexture.h" />
     <ClInclude Include="zpOpenGLUtil.h" />
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +88,7 @@
     <ClCompile Include="zpOpenGLRenderingEngine.cpp" />
     <ClCompile Include="zpOpenGLRenderTarget.cpp" />
     <ClCompile Include="zpOpenGLShaderResource.cpp" />
+    <ClCompile Include="zpOpenGLTexture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

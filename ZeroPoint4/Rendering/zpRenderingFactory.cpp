@@ -1,5 +1,6 @@
 #include "zpRendering.h"
 
+#if 0
 zpRenderingFactory::zpRenderingFactory()
 {}
 zpRenderingFactory::~zpRenderingFactory()
@@ -26,3 +27,4 @@ void zpRenderingFactory::destroyRenderingEngine()
 	}
 	
 }
+#endif

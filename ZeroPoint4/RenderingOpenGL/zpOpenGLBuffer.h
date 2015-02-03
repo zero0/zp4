@@ -2,10 +2,11 @@
 #ifndef ZP_OPENGL_BUFFER_H
 #define ZP_OPENGL_BUFFER_H
 
-class zpOpenGLBuffer : public zpBuffer {
+class zpBufferImpl
+{
 public:
-
-	virtual ~zpOpenGLBuffer();
+	zpBufferImpl();
+	~zpBufferImpl();
 
 	void create( zpBufferType type, zpBufferBindType bind, zp_uint count, zp_uint stride, void* data = 0 );
 	void destroy();
@@ -22,11 +23,6 @@ public:
 	zpBufferBindType getBufferBindType() const;
 
 private:
-	zpOpenGLBuffer();
-
-	zp_uint getBuffer() const;
-	zp_uint getTarget() const;
-
 	zp_uint m_count;
 	zp_uint m_stride;
 	zpBufferType m_type;
@@ -36,8 +32,8 @@ private:
 	zp_uint m_target;
 	zp_uint m_buffer;
 
-	friend class zpOpenGLRenderingEngine;
-	friend class zpOpenGLRenderingContext;
+	friend class zpRenderingEngineImpl;
+	friend class zpRenderingContextImpl;
 };
 
 #endif
