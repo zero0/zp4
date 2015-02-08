@@ -2,13 +2,9 @@
 
 #pragma format VNU
 
-ZP_SAMPLER_2D( _Normal );
 ZP_SAMPLER_2D( _MainTex );
 
 float4 _Color;
-int2 _Test;
-float3 _One;
-float4x4 _Matrix;
 
 struct v2f
 {
@@ -32,10 +28,9 @@ v2f main_vs( vs_input_base v )
 float4 main_ps( v2f input ) : SV_TARGET
 {
     float4 col = tex2D( _MainTex, input.uv );
-    float4 nor = tex2D( _Normal, input.uv );
 
     float diffuse = saturate( dot( input.normal.xyz, light_direction.xyz ) );
-    col.rgb *= light_color.rgb * diffuse * nor.rgb;
+    col.rgb *= light_color.rgb * diffuse * _Color.rgb;
 
     return col;
 }

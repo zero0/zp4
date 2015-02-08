@@ -7,7 +7,8 @@
     "Components": {
         "Transform": {},
         "MeshRenderer": {
-            "Mesh": "meshes/cube.meshb"
+            "Mesh": "meshes/cube.meshb",
+            "Material" : "materials/cube.materialb"
         },
         "RigidBody": {
             "Mass": 1,

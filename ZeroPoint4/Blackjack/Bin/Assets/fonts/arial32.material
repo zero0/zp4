@@ -1,13 +1,23 @@
 {
     "Shader" : "shaders/TransparentDiffuse.shaderb",
     "Textures" :
-    [
-        "fonts/arial32_0.textureb"
-    ],
-    "Constants" :
-    {},
-    "Samplers" :
-    [],
+    {
+        "_MainTex" :
+        {
+            "Texture" : "fonts/arial32_0.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        }
+    },
+    "Globals" :
+    {
+        "_Color" :
+        {
+            "Type" : "Color",
+            "Value": [ 1, 1, 1, 1 ]
+        }
+    },
     "BlendMode" :
     {
         "RenderTargets" :

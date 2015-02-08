@@ -15,7 +15,7 @@
         "_Color" :
         {
             "Type" : "Color",
-            "Value": [ 1, 0, 0, 1 ]
+            "Value": [ 1, 1, 1, 1 ]
         }
     }
 }

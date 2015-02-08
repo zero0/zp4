@@ -1,9 +1,31 @@
 {
     "Shader" : "shaders/DiffuseColor.shaderb",
     "Textures" :
-    [],
-    "Constants" :
-    {},
-    "Samplers" :
-    []
+    {
+        "_MainTex" :
+        {
+            "Texture" : "textures/test.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        }
+    },
+    "Globals" :
+    {
+        "_Color" :
+        {
+            "Type" : "Color",
+            "Value": [ 0, 0, 0, 1 ]
+        },
+        "_Value" :
+        {
+            "Type" : "Float",
+            "Value" : 0
+        },
+        "_Vector4" :
+        {
+            "Type" : "Vector4",
+            "Value" : [ 0, 0, 0, 0 ]
+        }
+    }
 }

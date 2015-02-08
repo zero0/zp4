@@ -83,7 +83,8 @@
             ]
         },
         "MeshRenderer": {
-            "Mesh": "meshes/cube.meshb"
+            "Mesh": "meshes/cube.meshb",
+            "Material" : "materials/cube.materialb"
         },
         "KinematicBody": {
             "Mass": 1,

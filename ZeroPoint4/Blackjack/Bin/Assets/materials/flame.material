@@ -1,13 +1,23 @@
 {
     "Shader" : "shaders/TransparentDiffuse.shaderb",
     "Textures" :
-    [
-        "textures/ex_Fire.textureb"
-    ],
-    "Constants" :
-    {},
-    "Samplers" :
-    [],
+    {
+        "_MainTex" :
+        {
+            "Texture" : "textures/ex_Fire.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        }
+    },
+    "Globals" :
+    {
+        "_Color" :
+        {
+            "Type" : "Color",
+            "Value": [ 1, 0, 0, 1 ]
+        }
+    },
     "BlendMode" :
     {
         "RenderTargets" :
@@ -22,6 +32,6 @@
     "Depth" :
     {
         "DepthEnabled" : true,
-		"DepthWriteMaskAll" : false
+        "DepthWriteMaskAll" : false
     }
 }

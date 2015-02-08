@@ -4,6 +4,8 @@
 
 ZP_SAMPLER_2D( _MainTex );
 
+float4 _Color;
+
 struct v2f
 {
 	float4 position : SV_POSITION;
@@ -26,5 +28,5 @@ v2f main_vs( vs_input_gui input )
 float4 main_ps( v2f input ) : SV_TARGET
 {
 	float4 col = tex2D( _MainTex, input.uv );
-	return col * input.color;
+	return col * input.color * _Color;
 }
