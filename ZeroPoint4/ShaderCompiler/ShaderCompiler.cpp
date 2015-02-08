@@ -99,7 +99,8 @@ void BaseShaderCompiler::shutdown()
 			const zp_char* previewText = writer.styleWrite( m_compiledShaderDesc );
 
 			zpStringBuffer previewFilename;
-			previewFilename.append( m_outputFile.substring( 0, m_outputFile.lastIndexOf( zpFile::sep ) + 1 ) );
+			previewFilename.append( m_outputFile );
+			previewFilename.append( '.' );
 			previewFilename.append( m_previewFile );
 
 			zpFile previewFile( previewFilename.str() );

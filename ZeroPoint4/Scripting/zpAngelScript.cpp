@@ -785,7 +785,7 @@ void as_Register_Object( asIScriptEngine* engine, zpApplication* app )
 #pragma region Register Behavior
 void as_Register_Behavior( asIScriptEngine* engine, zpApplication* app )
 {
-	zp_int r;
+	//zp_int r;
 
 	//r = engine->RegisterObjectType(      ZP_SCRIPT_BEHAVIOR, sizeof( zpScriptBehavior ),  asOBJ_ASHANDLE ); AS_ASSERT( r );
 

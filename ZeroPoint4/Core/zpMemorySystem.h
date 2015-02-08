@@ -24,7 +24,8 @@ public:
 	void* allocate( zp_uint size );
 	void deallocate( void* ptr );
 
-	void printAllocatedMemoryStackTrace();
+	void printAllAllocatedMemoryStackTrace();
+	void printAllocatedMemoryStackTrack( zp_int index );
 
 private:
 	zpMemorySystem();

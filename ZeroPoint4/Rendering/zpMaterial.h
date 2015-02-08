@@ -2,83 +2,55 @@
 #ifndef ZP_MATERIAL_H
 #define ZP_MATERIAL_H
 
+enum zpMaterialShaderType
+{
+	ZP_MATERIAL_SHADER_TYPE_VERTEX =		0,
+	ZP_MATERIAL_SHADER_TYPE_PIXEL,
+	ZP_MATERIAL_SHADER_TYPE_GEOMETRY,
+	ZP_MATERIAL_SHADER_TYPE_COMPUTE,
+
+	zpMaterialShaderType_Count
+};
+
 class zpMaterialContentManager;
 
-struct zpMaterial
-{
-	struct zpMaterialTextureSampler
-	{
-		zpTextureResourceInstance texture;
-		zpResourceBindSlotType bindSlots;
-		zpSamplerState sampler;
-	};
-	
-	zpBlendState blend;
-	zpDepthStencilState depth;
-
-	zpBuffer globalVariables;
-
-	zp_ushort materialId;
-	zp_ushort sortBias;
-	zpShaderResourceInstance shader;
-	zpFixedArrayList< zpMaterialTextureSampler, zpMaterialTextureSlot_Count > textures;
-};
-
-struct zpMaterialConstantBufferSlot
-{
-	zp_uint index;
-	zpResourceBindSlotType bindSlots;
-	zpString name;
-};
-struct zpTextureBindSlot
-{
-	zp_uint index;
-	zpString bindName;
-	zpTextureResourceInstance texture;
-	zpSamplerState sampler;
-};
 struct zpMaterialGlobalVariable
 {
 	zpString name;
 	zp_uint offset;
 	zp_uint size;
 };
-class zpNewMaterial
+struct zpMaterialTexture
 {
-public:
-	zpNewMaterial();
-	~zpNewMaterial();
-
-	zp_bool setGlobal( const zp_char* name, zp_float value );
-	zp_bool setGlobal( const zp_char* name, const zpVector2f& value );
-	zp_bool setGlobal( const zp_char* name, const zpVector4f& value );
-	zp_bool setGlobal( const zp_char* name, const zpColor4f& value );
-	zp_bool setGlobal( const zp_char* name, const zpMatrix4f& value );
-
-	zp_bool setTexture( const zp_char* name, const zpTextureResourceInstance& texture );
-	zp_bool setSampler( const zp_char* name, const zpSamplerStateDesc& samplerDesc );
-
-private:
+	zpString name;
+	zpTextureResourceInstance texture;
+	zpSamplerState sampler;
+	zpVector4f scaleOffset;
+	zp_uint slot;
+};
+struct zpMaterial
+{
 	zpShaderResourceInstance shader;
 
 	zpBlendState blend;
 	zpDepthStencilState depth;
 
 	zpBuffer globalVariables; //per-material shader $Globals constant buffer
+	zpArrayList< zpMaterialGlobalVariable > globalVariablesDef;
 
-
-
-	zpArrayList< zpMaterialGlobalVariable > globalVaraiblesDef;
+	zpArrayList< zpMaterialTexture > materialTextures;
 
 	zp_ushort materialId;
 	zp_ushort sortBias;
+
+	friend class zpMaterialResource;
 };
 
 class zpMaterialResource : public zpResource< zpMaterial >
 {
 private:
 	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline, zp_ushort materialId );
-	void unload();
+	void unload( zpRenderingPipeline* pipeline );
 
 	friend class zpMaterialContentManager;
 };

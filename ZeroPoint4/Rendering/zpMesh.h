@@ -6,7 +6,6 @@ class zpMeshContentManager;
 
 struct zpMeshPart
 {
-	zpMaterialResourceInstance m_material;
 	zp_uint m_indexOffset;
 	zp_uint m_indexCount;
 	zp_uint m_vertexOffset;

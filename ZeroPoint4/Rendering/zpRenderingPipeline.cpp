@@ -184,10 +184,10 @@ void zpRenderingPipeline::initialize()
 
 	m_engine.createBlendState( m_alphaBlend, blend );
 
-	m_engine.createBuffer( m_cameraBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
-	m_engine.createBuffer( m_perFrameBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
-	m_engine.createBuffer( m_perDrawCallBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
-	m_engine.createBuffer( m_lightBuffer, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
+	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_CAMERA ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
+	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_FRAME ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
+	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
+	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
 
 	// fill free camera buffer
 	m_cameras.resize( 8 );
@@ -286,10 +286,10 @@ void zpRenderingPipeline::teardown()
 }
 void zpRenderingPipeline::shutdown()
 {
-	m_engine.destroyBuffer( m_cameraBuffer );
-	m_engine.destroyBuffer( m_perFrameBuffer );
-	m_engine.destroyBuffer( m_perDrawCallBuffer );
-	m_engine.destroyBuffer( m_lightBuffer );
+	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_CAMERA ] );
+	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_FRAME ] );
+	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ] );
+	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ] );
 
 	m_engine.shutdown();
 }
@@ -310,8 +310,8 @@ void zpRenderingPipeline::beginFrame( zpRenderingContext* i, zpTime* time )
 	perFrameData.fixedDeltaTime = 0.0f;
 	perFrameData.timeFromStart = time->getSecondsSinceStart();
 
-	i->update( &m_perFrameBuffer, &perFrameData, sizeof( zpFrameBufferData ) );
-	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_FRAME, &m_perFrameBuffer );
+	i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_FRAME ], &perFrameData, sizeof( zpFrameBufferData ) );
+	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_FRAME, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_FRAME ] );
 
 	// clear previous camera
 	m_prevCamera = ZP_NULL;
@@ -357,7 +357,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 			camera = *b;
 			// 2) process commands, sorting, etc.
 			i->preprocessCommands( camera, camera->getRenderLayers() );
-			useCamera( i, camera, &m_cameraBuffer );
+			useCamera( i, camera, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_CAMERA ] );
 
 			// 3) render opaque commands
 			i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
@@ -407,7 +407,7 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 		for( ; b != e; ++b )
 		{
 			i->preprocessCommands( camera, camera->getRenderLayers() );
-			useCamera( i, camera, &m_cameraBuffer );
+			useCamera( i, camera, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_CAMERA ] );
 
 			processRenderingQueue( ZP_RENDERING_QUEUE_UI, false );
 			processRenderingQueue( ZP_RENDERING_QUEUE_UI_DEBUG, false );
@@ -794,17 +794,17 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 	
 	if( cmd != end )
 	{
-		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_perDrawCallBuffer );
+		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ] );
 	
 		if( useLighting )
 		{
-			i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_LIGHT, &m_lightBuffer );
+			i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_LIGHT, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ] );
 
 			zpDrawCallBufferData drawCallData;
 			for( ; cmd != end; ++cmd )
 			{
 				drawCallData.world = (*cmd)->matrix;
-				i->update( &m_perDrawCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
+				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], &drawCallData, sizeof( zpDrawCallBufferData ) );
 
 				// base pass with 1 directional
 				// additional passes with each other light
@@ -815,12 +815,12 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 				e = m_usedLights[ ZP_LIGHT_TYPE_DIRECTIONAL ].end();
 				if( b != e )
 				{
-					i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
 					i->processCommand( *cmd );
 
 					for( ++b; b != e; ++b )
 					{
-						i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+						i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
 						i->processCommand( *cmd );
 					}
 				}
@@ -841,7 +841,7 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 					lightSphere.setRadius( zpScalar( data->radius ) );
 					if( ZP_IS_COLLISION( (*cmd)->boundingBox, lightSphere ) )
 					{
-						i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+						i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
 						i->processCommand( *cmd );
 					}
 				}
@@ -850,7 +850,7 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 				e = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].end();
 				for( ; b != e; ++b )
 				{
-					i->update( &m_lightBuffer, *b, sizeof( zpLightBufferData ) );
+					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
 					i->processCommand( *cmd );
 				}
 
@@ -863,7 +863,7 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 			for( ; cmd != end; ++cmd )
 			{
 				drawCallData.world = (*cmd)->matrix;
-				i->update( &m_perDrawCallBuffer, &drawCallData, sizeof( zpDrawCallBufferData ) );
+				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], &drawCallData, sizeof( zpDrawCallBufferData ) );
 
 				i->processCommand( *cmd );
 			}

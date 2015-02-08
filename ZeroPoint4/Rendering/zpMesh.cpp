@@ -81,9 +81,6 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 			{
 				mp.m_boundingBox = *box;
 			}
-
-			const zp_char* mat = v[ "Material" ].asCString();
-			ok = pipeline->getMaterialContentManager()->getResource( mat, mp.m_material );
 		}
 	}
 

@@ -141,6 +141,13 @@ void zpMemorySystem::deallocate( void* ptr )
 #if ZP_MEMORY_TRACK_POINTERS
 	zp_int p = m_allocedPointers.indexOf( i );
 	ZP_ASSERT_WARN( p != -1, "Unknown allocation being deallocated" );
+	if( p < 0 )
+	{
+		--i;
+		p = m_allocedPointers.indexOf( i );
+		ZP_ASSERT_WARN( p != -1, "Another unknown allocation being deallocated" );
+		printAllocatedMemoryStackTrack( p );
+	}
 	m_allocedPointers.erase( p );
 	m_stackTraces.erase( p );
 #endif
@@ -185,7 +192,7 @@ void zpMemorySystem::deallocate( void* ptr )
 #endif
 
 
-void zpMemorySystem::printAllocatedMemoryStackTrace()
+void zpMemorySystem::printAllAllocatedMemoryStackTrace()
 {
 #if ZP_MEMORY_TRACK_POINTERS
 	if( !m_stackTraces.isEmpty() )
@@ -194,6 +201,14 @@ void zpMemorySystem::printAllocatedMemoryStackTrace()
 	}
 #endif
 }
+void zpMemorySystem::printAllocatedMemoryStackTrack( zp_int index )
+{
+#if ZP_MEMORY_TRACK_POINTERS
+	m_stackTraces[ index ].print();
+	zp_printfln( "" );
+#endif
+}
+
 
 void zpMemorySystem::initialize( zp_uint size ) 
 {

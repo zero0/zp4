@@ -91,10 +91,7 @@ private:
 	zpMeshContentManager m_meshContent;
 	zpFontContentManager m_fontContent;
 
-	zpBuffer m_cameraBuffer;
-	zpBuffer m_perFrameBuffer;
-	zpBuffer m_perDrawCallBuffer;
-	zpBuffer m_lightBuffer;
+	zpBuffer m_constantBuffers[ zpConstantBufferSlot_Count ];
 
 	zpRasterState m_raster;
 	zpBlendState m_alphaBlend;

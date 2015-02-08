@@ -60,6 +60,12 @@ zp_int zp_floor_to_int( zp_float v )
 	return static_cast< zp_int >( floorf( v ) );
 }
 
+zp_float zp_fmod( zp_float x, zp_float y )
+{
+	return fmodf( x, y );
+}
+
+
 zp_bool zp_approximate( zp_float a, zp_float b )
 {
 	zp_float c = a - b;

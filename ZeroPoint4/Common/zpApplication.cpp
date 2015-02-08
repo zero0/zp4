@@ -669,7 +669,7 @@ zp_float zpApplication::getLoadingWorldProgress() const
 void zpApplication::processFrame()
 {
 	m_timer.tick();
-	zp_long now = m_timer.getTime();
+	zp_long startTime = m_timer.getTime();
 
 	ZP_PROFILE_START( FRAME );
 
@@ -705,7 +705,7 @@ void zpApplication::processFrame()
 	// simulate
 	ZP_PROFILE_START( SIMULATE );
 	zp_int numUpdates = 0;
-	while( ( now - m_lastTime ) > m_simulateHz && numUpdates < 5 )
+	while( ( startTime - m_lastTime ) > m_simulateHz && numUpdates < 5 )
 	{
 		simulate();
 		m_lastTime += m_simulateHz;
@@ -714,12 +714,12 @@ void zpApplication::processFrame()
 	ZP_PROFILE_END( SIMULATE );
 
 	// adjust timer
-	if( ( now - m_lastTime ) > m_simulateHz )
+	if( ( startTime - m_lastTime ) > m_simulateHz )
 	{
-		m_lastTime = now - m_simulateHz;
+		m_lastTime = startTime - m_simulateHz;
 	}
 
-	m_timer.setInterpolation( (zp_float)( now - m_lastTime ) / (zp_float)m_simulateHz );
+	m_timer.setInterpolation( (zp_float)( startTime - m_lastTime ) / (zp_float)m_simulateHz );
 
 	ZP_PROFILE_START( RENDER_FRAME );
 	{
@@ -769,12 +769,13 @@ void zpApplication::processFrame()
 	// sleep for the remainder of the frame
 	zp_long endTime = m_timer.getTime();
 
-	zp_long diff = ( endTime - now );
+	zp_long diff = ( endTime - startTime );
 	zp_float d = m_timer.getSecondsPerTick() * (zp_float)diff * 1000.f;
 	zp_float sleepTime = m_totalFrameTimeMs - d;
 	while( sleepTime < 0.f )
 	{
 		zp_sleep( (zp_uint)m_totalFrameTimeMs );
+		sleepTime = zp_fmod( sleepTime, -m_totalFrameTimeMs );
 		sleepTime += m_totalFrameTimeMs;
 	}
 

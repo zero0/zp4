@@ -30,10 +30,9 @@ protected:
 
 private:
 	zp_uint m_layer;
-	zpMeshResourceInstance m_mesh;
 
-	zp_bool m_hasMaterialOverride;
-	zpMaterialResourceInstance m_materialOverride;
+	zpMeshResourceInstance m_mesh;
+	zpArrayList< zpMaterialResourceInstance > m_materials;
 };
 
 

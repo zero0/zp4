@@ -9,11 +9,13 @@
 #if ZP_USE_MEMORY_SYSTEM
 void* operator new( zp_uint size )
 {
-	return zpMemorySystem::getInstance()->allocate( size );
+	void* ptr = zpMemorySystem::getInstance()->allocate( size );
+	return ptr;
 }
 void* operator new[]( zp_uint size )
 {
-	return zpMemorySystem::getInstance()->allocate( size );
+	void* ptr = zpMemorySystem::getInstance()->allocate( size );
+	return ptr;
 }
 
 void operator delete( void* ptr )

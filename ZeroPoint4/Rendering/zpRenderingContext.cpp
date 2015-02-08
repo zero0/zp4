@@ -595,7 +595,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.topology = ZP_TOPOLOGY_TRIANGLE_LIST;
 		command.vertexBuffer = m->m_vertex.getBufferImpl();
 		command.indexBuffer = m->m_index.getBufferImpl();
-		command.material = material == ZP_NULL ? b->m_material.getResource() : material->getResource();
+		command.material = material->getResource();
 		command.vertexFormat = m->m_format;
 		command.vertexCount = b->m_vertexCount;
 		command.indexCount = b->m_indexCount;
@@ -824,8 +824,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 		const zpFontGlyph& glyph = font->glyphs[ c ];
 		
 		zpRectf uv( (zp_float)glyph.x, (zp_float)glyph.y, (zp_float)glyph.width, (zp_float)glyph.height );
-		zpRectf v(  );
-
+		zpRectf v;
 	}
 }
 void zpRenderingContext::endDrawFont()

@@ -224,9 +224,6 @@ void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, con
 void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 {
 	const zpShaderImpl* shader = material->shader.getResource()->getData()->getShaderImpl();
-	if( shader->m_vertexShader )   m_context->VSSetShader( shader->m_vertexShader, 0, 0 );
-	if( shader->m_geometryShader ) m_context->GSSetShader( shader->m_geometryShader, 0, 0 );
-	if( shader->m_pixelShader )    m_context->PSSetShader( shader->m_pixelShader, 0, 0 );
 
 	const zp_float factor[] = { 1, 1, 1, 1 };
 	const zpBlendStateImpl* blend = material->blend.getBlendStateImpl();
@@ -235,6 +232,33 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 	const zpDepthStencilStateImpl* depth = material->depth.getDepthStencilStateImpl();
 	m_context->OMSetDepthStencilState( depth ? depth->m_depthStencil : ZP_NULL, 0 );
 
+	const zpBufferImpl* b = material->globalVariables.getBufferImpl();
+	ID3D11Buffer* globalBuffer[1] = { b == ZP_NULL ? ZP_NULL : b->m_buffer };
+
+	if( shader->m_vertexShader )
+	{
+		m_context->VSSetShader( shader->m_vertexShader, 0, 0 );
+		m_context->VSSetConstantBuffers( ZP_CONSTANT_BUFFER_SLOT_GLOBAL, 1, globalBuffer );
+	}
+
+	if( shader->m_geometryShader )
+	{
+		m_context->GSSetShader( shader->m_geometryShader, 0, 0 );
+		m_context->GSSetConstantBuffers( ZP_CONSTANT_BUFFER_SLOT_GLOBAL, 1, globalBuffer );
+	}
+
+	if( shader->m_pixelShader )
+	{
+		m_context->PSSetShader( shader->m_pixelShader, 0, 0 );
+		m_context->PSSetConstantBuffers( ZP_CONSTANT_BUFFER_SLOT_GLOBAL, 1, globalBuffer );
+		
+		material->materialTextures.foreach( [ this ]( const zpMaterialTexture& t ) {
+			m_context->PSSetSamplers( t.slot, 1, &t.sampler.getSamplerStateImpl()->m_sampler );
+			m_context->PSSetShaderResources( t.slot, 1, &t.texture.getResource()->getData()->getTextureImpl()->m_textureResourceView );
+		} );
+	}
+
+#if 0
 	const zpMaterial::zpMaterialTextureSampler* b = material->textures.begin();
 	const zpMaterial::zpMaterialTextureSampler* e = material->textures.end();
 	for( zp_uint i = 0; b != e; ++i, ++b )
@@ -260,6 +284,7 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 		}
 
 	}
+#endif
 }
 
 #if 0

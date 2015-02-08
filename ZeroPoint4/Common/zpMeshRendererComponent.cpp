@@ -3,7 +3,6 @@
 zpMeshRendererComponent::zpMeshRendererComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 	, m_layer( ZP_RENDERING_LAYER_DEFAULT )
-	, m_hasMaterialOverride( false )
 {
 	zp_bool ok = false;
 	const zp_char* meshFile = def[ "Mesh" ].asCString();
@@ -19,9 +18,21 @@ zpMeshRendererComponent::zpMeshRendererComponent( zpObject* obj, const zpBison::
 	const zpBison::Value& material = def[ "Material" ];
 	if( material.isString() )
 	{
+		m_materials.reserve( 1 );
+
 		const zp_char* materialFile = material.asCString();
-		m_hasMaterialOverride = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_materialOverride );
-		ZP_ASSERT_WARN( m_hasMaterialOverride, "Unable to load material %s", materialFile );
+		ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_materials.pushBackEmpty() );
+		ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
+	}
+	else if( material.isArray() && material.isEmpty() )
+	{
+		m_materials.reserve( material.size() );
+
+		material.foreachArray( [ this, &ok ]( zpBison::Value& mat ) {
+			const zp_char* materialFile = mat.asCString();
+			ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_materials.pushBackEmpty() );
+			ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
+		} );
 	}
 }
 zpMeshRendererComponent::~zpMeshRendererComponent() {}
@@ -33,7 +44,7 @@ void zpMeshRendererComponent::render( zpRenderingContext* i )
 	const zpMatrix4f& transform = attachment->getWorldTransform();
 
 	// draw mesh
-	i->drawMesh( m_layer, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, transform, m_hasMaterialOverride ? &m_materialOverride : ZP_NULL );
+	i->drawMesh( m_layer, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, transform, m_materials.begin() );
 }
 
 void zpMeshRendererComponent::setRenderLayer( zp_uint layer )
@@ -47,22 +58,28 @@ zp_uint zpMeshRendererComponent::getRenderLayer() const
 
 zp_bool zpMeshRendererComponent::hasMaterialOverride() const
 {
-	return m_hasMaterialOverride;
+	return false; //m_hasMaterialOverride;
 }
 void zpMeshRendererComponent::setMaterialOverride( const zp_char* materialFile )
 {
-	m_hasMaterialOverride = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_materialOverride );
-	ZP_ASSERT_WARN( m_hasMaterialOverride, "Unable to load material %s", materialFile );
+	//m_hasMaterialOverride = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_materials );
+	//ZP_ASSERT_WARN( m_hasMaterialOverride, "Unable to load material %s", materialFile );
 }
 void zpMeshRendererComponent::resetMaterialOverride()
 {
-	m_materialOverride.release();
-	m_hasMaterialOverride = false;
+	
+
+	//m_materials.release();
+	//m_hasMaterialOverride = false;
 }
 
 void zpMeshRendererComponent::onCreate() {}
 void zpMeshRendererComponent::onInitialize() {}
-void zpMeshRendererComponent::onDestroy() {}
+void zpMeshRendererComponent::onDestroy()
+{
+	m_materials.foreach( []( zpMaterialResourceInstance& mat ) { mat.release(); } );
+	m_materials.destroy();
+}
 
 void zpMeshRendererComponent::onUpdate( zp_float deltaTime, zp_float realTime ) {}
 void zpMeshRendererComponent::onSimulate() {}
