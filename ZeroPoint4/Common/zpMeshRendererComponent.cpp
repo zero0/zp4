@@ -18,22 +18,18 @@ zpMeshRendererComponent::zpMeshRendererComponent( zpObject* obj, const zpBison::
 	const zpBison::Value& material = def[ "Material" ];
 	if( material.isString() )
 	{
-		m_materials.reserve( 1 );
-
 		const zp_char* materialFile = material.asCString();
-		ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_materials.pushBackEmpty() );
+		ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_material );
 		ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
 	}
-	else if( material.isArray() && material.isEmpty() )
-	{
-		m_materials.reserve( material.size() );
-
-		material.foreachArray( [ this, &ok ]( zpBison::Value& mat ) {
-			const zp_char* materialFile = mat.asCString();
-			ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_materials.pushBackEmpty() );
-			ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
-		} );
-	}
+	//else if( material.isArray() && material.isEmpty() )
+	//{
+	//	material.foreachArray( [ this, &ok ]( zpBison::Value& mat ) {
+	//		const zp_char* materialFile = mat.asCString();
+	//		ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_material );
+	//		ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
+	//	} );
+	//}
 }
 zpMeshRendererComponent::~zpMeshRendererComponent() {}
 
@@ -44,7 +40,7 @@ void zpMeshRendererComponent::render( zpRenderingContext* i )
 	const zpMatrix4f& transform = attachment->getWorldTransform();
 
 	// draw mesh
-	i->drawMesh( m_layer, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, transform, m_materials.begin() );
+	i->drawMesh( m_layer, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, transform, &m_material );
 }
 
 void zpMeshRendererComponent::setRenderLayer( zp_uint layer )
@@ -77,8 +73,10 @@ void zpMeshRendererComponent::onCreate() {}
 void zpMeshRendererComponent::onInitialize() {}
 void zpMeshRendererComponent::onDestroy()
 {
-	m_materials.foreach( []( zpMaterialResourceInstance& mat ) { mat.release(); } );
-	m_materials.destroy();
+	m_material.release();
+	m_mesh.release();
+	//m_materials.foreach( []( zpMaterialResourceInstance& mat ) { mat.release(); } );
+	//m_materials.destroy();
 }
 
 void zpMeshRendererComponent::onUpdate( zp_float deltaTime, zp_float realTime ) {}

@@ -212,8 +212,14 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	zp_int exitCode = 0;
 	zp_printfln( "App size %d", sizeof( zpApplication ) );
 
-	zpMemorySystem::getInstance()->initialize( ZP_MEMORY_MB( 10 ) );
+	zpMemorySystem* mem = zpMemorySystem::getInstance();
+	mem->initialize( ZP_MEMORY_MB( 10 ) );
 	{
+		void* t = mem->allocate( 2048 );
+		void* b = mem->allocate( 3 * 1024 );
+		mem->deallocate( t );
+		mem->deallocate( b );
+
 		bProtoDBPhase protoDBPhase;
 		bPhaseLoadWorld loadWorld;
 		bPlayPhase playPhase;
@@ -225,30 +231,32 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		cmdLine.split( ' ', args );
 
 		zpApplication* application = new zpApplication;
-		zpApplication& app = *application;
 
-		app.setConfigFilename( BLACKJACK_CONFIG );
-		app.setOptionsFilename( BLACKJACK_OPTIONS );
+		
+
+		// set config files
+		application->setConfigFilename( BLACKJACK_CONFIG );
+		application->setOptionsFilename( BLACKJACK_OPTIONS );
 
 		// add phases
-		app.addPhase( &protoDBPhase );
-		//app.addPhase( &loadWorld );
-		app.addPhase( &playPhase );
+		application->addPhase( &protoDBPhase );
+		//application->addPhase( &loadWorld );
+		application->addPhase( &playPhase );
 
 		// add states
-		app.addState( &editorState );
+		application->addState( &editorState );
 
 		// process command line
-		app.processCommandLine( args );
+		application->processCommandLine( args );
 		
 		// init, run, and shutdown
-		app.initialize();
-		app.run();
-		exitCode = app.shutdown();
+		application->initialize();
+		application->run();
+		exitCode = application->shutdown();
 
 		delete application;
 	}
-	zpMemorySystem::getInstance()->shutdown();
+	mem->shutdown();
 
 	return exitCode;
 }

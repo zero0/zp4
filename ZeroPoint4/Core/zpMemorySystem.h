@@ -7,8 +7,8 @@
 #define ZP_MEMORY_INCREMENT_SIZE	( 1 << ZP_MEMORY_INCREMENT_SHIFT )	// 64bit alignment
 #define ZP_MEMORY_INCREMENT_MASK	( ZP_MEMORY_INCREMENT_SIZE - 1 )
 #define ZP_MEMORY_ALIGN_SIZE( s )	( ( (s) + ZP_MEMORY_INCREMENT_SIZE ) & ( ~ZP_MEMORY_INCREMENT_MASK ) )
-//#define ZP_MEMORY_TABLE_INDEX( s )	ZP_MIN( ( (s) >> ZP_MEMORY_INCREMENT_SHIFT ), ( ZP_MEMORY_BLOCK_TABLE_SIZE - 1 ) )
-#define ZP_MEMORY_TABLE_INDEX( s )	( (s) % ZP_MEMORY_BLOCK_TABLE_SIZE )
+#define ZP_MEMORY_TABLE_INDEX( s )	ZP_MIN( ( (s) >> ZP_MEMORY_INCREMENT_SHIFT ), ( ZP_MEMORY_BLOCK_TABLE_SIZE - 1 ) )
+//#define ZP_MEMORY_TABLE_INDEX( s )	( (s) % ZP_MEMORY_BLOCK_TABLE_SIZE )
 #define ZP_MEMORY_TRACK_POINTERS	1
 #define ZP_MEMORY_SYSTEM_TRACKED_POINTERS	( 5 * 1024 )
 
@@ -33,12 +33,13 @@ private:
 	struct zpMemoryBlock
 	{
 		zp_uint size;
+		zp_uint alignedSize;
 		zpMemoryBlock* next;
 		zpMemoryBlock* prev;
 	};
 
-	void addBlock( zpMemoryBlock* block );
-	void removeBlock( zpMemoryBlock* block );
+	void addBlock( zpMemoryBlock** table, zpMemoryBlock* block );
+	void removeBlock( zpMemoryBlock** table, zpMemoryBlock* block );
 
 	zp_uint m_totalMemory;
 
@@ -55,6 +56,7 @@ private:
 	zp_byte* m_alignedMemory;
 
 	zpMemoryBlock* m_blockTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
+	zpMemoryBlock* m_freeTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
 
 	static zpMemorySystem s_memory;
 };

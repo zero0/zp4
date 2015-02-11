@@ -32,7 +32,7 @@ private:
 	zp_uint m_layer;
 
 	zpMeshResourceInstance m_mesh;
-	zpArrayList< zpMaterialResourceInstance > m_materials;
+	zpMaterialResourceInstance m_material;
 };
 
 

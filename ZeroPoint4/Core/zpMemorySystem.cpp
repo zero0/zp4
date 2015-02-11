@@ -78,24 +78,26 @@ void* zpMemorySystem::allocate( zp_uint size )
 	++m_numAllocs;
 	m_memAllocated += size;
 	m_memUsed += size;
-	void* ptr = zp_malloc( size + sizeof( zp_uint ) );
-	zp_uint* i = (zp_uint*)ptr;
-	*i = size;
+	//void* ptr = zp_malloc( size + sizeof( zp_uint ) );
+	//zp_uint* i = (zp_uint*)ptr;
+	//*i = size;
 #if ZP_MEMORY_TRACK_POINTERS
-	m_allocedPointers.pushBack( ptr );
-	m_stackTraces.pushBackEmpty();
+	//m_allocedPointers.pushBack( ptr );
+	//m_stackTraces.pushBackEmpty();
 #endif
-	return (void*)( i + 1 );
+	//return (void*)( i + 1 );
 
 	zp_uint alignedSize = ZP_MEMORY_ALIGN_SIZE( size + sizeof( zpMemoryBlock ) );
 
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( alignedSize );
-	zpMemoryBlock* freeBlock = m_blockTable[ index ];
+	zpMemoryBlock* freeBlock = m_freeTable[ index ];
+
+	// if a free block was not found, find the next largest block to allocate from
 	if( freeBlock == ZP_NULL )
 	{
 		for( zp_uint i = ZP_MEMORY_BLOCK_TABLE_SIZE - 1; i != 0 ; --i )
 		{
-			freeBlock = m_blockTable[ i ];
+			freeBlock = m_freeTable[ i ];
 			if( freeBlock != ZP_NULL )
 			{
 				break;
@@ -104,24 +106,41 @@ void* zpMemorySystem::allocate( zp_uint size )
 	}
 
 	zpMemoryBlock* block = ZP_NULL;
-	if( freeBlock->size <= alignedSize )
+	// if the free block size can fit the aligned size, use the block
+	if( freeBlock->alignedSize <= alignedSize )
 	{
+		// remove the block from the free list since it will be used
+		removeBlock( m_freeTable, freeBlock );
+
+		// store block and resize
 		block = freeBlock;
+		block->size = size;
+		block->alignedSize = alignedSize;
 	}
 	else
 	{
-		freeBlock->size -= alignedSize;
+		// remove the block from the free list
+		removeBlock( m_freeTable, freeBlock );
 
+		// decrease block size
+		freeBlock->alignedSize -= alignedSize;
+		freeBlock->size -= size;
+
+		// re-add block to free table (could go into different bucket)
+		addBlock( m_freeTable, freeBlock );
+
+		// find new location for memory
 		zp_byte* memory = (zp_byte*)freeBlock;
-		memory += freeBlock->size;
+		memory += freeBlock->alignedSize;
 
+		// cast memory as block
 		block = reinterpret_cast<zpMemoryBlock*>( memory );
-		block->size = alignedSize;
-	
-		addBlock( block );
+		block->size = size;
+		block->alignedSize = alignedSize;
 	}
-	
-	m_memAllocated += alignedSize;
+
+	// move free table to used table
+	addBlock( m_blockTable, block );
 
 	return (void*)( block + 1 );
 }
@@ -135,58 +154,71 @@ void zpMemorySystem::deallocate( void* ptr )
 	}
 
 	++m_numDeallocs;
-	zp_uint* i = (zp_uint*)ptr;
-	--i;
+	//zp_uint* i = (zp_uint*)ptr;
+	//--i;
 
 #if ZP_MEMORY_TRACK_POINTERS
-	zp_int p = m_allocedPointers.indexOf( i );
-	ZP_ASSERT_WARN( p != -1, "Unknown allocation being deallocated" );
-	if( p < 0 )
-	{
-		--i;
-		p = m_allocedPointers.indexOf( i );
-		ZP_ASSERT_WARN( p != -1, "Another unknown allocation being deallocated" );
-		printAllocatedMemoryStackTrack( p );
-	}
-	m_allocedPointers.erase( p );
-	m_stackTraces.erase( p );
+	//zp_int p = m_allocedPointers.indexOf( i );
+	//ZP_ASSERT_WARN( p != -1, "Unknown allocation being deallocated" );
+	//if( p < 0 )
+	//{
+	//	zp_printfln( "Unknown allocation size %d", *i );
+	//
+	//	--i;
+	//	p = m_allocedPointers.indexOf( i );
+	//	ZP_ASSERT_WARN( p != -1, "Another unknown allocation being deallocated" );
+	//
+	//	zp_printfln( "Another unknown allocation size %d", *i );
+	//
+	//	printAllocatedMemoryStackTrack( p );
+	//}
+	//m_allocedPointers.erase( p );
+	//m_stackTraces.erase( p );
 #endif
 
-	m_memDeallocated += *i;
-	m_memUsed -= *i;
+	//m_memDeallocated += *i;
+	//m_memUsed -= *i;
 
-	zp_free( i );
-	return;
+	//zp_free( i );
+	//return;
 
 	zpMemoryBlock* block = ( reinterpret_cast<zpMemoryBlock*>( ptr ) - 1 );
 
 	m_memDeallocated += block->size;
+	m_memUsed -= block->size;
+
+	// remove block from used table
+	removeBlock( m_blockTable, block );
+
+	// add block to free table
+	addBlock( m_freeTable, block );
+
+	return;
 
 	zpMemoryBlock* next = block->next;
 	if( next > block )
 	{
-		removeBlock( next );
+		removeBlock( m_freeTable, next );
 
 		block->size += next->size;
-		block->next = next->next;
-		block->next->prev = block;
+		block->alignedSize += next->alignedSize;
+
+		removeBlock( m_freeTable, block );
+
+		addBlock( m_freeTable, block );
 	}
 
 	zpMemoryBlock* prev = block->prev;
-	if( prev )
+	if( prev < block )
 	{
-		if( prev < block )
-		{
-			removeBlock( prev );
+		removeBlock( m_freeTable, prev );
 
-			prev->size += block->size;
-			prev->next = block->next;
-			prev->next->prev = prev;
+		prev->size += block->size;
+		prev->alignedSize += block->alignedSize;
 
-			block = prev;
-		}
+		removeBlock( m_freeTable, block );
 
-		addBlock( prev );
+		addBlock( m_freeTable, prev );
 	}
 }
 #endif
@@ -216,8 +248,8 @@ void zpMemorySystem::initialize( zp_uint size )
 
 	zpStackTrace::Initialize();
 
-	return;
 	zp_zero_memory_array( m_blockTable );
+	zp_zero_memory_array( m_freeTable );
 
 	zp_uint paddedSize = ZP_MEMORY_ALIGN_SIZE( size );
 	paddedSize += ZP_MEMORY_INCREMENT_SIZE + sizeof( zpMemoryBlock );
@@ -231,11 +263,10 @@ void zpMemorySystem::initialize( zp_uint size )
 	m_alignedMemory = m_allMemory + distance;
 	
 	zpMemoryBlock* block = reinterpret_cast<zpMemoryBlock*>( m_alignedMemory );
-	block->size = paddedSize;
-	block->next = ZP_NULL;
-	block->prev = ZP_NULL;
+	block->size = m_totalMemory;
+	block->alignedSize = paddedSize;
 
-	addBlock( block );
+	addBlock( m_freeTable, block );
 }
 void zpMemorySystem::shutdown()
 {
@@ -259,50 +290,55 @@ void zpMemorySystem::shutdown()
 	m_totalMemory = 0;
 }
 
-void zpMemorySystem::addBlock( zpMemoryBlock* block )
+void zpMemorySystem::addBlock( zpMemoryBlock** table, zpMemoryBlock* block )
 {
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
-	zpMemoryBlock* mem = m_blockTable[ index ];
+	zpMemoryBlock* mem = table[ index ];
 
-	if( mem != ZP_NULL )
+	if( mem )
 	{
-		block->next = mem;
-		block->prev = mem->prev;
-		if( block->prev )
+		// if block is less than the head size, push back
+		if( block->size < mem->size )
 		{
-			block->prev->next = block;
+			block->next = mem;
+			block->prev = mem->prev;
 		}
-		mem->prev = block;
+		// otherwise, push front and assign head since it's now the larges block
+		else
+		{
+			block->next = mem->next;
+			block->prev = mem;
 
-		if( mem->size < block->size )
-		{
-			m_blockTable[ index ] = block;
+			table[ index ] = block;
 		}
+		
+		block->next->prev = block;
+		block->prev->next = block;
 	} 
 	else
 	{
-		block->next = ZP_NULL;
-		block->prev = ZP_NULL;
+		block->next = block;
+		block->prev = block;
 
-		m_blockTable[ index ] = block;
+		table[ index ] = block;
 	}
 }
-void zpMemorySystem::removeBlock( zpMemoryBlock* block )
+void zpMemorySystem::removeBlock( zpMemoryBlock** table, zpMemoryBlock* block )
 {
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
 
 	block->prev->next = block->next;
 	block->next->prev = block->prev;
 
-	if( block == m_blockTable[ index ] )
+	if( block == table[ index ] )
 	{
 		if( block != block->next )
 		{
-			m_blockTable[ index ] = block->next;
+			table[ index ] = block->next;
 		}
 		else
 		{
-			m_blockTable[ index ] = ZP_NULL;
+			table[ index ] = ZP_NULL;
 		}
 	}
 }
