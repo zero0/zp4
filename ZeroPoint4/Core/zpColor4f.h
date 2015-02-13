@@ -66,6 +66,8 @@ public:
 	zpPackedColor();
 	explicit zpPackedColor( zpPackedColorType argb );
 	explicit zpPackedColor( const zpColor4f& color );
+	zpPackedColor( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b );
+	zpPackedColor( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b, zpPackedColorPartType a );
 	zpPackedColor( const zpPackedColor& color );
 	~zpPackedColor();
 

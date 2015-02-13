@@ -213,13 +213,8 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	zp_printfln( "App size %d", sizeof( zpApplication ) );
 
 	zpMemorySystem* mem = zpMemorySystem::getInstance();
-	mem->initialize( ZP_MEMORY_MB( 10 ) );
+	mem->initialize( ZP_MEMORY_MB( 5 ) );
 	{
-		void* t = mem->allocate( 2048 );
-		void* b = mem->allocate( 3 * 1024 );
-		mem->deallocate( t );
-		mem->deallocate( b );
-
 		bProtoDBPhase protoDBPhase;
 		bPhaseLoadWorld loadWorld;
 		bPlayPhase playPhase;
@@ -231,8 +226,6 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 		cmdLine.split( ' ', args );
 
 		zpApplication* application = new zpApplication;
-
-		
 
 		// set config files
 		application->setConfigFilename( BLACKJACK_CONFIG );

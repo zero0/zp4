@@ -91,6 +91,7 @@ public:
 	zp_int writeFormat( const zp_char* format, ... );
 	zp_int writeBuffer( const zpStringBuffer& buffer );
 	zp_int writeBuffer( const zpDataBuffer& buffer );
+	zp_int writeBuffer( const void* data, zp_uint size );
 
 	template<typename T>
 	zp_int writeData( const T& value )

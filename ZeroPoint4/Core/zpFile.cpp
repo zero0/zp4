@@ -625,6 +625,18 @@ zp_int zpFile::writeBuffer( const zpDataBuffer& buffer )
 	return count;
 }
 
+zp_int zpFile::writeBuffer( const void* data, zp_uint size )
+{
+	zp_int count = 0;
+
+	if( m_file )
+	{
+		count = fwrite( data, sizeof( zp_byte ), size, (FILE*)m_file );
+	}
+
+	return count;
+}
+
 void zpFile::flush()
 {
 	if( m_file )

@@ -184,9 +184,17 @@ zpPackedColor::zpPackedColor( zpPackedColorType argb )
 {}
 zpPackedColor::zpPackedColor( const zpColor4f& color )
 	: m_argb( 0 )
-{}
+{
+	fromColor4f( color );
+}
 zpPackedColor::zpPackedColor( const zpPackedColor& color )
 	: m_argb( color.m_argb )
+{}
+zpPackedColor::zpPackedColor( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b )
+	: m_argb( ( 0xFF << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b ) )
+{}
+zpPackedColor::zpPackedColor( zpPackedColorPartType r, zpPackedColorPartType g, zpPackedColorPartType b, zpPackedColorPartType a )
+	: m_argb( ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b ) )
 {}
 zpPackedColor::~zpPackedColor()
 {}

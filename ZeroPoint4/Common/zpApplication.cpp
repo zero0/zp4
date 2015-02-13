@@ -618,6 +618,10 @@ void zpApplication::handleInput()
 	{
 		m_displayStats.toggle( ZP_APPLICATION_STATS_UPDATE );
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F8 ) )
+	{
+		zpMemorySystem::getInstance()->takeMemorySnapshot( m_timer.getTime(), ZP_MEMORY_KB( 2.5f ) );
+	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
 	{
 		zp_bool wasSet = m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS );

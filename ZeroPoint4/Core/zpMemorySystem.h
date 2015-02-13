@@ -27,6 +27,8 @@ public:
 	void printAllAllocatedMemoryStackTrace();
 	void printAllocatedMemoryStackTrack( zp_int index );
 
+	void takeMemorySnapshot( zp_long currentTime, zp_uint strideInByts );
+
 private:
 	zpMemorySystem();
 
@@ -42,6 +44,7 @@ private:
 	void removeBlock( zpMemoryBlock** table, zpMemoryBlock* block );
 
 	zp_uint m_totalMemory;
+	zp_uint m_totalAlignedMemory;
 
 	zp_uint m_numAllocs;
 	zp_uint m_numDeallocs;
