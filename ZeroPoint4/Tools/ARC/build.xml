@@ -12,7 +12,7 @@
 	<property name="vc.sln" value="ZeroPoint4.sln" />
 
 	<property name="platform" value="x86" />
-	<property name="rendering" value="DX10" />
+	<property name="rendering" value="DX11" />
 	<property name="mode" value="Debug" />
 
 	<property name="base.dir" location="." />
@@ -29,11 +29,11 @@
 	<property name="world-compiler.exe" value="${exe.dir}/ObjectCompiler.exe" />
 
 	<property name="build-number.file" value="${ant.project.name}.buildnumber" />
-	
+
 	<property name="arc.tool.dir" value="${base.dir}/Tools/ARC" />
 	<property name="arc.src.dir" value="${arc.tool.dir}/src" />
 	<property name="arc.bin.dir" value="${arc.tool.dir}/bin" />
-	
+
 	<mapper id="shader.map" type="glob" from="*.shader" to="*.shaderb" />
 	<mapper id="material.map" type="glob" from="*.material" to="*.materialb" />
 	<mapper id="texture.map" type="glob" from="*.png" to="*.png" />
@@ -43,7 +43,7 @@
 	<mapper id="world.map" type="glob" from="*.world" to="*.worldb" />
 	<mapper id="script.map" type="glob" from="*.script" to="*.scriptb" />
 	<mapper id="sound.map" type="glob" from="*.wav" to="*.wav" />
-	
+
 	<fileset id="shader.files" dir="${assets.dir}" includes="**/*.shader" casesensitive="true" />
 	<fileset id="material.files" dir="${assets.dir}" includes="**/*.material" casesensitive="true" />
 	<fileset id="texture.files" dir="${assets.dir}" includes="**/*.png" casesensitive="true" />
@@ -53,9 +53,9 @@
 	<fileset id="world.files" dir="${assets.dir}" includes="**/*.world" casesensitive="true" />
 	<fileset id="script.files" dir="${assets.dir}" includes="**/*.script" casesensitive="true" />
 	<fileset id="sound.files" dir="${assets.dir}" includes="**/*.wav" casesensitive="true" />
-	
+
 	<fileset id="arc.src.files" dir="${arc.src.dir}" includes="**/*.java" casesensitive="true" />
-	
+
 	<target name="arc">
 		<javac srcdir="${arc.src.dir}" destdir="${arc.bin.dir}" includeAntRuntime="false">
 			<classpath>
@@ -73,7 +73,7 @@
             </classpath>
 		</java>
 	</target>
-	
+
 	<target name="usage">
 		<echo message="base = ${base.dir}" />
 		<echoproperties />
@@ -173,6 +173,7 @@
 		<apply executable="${shader-compiler.exe}" dir="${bin.dir}" dest="${out.dir}" force="true">
 			<arg value="${rendering}" />
 			<arg value="-Od" />
+			<arg value="-Ptxt" />
 			<srcfile />
 			<targetfile />
 			<fileset refid="shader.files" />
@@ -205,7 +206,7 @@
 			<mapper refid="mesh.map" />
 		</apply>
 	</target>
-	
+
 	<target name="compile-objects" depends="make-out-dir">
 		<!--<touch mkdirs="true">
 			<fileset refid="shader.files" />
@@ -218,7 +219,7 @@
 			<mapper refid="object.map" />
 		</apply>
 	</target>
-	
+
 	<target name="compile-worlds" depends="make-out-dir">
 		<!--<touch mkdirs="true">
 			<fileset refid="shader.files" />
@@ -239,7 +240,7 @@
 			<mapper refid="texture.map" />
 		</copy>
 	</target>
-	
+
 	<target name="compile-scripts" depends="make-out-dir">
 		<!-- for now just copy -->
 		<copy todir="${out.dir}">
@@ -255,7 +256,7 @@
 			<mapper refid="sound.map" />
 		</copy>
 	</target>
-	
+
 	<target name="compile-assets" depends="compile-json, compile-textures, compile-materials, compile-shaders, compile-meshes, compile-objects, compile-worlds, compile-scripts, compile-sounds">
 	</target>
 
