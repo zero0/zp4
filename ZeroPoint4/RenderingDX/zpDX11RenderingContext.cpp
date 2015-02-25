@@ -232,6 +232,9 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 	const zpDepthStencilStateImpl* depth = material->depth.getDepthStencilStateImpl();
 	m_context->OMSetDepthStencilState( depth ? depth->m_depthStencil : ZP_NULL, 0 );
 
+	const zpRasterStateImpl* raster = material->raster.getRasterStateImpl();
+	m_context->RSSetState( raster ? raster->m_raster : ZP_NULL );
+
 	const zpBufferImpl* b = material->globalVariables.getBufferImpl();
 	ID3D11Buffer* globalBuffer[1] = { b == ZP_NULL ? ZP_NULL : b->m_buffer };
 

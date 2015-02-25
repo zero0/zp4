@@ -45,6 +45,15 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 			pipeline->getRenderingEngine()->createDepthStencilState( m_resource.depth, depthDesc );
 		}
 
+		// load raster state for material
+		const zpBison::Value& raster = materialRoot[ "Raster" ];
+		if( !raster.isEmpty() )
+		{
+			zpRasterStateDesc rasterDesc;
+			pipeline->generateRasterStateDesc( raster, rasterDesc );
+			pipeline->getRenderingEngine()->createRasterState( m_resource.raster, rasterDesc );
+		}
+
 		//
 		// Load Shader slots
 		//

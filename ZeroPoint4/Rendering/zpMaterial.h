@@ -34,6 +34,7 @@ struct zpMaterial
 
 	zpBlendState blend;
 	zpDepthStencilState depth;
+	zpRasterState raster;
 
 	zpBuffer globalVariables; //per-material shader $Globals constant buffer
 	zpArrayList< zpMaterialGlobalVariable > globalVariablesDef;

@@ -27,12 +27,12 @@ void zpSkyBoxComponent::render( zpRenderingContext* i )
 	i->addVertex( zpVector4f( -1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 0, 1 ) );
 	i->addVertex( zpVector4f(  1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 0, 1 ) );
 	i->addVertex( zpVector4f(  1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 1, 1 ) );
-	 
+	
 	i->addVertex( zpVector4f(  1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 0, 1 ) );
 	i->addVertex( zpVector4f(  1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 1, 1 ) );
 	i->addVertex( zpVector4f( -1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 1, 1 ) );
 	i->addVertex( zpVector4f( -1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 0, 1 ) );
-
+	
 	i->addTriangleIndex( 0, 1, 2 ); //   1: face back
 	i->addTriangleIndex( 0, 2, 3 ); 
 	i->addTriangleIndex( 3, 2, 5 ); //   2: face right
@@ -45,6 +45,34 @@ void zpSkyBoxComponent::render( zpRenderingContext* i )
 	i->addTriangleIndex( 0, 6, 1 ); 
 	i->addTriangleIndex( 4, 5, 6 ); //   6: face front
 	i->addTriangleIndex( 4, 6, 7 ); 
+
+	//i->addVertex( zpVector4f( -1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 1, 1 ) );
+	//i->addVertex( zpVector4f( -1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 0, 1 ) );
+	//i->addVertex( zpVector4f(  1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 0, 1 ) );
+	//i->addVertex( zpVector4f(  1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 1, 1 ) );
+	//
+	//i->addVertex( zpVector4f( -1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 0, 1 ) );
+	//i->addVertex( zpVector4f( -1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 1, 1 ) );
+	//i->addVertex( zpVector4f(  1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 1, 1 ) );
+	//i->addVertex( zpVector4f(  1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 0, 1 ) );
+	//
+	//i->addTriangleIndex( 0, 1, 2 );
+	//i->addTriangleIndex( 0, 2, 3 );
+	//
+	//i->addTriangleIndex( 4, 6, 5 );
+	//i->addTriangleIndex( 4, 7, 6 );
+	//
+	//i->addTriangleIndex( 4, 5, 1 );
+	//i->addTriangleIndex( 4, 1, 0 );
+	//
+	//i->addTriangleIndex( 3, 2, 6 );
+	//i->addTriangleIndex( 3, 6, 7 );
+	//
+	//i->addTriangleIndex( 1, 5, 6 );
+	//i->addTriangleIndex( 1, 6, 2 );
+	//
+	//i->addTriangleIndex( 4, 0, 3 );
+	//i->addTriangleIndex( 4, 3, 7 );
 
 	i->endDrawImmediate();
 }
