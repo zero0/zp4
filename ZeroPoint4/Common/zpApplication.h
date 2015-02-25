@@ -194,6 +194,7 @@ private:
 	zp_bool m_shouldGarbageCollect;
 	zp_bool m_shouldReloadAllResources;
 	zp_bool m_isApplicationPaused;
+	zp_bool m_isApplicationStepped;
 
 	zp_int m_currentPhase;
 

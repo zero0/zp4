@@ -73,28 +73,32 @@ private:
 
 	enum zpParticleEffectShape : zp_byte
 	{
-		ZP_PARTICLE_EFFECT_SHAPE_SPHERE,
+		ZP_PARTICLE_EFFECT_SHAPE_SPHERE = 0,
 		ZP_PARTICLE_EFFECT_SHAPE_HEMISPHERE,
 		ZP_PARTICLE_EFFECT_SHAPE_CONE,
 		ZP_PARTICLE_EFFECT_SHAPE_BOX,
 
-		zpParticleEffectShape_Count,
+		zpParticleEffectShape_Count
 	};
 
 	enum zpParticleEffectRange : zp_byte
 	{
-		ZP_PARTICLE_EFFECT_RANGE_CONSTANT = 0x01,
-		ZP_PARTICLE_EFFECT_RANGE_RANDOM =   0x02,
-		ZP_PARTICLE_EFFECT_RANGE_LIFETIME = 0x04,
-		ZP_PARTICLE_EFFECT_RANGE_SPEED =    0x08,
+		ZP_PARTICLE_EFFECT_RANGE_CONSTANT = 0,
+		ZP_PARTICLE_EFFECT_RANGE_RANDOM,
+		ZP_PARTICLE_EFFECT_RANGE_LIFETIME,
+		ZP_PARTICLE_EFFECT_RANGE_SPEED,
+
+		zpParticleEffectRange_Count
 	};
 
 	enum zpParticleEffectState : zp_byte
 	{
-		ZP_PARTICLE_EFFECT_STATE_DISABLED,
+		ZP_PARTICLE_EFFECT_STATE_DISABLED = 0,
 		ZP_PARTICLE_EFFECT_STATE_STARTING,
 		ZP_PARTICLE_EFFECT_STATE_PLAYING,
 		ZP_PARTICLE_EFFECT_STATE_FINISHING,
+
+		zpParticleEffectState_Count
 	};
 
 	struct zpParticleEffect
@@ -124,6 +128,10 @@ private:
 		zp_float emitTime;
 		zp_float minEmitRate;
 		zp_float maxEmitRate;
+
+		zp_float flipbookSpeed;
+		zp_uint flipbookX;
+		zp_uint flipbookY;
 
 		zpParticleEffectRange scaleRange;
 		zpParticleEffectRange colorRange;

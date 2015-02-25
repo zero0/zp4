@@ -13,6 +13,7 @@ zpApplication::zpApplication()
 	, m_shouldGarbageCollect( false )
 	, m_shouldReloadAllResources( false )
 	, m_isApplicationPaused( false )
+	, m_isApplicationStepped( false )
 	, m_currentPhase( 0 )
 	, m_exitCode( 0 )
 	, m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
@@ -356,8 +357,10 @@ zp_int zpApplication::shutdown()
 
 void zpApplication::update()
 {
-	zp_float deltaTime = m_isApplicationPaused ? 0.f : m_timer.getDeltaSeconds();
+	zp_float deltaTime = m_isApplicationPaused && !m_isApplicationStepped ? 0.f : m_timer.getDeltaSeconds();
 	zp_float realTime = m_timer.getWallClockDeltaSeconds();
+	
+	m_isApplicationStepped = false;
 
 	updatePhase();
 
@@ -594,6 +597,10 @@ void zpApplication::handleInput()
 			pushState( m_editorStateName.str() );
 		}
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_RIGHT ) )
+	{
+		m_isApplicationStepped = true;
+	}
 	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_G ) )
 	{
 		garbageCollect();
@@ -750,7 +757,7 @@ void zpApplication::processFrame()
 			const zpArrayList< zpCamera* >& cameras = m_renderingPipeline.getUsedCameras( (zpCameraType)p );
 			cameras.foreach( [ i, this ]( const zpCamera* camera ) 
 			{
-				m_componentPoolParticleEmitter.render( i, camera );
+				if( camera->isActive() ) m_componentPoolParticleEmitter.render( i, camera );
 			} );
 		}
 		ZP_PROFILE_END( RENDER_PARTICLES );

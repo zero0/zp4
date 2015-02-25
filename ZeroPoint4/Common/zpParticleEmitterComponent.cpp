@@ -175,6 +175,34 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 		//}
 		i->setSortBias( effect->sortBias );
 
+		// setup UV rect
+		zpRectf uv( 0, 0, 1, 1 );
+
+		// if flipbook values set, calculate new UVs
+		if( effect->flipbookX != 0 && effect->flipbookY != 0 )
+		{
+			zp_uint index = zp_floor_to_int( effect->time * effect->flipbookSpeed );
+
+			index = index % ( effect->flipbookX * effect->flipbookY );
+
+			zpVector2f size( 1.f / effect->flipbookX, 1.f / effect->flipbookY );
+
+			zp_uint uIndex = index % effect->flipbookX;
+			zp_uint vIndex = index / effect->flipbookX;
+
+			zpVector2f offset( uIndex * size.getX(), vIndex * size.getY() );
+
+			uv.setPosition( offset );
+			uv.setSize( size );
+		}
+
+		// setup normals
+		//const zp_float n = 0.70711f;
+		//zpVector4f n0( -n, -n, n, 0 );
+		//zpVector4f n1( -n,  n, n, 0 );
+		//zpVector4f n2(  n, -n, n, 0 );
+		//zpVector4f n3(  n,  n, n, 0 );
+
 		zpParticle** p = effect->usedParticles.begin();
 		zpParticle** e = effect->usedParticles.end();
 		for( ; p != e; ++p )
@@ -189,20 +217,11 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 			zpVector4f p2(  1, -1, 0, 1 );
 			zpVector4f p3( -1, -1, 0, 1 );
 
+			// scale particles
 			zpMath::Mul( p0, p0, particle->scale );
 			zpMath::Mul( p1, p1, particle->scale );
 			zpMath::Mul( p2, p2, particle->scale );
 			zpMath::Mul( p3, p3, particle->scale );
-
-			// setup UV rect
-			zpRectf uv( 0, 0, 1, 1 );
-
-			// setup normals
-			//const zp_float n = 0.70711f;
-			//zpVector4f n0( -n, -n, n, 0 );
-			//zpVector4f n1( -n,  n, n, 0 );
-			//zpVector4f n2(  n, -n, n, 0 );
-			//zpVector4f n3(  n,  n, n, 0 );
 
 			// if billboard enabled, rotate towards camera
 			zpVector4f look, right, up;
@@ -368,23 +387,43 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 			zpMath::Div( sSpeed, sSpeed, sMaxSpeed );
 
 			// blend between start and end color based on life or speed
-			if( effect->colorRange & ZP_PARTICLE_EFFECT_RANGE_LIFETIME )
+			switch( effect->colorRange )
 			{
+			case ZP_PARTICLE_EFFECT_RANGE_CONSTANT:
+				particle->color = effect->startColor;
+				break;
+
+			case ZP_PARTICLE_EFFECT_RANGE_RANDOM:
+				zpColor4f::Lerp( particle->color, effect->startColor, effect->endColor, zpScalar( m_random->randomFloat( 0.f, 1.f ) ) );
+				break;
+
+			case ZP_PARTICLE_EFFECT_RANGE_LIFETIME:
 				zpColor4f::Lerp( particle->color, effect->startColor, effect->endColor, sLife );
-			}
-			if( effect->colorRange & ZP_PARTICLE_EFFECT_RANGE_SPEED )
-			{
+				break;
+
+			case ZP_PARTICLE_EFFECT_RANGE_SPEED:
 				zpColor4f::Lerp( particle->color, effect->startColor, effect->endColor, sSpeed );
+				break;
 			}
 
 			// blend between start and end scale based on life or speed
-			if( effect->scaleRange & ZP_PARTICLE_EFFECT_RANGE_LIFETIME )
+			switch( effect->scaleRange )
 			{
+			case ZP_PARTICLE_EFFECT_RANGE_CONSTANT:
+				particle->scale = effect->startScale;
+				break;
+
+			case ZP_PARTICLE_EFFECT_RANGE_RANDOM:
+				zpMath::Lerp( particle->scale, effect->startScale, effect->endScale, zpScalar( m_random->randomFloat( 0.f, 1.f ) ) );
+				break;
+
+			case ZP_PARTICLE_EFFECT_RANGE_LIFETIME:
 				zpMath::Lerp( particle->scale, effect->startScale, effect->endScale, sLife );
-			}
-			if( effect->scaleRange & ZP_PARTICLE_EFFECT_RANGE_SPEED )
-			{
+				break;
+
+			case ZP_PARTICLE_EFFECT_RANGE_SPEED:
 				zpMath::Lerp( particle->scale, effect->startScale, effect->endScale, sSpeed );
+				break;
 			}
 		}
 
@@ -456,6 +495,10 @@ zp_bool zpParticleEmitterComponent::createEffect( const zp_char* name, const zpB
 	effect.sortBias = (zp_ushort)effectDef[ "SortBias" ].asInt();
 	effect.minEmitRate = effectDef[ "MinEmitRate" ].asFloat();
 	effect.maxEmitRate = effectDef[ "MaxEmitRate" ].asFloat();
+
+	effect.flipbookSpeed = effectDef[ "FlipbookSpeed" ].asFloat();
+	effect.flipbookX = effectDef[ "FlipbookX" ].asInt();
+	effect.flipbookY = effectDef[ "FlipbookY" ].asInt();
 
 	effect.scaleRange = ZP_PARTICLE_EFFECT_RANGE_LIFETIME;
 	effect.colorRange = ZP_PARTICLE_EFFECT_RANGE_LIFETIME;
