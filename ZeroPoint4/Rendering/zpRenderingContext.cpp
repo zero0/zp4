@@ -35,6 +35,8 @@ void zpRenderingContext::setup( zpRenderingEngine* engine, zpRenderingContextImp
 	{
 		engine->createBuffer( m_immediateVertexBuffers.pushBackEmpty(), ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE );
 		engine->createBuffer( m_immediateIndexBuffers.pushBackEmpty(), ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_DYNAMIC, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, sizeof( zp_ushort ) );
+
+		m_renderingStats.pushBackEmpty();
 	}
 
 	m_currentVertexBuffer = &m_immediateVertexBuffers[ m_currentBufferIndex ];
@@ -50,6 +52,8 @@ void zpRenderingContext::destroy()
 
 	clearState();
 	flush();
+
+	m_renderingStats.clear();
 }
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture* const* targets, zpDepthStencilBuffer* depthStencilBuffer )
@@ -78,6 +82,9 @@ void zpRenderingContext::clearStencilBuffer( zpDepthStencilBuffer* depthStencilB
 void zpRenderingContext::clearState()
 {
 	m_renderContextImpl->clearState();
+
+	zpRenderingStats& stats = m_renderingStats[ m_currentBufferIndex ];
+	zp_zero_memory( &stats );
 }
 void zpRenderingContext::flush()
 {
@@ -647,9 +654,6 @@ void zpRenderingContext::fillBuffers()
 	
 	m_scratchVertexBuffer.reset();
 	m_scratchIndexBuffer.reset();
-
-	m_numTotalDrawCommands = 0;
-	m_numTotalVerticies = 0;
 }
 
 void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
@@ -658,18 +662,22 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 	for( zp_uint i = 0; i < zpRenderingQueue_Count; ++i )
 	{
 		m_filteredCommands[ i ].reset();
+		m_filteredCommands[ i ].reserve( 10 );
 	}
+
+	const zpFrustum& frustum = camera->getFrustum();
+	zpRenderingStats& stats = m_renderingStats[ m_currentBufferIndex ];
 
 	// filter all commands into layer buckets if camera is present
 	zpRenderingCommand* cmd = m_renderingCommands.begin();
 	zpRenderingCommand* end = m_renderingCommands.end();
 	for( ; cmd != end; ++cmd )
 	{
-		// if the command has no verts, don't add it
-		if( cmd->vertexCount == 0 ) continue;
+		stats.numDrawCommands[ cmd->queue ]++;
 
+		// if the command has no verts, don't add it
 		// if the camera does not support any layer the command is not, don't add it
-		if( ( layer & cmd->layer ) == 0 ) continue;
+		if( cmd->vertexCount == 0 || ( layer & cmd->layer ) == 0 ) continue;
 
 		// filter commands into buckets
 		switch( cmd->queue )
@@ -678,14 +686,16 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 		case ZP_RENDERING_QUEUE_SKYBOX:
 		case ZP_RENDERING_QUEUE_UI:
 		case ZP_RENDERING_QUEUE_UI_DEBUG:
+			stats.visibleDrawCommands[ cmd->queue ]++;
 			m_filteredCommands[ cmd->queue ].pushBack( cmd );
 			break;
 
 			// otherwise, sort and cull commands based on the camera and its frustum
 		default:
-			if( ZP_IS_COLLISION( camera->getFrustum(), cmd->boundingBox ) )
+			if( ZP_IS_COLLISION( frustum, cmd->boundingBox ) )
 			{
 				generateSortKeyForCommand( cmd, camera );
+				stats.visibleDrawCommands[ cmd->queue ]++;
 				m_filteredCommands[ cmd->queue ].pushBack( cmd );
 			}
 		}
@@ -739,6 +749,10 @@ void zpRenderingContext::processCommand( const zpRenderingCommand* cmd )
 
 void zpRenderingContext::finalizeCommands()
 {
+	zpRenderingStats& stats = m_renderingStats[ m_currentBufferIndex ];
+	stats.totalDrawCommands = m_renderingCommands.size();
+	stats.totalVerticies = m_immediateVertexSize;
+
 	m_renderingCommands.reset();
 
 	m_currentBufferIndex = ( m_currentBufferIndex + 1 ) % ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS;
@@ -833,6 +847,12 @@ void zpRenderingContext::endDrawFont()
 
 	endDrawImmediate();
 	m_currentFont = ZP_NULL;
+}
+
+const zpRenderingStats& zpRenderingContext::getPreviousFrameStats() const
+{
+	zp_uint index = ( ( ( (zp_int)m_currentBufferIndex ) - 1 ) + ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS ) % ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS;
+	return m_renderingStats[ index ];
 }
 
 void zpRenderingContext::generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera )

@@ -109,24 +109,29 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 		{
 			m_resource.materialTextures.reserve( matTextures.size() );
 			matTextures.foreachObject( [ this, pipeline, &textures ]( const zpBison::Value& key, const zpBison::Value& textureValue ) {
-				const zp_char* textureFile = textureValue[ "Texture" ].asCString();
+				zpString name( key.asCString() );
+				zp_int slot = textures.indexOf( name );
+				if( slot >= 0 )
+				{
+					const zp_char* textureFile = textureValue[ "Texture" ].asCString();
 
-				const zpBison::Value& textureOffset = textureValue[ "Offset" ];
-				const zpBison::Value& textureScale = textureValue[ "Scale" ];
-				const zpBison::Value& textureSampler = textureValue[ "Sampler" ];
+					const zpBison::Value& textureOffset = textureValue[ "Offset" ];
+					const zpBison::Value& textureScale = textureValue[ "Scale" ];
+					const zpBison::Value& textureSampler = textureValue[ "Sampler" ];
 
-				zpMaterialTexture& t = m_resource.materialTextures.pushBackEmpty();
-				t.name = key.asCString();
-				t.scaleOffset = zpVector4f( textureOffset[ 0 ].asFloat(), textureOffset[ 1 ].asFloat(), textureScale[ 0 ].asFloat(), textureScale[ 1 ].asFloat() );
+					zpMaterialTexture& t = m_resource.materialTextures.pushBackEmpty();
+					t.name = name;
+					t.scaleOffset = zpVector4f( textureOffset[ 0 ].asFloat(), textureOffset[ 1 ].asFloat(), textureScale[ 0 ].asFloat(), textureScale[ 1 ].asFloat() );
 
-				zp_bool ok = pipeline->getTextureContentManager()->getResource( textureFile, t.texture );
-				ZP_ASSERT( ok, "Failed to get texture %s", textureFile );
+					zp_bool ok = pipeline->getTextureContentManager()->getResource( textureFile, t.texture );
+					ZP_ASSERT( ok, "Failed to get texture %s", textureFile );
 
-				zpSamplerStateDesc desc;
-				pipeline->generateSamplerStateDesc( textureSampler, desc );
-				pipeline->getRenderingEngine()->createSamplerState( t.sampler, desc );
+					zpSamplerStateDesc desc;
+					pipeline->generateSamplerStateDesc( textureSampler, desc );
+					pipeline->getRenderingEngine()->createSamplerState( t.sampler, desc );
 
-				t.slot = textures.indexOf( t.name );
+					t.slot = slot;
+				}
 			} );
 		}
 

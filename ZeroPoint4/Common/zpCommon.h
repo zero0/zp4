@@ -28,6 +28,7 @@ class zpLightComponent;
 class zpCameraComponent;
 class zpMeshRendererComponent;
 class zpParticleEmitterComponent;
+class zpSkyBoxComponent;
 
 class zpRigidBodyComponent;
 class zpKinematicBodyComponent;
@@ -65,6 +66,7 @@ class zpOctreeNode;
 #include "zpCameraComponent.h"
 #include "zpMeshRendererComponent.h"
 #include "zpParticleEmitterComponent.h"
+#include "zpSkyBoxComponent.h"
 
 // Physics
 #include "zpRigidBodyComponent.h"

@@ -708,35 +708,43 @@ void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zp
 	zpTexture* const* rts = camera->getRenderTargets();
 	zpDepthStencilBuffer* d = camera->getDepthStencilBuffer();
 
+	// set render targets for camera
 	i->setRenderTarget( 0, camera->getNumRenderTargets(), rts, d );
-	if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_BEFORE_RENDER ) )
+
+	// clear camera
+	const zpFlag8& clearMode = camera->getClearMode();
+	if( clearMode.isAllMarked( ZP_CAMERA_CLEAR_MODE_BEFORE_RENDER ) )
 	{
-		if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH | ZP_CAMERA_CLEAR_MODE_STENCIL ) )
+		if( clearMode.isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH | ZP_CAMERA_CLEAR_MODE_STENCIL ) )
 		{
 			i->clearDepthStencilBuffer( d, camera->getDepthClear(), camera->getStencilClear() );
 		}
-		else if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH ) )
+		else if( clearMode.isAllMarked( ZP_CAMERA_CLEAR_MODE_DEPTH ) )
 		{
 			i->clearDepthBuffer( d, camera->getDepthClear() );
 		}
-		else if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_STENCIL ) )
+		else if( clearMode.isAllMarked( ZP_CAMERA_CLEAR_MODE_STENCIL ) )
 		{
 			i->clearStencilBuffer( d, camera->getStencilClear() );
 		}
 
-		if( camera->getClearMode().isAllMarked( ZP_CAMERA_CLEAR_MODE_COLOR ) )
+		if( clearMode.isAllMarked( ZP_CAMERA_CLEAR_MODE_COLOR ) )
 		{
 			i->clearRenderTarget( rts[0], camera->getClearColor() );
 		}
 	}
 
+	// if the camera needs to updated, update the camera data
 	if( camera->update() || m_prevCamera != camera )
 	{
 		m_prevCamera = camera;
 		i->update( cameraBuffer, &camera->getCameraBufferData(), sizeof( zpCameraBufferData ) );
 	}
+
+	// set camera constant buffer
 	i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_CAMERA, cameraBuffer );
 
+	// set viewport and scissor rect
 	i->setViewport( camera->getViewport() );
 	i->setScissorRect( camera->getClipRect() );
 }

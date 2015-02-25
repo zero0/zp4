@@ -12,6 +12,14 @@
 #define ZP_MEMORY_TRACK_POINTERS	1
 #define ZP_MEMORY_SYSTEM_TRACKED_POINTERS	( 5 * 1024 )
 
+struct zpMemoryBlock
+{
+	zp_uint size;
+	zp_uint alignedSize;
+	zpMemoryBlock* next;
+	zpMemoryBlock* prev;
+};
+
 class zpMemorySystem
 {
 public:
@@ -32,19 +40,12 @@ public:
 private:
 	zpMemorySystem();
 
-	struct zpMemoryBlock
-	{
-		zp_uint size;
-		zp_uint alignedSize;
-		zpMemoryBlock* next;
-		zpMemoryBlock* prev;
-	};
-
 	void addBlock( zpMemoryBlock** table, zpMemoryBlock* block );
 	void removeBlock( zpMemoryBlock** table, zpMemoryBlock* block );
 
 	zp_uint m_totalMemory;
 	zp_uint m_totalAlignedMemory;
+	zp_uint m_allocatedMemorySize;
 
 	zp_uint m_numAllocs;
 	zp_uint m_numDeallocs;

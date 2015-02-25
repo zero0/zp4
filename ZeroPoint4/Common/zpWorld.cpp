@@ -165,47 +165,62 @@ zp_float zpWorld::getLoadingProgress() const
 void zpWorld::createWorldObject( const zpBison::Value& def )
 {
 	zpObject* o;
-	const zp_char* objFile = def[ "Object" ].asCString();
-	o = m_application->getObjectContentManager()->createObject( objFile );
+	const zpBison::Value& obj = def[ "Object" ];
 
+	// if object defined in world, load external object
+	if( obj.isString() )
+	{
+		const zp_char* objFile = obj.asCString();
+		o = m_application->getObjectContentManager()->createObject( objFile );
+
+		// set the transform of the object that is loaded
+		const zpBison::Value& transform = def[ "Transform" ];
+		if( !transform.isEmpty() )
+		{
+			zpTransformComponent* t = o->getComponents()->getTransformComponent();
+			if( t != ZP_NULL )
+			{
+				const zpBison::Value& position = transform[ "Position" ];
+				const zpBison::Value& rotation = transform[ "Rotation" ];
+				const zpBison::Value& scale = transform[ "Scale" ];
+
+				// position
+				if( position.isArray() && !position.isEmpty() )
+				{
+					zpVector4f pos( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
+					t->setLocalPosition( pos );
+				}
+
+				// rotation
+				if( rotation.isArray() && !rotation.isEmpty() )
+				{
+					zpScalar yaw(   rotation[ 0 ].asFloat() );
+					zpScalar pitch( rotation[ 1 ].asFloat() );
+					zpScalar roll(  rotation[ 2 ].asFloat() );
+
+					zpQuaternion4f rot;
+					zpMath::SetEulerAngle( rot, yaw, pitch, roll );
+					t->setLocalRotation( rot );
+				}
+
+				// scale
+				if( scale.isArray() && !scale.isEmpty() )
+				{
+					zpVector4f scl( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
+					t->setLocalScale( scl );
+				}
+			}
+		}
+	}
+	// otherwise, load the object inline
+	else
+	{
+		o = m_application->getObjectContentManager()->createObject( def );
+	}
+	
+	// set the world if it does not need to be destroyed after load
 	if( !isFlagSet( ZP_WORLD_FLAG_DESTROY_AFTER_LOAD ) )
 	{
 		o->setWorld( this );
-	}
-
-	const zpBison::Value& transform = def[ "Transform" ];
-	if( !transform.isEmpty() )
-	{
-		const zpBison::Value& position = transform[ "Position" ];
-		const zpBison::Value& rotation = transform[ "Rotation" ];
-		const zpBison::Value& scale = transform[ "Scale" ];
-
-		zpTransformComponent* t = o->getComponents()->getTransformComponent();
-
-		// position
-		if( position.isArray() && !position.isEmpty() )
-		{
-			zpVector4f pos( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
-			t->setLocalPosition( pos );
-		}
-
-		// rotation
-		if( rotation.isArray() && !rotation.isEmpty() )
-		{
-			zpScalar yaw(   rotation[ 0 ].asFloat() );
-			zpScalar pitch( rotation[ 1 ].asFloat() );
-			zpScalar roll(  rotation[ 2 ].asFloat() );
-
-			zpQuaternion4f rot;
-			zpMath::SetEulerAngle( rot, yaw, pitch, roll );
-			t->setLocalRotation( rot );
-		}
-
-		// scale
-		if( scale.isArray() && !scale.isEmpty() )
-		{
-			zpVector4f scl( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
-			t->setLocalScale( scl );
-		}
 	}
 }

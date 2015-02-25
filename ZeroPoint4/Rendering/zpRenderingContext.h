@@ -2,6 +2,15 @@
 #ifndef ZP_RENDERING_CONTEXT
 #define ZP_RENDERING_CONTEXT
 
+struct zpRenderingStats
+{
+	zp_uint totalDrawCommands;
+	zp_uint totalVerticies;
+
+	zp_uint numDrawCommands[ zpRenderingQueue_Count ];
+	zp_uint visibleDrawCommands[ zpRenderingQueue_Count ];
+};
+
 class zpRenderingEngineImpl;
 class zpRenderingContextImpl;
 
@@ -143,6 +152,8 @@ public:
 
 	const zpArrayList< zpRenderingCommand* >& getFilteredCommands( zpRenderingQueue layer ) const { return m_filteredCommands[ layer ]; }
 
+	const zpRenderingStats& getPreviousFrameStats() const;
+
 private:
 	zpRenderingContext();
 
@@ -150,9 +161,6 @@ private:
 	void destroy();
 
 	void generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera );
-
-	zp_uint m_numTotalDrawCommands;
-	zp_uint m_numTotalVerticies;
 
 	zpRenderingContextImpl* m_renderContextImpl;
 	zpRenderingEngine* m_renderingEngine;
@@ -171,6 +179,8 @@ private:
 
 	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateVertexBuffers;
 	zpFixedArrayList< zpBuffer, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_immediateIndexBuffers;
+	
+	zpFixedArrayList< zpRenderingStats, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_renderingStats;
 
 	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingQueue_Count ];
 

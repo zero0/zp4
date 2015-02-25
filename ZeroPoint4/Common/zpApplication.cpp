@@ -618,6 +618,10 @@ void zpApplication::handleInput()
 	{
 		m_displayStats.toggle( ZP_APPLICATION_STATS_UPDATE );
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F4 ) )
+	{
+		m_displayStats.toggle( ZP_APPLICATION_STATS_RENDERING_CMDS );
+	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F8 ) )
 	{
 		zpMemorySystem::getInstance()->takeMemorySnapshot( m_timer.getTime(), ZP_MEMORY_KB( 2.5f ) );
@@ -728,6 +732,11 @@ void zpApplication::processFrame()
 	ZP_PROFILE_START( RENDER_FRAME );
 	{
 		zpRenderingContext* i = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
+
+		// render sky box
+		ZP_PROFILE_START( RENDER_SKYBOX );
+		m_componentPoolSkyBox.render( i );
+		ZP_PROFILE_END( RENDER_SKYBOX );
 
 		// individual component render
 		ZP_PROFILE_START( RENDER_MESHES );
@@ -972,14 +981,15 @@ void zpApplication::guiEditMode()
 }
 void zpApplication::onGUI()
 {
+	zpFixedStringBuffer< 64 > buff;
+
 	// draw FPS
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
 	{
 		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME, m_timer.getSecondsPerTick() );
-		zpFixedStringBuffer< 64 > fps;
-		fps << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
+		buff << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
 
-		m_gui.label( 24, fps.str(), zpColor4f( 1, 1, 1, 1 ) );
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 1, 1, 1 ) );
 	}
 
 	// draw rendering stats
@@ -992,7 +1002,6 @@ void zpApplication::onGUI()
 		zp_float renderParticlesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PARTICLES	, m_timer.getSecondsPerTick() );
 		zp_float renderPresentMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT		, m_timer.getSecondsPerTick() );
 		zp_float renderDebugMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER		, m_timer.getSecondsPerTick() );
-		zpFixedStringBuffer< 64 > buff;
 
 		zpRectf rect( 5, 5, 320, 200 );
 		m_gui.beginWindow( "Rendering", rect, rect );
@@ -1039,7 +1048,6 @@ void zpApplication::onGUI()
 		zp_float scriptUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float inputUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float audioUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE	, m_timer.getSecondsPerTick() );
-		zpFixedStringBuffer< 64 > buff;
 
 		zpRectf rect( 5, 5, 320, 230 );
 		m_gui.beginWindow( "Update", rect, rect );
@@ -1074,6 +1082,24 @@ void zpApplication::onGUI()
 
 		buff << "Audio    " << audioUpdateMs * 1000.f << " ms";
 		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		m_gui.endWindow();
+	}
+
+	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_RENDERING_CMDS ) )
+	{
+		const zpRenderingStats& stats = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext()->getPreviousFrameStats();
+
+		zpRectf rect( 5, 5, 320, 230 );
+		m_gui.beginWindow( "Rendering Stats", rect, rect );
+
+		buff << "Num Draw Cmds " << stats.totalDrawCommands;
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 1, 0, 1 ) );
+		buff.clear();
+
+		buff << "Total Verts   " << stats.totalVerticies;
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 1, 0, 1 ) );
 		buff.clear();
 
 		m_gui.endWindow();

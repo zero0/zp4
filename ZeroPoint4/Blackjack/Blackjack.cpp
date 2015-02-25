@@ -210,10 +210,30 @@ private:
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
 	zp_int exitCode = 0;
-	zp_printfln( "App size %d", sizeof( zpApplication ) );
+	zpRandom *d = zpRandom::getInstance();
 
 	zpMemorySystem* mem = zpMemorySystem::getInstance();
-	mem->initialize( ZP_MEMORY_MB( 5 ) );
+	mem->initialize( ZP_MEMORY_MB( 10 ) );
+
+#if 0
+	for( zp_int i = 0; i < 100; ++i )
+	{
+		void* a = mem->allocate( ZP_MEMORY_MB( d->randomFloat( 0.01f, 0.1f ) ) );
+		void* b = mem->allocate( ZP_MEMORY_MB( d->randomFloat( 0.01f, 0.1f ) ) );
+		void* c = mem->allocate( ZP_MEMORY_MB( d->randomFloat( 0.01f, 0.1f ) ) );
+
+		mem->deallocate( a );
+		mem->deallocate( c );
+		mem->deallocate( b );
+	}
+
+	mem->takeMemorySnapshot( 0, ZP_MEMORY_KB( 1 ) );
+
+
+
+
+	if( 0 )
+#endif
 	{
 		bProtoDBPhase protoDBPhase;
 		bPhaseLoadWorld loadWorld;

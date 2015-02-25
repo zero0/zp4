@@ -141,6 +141,9 @@
     <ClInclude Include="zpWidgetComponent.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="zpSkyBoxComponent.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="zpWidgetComponent.cpp">
       <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="zpSkyBoxComponent.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

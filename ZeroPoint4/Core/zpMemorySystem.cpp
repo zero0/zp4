@@ -1,42 +1,8 @@
 #include "zpCore.h"
 #include <malloc.h>
-//#include <new>
 
-#if ZP_USE_MEMORY_SYSTEM
-//void* operator new( zp_uint size ) {
-//	return zpMemorySystem::getInstance()->allocate( size );
-//}
-//void* operator new[]( zp_uint size ) {
-//	return zpMemorySystem::getInstance()->allocate( size );
-//}
-//
-//void operator delete( void* ptr ) {
-//	zpMemorySystem::getInstance()->deallocate( ptr );
-//}
-//void operator delete[]( void* ptr ) {
-//	zpMemorySystem::getInstance()->deallocate( ptr );
-//}
-#else
-
-#if ZP_USE_ALIGNMENT
-void* operator new( zp_uint size ) {
-	return zp_aligned_malloc( size, ZP_MALLOC_ALIGNMENT );
-}
-
-void operator delete( void* ptr ) {
-	zp_aligned_free( ptr );
-}
-#else
-void* operator new( zp_size size ) {
-	return zp_malloc( size );
-}
-
-void operator delete( void* ptr ) {
-	zp_free( ptr );
-}
-#endif
-
-#endif
+#define ZP_MEMORY_SYSTEM_START_CANARY	0xCAFEBABE
+#define ZP_MEMORY_SYSTEM_END_CANARY		0xDEADBEEF
 
 zpMemorySystem::zpMemorySystem()
 	: m_totalMemory( 0 )
@@ -96,24 +62,25 @@ void* zpMemorySystem::allocate( zp_uint size )
 			}
 		}
 	}
+	
+	ZP_ASSERT( freeBlock != ZP_NULL, "Unable to find free block of memory to use" );
+	//ZP_ASSERT( freeBlock->alignedSize > alignedSize, "Free block too small to use. Free block is %d, %d needed", freeBlock->alignedSize, alignedSize );
 
+	// remove the block from the free list since it will be used
+	removeBlock( m_freeTable, freeBlock );
+	
 	zpMemoryBlock* block = ZP_NULL;
 	// if the free block size can fit the aligned size, use the block
 	if( freeBlock->alignedSize <= alignedSize )
 	{
-		// remove the block from the free list since it will be used
-		removeBlock( m_freeTable, freeBlock );
-
 		// store block and resize
 		block = freeBlock;
 		block->size = size;
 		block->alignedSize = alignedSize;
 	}
+	// otherwise, decrease the size of the block and add it back to the free list for later use
 	else
 	{
-		// remove the block from the free list
-		removeBlock( m_freeTable, freeBlock );
-
 		// decrease block size
 		freeBlock->alignedSize -= alignedSize;
 		freeBlock->size -= size;
@@ -126,7 +93,7 @@ void* zpMemorySystem::allocate( zp_uint size )
 		memory += freeBlock->alignedSize;
 
 		// cast memory as block
-		block = reinterpret_cast<zpMemoryBlock*>( memory );
+		block = reinterpret_cast< zpMemoryBlock* >( memory );
 		block->size = size;
 		block->alignedSize = alignedSize;
 	}
@@ -154,7 +121,7 @@ void zpMemorySystem::deallocate( void* ptr )
 
 	++m_numDeallocs;
 
-	zpMemoryBlock* block = ( reinterpret_cast<zpMemoryBlock*>( ptr ) - 1 );
+	zpMemoryBlock* block = ( reinterpret_cast< zpMemoryBlock* >( ptr ) - 1 );
 
 #if ZP_MEMORY_TRACK_POINTERS
 	zp_int p = m_allocedPointers.indexOf( ptr );
@@ -175,7 +142,7 @@ void zpMemorySystem::deallocate( void* ptr )
 	return;
 
 	zpMemoryBlock* next = block->next;
-	if( next > block )
+	if( next && next > block )
 	{
 		removeBlock( m_freeTable, next );
 
@@ -187,18 +154,18 @@ void zpMemorySystem::deallocate( void* ptr )
 		addBlock( m_freeTable, block );
 	}
 
-	zpMemoryBlock* prev = block->prev;
-	if( prev < block )
-	{
-		removeBlock( m_freeTable, prev );
-
-		prev->size += block->size;
-		prev->alignedSize += block->alignedSize;
-
-		removeBlock( m_freeTable, block );
-
-		addBlock( m_freeTable, prev );
-	}
+	//zpMemoryBlock* prev = block->prev;
+	//if( prev < block )
+	//{
+	//	removeBlock( m_freeTable, prev );
+	//
+	//	prev->size += block->size;
+	//	prev->alignedSize += block->alignedSize;
+	//
+	//	removeBlock( m_freeTable, block );
+	//
+	//	addBlock( m_freeTable, prev );
+	//}
 }
 #endif
 
@@ -279,11 +246,14 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_uint strideInBy
 	*d++ = depth * 8;
 	*d++ = 0x24;
 
-	zp_memset( d, colorEmpty.getPackedColor(), imageSize );
+	// clear entire image
+	//writeColor( d, imageSize, colorEmpty );
+	zp_memset( d, 0, imageSize );
 
 	// write padding colors
 	writeColor( d, m_alignedMemory - m_allMemory, colorEmptyPadding );
 
+	// increment d to so offset is zero based
 	d += m_alignedMemory - m_allMemory;
 
 	// write free table
@@ -361,17 +331,18 @@ void zpMemorySystem::initialize( zp_uint size )
 	zp_zero_memory_array( m_freeTable );
 
 	m_totalAlignedMemory = ZP_MEMORY_ALIGN_SIZE( size );
-	m_totalAlignedMemory += ZP_MEMORY_INCREMENT_SIZE + sizeof( zpMemoryBlock );
+	m_allocatedMemorySize = m_totalAlignedMemory + ZP_MEMORY_INCREMENT_SIZE + sizeof( zpMemoryBlock );
 
-	m_allMemory = (zp_byte*)zp_malloc( m_totalAlignedMemory );
+	m_allMemory = (zp_byte*)zp_malloc( m_allocatedMemorySize + sizeof( zp_uint ) );
 #if ZP_DEBUG
-	zp_memset( m_allMemory, 0, m_totalAlignedMemory );
+	zp_memset( m_allMemory, 0, m_allocatedMemorySize );
+	*( (zp_uint*)( m_allMemory + m_allocatedMemorySize ) ) = ZP_MEMORY_SYSTEM_END_CANARY;
 #endif
-	zp_byte* memOffset = m_allMemory + sizeof( zpMemoryBlock );
-	zp_int distance = ZP_MEMORY_INCREMENT_SIZE - ( (zp_int)memOffset & ZP_MEMORY_INCREMENT_MASK );
+
+	zp_int distance = ZP_MEMORY_INCREMENT_SIZE - ( (zp_int)m_allMemory & ZP_MEMORY_INCREMENT_MASK );
 	m_alignedMemory = m_allMemory + distance;
-	
-	zpMemoryBlock* block = reinterpret_cast<zpMemoryBlock*>( m_alignedMemory );
+
+	zpMemoryBlock* block = reinterpret_cast< zpMemoryBlock* >( m_alignedMemory );
 	block->size = m_totalMemory;
 	block->alignedSize = m_totalAlignedMemory;
 
@@ -379,6 +350,7 @@ void zpMemorySystem::initialize( zp_uint size )
 }
 void zpMemorySystem::shutdown()
 {
+	ZP_ASSERT( *( (zp_uint*)( m_allMemory + m_allocatedMemorySize ) ) == ZP_MEMORY_SYSTEM_END_CANARY, "Buffer overrun" );
 
 #if ZP_MEMORY_TRACK_POINTERS
 	if( !m_stackTraces.isEmpty() )
@@ -399,30 +371,72 @@ void zpMemorySystem::shutdown()
 	m_totalMemory = 0;
 }
 
+void _insertAfter( zpMemoryBlock* block, zpMemoryBlock* newBlock )
+{
+	newBlock->next = block->next;
+	newBlock->prev = block;
+
+	block->next->prev = newBlock;
+	block->prev->next = newBlock;
+}
+
+void _insertBefore( zpMemoryBlock* node, zpMemoryBlock* newBlock )
+{
+	_insertAfter( node->prev, newBlock );
+}
+
 void zpMemorySystem::addBlock( zpMemoryBlock** table, zpMemoryBlock* block )
 {
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
-	zpMemoryBlock* mem = table[ index ];
+	zpMemoryBlock* tableHead = table[ index ];
 
-	if( mem )
+	if( tableHead )
 	{
-		// if block is less than the head size, push back
-		if( block->size < mem->size )
+		// if the block is larger than the top, insert front
+		if( block->alignedSize > tableHead->alignedSize )
 		{
+			_insertBefore( tableHead, block );
+
+			table[ index ] = block;
+		}
+		// otherwise, while there is a next point
+		else
+		{
+			zpMemoryBlock* h = tableHead;
+			zpMemoryBlock* n = tableHead->next;
+			while( n != tableHead )
+			{
+				if( block->alignedSize > n->alignedSize )
+				{
+					break;
+				}
+				h = n;
+				n = n->next;
+			}
+			_insertAfter( h, block );
+		}
+
+		/*
+		// if block is less than the head size, push back
+		if( block->alignedSize <= mem->alignedSize )
+		{
+			zpMemoryBlock* m = mem;
+			while( block->alignedSize < )
 			block->next = mem;
-			block->prev = mem->prev;
+			//block->prev = mem->prev;
 		}
 		// otherwise, push front and assign head since it's now the larges block
 		else
 		{
 			block->next = mem->next;
-			block->prev = mem;
+			//block->prev = mem;
 
 			table[ index ] = block;
 		}
 		
-		block->next->prev = block;
-		block->prev->next = block;
+		//block->next->prev = block;
+		//block->prev->next = block;
+		*/
 	} 
 	else
 	{
@@ -436,8 +450,8 @@ void zpMemorySystem::removeBlock( zpMemoryBlock** table, zpMemoryBlock* block )
 {
 	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
 
-	block->prev->next = block->next;
-	block->next->prev = block->prev;
+	//block->prev->next = block->next;
+	//block->next->prev = block->prev;
 
 	if( block == table[ index ] )
 	{
