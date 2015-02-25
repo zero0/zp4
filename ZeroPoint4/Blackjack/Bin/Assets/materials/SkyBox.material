@@ -1,0 +1,26 @@
+{
+    "Shader" : "shaders/SkyBox.shaderb",
+    "Textures" :
+    {
+        "_MainTex" :
+        {
+            "Texture" : "textures/test.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        }
+    },
+    "Globals" :
+    {
+
+    },
+    "Depth" :
+    {
+        "DepthEnabled" : true,
+        "DepthWriteMaskAll" : false
+    },
+    "Raster" :
+    {
+        "CullMode" : "Front"
+    }
+}

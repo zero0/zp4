@@ -2,6 +2,18 @@
     "Name": "physics world",
     "Objects": [
         {
+            "Name": "skybox",
+            "Tags": [],
+            "Layer": "Default",
+            "IsStatic": true,
+            "Components":
+            {
+                "SkyBox": {
+                    "Material" : "materials/SkyBox.materialb"
+                }
+            }
+        },
+        {
             "Object": "objects/plane.objectb",
             "Transform": {
                 "Position": [

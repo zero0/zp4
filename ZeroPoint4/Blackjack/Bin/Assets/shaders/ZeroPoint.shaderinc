@@ -7,9 +7,9 @@ ZP_CBUFFER_START( Camera, 0 )
     float4x4 viewProjection;
     float4x4 invViewProjection;
 
-    float4 up;
-    float4 lookTo;
-    float4 position;
+    float4 cameraUp;
+    float4 cameraLookTo;
+    float4 cameraPosition;
 
     float zNear;
     float zFar;
