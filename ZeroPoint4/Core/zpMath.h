@@ -10,9 +10,11 @@
 #define ZP_PIOVER4	( 0.25f* ZP_PI ) 
 #define ZP_FLT_MAX	( 3.402823466e+38F )
 #define ZP_FLT_MIN	( 1.175494351e-38F )
+#define ZP_PIOVER180	( ZP_PI / 180.f )
+#define ZP_180OVERPI	( 180.f / ZP_PI )
 
-#define ZP_RAD_TO_DEG( r )	( ( (r) * 180.f ) * ZP_1OVERPI )
-#define ZP_DEG_TO_RAD( d )	( ( (d) * ZP_PI ) / 180.0f )
+#define ZP_RAD_TO_DEG( r )	( (r) * ZP_180OVERPI )
+#define ZP_DEG_TO_RAD( d )	( (d) * ZP_PIOVER180 )
 
 #define ZP_MIN( a, b )	( ( (a) < (b) ) ? (a) : (b) )
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
@@ -185,25 +187,10 @@ namespace zpMath
 
 	ZP_FORCE_INLINE void Cmp( zp_int& s, const zpVector4f& a, const zpVector4f& b );
 
-	ZP_FORCE_INLINE zp_int Cmp( const zpScalar& a, const zpScalar& b )
-	{
-		zp_int s;
-		Cmp( s, a, b );
-		return s;
-	}
-	ZP_FORCE_INLINE zp_int Cmp0( const zpScalar& a )
-	{
-		zp_int s;
-		Cmp0( s, a );
-		return s;
-	}
+	ZP_FORCE_INLINE zp_int Cmp( const zpScalar& a, const zpScalar& b );
+	ZP_FORCE_INLINE zp_int Cmp0( const zpScalar& a );
 
-	ZP_FORCE_INLINE zp_int Cmp( const zpVector4f& a, const zpVector4f& b )
-	{
-		zp_int s;
-		Cmp( s, a, b );
-		return s;
-	}
+	ZP_FORCE_INLINE zp_int Cmp( const zpVector4f& a, const zpVector4f& b );
 
 	ZP_FORCE_INLINE void LookAtLH( zpMatrix4f& s, const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up );
 	ZP_FORCE_INLINE void LookAtRH( zpMatrix4f& s, const zpVector4f& eye, const zpVector4f& direction, const zpVector4f& up );
@@ -278,6 +265,8 @@ namespace zpMath
 #include "zpMatrix4Fpu.inl"
 #include "zpQuaterionFpu.inl"
 #endif
+
+#include "zpMath.inl"
 
 #endif
 

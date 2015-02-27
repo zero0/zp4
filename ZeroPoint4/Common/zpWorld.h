@@ -66,7 +66,7 @@ private:
 	zpWorldResourceInstance m_world;
 };
 
-class zpWorldContentManager : public zpContentManager< zpWorldResource, zpWorldResourceInstance, zpWorldContentManager, 4 >, private zpContentPool< zpWorld, 4 >
+class zpWorldContentManager : public zpContentManager< zpWorldResource, zpWorldResourceInstance, zpWorldContentManager, 4 >, public zpContentPool< zpWorld, 4 >
 {
 public:
 	zpWorld* createWorld( const zp_char* filename, zp_bool destroyAfterLoad = true );

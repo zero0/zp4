@@ -2,7 +2,7 @@
 #ifndef ZP_VECTOR4F_H
 #define ZP_VECTOR4F_H
 
-ZP_ALIGN16 class zpVector4f
+class ZP_ALIGN16 zpVector4f
 {
 public:
 	ZP_FORCE_INLINE zpVector4f();

@@ -99,7 +99,7 @@ private:
 	zpObjectResourceInstance m_object;
 };
 
-class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 4 >, private zpContentPool< zpObject, 8 >
+class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 4 >, public zpContentPool< zpObject, 8 >
 {
 public:
 	zpObject* createObject();

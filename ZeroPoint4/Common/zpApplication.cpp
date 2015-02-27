@@ -169,6 +169,9 @@ void zpApplication::initialize()
 	m_renderingPipeline.getMeshContentManager()->setApplication( this );
 	m_renderingPipeline.getFontContentManager()->setApplication( this );
 	
+	zpMemorySystem* mem = zpMemorySystem::getInstance();
+	m_objectContent.setup( mem );
+	m_worldContent.setup( mem );
 
 	zp_bool ok;
 	ok = m_textContent.getResource( m_configFilename, m_appConfig );
@@ -231,6 +234,13 @@ void zpApplication::initialize()
 }
 void zpApplication::setup()
 {
+	zpMemorySystem* mem = zpMemorySystem::getInstance();
+
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp )		m_componentPool##cmp.setup( mem );
+#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
+
 	m_renderingPipeline.setup();
 	m_gui.setup();
 
@@ -320,6 +330,11 @@ void zpApplication::teardown()
 	m_renderingPipeline.teardown();
 	m_gui.teardown();
 
+#undef ZP_COMPONENT_DEF
+#define ZP_COMPONENT_DEF( cmp )		m_componentPool##cmp.teardown();
+#include "zpAllComponents.inl"
+#undef ZP_COMPONENT_DEF
+
 	garbageCollect();
 }
 zp_int zpApplication::shutdown()
@@ -330,6 +345,9 @@ zp_int zpApplication::shutdown()
 	m_allStates.clear();
 
 	runGarbageCollect();
+
+	m_objectContent.teardown();
+	m_worldContent.teardown();
 
 	m_renderingPipeline.shutdown();
 	m_physicsEngine.destroy();

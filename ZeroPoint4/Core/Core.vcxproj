@@ -178,11 +178,10 @@
     <None Include="zpBaseTypesFpu.inl" />
     <None Include="zpDelegate.inl" />
     <None Include="zpHashMap.inl" />
-    <None Include="zpIntegerFpu.inl" />
-    <None Include="zpIntegerSimd.inl" />
     <None Include="zpIntrusiveList.inl" />
     <None Include="zpLinkedList.inl" />
     <None Include="zpMap.inl" />
+    <None Include="zpMath.inl" />
     <None Include="zpMathFpu.inl" />
     <None Include="zpMathSimd.inl" />
     <None Include="zpMatrix4f.inl" />

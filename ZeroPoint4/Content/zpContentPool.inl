@@ -1,17 +1,39 @@
 template<typename T, zp_uint Count>
 zpContentPool<T, Count>::zpContentPool()
-{
-	zp_zero_memory_array( m_pool );
-	T* t = (T*)m_pool;
-
-	for( zp_uint i = 0; i < Count; ++i, ++t )
-	{
-		m_free.pushBack( t );
-	}
-}
+	: m_memory( ZP_NULL )
+{}
 template<typename T, zp_uint Count>
 zpContentPool<T, Count>::~zpContentPool()
 {}
+
+template<typename T, zp_uint Count>
+void zpContentPool<T, Count>::setup( zpMemorySystem* memory )
+{
+	for( zp_uint i = 0, imax = Count; i < imax; ++i )
+	{
+		T* t = (T*)memory->allocate( sizeof( T ) );
+		m_free.pushBack( t );
+	}
+
+	m_memory = memory;
+}
+
+template<typename T, zp_uint Count>
+void zpContentPool<T, Count>::teardown()
+{
+	ZP_ASSERT( m_used.isEmpty(), "Not all objects destroyed %d", m_used.size() );
+
+	T** b = m_free.begin();
+	T** e = m_free.end();
+	for( ; b != e; ++b )
+	{
+		T* t = *b;
+		m_memory->deallocate( t );
+	}
+
+	m_free.clear();
+	m_used.clear();
+}
 
 template<typename T, zp_uint Count> template<typename R>
 T* zpContentPool<T, Count>::create( const R& param )

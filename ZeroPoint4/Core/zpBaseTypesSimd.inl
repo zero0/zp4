@@ -3,13 +3,19 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
-struct zpScalar
+struct ZP_ALIGN16 zpScalar
 {
 	ZP_FORCE_INLINE zpScalar() {}
-	ZP_FORCE_INLINE explicit zpScalar( const zp_float x )
-		: m_x( _mm_set_ss( x ) )
+	ZP_FORCE_INLINE explicit zpScalar( const zp_float& x )
+		: m_x( _mm_set_ps1( x ) )
+	{}
+	ZP_FORCE_INLINE explicit zpScalar( zp_float&& x )
+		: m_x( _mm_set_ps1( x ) )
 	{}
 	ZP_FORCE_INLINE explicit zpScalar( const __m128& x )
+		: m_x( x )
+	{}
+	ZP_FORCE_INLINE explicit zpScalar( __m128&& x )
 		: m_x( x )
 	{}
 	ZP_FORCE_INLINE zpScalar( const zpScalar& x )
@@ -43,6 +49,16 @@ struct zpScalar
 	friend void zpMath::Mul( zpVector4f& s, const zpScalar& a, const zpVector4f& b );
 	friend void zpMath::Div( zpVector4f& s, const zpScalar& a, const zpVector4f& b );
 
+	friend void zpMath::Add( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	friend void zpMath::Sub( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	friend void zpMath::Mul( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+	friend void zpMath::Div( zpQuaternion4f& s, const zpQuaternion4f& a, const zpScalar& b );
+
+	friend void zpMath::Add( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	friend void zpMath::Sub( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	friend void zpMath::Mul( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+	friend void zpMath::Div( zpQuaternion4f& s, const zpScalar& a, const zpQuaternion4f& b );
+
 	friend void zpMath::Mul( zpMatrix4f& s, const zpScalar& a, const zpMatrix4f& b );
 
 	friend void zpMath::Madd( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& c );
@@ -51,12 +67,17 @@ struct zpScalar
 	friend void zpMath::Dot2( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
 	friend void zpMath::Dot3( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
 	friend void zpMath::Dot4( zpScalar& s, const zpVector4f& a, const zpVector4f& b );
+	friend void zpMath::Dot4( zpScalar& s, const zpQuaternion4f& a, const zpQuaternion4f& b );
 
 	friend void zpMath::LengthSquared2( zpScalar& s, const zpVector4f& a );
 	friend void zpMath::LengthSquared3( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::LengthSquared4( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::LengthSquared4( zpScalar& s, const zpQuaternion4f& a );
 
 	friend void zpMath::Length2( zpScalar& s, const zpVector4f& a );
 	friend void zpMath::Length3( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::Length4( zpScalar& s, const zpVector4f& a );
+	friend void zpMath::Length4( zpScalar& s, const zpQuaternion4f& a );
 
 	friend void zpMath::Abs( zpScalar& s, const zpScalar& a );
 	friend void zpMath::Neg( zpScalar& s, const zpScalar& a );
@@ -74,24 +95,23 @@ private:
 };
 
 
-struct zp_vec4
+struct ZP_ALIGN16 zp_vec4
 {
 	ZP_FORCE_INLINE zp_vec4()
 	{}
 	ZP_FORCE_INLINE zp_vec4( zp_float _x, zp_float _y, zp_float _z, zp_float _w )
-	{
-		m_xyxw = _mm_setr_ps( _x, _y, _z, _w );
-	}
+		: m_xyxw( _mm_setr_ps( _x, _y, _z, _w ) )
+	{}
 	ZP_FORCE_INLINE zp_vec4( const __m128& v )
 		: m_xyxw( v )
 	{}
 
-	operator const __m128&() const
+	ZP_FORCE_INLINE operator const __m128&() const
 	{
 		return m_xyxw;
 	}
 
-	template<int I>
+	template<zp_int I>
 	ZP_FORCE_INLINE zpScalar get() const
 	{
 		return zpScalar( _mm_shuffle_ps( m_xyxw, m_xyxw, _MM_SHUFFLE( I, I, I, I ) ) );
@@ -113,26 +133,26 @@ struct zp_vec4
 		return get<3>();
 	} 
 
-	template<int I>
-	ZP_FORCE_INLINE zpScalar set( const zpScalar& s )
+	template<zp_int I>
+	ZP_FORCE_INLINE void set( const zpScalar& s )
 	{
-		m_xyxw.m128_f32[ I ] = s.m_x.m128_f32[ I ];
+		m_xyxw.m128_f32[ I ] = s.getFloat();
 	}
-	ZP_FORCE_INLINE zpScalar setX( const zpScalar& s )
+	ZP_FORCE_INLINE void setX( const zpScalar& s )
 	{
-		return get<0>();
+		set<0>( s );
 	}
-	ZP_FORCE_INLINE zpScalar setY( const zpScalar& s )
+	ZP_FORCE_INLINE void setY( const zpScalar& s )
 	{
-		return get<1>();
+		set<1>( s );
 	}
-	ZP_FORCE_INLINE zpScalar setZ( const zpScalar& s )
+	ZP_FORCE_INLINE void setZ( const zpScalar& s )
 	{
-		return get<2>();
+		set<2>( s );
 	}
-	ZP_FORCE_INLINE zpScalar setW( const zpScalar& s )
+	ZP_FORCE_INLINE void setW( const zpScalar& s )
 	{
-		return get<3>();
+		set<3>( s );
 	}
 
 private:

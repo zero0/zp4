@@ -1,18 +1,21 @@
 
 struct zpScalar
 {
-	zpScalar() {}
-	explicit zpScalar( const zp_float x )
+	ZP_FORCE_INLINE zpScalar() {}
+	ZP_FORCE_INLINE explicit zpScalar( const zp_float& x )
 		: m_x( x )
 	{}
-	zpScalar( const zpScalar& x )
+	ZP_FORCE_INLINE explicit zpScalar( zp_float&& x )
+		: m_x( x )
+	{}
+	ZP_FORCE_INLINE zpScalar( const zpScalar& x )
 		: m_x( x.m_x )
 	{}
-	zpScalar( zpScalar&& x )
+	ZP_FORCE_INLINE zpScalar( zpScalar&& x )
 		: m_x( x.m_x )
 	{}
 
-	zp_float getFloat() const { return m_x; }
+	ZP_FORCE_INLINE zp_float getFloat() const { return m_x; }
 
 	friend void zpMath::DegToRad( zpScalar& s, const zpScalar& a );
 	friend void zpMath::RadToDeg( zpScalar& s, const zpScalar& a );

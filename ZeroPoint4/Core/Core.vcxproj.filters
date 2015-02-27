@@ -185,12 +185,6 @@
     <None Include="zpIntrusiveList.inl">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="zpIntegerFpu.inl">
-      <Filter>Source Files\Fpu</Filter>
-    </None>
-    <None Include="zpIntegerSimd.inl">
-      <Filter>Source Files\Simd</Filter>
-    </None>
     <None Include="zpMatrix4Simd.inl">
       <Filter>Source Files\Simd</Filter>
     </None>
@@ -250,6 +244,9 @@
     </None>
     <None Include="zpQuaternion4Simd.inl">
       <Filter>Source Files\Simd</Filter>
+    </None>
+    <None Include="zpMath.inl">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

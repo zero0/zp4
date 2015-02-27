@@ -28,7 +28,7 @@
 //#ifdef _WIN32
 //#define ZP_USE_SIMD			0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD				0
+#define ZP_USE_SIMD				1
 //#endif
 
 

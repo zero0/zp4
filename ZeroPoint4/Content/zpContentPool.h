@@ -9,6 +9,9 @@ public:
 	zpContentPool();
 	~zpContentPool();
 
+	void setup( zpMemorySystem* memory );
+	void teardown();
+
 	template<typename R>
 	T* create( const R& param );
 
@@ -23,10 +26,10 @@ public:
 	zp_uint getUsedCount() const;
 
 protected:
-	zp_byte m_pool[ Count * sizeof( T ) ];
-
 	zpFixedArrayList< T*, Count > m_used;
 	zpFixedArrayList< T*, Count > m_free;
+
+	zpMemorySystem* m_memory;
 };
 
 #include "zpContentPool.inl"
