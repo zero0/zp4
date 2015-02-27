@@ -236,6 +236,8 @@ namespace zpMath
 	ZP_FORCE_INLINE void ToMatrix( zpMatrix4f& s, const zpQuaternion4f& a );
 
 	ZP_FORCE_INLINE void TRS( zpMatrix4f& m, const zpVector4f& p, const zpQuaternion4f& r, const zpVector4f& s );
+
+	ZP_FORCE_INLINE void Reflect( zpVector4f& s, const zpVector4f& a, const zpVector4f& n );
 };
 
 #if ZP_USE_SIMD
@@ -268,6 +270,7 @@ namespace zpMath
 #include "zpVector4Simd.inl"
 //#include "zpIntegerSimd.inl"
 #include "zpMatrix4Simd.inl"
+#include "zpQuaternion4Simd.inl"
 #else
 #include "zpMathFpu.inl"
 #include "zpVector4Fpu.inl"

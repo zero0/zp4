@@ -71,7 +71,7 @@ private:
 		zp_float maxSpeed;
 	};
 
-	enum zpParticleEffectShape : zp_byte
+	enum zpParticleEffectShape
 	{
 		ZP_PARTICLE_EFFECT_SHAPE_SPHERE = 0,
 		ZP_PARTICLE_EFFECT_SHAPE_HEMISPHERE,
@@ -81,7 +81,7 @@ private:
 		zpParticleEffectShape_Count
 	};
 
-	enum zpParticleEffectRange : zp_byte
+	enum zpParticleEffectRange
 	{
 		ZP_PARTICLE_EFFECT_RANGE_CONSTANT = 0,
 		ZP_PARTICLE_EFFECT_RANGE_RANDOM,
@@ -91,7 +91,7 @@ private:
 		zpParticleEffectRange_Count
 	};
 
-	enum zpParticleEffectState : zp_byte
+	enum zpParticleEffectState
 	{
 		ZP_PARTICLE_EFFECT_STATE_DISABLED = 0,
 		ZP_PARTICLE_EFFECT_STATE_STARTING,
@@ -99,6 +99,21 @@ private:
 		ZP_PARTICLE_EFFECT_STATE_FINISHING,
 
 		zpParticleEffectState_Count
+	};
+
+	enum zpParticleEffectFlag
+	{
+		ZP_PARTICLE_EFFECT_FLAG_EMIT_FROM_SHELL = 0,
+		ZP_PARTICLE_EFFECT_FLAG_RANDOM_DIRECTION,
+		ZP_PARTICLE_EFFECT_FLAG_LOOPING,
+		ZP_PARTICLE_EFFECT_FLAG_PRE_WARM,
+		ZP_PARTICLE_EFFECT_FLAG_USE_REAL_TIME,
+		ZP_PARTICLE_EFFECT_FLAG_WORLD_SPACE,
+		ZP_PARTICLE_EFFECT_FLAG_IS_BILLBOARD,
+		ZP_PARTICLE_EFFECT_FLAG_PLAY_ON_CREATE,
+		ZP_PARTICLE_EFFECT_FLAG_USE_DEPTH_SORT,
+
+		zpParticleEffectFlag_Count
 	};
 
 	struct zpParticleEffect

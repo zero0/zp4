@@ -248,6 +248,9 @@
     <None Include="zpQuaternion.inl">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="zpQuaternion4Simd.inl">
+      <Filter>Source Files\Simd</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCore.cpp">

@@ -48,19 +48,19 @@ void zpKinematicBodyComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 		const zpKeyboard* k = getApplication()->getInputManager()->getKeyboard();
 		if( k->isKeyDown( ZP_KEY_CODE_W ) )
 		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 1.f ) );
+			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 10.f ) );
 		}
 		else if( k->isKeyDown( ZP_KEY_CODE_S ) )
 		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, -1.f ) );
+			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, -10.f ) );
 		}
 		else if( k->isKeyDown( ZP_KEY_CODE_A ) )
 		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 1.f, 0, 0 ) );
+			m_kinematicBody.setWalkDirection( zpVector4f( 10.f, 0, 0 ) );
 		}
 		else if( k->isKeyDown( ZP_KEY_CODE_D ) )
 		{
-			m_kinematicBody.setWalkDirection( zpVector4f( -1.f, 0, 0 ) );
+			m_kinematicBody.setWalkDirection( zpVector4f( -10.f, 0, 0 ) );
 		}
 		else if( k->isKeyPressed( ZP_KEY_CODE_SPACE ) )
 		{

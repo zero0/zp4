@@ -737,15 +737,17 @@ ZP_FORCE_INLINE void zpMath::Invert( zpMatrix4f& s, const zpMatrix4f& a )
 
 ZP_FORCE_INLINE void zpMath::Lerp( zpVector4f& s, const zpVector4f& a, const zpVector4f& b, const zpScalar& alpha )
 {
-	zpMath::Sub( s, b, a );
-	zpMath::Mul( s, s, alpha );
-	zpMath::Add( s, s, a );
+	zpVector4f l;
+	zpMath::Sub( l, b, a );
+	zpMath::Mul( l, l, alpha );
+	zpMath::Add( s, l, a );
 }
 ZP_FORCE_INLINE void zpMath::Lerp( zpScalar& s, const zpScalar& a, const zpScalar& b, const zpScalar& alpha )
 {
-	zpMath::Sub( s, b, a );
-	zpMath::Mul( s, s, alpha );
-	zpMath::Add( s, s, a );
+	zpScalar l;
+	zpMath::Sub( l, b, a );
+	zpMath::Mul( l, l, alpha );
+	zpMath::Add( s, l, a );
 }
 
 ZP_FORCE_INLINE void zpMath::RotateX( zpVector4f& s, const zpVector4f& a, const zpScalar& rad )
@@ -926,4 +928,13 @@ void zpMath::TRS( zpMatrix4f& m, const zpVector4f& p, const zpQuaternion4f& r, c
 
 	zpMath::Mul( m, sm, rm );
 	zpMath::Mul( m, m, pm );
+}
+
+void zpMath::Reflect( zpVector4f& s, const zpVector4f& a, const zpVector4f& n )
+{
+	zpScalar d;
+	zpMath::Dot3( d, a, n );
+	zpMath::Mul( d, d, zpScalar( -2.0f ) );
+
+	zpMath::Madd( s, a, d, n );
 }

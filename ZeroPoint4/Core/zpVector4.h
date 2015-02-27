@@ -802,6 +802,9 @@ public:
 	friend void zpMath::Min( zpVector4f& s, const zpVector4f& a, const zpVector4f& b );
 	friend void zpMath::Cmp( zp_int& s, const zpVector4f& a, const zpVector4f& b );
 
+	friend void zpMath::Reflect( zpVector4f& s, const zpVector4f& a, const zpVector4f& n );
+
+
 private:
 	zp_vec4 m_xyzw;
 };

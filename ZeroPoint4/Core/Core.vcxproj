@@ -193,6 +193,7 @@
     <None Include="zpBaseTypesSimd.inl" />
     <None Include="zpQuaternion.inl" />
     <None Include="zpQuaterionFpu.inl" />
+    <None Include="zpQuaternion4Simd.inl" />
     <None Include="zpRect.inl" />
     <None Include="zpTween.inl" />
     <None Include="zpVector2.inl" />

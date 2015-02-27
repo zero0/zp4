@@ -453,7 +453,10 @@ void zpApplication::update()
 		m_objectContent.initializeAllObjectsInWorld( m_currentWorld );
 	}
 
+	// update physics
+	ZP_PROFILE_START( PHYSICS_UPDATE );
 	m_physicsEngine.update( deltaTime );
+	ZP_PROFILE_END( PHYSICS_UPDATE );
 
 	// update input
 	ZP_PROFILE_START( INPUT_UPDATE );
@@ -1055,8 +1058,9 @@ void zpApplication::onGUI()
 		zp_float scriptUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float inputUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float audioUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE	, m_timer.getSecondsPerTick() );
+		zp_float physicsUpdaateMS =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_PHYSICS_UPDATE	, m_timer.getSecondsPerTick() );
 
-		zpRectf rect( 5, 5, 320, 230 );
+		zpRectf rect( 5, 5, 320, 260 );
 		m_gui.beginWindow( "Update", rect, rect );
 
 		buff << "Update   " << updateMs * 1000.f << " ms";
@@ -1088,6 +1092,10 @@ void zpApplication::onGUI()
 		buff.clear();
 
 		buff << "Audio    " << audioUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Physics  " << physicsUpdaateMS * 1000.f << " ms";
 		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
 		buff.clear();
 

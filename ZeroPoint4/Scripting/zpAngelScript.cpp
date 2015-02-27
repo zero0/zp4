@@ -386,7 +386,7 @@ zpScalar as_zpScalar_Neg( zpScalar* self )
 	return s;
 }
 
-zp_bool as_zpScalar_Eq( zpScalar* self, zpScalar b )
+zp_bool as_zpScalar_Eq( zpScalar* self, const zpScalar& b )
 {
 	return zpMath::Cmp( *self, b ) == 0;
 }

@@ -7,6 +7,32 @@
 #include "src/BulletDynamics/Character/btKinematicCharacterController.h"
 #include "src/BulletCollision/CollisionDispatch/btGhostObject.h"
 
+ZP_FORCE_INLINE void _btVector3ToVector4Position( const btVector3& s, zpVector4f& a )
+{
+	btVector3FloatData data;
+	s.serializeFloat( data );
+
+	a.load4( data.m_floats );
+	//a = zpVector4f( data.m_floats[0], data.m_floats[1], data.m_floats[2], 1.f );
+}
+
+ZP_FORCE_INLINE void _btVector3ToVector4Normal( const btVector3& s, zpVector4f& a )
+{
+	btVector3FloatData data;
+	s.serializeFloat( data );
+
+	a.load4( data.m_floats );
+	//a = zpVector4f( data.m_floats[0], data.m_floats[1], data.m_floats[2], 0.f );
+}
+
+ZP_FORCE_INLINE void _zpVector4ToVector3( const zpVector4f& s, btVector3& a )
+{
+	btVector3FloatData data;
+	s.store4( data.m_floats );
+
+	a.deSerializeFloat( data );
+}
+
 zpKinematicBody::zpKinematicBody()
 	: m_collider( ZP_NULL )
 	, m_ghost( ZP_NULL )
@@ -25,7 +51,7 @@ zpKinematicBody::~zpKinematicBody()
 class zpKinematicClosestNotMeConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
 {
 public:
-	zpKinematicClosestNotMeConvexResultCallback( btCollisionObject* me, const btVector3& up, btScalar minSlopeDot )
+	zpKinematicClosestNotMeConvexResultCallback( btCollisionObject* me, const zpVector4f& up, zp_float minSlopeDot )
 		: btCollisionWorld::ClosestConvexResultCallback( btVector3( 0.0f, 0.0f, 0.0f ), btVector3( 0.0f, 0.0f, 0.0f ) )
 		, m_me( me )
 		, m_up( up )
@@ -53,16 +79,24 @@ public:
 			hitNormalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis() * convexResult.m_hitNormalLocal;
 		}
 
-		btScalar dotUp = m_up.dot( hitNormalWorld );
-		if( dotUp < m_minSlopeDot ) return btScalar( 1.0f );
+		//btScalar dotUp = m_up.dot( hitNormalWorld );
+		//if( dotUp < m_minSlopeDot ) return btScalar( 1.0f );
 
-		return ClosestConvexResultCallback::addSingleResult( convexResult, normalInWorldSpace );
+		zpScalar dotUp;
+		zpVector4f hitNormal;
+		_btVector3ToVector4Normal( hitNormalWorld, hitNormal );
+
+		zpMath::Dot3( dotUp, m_up, hitNormal );
+		if( zpMath::Cmp( dotUp, m_minSlopeDot ) < 0 ) return btScalar( 1.0f );
+
+		btScalar ret = ClosestConvexResultCallback::addSingleResult( convexResult, normalInWorldSpace );
+		return ret;
 	}
 
 protected:
 	btCollisionObject* m_me;
-	const btVector3 m_up;
-	btScalar m_minSlopeDot;
+	const zpVector4f m_up;
+	zpScalar m_minSlopeDot;
 };
 
 class zpKinematicCharacterController : public btCharacterControllerInterface
@@ -92,8 +126,12 @@ public:
 		m_stepHeight = 0.5f;
 		m_currentStepOffset = 0.f;
 
-		m_walkDirection.setZero();
-		m_up.setValue( 0, 1, 0 );
+		m_dampenAcceleration = 0.1f;
+		m_velocity = zpVector4f( 0.f );
+		m_acceleration = zpVector4f( 0.f );
+
+		m_walkDirection = zpVector4f( 0.f );
+		m_up = zpVector4f( 0.f, 1.f, 0.f );
 	}
 	void destroy()
 	{
@@ -109,37 +147,48 @@ public:
 
 	void debugDraw( btIDebugDraw* debugDrawer )
 	{
-		if( !m_walkDirection.isZero() )
-		{
-			const btVector3& pos = m_ghost->getWorldTransform().getOrigin();
-			debugDrawer->drawLine( pos, pos + m_walkDirection, btVector3( 0, 1, 0 ) );
-		}
+		//if( !m_walkDirection.isZero() )
+		//{
+		//	const btVector3& pos = m_ghost->getWorldTransform().getOrigin();
+		//	debugDrawer->drawLine( pos, pos + m_walkDirection, btVector3( 0, 1, 0 ) );
+		//}
+	}
+
+	void setAcceleration( const zpVector4f& acceleration )
+	{
+		m_acceleration = acceleration;
 	}
 
 	void setWalkDirection( const btVector3& walkDirection )
 	{
 		m_useWalkDirection = true;
-		m_walkDirection = walkDirection;
-		m_normalizedWalkDirection = walkDirection;
-		m_normalizedWalkDirection.normalize();
+		_btVector3ToVector4Normal( walkDirection, m_walkDirection );
+		//m_walkDirection = walkDirection;
+		//m_normalizedWalkDirection.normalize();
+		zpMath::Normalize3( m_normalizedWalkDirection, m_walkDirection );
 		m_velocityTimeInterval = 0.f;
 	}
 	void setVelocityForTimeInterval( const btVector3& velocity, btScalar timeInterval )
 	{
 		m_useWalkDirection = false;
-		m_walkDirection = velocity;
-		m_normalizedWalkDirection = velocity;
-		m_normalizedWalkDirection.normalize();
+		//m_walkDirection = velocity;
+		_btVector3ToVector4Normal( velocity, m_velocity );
+		//m_normalizedWalkDirection.normalize();
+		zpMath::Normalize3( m_normalizedWalkDirection, m_normalizedWalkDirection );
 		m_velocityTimeInterval = timeInterval;
 	}
 	void reset()
 	{
-		m_walkDirection.setZero();
+		m_acceleration = zpVector4f( 0.f );
+		m_velocity = zpVector4f( 0.f );
+		m_walkDirection = zpVector4f( 0.f );
 		m_verticalVelocity = 0.f;
 		m_verticalOffset = 0.f;
 	}
 	void warp( const btVector3& origin )
 	{
+		reset();
+
 		btTransform xform;
 		xform.setIdentity();
 		xform.setOrigin( origin );
@@ -157,7 +206,9 @@ public:
 			break;
 		}
 
-		m_currentPosition = m_ghost->getWorldTransform().getOrigin();
+		const btVector3& currentPos = m_ghost->getWorldTransform().getOrigin();
+
+		_btVector3ToVector4Position( currentPos, m_currentPosition );
 		m_targetPosition = m_currentPosition;
 	}
 
@@ -188,26 +239,49 @@ public:
 		stepUp( collisionWorld, dt );
 
 		// 2 walk forward
-		btVector3 move = m_walkDirection * m_walkVelocity;
+		zpScalar sdt( dt );
+
+		zpVector4f a;
+		zpVector4f move;
+
+		//btVector3 v = m_acceleration * dt + m_velocity;
+		zpMath::Madd( m_velocity, m_velocity, sdt, m_acceleration );
+
+		//btVector3 move = v * dt + btScalar( 0.5f ) * m_acceleration * dt * dt;
+		zpScalar sdt2;
+		zpMath::Mul( sdt2, sdt, sdt );
+		zpMath::Mul( sdt2, sdt2, zpScalar( 0.5f ) );
+		zpMath::Mul( a, m_acceleration, sdt2 );
+
+		zpMath::Mul( move, m_velocity, sdt );
+		zpMath::Add( move, move, a );
+
+		//btVector3 move = m_walkDirection * m_walkVelocity;
 		if( !m_useWalkDirection )
 		{
 			btScalar time = ( dt < m_velocityTimeInterval ) ? dt : m_velocityTimeInterval;
 			m_velocityTimeInterval -= dt;
 
-			move *= time;
+			//move *= time;
+			zpMath::Mul( move, move, zpScalar( time ) );
 		}
+
 		stepForwardAndStrafe( collisionWorld, dt, move );
 
 		// 3 stepDown
 		stepDown( collisionWorld, dt );
 
-		xform.setOrigin( m_currentPosition );
+		btVector3 pos;
+		_zpVector4ToVector3( m_currentPosition, pos );
+
+		xform.setOrigin( pos );
 		m_ghost->setWorldTransform( xform );
 	}
 
 	bool canJump() const
 	{
-		return onGround();
+		zp_bool grounded = onGround();
+		return grounded;
 	}
 
 	void jump()
@@ -223,7 +297,8 @@ public:
 
 	bool onGround() const
 	{
-		return zp_approximate( m_verticalVelocity, 0.f ) && zp_approximate( m_verticalOffset, 0.f );
+		zp_bool grounded = zp_approximate( m_verticalVelocity, 0.f ) && zp_approximate( m_verticalOffset, 0.f );
+		return grounded;
 	}
 
 	zp_bool recoverFromPenetration( btCollisionWorld* collisionWorld )
@@ -232,7 +307,8 @@ public:
 
 		collisionWorld->getDispatcher()->dispatchAllCollisionPairs( m_ghost->getOverlappingPairCache(), collisionWorld->getDispatchInfo(), collisionWorld->getDispatcher() );
 
-		m_currentPosition = m_ghost->getWorldTransform().getOrigin();
+		const btVector3& pos = m_ghost->getWorldTransform().getOrigin();
+		_btVector3ToVector4Position( pos, m_currentPosition );
 
 		btScalar maxPen = 0;
 		btBroadphasePairArray& overlappingPairs = m_ghost->getOverlappingPairCache()->getOverlappingPairArray();
@@ -257,7 +333,7 @@ public:
 			for( zp_int j = 0; j < m_manifoldArray.size(); ++j )
 			{
 				btPersistentManifold* manifold = m_manifoldArray[ j ];
-				btScalar directionSign = manifold->getBody0() == m_ghost ? -1.f : 1.f;
+				zpScalar directionSign( manifold->getBody0() == m_ghost ? -1.f : 1.f );
 
 				for( zp_int p = 0; p < manifold->getNumContacts(); ++p )
 				{
@@ -270,10 +346,26 @@ public:
 						if( dist < maxPen )
 						{
 							maxPen = dist;
-							m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
-							m_touchingNormal.normalize();
+
+							zpVector4f touchNorm;
+							_btVector3ToVector4Normal( pt.m_normalWorldOnB, touchNorm );
+
+							zpMath::Mul( m_touchingNormal, touchNorm, directionSign );
+							zpMath::Normalize3( m_touchingNormal, m_touchingNormal );
+							//m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
+							//m_touchingNormal.normalize();
 						}
-						m_currentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar( 0.2f );
+
+						//m_currentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar( 0.2f );
+						zpVector4f worldOnB;
+						zpScalar d;
+
+						_btVector3ToVector4Normal( pt.m_normalWorldOnB, worldOnB );
+
+						zpMath::Mul( d, directionSign, zpScalar( dist ) );
+						zpMath::Mul( d, d, zpScalar( 0.2f ) );
+						zpMath::Madd( m_currentPosition, m_currentPosition, d, worldOnB );
+
 						penetration = true;
 					}
 					else
@@ -282,13 +374,16 @@ public:
 					}
 				}
 
-				//manifold->clearManifold();
+				manifold->clearManifold();
 			}
 		}
 
 		if( penetration )
 		{
-			m_ghost->getWorldTransform().setOrigin( m_currentPosition );
+			btVector3 pos;
+			_zpVector4ToVector3( m_currentPosition, pos );
+
+			m_ghost->getWorldTransform().setOrigin( pos );
 		}
 		
 		return penetration;
@@ -300,12 +395,28 @@ public:
 		start.setIdentity();
 		end.setIdentity();
 
-		m_targetPosition = m_currentPosition + m_up * ( m_stepHeight + ( m_verticalOffset > 0.f ? m_verticalOffset : 0.f ) );
+		//m_targetPosition = m_currentPosition + m_up * ( m_stepHeight + ( m_verticalOffset > 0.f ? m_verticalOffset : 0.f ) );
+		zpScalar h;
+		zpMath::Add( h, zpScalar( m_stepHeight ), zpScalar( m_verticalOffset > 0.f ? m_verticalOffset : 0.f ) );
+		zpMath::Madd( m_targetPosition, m_currentPosition, m_up, h );
 
-		start.setOrigin( m_currentPosition + m_up * m_shape->getMargin() );
-		end.setOrigin( m_targetPosition );
+		btVector3 s, e;
 
-		zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, -m_up, 0.7071f );
+		zpVector4f pos;
+		zpMath::Madd( pos, m_currentPosition, m_up, zpScalar( m_shape->getMargin() ) );
+
+		_zpVector4ToVector3( pos, s );
+		_zpVector4ToVector3( m_targetPosition, e );
+
+		start.setOrigin( s );
+		end.setOrigin( e );
+		//start.setOrigin( m_currentPosition + m_up * m_shape->getMargin() );
+		//end.setOrigin( m_targetPosition );
+
+		zpVector4f negUp;
+		zpMath::Neg( negUp, m_up );
+
+		zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, negUp, 0.7071f );
 		if( m_useGhostObjectSweepTest )
 		{
 			m_ghost->convexSweepTest( m_shape, start, end, cb );
@@ -317,10 +428,17 @@ public:
 
 		if( cb.hasHit() )
 		{
-			if( cb.m_hitNormalWorld.dot( m_up ) > 0.f )
+			zpScalar d;
+			zpVector4f hitNormalWorld;
+			_btVector3ToVector4Normal( cb.m_hitNormalWorld, hitNormalWorld );
+			zpMath::Dot3( d, m_up, hitNormalWorld );
+
+			//if( cb.m_hitNormalWorld.dot( m_up ) > 0.f )
+			if( zpMath::Cmp0( d ) > 0 )
 			{
 				m_currentStepOffset = m_stepHeight * cb.m_closestHitFraction;
-				m_currentPosition.setInterpolate3( m_currentPosition, m_targetPosition, cb.m_closestHitFraction );
+				//m_currentPosition.setInterpolate3( m_currentPosition, m_targetPosition, cb.m_closestHitFraction );
+				zpMath::Lerp( m_currentPosition, m_currentPosition, m_targetPosition, zpScalar( cb.m_closestHitFraction ) );
 			}
 
 			m_verticalVelocity = 0.f;
@@ -333,25 +451,25 @@ public:
 		}
 	}
 
-	void stepForwardAndStrafe( btCollisionWorld* collisionWorld, btScalar dt, const btVector3& move )
+	void stepForwardAndStrafe( btCollisionWorld* collisionWorld, btScalar dt, const zpVector4f& move )
 	{
-		if( move.isZero() )
-		{
-			return;
-		}
-
 		btTransform start, end;
 		start.setIdentity();
 		end.setIdentity();
 
-		m_targetPosition = m_currentPosition + move;
+		//m_targetPosition = m_currentPosition + move;
+		zpMath::Add( m_targetPosition, m_currentPosition, move );
 
 		zp_float fraction = 1.f;
 
 		if( m_touchingContact )
 		{
-			btScalar d = m_normalizedWalkDirection.dot( m_touchingNormal );
-			if( d > 0.1f )
+			//btScalar d = m_normalizedWalkDirection.dot( m_touchingNormal );
+			zpScalar d;
+			zpMath::Dot3( d, m_normalizedWalkDirection, m_touchingNormal );
+
+			//if( d > 0.1f )
+			if( zpMath::Cmp( d, zpScalar( 0.1f ) ) > 0 )
 			{
 				updateTargetPositionBasedOnCollision( m_touchingNormal );
 			}
@@ -360,13 +478,21 @@ public:
 		zp_int maxIterations = 10;
 		while( fraction > 0.01f && maxIterations-- > 0 )
 		{
-			start.setOrigin( m_currentPosition );
-			end.setOrigin( m_targetPosition );
+			btVector3 s, e;
+			_zpVector4ToVector3( m_currentPosition, s );
+			_zpVector4ToVector3( m_targetPosition, e );
 
-			btVector3 negDirection = m_currentPosition - m_targetPosition;
-			negDirection.normalize();
+			start.setOrigin( s );
+			end.setOrigin( e );
 
-			zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, negDirection, 0.f );
+			zpVector4f neg;
+			zpMath::Sub( neg, m_currentPosition, m_targetPosition );
+			zpMath::Normalize3( neg, neg );
+
+			//btVector3 negDirection = m_currentPosition - m_targetPosition;
+			//negDirection.normalize();
+
+			zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, neg, 0.f );
 			if( m_useGhostObjectSweepTest )
 			{
 				m_ghost->convexSweepTest( m_shape, start, end, cb );
@@ -380,15 +506,29 @@ public:
 
 			if( cb.hasHit() )
 			{
-				updateTargetPositionBasedOnCollision( cb.m_hitNormalWorld );
-				btVector3 currentDir = m_targetPosition - m_currentPosition;
-				btScalar len = currentDir.length();
-				if( len > ZP_EPSILON )
-				{
-					currentDir /= len;
+				zpVector4f hitNorm;
+				_btVector3ToVector4Normal( cb.m_hitNormalWorld, hitNorm );
 
-					btScalar d = currentDir.dot( m_normalizedWalkDirection );
-					if( d < ZP_EPSILON )
+				updateTargetPositionBasedOnCollision( hitNorm );
+
+				zpScalar len;
+				zpVector4f curDir;
+				zpMath::Sub( curDir, m_targetPosition, m_currentPosition );
+				zpMath::Length3( len, curDir );
+
+				//btVector3 currentDir = m_targetPosition - m_currentPosition;
+				//btScalar len = currentDir.length();
+				
+				//if( len > ZP_EPSILON )
+				if( zpMath::Cmp0( len ) > 0 )
+				{
+					//currentDir /= len;
+					zpMath::Div( curDir, curDir, len );
+
+					//btScalar d = currentDir.dot( m_normalizedWalkDirection );
+					//if( d < ZP_EPSILON )
+					zpMath::Dot3( len, curDir, m_normalizedWalkDirection );
+					if( zpMath::Cmp0( len ) < 0 )
 					{
 						break;
 					}
@@ -420,11 +560,20 @@ public:
 			}
 		}
 
-		btVector3 drop = m_up * ( m_currentStepOffset + downVelocity );
-		m_targetPosition -= drop;
+		//btVector3 drop = m_up * ( m_currentStepOffset + downVelocity );
+		//m_targetPosition -= drop;
+		zpScalar v;
+		zpVector4f drop;
+		zpMath::Add( v, zpScalar( m_currentStepOffset ), zpScalar( downVelocity ) );
+		zpMath::Mul( drop, m_up, v );
+		zpMath::Sub( m_targetPosition, m_targetPosition, drop );
 
-		start.setOrigin( m_currentPosition );
-		end.setOrigin( m_targetPosition );
+		btVector3 s, e;
+		_zpVector4ToVector3( m_currentPosition, s );
+		_zpVector4ToVector3( m_targetPosition, e );
+
+		start.setOrigin( s );
+		end.setOrigin( e );
 
 		zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, m_up, m_maxSlopeHeight );
 		if( m_useGhostObjectSweepTest )
@@ -438,7 +587,8 @@ public:
 
 		if( cb.hasHit() )
 		{
-			m_currentPosition.setInterpolate3( m_currentPosition, m_targetPosition, cb.m_closestHitFraction );
+			//m_currentPosition.setInterpolate3( m_currentPosition, m_targetPosition, cb.m_closestHitFraction );
+			zpMath::Lerp( m_currentPosition, m_currentPosition, m_targetPosition, zpScalar( cb.m_closestHitFraction ) );
 			m_verticalVelocity = 0.f;
 			m_verticalOffset = 0.f;
 			m_wasJumping = false;
@@ -449,8 +599,37 @@ public:
 		}
 	}
 
-	void updateTargetPositionBasedOnCollision( const btVector3& hitNormal )
+	void updateTargetPositionBasedOnCollision( const zpVector4f& hitNormal )
 	{
+		zpScalar len;
+		zpVector4f moveDir;
+
+		zpMath::Sub( moveDir, m_targetPosition, m_currentPosition );
+		zpMath::Length3( len, moveDir );
+
+		if( zpMath::Cmp0( len ) > 0 )
+		{
+			zpMath::Div( moveDir, moveDir, len );
+
+			zpVector4f reflDir;
+			zpMath::Reflect( reflDir, moveDir, hitNormal );
+			zpMath::Normalize3( reflDir, reflDir );
+
+			zpScalar d;
+			zpMath::Dot3( d, reflDir, hitNormal );
+
+			zpVector4f paralDir;
+			zpMath::Mul( paralDir, hitNormal, d );
+
+			zpVector4f perpDir;
+			zpMath::Sub( perpDir, reflDir, paralDir );
+
+			m_targetPosition = m_currentPosition;
+
+			zpMath::Madd( m_targetPosition, m_targetPosition,  perpDir, len );
+		}
+
+#if 0
 		btVector3 movementDirection = m_targetPosition - m_currentPosition;
 		btScalar movementLength = movementDirection.length();
 
@@ -469,6 +648,7 @@ public:
 			btVector3 perpComop = perpendicularDir * movementLength;
 			m_targetPosition += perpendicularDir;
 		}
+#endif
 	}
 
 private:
@@ -491,12 +671,16 @@ private:
 	zp_float m_stepHeight;
 	zp_float m_currentStepOffset;
 
-	btVector3 m_walkDirection;
-	btVector3 m_normalizedWalkDirection;
-	btVector3 m_currentPosition;
-	btVector3 m_targetPosition;
-	btVector3 m_up;
-	btVector3 m_touchingNormal;
+	zp_float m_dampenAcceleration;
+	zpVector4f m_velocity;
+	zpVector4f m_acceleration;
+
+	zpVector4f m_walkDirection;
+	zpVector4f m_normalizedWalkDirection;
+	zpVector4f m_currentPosition;
+	zpVector4f m_targetPosition;
+	zpVector4f m_up;
+	zpVector4f m_touchingNormal;
 
 	btManifoldArray m_manifoldArray;
 
@@ -599,11 +783,8 @@ zp_bool zpKinematicBody::onGround() const
 
 void zpKinematicBody::warp( const zpVector4f& position )
 {
-	btVector3FloatData data;
-	position.store4( data.m_floats );
-
 	btVector3 pos;
-	pos.deSerializeFloat( data );
+	_zpVector4ToVector3( position, pos );
 
 	zpKinematicCharacterController* controller = (zpKinematicCharacterController*)m_controller;
 	controller->warp( pos );
@@ -611,14 +792,9 @@ void zpKinematicBody::warp( const zpVector4f& position )
 
 void zpKinematicBody::setWalkDirection( const zpVector4f& direction )
 {
-	btVector3FloatData data;
-	direction.store4( data.m_floats );
-
-	btVector3 dir;
-	dir.deSerializeFloat( data );
-
 	zpKinematicCharacterController* controller = (zpKinematicCharacterController*)m_controller;
-	controller->setWalkDirection( dir );
+	//controller->setWalkDirection( dir );
+	controller->setAcceleration( direction );
 }
 
 zp_handle zpKinematicBody::getKinematicController() const
