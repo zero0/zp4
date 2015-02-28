@@ -66,12 +66,10 @@ ZP_FORCE_INLINE void zpMath::Mul( zpVector4f& s, const zpVector4f& a, const zpMa
 {
 	zpVector4f col;
 
-	zpMath::Mul( col, a.getX(), b.getRow( 0 ) );
-	zpMath::Madd( col, col, a.getY(), b.getRow( 1 ) );
-	zpMath::Madd( col, col, a.getZ(), b.getRow( 2 ) );
-	zpMath::Madd( col, col, a.getW(), b.getRow( 3 ) );
-
-	s = col;
+	zpMath::Mul( col, a.getX(), b.m_m1 );
+	zpMath::Madd( col, col, a.getY(), b.m_m2 );
+	zpMath::Madd( col, col, a.getZ(), b.m_m3 );
+	zpMath::Madd( s, col, a.getW(), b.m_m4 );
 }
 ZP_FORCE_INLINE void zpMath::Mul( zpMatrix4f& s, const zpMatrix4f& a, const zpMatrix4f& b )
 {
@@ -92,29 +90,17 @@ ZP_FORCE_INLINE void zpMath::Mul( zpMatrix4f& s, const zpMatrix4f& a, const zpMa
 	zpMath::Madd( col3, col3, a.getRow( 2 ).getZ(), b.getRow( 2 ) );
 	zpMath::Madd( col4, col4, a.getRow( 3 ).getZ(), b.getRow( 2 ) );
 
-	zpMath::Madd( col1, col1, a.getRow( 0 ).getW(), b.getRow( 3 ) );
-	zpMath::Madd( col2, col2, a.getRow( 1 ).getW(), b.getRow( 3 ) );
-	zpMath::Madd( col3, col3, a.getRow( 2 ).getW(), b.getRow( 3 ) );
-	zpMath::Madd( col4, col4, a.getRow( 3 ).getW(), b.getRow( 3 ) );
-
-	s.setRow( 0, col1 );
-	s.setRow( 1, col2 );
-	s.setRow( 2, col3 );
-	s.setRow( 3, col4 );
+	zpMath::Madd( s.m_m1, col1, a.getRow( 0 ).getW(), b.getRow( 3 ) );
+	zpMath::Madd( s.m_m2, col2, a.getRow( 1 ).getW(), b.getRow( 3 ) );
+	zpMath::Madd( s.m_m3, col3, a.getRow( 2 ).getW(), b.getRow( 3 ) );
+	zpMath::Madd( s.m_m4, col4, a.getRow( 3 ).getW(), b.getRow( 3 ) );
 }
 ZP_FORCE_INLINE void zpMath::Mul( zpMatrix4f& s, const zpScalar& a, const zpMatrix4f& b )
 {
-	zpVector4f row1, row2, row3, row4;
-
-	zpMath::Mul( row1, a, b.getRow( 0 ) );
-	zpMath::Mul( row2, a, b.getRow( 1 ) );
-	zpMath::Mul( row3, a, b.getRow( 2 ) );
-	zpMath::Mul( row4, a, b.getRow( 3 ) );
-
-	s.setRow( 0, row1 );
-	s.setRow( 1, row2 );
-	s.setRow( 2, row3 );
-	s.setRow( 3, row4 );
+	zpMath::Mul( s.m_m1, a, b.m_m1 );
+	zpMath::Mul( s.m_m2, a, b.m_m2 );
+	zpMath::Mul( s.m_m3, a, b.m_m3 );
+	zpMath::Mul( s.m_m4, a, b.m_m1 );
 }
 
 ZP_FORCE_INLINE void zpMath::Perpendicular3( zpVector4f& s, const zpVector4f& a )

@@ -2,14 +2,17 @@
 ZP_FORCE_INLINE void zpMath::Sin( zpScalar& s, const zpScalar& a )
 {
 	//s.m_x = zp_sin( a.m_x );
+	s = zpScalar( zp_sin( a.getFloat() ) );
 }
 ZP_FORCE_INLINE void zpMath::Cos( zpScalar& s, const zpScalar& a )
 {
 	//s.m_x = zp_cos( a.m_x );
+	s = zpScalar( zp_cos( a.getFloat() ) );
 }
 ZP_FORCE_INLINE void zpMath::Tan( zpScalar& s, const zpScalar& a )
 {
 	//s.m_x = zp_tan( a.m_x );
+	s = zpScalar( zp_tan( a.getFloat() ) );
 }
 
 ZP_FORCE_INLINE void zpMath::Add( zpScalar& s, const zpScalar& a, const zpScalar& b )

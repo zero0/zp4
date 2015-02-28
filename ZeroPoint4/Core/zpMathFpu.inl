@@ -378,10 +378,6 @@ ZP_FORCE_INLINE void zpMath::Cmp( zp_int& s, const zpScalar& a, const zpScalar& 
 {
 	s = a.m_x > b.m_x ? 1 : a.m_x < b.m_x ? -1 : 0;
 }
-ZP_FORCE_INLINE void zpMath::Cmp0( zp_int& s, const zpScalar& a )
-{
-	s = a.m_x > 0.0f ? 1 : a.m_x < 0.0f ? -1 : 0;
-}
 
 ZP_FORCE_INLINE void zpMath::Cmp( zp_int& s, const zpVector4f& a, const zpVector4f& b )
 {
