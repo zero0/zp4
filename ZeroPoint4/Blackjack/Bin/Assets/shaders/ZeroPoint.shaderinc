@@ -1,6 +1,8 @@
 #ifndef ZERO_POINT_SHADER_INC
 #define ZERO_POINT_SHADER_INC
 
+#define ZP_INITIALIZE( Type, v )    v = (Type)0
+
 #include <ZeroPointHLSL.shaderinc>
 
 ZP_CBUFFER_START( Camera, 0 )
@@ -36,6 +38,18 @@ ZP_CBUFFER_START( Light0, 3 )
     float light_outerAngle;
     float light_radius;
     int light_type;
+ZP_CBUFFER_END
+
+ZP_CBUFFER_START( SH, 4 )
+    float4 _SHAr;
+    float4 _SHAg;
+    float4 _SHAb;
+
+    float4 _SHBr;
+    float4 _SHBg;
+    float4 _SHBb;
+
+    float4 _SHC;
 ZP_CBUFFER_END
 
 struct vs_input_base
@@ -75,11 +89,33 @@ struct vs_input_full
     float2 texcoord1 : TEXCOORD1;
 };
 
-float2 TexCoordMul( float4x4 m, float2 uv )
+inline float2 TexCoordMul( float4x4 m, float2 uv )
 {
     return mul( m, float4( uv, 0, 0 ) ).xy;
 };
 
-#define ZP_INITIALIZE( Type, v )    v = (Type)0
+#define TexCoordOffset( uv, name )  ( (uv) * name##_ST.xy + name##_ST.zw )
+
+float3 ShadeSH( float4 normal )
+{
+    float3 x1, x2, x3;
+
+    // Linear + constant polynomial terms
+    x1.r = dot( _SHAr, normal );
+    x1.g = dot( _SHAg, normal );
+    x1.b = dot( _SHAb, normal );
+
+    // 4 of the quadratic polynomials
+    float4 vB = normal.xyzz * normal.yzzx;
+    x2.r = dot( _SHBr, vB );
+    x2.g = dot( _SHBg, vB );
+    x2.b = dot( _SHBb, vB );
+
+    // Final quadratic polynomial
+    float vC = normal.x * normal.x - normal.y * normal.y;
+    x3 = _SHC.rgb * vC;
+    return x1 + x2 + x3;
+}
+
 
 #endif

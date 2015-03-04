@@ -20,36 +20,15 @@
 
 #endif // ZP_SHADER_DX9
 
-#define ZP_SAMPLER_1D( name )       Texture1D name; SamplerState name##_Sampler
-#define ZP_SAMPLER_2D( name )       Texture2D name; SamplerState name##_Sampler
-#define ZP_SAMPLER_3D( name )       Texture3D name; SamplerState name##_Sampler
-#define ZP_SAMPLER_CUBE( name )     TextureCube name; SamplerState name##_Sampler
+#define ZP_SAMPLER_1D( name )       Texture1D name;   SamplerState name##_Sampler; float4 name##_ST
+#define ZP_SAMPLER_2D( name )       Texture2D name;   SamplerState name##_Sampler; float4 name##_ST
+#define ZP_SAMPLER_3D( name )       Texture3D name;   SamplerState name##_Sampler; float4 name##_ST
+#define ZP_SAMPLER_CUBE( name )     TextureCube name; SamplerState name##_Sampler; float4 name##_ST
 
-#define tex1D( name, uv )       ( name.Sample( name##_Sampler, (uv) ) )
-#define tex2D( name, uv )       ( name.Sample( name##_Sampler, (uv) ) )
-#define tex3D( name, uv )       ( name.Sample( name##_Sampler, (uv) ) )
-#define texCUBE( name, uv )     ( name.Sample( name##_Sampler, (uv) ) )
-
-struct zpSampler1D
-{
-    Texture1D       t;
-    SamplerState    s;
-};
-struct zpSampler2D
-{
-    Texture2D       t;
-    SamplerState    s;
-};
-struct zpSampler3D
-{
-    Texture3D       t;
-    SamplerState    s;
-};
-struct zpSamplerCUBE
-{
-    TextureCube     t;
-    SamplerState    s;
-};
+#define tex1D( name, uv )           ( name.Sample( name##_Sampler, (uv) ) )
+#define tex2D( name, uv )           ( name.Sample( name##_Sampler, (uv) ) )
+#define tex3D( name, uv )           ( name.Sample( name##_Sampler, (uv) ) )
+#define texCUBE( name, uv )         ( name.Sample( name##_Sampler, (uv) ) )
 
 #endif
 
