@@ -184,10 +184,12 @@ void zpRenderingPipeline::initialize()
 
 	m_engine.createBlendState( m_alphaBlend, blend );
 
+	// create buffers
 	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_CAMERA ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpCameraBufferData ) );
 	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_FRAME ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpFrameBufferData ) );
 	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpDrawCallBufferData ) );
 	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpLightBufferData ) );
+	m_engine.createBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_SH ], ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DEFAULT, sizeof( zpSphericalHarmonicsData ) );
 
 	// fill free camera buffer
 	m_cameras.resize( 8 );
@@ -290,6 +292,7 @@ void zpRenderingPipeline::shutdown()
 	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_FRAME ] );
 	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ] );
 	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ] );
+	m_engine.destroyBuffer( m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_SH ] );
 
 	m_engine.shutdown();
 }

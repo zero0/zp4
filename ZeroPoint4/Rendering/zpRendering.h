@@ -277,9 +277,11 @@ enum zpConstantBufferSlot
 	ZP_CONSTANT_BUFFER_SLOT_PER_FRAME,
 	ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL,
 	ZP_CONSTANT_BUFFER_SLOT_LIGHT,
-	ZP_CONSTANT_BUFFER_SLOT_GLOBAL,
+	ZP_CONSTANT_BUFFER_SLOT_SH,
 
-	zpConstantBufferSlot_Count
+	zpConstantBufferSlot_Count,
+
+	ZP_CONSTANT_BUFFER_SLOT_GLOBAL = zpConstantBufferSlot_Count,
 };
 
 enum zpTextureWrap : zp_byte

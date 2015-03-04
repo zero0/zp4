@@ -300,10 +300,11 @@ zp_bool DXShaderCompiler::compileShaderPlatform( const zp_char* mainFunc, const 
 				ID3D11ShaderReflectionConstantBuffer* constantBuffer = reflection->GetConstantBufferByName( rescDesc.Name );
 				constantBuffer->GetDesc( &constDesc );
 				
-				if( zp_strcmp( rescDesc.Name, DX_GLOBAL_CBUFFER ) == 0 )
+				// if global constant buffer and it has yet to be build
+				if( zp_strcmp( rescDesc.Name, DX_GLOBAL_CBUFFER ) == 0 && info.shaderInput.globalVariables.isEmpty() )
 				{
 					info.shaderInput.globalVariablesSize = constDesc.Size;
-
+					info.shaderInput.globalVariables.reserve( constDesc.Variables );
 					for( zp_uint v = 0; v < constDesc.Variables; ++v )
 					{
 						zpGlobalVariableInput& g = info.shaderInput.globalVariables.pushBackEmpty();
@@ -410,14 +411,12 @@ zp_bool DXShaderCompiler::compileShaderPlatform( const zp_char* mainFunc, const 
 				}
 				
 				zp_printfln( "cbuf %s bind %d", rescDesc.Name, rescDesc.BindPoint );
-				zpConstantBufferShaderInput& c = info.shaderInput.constantBuffers.pushBackEmpty();
-				c.name = constDesc.Name;
-				c.size = constDesc.Size;
-				c.slot = rescDesc.BindPoint;
+				//zpConstantBufferShaderInput& c = info.shaderInput.constantBuffers.pushBackEmpty();
+				//c.name = constDesc.Name;
+				//c.size = constDesc.Size;
+				//c.slot = rescDesc.BindPoint;
 			}
 		}
-
-		zp_int p = 0;p++;
 	}
 
 	// release blobs

@@ -22,4 +22,17 @@ struct zpLightBufferData
 	zpLightType type;
 };
 
+struct zpSphericalHarmonicsData
+{
+	zpVector4f _SHAr;
+	zpVector4f _SHAg;
+	zpVector4f _SHAb;
+
+	zpVector4f _SHBr;
+	zpVector4f _SHBg;
+	zpVector4f _SHBb;
+
+	zpVector4f _SHC;
+};
+
 #endif

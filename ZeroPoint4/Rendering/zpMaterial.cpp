@@ -1,6 +1,8 @@
 #include "zpRendering.h"
 #include "Common/zpCommon.h"
 
+#define ZP_MATERIAL_GLOBAL_CBUFFER	"$Globals"
+
 zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* pipeline, zp_ushort materialId )
 {
 	zp_bool ok;
@@ -72,13 +74,14 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 		{
 			hasGlobalBuffer = true;
 
-			zp_uint globalVariablesSize = shaderData[ "GlobalsSize" ].asInt();
-
+			// global variables size
+			zp_uint globalVariablesSize = shaderGlobals[ "Size" ].asInt();
 			pipeline->getRenderingEngine()->createBuffer( m_resource.globalVariables, ZP_BUFFER_TYPE_CONSTANT, ZP_BUFFER_BIND_DYNAMIC, globalVariablesSize );
 
 			// build constant buffer def list
-			m_resource.globalVariablesDef.reserve( shaderGlobals.size() );
-			shaderGlobals.foreachArray( [ this ]( const zpBison::Value& glob ) {
+			const zpBison::Value& globalVariables = shaderGlobals[ "Variables" ];
+			m_resource.globalVariablesDef.reserve( globalVariables.size() );
+			globalVariables.foreachArray( [ this ]( const zpBison::Value& glob ) {
 				const zp_char* globalType = glob[ "Type" ].asCString();
 				const zp_char* globalName = glob[ "Name" ].asCString();
 				zp_uint globalSize =   (zp_uint)glob[ "Size" ].asInt();
@@ -91,8 +94,8 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 			} );
 		}
 
-		zpFixedArrayList< zpString, 16 > textures;
-		textures.resize( 16 );
+		zpFixedArrayList< zpString, 8 > textures;
+		textures.resize( 8 );
 
 		// pixel shader slots
 		const zpBison::Value ps = shaderData[ "PS" ];

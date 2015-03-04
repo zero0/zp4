@@ -49,10 +49,10 @@ struct zpConstantBufferShaderInput
 };
 struct zpShaderInput
 {
-	zpArrayList< zpTextureShaderInput > textures;
-	zpArrayList< zpConstantBufferShaderInput > constantBuffers;
-	zpArrayList< zpGlobalVariableInput > globalVariables;
 	zp_uint globalVariablesSize;
+	zpArrayList< zpTextureShaderInput > textures;
+	//zpArrayList< zpConstantBufferShaderInput > constantBuffers;
+	zpArrayList< zpGlobalVariableInput > globalVariables;
 };
 struct zpShaderInfo
 {

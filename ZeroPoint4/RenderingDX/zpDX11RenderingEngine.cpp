@@ -305,9 +305,9 @@ zp_bool zpRenderingEngineImpl::destroyBuffer( zpBufferImpl* buffer )
 		ZP_SAFE_RELEASE( buffer->m_buffer );
 
 		zp_uint count = m_usedBuffers.eraseAll( buffer );
-		ZP_ASSERT( count > 0, "Unknown Buffer being destroyed" );
 
-		if( count > 0 )
+		ZP_ASSERT( count == 1, "Unknown Buffer being destroyed" );
+		if( count == 1 )
 		{
 			m_freeBuffers.pushBack( buffer );
 			buffer = ZP_NULL;

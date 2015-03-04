@@ -18,7 +18,7 @@ void BaseShaderCompiler::initialize( const zpArrayList< zpString >& args )
 	// find local include dir from input file and by default use the local as the system include path
 	m_localIncludeDir = m_inputFile.substring( 0, m_inputFile.lastIndexOf( zpFile::sep ) );
 	m_systemIncludeDir = m_localIncludeDir;
-
+	m_previewFile = "txt";
 	// process args for optional params
 	if( args.size() > 3 )
 	{
@@ -208,16 +208,16 @@ void BaseShaderCompiler::parseShaderInfo( zpJson& shaderJson, zpShaderInfo& info
 		} );
 	}
 
-	if( !info.shaderInput.constantBuffers.isEmpty() )
-	{
-		zpJson& constantBuffers = shaderJson[ "ConstantBuffers" ];
-		info.shaderInput.constantBuffers.foreachIndexed( [ &constantBuffers ]( zp_uint index, zpConstantBufferShaderInput& c ) {
-			zpJson& cb = constantBuffers[ index ];
-			cb[ "Name" ] = zpJson( c.name );
-			cb[ "Size" ] = zpJson( c.size );
-			cb[ "Slot" ] = zpJson( c.slot );
-		} );
-	}
+	//if( !info.shaderInput.constantBuffers.isEmpty() )
+	//{
+	//	zpJson& constantBuffers = shaderJson[ "ConstantBuffers" ];
+	//	info.shaderInput.constantBuffers.foreachIndexed( [ &constantBuffers ]( zp_uint index, zpConstantBufferShaderInput& c ) {
+	//		zpJson& cb = constantBuffers[ index ];
+	//		cb[ "Name" ] = zpJson( c.name );
+	//		cb[ "Size" ] = zpJson( c.size );
+	//		cb[ "Slot" ] = zpJson( c.slot );
+	//	} );
+	//}
 }
 
 void BaseShaderCompiler::parseGlobalShaderInfo( zpJson& shaderJson, zpShaderInfo& info )
@@ -227,15 +227,15 @@ void BaseShaderCompiler::parseGlobalShaderInfo( zpJson& shaderJson, zpShaderInfo
 		zpJson& globals = shaderJson[ "Globals" ];
 		if( globals.isEmpty() )
 		{
-			shaderJson[ "GlobalsSize" ] = zpJson( info.shaderInput.globalVariablesSize );
-			info.shaderInput.globalVariables.foreachIndexed( [ &globals ]( zp_uint index, zpGlobalVariableInput& g ) {
-				zpJson& gv = globals[ index ];
+			globals[ "Size" ] = zpJson( info.shaderInput.globalVariablesSize );
+			zpJson& variables = globals[ "Variables" ];
+			info.shaderInput.globalVariables.foreachIndexed( [ &variables ]( zp_uint index, zpGlobalVariableInput& g ) {
+				zpJson& gv = variables[ index ];
 				gv[ "Name" ] = zpJson( g.name );
 				gv[ "Size" ] = zpJson( g.size );
 				gv[ "Type" ] = zpJson( g.type );
 				gv[ "Offset" ] = zpJson( g.offset );
 			} );
-	
 		}
 	}
 }
