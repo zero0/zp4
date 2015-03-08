@@ -10,12 +10,16 @@ const zp_char* g_shape[] =
 
 zpParticleEmitterComponent::zpParticleEmitterComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
-	, m_layer( 0 )
+	, m_layer( ZP_RENDERING_LAYER_DEFAULT )
 	, m_queue( ZP_RENDERING_QUEUE_TRANSPARENT )
 	, m_maxParticles( 0 )
 	, m_random( zpRandom::getInstance() )
 {
-	m_layer = def[ "Layer" ].asInt();
+	const zpBison::Value& layer = def[ "Layer" ];
+	if( layer.isInt() )
+	{
+		m_layer = layer.asInt();
+	}
 
 	m_maxParticles = def[ "MaxParticles" ].asInt();
 	m_allParticles.reserve( m_maxParticles );
@@ -43,7 +47,7 @@ zpParticleEmitterComponent::~zpParticleEmitterComponent()
 
 void zpParticleEmitterComponent::render( zpRenderingContext* i, const zpCamera* camera )
 {
-	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) && camera->getRenderLayers().isMarked( m_layer ) )
+	if( m_flags.isAllMarked( 1 << ZP_COMPONENT_FLAG_CREATED | 1 << ZP_COMPONENT_FLAG_ENABLED ) )
 	{
 		onRender( i, camera );
 	}
@@ -152,22 +156,22 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 		// if depth sort enabled, sort particles based on distance to camera
 		if( effect->useDepthSort )
 		{
-			effect->usedParticles.sort( [ camera ]( zpParticle* a, zpParticle* b ) -> zp_bool
-			{
-				zp_int cmp;
-				zpScalar lenA, lenB;
-				zpVector4f posA, posB;
-				zpMath::Sub( posA, a->position, camera->getPosition() );
-				zpMath::Sub( posB, b->position, camera->getPosition() );
-				zpMath::LengthSquared3( lenA, posA );
-				zpMath::LengthSquared3( lenB, posB );
-				zpMath::Cmp( cmp, lenA, lenB );
-
-				return cmp > 0;
-			} );
+			//effect->usedParticles.sort( [ camera ]( zpParticle* a, zpParticle* b ) -> zp_bool
+			//{
+			//	zp_int cmp;
+			//	zpScalar lenA, lenB;
+			//	zpVector4f posA, posB;
+			//	zpMath::Sub( posA, a->position, camera->getPosition() );
+			//	zpMath::Sub( posB, b->position, camera->getPosition() );
+			//	zpMath::LengthSquared3( lenA, posA );
+			//	zpMath::LengthSquared3( lenB, posB );
+			//	zpMath::Cmp( cmp, lenA, lenB );
+			//
+			//	return cmp > 0;
+			//} );
 		}
 
-		i->beginDrawImmediate( 1 << m_layer, m_queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &effect->material );
+		i->beginDrawImmediate( m_layer, m_queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &effect->material );
 
 		//if( !effect->isWorldSpace )
 		//{
@@ -225,16 +229,16 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 
 			// if billboard enabled, rotate towards camera
 			zpVector4f look, right, up;
-			if( effect->isBillboard )
-			{
-				zpMath::Sub( look, particle->position, camera->getPosition() );
-				zpMath::Normalize3( look, look );
-				zpMath::Cross3( right, camera->getUp(), look );
-				zpMath::Normalize3( right, right );
-				zpMath::Cross3( up, look, right );
-			}
-			// otherwise, set position and rotate so the normal is facing up
-			else
+			//if( effect->isBillboard )
+			//{
+			//	zpMath::Sub( look, particle->position, camera->getPosition() );
+			//	zpMath::Normalize3( look, look );
+			//	zpMath::Cross3( right, camera->getUp(), look );
+			//	zpMath::Normalize3( right, right );
+			//	zpMath::Cross3( up, look, right );
+			//}
+			//// otherwise, set position and rotate so the normal is facing up
+			//else
 			{
 				look = particle->normal;
 				zpMath::Perpendicular3( right, look );

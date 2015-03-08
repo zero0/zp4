@@ -19,7 +19,7 @@ public:
 	virtual void onEnterPhase( zpApplication* app ) = 0;
 	virtual void onLeavePhase( zpApplication* app ) = 0;
 
-	virtual zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) = 0;
+	virtual zpApplicationPhaseResult onUpdatePhase( zpApplication* app, zp_float deltaTime, zp_float realTime ) = 0;
 };
 
 ZP_PURE_INTERFACE zpApplicationState
@@ -46,7 +46,7 @@ public:
 	void onEnterPhase( zpApplication* app ) {}
 	void onLeavePhase( zpApplication* app ) {}
 
-	zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) { return ZP_APPLICATION_PHASE_NORMAL; }
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app, zp_float deltaTime, zp_float realTime ) { return ZP_APPLICATION_PHASE_NORMAL; }
 };
 
 class zpEmptyState : public zpApplicationState
@@ -96,7 +96,7 @@ public:
 	void addState( zpApplicationState* state );
 
 	void popCurrentPhase();
-	void updatePhase();
+	void updatePhase( zp_float deltaTime, zp_float realTime );
 	void pushNextPhase();
 
 	void swapState( const zp_char* stateName );
@@ -160,8 +160,8 @@ public:
 	zpTags* getTags() { return &m_tags; }
 
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp ) zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
-#include "zpAllComponents.inl"
+#define ZP_COMPONENT_DEF( cmp )			zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
+	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
 	zp_uint getFrameCount() const { return m_frameCount; }
@@ -197,8 +197,8 @@ private:
 	zp_bool m_isApplicationStepped;
 
 	zp_int m_currentPhase;
-
 	zp_int m_exitCode;
+
 	zpString m_optionsFilename;
 	zpString m_configFilename;
 	zpString m_loadingWorldFilename;
@@ -249,8 +249,8 @@ private:
 	zpProtoDBManager m_protoDBManager;
 
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp )	zp##cmp##ComponentPool m_componentPool##cmp;
-#include "zpAllComponents.inl"
+#define ZP_COMPONENT_DEF( cmp )			zp##cmp##ComponentPool m_componentPool##cmp;
+	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
 	enum zpApplicationStats : zp_uint

@@ -56,16 +56,18 @@ void zpApplication::popCurrentPhase()
 	m_phases[ m_currentPhase ]->onLeavePhase( this );
 	m_currentPhase--;
 }
-void zpApplication::updatePhase()
+void zpApplication::updatePhase( zp_float deltaTime, zp_float realTime )
 {
-	zpApplicationPhaseResult r = m_phases[ m_currentPhase ]->onUpdatePhase( this );
+	zpApplicationPhaseResult r = m_phases[ m_currentPhase ]->onUpdatePhase( this, deltaTime, realTime );
 	switch( r )
 	{
 	case ZP_APPLICATION_PHASE_NORMAL:
 		break;
+
 	case ZP_APPLICATION_PHASE_COMPLETE:
 		pushNextPhase();
 		break;
+
 	case ZP_APPLICATION_PHASE_FAILURE:
 		popCurrentPhase();
 		break;
@@ -237,8 +239,8 @@ void zpApplication::setup()
 	zpMemorySystem* mem = zpMemorySystem::getInstance();
 
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp )		m_componentPool##cmp.setup( mem );
-#include "zpAllComponents.inl"
+#define ZP_COMPONENT_DEF( cmp )			m_componentPool##cmp.setup( mem );
+	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
 	m_renderingPipeline.setup();
@@ -332,7 +334,7 @@ void zpApplication::teardown()
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )		m_componentPool##cmp.teardown();
-#include "zpAllComponents.inl"
+	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
 	garbageCollect();
@@ -375,13 +377,17 @@ zp_int zpApplication::shutdown()
 
 void zpApplication::update()
 {
+	// get times
 	zp_float deltaTime = m_isApplicationPaused && !m_isApplicationStepped ? 0.f : m_timer.getDeltaSeconds();
 	zp_float realTime = m_timer.getWallClockDeltaSeconds();
 	
+	// clear application step
 	m_isApplicationStepped = false;
 
-	updatePhase();
+	// update phases
+	updatePhase( deltaTime, realTime );
 
+	// update state
 	updateState( deltaTime, realTime );
 
 	zp_bool initalizeCurrentWorld = false;
@@ -773,14 +779,15 @@ void zpApplication::processFrame()
 
 		// render particles for each camera
 		ZP_PROFILE_START( RENDER_PARTICLES );
-		for( zp_uint p = 0; p < zpCameraType_Count; ++p )
-		{
-			const zpArrayList< zpCamera* >& cameras = m_renderingPipeline.getUsedCameras( (zpCameraType)p );
-			cameras.foreach( [ i, this ]( const zpCamera* camera ) 
-			{
-				if( camera->isActive() ) m_componentPoolParticleEmitter.render( i, camera );
-			} );
-		}
+		m_componentPoolParticleEmitter.render( i, ZP_NULL );
+		//for( zp_uint p = 0; p < zpCameraType_Count; ++p )
+		//{
+		//	const zpArrayList< zpCamera* >& cameras = m_renderingPipeline.getUsedCameras( (zpCameraType)p );
+		//	cameras.foreach( [ i, this ]( const zpCamera* camera ) 
+		//	{
+		//		if( camera->isActive() ) 
+		//	} );
+		//}
 		ZP_PROFILE_END( RENDER_PARTICLES );
 		
 		// render begin

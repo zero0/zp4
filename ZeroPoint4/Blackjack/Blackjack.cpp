@@ -29,7 +29,7 @@ public:
 	void onEnterPhase( zpApplication* app )
 	{
 		zp_printfln( "Enter ProtoDB Phase..." );
-		m_count = 60;
+		m_count = 6;
 
 		zpProtoDBManager* p = app->getProtoDBManager();
 
@@ -45,14 +45,14 @@ public:
 		//p->shutdown();
 	}
 
-	zpApplicationPhaseResult onUpdatePhase( zpApplication* app )
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app, zp_float deltaTime, zp_float realTime )
 	{
-		--m_count;
-		return m_count == 0 ? ZP_APPLICATION_PHASE_COMPLETE : ZP_APPLICATION_PHASE_NORMAL;
+		m_count -= deltaTime;
+		return m_count < 0.f ? ZP_APPLICATION_PHASE_COMPLETE : ZP_APPLICATION_PHASE_NORMAL;
 	}
 
 private:
-	zp_int m_count;
+	zp_float m_count;
 };
 
 class bPlayPhase : public zpApplicationPhase
@@ -71,7 +71,7 @@ public:
 		zp_printfln( "Leave Play Phase..." );
 	}
 
-	zpApplicationPhaseResult onUpdatePhase( zpApplication* app )
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app, zp_float deltaTime, zp_float realTime )
 	{
 		if( app->getInputManager()->getKeyboard()->isKeyPressed( ZP_KEY_CODE_P ) )
 		{
@@ -98,7 +98,8 @@ public:
 	void onEnterPhase( zpApplication* app ) {}
 	void onLeavePhase( zpApplication* app ) {}
 
-	zpApplicationPhaseResult onUpdatePhase( zpApplication* app ) { return ZP_APPLICATION_PHASE_NORMAL; }
+	// update the current phase
+	zpApplicationPhaseResult onUpdatePhase( zpApplication* app, zp_float deltaTime, zp_float realTime ) { return ZP_APPLICATION_PHASE_NORMAL; }
 
 private:
 	zpString m_loadingWorld;
@@ -173,10 +174,14 @@ public:
 			if( leftButton && !rightButton )
 			{
 				zpVector4f lootTo( forward );
+				zpScalar x( (zp_float)mouseDelta.getX() ), y( (zp_float)mouseDelta.getY() ), rt( realTime );
+
+				zpMath::Mul( x, x, rt );
+				zpMath::Mul( y, y, rt );
 
 				zpVector4f r, u;
-				zpMath::Mul( r, right, zpScalar( realTime * mouseDelta.getX() ) );
-				zpMath::Mul( u, up, zpScalar( realTime * mouseDelta.getY() ) );
+				zpMath::Mul( r, right, x );
+				zpMath::Mul( u, up, y );
 				zpMath::Add( r, r, u );
 				zpMath::Add( r, r, pos );
 
@@ -186,11 +191,16 @@ public:
 			else if( rightButton && !leftButton )
 			{
 				zpVector4f lootAt( m_editorCamera->getLookAt() );
+				zpScalar x( (zp_float)mouseDelta.getX() ), y( (zp_float)mouseDelta.getY() );
+				zpMath::Neg( y, y );
+
+				zpMath::DegToRad( x, x );
+				zpMath::DegToRad( y, y );
 
 				zpVector4f camPos( pos );
 				zpMath::Sub( camPos, camPos, lootAt );
-				zpMath::RotateY( camPos, camPos, zpScalar( ZP_DEG_TO_RAD( mouseDelta.getX() ) ) );
-				zpMath::RotateX( camPos, camPos, zpScalar( ZP_DEG_TO_RAD( -mouseDelta.getY() ) ) );
+				zpMath::RotateY( camPos, camPos, x );
+				zpMath::RotateX( camPos, camPos, y );
 				zpMath::Add( camPos, camPos, lootAt );
 
 				m_editorCamera->setPosition( camPos );
