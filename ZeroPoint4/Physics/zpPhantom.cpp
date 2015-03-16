@@ -22,6 +22,7 @@ void zpPhantom::create( zpPhysicsEngine* engine, const zpMatrix4f& transform, co
 	btCollisionShape* shape = (btCollisionShape*)m_collider->getCollider();
 
 	btPairCachingGhostObject* ghost = new btPairCachingGhostObject();
+	ghost->setUserPointer( this );
 	ghost->setCollisionShape( shape );
 	ghost->setCollisionFlags( ghost->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE );
 
@@ -103,8 +104,6 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 	btManifoldArray manifolds;
 	btPairCachingGhostObject* ghost = static_cast< btPairCachingGhostObject* >( m_phantom );
 
-	// @TODO: look at ghost->getOverlappingObject
-
 	const btBroadphasePairArray& pairs = ghost->getOverlappingPairCache()->getOverlappingPairArray();
 	for( zp_int i = 0; i < pairs.size(); ++i )
 	{
@@ -112,21 +111,22 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 
 		const btBroadphasePair& pair = pairs[ i ];
 		const btBroadphasePair* p = cache->findPair( pair.m_pProxy0, pair.m_pProxy1 );
-		if( p == ZP_NULL )
-		{
-			p = &pair;
-		}
+		if( p == ZP_NULL ) continue;
+
 		p->m_algorithm->getAllContactManifolds( manifolds );
 
 		for( zp_int j = 0; j < manifolds.size(); ++j )
 		{
 			btPersistentManifold* manifold = manifolds[ j ];
-			if( manifold->getNumContacts() > 0 )
-			{
-				btCollisionObject* b0 = static_cast< btCollisionObject* >( manifold->getBody0() );
-				btCollisionObject* b1 = static_cast< btCollisionObject* >( manifold->getBody1() );
+			btCollisionObject* b0 = static_cast< btCollisionObject* >( manifold->getBody0() );
+			btCollisionObject* b1 = static_cast< btCollisionObject* >( manifold->getBody1() );
 
-				//zp_printfln( "this-%p 0-%p 1-%p %d contacts ", m_phantom, manifold->getBody0(), manifold->getBody1(), manifold->getNumContacts() );
+			btCollisionObject* otherObject = m_phantom == b0 ? b1 : b0;
+
+			for( zp_int m = 0; m < manifold->getNumContacts(); ++m )
+			{
+				btManifoldPoint& point = manifold->getContactPoint( m );
+				
 			}
 		}
 	}

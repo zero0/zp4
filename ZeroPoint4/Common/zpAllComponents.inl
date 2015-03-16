@@ -28,6 +28,7 @@ ZP_COMPONENT_DEF( Phantom )
 // Common
 ZP_COMPONENT_DEF( Breakable )
 ZP_COMPONENT_DEF( Projectile )
+ZP_COMPONENT_DEF( Spawner )
 
 // UI
 ZP_COMPONENT_DEF( Canvas )

@@ -607,10 +607,6 @@ void zpApplication::handleInput()
 	{
 		exit( 0 );
 	}
-	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
-	{
-		restart();
-	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_TAB ) )
 	{
 		zpApplicationState* currentState = getCurrentState();
@@ -662,9 +658,12 @@ void zpApplication::handleInput()
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
 	{
+		restart();
+	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F10 ) )
+	{
 		zp_bool wasSet = m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS );
 		zp_bool isSet = m_displayStats.toggle( ZP_APPLICATION_STATS_DRAW_PHYSICS );
-		
 
 		if( !wasSet && isSet )
 		{

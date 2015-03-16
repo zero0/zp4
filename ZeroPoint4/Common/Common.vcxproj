@@ -69,8 +69,11 @@
     <ClInclude Include="zpAllComponents.h" />
     <ClInclude Include="zpAllGameManagers.h" />
     <ClInclude Include="zpApplication.h" />
+    <ClInclude Include="zpCharacterComponent.h" />
+    <ClInclude Include="zpPlayerComponent.h" />
     <ClInclude Include="zpRectTransformComponent.h" />
     <ClInclude Include="zpSkyBoxComponent.h" />
+    <ClInclude Include="zpSpawnerComponent.h" />
     <ClInclude Include="zpTransformComponent.h" />
     <ClInclude Include="zpAudioEmitterComponent.h" />
     <ClInclude Include="zpAudioListenerComponent.h" />
@@ -105,6 +108,7 @@
     <ClCompile Include="zpApplication.cpp" />
     <ClCompile Include="zpRectTransformComponent.cpp" />
     <ClCompile Include="zpSkyBoxComponent.cpp" />
+    <ClCompile Include="zpSpawnerComponent.cpp" />
     <ClCompile Include="zpTransformComponent.cpp" />
     <ClCompile Include="zpAudioEmitterComponent.cpp" />
     <ClCompile Include="zpAudioListenerComponent.cpp" />

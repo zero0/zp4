@@ -2,6 +2,14 @@
 #ifndef ZP_PHANTOM_H
 #define ZP_PHANTOM_H
 
+ZP_PURE_INTERFACE zpPhantomCallback
+{
+public:
+	virtual void onObjectEnter() = 0;
+	virtual void onObjectOverlap() = 0;
+	virtual void onObjectLeave() = 0;
+};
+
 class zpPhantom
 {
 public:
@@ -24,6 +32,9 @@ public:
 	void processCollisions( zp_handle dymaicsWorld ) const;
 
 private:
+	void objectEntered( zp_handle obj );
+	void objectExited( zp_handle obj );
+
 	zp_handle m_phantom;
 	zpCollider* m_collider;
 

@@ -37,6 +37,7 @@ class zpPhantomComponent;
 class zpBreakableComponent;
 class zpTransformComponent;
 class zpProjectileComponent;
+class zpSpawnerComponent;
 
 class zpRectTransformComponent;
 class zpCanvasComponent;
@@ -77,6 +78,7 @@ class zpOctreeNode;
 #include "zpBreakableComponent.h"
 #include "zpTransformComponent.h"
 #include "zpProjectileComponent.h"
+#include "zpSpawnerComponent.h"
 
 // GUI
 #include "zpRectTransformComponent.h"

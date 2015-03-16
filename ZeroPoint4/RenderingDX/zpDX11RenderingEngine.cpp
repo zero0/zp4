@@ -218,7 +218,6 @@ void zpRenderingEngineImpl::destroy()
 	{
 		ZP_SAFE_RELEASE( layout );
 	} );
-	m_inputLayouts.clear();
 
 	m_samplerStates.clear();
 	m_rasterStates.clear();
@@ -234,6 +233,8 @@ void zpRenderingEngineImpl::shutdown()
 	ZP_ASSERT( m_usedTextures.isEmpty(), "Texture still in use" );
 	ZP_ASSERT( m_usedBuffers.isEmpty(), "Buffer still in use" );
 	ZP_ASSERT( m_usedShaders.isEmpty(), "Shader still in use" );
+
+	m_inputLayouts.clear();
 
 	m_textures.clear();
 	m_buffers.clear();

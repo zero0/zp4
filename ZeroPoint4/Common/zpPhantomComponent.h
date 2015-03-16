@@ -26,6 +26,10 @@ private:
 	
 	zpPhantom m_phantom;
 
+	zpString m_eventOnEnter;
+	zpString m_eventOnOverlap;
+	zpString m_eventOnLeave;
+
 	zpString m_messageOnEnter;
 	zpString m_messageOnOverlap;
 	zpString m_messageOnLeave;
