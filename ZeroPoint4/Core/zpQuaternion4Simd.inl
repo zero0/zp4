@@ -1,4 +1,5 @@
 
+#if 0
 ZP_FORCE_INLINE void zpQuaternion4f::store3( zp_float* xyz ) const
 {
 	const __m128& q = m_xyzw;
@@ -24,3 +25,4 @@ ZP_FORCE_INLINE void zpQuaternion4f::load4( const zp_float* xyzw )
 {
 	m_xyzw = zp_vec4( xyzw[0], xyzw[1], xyzw[2], xyzw[3] );
 }
+#endif

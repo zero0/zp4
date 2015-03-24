@@ -2,6 +2,9 @@
 #ifndef ZP_QUATERNION4F_H
 #define ZP_QUATERNION4F_H
 
+typedef zp_vec4 zpQuaternion4f;
+
+#if 0
 ZP_ALIGN16 class zpQuaternion4f
 {
 public:
@@ -92,5 +95,6 @@ public:
 private:
 	zp_vec4 m_xyzw;
 };
+#endif
 
 #endif

@@ -31,6 +31,18 @@ protected:
 
 private:
 	zpPlayerNumber m_player;
+	zpControllerNumber m_controllerIndex;
+	const zpController* m_controller;
+};
+
+
+class zpPlayerComponentPool : public zpContentPool< zpPlayerComponent, zpPlayerNumber_Count >
+{
+public:
+	zpPlayerComponentPool();
+	virtual ~zpPlayerComponentPool();
+
+	void update( zp_float deltaTime, zp_float realTime );
 };
 
 #endif

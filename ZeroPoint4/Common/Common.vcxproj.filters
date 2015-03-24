@@ -251,6 +251,9 @@
     <ClCompile Include="zpSpawnerComponent.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="zpPlayerComponent.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpAllComponents.inl">

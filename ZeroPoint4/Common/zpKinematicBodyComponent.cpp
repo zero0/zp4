@@ -12,7 +12,28 @@ zpKinematicBodyComponent::~zpKinematicBodyComponent()
 {
 	m_kinematicBody.destroy( getApplication()->getPhysicsEngine() );
 }
-	
+
+zp_bool zpKinematicBodyComponent::canJump() const
+{
+	return m_kinematicBody.canJump();
+}
+
+void zpKinematicBodyComponent::jump()
+{
+	m_kinematicBody.jump();
+}
+void zpKinematicBodyComponent::walk( const zpVector4f& direction, const zpScalar& speed )
+{
+	zpVector4f dir;
+	zpMath::Mul( dir, direction, speed );
+
+	m_kinematicBody.setWalkDirection( dir );
+}
+void zpKinematicBodyComponent::stop()
+{
+	m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 0, 0 ) );
+}
+
 void zpKinematicBodyComponent::onCreate()
 {
 
@@ -43,37 +64,8 @@ void zpKinematicBodyComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 		zpQuaternion4f rot;
 		m_kinematicBody.getPositionRotation( pos, rot );
 
-		getParentObject()->getComponents()->getTransformComponent()->setLocalTransform( pos, rot );
-
-		const zpKeyboard* k = getApplication()->getInputManager()->getKeyboard();
-		if( k->isKeyDown( ZP_KEY_CODE_W ) )
-		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 10.f ) );
-		}
-		else if( k->isKeyDown( ZP_KEY_CODE_S ) )
-		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, -10.f ) );
-		}
-		else if( k->isKeyDown( ZP_KEY_CODE_A ) )
-		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 10.f, 0, 0 ) );
-		}
-		else if( k->isKeyDown( ZP_KEY_CODE_D ) )
-		{
-			m_kinematicBody.setWalkDirection( zpVector4f( -10.f, 0, 0 ) );
-		}
-		else if( k->isKeyPressed( ZP_KEY_CODE_SPACE ) )
-		{
-			m_kinematicBody.jump();
-		}
-		else if( k->isKeyPressed( ZP_KEY_CODE_R ) )
-		{
-			m_kinematicBody.warp( zpVector4f( 0, 10, 0 ) );
-		}
-		else
-		{
-			m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 0 ) );
-		}
+		zpTransformComponent* t = getParentObject()->getComponents()->getTransformComponent();
+		t->setLocalTransform( pos, rot );
 	}
 }
 void zpKinematicBodyComponent::onSimulate()

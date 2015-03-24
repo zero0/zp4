@@ -9,6 +9,7 @@ ZP_FORCE_INLINE void zpVector4f::operator delete( void* ptr ) {
 	_aligned_free( ptr );
 }
 */
+#if 0
 
 ZP_FORCE_INLINE void zpVector4f::store3( zp_float* xyz ) const
 {
@@ -37,7 +38,6 @@ ZP_FORCE_INLINE void zpVector4f::load4( const zp_float* xyzw )
 }
 
 
-#if 0
 ZP_FORCE_INLINE zpVector4f::zpVector4f( zp_float x, zp_float y, zp_float z, zp_float w ) :
 	m_xyzw( x, y, z, w )
 {}

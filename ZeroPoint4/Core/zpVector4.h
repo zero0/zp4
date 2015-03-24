@@ -2,6 +2,9 @@
 #ifndef ZP_VECTOR4F_H
 #define ZP_VECTOR4F_H
 
+typedef zp_vec4 zpVector4f;
+
+#if 0
 class ZP_ALIGN16 zpVector4f
 {
 public:
@@ -808,6 +811,7 @@ public:
 private:
 	zp_vec4 m_xyzw;
 };
+#endif
 
 //ZP_FORCE_INLINE zpVector4f operator+( const zpVector4f& v1, const zpVector4f& v2 );
 //ZP_FORCE_INLINE zpVector4f operator-( const zpVector4f& v1, const zpVector4f& v2 );

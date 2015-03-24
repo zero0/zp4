@@ -4,6 +4,7 @@
 //#define MM( r, c )		matrix[( (r) * 4 + (c) )]
 //#define MM_( r, c )		( (r) * 4 + (c) )
 
+#if 0
 ZP_FORCE_INLINE zpMatrix4f::zpMatrix4f()
 {}
 //ZP_FORCE_INLINE zpMatrix4f::zpMatrix4f( const zp_float* matrix )
@@ -108,3 +109,4 @@ ZP_FORCE_INLINE void zpMatrix4f::setIdentity()
 //
 //#undef MM_
 //#undef MM
+#endif

@@ -106,6 +106,7 @@
     <ClCompile Include="zpAllComponents.cpp" />
     <ClCompile Include="zpAllGameManagers.cpp" />
     <ClCompile Include="zpApplication.cpp" />
+    <ClCompile Include="zpPlayerComponent.cpp" />
     <ClCompile Include="zpRectTransformComponent.cpp" />
     <ClCompile Include="zpSkyBoxComponent.cpp" />
     <ClCompile Include="zpSpawnerComponent.cpp" />

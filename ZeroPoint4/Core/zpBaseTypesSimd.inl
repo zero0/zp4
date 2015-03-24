@@ -3,6 +3,9 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 
+typedef __m128 zp_vec4;
+
+#if 0
 struct ZP_ALIGN16 zpScalar
 {
 	ZP_FORCE_INLINE zpScalar() {}
@@ -158,3 +161,5 @@ struct ZP_ALIGN16 zp_vec4
 private:
 	__m128 m_xyxw;
 };
+
+#endif

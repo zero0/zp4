@@ -7,6 +7,12 @@ public:
 	zpKinematicBodyComponent( zpObject* obj, const zpBison::Value& def );
 	virtual ~zpKinematicBodyComponent();
 
+	zp_bool canJump() const;
+
+	void jump();
+	void walk( const zpVector4f& direction, const zpScalar& speed );
+	void stop();
+
 protected:
 	void onCreate();
 	void onInitialize();

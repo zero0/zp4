@@ -1,4 +1,5 @@
 
+#if 0
 ZP_FORCE_INLINE zpVector4f::zpVector4f()
 	: m_xyzw()
 {}
@@ -322,3 +323,5 @@ ZP_FORCE_INLINE void zpVector4f::setW( const zpScalar& w )
 //	v.div4( v1 );
 //	return v;
 //}
+
+#endif

@@ -1,4 +1,5 @@
 
+#if 0
 ZP_FORCE_INLINE zpQuaternion4f::zpQuaternion4f()
 	: m_xyzw()
 {}
@@ -79,3 +80,6 @@ ZP_FORCE_INLINE void zpQuaternion4f::setW( const zpScalar& w )
 {
 	m_xyzw.setW( w );
 }
+
+#endif
+
