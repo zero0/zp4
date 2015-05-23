@@ -56,7 +56,7 @@ namespace zpMath
 	}
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Load4( const zp_float* xyzw )
 	{
-		return _mm_loadr_ps( xyzw );
+		return _mm_load_ps( xyzw );
 	}
 
 	//

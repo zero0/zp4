@@ -7,28 +7,32 @@
 #include "src/BulletDynamics/Character/btKinematicCharacterController.h"
 #include "src/BulletCollision/CollisionDispatch/btGhostObject.h"
 
-ZP_FORCE_INLINE void _btVector3ToVector4Position( const btVector3& s, zpVector4f& a )
+ZP_FORCE_INLINE zpVector4f _btVector3ToVector4Position( const btVector3& s )
 {
 	ZP_ALIGN16 btVector3FloatData data;
 	s.serializeFloat( data );
 
-	a = zpMath::Vector4Load4( data.m_floats );
+	zpVector4f a = zpMath::Vector4Load4( data.m_floats );
+	return a;
 }
 
-ZP_FORCE_INLINE void _btVector3ToVector4Normal( const btVector3& s, zpVector4f& a )
+ZP_FORCE_INLINE zpVector4f _btVector3ToVector4Normal( const btVector3& s )
 {
 	ZP_ALIGN16 btVector3FloatData data;
 	s.serializeFloat( data );
 
-	a = zpMath::Vector4Load4( data.m_floats );
+	zpVector4f a = zpMath::Vector4Load4( data.m_floats );
+	return a;
 }
 
-ZP_FORCE_INLINE void _zpVector4ToVector3( const zpVector4f& s, btVector3& a )
+ZP_FORCE_INLINE btVector3 ZP_VECTORCALL _zpVector4ToVector3( zpVector4fParamF s )
 {
 	ZP_ALIGN16 btVector3FloatData data;
 	zpMath::Vector4Store4( s, data.m_floats );
 
+	btVector3 a;
 	a.deSerializeFloat( data );
+	return a;
 }
 
 zpKinematicBody::zpKinematicBody()
@@ -82,7 +86,7 @@ public:
 
 		zpScalar dotUp;
 		zpVector4f hitNormal;
-		_btVector3ToVector4Normal( hitNormalWorld, hitNormal );
+		hitNormal = _btVector3ToVector4Normal( hitNormalWorld );
 
 		dotUp = zpMath::Vector4Dot3( m_up, hitNormal );
 		if( zpMath::ScalarCmp( dotUp, m_minSlopeDot ) < 0 ) return btScalar( 1.0f );
@@ -160,7 +164,7 @@ public:
 	void setWalkDirection( const btVector3& walkDirection )
 	{
 		m_useWalkDirection = true;
-		_btVector3ToVector4Normal( walkDirection, m_walkDirection );
+		m_walkDirection = _btVector3ToVector4Normal( walkDirection );
 		//m_walkDirection = walkDirection;
 		//m_normalizedWalkDirection.normalize();
 		m_normalizedWalkDirection = zpMath::Vector4Normalize3( m_walkDirection );
@@ -170,7 +174,7 @@ public:
 	{
 		m_useWalkDirection = false;
 		//m_walkDirection = velocity;
-		_btVector3ToVector4Normal( velocity, m_velocity );
+		m_velocity = _btVector3ToVector4Normal( velocity );
 		//m_normalizedWalkDirection.normalize();
 		m_normalizedWalkDirection = zpMath::Vector4Normalize3( m_normalizedWalkDirection );
 		m_velocityTimeInterval = timeInterval;
@@ -206,7 +210,7 @@ public:
 
 		const btVector3& currentPos = m_ghost->getWorldTransform().getOrigin();
 
-		_btVector3ToVector4Position( currentPos, m_currentPosition );
+		m_currentPosition = _btVector3ToVector4Position( currentPos );
 		m_targetPosition = m_currentPosition;
 	}
 
@@ -270,7 +274,7 @@ public:
 		stepDown( collisionWorld, dt );
 
 		btVector3 pos;
-		_zpVector4ToVector3( m_currentPosition, pos );
+		pos = _zpVector4ToVector3( m_currentPosition );
 
 		xform.setOrigin( pos );
 		m_ghost->setWorldTransform( xform );
@@ -306,7 +310,7 @@ public:
 		collisionWorld->getDispatcher()->dispatchAllCollisionPairs( m_ghost->getOverlappingPairCache(), collisionWorld->getDispatchInfo(), collisionWorld->getDispatcher() );
 
 		const btVector3& pos = m_ghost->getWorldTransform().getOrigin();
-		_btVector3ToVector4Position( pos, m_currentPosition );
+		m_currentPosition = _btVector3ToVector4Position( pos );
 
 		btScalar maxPen = 0;
 		btBroadphasePairArray& overlappingPairs = m_ghost->getOverlappingPairCache()->getOverlappingPairArray();
@@ -346,7 +350,7 @@ public:
 							maxPen = dist;
 
 							zpVector4f touchNorm;
-							_btVector3ToVector4Normal( pt.m_normalWorldOnB, touchNorm );
+							touchNorm = _btVector3ToVector4Normal( pt.m_normalWorldOnB );
 
 							m_touchingNormal = zpMath::Vector4Mul( touchNorm, directionSign );
 							m_touchingNormal = zpMath::Vector4Normalize3( m_touchingNormal );
@@ -358,7 +362,7 @@ public:
 						zpVector4f worldOnB;
 						zpScalar d;
 
-						_btVector3ToVector4Normal( pt.m_normalWorldOnB, worldOnB );
+						worldOnB = _btVector3ToVector4Normal( pt.m_normalWorldOnB );
 
 						d = zpMath::ScalarMul( directionSign, zpMath::Scalar( dist ) );
 						d = zpMath::ScalarMul( d, zpMath::Scalar( 0.2f ) );
@@ -379,7 +383,7 @@ public:
 		if( penetration )
 		{
 			btVector3 pos;
-			_zpVector4ToVector3( m_currentPosition, pos );
+			pos = _zpVector4ToVector3( m_currentPosition );
 
 			m_ghost->getWorldTransform().setOrigin( pos );
 		}
@@ -403,8 +407,8 @@ public:
 		zpVector4f pos;
 		pos = zpMath::Vector4Madd( m_currentPosition, m_up, zpMath::Scalar( m_shape->getMargin() ) );
 
-		_zpVector4ToVector3( pos, s );
-		_zpVector4ToVector3( m_targetPosition, e );
+		s = _zpVector4ToVector3( pos );
+		e = _zpVector4ToVector3( m_targetPosition );
 
 		start.setOrigin( s );
 		end.setOrigin( e );
@@ -428,7 +432,7 @@ public:
 		{
 			zpScalar d;
 			zpVector4f hitNormalWorld;
-			_btVector3ToVector4Normal( cb.m_hitNormalWorld, hitNormalWorld );
+			hitNormalWorld = _btVector3ToVector4Normal( cb.m_hitNormalWorld );
 			d = zpMath::Vector4Dot3( m_up, hitNormalWorld );
 
 			//if( cb.m_hitNormalWorld.dot( m_up ) > 0.f )
@@ -477,8 +481,8 @@ public:
 		while( fraction > 0.01f && maxIterations-- > 0 )
 		{
 			btVector3 s, e;
-			_zpVector4ToVector3( m_currentPosition, s );
-			_zpVector4ToVector3( m_targetPosition, e );
+			s = _zpVector4ToVector3( m_currentPosition );
+			e = _zpVector4ToVector3( m_targetPosition );
 
 			start.setOrigin( s );
 			end.setOrigin( e );
@@ -505,7 +509,7 @@ public:
 			if( cb.hasHit() )
 			{
 				zpVector4f hitNorm;
-				_btVector3ToVector4Normal( cb.m_hitNormalWorld, hitNorm );
+				hitNorm = _btVector3ToVector4Normal( cb.m_hitNormalWorld );
 
 				updateTargetPositionBasedOnCollision( hitNorm );
 
@@ -567,8 +571,8 @@ public:
 		m_targetPosition = zpMath::Vector4Sub( m_targetPosition, drop );
 
 		btVector3 s, e;
-		_zpVector4ToVector3( m_currentPosition, s );
-		_zpVector4ToVector3( m_targetPosition, e );
+		s = _zpVector4ToVector3( m_currentPosition );
+		e = _zpVector4ToVector3( m_targetPosition );
 
 		start.setOrigin( s );
 		end.setOrigin( e );
@@ -702,7 +706,7 @@ void zpKinematicBody::initialize( const zpMatrix4f& transform )
 
 	btQuaternion rot( btQuaternion::getIdentity() );
 	btVector3 pos;
-	_zpVector4ToVector3( transform.r[ 3 ], pos );
+	pos = _zpVector4ToVector3( transform.r[ 3 ] );
 
 	btTransform startTransform( rot, pos );
 
@@ -786,7 +790,7 @@ zp_bool zpKinematicBody::onGround() const
 void zpKinematicBody::warp( const zpVector4f& position )
 {
 	btVector3 pos;
-	_zpVector4ToVector3( position, pos );
+	pos = _zpVector4ToVector3( position );
 
 	zpKinematicCharacterController* controller = (zpKinematicCharacterController*)m_controller;
 	controller->warp( pos );

@@ -511,6 +511,18 @@ namespace zpMath
 		return zpMath::Quaternion( sx, sy, sz, sw );
 	}
 
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL TR( zpVector4fParamF p, zpQuaternion4fParamF r )
+	{
+		zpMatrix4f pm = MatrixIdentity();
+		pm.m_m4 = p;
+
+		zpMatrix4f rm = QuaternionToMatrix( r );
+
+		zpMatrix4f m;
+		m = MatrixMul( rm, pm );
+
+		return m;
+	}
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL TRS( zpVector4fParamF p, zpQuaternion4fParamF r, zpVector4fParamF s )
 	{
 		zpMatrix4f pm = MatrixIdentity();

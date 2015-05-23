@@ -339,6 +339,7 @@ namespace zpMath
 
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL QuaternionToMatrix( zpQuaternion4fParamF a );
 
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL TR( zpVector4fParamF p, zpQuaternion4fParamF r );
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL TRS( zpVector4fParamF p, zpQuaternion4fParamF r, zpVector4fParamF s );
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixIdentity();
 
