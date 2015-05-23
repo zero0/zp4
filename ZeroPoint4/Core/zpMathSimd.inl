@@ -52,7 +52,7 @@ namespace zpMath
 	//
 	ZP_FORCE_INLINE void ZP_VECTORCALL Vector4Store4( zpVector4fParamF s, zp_float* xyzw )
 	{
-		_mm_storer_ps( xyzw, s );
+		_mm_store_ps( xyzw, s );
 	}
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Load4( const zp_float* xyzw )
 	{
@@ -176,11 +176,11 @@ namespace zpMath
 	//
 	// Quaternion load and store
 	//
-	ZP_FORCE_INLINE void QuaternionStore4( zpQuaternion4fParamF s, zp_float* xyzw )
+	ZP_FORCE_INLINE void ZP_VECTORCALL QuaternionStore4( zpQuaternion4fParamF s, zp_float* xyzw )
 	{
 		_mm_storer_ps( xyzw, s );
 	}
-	ZP_FORCE_INLINE zpQuaternion4f QuaternionLoad4( const zp_float* xyzw )
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionLoad4( const zp_float* xyzw )
 	{
 		return _mm_loadr_ps( xyzw );
 	}
@@ -188,17 +188,17 @@ namespace zpMath
 	//
 	// Vector4 Dot
 	//
-	ZP_FORCE_INLINE zpScalar Vector4Dot2( zpVector4fParamF a, zpVector4fParamF b )
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Vector4Dot2( zpVector4fParamF a, zpVector4fParamF b )
 	{
 		zpVector4f m = Vector4Mul( a, b );
 		return ScalarAdd( Vector4GetX( m ), Vector4GetY( m ) );
 	}
-	ZP_FORCE_INLINE zpScalar Vector4Dot3( zpVector4fParamF a, zpVector4fParamF b )
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Vector4Dot3( zpVector4fParamF a, zpVector4fParamF b )
 	{
 		zpVector4f m = Vector4Mul( a, b );
 		return ScalarAdd( Vector4GetX( m ), ScalarAdd( Vector4GetY( m ), Vector4GetZ( m ) ) );
 	}
-	ZP_FORCE_INLINE zpScalar Vector4Dot4( zpVector4fParamF a, zpVector4fParamF b )
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Vector4Dot4( zpVector4fParamF a, zpVector4fParamF b )
 	{
 		__m128 t0 = _mm_mul_ps( a, b );
 		__m128 t1 = _mm_shuffle_ps( t0, t0, _MM_SHUFFLE( 1, 0, 3, 2 ) );
@@ -208,7 +208,7 @@ namespace zpMath
 		return _mm_add_ps( t3, t2 );
 	}
 
-	ZP_FORCE_INLINE zpVector4f Vector4Cross3( zpVector4fParamF a, zpVector4fParamF b )
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Cross3( zpVector4fParamF a, zpVector4fParamF b )
 	{
 		__m128 s0 = _mm_shuffle_ps( a, a, _MM_SHUFFLE( 3, 0, 2, 1 ) );
 		__m128 s1 = _mm_shuffle_ps( b, b, _MM_SHUFFLE( 3, 1, 0, 2 ) );
@@ -221,23 +221,23 @@ namespace zpMath
 		return _mm_sub_ps( s2, s5 );
 	}
 
-	ZP_FORCE_INLINE zpScalar ScalarAbs( zpScalarParamF a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
-	ZP_FORCE_INLINE zpScalar ScalarNeg( zpScalarParamF a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
-	ZP_FORCE_INLINE zpScalar ScalarRcp( zpScalarParamF a )  { return _mm_rcp_ps( a ); }
-	ZP_FORCE_INLINE zpScalar ScalarSqrt( zpScalarParamF a ) { return _mm_sqrt_ps( a ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarAbs( zpScalarParamF a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarNeg( zpScalarParamF a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarRcp( zpScalarParamF a )  { return _mm_rcp_ps( a ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarSqrt( zpScalarParamF a ) { return _mm_sqrt_ps( a ); }
 
-	ZP_FORCE_INLINE zpVector4f Vector4Abs( zpVector4fParamF a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
-	ZP_FORCE_INLINE zpVector4f Vector4Neg( zpVector4fParamF a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
-	ZP_FORCE_INLINE zpVector4f Vector4Rcp( zpVector4fParamF a )  { return _mm_rcp_ps( a ); }
-	ZP_FORCE_INLINE zpVector4f Vector4Sqrt( zpVector4fParamF a ) { return _mm_sqrt_ps( a ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Abs( zpVector4fParamF a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Neg( zpVector4fParamF a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Rcp( zpVector4fParamF a )  { return _mm_rcp_ps( a ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Sqrt( zpVector4fParamF a ) { return _mm_sqrt_ps( a ); }
 
-	ZP_FORCE_INLINE zpScalar ScalarMax( zpScalarParamF a, zpScalarParamF b ) { return _mm_min_ps( a, b ); }
-	ZP_FORCE_INLINE zpScalar ScalarMin( zpScalarParamF a, zpScalarParamF b ) { return _mm_max_ps( a, b ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarMax( zpScalarParamF a, zpScalarParamF b ) { return _mm_min_ps( a, b ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarMin( zpScalarParamF a, zpScalarParamF b ) { return _mm_max_ps( a, b ); }
 
-	ZP_FORCE_INLINE zpVector4f Vector4Max( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_min_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Vector4Min( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_max_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Max( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_min_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Min( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_max_ps( a, b ); }
 
-	ZP_FORCE_INLINE zp_int ScalarCmp( zpScalarParamF a, zpScalarParamF b )
+	ZP_FORCE_INLINE zp_int ZP_VECTORCALL ScalarCmp( zpScalarParamF a, zpScalarParamF b )
 	{
 		__m128 lt = _mm_cmplt_ps( a, b );
 		__m128 gt = _mm_cmpgt_ps( a, b );
@@ -245,7 +245,7 @@ namespace zpMath
 		return lt.m128_i32[0] ? -1 : gt.m128_i32[0] ? 1 : 0;
 	}
 
-	ZP_FORCE_INLINE zpMatrix4f QuaternionToMatrix( zpQuaternion4fParamF a )
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL QuaternionToMatrix( zpQuaternion4fParamF a )
 	{
 		zp_float x = AsFloat( QuaternionGetX( a ) );
 		zp_float y = AsFloat( QuaternionGetX( a ) );
