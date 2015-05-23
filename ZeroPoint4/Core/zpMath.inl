@@ -331,38 +331,8 @@ namespace zpMath
 
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL Transpose( zpMatrix4fParamF a )
 	{
-		ZP_ALIGN16 zp_float data[4][4];
-		ZP_ALIGN16 zp_float matrix[4][4];
-		Vector4Store4( a.m_m1, matrix[0] );
-		Vector4Store4( a.m_m2, matrix[1] );
-		Vector4Store4( a.m_m3, matrix[2] );
-		Vector4Store4( a.m_m4, matrix[3] );
-
-		data[0][0] = matrix[0][0];
-		data[0][1] = matrix[1][0];
-		data[0][2] = matrix[2][0];
-		data[0][3] = matrix[3][0];
-
-		data[1][0] = matrix[0][1];
-		data[1][1] = matrix[1][1];
-		data[1][2] = matrix[2][1];
-		data[1][3] = matrix[3][1];
-
-		data[2][0] = matrix[0][2];
-		data[2][1] = matrix[1][2];
-		data[2][2] = matrix[2][2];
-		data[2][3] = matrix[3][2];
-
-		data[3][0] = matrix[0][3];
-		data[3][1] = matrix[1][3];
-		data[3][2] = matrix[2][3];
-		data[3][3] = matrix[3][3];
-
-		zpMatrix4f s;
-		s.m_m1 = Vector4Load4( data[0] );
-		s.m_m2 = Vector4Load4( data[1] );
-		s.m_m3 = Vector4Load4( data[2] );
-		s.m_m4 = Vector4Load4( data[3] );
+		zpMatrix4f s = a;
+		_MM_TRANSPOSE4_PS( s.m_m1, s.m_m2, s.m_m3, s.m_m4 );
 
 		return s;
 	}
