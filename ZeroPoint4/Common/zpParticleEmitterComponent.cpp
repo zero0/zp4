@@ -213,7 +213,6 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 		{
 			zpParticle* particle = *p;
 
-			zpMatrix4f wvp;
 
 			// scale points out from the center
 			zpVector4f p0 = zpMath::Vector4( -1,  1, 0, 1 );
@@ -222,10 +221,10 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 			zpVector4f p3 = zpMath::Vector4( -1, -1, 0, 1 );
 
 			// scale particles
-			p0 = zpMath::Vector4Scale( p0, particle->scale );
-			p1 = zpMath::Vector4Scale( p1, particle->scale );
-			p2 = zpMath::Vector4Scale( p2, particle->scale );
-			p3 = zpMath::Vector4Scale( p3, particle->scale );
+			p0 = zpMath::Vector4Mul( p0, particle->scale );
+			p1 = zpMath::Vector4Mul( p1, particle->scale );
+			p2 = zpMath::Vector4Mul( p2, particle->scale );
+			p3 = zpMath::Vector4Mul( p3, particle->scale );
 
 			// if billboard enabled, rotate towards camera
 			zpVector4f look, right, up;
@@ -245,6 +244,7 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 				up = zpMath::Vector4Cross3( right, look );
 			}
 
+			zpMatrix4f wvp;
 			wvp.r[ 0 ] = right;
 			wvp.r[ 1 ] = up;
 			wvp.r[ 2 ] = look;
@@ -422,15 +422,15 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_RANDOM:
-				particle->scale = zpMath::ScalarLerp( effect->startScale, effect->endScale, zpMath::Scalar( m_random->randomFloat( 0.f, 1.f ) ) );
+				particle->scale = zpMath::Vector4Lerp( effect->startScale, effect->endScale, zpMath::Scalar( m_random->randomFloat( 0.f, 1.f ) ) );
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_LIFETIME:
-				particle->scale = zpMath::ScalarLerp( effect->startScale, effect->endScale, sLife );
+				particle->scale = zpMath::Vector4Lerp( effect->startScale, effect->endScale, sLife );
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_SPEED:
-				particle->scale = zpMath::ScalarLerp( effect->startScale, effect->endScale, sSpeed );
+				particle->scale = zpMath::Vector4Lerp( effect->startScale, effect->endScale, sSpeed );
 				break;
 			}
 		}
