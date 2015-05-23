@@ -5,7 +5,7 @@ zpPlaneOps::zpPlaneOps()
 	, height( 1.0f )
 	, widthSegments( 1 )
 	, heightSegments( 1 )
-	, up( zpVector4f( 0, 1, 0 ) )
+	, up( zpMath::Vector4( 0, 1, 0, 0 ) )
 	, uvRect( 0, 0, 1, 1 )
 	, rotationAngle( 0.0f )
 	, isTopLeftCenter( false )
@@ -23,51 +23,57 @@ void zpGenerateMesh::Plane( zpArrayList< zpVector4f >& verts, zpArrayList< zpVec
 	
 	zpVector2f uv, size;
 	zpVector4f up( ops.up ), vx, vy, vw, vh, vert;
-	zpMath::Normalize3( up, up );
-	zpMath::Perpendicular3( vx, up );
-	zpMath::Cross3( vy, up, vx );
+	up = zpMath::Vector4Normalize3( up );
+	vx = zpMath::Vector4Perpendicular3( up );
+	vy = zpMath::Vector4Cross3( up, vx );
 
-	zpScalar wDelta( ops.width ), hDelta( ops.height );
+	zpScalar wDelta = zpMath::Scalar( ops.width );
+	zpScalar hDelta = zpMath::Scalar( ops.height );
 
-	zpVector4f orig( 0.f );
+	zpVector4f orig = zpMath::Vector4( 0.f, 0.f, 0.f, 1.f );
 	if( !ops.isTopLeftCenter )
 	{
-		zpVector4f a, b;
-		zpMath::Mul( a, vx, wDelta );
-		zpMath::Mul( a, a, zpScalar( -2.0f ) );
+		zpVector4f a, b, c;
+		a = zpMath::Vector4Mul( vx, wDelta );
+		a = zpMath::Vector4Mul( a, zpMath::Scalar( -2.0f ) );
 
-		zpMath::Mul( b, vy, hDelta );
-		zpMath::Mul( b, b, zpScalar( -2.0f ) );
+		b = zpMath::Vector4Mul( vy, hDelta );
+		b = zpMath::Vector4Mul( b, zpMath::Scalar( -2.0f ) );
 
-		zpMath::Add( orig, a, b );
+		c = zpMath::Vector4Add( a, b );
+		orig = zpMath::Vector4Add( orig, c );
 	}
 
-	zpScalar uMin( ops.uvRect.getLeft() ), uMax( ops.uvRect.getRight() );
-	zpScalar vMin( ops.uvRect.getTop() ), vMax( ops.uvRect.getBottom() );
+	zpScalar uMin = zpMath::Scalar( ops.uvRect.getLeft() );
+	zpScalar uMax = zpMath::Scalar( ops.uvRect.getRight() );
+	zpScalar vMin = zpMath::Scalar( ops.uvRect.getTop() );
+	zpScalar vMax = zpMath::Scalar( ops.uvRect.getBottom() );
 
 	for( zp_uint w = 0; w <= ops.widthSegments; ++w )
 	{
 		for( zp_uint h = 0; h <= ops.heightSegments; ++h )
 		{
-			zpScalar wd( (zp_float)w ), hd( (zp_float)h ), u, v;
-			zpMath::Div( wd, wd, zpScalar( (zp_float)ops.widthSegments ) );
-			zpMath::Div( hd, hd, zpScalar( (zp_float)ops.heightSegments ) );
+			zpScalar wd = zpMath::Scalar( (zp_float)w );
+			zpScalar hd = zpMath::Scalar( (zp_float)h ), u, v;
 
-			zpMath::Lerp( u, uMin, uMax, wd );
-			zpMath::Lerp( v, vMin, vMax, hd );
+			wd = zpMath::ScalarDiv( wd, zpMath::Scalar( (zp_float)ops.widthSegments ) );
+			hd = zpMath::ScalarDiv( hd, zpMath::Scalar( (zp_float)ops.heightSegments ) );
 
-			zpMath::Mul( wd, wd, wDelta );
-			zpMath::Mul( hd, hd, hDelta );
+			u = zpMath::ScalarLerp( uMin, uMax, wd );
+			v = zpMath::ScalarLerp( vMin, vMax, hd );
 
-			zpMath::Mul( vw, vx, wd );
-			zpMath::Mul( vh, vy, hd );
+			wd = zpMath::ScalarMul( wd, wDelta );
+			hd = zpMath::ScalarMul( hd, hDelta );
 
-			zpMath::Add( vert, orig, vw );
-			zpMath::Add( vert, vert, vh );
+			vw = zpMath::Vector4Mul( vx, wd );
+			vh = zpMath::Vector4Mul( vy, hd );
+
+			vert = zpMath::Vector4Add( orig, vw );
+			vert = zpMath::Vector4Add( vert, vh );
 
 			verts.pushBack( vert );
 			normals.pushBack( up );
-			uvs.pushBack( zpVector2f( u.getFloat(), v.getFloat() ) );
+			uvs.pushBack( zpVector2f( zpMath::AsFloat( u ), zpMath::AsFloat( v ) ) );
 		}
 	}
 

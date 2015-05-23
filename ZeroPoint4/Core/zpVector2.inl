@@ -243,5 +243,5 @@ zp_bool zpVector2<T>::operator!=( const zpVector2<F>& vector ) const {
 template<typename T>
 zpVector4f zpVector2<T>::asVector4( T z, T w ) const
 {
-	return zpVector4f( (zp_float)m_x, (zp_float)m_y, (zp_float)z, (zp_float)w );
+	return zpMath::Vector4( (zp_float)m_x, (zp_float)m_y, (zp_float)z, (zp_float)w );
 }

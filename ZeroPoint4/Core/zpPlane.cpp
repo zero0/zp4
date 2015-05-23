@@ -7,11 +7,11 @@ zpPlane::zpPlane( const zpVector4f& normal )
 	: m_plane( normal )
 {}
 zpPlane::zpPlane( zp_float a, zp_float b, zp_float c, zp_float d )
-	: m_plane( a, b, c, d )
+	: m_plane( zpMath::Vector4( a, b, c, d ) )
 {
 	zpScalar l;
-	zpMath::Length3( l, m_plane );
-	zpMath::Div( m_plane, m_plane, l );
+	l = zpMath::Vector4Length3( m_plane );
+	m_plane = zpMath::Vector4Div( m_plane, l );
 }
 zpPlane::zpPlane( const zpPlane& plane )
 	: m_plane( plane.m_plane )
@@ -33,46 +33,46 @@ void zpPlane::operator=( zpPlane&& plane )
 
 zpPlaneSide zpPlane::getSideOfPlane( const zpVector4f& point ) const
 {
-	zpScalar z( 0.0f );
+	zpScalar z = zpMath::Scalar( 0.0f );
 	zpScalar d;
-	zpMath::Dot3( d, point, m_plane );
-	zpMath::Add( d, d, m_plane.getW() );
+	d = zpMath::Vector4Dot3( point, m_plane );
+	d = zpMath::Vector4Add( d, zpMath::Vector4GetW( m_plane ) );
 
 	zp_int c;
-	zpMath::Cmp( c, d, z );
+	c = zpMath::ScalarCmp( d, z );
 
 	return c > 0 ? ZP_PLANE_SIDE_POSITIVE : c < 0 ? ZP_PLANE_SIDE_NEGATIVE : ZP_PLANE_SIDE_ON_PLANE;
 }
 zpScalar zpPlane::getDistanceToPoint( const zpVector4f& point ) const
 {
 	zpScalar d;
-	zpMath::Dot3( d, point, m_plane );
-	zpMath::Add( d, d, m_plane.getW() );
+	d = zpMath::Vector4Dot3( point, m_plane );
+	d = zpMath::Vector4Add( d, zpMath::Vector4GetW( m_plane ) );
 
 	return d;
 }
 
 void zpPlane::set( zp_float a, zp_float b, zp_float c, zp_float d )
 {
-	m_plane = zpVector4f( a, b, c, d );
+	m_plane = zpMath::Vector4( a, b, c, d );
 
 	zpScalar l;
-	zpMath::Length3( l, m_plane );
-	zpMath::Div( m_plane, m_plane, l );
+	l = zpMath::Vector4Length3( m_plane );
+	m_plane = zpMath::Vector4Div( m_plane, l );
 }
 void zpPlane::set( const zpVector4f& p0, const zpVector4f& p1, const zpVector4f& p2 )
 {
 	zpVector4f p01, p02;
 	zpScalar d;
 
-	zpMath::Sub( p01, p0, p1 );
-	zpMath::Sub( p02, p2, p1 );
-	zpMath::Cross3( m_plane, p01, p02 );
-	zpMath::Normalize3( m_plane, m_plane );
+	p01 = zpMath::Vector4Sub( p0, p1 );
+	p02 = zpMath::Vector4Sub( p2, p1 );
+	m_plane = zpMath::Vector4Cross3( p01, p02 );
+	m_plane = zpMath::Vector4Normalize3( m_plane );
 
-	zpMath::Dot3( d, m_plane, p1 );
-	zpMath::Neg( d, d );
-	m_plane.setW( d );
+	d = zpMath::Vector4Dot3( m_plane, p1 );
+	d = zpMath::Vector4Neg( d );
+	m_plane = zpMath::Vector4SetW( m_plane, d );
 }
 
 const zpVector4f& zpPlane::getVector() const

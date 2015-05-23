@@ -152,7 +152,7 @@ void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue que
 	m_currentCommnad->indexCount = 0;
 	m_currentCommnad->vertexOffset = 0;
 	m_currentCommnad->indexOffset = 0;
-	m_currentCommnad->matrix.setIdentity();
+	m_currentCommnad->matrix = zpMath::MatrixIdentity();
 
 	m_currentCommnad->vertexStride = VertexFormatStrides[ vertexFormat ];
 }
@@ -188,7 +188,10 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpColor4f& colo
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR, "" );
 
-	m_scratchVertexBuffer.write( pos );
+	ZP_ALIGN16 zp_float v[ 4 ];
+	zpMath::Vector4Store4( pos, v + 0 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color );
 	m_currentCommnad->vertexCount += 1;
 
@@ -199,7 +202,10 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector2f& uv0
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_UV, "" );
 
-	m_scratchVertexBuffer.write( pos );
+	ZP_ALIGN16 zp_float v[ 4 ];
+	zpMath::Vector4Store4( pos, v + 0 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( uv0 );
 	m_currentCommnad->vertexCount += 1;
 
@@ -210,7 +216,10 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector2f& uv0
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, "" );
 
-	m_scratchVertexBuffer.write( pos );
+	ZP_ALIGN16 zp_float v[ 4 ];
+	zpMath::Vector4Store4( pos, v + 0 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color );
 	m_scratchVertexBuffer.write( uv0 );
 	m_currentCommnad->vertexCount += 1;
@@ -222,7 +231,10 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& nor
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV, "" );
 
-	m_scratchVertexBuffer.write( pos );
+	ZP_ALIGN16 zp_float v[ 4 ];
+	zpMath::Vector4Store4( pos, v + 0 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( normal );
 	m_scratchVertexBuffer.write( uv0 );
 	m_currentCommnad->vertexCount += 1;
@@ -234,7 +246,10 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& nor
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2, "" );
 
-	m_scratchVertexBuffer.write( pos );
+	ZP_ALIGN16 zp_float v[ 4 ];
+	zpMath::Vector4Store4( pos, v + 0 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( normal );
 	m_scratchVertexBuffer.write( uv0 );
 	m_scratchVertexBuffer.write( uv1 );
@@ -279,9 +294,13 @@ void zpRenderingContext::addLine( const zpVector4f& pos0, const zpVector4f& pos1
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 8 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( color );
 
 	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
@@ -299,9 +318,13 @@ void zpRenderingContext::addLine( const zpVector4f& pos0, const zpColor4f& color
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 8 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color0 );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( color1 );
 
 	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
@@ -319,13 +342,19 @@ void zpRenderingContext::addQuad( const zpVector4f& pos0, const zpVector4f& pos1
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 16 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+	zpMath::Vector4Store4( pos2, v + 8 );
+	zpMath::Vector4Store4( pos3, v + 12 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( color );
-	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.writeBulk( v + 8, 4 );
 	m_scratchVertexBuffer.write( color );
-	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.writeBulk( v + 12, 4 );
 	m_scratchVertexBuffer.write( color );
 
 	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
@@ -353,13 +382,19 @@ void zpRenderingContext::addQuad(
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 16 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+	zpMath::Vector4Store4( pos2, v + 8 );
+	zpMath::Vector4Store4( pos3, v + 12 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color0 );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( color1 );
-	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.writeBulk( v + 8, 4 );
 	m_scratchVertexBuffer.write( color2 );
-	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.writeBulk( v + 12, 4 );
 	m_scratchVertexBuffer.write( color3 );
 
 	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
@@ -387,13 +422,19 @@ void zpRenderingContext::addQuad(
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_UV, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 16 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+	zpMath::Vector4Store4( pos2, v + 8 );
+	zpMath::Vector4Store4( pos3, v + 12 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( uv0 );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( uv1 );
-	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.writeBulk( v + 8, 4 );
 	m_scratchVertexBuffer.write( uv2 );
-	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.writeBulk( v + 12, 4 );
 	m_scratchVertexBuffer.write( uv3 );
 
 	m_scratchIndexBuffer.write< zp_ushort >( m_currentCommnad->vertexCount + 0 );
@@ -421,16 +462,22 @@ void zpRenderingContext::addQuad(
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 16 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+	zpMath::Vector4Store4( pos2, v + 8 );
+	zpMath::Vector4Store4( pos3, v + 12 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color );
 	m_scratchVertexBuffer.write( uv0 );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( color );
 	m_scratchVertexBuffer.write( uv1 );
-	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.writeBulk( v + 8, 4 );
 	m_scratchVertexBuffer.write( color );
 	m_scratchVertexBuffer.write( uv2 );
-	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.writeBulk( v + 12, 4 );
 	m_scratchVertexBuffer.write( color );
 	m_scratchVertexBuffer.write( uv3 );
 
@@ -459,16 +506,22 @@ void zpRenderingContext::addQuad(
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 16 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+	zpMath::Vector4Store4( pos2, v + 8 );
+	zpMath::Vector4Store4( pos3, v + 12 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( color0 );
 	m_scratchVertexBuffer.write( uv0 );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( color1 );
 	m_scratchVertexBuffer.write( uv1 );
-	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.writeBulk( v + 8, 4 );
 	m_scratchVertexBuffer.write( color2 );
 	m_scratchVertexBuffer.write( uv2 );
-	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.writeBulk( v + 12, 4 );
 	m_scratchVertexBuffer.write( color3 );
 	m_scratchVertexBuffer.write( uv3 );
 
@@ -497,16 +550,22 @@ void zpRenderingContext::addQuad(
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 16 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+	zpMath::Vector4Store4( pos2, v + 8 );
+	zpMath::Vector4Store4( pos3, v + 12 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( normal0 );
 	m_scratchVertexBuffer.write( uv0 );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( normal1 );
 	m_scratchVertexBuffer.write( uv1 );
-	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.writeBulk( v + 8, 4 );
 	m_scratchVertexBuffer.write( normal2 );
 	m_scratchVertexBuffer.write( uv2 );
-	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.writeBulk( v + 12, 4 );
 	m_scratchVertexBuffer.write( normal3 );
 	m_scratchVertexBuffer.write( uv3 );
 
@@ -536,19 +595,25 @@ void zpRenderingContext::addQuad(
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2, "" );
 
-	m_scratchVertexBuffer.write( pos0 );
+	ZP_ALIGN16 zp_float v[ 16 ];
+	zpMath::Vector4Store4( pos0, v + 0 );
+	zpMath::Vector4Store4( pos1, v + 4 );
+	zpMath::Vector4Store4( pos2, v + 8 );
+	zpMath::Vector4Store4( pos3, v + 12 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
 	m_scratchVertexBuffer.write( normal0 );
 	m_scratchVertexBuffer.write( uv00 );
 	m_scratchVertexBuffer.write( uv10 );
-	m_scratchVertexBuffer.write( pos1 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( normal1 );
 	m_scratchVertexBuffer.write( uv01 );
 	m_scratchVertexBuffer.write( uv11 );
-	m_scratchVertexBuffer.write( pos2 );
+	m_scratchVertexBuffer.writeBulk( v + 8, 4 );
 	m_scratchVertexBuffer.write( normal2 );
 	m_scratchVertexBuffer.write( uv02 );
 	m_scratchVertexBuffer.write( uv12 );
-	m_scratchVertexBuffer.write( pos3 );
+	m_scratchVertexBuffer.writeBulk( v + 12, 4 );
 	m_scratchVertexBuffer.write( normal3 );
 	m_scratchVertexBuffer.write( uv03 );
 	m_scratchVertexBuffer.write( uv13 );
@@ -587,7 +652,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 
-	zpVector4f c, center( matrix.getRow( 3 ) );
+	zpVector4f c, center( matrix.r[ 3 ] );
 
 	const zpMesh* m = mesh->getResource()->getData();
 	const zpMeshPart* b = m->m_parts.begin();
@@ -641,14 +706,14 @@ void zpRenderingContext::fillBuffers()
 	if( m_scratchVertexBuffer.size() )
 	{
 		map( m_currentVertexBuffer, &mapData );
-		zp_memcpy( mapData, ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE, m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
+		zp_memcpy( mapData, m_scratchVertexBuffer.size(), m_scratchVertexBuffer.getData(), m_scratchVertexBuffer.size() );
 		unmap( m_currentVertexBuffer );
 	}
 
 	if( m_scratchIndexBuffer.size() )
 	{
 		map( m_currentIndexBuffer, &mapData );
-		zp_memcpy( mapData, ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE, m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
+		zp_memcpy( mapData, m_scratchIndexBuffer.size(), m_scratchIndexBuffer.getData(), m_scratchIndexBuffer.size() );
 		unmap( m_currentIndexBuffer );
 	}
 	
@@ -790,7 +855,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 
 	zp_char prev = '\0', curr = '\0';
 	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->scaleW, 1.f / font->scaleH ), cursor( position );
-	zpVector4f p0, p1, p2, p3, offset( 0.f );
+	zpVector4f p0, p1, p2, p3, offset = zpMath::Vector4( 0, 0, 0, 1 );
 	for( ; *text != '\0'; ++text )
 	{
 		curr = *text;
@@ -830,7 +895,7 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 	const zpFontSet* font = m_currentFont->getResource()->getData();
 
 	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->scaleW, 1.f / font->scaleH );
-	zpVector4f cursor( position ), p0, p1, p2, p3, offset( 0.f );
+	zpVector4f cursor( position ), p0, p1, p2, p3, offset = zpMath::Vector4( 0, 0, 0, 1 );
 	for( ; *text != '\0'; ++text )
 	{
 		zp_int c = (zp_int)*text;
@@ -857,15 +922,15 @@ const zpRenderingStats& zpRenderingContext::getPreviousFrameStats() const
 
 void zpRenderingContext::generateSortKeyForCommand( zpRenderingCommand* command, zpCamera* camera )
 {
-	zpScalar len, dist( camera->getFar() );
+	zpScalar len, dist = zpMath::Scalar( camera->getFar() );
 	zpVector4f center = command->boundingBox.getCenter();
 
-	zpMath::Sub( center, center, camera->getPosition() );
-	zpMath::LengthSquared3( len, center );
-	zpMath::Mul( dist, dist, dist );
-	zpMath::Div( len, len, dist );
+	center = zpMath::Vector4Sub( center, camera->getPosition() );
+	len = zpMath::Vector4LengthSquared3( center );
+	dist = zpMath::ScalarMul( dist, dist );
+	len = zpMath::ScalarDiv( len, dist );
 
-	zp_ushort distKey = command->sortBias + (zp_ushort)( len.getFloat() * (zp_float)zp_limit_max<zp_ushort>() );
+	zp_ushort distKey = command->sortBias + (zp_ushort)( zpMath::AsFloat( len ) * (zp_float)zp_limit_max<zp_ushort>() );
 	zp_uint matKey = command->sortKey;
 
 	command->sortKey = ( distKey << 16 ) | ( matKey & 0xFFFF );

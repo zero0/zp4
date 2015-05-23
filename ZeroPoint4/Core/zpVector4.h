@@ -2,8 +2,6 @@
 #ifndef ZP_VECTOR4F_H
 #define ZP_VECTOR4F_H
 
-typedef zp_vec4 zpVector4f;
-
 #if 0
 class ZP_ALIGN16 zpVector4f
 {

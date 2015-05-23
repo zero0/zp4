@@ -23,15 +23,15 @@ void zpSkyBoxComponent::render( zpRenderingContext* i )
 {
 	i->beginDrawImmediate( m_layer, ZP_RENDERING_QUEUE_SKYBOX, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &m_material );
 
-	i->addVertex( zpVector4f( -1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 1, 1 ) );
-	i->addVertex( zpVector4f( -1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 0, 1 ) );
-	i->addVertex( zpVector4f(  1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 0, 1 ) );
-	i->addVertex( zpVector4f(  1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 1, 1 ) );
-	
-	i->addVertex( zpVector4f(  1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 0, 1 ) );
-	i->addVertex( zpVector4f(  1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 1, 1 ) );
-	i->addVertex( zpVector4f( -1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 1, 1 ) );
-	i->addVertex( zpVector4f( -1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 0, 1 ) );
+	i->addVertex( zpMath::Vector4( -1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 1, 1 ) );
+	i->addVertex( zpMath::Vector4( -1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 0, 1 ) );
+	i->addVertex( zpMath::Vector4(  1,  1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 0, 1 ) );
+	i->addVertex( zpMath::Vector4(  1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 1, 1 ) );
+
+	i->addVertex( zpMath::Vector4(  1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 0, 0, 1 ) );
+	i->addVertex( zpMath::Vector4(  1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 0, 1, 1, 1 ) );
+	i->addVertex( zpMath::Vector4( -1,  1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 0, 1, 1 ) );
+	i->addVertex( zpMath::Vector4( -1, -1,  1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 0, 1 ) );
 	
 	i->addTriangleIndex( 0, 1, 2 ); //   1: face back
 	i->addTriangleIndex( 0, 2, 3 ); 

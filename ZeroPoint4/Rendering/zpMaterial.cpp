@@ -133,7 +133,7 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 
 					zpMaterialTexture& t = m_resource.materialTextures.pushBackEmpty();
 					t.name = name;
-					t.scaleOffset = zpVector4f( textureOffset[ 0 ].asFloat(), textureOffset[ 1 ].asFloat(), textureScale[ 0 ].asFloat(), textureScale[ 1 ].asFloat() );
+					t.scaleOffset = zpMath::Vector4( textureOffset[ 0 ].asFloat(), textureOffset[ 1 ].asFloat(), textureScale[ 0 ].asFloat(), textureScale[ 1 ].asFloat() );
 
 					zp_bool ok = pipeline->getTextureContentManager()->getResource( textureFile, t.texture );
 					ZP_ASSERT( ok, "Failed to get texture %s", textureFile );
@@ -182,7 +182,7 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 					}
 					else if( zp_strcmp( globalType, "Float4" ) == 0 )
 					{
-						zpVector4f val( value[ 0 ].asFloat(), value[ 1 ].asFloat(), value[ 2 ].asFloat(), value[ 3 ].asFloat() );
+						zpVector4f val = zpMath::Vector4( value[ 0 ].asFloat(), value[ 1 ].asFloat(), value[ 2 ].asFloat(), value[ 3 ].asFloat() );
 						( *(zpVector4f*)( buffer + var->offset ) ) = val;
 					}
 					else if( zp_strcmp( globalType, "Color" ) == 0 )

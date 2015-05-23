@@ -2,13 +2,13 @@
 
 zpTransformComponent::zpTransformComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
-	, m_localPosition( 0, 0, 0, 1 )
-	, m_localRotation( 0, 0, 0, 1 )
-	, m_localScale( 1, 1, 1, 1 )
+	, m_localPosition( zpMath::Vector4( 0, 0, 0, 1 ) )
+	, m_localRotation( zpMath::Vector4( 0, 0, 0, 1 ) )
+	, m_localScale( zpMath::Vector4( 1, 1, 1, 1 ) )
 	, m_parent( ZP_NULL )
 {
-	m_localTransform.setIdentity();
-	m_worldTransform.setIdentity();
+	m_localTransform = zpMath::MatrixIdentity();
+	m_worldTransform = zpMath::MatrixIdentity();
 
 	if( !def.isNull() )
 	{
@@ -16,29 +16,29 @@ zpTransformComponent::zpTransformComponent( zpObject* obj, const zpBison::Value&
 		const zpBison::Value& rotation = def[ "Rotation" ];
 		const zpBison::Value& scale = def[ "Scale" ];
 
-		zpVector4f pos( 0, 0, 0, 1 );
-		zpVector4f scl( 1, 1, 1, 0 );
-		zpQuaternion4f rot( 0, 0, 0, 1 );
+		zpVector4f pos = zpMath::Vector4( 0, 0, 0, 1 );
+		zpVector4f scl = zpMath::Vector4( 1, 1, 1, 0 );
+		zpQuaternion4f rot = zpMath::Quaternion( 0, 0, 0, 1 );
 
 		// position
 		if( position.isArray() && !position.isEmpty() )
 		{
-			pos = zpVector4f( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
+			pos = zpMath::Vector4( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
 		}
 
 		// rotation
 		if( rotation.isArray() && !rotation.isEmpty() )
 		{
-			zpScalar yaw(   rotation[ 0 ].asFloat() );
-			zpScalar pitch( rotation[ 1 ].asFloat() );
-			zpScalar roll(  rotation[ 2 ].asFloat() );
-			zpMath::SetEulerAngle( rot, yaw, pitch, roll );
+			zpScalar yaw   = zpMath::Scalar( rotation[ 0 ].asFloat() );
+			zpScalar pitch = zpMath::Scalar( rotation[ 1 ].asFloat() );
+			zpScalar roll  = zpMath::Scalar( rotation[ 2 ].asFloat() );
+			rot = zpMath::QuaternionFromEulerAngle( yaw, pitch, roll );
 		}
 
 		// scale
 		if( scale.isArray() && !scale.isEmpty() )
 		{
-			scl = zpVector4f( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
+			scl = zpMath::Vector4( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
 		}
 
 		// build local matrix
@@ -84,7 +84,7 @@ void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, c
 	m_localPosition = localPosition;
 	m_localRotation = localRotation;
 
-	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	m_localTransform = zpMath::TRS( m_localPosition, m_localRotation, m_localScale );
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 
 }
@@ -94,7 +94,7 @@ void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, c
 	m_localRotation = localRotation;
 	m_localScale = localScale;
 
-	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	m_localTransform = zpMath::TRS( m_localPosition, m_localRotation, m_localScale );
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 
@@ -102,21 +102,21 @@ void zpTransformComponent::setLocalPosition( const zpVector4f& localPosition )
 {
 	m_localPosition = localPosition;
 
-	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	m_localTransform = zpMath::TRS( m_localPosition, m_localRotation, m_localScale );
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 void zpTransformComponent::setLocalScale( const zpVector4f& localScale )
 {
 	m_localScale = localScale;
 
-	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	m_localTransform = zpMath::TRS( m_localPosition, m_localRotation, m_localScale );
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 void zpTransformComponent::setLocalRotation( const zpQuaternion4f& localRotation )
 {
 	m_localRotation = localRotation;
 
-	zpMath::TRS( m_localTransform, m_localPosition, m_localRotation, m_localScale );
+	m_localTransform = zpMath::TRS( m_localPosition, m_localRotation, m_localScale );
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 
@@ -135,7 +135,7 @@ const zpVector4f& zpTransformComponent::getLocalScale() const
 
 const zpVector4f& zpTransformComponent::getWorldPosition() const
 {
-	return m_worldTransform.getRow( 3 );
+	return m_worldTransform.r[ 3 ];
 }
 
 const zpMatrix4f& zpTransformComponent::getWorldTransform() const
@@ -231,7 +231,7 @@ void zpTransformComponent::addChild( zpTransformComponent* child, const zpVector
 void zpTransformComponent::translate( const zpVector4f& dir )
 {
 	zpVector4f pos;
-	zpMath::Add( pos, m_localPosition, dir );
+	pos = zpMath::Vector4Add( m_localPosition, dir );
 	setLocalPosition( pos );
 }
 
@@ -262,7 +262,7 @@ void zpTransformComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 		zpTransformComponent* p = m_parent;
 		while( p != ZP_NULL )
 		{
-			zpMath::Mul( m_worldTransform, m_worldTransform, p->getLocalTransform() );
+			m_worldTransform = zpMath::MatrixMul( m_worldTransform, p->getLocalTransform() );
 
 			zpTransformComponent* a = p->getParentObject()->getComponents()->getTransformComponent();
 			p = a == ZP_NULL ? ZP_NULL : a->m_parent;

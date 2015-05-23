@@ -120,15 +120,15 @@ zp_bool zpBisonStringToEnum( const zp_char* (&e)[ count ], const zpBison::Value&
 
 ZP_FORCE_INLINE zpVector4f zpBisonArray2ToVector4( const zpBison::Value& vec, zp_float z, zp_float w )
 {
-	return zpVector4f( vec[0].asFloat(), vec[1].asFloat(), z, w );
+	return zpMath::Vector4( vec[0].asFloat(), vec[1].asFloat(), z, w );
 }
 ZP_FORCE_INLINE zpVector4f zpBisonArray3ToVector4( const zpBison::Value& vec, zp_float w )
 {
-	return zpVector4f( vec[0].asFloat(), vec[1].asFloat(), vec[2].asFloat(), w );
+	return zpMath::Vector4( vec[0].asFloat(), vec[1].asFloat(), vec[2].asFloat(), w );
 }
 ZP_FORCE_INLINE zpVector4f zpBisonArray4ToVector4( const zpBison::Value& vec )
 {
-	return zpVector4f( vec[0].asFloat(), vec[1].asFloat(), vec[2].asFloat(), vec[3].asFloat() );
+	return zpMath::Vector4( vec[0].asFloat(), vec[1].asFloat(), vec[2].asFloat(), vec[3].asFloat() );
 }
 ZP_FORCE_INLINE void zpBisonArray4ToColor4( const zpBison::Value& color, zpColor4f& c )
 {

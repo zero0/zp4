@@ -26,10 +26,10 @@ zpSpawnerComponent::zpSpawnerComponent( zpObject* obj, const zpBison::Value& def
 			g.maxNumToSpawn = v[ "MaxNumToSpawn" ].asInt();
 
 			const zpBison::Value& r = v[ "Range" ];
-			g.range = zpVector4f( r[0].asFloat(), r[1].asFloat(), r[2].asFloat(), 0.f );
+			g.range = zpMath::Vector4( r[0].asFloat(), r[1].asFloat(), r[2].asFloat(), 0.f );
 
 			const zpBison::Value& p = v[ "Position" ];
-			g.position = zpVector4f( p[0].asFloat(), p[1].asFloat(), p[2].asFloat(), 1.f );
+			g.position = zpMath::Vector4( p[0].asFloat(), p[1].asFloat(), p[2].asFloat(), 1.f );
 
 			const zpBison::Value& o = v[ "Objects" ];
 			if( o.isArray() && !o.isEmpty() )
@@ -128,7 +128,7 @@ void zpSpawnerComponent::spawnFromGroup( zp_int group )
 			zpVector4f pos( spawnGroup.position );
 			if( t != ZP_NULL )
 			{
-				zpMath::Mul( pos, pos, t->getWorldTransform() );
+				pos = zpMath::MatrixTransform( t->getWorldTransform(), pos );
 			}
 
 			zpObject* obj = spawnObjectAt( objName, pos, spawnGroup.rotation );

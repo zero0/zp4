@@ -2,14 +2,6 @@
 #ifndef ZP_MATRIX4F_H
 #define ZP_MATRIX4F_H
 
-ZP_ALIGN16 struct zpMatrix4f
-{
-	zpVector4f m_m1;
-	zpVector4f m_m2;
-	zpVector4f m_m3;
-	zpVector4f m_m4;
-};
-
 #if 0
 ZP_ALIGN16 class zpMatrix4f {
 public:

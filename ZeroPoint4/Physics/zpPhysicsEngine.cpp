@@ -15,25 +15,19 @@ public:
 
 	void drawLine( const btVector3& from, const btVector3& to, const btVector3& color )
 	{
-		zpVector4f f( 0, 0, 0, 1 ), t( 0, 0, 0, 1 );
-		zpColor4f c( 0, 0, 0, 1 );
-
-		f.load3( from.m_floats );
-		t.load3( to.m_floats );
-		c.load3( color.m_floats );
+		zpVector4f f = zpMath::Vector4( from.x(), from.y(), from.z(), 1 );
+		zpVector4f t = zpMath::Vector4( to.x(), to.y(), to.z(), 1 );
+		zpColor4f c( color.x(), color.y(), color.z(), 1 );
 
 		m_drawer->drawLine( f, t, c, c );
 	}
 
-	void drawLine( const btVector3& from,const btVector3& to, const btVector3& fromColor, const btVector3& toColor )
+	void drawLine( const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor )
 	{
-		zpVector4f f( 0, 0, 0, 1 ), t( 0, 0, 0, 1 );
-		zpColor4f fc( 0, 0, 0, 1 ), tc( 0, 0, 0, 1 );
-
-		f.load3( from.m_floats );
-		t.load3( to.m_floats );
-		fc.load3( fromColor.m_floats );
-		tc.load3( toColor.m_floats );
+		zpVector4f f = zpMath::Vector4( from.x(), from.y(), from.z(), 1 );
+		zpVector4f t = zpMath::Vector4( to.x(), to.y(), to.z(), 1 );
+		zpColor4f fc( fromColor.x(), fromColor.y(), fromColor.z(), 1 );
+		zpColor4f tc( toColor.x(), toColor.y(), toColor.z(), 1 );
 
 		m_drawer->drawLine( f, t, fc, tc );
 	}
@@ -65,7 +59,7 @@ zpPhysicsEngine::zpPhysicsEngine()
 	, m_timestep( 1.f / 60.f )
 	, m_fixedTimestep( 1.f / 60.f )
 	, m_numSubStep( 10 )
-	, m_gravity( 0, -9.8f, 0, 0 )
+	, m_gravity( zpMath::Vector4( 0, -9.8f, 0, 0 ) )
 {}
 zpPhysicsEngine::~zpPhysicsEngine()
 {}
@@ -94,8 +88,11 @@ void zpPhysicsEngine::create()
 	btGhostPairCallback* ghostCallback = new btGhostPairCallback;
 	btOverlapFilterCallback* filterCallback = new zpFilterCallback;
 
+	btVector3 gravity;
+	zpMath::Vector4Store4( m_gravity, gravity.m_floats );
+
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
-	dynamicsWorld->setGravity( btVector3( m_gravity.getX().getFloat(), m_gravity.getY().getFloat(), m_gravity.getZ().getFloat() ) );
+	dynamicsWorld->setGravity( gravity );
 	dynamicsWorld->getPairCache()->setInternalGhostPairCallback( ghostCallback );
 	dynamicsWorld->getPairCache()->setOverlapFilterCallback( filterCallback );
 	dynamicsWorld->setInternalTickCallback( zpPhysicTimeStepCallback, this, false );
@@ -168,7 +165,7 @@ void zpPhysicsEngine::setGravity( const zpVector4f& gravity )
 	m_gravity = gravity;
 
 	btVector3 g;
-	m_gravity.store4( g.m_floats );
+	zpMath::Vector4Store4( m_gravity, g.m_floats );
 
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
 	dynamicsWorld->setGravity( g );
@@ -234,16 +231,16 @@ zp_bool zpPhysicsEngine::raycast( const zpVector4f& fromWorld, const zpVector4f&
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
 
 	btVector3 from, to;
-	fromWorld.store4( from.m_floats );
-	toWorld.store4( to.m_floats );
+	zpMath::Vector4Store4( fromWorld, from.m_floats );
+	zpMath::Vector4Store4( toWorld, to.m_floats );
 
 	btCollisionWorld::ClosestRayResultCallback cb( from, to );
 	dynamicsWorld->rayTest( from, to, cb );
 
 	if( cb.hasHit() )
 	{
-		hit.position.load4( cb.m_hitPointWorld.m_floats );
-		hit.normal.load4( cb.m_hitNormalWorld.m_floats );
+		hit.position = zpMath::Vector4Load4( cb.m_hitPointWorld.m_floats );
+		hit.normal = zpMath::Vector4Load4( cb.m_hitNormalWorld.m_floats );
 		hit.hitObject = cb.m_collisionObject ? cb.m_collisionObject->getUserPointer() : ZP_NULL;
 		return true;
 	}

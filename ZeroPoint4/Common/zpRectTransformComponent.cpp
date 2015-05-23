@@ -149,10 +149,10 @@ void zpRectTransformComponent::getLocalCorners( zpVector4f* corners ) const
 	zp_float x1 = x0 + m_width;
 	zp_float y1 = y0 + m_height;
 
-	corners[ 0 ] = zpVector4f( x0, y0, 0, 1 );
-	corners[ 1 ] = zpVector4f( x0, y1, 0, 1 );
-	corners[ 2 ] = zpVector4f( x1, y1, 0, 1 );
-	corners[ 3 ] = zpVector4f( x1, y0, 0, 1 );
+	corners[ 0 ] = zpMath::Vector4( x0, y0, 0, 1 );
+	corners[ 1 ] = zpMath::Vector4( x0, y1, 0, 1 );
+	corners[ 2 ] = zpMath::Vector4( x1, y1, 0, 1 );
+	corners[ 3 ] = zpMath::Vector4( x1, y0, 0, 1 );
 }
 void zpRectTransformComponent::getWorldCorners( zpVector4f* corners ) const
 {
@@ -161,10 +161,10 @@ void zpRectTransformComponent::getWorldCorners( zpVector4f* corners ) const
 	zpTransformComponent* trans = getParentObject()->getComponents()->getTransformComponent();
 
 	const zpMatrix4f& mat = trans->getWorldTransform();
-	zpMath::Mul( corners[ 0 ], corners[ 0 ], mat );
-	zpMath::Mul( corners[ 1 ], corners[ 1 ], mat );
-	zpMath::Mul( corners[ 2 ], corners[ 2 ], mat );
-	zpMath::Mul( corners[ 3 ], corners[ 3 ], mat );
+	corners[ 0 ] = zpMath::MatrixTransform( mat, corners[ 0 ] );
+	corners[ 1 ] = zpMath::MatrixTransform( mat, corners[ 1 ] );
+	corners[ 2 ] = zpMath::MatrixTransform( mat, corners[ 2 ] );
+	corners[ 3 ] = zpMath::MatrixTransform( mat, corners[ 3 ] );
 }
 
 zpVector4f zpRectTransformComponent::getRegion() const
@@ -176,7 +176,7 @@ zpVector4f zpRectTransformComponent::getRegion() const
 	zp_float x1 = x0 + m_width;
 	zp_float y1 = y0 + m_height;
 
-	return zpVector4f( x0, y0, x1, y1 );
+	return zpMath::Vector4( x0, y0, x1, y1 );
 }
 
 void zpRectTransformComponent::onCreate()
@@ -262,19 +262,29 @@ void zpRectTransformComponent::onUpdateAnchors()
 	{
 		if( m_leftAnchor.rect == ZP_NULL )
 		{
-			lt = pos.getX().getFloat() + m_leftAnchor.absolute;
-			bt = pos.getY().getFloat() + m_bottomAnchor.absolute;
-			rt = pos.getX().getFloat() + m_rightAnchor.absolute;
-			tt = pos.getY().getFloat() + m_topAnchor.absolute;
+			zp_float x, y;
+			x = zpMath::AsFloat( zpMath::Vector4GetX( pos ) );
+			y = zpMath::AsFloat( zpMath::Vector4GetY( pos ) );
+
+			lt = x + m_leftAnchor.absolute;
+			bt = y + m_bottomAnchor.absolute;
+			rt = x + m_rightAnchor.absolute;
+			tt = y + m_topAnchor.absolute;
 		}
 		else
 		{
 			getSides( parent, sides );
 
-			zp_lerp< zp_float >( lt, sides[0].getX().getFloat(), sides[2].getX().getFloat(), m_leftAnchor.relative   );
-			zp_lerp< zp_float >( rt, sides[0].getX().getFloat(), sides[2].getX().getFloat(), m_rightAnchor.relative  );
-			zp_lerp< zp_float >( bt, sides[3].getY().getFloat(), sides[1].getY().getFloat(), m_bottomAnchor.relative );
-			zp_lerp< zp_float >( tt, sides[3].getY().getFloat(), sides[1].getY().getFloat(), m_topAnchor.relative    );
+			zp_float s0x, s1y, s2x, s3y;
+			s0x = zpMath::AsFloat( zpMath::Vector4GetX( sides[0] ) );
+			s1y = zpMath::AsFloat( zpMath::Vector4GetY( sides[1] ) );
+			s2x = zpMath::AsFloat( zpMath::Vector4GetX( sides[2] ) );
+			s3y = zpMath::AsFloat( zpMath::Vector4GetY( sides[3] ) );
+
+			zp_lerp< zp_float >( lt, s0x, s2x, m_leftAnchor.relative   );
+			zp_lerp< zp_float >( rt, s0x, s2x, m_rightAnchor.relative  );
+			zp_lerp< zp_float >( bt, s3y, s1y, m_bottomAnchor.relative );
+			zp_lerp< zp_float >( tt, s3y, s1y, m_topAnchor.relative    );
 
 			lt += m_leftAnchor.absolute;
 			rt += m_rightAnchor.absolute;
@@ -291,7 +301,7 @@ void zpRectTransformComponent::onUpdateAnchors()
 	zp_lerp( nx, lt, rt, pvt.getX() );
 	zp_lerp( ny, bt, tt, pvt.getY() );
 
-	zpVector4f newPos = zpVector4f( nx, ny, pos.getZ().getFloat(), 1 );
+	zpVector4f newPos = zpMath::Vector4( nx, ny, zpMath::AsFloat( zpMath::Vector4GetZ( pos ) ), 1 );
 	zp_int w = zp_floor_to_int( rt - lt + 0.5f );
 	zp_int h = zp_floor_to_int( tt - bt + 0.5f );
 
@@ -300,9 +310,9 @@ void zpRectTransformComponent::onUpdateAnchors()
 
 	zpScalar d;
 	zpVector4f diff;
-	zpMath::Sub( diff, pos, newPos );
-	zpMath::LengthSquared3( d, diff );
-	if( zpMath::Cmp( d, zpScalar( 0.001f ) ) > 0 )
+	diff = zpMath::Vector4Sub( pos, newPos );
+	d = zpMath::Vector4LengthSquared3( diff );
+	if( zpMath::ScalarCmp( d, zpMath::Scalar( 0.001f ) ) > 0 )
 	{
 		trans->setLocalPosition( newPos );
 	}
@@ -328,10 +338,10 @@ void zpRectTransformComponent::getSides( zpTransformComponent* relativeTo, zpVec
 	zp_float cy = ( y0 + y1 ) * 0.5f;
 
 	const zpMatrix4f& mat = trans->getWorldTransform();
-	zpMath::Mul( sides[ 0 ], zpVector4f( x0, cy, 0, 1 ), mat );
-	zpMath::Mul( sides[ 1 ], zpVector4f( cx, y1, 0, 1 ), mat );
-	zpMath::Mul( sides[ 2 ], zpVector4f( x1, cy, 0, 1 ), mat );
-	zpMath::Mul( sides[ 3 ], zpVector4f( cx, y0, 0, 1 ), mat );
+	sides[ 0 ] = zpMath::MatrixTransform( mat, zpMath::Vector4( x0, cy, 0, 1 ) );
+	sides[ 1 ] = zpMath::MatrixTransform( mat, zpMath::Vector4( cx, y1, 0, 1 ) );
+	sides[ 2 ] = zpMath::MatrixTransform( mat, zpMath::Vector4( x1, cy, 0, 1 ) );
+	sides[ 3 ] = zpMath::MatrixTransform( mat, zpMath::Vector4( cx, y0, 0, 1 ) );
 
 	//if( relativeTo != ZP_NULL )
 	//{

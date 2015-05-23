@@ -67,21 +67,21 @@ void zpLightComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 	{
 	case ZP_LIGHT_TYPE_DIRECTIONAL:
 		{
-			zpMath::Mul( m_light->direction, zpVector4f( 0, 0, 1, 0 ), transform );
-			zpMath::Normalize3( m_light->direction, m_light->direction );
+			m_light->direction = zpMath::MatrixTransform( transform, zpMath::Vector4( 0, 0, 1, 0 ) );
+			m_light->direction = zpMath::Vector4Normalize3( m_light->direction );
 		}
 		break;
 	case ZP_LIGHT_TYPE_POINT:
 		{
-			m_light->position = transform.getRow( 3 );
+			m_light->position = transform.r[ 3 ];
 		}
 		break;
 	case ZP_LIGHT_TYPE_SPOT:
 		{
-			zpMath::Mul( m_light->direction, zpVector4f( 0, 0, 1, 0 ), transform );
-			zpMath::Normalize3( m_light->direction, m_light->direction );
+			m_light->direction = zpMath::MatrixTransform( transform, zpMath::Vector4( 0, 0, 1, 0 ) );
+			m_light->direction = zpMath::Vector4Normalize3( m_light->direction );
 
-			m_light->position = transform.getRow( 3 );
+			m_light->position = transform.r[ 3 ];
 		}
 		break;
 	}

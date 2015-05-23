@@ -187,26 +187,26 @@ void zpWorld::createWorldObject( const zpBison::Value& def )
 				// position
 				if( position.isArray() && !position.isEmpty() )
 				{
-					zpVector4f pos( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
+					zpVector4f pos = zpMath::Vector4( position[ 0 ].asFloat(), position[ 1 ].asFloat(), position[ 2 ].asFloat(), 1.f );
 					t->setLocalPosition( pos );
 				}
 
 				// rotation
 				if( rotation.isArray() && !rotation.isEmpty() )
 				{
-					zpScalar yaw(   rotation[ 0 ].asFloat() );
-					zpScalar pitch( rotation[ 1 ].asFloat() );
-					zpScalar roll(  rotation[ 2 ].asFloat() );
+					zpScalar yaw   = zpMath::Scalar( rotation[ 0 ].asFloat() );
+					zpScalar pitch = zpMath::Scalar( rotation[ 1 ].asFloat() );
+					zpScalar roll  = zpMath::Scalar( rotation[ 2 ].asFloat() );
 
 					zpQuaternion4f rot;
-					zpMath::SetEulerAngle( rot, yaw, pitch, roll );
+					rot = zpMath::QuaternionFromEulerAngle( yaw, pitch, roll );
 					t->setLocalRotation( rot );
 				}
 
 				// scale
 				if( scale.isArray() && !scale.isEmpty() )
 				{
-					zpVector4f scl( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
+					zpVector4f scl = zpMath::Vector4( scale[ 0 ].asFloat(), scale[ 1 ].asFloat(), scale[ 2 ].asFloat(), 1.f );
 					t->setLocalScale( scl );
 				}
 			}

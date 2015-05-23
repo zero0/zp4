@@ -216,16 +216,16 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 			zpMatrix4f wvp;
 
 			// scale points out from the center
-			zpVector4f p0( -1,  1, 0, 1 );
-			zpVector4f p1(  1,  1, 0, 1 );
-			zpVector4f p2(  1, -1, 0, 1 );
-			zpVector4f p3( -1, -1, 0, 1 );
+			zpVector4f p0 = zpMath::Vector4( -1,  1, 0, 1 );
+			zpVector4f p1 = zpMath::Vector4(  1,  1, 0, 1 );
+			zpVector4f p2 = zpMath::Vector4(  1, -1, 0, 1 );
+			zpVector4f p3 = zpMath::Vector4( -1, -1, 0, 1 );
 
 			// scale particles
-			zpMath::Mul( p0, p0, particle->scale );
-			zpMath::Mul( p1, p1, particle->scale );
-			zpMath::Mul( p2, p2, particle->scale );
-			zpMath::Mul( p3, p3, particle->scale );
+			p0 = zpMath::Vector4Scale( p0, particle->scale );
+			p1 = zpMath::Vector4Scale( p1, particle->scale );
+			p2 = zpMath::Vector4Scale( p2, particle->scale );
+			p3 = zpMath::Vector4Scale( p3, particle->scale );
 
 			// if billboard enabled, rotate towards camera
 			zpVector4f look, right, up;
@@ -241,20 +241,20 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 			//else
 			{
 				look = particle->normal;
-				zpMath::Perpendicular3( right, look );
-				zpMath::Cross3( up, right, look );
+				right = zpMath::Vector4Perpendicular3( look );
+				up = zpMath::Vector4Cross3( right, look );
 			}
 
-			wvp.setRow( 0, right );
-			wvp.setRow( 1, up );
-			wvp.setRow( 2, look );
-			wvp.setRow( 3, particle->position );
+			wvp.r[ 0 ] = right;
+			wvp.r[ 1 ] = up;
+			wvp.r[ 2 ] = look;
+			wvp.r[ 3 ] = particle->position;
 
 			// get final point
-			zpMath::Mul( p0, p0, wvp );
-			zpMath::Mul( p1, p1, wvp );
-			zpMath::Mul( p2, p2, wvp );
-			zpMath::Mul( p3, p3, wvp );
+			p0 = zpMath::MatrixTransform( wvp, p0 );
+			p1 = zpMath::MatrixTransform( wvp, p1 );
+			p2 = zpMath::MatrixTransform( wvp, p2 );
+			p3 = zpMath::MatrixTransform( wvp, p3 );
 
 			// draw quad
 			i->addQuad(
@@ -299,10 +299,11 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 
 	zpVector4f position( getParentObject()->getComponents()->getTransformComponent()->getWorldPosition() ), pos, velocity;
 
-	zpMath::Sub( pos, position, m_prevPosition );
+	pos = zpMath::Vector4Sub( position, m_prevPosition );
 	m_prevPosition = position;
 
-	zpMath::Mul( velocity, pos, zpScalar( deltaTime ) );
+	zpScalar dt = zpMath::Scalar( deltaTime );
+	velocity = zpMath::Vector4Mul( pos, dt );
 
 	zpParticleEffect* effect = m_effects.begin();
 	zpParticleEffect* end = m_effects.end();
@@ -311,10 +312,10 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 		if( effect->state == ZP_PARTICLE_EFFECT_STATE_DISABLED ) continue;
 
 		// use either dt or rt based on the delta time flag
-		zp_float dt = effect->useRealTime ? realTime : deltaTime;
+		zp_float fdt = effect->useRealTime ? realTime : deltaTime;
 
 		// increment effect time
-		effect->time += dt;
+		effect->time += fdt;
 
 		// if effect is waiting to start and is passed the delay, star the effect
 		if( effect->state == ZP_PARTICLE_EFFECT_STATE_STARTING )
@@ -356,7 +357,7 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 		// if not finishing effect, still emit particles
 		if( effect->state != ZP_PARTICLE_EFFECT_STATE_FINISHING )
 		{
-			effect->emitTime -= dt;
+			effect->emitTime -= fdt;
 			if( effect->emitTime < 0.f )
 			{
 				effect->emitTime = m_random->randomFloat( effect->minEmitRate, effect->maxEmitRate );
@@ -364,8 +365,7 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 			}
 		}
 
-		zpScalar sdt( dt );
-		zpScalar velScale( effect->inheritVelocityScale );
+		zpScalar velScale = zpMath::Scalar( effect->inheritVelocityScale );
 
 		// update particles
 		zpParticle** p = effect->usedParticles.begin();
@@ -374,21 +374,25 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 		{
 			zpParticle* particle = *p;
 
-			particle->life -= dt;
+			particle->life -= fdt;
 			if( particle->life < 0.f ) continue;
 
 			// calculate velocity, position and rotation
-			zpMath::Madd( particle->velocity, particle->velocity, velScale, velocity );
-			zpMath::Madd( particle->velocity, particle->velocity, sdt, effect->gravity );
-			zpMath::Madd( particle->position, particle->position, sdt, particle->velocity );
-			zpMath::Madd( particle->rotation, particle->rotation, sdt, particle->angularVelocity );
+			particle->velocity = zpMath::Vector4Madd( particle->velocity, velScale, velocity );
+			particle->velocity = zpMath::Vector4Madd( particle->velocity, dt, effect->gravity );
+			particle->position = zpMath::Vector4Madd( particle->position, dt, particle->velocity );
+			particle->rotation = zpMath::Vector4Madd( particle->rotation, dt, particle->angularVelocity );
 
 			// get life and speed percents
-			zpScalar sLife( particle->life ), sMaxLife( particle->maxLife ), sSpeed, sMaxSpeed( particle->maxSpeed );
-			zpMath::Length3( sSpeed, particle->velocity );
-			zpMath::Sub( sLife, sMaxLife, sLife );
-			zpMath::Div( sLife, sLife, sMaxLife );
-			zpMath::Div( sSpeed, sSpeed, sMaxSpeed );
+			zpScalar sLife     = zpMath::Scalar( particle->life );
+			zpScalar sMaxLife  = zpMath::Scalar( particle->maxLife );
+			zpScalar sMaxSpeed = zpMath::Scalar( particle->maxSpeed );
+			zpScalar sSpeed;
+
+			sSpeed = zpMath::Vector4Length3( particle->velocity );
+			sLife = zpMath::ScalarSub( sMaxLife, sLife );
+			sLife = zpMath::ScalarDiv( sLife, sMaxLife );
+			sSpeed = zpMath::ScalarDiv( sSpeed, sMaxSpeed );
 
 			// blend between start and end color based on life or speed
 			switch( effect->colorRange )
@@ -398,7 +402,7 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_RANDOM:
-				zpColor4f::Lerp( particle->color, effect->startColor, effect->endColor, zpScalar( m_random->randomFloat( 0.f, 1.f ) ) );
+				zpColor4f::Lerp( particle->color, effect->startColor, effect->endColor, zpMath::Scalar( m_random->randomFloat( 0.f, 1.f ) ) );
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_LIFETIME:
@@ -418,15 +422,15 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_RANDOM:
-				zpMath::Lerp( particle->scale, effect->startScale, effect->endScale, zpScalar( m_random->randomFloat( 0.f, 1.f ) ) );
+				particle->scale = zpMath::ScalarLerp( effect->startScale, effect->endScale, zpMath::Scalar( m_random->randomFloat( 0.f, 1.f ) ) );
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_LIFETIME:
-				zpMath::Lerp( particle->scale, effect->startScale, effect->endScale, sLife );
+				particle->scale = zpMath::ScalarLerp( effect->startScale, effect->endScale, sLife );
 				break;
 
 			case ZP_PARTICLE_EFFECT_RANGE_SPEED:
-				zpMath::Lerp( particle->scale, effect->startScale, effect->endScale, sSpeed );
+				particle->scale = zpMath::ScalarLerp( effect->startScale, effect->endScale, sSpeed );
 				break;
 			}
 		}
@@ -551,10 +555,10 @@ void zpParticleEmitterComponent::emitParticle( zpParticleEffect* effect )
 			norm = m_random->randomUnitSphere( 0.f );
 			if( effect->emitFromShell )
 			{
-				zpMath::Normalize3( norm, norm );
+				norm = zpMath::Vector4Normalize3( norm );
 			}
-			zpMath::Mul( norm, norm, effect->shapeSize );
-			zpMath::Add( pos, pos, norm );
+			norm = zpMath::Vector4Mul( norm, effect->shapeSize );
+			pos = zpMath::Vector4Add( pos, norm );
 
 			if( effect->randomDirection )
 			{
@@ -571,19 +575,19 @@ void zpParticleEmitterComponent::emitParticle( zpParticleEffect* effect )
 
 	case ZP_PARTICLE_EFFECT_SHAPE_CONE:
 		{
-			norm = effect->shapeSize.xyz0();
-			zpMath::Add( pos, pos, m_random->randomVector( zpVector4f( 0 ), norm ) );
+			norm = effect->shapeSize;
+			pos = zpMath::Vector4Add( pos, m_random->randomVector( zpMath::Vector4( 0, 0, 0, 0 ), norm ) );
 		}
 		break;
 
 	case ZP_PARTICLE_EFFECT_SHAPE_BOX:
 		{
 			zpVector4f half, negHalf;
-			zpMath::Mul( half, effect->shapeSize, zpScalar( 0.5f ) );
-			zpMath::Mul( negHalf, effect->shapeSize, zpScalar( -0.5f ) );
+			half = zpMath::Vector4Mul( effect->shapeSize, zpMath::Scalar( 0.5f ) );
+			negHalf = zpMath::Vector4Mul( effect->shapeSize, zpMath::Scalar( -0.5f ) );
 
 			norm = m_random->randomVector( negHalf, half );
-			zpMath::Add( pos, pos, norm );
+			pos = zpMath::Vector4Add( pos, norm );
 
 			if( effect->randomDirection )
 			{
@@ -593,12 +597,12 @@ void zpParticleEmitterComponent::emitParticle( zpParticleEffect* effect )
 		break;
 	}
 
-	zpMath::Normalize3( particle->normal, norm );
+	particle->normal = zpMath::Vector4Normalize3( norm );
 
 	particle->position = pos;
 
-	zpScalar sSpeed( m_random->randomFloat( effect->minSpeed, effect->maxSpeed ) );
-	zpMath::Mul( particle->velocity, particle->normal, sSpeed );
+	zpScalar sSpeed = zpMath::Scalar( m_random->randomFloat( effect->minSpeed, effect->maxSpeed ) );
+	particle->velocity = zpMath::Vector4Mul( particle->normal, sSpeed );
 
 	particle->scale = effect->startScale;
 	particle->color = effect->startColor;

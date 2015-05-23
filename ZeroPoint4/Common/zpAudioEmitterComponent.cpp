@@ -3,7 +3,7 @@
 zpAudioEmitterComponent::zpAudioEmitterComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 	, m_isMoving( false )
-	, m_prevPosition( 0 )
+	, m_prevPosition( zpMath::Vector4( 0, 0, 0, 0 ) )
 {
 	m_isMoving = def[ "IsMoving" ].asBool();
 }
@@ -69,11 +69,11 @@ void zpAudioEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 		{
 			zp_float dt = deltaTime;
 
-			zpVector4f pos( getParentObject()->getComponents()->getTransformComponent()->getWorldPosition() );
+			zpVector4f pos = getParentObject()->getComponents()->getTransformComponent()->getWorldPosition();
 			zpVector4f vel;
 
-			zpMath::Sub( vel, pos, m_prevPosition );
-			zpMath::Div( vel, vel, zpScalar( dt ) );
+			vel = zpMath::Vector4Sub( pos, m_prevPosition );
+			vel = zpMath::Vector4Div( vel, zpMath::Scalar( dt ) );
 			m_prevPosition = pos;
 
 			m_sounds.foreach( [ &pos, &vel ]( const zpString& key, zpAudioResourceInstance& sound )

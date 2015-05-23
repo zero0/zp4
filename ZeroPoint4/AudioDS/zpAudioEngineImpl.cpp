@@ -112,8 +112,8 @@ void zpAudioEngineImpl::getMasterVolume( zp_float& volume )
 
 void zpAudioEngineImpl::setListenerPosition( const zpVector4f& pos )
 {
-	zp_float p[3];
-	pos.store3( p );
+	zp_float p[4];
+	zpMath::Vector4Store4( pos, p );
 
 	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
 	listener->SetPosition( p[0], p[1], p[2], DS3D_DEFERRED );
@@ -122,8 +122,8 @@ void zpAudioEngineImpl::setListenerPosition( const zpVector4f& pos )
 }
 void zpAudioEngineImpl::setListenerVelocity( const zpVector4f& vel )
 {
-	zp_float v[3];
-	vel.store3( v );
+	zp_float v[4];
+	zpMath::Vector4Store4( vel, v );
 
 	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
 	listener->SetVelocity( v[0], v[1], v[2], DS3D_DEFERRED );
@@ -132,9 +132,9 @@ void zpAudioEngineImpl::setListenerVelocity( const zpVector4f& vel )
 }
 void zpAudioEngineImpl::setListenerOrientation( const zpVector4f& forward, const zpVector4f& up )
 {
-	zp_float f[3], u[3];
-	forward.store3( f );
-	up.store3( u );
+	zp_float f[4], u[4];
+	zpMath::Vector4Store4( forward, f );
+	zpMath::Vector4Store4( up, u );
 
 	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
 	listener->SetOrientation( f[0], f[1], f[2], u[0], u[1], u[2], DS3D_DEFERRED );
@@ -170,7 +170,7 @@ void zpAudioEngineImpl::getListenerPosition( zpVector4f& pos )
 	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
 	listener->GetPosition( &p );
 
-	pos = zpVector4f( p.x, p.y, p.z );
+	pos = zpMath::Vector4( p.x, p.y, p.z, 1 );
 }
 void zpAudioEngineImpl::getListenerVelocity( zpVector4f& vel )
 {
@@ -179,7 +179,7 @@ void zpAudioEngineImpl::getListenerVelocity( zpVector4f& vel )
 	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
 	listener->GetPosition( &v );
 
-	vel = zpVector4f( v.x, v.y, v.z );
+	vel = zpMath::Vector4( v.x, v.y, v.z, 0 );
 }
 void zpAudioEngineImpl::getListenerOrientation( zpVector4f& forward, zpVector4f& up )
 {
@@ -188,8 +188,8 @@ void zpAudioEngineImpl::getListenerOrientation( zpVector4f& forward, zpVector4f&
 	LPDIRECTSOUND3DLISTENER listener = (LPDIRECTSOUND3DLISTENER)m_listener;
 	listener->GetOrientation( &f, &u );
 
-	forward = zpVector4f( f.x, f.y, f.z );
-	up = zpVector4f( u.x, u.y, u.z );
+	forward = zpMath::Vector4( f.x, f.y, f.z, 0 );
+	up = zpMath::Vector4( u.x, u.y, u.z, 0 );
 }
 void zpAudioEngineImpl::getListenerRolloff( zp_float& rolloff )
 {
@@ -332,8 +332,8 @@ void zpAudioEngineImpl::setSoundBufferPan( const zpAudioBuffer& buffer, zp_float
 }
 void zpAudioEngineImpl::setSoundBufferPosition( const zpAudioBuffer& buffer, const zpVector4f& pos )
 {
-	zp_float p[3];
-	pos.store3( p );
+	zp_float p[4];
+	zpMath::Vector4Store4( pos, p );
 
 	LPDIRECTSOUND3DBUFFER soundBuffer = (LPDIRECTSOUND3DBUFFER)buffer.soundBuffer3D;
 	soundBuffer->SetPosition( p[0], p[1], p[2], DS3D_DEFERRED );
@@ -342,8 +342,8 @@ void zpAudioEngineImpl::setSoundBufferPosition( const zpAudioBuffer& buffer, con
 }
 void zpAudioEngineImpl::setSoundBufferVelocity( const zpAudioBuffer& buffer, const zpVector4f& vel )
 {
-	zp_float v[3];
-	vel.store3( v );
+	zp_float v[4];
+	zpMath::Vector4Store4( vel, v );
 
 	LPDIRECTSOUND3DBUFFER soundBuffer = (LPDIRECTSOUND3DBUFFER)buffer.soundBuffer3D;
 	soundBuffer->SetVelocity( v[0], v[1], v[2], DS3D_DEFERRED );
@@ -381,7 +381,7 @@ void zpAudioEngineImpl::getSoundBufferPosition( const zpAudioBuffer& buffer, zpV
 	LPDIRECTSOUND3DBUFFER soundBuffer = (LPDIRECTSOUND3DBUFFER)buffer.soundBuffer3D;
 	soundBuffer->GetPosition( &p );
 
-	pos = zpVector4f( p.x, p.y, p.z );
+	pos = zpMath::Vector4( p.x, p.y, p.z, 1 );
 }
 void zpAudioEngineImpl::getSoundBufferVelocity( const zpAudioBuffer& buffer, zpVector4f& vel )
 {
@@ -389,7 +389,7 @@ void zpAudioEngineImpl::getSoundBufferVelocity( const zpAudioBuffer& buffer, zpV
 	LPDIRECTSOUND3DBUFFER soundBuffer = (LPDIRECTSOUND3DBUFFER)buffer.soundBuffer3D;
 	soundBuffer->GetVelocity( &v );
 
-	vel = zpVector4f( v.x, v.y, v.z );
+	vel = zpMath::Vector4( v.x, v.y, v.z, 0 );
 }
 void zpAudioEngineImpl::getSoundBufferDistances( const zpAudioBuffer& buffer, zp_float& minDistance, zp_float& maxDistance )
 {

@@ -61,9 +61,9 @@ zpCameraComponent::zpCameraComponent( zpObject* obj, const zpBison::Value& def )
 	}
 
 	const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
-	const zpVector4f& pos = transform.getRow( 3 );
-	const zpVector4f& lookTo = transform.getRow( 2 );
-	const zpVector4f& up = transform.getRow( 1 );
+	const zpVector4f& pos = transform.r[ 3 ];
+	const zpVector4f& lookTo = transform.r[ 2 ];
+	const zpVector4f& up = transform.r[ 1 ];
 
 	viewport.topX = (zp_float)screenPosition.getX();
 	viewport.topY = (zp_float)screenPosition.getY();
@@ -102,9 +102,9 @@ void zpCameraComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 	if( t->getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
 	{
 		const zpMatrix4f& transform = t->getWorldTransform();
-		const zpVector4f& pos = transform.getRow( 3 );
-		const zpVector4f& lookTo = transform.getRow( 2 );
-		const zpVector4f& up = transform.getRow( 1 );
+		const zpVector4f& pos = transform.r[ 3 ];
+		const zpVector4f& lookTo = transform.r[ 2 ];
+		const zpVector4f& up = transform.r[ 1 ];
 
 		m_camera->setPosition( pos );
 		m_camera->setLookTo( lookTo );

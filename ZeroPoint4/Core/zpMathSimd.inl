@@ -4,23 +4,27 @@ namespace zpMath
 	//
 	// Constructors
 	//
-	ZP_FORCE_INLINE zpScalar Scalar( zp_float s )
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Scalar( zp_float s )
 	{
 		return _mm_set1_ps( s );
 	}
-	ZP_FORCE_INLINE zpVector4f Vector4( zp_float x, zp_float y, zp_float z, zp_float w )
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4( zp_float x, zp_float y, zp_float z, zp_float w )
 	{
 		return _mm_setr_ps( x, y, z, w );
 	}
-	ZP_FORCE_INLINE zpVector4f Vector4( zpScalar x, zpScalar y, zpScalar z, zpScalar w )
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4( zpScalarParamF x, zpScalarParamF y, zpScalarParamF z, zpScalarParamG w )
 	{
 		return _mm_setr_ps( AsFloat( x ), AsFloat( y ), AsFloat( z ), AsFloat( w ) );
 	}
-	ZP_FORCE_INLINE zpQuaternion4f Quaternion4( zp_float x, zp_float y, zp_float z, zp_float w )
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL Quaternion( zp_float x, zp_float y, zp_float z, zp_float w )
 	{
 		return _mm_setr_ps( x, y, z, w );
 	}
-	ZP_FORCE_INLINE zp_float AsFloat( zpScalar s )
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL Quaternion( zpScalarParamF x, zpScalarParamF y, zpScalarParamF z, zpScalarParamG w )
+	{
+		return _mm_setr_ps( AsFloat( x ), AsFloat( y ), AsFloat( z ), AsFloat( w ) );
+	}
+	ZP_FORCE_INLINE zp_float ZP_VECTORCALL AsFloat( zpScalarParamF s )
 	{
 		zp_float v;
 		_mm_store_ss( &v, s );
@@ -30,27 +34,27 @@ namespace zpMath
 	//
 	// Vector getters
 	//
-	ZP_FORCE_INLINE zpScalar GetX( zpVector4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 0, 0, 0, 0 ) ); }
-	ZP_FORCE_INLINE zpScalar GetY( zpVector4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 1, 1, 1, 1 ) ); }
-	ZP_FORCE_INLINE zpScalar GetZ( zpVector4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 2, 2, 2, 2 ) ); }
-	ZP_FORCE_INLINE zpScalar GetW( zpVector4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 3, 3, 3, 3 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Vector4GetX( zpVector4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 0, 0, 0, 0 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Vector4GetY( zpVector4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 1, 1, 1, 1 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Vector4GetZ( zpVector4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 2, 2, 2, 2 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Vector4GetW( zpVector4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 3, 3, 3, 3 ) ); }
 
 	//
 	// Vector setters
 	//
-	ZP_FORCE_INLINE zpVector4f SetX( zpVector4f s, zpScalar x ) { return s; }
-	ZP_FORCE_INLINE zpVector4f SetY( zpVector4f s, zpScalar y ) { return s; }
-	ZP_FORCE_INLINE zpVector4f SetZ( zpVector4f s, zpScalar z ) { return s; }
-	ZP_FORCE_INLINE zpVector4f SetW( zpVector4f s, zpScalar w ) { return s; }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4SetX( zpVector4fParamF s, zpScalarParamF x ) { s.m128_f32[0] = AsFloat( x ); return s; }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4SetY( zpVector4fParamF s, zpScalarParamF y ) { s.m128_f32[1] = AsFloat( y ); return s; }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4SetZ( zpVector4fParamF s, zpScalarParamF z ) { s.m128_f32[2] = AsFloat( z ); return s; }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4SetW( zpVector4fParamF s, zpScalarParamF w ) { s.m128_f32[3] = AsFloat( w ); return s; }
 
 	//
 	// Vector load and store
 	//
-	ZP_FORCE_INLINE void Store4( zpVector4f s, zp_float* xyzw )
+	ZP_FORCE_INLINE void ZP_VECTORCALL Vector4Store4( zpVector4fParamF s, zp_float* xyzw )
 	{
 		_mm_storer_ps( xyzw, s );
 	}
-	ZP_FORCE_INLINE zpVector4f Load4( const zp_float* xyzw )
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Load4( const zp_float* xyzw )
 	{
 		return _mm_loadr_ps( xyzw );
 	}
@@ -58,126 +62,143 @@ namespace zpMath
 	//
 	// Quaternion getter
 	//
-	ZP_FORCE_INLINE zpScalar GetX( zpQuaternion4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 0, 0, 0, 0 ) ); }
-	ZP_FORCE_INLINE zpScalar GetY( zpQuaternion4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 1, 1, 1, 1 ) ); }
-	ZP_FORCE_INLINE zpScalar GetZ( zpQuaternion4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 2, 2, 2, 2 ) ); }
-	ZP_FORCE_INLINE zpScalar GetW( zpQuaternion4f s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 3, 3, 3, 3 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetX( zpQuaternion4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 0, 0, 0, 0 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetY( zpQuaternion4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 1, 1, 1, 1 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetZ( zpQuaternion4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 2, 2, 2, 2 ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetW( zpQuaternion4fParamF s ) { return _mm_shuffle_ps( s, s, _MM_SHUFFLE( 3, 3, 3, 3 ) ); }
 
 	//
 	// Quaternion setter
 	//
-	ZP_FORCE_INLINE zpQuaternion4f SetX( zpQuaternion4f s, zpScalar x ) { return s; }
-	ZP_FORCE_INLINE zpQuaternion4f SetY( zpQuaternion4f s, zpScalar y ) { return s; }
-	ZP_FORCE_INLINE zpQuaternion4f SetZ( zpQuaternion4f s, zpScalar z ) { return s; }
-	ZP_FORCE_INLINE zpQuaternion4f SetW( zpQuaternion4f s, zpScalar w ) { return s; }
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionSetX( zpQuaternion4fParamF s, zpScalarParamF x ) { s.m128_f32[0] = AsFloat( x ); return s; }
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionSetY( zpQuaternion4fParamF s, zpScalarParamF y ) { s.m128_f32[1] = AsFloat( y ); return s; }
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionSetZ( zpQuaternion4fParamF s, zpScalarParamF z ) { s.m128_f32[2] = AsFloat( z ); return s; }
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionSetW( zpQuaternion4fParamF s, zpScalarParamF w ) { s.m128_f32[3] = AsFloat( w ); return s; }
 
 	//
 	// Trig functions
 	//
-	ZP_FORCE_INLINE zpScalar Sin( zpScalar a ) { zp_float s = AsFloat( a ); return Scalar( zp_sin( s ) ); }
-	ZP_FORCE_INLINE zpScalar Cos( zpScalar a ) { zp_float s = AsFloat( a ); return Scalar( zp_cos( s ) ); }
-	ZP_FORCE_INLINE zpScalar Tan( zpScalar a ) { zp_float s = AsFloat( a ); return Scalar( zp_tan( s ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarSin( zpScalarParamF a ) { zp_float s = AsFloat( a ); return Scalar( zp_sin( s ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarCos( zpScalarParamF a ) { zp_float s = AsFloat( a ); return Scalar( zp_cos( s ) ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarTan( zpScalarParamF a ) { zp_float s = AsFloat( a ); return Scalar( zp_tan( s ) ); }
 
 	//
 	// Scalar math
 	//
-	ZP_FORCE_INLINE zpScalar Add( zpScalar a, zpScalar b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpScalar Sub( zpScalar a, zpScalar b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpScalar Mul( zpScalar a, zpScalar b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpScalar Div( zpScalar a, zpScalar b ) { return _mm_div_ps( a, b ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarAdd( zpScalarParamF a, zpScalarParamF b ) { return _mm_add_ps( a, b ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarSub( zpScalarParamF a, zpScalarParamF b ) { return _mm_sub_ps( a, b ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarMul( zpScalarParamF a, zpScalarParamF b ) { return _mm_mul_ps( a, b ); }
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarDiv( zpScalarParamF a, zpScalarParamF b ) { return _mm_div_ps( a, b ); }
 
 	//
 	// Vector / Scalar math
 	//
-	ZP_FORCE_INLINE zpVector4f Add( zpVector4f a, zpScalar b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Sub( zpVector4f a, zpScalar b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Mul( zpVector4f a, zpScalar b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Div( zpVector4f a, zpScalar b ) { return _mm_div_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Add( zpVector4f a, zpScalar b ) { return _mm_add_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Sub( zpVector4f a, zpScalar b ) { return _mm_sub_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Mul( zpVector4f a, zpScalar b ) { return _mm_mul_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Div( zpVector4f a, zpScalar b ) { return _mm_div_ps( a, b ); }
 
 	//
 	// Scalar / Vector math
 	//
-	ZP_FORCE_INLINE zpVector4f Add( zpScalar a, zpVector4f b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Sub( zpScalar a, zpVector4f b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Mul( zpScalar a, zpVector4f b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Div( zpScalar a, zpVector4f b ) { return _mm_div_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Add( zpScalar a, zpVector4f b ) { return _mm_add_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Sub( zpScalar a, zpVector4f b ) { return _mm_sub_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Mul( zpScalar a, zpVector4f b ) { return _mm_mul_ps( a, b ); }
+	//ZP_FORCE_INLINE zpVector4f Div( zpScalar a, zpVector4f b ) { return _mm_div_ps( a, b ); }
 
 	//
 	// Vector / Vector math
 	//
-	ZP_FORCE_INLINE zpVector4f Add( zpVector4f a, zpVector4f b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Sub( zpVector4f a, zpVector4f b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Mul( zpVector4f a, zpVector4f b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Div( zpVector4f a, zpVector4f b ) { return _mm_div_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Add( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_add_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Sub( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_sub_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Mul( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_mul_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Div( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_div_ps( a, b ); }
+
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Scale( zpVector4fParamF a, zpScalarParamF b ) { return _mm_mul_ps( a, b ); }
 
 	//
 	// Quat / Scalar math
 	//
-	ZP_FORCE_INLINE zpQuaternion4f Add( zpQuaternion4f a, zpScalar b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Sub( zpQuaternion4f a, zpScalar b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Mul( zpQuaternion4f a, zpScalar b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Div( zpQuaternion4f a, zpScalar b ) { return _mm_div_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Add( zpQuaternion4f a, zpScalar b ) { return _mm_add_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Sub( zpQuaternion4f a, zpScalar b ) { return _mm_sub_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Mul( zpQuaternion4f a, zpScalar b ) { return _mm_mul_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Div( zpQuaternion4f a, zpScalar b ) { return _mm_div_ps( a, b ); }
 
 	//
 	// Scalar / Quat math
 	//
-	ZP_FORCE_INLINE zpQuaternion4f Add( zpScalar a, zpQuaternion4f b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Sub( zpScalar a, zpQuaternion4f b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Mul( zpScalar a, zpQuaternion4f b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Div( zpScalar a, zpQuaternion4f b ) { return _mm_div_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Add( zpScalar a, zpQuaternion4f b ) { return _mm_add_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Sub( zpScalar a, zpQuaternion4f b ) { return _mm_sub_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Mul( zpScalar a, zpQuaternion4f b ) { return _mm_mul_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Div( zpScalar a, zpQuaternion4f b ) { return _mm_div_ps( a, b ); }
 
 	//
 	// Quat / Vector math
 	//
-	ZP_FORCE_INLINE zpQuaternion4f Add( zpQuaternion4f a, zpVector4f b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Sub( zpQuaternion4f a, zpVector4f b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Mul( zpQuaternion4f a, zpVector4f b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Div( zpQuaternion4f a, zpVector4f b ) { return _mm_div_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Add( zpQuaternion4f a, zpVector4f b ) { return _mm_add_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Sub( zpQuaternion4f a, zpVector4f b ) { return _mm_sub_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Mul( zpQuaternion4f a, zpVector4f b ) { return _mm_mul_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Div( zpQuaternion4f a, zpVector4f b ) { return _mm_div_ps( a, b ); }
 
 	//
 	// Vector / Quat math
 	//
-	ZP_FORCE_INLINE zpQuaternion4f Add( zpVector4f a, zpQuaternion4f b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Sub( zpVector4f a, zpQuaternion4f b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Mul( zpVector4f a, zpQuaternion4f b ) { return _mm_mul_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Div( zpVector4f a, zpQuaternion4f b ) { return _mm_div_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Add( zpVector4f a, zpQuaternion4f b ) { return _mm_add_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Sub( zpVector4f a, zpQuaternion4f b ) { return _mm_sub_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Mul( zpVector4f a, zpQuaternion4f b ) { return _mm_mul_ps( a, b ); }
+	//ZP_FORCE_INLINE zpQuaternion4f Div( zpVector4f a, zpQuaternion4f b ) { return _mm_div_ps( a, b ); }
 
 	//
 	// Quat / Quat math
 	//
-	ZP_FORCE_INLINE zpQuaternion4f Add( zpQuaternion4f a, zpQuaternion4f b ) { return _mm_add_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Sub( zpQuaternion4f a, zpQuaternion4f b ) { return _mm_sub_ps( a, b ); }
-	ZP_FORCE_INLINE zpQuaternion4f Mul( zpQuaternion4f a, zpQuaternion4f b )
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionAdd( zpQuaternion4fParamF a, zpQuaternion4fParamF b ) { return _mm_add_ps( a, b ); }
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionSub( zpQuaternion4fParamF a, zpQuaternion4fParamF b ) { return _mm_sub_ps( a, b ); }
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionMul( zpQuaternion4fParamF a, zpQuaternion4fParamF b )
 	{
-		zp_float ax = AsFloat( GetX( a ) );
-		zp_float ay = AsFloat( GetY( a ) );
-		zp_float az = AsFloat( GetZ( a ) );
-		zp_float aw = AsFloat( GetW( a ) );
+		zp_float ax = AsFloat( QuaternionGetX( a ) );
+		zp_float ay = AsFloat( QuaternionGetY( a ) );
+		zp_float az = AsFloat( QuaternionGetZ( a ) );
+		zp_float aw = AsFloat( QuaternionGetW( a ) );
 		
-		zp_float bx = AsFloat( GetX( b ) );
-		zp_float by = AsFloat( GetY( b ) );
-		zp_float bz = AsFloat( GetZ( b ) );
-		zp_float bw = AsFloat( GetW( b ) );
+		zp_float bx = AsFloat( QuaternionGetX( b ) );
+		zp_float by = AsFloat( QuaternionGetY( b ) );
+		zp_float bz = AsFloat( QuaternionGetZ( b ) );
+		zp_float bw = AsFloat( QuaternionGetW( b ) );
 		
 		zp_float nx = aw * bx + ay * bw + ay * bz - az * by;
 		zp_float ny = aw * by + ax * bw + az * bx - ax * bz;
 		zp_float nz = aw * bz + az * bw + ax * by - ay * bx;
 		zp_float nw = aw * bw - ax * bx - ay * by - az * bz;
 
-		return Quaternion4( nx, ny, nz, nw );
+		return Quaternion( nx, ny, nz, nw );
 	}
 
-	ZP_FORCE_INLINE zpScalar Dot2( zpVector4f a, zpVector4f b )
+	//
+	// Quaternion load and store
+	//
+	ZP_FORCE_INLINE void QuaternionStore4( zpQuaternion4fParamF s, zp_float* xyzw )
 	{
-		zpVector4f m = Mul( a, b );
-		return Add( GetX( m ), GetY( m ) );
+		_mm_storer_ps( xyzw, s );
 	}
-	ZP_FORCE_INLINE zpScalar Dot3( zpVector4f a, zpVector4f b )
+	ZP_FORCE_INLINE zpQuaternion4f QuaternionLoad4( const zp_float* xyzw )
 	{
-		zpVector4f m = Mul( a, b );
-		return Add( GetX( m ), Add( GetY( m ), GetZ( m ) ) );
+		return _mm_loadr_ps( xyzw );
 	}
-	ZP_FORCE_INLINE zpScalar Dot4( zpVector4f a, zpVector4f b )
+
+	//
+	// Vector4 Dot
+	//
+	ZP_FORCE_INLINE zpScalar Vector4Dot2( zpVector4fParamF a, zpVector4fParamF b )
+	{
+		zpVector4f m = Vector4Mul( a, b );
+		return ScalarAdd( Vector4GetX( m ), Vector4GetY( m ) );
+	}
+	ZP_FORCE_INLINE zpScalar Vector4Dot3( zpVector4fParamF a, zpVector4fParamF b )
+	{
+		zpVector4f m = Vector4Mul( a, b );
+		return ScalarAdd( Vector4GetX( m ), ScalarAdd( Vector4GetY( m ), Vector4GetZ( m ) ) );
+	}
+	ZP_FORCE_INLINE zpScalar Vector4Dot4( zpVector4fParamF a, zpVector4fParamF b )
 	{
 		__m128 t0 = _mm_mul_ps( a, b );
 		__m128 t1 = _mm_shuffle_ps( t0, t0, _MM_SHUFFLE( 1, 0, 3, 2 ) );
@@ -187,7 +208,7 @@ namespace zpMath
 		return _mm_add_ps( t3, t2 );
 	}
 
-	ZP_FORCE_INLINE zpVector4f Cross3( zpVector4f a, zpVector4f b )
+	ZP_FORCE_INLINE zpVector4f Vector4Cross3( zpVector4fParamF a, zpVector4fParamF b )
 	{
 		__m128 s0 = _mm_shuffle_ps( a, a, _MM_SHUFFLE( 3, 0, 2, 1 ) );
 		__m128 s1 = _mm_shuffle_ps( b, b, _MM_SHUFFLE( 3, 1, 0, 2 ) );
@@ -200,29 +221,54 @@ namespace zpMath
 		return _mm_sub_ps( s2, s5 );
 	}
 
+	ZP_FORCE_INLINE zpScalar ScalarAbs( zpScalarParamF a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
+	ZP_FORCE_INLINE zpScalar ScalarNeg( zpScalarParamF a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
+	ZP_FORCE_INLINE zpScalar ScalarRcp( zpScalarParamF a )  { return _mm_rcp_ps( a ); }
+	ZP_FORCE_INLINE zpScalar ScalarSqrt( zpScalarParamF a ) { return _mm_sqrt_ps( a ); }
 
-	ZP_FORCE_INLINE zpScalar Abs( zpScalar a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
-	ZP_FORCE_INLINE zpScalar Neg( zpScalar a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
-	ZP_FORCE_INLINE zpScalar Rcp( zpScalar a )  { return _mm_rcp_ps( a ); }
-	ZP_FORCE_INLINE zpScalar Sqrt( zpScalar a ) { return _mm_sqrt_ps( a ); }
+	ZP_FORCE_INLINE zpVector4f Vector4Abs( zpVector4fParamF a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
+	ZP_FORCE_INLINE zpVector4f Vector4Neg( zpVector4fParamF a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
+	ZP_FORCE_INLINE zpVector4f Vector4Rcp( zpVector4fParamF a )  { return _mm_rcp_ps( a ); }
+	ZP_FORCE_INLINE zpVector4f Vector4Sqrt( zpVector4fParamF a ) { return _mm_sqrt_ps( a ); }
 
-	ZP_FORCE_INLINE zpVector4f Abs( zpVector4f a )  { return _mm_and_ps( a, *(__m128*)&_mm_set1_epi32( 0x7fffffff ) ); }
-	ZP_FORCE_INLINE zpVector4f Neg( zpVector4f a )  { return _mm_xor_ps( a, *(__m128*)&_mm_set1_epi32( 0x80000000 ) ); }
-	ZP_FORCE_INLINE zpVector4f Rcp( zpVector4f a )  { return _mm_rcp_ps( a ); }
-	ZP_FORCE_INLINE zpVector4f Sqrt( zpVector4f a ) { return _mm_sqrt_ps( a ); }
+	ZP_FORCE_INLINE zpScalar ScalarMax( zpScalarParamF a, zpScalarParamF b ) { return _mm_min_ps( a, b ); }
+	ZP_FORCE_INLINE zpScalar ScalarMin( zpScalarParamF a, zpScalarParamF b ) { return _mm_max_ps( a, b ); }
 
-	ZP_FORCE_INLINE zpScalar Max( zpScalar a, zpScalar b ) { return _mm_min_ps( a, b ); }
-	ZP_FORCE_INLINE zpScalar Min( zpScalar a, zpScalar b ) { return _mm_max_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f Vector4Max( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_min_ps( a, b ); }
+	ZP_FORCE_INLINE zpVector4f Vector4Min( zpVector4fParamF a, zpVector4fParamF b ) { return _mm_max_ps( a, b ); }
 
-	ZP_FORCE_INLINE zpVector4f Max( zpVector4f a, zpVector4f b ) { return _mm_min_ps( a, b ); }
-	ZP_FORCE_INLINE zpVector4f Min( zpVector4f a, zpVector4f b ) { return _mm_max_ps( a, b ); }
-
-	ZP_FORCE_INLINE zp_int zpMath::Cmp( zpScalar a, zpScalar b )
+	ZP_FORCE_INLINE zp_int ScalarCmp( zpScalarParamF a, zpScalarParamF b )
 	{
 		__m128 lt = _mm_cmplt_ps( a, b );
 		__m128 gt = _mm_cmpgt_ps( a, b );
 
 		return lt.m128_i32[0] ? -1 : gt.m128_i32[0] ? 1 : 0;
+	}
+
+	ZP_FORCE_INLINE zpMatrix4f QuaternionToMatrix( zpQuaternion4fParamF a )
+	{
+		zp_float x = AsFloat( QuaternionGetX( a ) );
+		zp_float y = AsFloat( QuaternionGetX( a ) );
+		zp_float z = AsFloat( QuaternionGetX( a ) );
+		zp_float w = AsFloat( QuaternionGetX( a ) );
+
+		zp_float xx = x * x;
+		zp_float xy = x * y;
+		zp_float xz = x * z;
+		zp_float xw = x * w;
+		zp_float yy = y * y;
+		zp_float yz = y * z;
+		zp_float yw = y * w;
+		zp_float zz = z * z;
+		zp_float zw = z * w;
+
+		zpMatrix4f s;
+		s.r[ 0 ] = Vector4( 1 - 2 * (yy + zz), 2 * (xy - zw), 2 * (xz + yw), 0 );
+		s.r[ 1 ] = Vector4( 2 * (xy + zw), 1 - 2 * (xx + zz), 2 * (yz - xw), 0 );
+		s.r[ 2 ] = Vector4( 2 * (xz - yw), 2 * (yz + xw), 1 - 2 * (xx + yy), 0 );
+		s.r[ 3 ] = Vector4( 0, 0, 0, 1 );
+
+		return s;
 	}
 };
 

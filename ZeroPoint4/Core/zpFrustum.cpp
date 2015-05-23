@@ -57,7 +57,7 @@ void zpFrustum::setMatrix( const zpMatrix4f& matrix )
 void zpFrustum::setLookAt( const zpVector4f& eye, const zpVector4f& lookAt, const zpVector4f& up, zp_float ratio, zp_float fovy, zp_float zNear, zp_float zFar )
 {
 	zpVector4f dir;
-	zpMath::Sub( dir, lookAt, eye );
+	dir = zpMath::Vector4Sub( lookAt, eye );
 
 	setLookTo( eye, dir, up, ratio, fovy, zNear, zFar );
 }
@@ -142,68 +142,68 @@ void zpFrustum::setLookTo( const zpVector4f& eye, const zpVector4f& direction, c
 	zpVector4f fc;
 	zpVector4f nc;
 
-	zpScalar zNearS( zNear );
-	zpScalar zFarS( zFar );
-	zpScalar r( ratio );
+	zpScalar zNearS = zpMath::Scalar( zNear );
+	zpScalar zFarS  = zpMath::Scalar( zFar );
+	zpScalar r      = zpMath::Scalar( ratio );
 
-	zpScalar tang( fovy );
-	zpMath::DegToRad( tang, tang );
-	zpMath::Mul( tang, tang, zpScalar( 0.5f ) );
-	zpMath::Tan( tang, tang );
+	zpScalar tang = zpMath::Scalar( fovy );
+	tang = zpMath::ScalarDegToRad( tang );
+	tang = zpMath::ScalarMul( tang, zpMath::Scalar( 0.5f ) );
+	tang = zpMath::ScalarTan( tang );
 
 	zpScalar nh;//( zNear * tang );
 	zpScalar nw;//( zNear * tang * ratio );
 	zpScalar fh;//( zFar * tang );
 	zpScalar fw;//( zFar * tang * ratio );
 
-	zpMath::Mul( nh, zNearS, tang );
-	zpMath::Mul( nw, nh, r );
+	nh = zpMath::Vector4Mul( zNearS, tang );
+	nw = zpMath::Vector4Mul( nh, r );
 
-	zpMath::Mul( fh, zFarS, tang );
-	zpMath::Mul( fw, fh, r );
+	fh = zpMath::Vector4Mul( zFarS, tang );
+	fw = zpMath::Vector4Mul( fh, r );
 
-	zpMath::Madd( nc, eye, direction, zNearS );
-	zpMath::Madd( fc, eye, direction, zFarS );
+	nc = zpMath::Vector4Madd( eye, direction, zNearS );
+	fc = zpMath::Vector4Madd( eye, direction, zFarS );
 
 	zpVector4f x;
-	zpMath::Cross3( x, up, direction );
-	zpMath::Normalize3( x, x );
+	x = zpMath::Vector4Cross3( up, direction );
+	x = zpMath::Vector4Normalize3( x );
 
 	zpVector4f y;
-	zpMath::Cross3( y, direction, x );
+	y = zpMath::Vector4Cross3( direction, x );
 
 	zpVector4f yNh, yFh;
 	zpVector4f xNw, xFw;
-	zpMath::Mul( yNh, y, nh );
-	zpMath::Mul( xNw, x, nw );
-	zpMath::Mul( yFh, y, fh );
-	zpMath::Mul( xFw, x, fw );
+	yNh = zpMath::Vector4Mul( y, nh );
+	xNw = zpMath::Vector4Mul( x, nw );
+	yFh = zpMath::Vector4Mul( y, fh );
+	xFw = zpMath::Vector4Mul( x, fw );
 
 	// near
-	zpMath::Add( m_ntl, nc, yNh );
-	zpMath::Sub( m_ntl, m_ntl, xNw );
+	m_ntl = zpMath::Vector4Add( nc, yNh );
+	m_ntl = zpMath::Vector4Sub( m_ntl, xNw );
 
-	zpMath::Add( m_ntr, nc, yNh );
-	zpMath::Add( m_ntr, m_ntr, xNw );
+	m_ntr = zpMath::Vector4Add( nc, yNh );
+	m_ntr = zpMath::Vector4Add( m_ntr, xNw );
 
-	zpMath::Sub( m_nbl, nc, yNh );
-	zpMath::Sub( m_nbl, m_nbl, xNw );
+	m_nbl = zpMath::Vector4Sub( nc, yNh );
+	m_nbl = zpMath::Vector4Sub( m_nbl, xNw );
 
-	zpMath::Sub( m_nbr, nc, yNh );
-	zpMath::Add( m_nbr, m_nbr, xNw );
+	m_nbr = zpMath::Vector4Sub( nc, yNh );
+	m_nbr = zpMath::Vector4Add( m_nbr, xNw );
 
 	// far
-	zpMath::Add( m_ftl, fc, yFh );
-	zpMath::Sub( m_ftl, m_ftl, xFw );
+	m_ftl = zpMath::Vector4Add( fc, yFh );
+	m_ftl = zpMath::Vector4Sub( m_ftl, xFw );
 
-	zpMath::Add( m_ftr, fc, yFh );
-	zpMath::Add( m_ftr, m_ftr, xFw );
+	m_ftr = zpMath::Vector4Add( fc, yFh );
+	m_ftr = zpMath::Vector4Add( m_ftr, xFw );
 
-	zpMath::Sub( m_fbl, fc, yFh );
-	zpMath::Sub( m_fbl, m_fbl, xFw );
+	m_fbl = zpMath::Vector4Sub( fc, yFh );
+	m_fbl = zpMath::Vector4Sub( m_fbl, xFw );
 
-	zpMath::Sub( m_fbr, fc, yFh );
-	zpMath::Add( m_fbr, m_fbr, xFw );
+	m_fbr = zpMath::Vector4Sub( fc, yFh );
+	m_fbr = zpMath::Vector4Add( m_fbr, xFw );
 
 	//m_top.set(		m_ntl, m_ftl, m_ntr );
 	//m_bottom.set(	m_nbr, m_fbr, m_nbl );

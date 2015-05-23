@@ -25,13 +25,13 @@ void zpKinematicBodyComponent::jump()
 void zpKinematicBodyComponent::walk( const zpVector4f& direction, const zpScalar& speed )
 {
 	zpVector4f dir;
-	zpMath::Mul( dir, direction, speed );
+	dir = zpMath::Vector4Scale( direction, speed );
 
 	m_kinematicBody.setWalkDirection( dir );
 }
 void zpKinematicBodyComponent::stop()
 {
-	m_kinematicBody.setWalkDirection( zpVector4f( 0, 0, 0, 0 ) );
+	m_kinematicBody.setWalkDirection( zpMath::Vector4( 0, 0, 0, 0 ) );
 }
 
 void zpKinematicBodyComponent::onCreate()

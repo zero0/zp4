@@ -26,8 +26,11 @@ void zpPhantom::create( zpPhysicsEngine* engine, const zpMatrix4f& transform, co
 	ghost->setCollisionShape( shape );
 	ghost->setCollisionFlags( ghost->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE );
 
+	zp_float matrix[16];
+	zpMath::MatrixStoreOpenGL( transform, matrix );
+
 	btTransform trans;
-	trans.setFromOpenGLMatrix( transform.getData() );
+	trans.setFromOpenGLMatrix( matrix );
 	ghost->setWorldTransform( trans );
 
 	m_phantom = ghost;
@@ -47,8 +50,11 @@ void zpPhantom::setMatrix( const zpMatrix4f& transform )
 {
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
 
+	zp_float matrix[16];
+	zpMath::MatrixStoreOpenGL( transform, matrix );
+
 	btTransform t;
-	t.setFromOpenGLMatrix( transform.getData() );
+	t.setFromOpenGLMatrix( matrix );
 
 	ghost->setWorldTransform( t );
 }
@@ -58,7 +64,10 @@ zp_bool zpPhantom::getMatrix( zpMatrix4f& transform ) const
 
 	const btTransform& t = ghost->getWorldTransform();
 
-	t.getOpenGLMatrix( transform.getData() );
+	zp_float matrix[ 16 ];
+	t.getOpenGLMatrix( matrix );
+
+	transform = zpMath::MatrixLoadOpenGL( matrix );
 	return true;
 }
 
@@ -87,8 +96,8 @@ zp_bool zpPhantom::rayTest( const zpVector4f& fromWorld, const zpVector4f& toWor
 
 	if( cb.hasHit() )
 	{
-		hit.position.load4( cb.m_hitPointWorld.m_floats );
-		hit.normal.load4( cb.m_hitNormalWorld.m_floats );
+		hit.position = zpMath::Vector4Load4( cb.m_hitPointWorld.m_floats );
+		hit.normal = zpMath::Vector4Load4( cb.m_hitNormalWorld.m_floats );
 		hit.hitObject = cb.m_collisionObject ? cb.m_collisionObject->getUserPointer() : ZP_NULL;
 		return true;
 	}

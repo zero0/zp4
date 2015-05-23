@@ -37,7 +37,7 @@ void zpRigidBody::initialize( const zpMatrix4f& transform )
 
 	btQuaternion rot( btQuaternion::getIdentity() );
 	btVector3 pos;
-	transform.getRow( 3 ).store4( pos.m_floats );
+	zpMath::Vector4Store4( transform.r[ 3 ], pos.m_floats );
 
 	btTransform trans( rot, pos );
 
@@ -89,7 +89,10 @@ void zpRigidBody::getMatrix( zpMatrix4f& transform ) const
 	btTransform t;
 	motion->getWorldTransform( t );
 
-	t.getOpenGLMatrix( transform.getData() );
+	zp_float matrix[ 16 ];
+	t.getOpenGLMatrix( matrix );
+
+	transform = zpMath::MatrixLoadOpenGL( matrix );
 }
 void zpRigidBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation ) const
 {
@@ -99,9 +102,10 @@ void zpRigidBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rot
 	motion->getWorldTransform( t );
 
 	const btVector3& o = t.getOrigin();
-	position = zpVector4f( o.x(), o.y(), o.z(), 1.f );
+	const btQuaternion& q = t.getRotation();
 
-	rotation.load4( t.getRotation() );
+	position = zpMath::Vector4( o.x(), o.y(), o.z(), 1.f );
+	rotation = zpMath::Quaternion( q.x(), q.y(), q.z(), q.w() );
 }
 
 zp_bool zpRigidBody::isStatic() const

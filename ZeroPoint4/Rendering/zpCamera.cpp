@@ -10,7 +10,7 @@ zpCamera::zpCamera()
 	, m_orthoRect()
 	, m_clipRect()
 	, m_viewport()
-	, m_lookAt( 0, 0, 0, 1 )
+	, m_lookAt( zpMath::Vector4( 0, 0, 0, 1 ) )
 	, m_clearColor( 0, 0, 0, 0 )
 	, m_clearDepth( 1.0f )
 	, m_clearStencil( 0 )
@@ -35,36 +35,36 @@ zp_bool zpCamera::update()
 		{
 		case ZP_CAMERA_PROJECTION_ORTHO:
 			{
-				zpScalar l( (zp_float)m_orthoRect.getLeft() );
-				zpScalar r( (zp_float)m_orthoRect.getRight() );
-				zpScalar t( (zp_float)m_orthoRect.getTop() );
-				zpScalar b( (zp_float)m_orthoRect.getBottom() );
-				zpScalar n( m_bufferData.zNear );
-				zpScalar f( m_bufferData.zFar );
+				zpScalar l = zpMath::Scalar( (zp_float)m_orthoRect.getLeft() );
+				zpScalar r = zpMath::Scalar( (zp_float)m_orthoRect.getRight() );
+				zpScalar t = zpMath::Scalar( (zp_float)m_orthoRect.getTop() );
+				zpScalar b = zpMath::Scalar( (zp_float)m_orthoRect.getBottom() );
+				zpScalar n = zpMath::Scalar( m_bufferData.zNear );
+				zpScalar f = zpMath::Scalar( m_bufferData.zFar );
 				
-				zpMath::OrthoLH( m_projection, l, r, t, b, n, f );
+				m_projection = zpMath::OrthoLH( l, r, t, b, n, f );
 			}
 			break;
 		case ZP_CAMERA_PROJECTION_ORTHO_CENTERED:
 			{
-				zpScalar l( m_orthoRect.getSize().getX() * -0.5f );
-				zpScalar r( m_orthoRect.getSize().getX() *  0.5f );
-				zpScalar t( m_orthoRect.getSize().getY() *  0.5f );
-				zpScalar b( m_orthoRect.getSize().getY() * -0.5f );
-				zpScalar n( m_bufferData.zNear );
-				zpScalar f( m_bufferData.zFar );
+				zpScalar l = zpMath::Scalar( m_orthoRect.getSize().getX() * -0.5f );
+				zpScalar r = zpMath::Scalar( m_orthoRect.getSize().getX() *  0.5f );
+				zpScalar t = zpMath::Scalar( m_orthoRect.getSize().getY() *  0.5f );
+				zpScalar b = zpMath::Scalar( m_orthoRect.getSize().getY() * -0.5f );
+				zpScalar n = zpMath::Scalar( m_bufferData.zNear );
+				zpScalar f = zpMath::Scalar( m_bufferData.zFar );
 
-				zpMath::OrthoLH( m_projection, l, r, t, b, n, f );
+				m_projection = zpMath::OrthoLH( l, r, t, b, n, f );
 			}
 			break;
 		case ZP_CAMERA_PROJECTION_PERSPECTIVE:
 			{
-				zpScalar fovy( m_bufferData.fovy );
-				zpScalar aspectRatio( m_bufferData.aspectRatio );
-				zpScalar n( m_bufferData.zNear );
-				zpScalar f( m_bufferData.zFar );
+				zpScalar fovy = zpMath::Scalar( m_bufferData.fovy );
+				zpScalar aspectRatio = zpMath::Scalar( m_bufferData.aspectRatio );
+				zpScalar n = zpMath::Scalar( m_bufferData.zNear );
+				zpScalar f = zpMath::Scalar( m_bufferData.zFar );
 
-				zpMath::PerspectiveLH( m_projection, fovy, aspectRatio, n, f );
+				m_projection = zpMath::PerspectiveLH( fovy, aspectRatio, n, f );
 			}
 			break;
 		}
@@ -75,7 +75,7 @@ zp_bool zpCamera::update()
 
 	if( m_isViewDirty )
 	{
-		zpMath::LookAtLH( m_view, m_bufferData.position, m_bufferData.lookTo, m_bufferData.up );
+		m_view = zpMath::LookAtLH( m_bufferData.position, m_bufferData.lookTo, m_bufferData.up );
 
 		isViewProjectionDirty = true;
 		m_isViewDirty = false;
@@ -85,8 +85,8 @@ zp_bool zpCamera::update()
 	{
 		m_frustum.setLookTo( m_bufferData.position, m_bufferData.lookTo, m_bufferData.up, m_bufferData.aspectRatio, m_bufferData.fovy, m_bufferData.zNear, m_bufferData.zFar );
 
-		zpMath::Mul( m_bufferData.viewProjection, m_view, m_projection );
-		zpMath::Invert( m_bufferData.invViewProjection, m_bufferData.viewProjection );
+		m_bufferData.viewProjection = zpMath::MatrixMul( m_view, m_projection );
+		m_bufferData.invViewProjection = zpMath::Invert( m_bufferData.viewProjection );
 	}
 
 	return isViewProjectionDirty;
@@ -141,14 +141,14 @@ void zpCamera::setPosition( const zpVector4f& position )
 void zpCamera::setLookTo( const zpVector4f& lookTo )
 {
 	// set look to
-	zpMath::Normalize3( m_bufferData.lookTo, lookTo );
+	m_bufferData.lookTo = zpMath::Vector4Normalize3( lookTo );
 
 	// calc new look at
 	zpVector4f len;
 	zpScalar d;
-	zpMath::Sub( len, m_lookAt, m_bufferData.position );
-	zpMath::Length3( d, len );
-	zpMath::Madd( m_lookAt, m_bufferData.position, m_bufferData.lookTo, d );
+	len = zpMath::Vector4Sub( m_lookAt, m_bufferData.position );
+	d = zpMath::Vector4Length3( len );
+	m_lookAt = zpMath::Vector4Madd( m_bufferData.position, m_bufferData.lookTo, d );
 
 	m_isViewDirty = true;
 }
@@ -159,14 +159,14 @@ void zpCamera::setLookAt( const zpVector4f& lookAt )
 
 	// calc new look to
 	zpVector4f dir;
-	zpMath::Sub( dir, lookAt, m_bufferData.position );
-	zpMath::Normalize3( m_bufferData.lookTo, dir );
+	dir = zpMath::Vector4Sub( lookAt, m_bufferData.position );
+	m_bufferData.lookTo = zpMath::Vector4Normalize3( dir );
 
 	m_isViewDirty = true;
 }
 void zpCamera::setUp( const zpVector4f& up )
 {
-	zpMath::Normalize3( m_bufferData.up, up );
+	m_bufferData.up = zpMath::Vector4Normalize3( up );
 	m_isViewDirty = true;
 }
 
@@ -231,13 +231,13 @@ void zpCamera::generateRay( const zpVector2i& screenSize, const zpVector2i& wind
 	zp_float x = ( ( 2.0f * (zp_float)windowPosition.getX() ) / (zp_float)screenSize.getX() ) - 1.0f;
 	zp_float y = -( ( ( 2.0f * (zp_float)windowPosition.getY() ) / (zp_float)screenSize.getY() ) - 1.0f );
 
-	zpVector4f nearZ( x, y, 0.0f, 1.0f );
-	zpVector4f farZ(  x, y, 1.0f, 1.0f );
+	zpVector4f nearZ = zpMath::Vector4( x, y, 0.0f, 1.0f );
+	zpVector4f farZ = zpMath::Vector4(  x, y, 1.0f, 1.0f );
 
-	zpMath::Mul( nearZ, nearZ, m_bufferData.invViewProjection );
-	zpMath::Mul( farZ, farZ, m_bufferData.invViewProjection );
+	nearZ = zpMath::MatrixTransform( m_bufferData.invViewProjection, nearZ );
+	farZ = zpMath::MatrixTransform( m_bufferData.invViewProjection, farZ );
 	
-	zpMath::Sub( farZ, farZ, nearZ );
+	farZ = zpMath::Vector4Sub( farZ, nearZ );
 
 	outRay.setOrigin( nearZ );
 	outRay.setDirection( farZ );

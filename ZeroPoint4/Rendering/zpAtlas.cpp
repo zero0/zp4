@@ -58,7 +58,7 @@ zp_bool zpAtlasResource::load( const zp_char* filename, zpRenderingPipeline* pip
 			sprite.name = k.asCString();
 			sprite.outer = zpRectf( outer[ 0 ].asFloat(), outer[ 1 ].asFloat(), outer[ 2 ].asFloat(), outer[ 3 ].asFloat() );
 			sprite.inner = zpRectf( inner[ 0 ].asFloat(), inner[ 1 ].asFloat(), inner[ 2 ].asFloat(), inner[ 3 ].asFloat() );
-			sprite.padding = zpVector4f( padding[ 0 ].asFloat(), padding[ 1 ].asFloat(), padding[ 2 ].asFloat(), padding[ 3 ].asFloat() );
+			sprite.padding = zpMath::Vector4( padding[ 0 ].asFloat(), padding[ 1 ].asFloat(), padding[ 2 ].asFloat(), padding[ 3 ].asFloat() );
 			sprite.rotated = v[ "Rotated" ].asBool();
 		} );
 	}

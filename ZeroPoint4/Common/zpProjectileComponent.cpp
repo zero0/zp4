@@ -51,59 +51,59 @@ void zpProjectileComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isRunning )
 	{
-		zpScalar dt( deltaTime );
-		zpScalar speed( m_speed );
-		zpScalar accel( m_acceleration );
-		zpScalar angVel( m_angularVelocity );
+		zpScalar dt     = zpMath::Scalar( deltaTime );
+		zpScalar speed  = zpMath::Scalar( m_speed );
+		zpScalar accel  = zpMath::Scalar( m_acceleration );
+		zpScalar angVel = zpMath::Scalar( m_angularVelocity );
 		zpScalar dist;
 		zpVector4f vel;
 		zpVector4f pos;
-		zpVector4f acc( 0.f );
-		zpVector4f ang( 0.f );
+		zpVector4f acc = zpMath::Vector4( 0, 0, 0, 0 );
+		zpVector4f ang = zpMath::Vector4( 0, 0, 0, 0 );
 		zpVector4f dis;
 
 		zpMatrix4f mat( getParentObject()->getComponents()->getTransformComponent()->getWorldTransform() );
-		const zpVector4f& p = mat.getRow( 3 );
+		zpVector4f p = mat.r[ 3 ];
 
 		if( m_followTarget && m_endTarget != ZP_NULL )
 		{
 			const zpVector4f& e = m_endTarget->getComponents()->getTransformComponent()->getWorldPosition();
 
-			zpMath::Mul( angVel, angVel, dt );
-			zpMath::Sub( ang, m_endPosition, e );
-			zpMath::Normalize3( ang, ang );
-			zpMath::Mul( ang, ang, angVel );
+			angVel = zpMath::Vector4Mul( angVel, dt );
+			ang = zpMath::Vector4Sub( m_endPosition, e );
+			ang = zpMath::Vector4Normalize3( ang );
+			ang = zpMath::Vector4Mul( ang, angVel );
 
 			m_endPosition = e;
 			m_endSphere.setCenter( e );
 		}
 
-		zpMath::Mul( speed, speed, dt );
+		speed = zpMath::ScalarMul( speed, dt );
 
-		zpMath::Sub( vel, m_endPosition, p );
-		zpMath::Normalize3( vel, vel );
-		zpMath::Mul( vel, vel, speed );
-		zpMath::Add( m_velocity, vel, ang );
+		vel = zpMath::Vector4Sub( m_endPosition, p );
+		vel = zpMath::Vector4Normalize3( vel );
+		vel = zpMath::Vector4Mul( vel, speed );
+		m_velocity = zpMath::Vector4Add( vel, ang );
 
-		zpMath::Add( pos, p, m_velocity );
+		pos = zpMath::Vector4Add( p, m_velocity );
 
-		zpMath::Mul( accel, accel, dt );
-		zpMath::Add( speed, speed, accel );
+		accel = zpMath::Vector4Mul( accel, dt );
+		speed = zpMath::Vector4Add( speed, accel );
 
-		m_speed = speed.getFloat();
+		m_speed = zpMath::AsFloat( speed );
 
-		mat.setRow( 3, pos );
+		mat.r[ 3 ] = pos;
 		m_projectileSphere.setCenter( pos );
 
 		getParentObject()->getComponents()->getTransformComponent()->setLocalPosition( pos );
 
-		zpMath::Sub( dis, pos, m_startPosition );
-		zpMath::Dot3( dist, dis, dis );
+		dis =  zpMath::Vector4Sub( pos, m_startPosition );
+		dist = zpMath::Vector4Dot3( dis, dis );
 
-		zpScalar maxRange( m_maxRange );
-		zpMath::Mul( maxRange, maxRange, maxRange );
+		zpScalar maxRange = zpMath::Scalar( m_maxRange );
+		maxRange = zpMath::ScalarMul( maxRange, maxRange );
 
-		if( ZP_IS_COLLISION( m_projectileSphere, m_endSphere ) || zpMath::Cmp( dist, maxRange ) > 0 )
+		if( ZP_IS_COLLISION( m_projectileSphere, m_endSphere ) || zpMath::ScalarCmp( dist, maxRange ) > 0 )
 		{
 			projectileCollided();
 		}
@@ -132,10 +132,10 @@ void zpProjectileComponent::onFire()
 	m_startPosition = s;
 
 	m_projectileSphere.setCenter( m_startPosition );
-	m_projectileSphere.setRadius( zpScalar( m_projectileRadius ) );
+	m_projectileSphere.setRadius( zpMath::Scalar( m_projectileRadius ) );
 
 	m_endSphere.setCenter( m_endPosition );
-	m_endSphere.setRadius( zpScalar( m_endRadius ) );
+	m_endSphere.setRadius( zpMath::Scalar( m_endRadius ) );
 
 	m_velocity = m_initialVelocity;
 }

@@ -41,20 +41,20 @@ zp_float zpRandom::randomFloat( zp_float low, zp_float high )
 
 zpScalar zpRandom::randomScalar( const zpScalar& low, const zpScalar& high )
 {
-	return zpScalar( randomFloat( low.getFloat(), high.getFloat() ) );
+	return zpMath::Scalar( randomFloat( zpMath::AsFloat( low ), zpMath::AsFloat( high ) ) );
 }
 
 zpVector4f zpRandom::randomVector( const zpVector4f& low, const zpVector4f& high )
 {
-	return zpVector4f(
-		randomScalar( low.getX(), high.getX() ),
-		randomScalar( low.getY(), high.getY() ),
-		randomScalar( low.getZ(), high.getZ() ),
-		randomScalar( low.getW(), high.getW() ) );
+	return zpMath::Vector4(
+		randomScalar( zpMath::Vector4GetX( low ), zpMath::Vector4GetX( high ) ),
+		randomScalar( zpMath::Vector4GetY( low ), zpMath::Vector4GetY( high ) ),
+		randomScalar( zpMath::Vector4GetZ( low ), zpMath::Vector4GetZ( high ) ),
+		randomScalar( zpMath::Vector4GetW( low ), zpMath::Vector4GetW( high ) ) );
 }
 zpVector4f zpRandom::randomUnitSphere( zp_float w )
 {
-	return zpVector4f(
+	return zpMath::Vector4(
 		randomFloat( -1.f, 1.f ),
 		randomFloat( -1.f, 1.f ),
 		randomFloat( -1.f, 1.f ),
@@ -62,7 +62,7 @@ zpVector4f zpRandom::randomUnitSphere( zp_float w )
 }
 zpVector4f zpRandom::randomUnitCircle( zp_float z, zp_float w )
 {
-	return zpVector4f(
+	return zpMath::Vector4(
 		randomFloat( -1.f, 1.f ),
 		randomFloat( -1.f, 1.f ),
 		z,

@@ -50,11 +50,14 @@ void zpAudioListenerComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 
-	zpScalar dt( deltaTime );
+	zpScalar dt = zpMath::Scalar( deltaTime );
 
-	zpVector4f fwd( transform.getRow( 2 ) ), up( transform.getRow( 1 ) ), pos( transform.getRow( 3 ) ), vel;
-	zpMath::Sub( vel, pos, m_oldPosition );
-	zpMath::Mul( vel, vel, dt );
+	zpVector4f up( transform.r[ 1 ] );
+	zpVector4f fwd( transform.r[ 2 ] );
+	zpVector4f pos( transform.r[ 3 ] );
+	zpVector4f vel;
+	vel = zpMath::Vector4Sub( pos, m_oldPosition );
+	vel = zpMath::Vector4Mul( vel, dt );
 
 	m_engine->setListenerPosition( pos );
 	m_engine->setListenerVelocity( vel );

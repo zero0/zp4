@@ -8,7 +8,7 @@ zpRay::zpRay( const zpVector4f& origin, const zpVector4f& direction )
 	: m_origin( origin )
 	, m_direction( direction )
 {
-	zpMath::Normalize3( m_direction, m_direction );
+	m_direction = zpMath::Vector4Normalize3( m_direction );
 }
 zpRay::zpRay( const zpRay& ray )
 	: m_origin( ray.m_origin )
@@ -46,25 +46,25 @@ const zpVector4f& zpRay::getDirection() const
 }
 void zpRay::setDirection( const zpVector4f& direction )
 {
-	zpMath::Normalize3( m_direction, direction );
+	m_direction = zpMath::Vector4Normalize3( direction );
 }
 
 zpVector4f zpRay::getPointAt( const zpScalar& t ) const
 {
 	zpVector4f p;
-	zpMath::Madd( p, m_origin, m_direction, t );
+	p = zpMath::Vector4Madd( m_origin, m_direction, t );
 	return p;
 }
 zp_bool zpRay::isPointOnRay( const zpVector4f& point ) const
 {
 	zpVector4f r;
-	zpMath::Sub( r, point, m_origin );
-	zpMath::Normalize3( r, r );
+	r = zpMath::Vector4Sub( point, m_origin );
+	r = zpMath::Vector4Normalize3( r );
 
 	zpScalar d;
-	zpMath::Dot3( d, r, m_direction );
+	d = zpMath::Vector4Dot3( r, m_direction );
 
 	zp_int c;
-	zpMath::Cmp( c, d, zpScalar( 1.0f ) );
+	c = zpMath::ScalarCmp( d, zpMath::Scalar( 1.0f ) );
 	return c == 0;
 }

@@ -1,8 +1,8 @@
 #include "zpCore.h"
 
 zpBoundingSphere::zpBoundingSphere()
-	: m_center( 0 )
-	, m_radius( ZP_FLT_MIN )
+	: m_center( zpMath::Vector4( 0, 0, 0, 0 ) )
+	, m_radius( zpMath::Scalar( ZP_FLT_MIN ) )
 {}
 zpBoundingSphere::zpBoundingSphere( const zpVector4f& center, const zpScalar& radius )
 	: m_center( center )
@@ -51,13 +51,13 @@ void zpBoundingSphere::setRadius( const zpScalar& radius )
 void zpBoundingSphere::generateBoundingAABB( zpBoundingAABB& box ) const
 {
 	zpScalar nr;
-	zpMath::Neg( nr, m_radius );
+	nr = zpMath::ScalarNeg( m_radius );
 
-	zpVector4f min( nr );
-	zpVector4f max( m_radius );
+	zpVector4f min = zpMath::Vector4( nr, nr, nr, zpMath::Scalar( 0 ) );
+	zpVector4f max = zpMath::Vector4( m_radius, m_radius, m_radius, zpMath::Scalar( 0 ) );
 
-	zpMath::Add( min, min, m_center );
-	zpMath::Add( max, max, m_center );
+	min = zpMath::Vector4Add( min, m_center );
+	max = zpMath::Vector4Add( max, m_center );
 
 	box.setMin( min );
 	box.setMax( max );
@@ -65,59 +65,59 @@ void zpBoundingSphere::generateBoundingAABB( zpBoundingAABB& box ) const
 
 void zpBoundingSphere::translate( const zpVector4f& translate )
 {
-	zpMath::Add( m_center, m_center, translate );
+	m_center = zpMath::Vector4Add( m_center, translate );
 }
 void zpBoundingSphere::scale( const zpScalar& scale )
 {
-	zpMath::Mul( m_radius, m_radius, scale );
+	m_radius = zpMath::ScalarMul( m_radius, scale );
 }
 void zpBoundingSphere::pad( const zpScalar& padding )
 {
-	zpMath::Add( m_radius, m_radius, padding );
+	m_radius = zpMath::ScalarAdd( m_radius, padding );
 }
 
 void zpBoundingSphere::add( zp_float x, zp_float y, zp_float z )
 {
-	add( zpVector4f( x, y, z ) );
+	add( zpMath::Vector4( x, y, z, 0 ) );
 }
 void zpBoundingSphere::add( const zpScalar& x, const zpScalar& y, const zpScalar& z )
 {
-	add( zpVector4f( x, y, z ) );
+	add( zpMath::Vector4( x, y, z, zpMath::Scalar( 0 ) ) );
 }
 void zpBoundingSphere::add( const zpVector4f& point )
 {
 	zpVector4f dist;
 	zpScalar d;
 
-	zpMath::Sub( dist, m_center, point );
-	zpMath::Length3( d, dist );
+	dist = zpMath::Vector4Sub( m_center, point );
+	d = zpMath::Vector4Length3( dist );
 
-	zpMath::Max( m_radius, m_radius, d );
+	m_radius = zpMath::ScalarMax( m_radius, d );
 }
 void zpBoundingSphere::add( const zpBoundingAABB& box )
 {
 	zpVector4f min( box.getMin() );
 	zpVector4f max( box.getMax() );
 
-	zpMath::Sub( min, min, m_center );
-	zpMath::Sub( max, max, m_center );
+	min = zpMath::Vector4Sub( min, m_center );
+	max = zpMath::Vector4Sub( max, m_center );
 
 	zpScalar minD, maxD;
-	zpMath::Length3( minD, min );
-	zpMath::Length3( maxD, max );
+	minD = zpMath::Vector4Length3( min );
+	maxD = zpMath::Vector4Length3( max );
 
-	zpMath::Max( minD, minD, maxD );
-	zpMath::Max( m_radius, m_radius, minD );
+	minD = zpMath::ScalarMax( minD, maxD );
+	m_radius = zpMath::ScalarMax( m_radius, minD );
 }
 void zpBoundingSphere::add( const zpBoundingSphere& sphere )
 {
 	zpVector4f dist;
 	zpScalar d;
 
-	zpMath::Sub( dist, m_center, sphere.m_center );
-	zpMath::Length3( d, dist );
+	dist = zpMath::Vector4Sub( m_center, sphere.m_center );
+	d = zpMath::Vector4Length3( dist );
 
-	zpMath::Add( d, d, sphere.m_radius );
+	d = zpMath::ScalarAdd( d, sphere.m_radius );
 
-	zpMath::Max( m_radius, m_radius, d );
+	m_radius = zpMath::ScalarMax( m_radius, d );
 }

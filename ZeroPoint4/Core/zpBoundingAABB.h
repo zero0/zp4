@@ -12,9 +12,6 @@ public:
 	zpBoundingAABB( zpBoundingAABB&& box );
 	~zpBoundingAABB();
 
-	void operator=( const zpBoundingAABB& box );
-	void operator=( zpBoundingAABB&& box );
-
 	void reset();
 
 	zpVector4f getMin() const;
@@ -37,9 +34,9 @@ public:
 	zpVector4f getSize() const;
 
 	void translate( const zpVector4f& translate );
-	void scale( const zpScalar& scale );
+	void scaleUniform( const zpScalar& scale );
 	void scale( const zpVector4f& scale );
-	void pad( const zpScalar& padding );
+	void padUniform( const zpScalar& padding );
 	void pad( const zpVector4f& padding );
 
 	void add( zp_float x, zp_float y, zp_float z );

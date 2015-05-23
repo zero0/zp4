@@ -229,9 +229,9 @@ void zpRenderingPipeline::setup()
 	cam = getCamera( ZP_CAMERA_TYPE_MAIN );
 	cam->setActive( true );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_PERSPECTIVE );
-	cam->setPosition( zpVector4f( 20, 20, 20, 1 ) );
-	cam->setLookAt( zpVector4f( 0, 0, 0, 1 ) );
-	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
+	cam->setPosition( zpMath::Vector4( 20, 20, 20, 1 ) );
+	cam->setLookAt( zpMath::Vector4( 0, 0, 0, 1 ) );
+	cam->setUp( zpMath::Vector4( 0, 1, 0, 0 ) );
 	cam->setAspectRatio( viewport.width / viewport.height );
 	cam->setFovy( 45.0f );
 	cam->setNearFar( 1.0f, 1000.0f );
@@ -250,9 +250,9 @@ void zpRenderingPipeline::setup()
 	cam = getCamera( ZP_CAMERA_TYPE_UI );
 	cam->setActive( true );
 	cam->setProjectionType( ZP_CAMERA_PROJECTION_ORTHO );
-	cam->setPosition( zpVector4f( 0, 0, -1, 1 ) );
-	cam->setLookTo( zpVector4f( 0, 0, 1, 0 ) );
-	cam->setUp( zpVector4f( 0, 1, 0, 0 ) );
+	cam->setPosition( zpMath::Vector4( 0, 0, -1, 1 ) );
+	cam->setLookTo( zpMath::Vector4( 0, 0, 1, 0 ) );
+	cam->setUp( zpMath::Vector4( 0, 1, 0, 0 ) );
 	cam->setAspectRatio( viewport.width / viewport.height );
 	cam->setFovy( 45.0f );
 	cam->setNearFar( 1.0f, 100.0f );
@@ -269,7 +269,7 @@ void zpRenderingPipeline::setup()
 	m_debugUICamera = cam;
 
 	m_dirLight = getLight( ZP_LIGHT_TYPE_DIRECTIONAL );
-	zpMath::Normalize3( m_dirLight->direction, zpVector4f( 1, -1, 1 ) );
+	m_dirLight->direction = zpMath::Vector4Normalize3( zpMath::Vector4( 1, -1, 1, 0 ) );
 	m_dirLight->color = zpColor4f( 1, 1, 1, 1 );
 }
 void zpRenderingPipeline::teardown()
@@ -849,7 +849,7 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 					zpLightBufferData* data = *b;
 
 					lightSphere.setCenter( data->position );
-					lightSphere.setRadius( zpScalar( data->radius ) );
+					lightSphere.setRadius( zpMath::Scalar( data->radius ) );
 					if( ZP_IS_COLLISION( (*cmd)->boundingBox, lightSphere ) )
 					{
 						i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );

@@ -74,12 +74,12 @@ void zpDataBuffer::ensureCapacity( zp_uint capacity )
 			}
 			while( m_capacity < capacity ) m_capacity *= 2;
 
-			zp_byte* data = (zp_byte*)zp_malloc( m_capacity );
+			zp_byte* data = new zp_byte[ m_capacity ];
 			if( m_data )
 			{
 				zp_memcpy( data, capacity, m_data, m_size );
 			}
-			ZP_SAFE_FREE( m_data );
+			ZP_SAFE_DELETE_ARRAY( m_data );
 
 			m_data = data;
 		}
@@ -113,7 +113,7 @@ void zpDataBuffer::destroy()
 	m_capacity = 0;
 	if( !m_isFixed )
 	{
-		ZP_SAFE_FREE( m_data );
+		ZP_SAFE_DELETE_ARRAY( m_data );
 	}
 }
 

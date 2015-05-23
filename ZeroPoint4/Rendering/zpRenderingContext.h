@@ -167,8 +167,10 @@ private:
 
 	zpRenderingCommand* m_currentCommnad;
 	zpFixedArrayList< zpRenderingCommand, ZP_RENDERING_MAX_COMMNADS > m_renderingCommands;
-	zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE > m_scratchVertexBuffer;
-	zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE > m_scratchIndexBuffer;
+	//zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE > m_scratchVertexBuffer;
+	//zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE > m_scratchIndexBuffer;
+	zpDataBuffer m_scratchVertexBuffer;
+	zpDataBuffer m_scratchIndexBuffer;
 
 	zp_uint m_immediateVertexSize;
 	zp_uint m_immediateIndexSize;

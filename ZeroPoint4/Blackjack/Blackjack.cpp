@@ -147,8 +147,7 @@ public:
 		const zpVector4f& forward = m_editorCamera->getLookTo();
 		const zpVector4f& up = m_editorCamera->getUp();
 
-		zpVector4f right;
-		zpMath::Cross3( right, forward, up );
+		zpVector4f right = zpMath::Vector4Cross3( forward, up );
 
 		zp_int w = mouse->getScrollWheelDelta();
 		const zpVector2i& mouseDelta = mouse->getDelta();
@@ -160,9 +159,8 @@ public:
 				w *= 6;
 			}
 
-			zpVector4f f;
-			zpMath::Mul( f, forward, zpScalar( (zp_float)w ) );
-			zpMath::Add( f, pos, f );
+			zpVector4f f = zpMath::Vector4Scale( forward, zpMath::Scalar( (zp_float)w ) );
+			f = zpMath::Vector4Add( pos, f );
 
 			m_editorCamera->setPosition( f );
 		}
@@ -174,16 +172,20 @@ public:
 			if( leftButton && !rightButton )
 			{
 				zpVector4f lootTo( forward );
-				zpScalar x( (zp_float)mouseDelta.getX() ), y( (zp_float)mouseDelta.getY() ), rt( realTime );
+				zpScalar x, y, rt;
+				
+				x = zpMath::Scalar( (zp_float)mouseDelta.getX() );
+				y = zpMath::Scalar( (zp_float)mouseDelta.getY() );
+				rt = zpMath::Scalar( realTime );
 
-				zpMath::Mul( x, x, rt );
-				zpMath::Mul( y, y, rt );
+				x = zpMath::ScalarMul( x, rt );
+				y = zpMath::ScalarMul( y, rt );
 
 				zpVector4f r, u;
-				zpMath::Mul( r, right, x );
-				zpMath::Mul( u, up, y );
-				zpMath::Add( r, r, u );
-				zpMath::Add( r, r, pos );
+				r = zpMath::Vector4Scale( right, x );
+				u = zpMath::Vector4Scale( up, y );
+				r = zpMath::Vector4Add( r, u );
+				r = zpMath::Vector4Add( r, pos );
 
 				m_editorCamera->setPosition( r );
 				m_editorCamera->setLookTo( lootTo );
@@ -191,17 +193,19 @@ public:
 			else if( rightButton && !leftButton )
 			{
 				zpVector4f lootAt( m_editorCamera->getLookAt() );
-				zpScalar x( (zp_float)mouseDelta.getX() ), y( (zp_float)mouseDelta.getY() );
-				zpMath::Neg( y, y );
+				zpScalar x, y;
+				x = zpMath::Scalar( (zp_float)mouseDelta.getX() );
+				y = zpMath::Scalar( (zp_float)mouseDelta.getY() );
+				y = zpMath::ScalarNeg( y );
 
-				zpMath::DegToRad( x, x );
-				zpMath::DegToRad( y, y );
+				x = zpMath::ScalarDegToRad( x );
+				y = zpMath::ScalarDegToRad( y );
 
 				zpVector4f camPos( pos );
-				zpMath::Sub( camPos, camPos, lootAt );
-				zpMath::RotateY( camPos, camPos, x );
-				zpMath::RotateX( camPos, camPos, y );
-				zpMath::Add( camPos, camPos, lootAt );
+				camPos = zpMath::Vector4Sub( camPos, lootAt );
+				camPos = zpMath::Vector4RotateY( camPos, x );
+				camPos = zpMath::Vector4RotateX( camPos, y );
+				camPos = zpMath::Vector4Add( camPos, lootAt );
 
 				m_editorCamera->setPosition( camPos );
 				m_editorCamera->setLookAt( lootAt );

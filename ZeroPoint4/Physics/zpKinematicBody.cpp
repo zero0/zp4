@@ -9,26 +9,24 @@
 
 ZP_FORCE_INLINE void _btVector3ToVector4Position( const btVector3& s, zpVector4f& a )
 {
-	btVector3FloatData data;
+	ZP_ALIGN16 btVector3FloatData data;
 	s.serializeFloat( data );
 
-	a.load4( data.m_floats );
-	//a = zpVector4f( data.m_floats[0], data.m_floats[1], data.m_floats[2], 1.f );
+	a = zpMath::Vector4Load4( data.m_floats );
 }
 
 ZP_FORCE_INLINE void _btVector3ToVector4Normal( const btVector3& s, zpVector4f& a )
 {
-	btVector3FloatData data;
+	ZP_ALIGN16 btVector3FloatData data;
 	s.serializeFloat( data );
 
-	a.load4( data.m_floats );
-	//a = zpVector4f( data.m_floats[0], data.m_floats[1], data.m_floats[2], 0.f );
+	a = zpMath::Vector4Load4( data.m_floats );
 }
 
 ZP_FORCE_INLINE void _zpVector4ToVector3( const zpVector4f& s, btVector3& a )
 {
-	btVector3FloatData data;
-	s.store4( data.m_floats );
+	ZP_ALIGN16 btVector3FloatData data;
+	zpMath::Vector4Store4( s, data.m_floats );
 
 	a.deSerializeFloat( data );
 }
@@ -55,7 +53,7 @@ public:
 		: btCollisionWorld::ClosestConvexResultCallback( btVector3( 0.0f, 0.0f, 0.0f ), btVector3( 0.0f, 0.0f, 0.0f ) )
 		, m_me( me )
 		, m_up( up )
-		, m_minSlopeDot( minSlopeDot )
+		, m_minSlopeDot( zpMath::Scalar( minSlopeDot ) )
 	{
 		m_collisionFilterGroup = me->getBroadphaseHandle()->m_collisionFilterGroup;
 		m_collisionFilterMask = me->getBroadphaseHandle()->m_collisionFilterMask;
@@ -86,8 +84,8 @@ public:
 		zpVector4f hitNormal;
 		_btVector3ToVector4Normal( hitNormalWorld, hitNormal );
 
-		zpMath::Dot3( dotUp, m_up, hitNormal );
-		if( zpMath::Cmp( dotUp, m_minSlopeDot ) < 0 ) return btScalar( 1.0f );
+		dotUp = zpMath::Vector4Dot3( m_up, hitNormal );
+		if( zpMath::ScalarCmp( dotUp, m_minSlopeDot ) < 0 ) return btScalar( 1.0f );
 
 		btScalar ret = ClosestConvexResultCallback::addSingleResult( convexResult, normalInWorldSpace );
 		return ret;
@@ -127,11 +125,11 @@ public:
 		m_currentStepOffset = 0.f;
 
 		m_dampenAcceleration = 0.1f;
-		m_velocity = zpVector4f( 0.f );
-		m_acceleration = zpVector4f( 0.f );
+		m_velocity = zpMath::Vector4( 0, 0, 0, 0 );
+		m_acceleration = zpMath::Vector4( 0, 0, 0, 0 );
 
-		m_walkDirection = zpVector4f( 0.f );
-		m_up = zpVector4f( 0.f, 1.f, 0.f );
+		m_walkDirection = zpMath::Vector4( 0, 0, 0, 0 );
+		m_up = zpMath::Vector4( 0, 1, 0, 0 );
 	}
 	void destroy()
 	{
@@ -165,7 +163,7 @@ public:
 		_btVector3ToVector4Normal( walkDirection, m_walkDirection );
 		//m_walkDirection = walkDirection;
 		//m_normalizedWalkDirection.normalize();
-		zpMath::Normalize3( m_normalizedWalkDirection, m_walkDirection );
+		m_normalizedWalkDirection = zpMath::Vector4Normalize3( m_walkDirection );
 		m_velocityTimeInterval = 0.f;
 	}
 	void setVelocityForTimeInterval( const btVector3& velocity, btScalar timeInterval )
@@ -174,14 +172,14 @@ public:
 		//m_walkDirection = velocity;
 		_btVector3ToVector4Normal( velocity, m_velocity );
 		//m_normalizedWalkDirection.normalize();
-		zpMath::Normalize3( m_normalizedWalkDirection, m_normalizedWalkDirection );
+		m_normalizedWalkDirection = zpMath::Vector4Normalize3( m_normalizedWalkDirection );
 		m_velocityTimeInterval = timeInterval;
 	}
 	void reset()
 	{
-		m_acceleration = zpVector4f( 0.f );
-		m_velocity = zpVector4f( 0.f );
-		m_walkDirection = zpVector4f( 0.f );
+		m_acceleration =  zpMath::Vector4( 0, 0, 0, 0 );
+		m_velocity =      zpMath::Vector4( 0, 0, 0, 0 );
+		m_walkDirection = zpMath::Vector4( 0, 0, 0, 0 );
 		m_verticalVelocity = 0.f;
 		m_verticalOffset = 0.f;
 	}
@@ -239,22 +237,22 @@ public:
 		stepUp( collisionWorld, dt );
 
 		// 2 walk forward
-		zpScalar sdt( dt );
+		zpScalar sdt = zpMath::Scalar( dt );
 
 		zpVector4f a;
 		zpVector4f move;
 
 		//btVector3 v = m_acceleration * dt + m_velocity;
-		zpMath::Madd( m_velocity, m_velocity, sdt, m_acceleration );
+		m_velocity = zpMath::Vector4Madd( m_velocity, sdt, m_acceleration );
 
 		//btVector3 move = v * dt + btScalar( 0.5f ) * m_acceleration * dt * dt;
 		zpScalar sdt2;
-		zpMath::Mul( sdt2, sdt, sdt );
-		zpMath::Mul( sdt2, sdt2, zpScalar( 0.5f ) );
-		zpMath::Mul( a, m_acceleration, sdt2 );
+		sdt2 = zpMath::ScalarMul( sdt, sdt );
+		sdt2 = zpMath::ScalarMul( sdt2, zpMath::Scalar( 0.5f ) );
+		a = zpMath::Vector4Scale( m_acceleration, sdt2 );
 
-		zpMath::Mul( move, m_velocity, sdt );
-		zpMath::Add( move, move, a );
+		move = zpMath::Vector4Mul( m_velocity, sdt );
+		move = zpMath::Vector4Add( move, a );
 
 		//btVector3 move = m_walkDirection * m_walkVelocity;
 		if( !m_useWalkDirection )
@@ -263,7 +261,7 @@ public:
 			m_velocityTimeInterval -= dt;
 
 			//move *= time;
-			zpMath::Mul( move, move, zpScalar( time ) );
+			move = zpMath::Vector4Scale( move, zpMath::Scalar( time ) );
 		}
 
 		stepForwardAndStrafe( collisionWorld, dt, move );
@@ -333,7 +331,7 @@ public:
 			for( zp_int j = 0; j < m_manifoldArray.size(); ++j )
 			{
 				btPersistentManifold* manifold = m_manifoldArray[ j ];
-				zpScalar directionSign( manifold->getBody0() == m_ghost ? -1.f : 1.f );
+				zpScalar directionSign = zpMath::Scalar( manifold->getBody0() == m_ghost ? -1.f : 1.f );
 
 				for( zp_int p = 0; p < manifold->getNumContacts(); ++p )
 				{
@@ -350,8 +348,8 @@ public:
 							zpVector4f touchNorm;
 							_btVector3ToVector4Normal( pt.m_normalWorldOnB, touchNorm );
 
-							zpMath::Mul( m_touchingNormal, touchNorm, directionSign );
-							zpMath::Normalize3( m_touchingNormal, m_touchingNormal );
+							m_touchingNormal = zpMath::Vector4Mul( touchNorm, directionSign );
+							m_touchingNormal = zpMath::Vector4Normalize3( m_touchingNormal );
 							//m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
 							//m_touchingNormal.normalize();
 						}
@@ -362,9 +360,9 @@ public:
 
 						_btVector3ToVector4Normal( pt.m_normalWorldOnB, worldOnB );
 
-						zpMath::Mul( d, directionSign, zpScalar( dist ) );
-						zpMath::Mul( d, d, zpScalar( 0.2f ) );
-						zpMath::Madd( m_currentPosition, m_currentPosition, d, worldOnB );
+						d = zpMath::ScalarMul( directionSign, zpMath::Scalar( dist ) );
+						d = zpMath::ScalarMul( d, zpMath::Scalar( 0.2f ) );
+						m_currentPosition = zpMath::Vector4ScaleAdd( m_currentPosition, d, worldOnB );
 
 						penetration = true;
 					}
@@ -397,13 +395,13 @@ public:
 
 		//m_targetPosition = m_currentPosition + m_up * ( m_stepHeight + ( m_verticalOffset > 0.f ? m_verticalOffset : 0.f ) );
 		zpScalar h;
-		zpMath::Add( h, zpScalar( m_stepHeight ), zpScalar( m_verticalOffset > 0.f ? m_verticalOffset : 0.f ) );
-		zpMath::Madd( m_targetPosition, m_currentPosition, m_up, h );
+		h = zpMath::ScalarAdd( zpMath::Scalar( m_stepHeight ), zpMath::Scalar( m_verticalOffset > 0.f ? m_verticalOffset : 0.f ) );
+		m_targetPosition = zpMath::Vector4Madd( m_currentPosition, m_up, h );
 
 		btVector3 s, e;
 
 		zpVector4f pos;
-		zpMath::Madd( pos, m_currentPosition, m_up, zpScalar( m_shape->getMargin() ) );
+		pos = zpMath::Vector4Madd( m_currentPosition, m_up, zpMath::Scalar( m_shape->getMargin() ) );
 
 		_zpVector4ToVector3( pos, s );
 		_zpVector4ToVector3( m_targetPosition, e );
@@ -414,7 +412,7 @@ public:
 		//end.setOrigin( m_targetPosition );
 
 		zpVector4f negUp;
-		zpMath::Neg( negUp, m_up );
+		negUp = zpMath::Vector4Neg( m_up );
 
 		zpKinematicClosestNotMeConvexResultCallback cb( m_ghost, negUp, 0.7071f );
 		if( m_useGhostObjectSweepTest )
@@ -431,14 +429,14 @@ public:
 			zpScalar d;
 			zpVector4f hitNormalWorld;
 			_btVector3ToVector4Normal( cb.m_hitNormalWorld, hitNormalWorld );
-			zpMath::Dot3( d, m_up, hitNormalWorld );
+			d = zpMath::Vector4Dot3( m_up, hitNormalWorld );
 
 			//if( cb.m_hitNormalWorld.dot( m_up ) > 0.f )
-			if( zpMath::Cmp0( d ) > 0 )
+			if( zpMath::ScalarCmp0( d ) > 0 )
 			{
 				m_currentStepOffset = m_stepHeight * cb.m_closestHitFraction;
 				//m_currentPosition.setInterpolate3( m_currentPosition, m_targetPosition, cb.m_closestHitFraction );
-				zpMath::Lerp( m_currentPosition, m_currentPosition, m_targetPosition, zpScalar( cb.m_closestHitFraction ) );
+				m_currentPosition = zpMath::Vector4Lerp( m_currentPosition, m_targetPosition, zpMath::Scalar( cb.m_closestHitFraction ) );
 			}
 
 			m_verticalVelocity = 0.f;
@@ -458,7 +456,7 @@ public:
 		end.setIdentity();
 
 		//m_targetPosition = m_currentPosition + move;
-		zpMath::Add( m_targetPosition, m_currentPosition, move );
+		m_targetPosition = zpMath::Vector4Add( m_currentPosition, move );
 
 		zp_float fraction = 1.f;
 
@@ -466,10 +464,10 @@ public:
 		{
 			//btScalar d = m_normalizedWalkDirection.dot( m_touchingNormal );
 			zpScalar d;
-			zpMath::Dot3( d, m_normalizedWalkDirection, m_touchingNormal );
+			d = zpMath::Vector4Dot3( m_normalizedWalkDirection, m_touchingNormal );
 
 			//if( d > 0.1f )
-			if( zpMath::Cmp( d, zpScalar( 0.1f ) ) > 0 )
+			if( zpMath::ScalarCmp( d, zpMath::Scalar( 0.1f ) ) > 0 )
 			{
 				updateTargetPositionBasedOnCollision( m_touchingNormal );
 			}
@@ -486,8 +484,8 @@ public:
 			end.setOrigin( e );
 
 			zpVector4f neg;
-			zpMath::Sub( neg, m_currentPosition, m_targetPosition );
-			zpMath::Normalize3( neg, neg );
+			neg = zpMath::Vector4Sub( m_currentPosition, m_targetPosition );
+			neg = zpMath::Vector4Normalize3( neg );
 
 			//btVector3 negDirection = m_currentPosition - m_targetPosition;
 			//negDirection.normalize();
@@ -513,22 +511,22 @@ public:
 
 				zpScalar len;
 				zpVector4f curDir;
-				zpMath::Sub( curDir, m_targetPosition, m_currentPosition );
-				zpMath::Length3( len, curDir );
+				curDir = zpMath::Vector4Sub( m_targetPosition, m_currentPosition );
+				len = zpMath::Vector4Length3( curDir );
 
 				//btVector3 currentDir = m_targetPosition - m_currentPosition;
 				//btScalar len = currentDir.length();
 				
 				//if( len > ZP_EPSILON )
-				if( zpMath::Cmp0( len ) > 0 )
+				if( zpMath::ScalarCmp0( len ) > 0 )
 				{
 					//currentDir /= len;
-					zpMath::Div( curDir, curDir, len );
+					curDir = zpMath::Vector4Div( curDir, len );
 
 					//btScalar d = currentDir.dot( m_normalizedWalkDirection );
 					//if( d < ZP_EPSILON )
-					zpMath::Dot3( len, curDir, m_normalizedWalkDirection );
-					if( zpMath::Cmp0( len ) < 0 )
+					len = zpMath::Vector4Dot3( curDir, m_normalizedWalkDirection );
+					if( zpMath::ScalarCmp0( len ) < 0 )
 					{
 						break;
 					}
@@ -564,9 +562,9 @@ public:
 		//m_targetPosition -= drop;
 		zpScalar v;
 		zpVector4f drop;
-		zpMath::Add( v, zpScalar( m_currentStepOffset ), zpScalar( downVelocity ) );
-		zpMath::Mul( drop, m_up, v );
-		zpMath::Sub( m_targetPosition, m_targetPosition, drop );
+		v = zpMath::ScalarAdd( zpMath::Scalar( m_currentStepOffset ), zpMath::Scalar( downVelocity ) );
+		drop = zpMath::Vector4Scale( m_up, v );
+		m_targetPosition = zpMath::Vector4Sub( m_targetPosition, drop );
 
 		btVector3 s, e;
 		_zpVector4ToVector3( m_currentPosition, s );
@@ -588,7 +586,7 @@ public:
 		if( cb.hasHit() )
 		{
 			//m_currentPosition.setInterpolate3( m_currentPosition, m_targetPosition, cb.m_closestHitFraction );
-			zpMath::Lerp( m_currentPosition, m_currentPosition, m_targetPosition, zpScalar( cb.m_closestHitFraction ) );
+			m_currentPosition = zpMath::Vector4Lerp( m_currentPosition, m_targetPosition, zpMath::Scalar( cb.m_closestHitFraction ) );
 			m_verticalVelocity = 0.f;
 			m_verticalOffset = 0.f;
 			m_wasJumping = false;
@@ -604,29 +602,29 @@ public:
 		zpScalar len;
 		zpVector4f moveDir;
 
-		zpMath::Sub( moveDir, m_targetPosition, m_currentPosition );
-		zpMath::Length3( len, moveDir );
+		moveDir = zpMath::Vector4Sub( m_targetPosition, m_currentPosition );
+		len = zpMath::Vector4Length3( moveDir );
 
-		if( zpMath::Cmp0( len ) > 0 )
+		if( zpMath::ScalarCmp0( len ) > 0 )
 		{
-			zpMath::Div( moveDir, moveDir, len );
+			moveDir = zpMath::Vector4Div( moveDir, len );
 
 			zpVector4f reflDir;
-			zpMath::Reflect( reflDir, moveDir, hitNormal );
-			zpMath::Normalize3( reflDir, reflDir );
+			reflDir = zpMath::Vector4Reflect( moveDir, hitNormal );
+			reflDir = zpMath::Vector4Normalize3( reflDir );
 
 			zpScalar d;
-			zpMath::Dot3( d, reflDir, hitNormal );
+			d = zpMath::Vector4Dot3( reflDir, hitNormal );
 
 			zpVector4f paralDir;
-			zpMath::Mul( paralDir, hitNormal, d );
+			paralDir = zpMath::Vector4Scale( hitNormal, d );
 
 			zpVector4f perpDir;
-			zpMath::Sub( perpDir, reflDir, paralDir );
+			perpDir = zpMath::Vector4Sub( reflDir, paralDir );
 
 			m_targetPosition = m_currentPosition;
 
-			zpMath::Madd( m_targetPosition, m_targetPosition,  perpDir, len );
+			m_targetPosition = zpMath::Vector4Madd( m_targetPosition, perpDir, len );
 		}
 
 #if 0
@@ -704,7 +702,7 @@ void zpKinematicBody::initialize( const zpMatrix4f& transform )
 
 	btQuaternion rot( btQuaternion::getIdentity() );
 	btVector3 pos;
-	transform.getRow( 3 ).store4( pos.m_floats );
+	_zpVector4ToVector3( transform.r[ 3 ], pos );
 
 	btTransform startTransform( rot, pos );
 
@@ -742,7 +740,10 @@ void zpKinematicBody::getMatrix( zpMatrix4f& transform ) const
 
 	const btTransform& t = ghost->getWorldTransform();
 
-	t.getOpenGLMatrix( transform.getData() );
+	zp_float matrix[ 16 ];
+	t.getOpenGLMatrix( matrix );
+
+	transform = zpMath::MatrixLoadOpenGL( matrix );
 }
 void zpKinematicBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rotation ) const
 {
@@ -751,9 +752,10 @@ void zpKinematicBody::getPositionRotation( zpVector4f& position, zpQuaternion4f&
 	const btTransform& t = ghost->getWorldTransform();
 
 	const btVector3& o = t.getOrigin();
-	position = zpVector4f( o.x(), o.y(), o.z(), 1.f );
+	const btQuaternion& q = t.getRotation();
 
-	rotation.load4( t.getRotation() );
+	position = zpMath::Vector4( o.x(), o.y(), o.z(), 1.f );
+	rotation = zpMath::Quaternion( q.x(), q.y(), q.z(), q.w() );
 }
 
 zp_short zpKinematicBody::getGroup() const

@@ -55,6 +55,12 @@
 #define ZP_STDCALL					__stdcall
 #define ZP_FASTCALL					__fastcall
 
+#if ZP_WIN_32
+#define ZP_VECTORCALL				__fastcall
+#elif ZP_WIN_64
+#define ZP_VECTORCALL				__vectorcall
+#endif
+
 #define ZP_INLINE					inline
 #define ZP_FORCE_INLINE				__forceinline
 #define ZP_NO_VTABLE				__declspec( novtable )

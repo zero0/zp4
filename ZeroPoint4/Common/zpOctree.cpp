@@ -208,22 +208,22 @@ void zpOctreeNode::subdivide()
 
 	static const zpVector4f offsets[] =
 	{
-		zpVector4f(  1,  1,  1 ),
-		zpVector4f( -1,  1,  1 ),
-		zpVector4f(  1,  1, -1 ),
-		zpVector4f( -1,  1, -1 ),
-		zpVector4f(  1, -1,  1 ),
-		zpVector4f( -1, -1,  1 ),
-		zpVector4f(  1, -1, -1 ),
-		zpVector4f( -1, -1, -1 ),
+		zpMath::Vector4(  1,  1,  1, 0 ),
+		zpMath::Vector4( -1,  1,  1, 0 ),
+		zpMath::Vector4(  1,  1, -1, 0 ),
+		zpMath::Vector4( -1,  1, -1, 0 ),
+		zpMath::Vector4(  1, -1,  1, 0 ),
+		zpMath::Vector4( -1, -1,  1, 0 ),
+		zpMath::Vector4(  1, -1, -1, 0 ),
+		zpMath::Vector4( -1, -1, -1, 0 ),
 	};
 
-	zpMath::Mul( quartSize, halfSize, zpScalar( 0.5f ) );
+	quartSize = zpMath::Vector4Mul( halfSize, zpMath::Scalar( 0.5f ) );
 
 	for( zp_int i = 0; i < zpOctreeNodeSide_Count; ++i )
 	{
-		zpMath::Mul( c, offsets[ i ], quartSize );
-		zpMath::Add( c, c, center );
+		c = zpMath::Vector4Mul( offsets[ i ], quartSize );
+		c = zpMath::Vector4Add( c, center );
 
 		zpOctreeNode* n = m_children[ i ];
 		n->m_bounds.setCenter( c );

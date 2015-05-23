@@ -173,7 +173,7 @@ zp_bool zpColor4f::operator!=( const zpColor4f& color ) const
 
 void zpColor4f::Lerp( zpColor4f& s, const zpColor4f& a, const zpColor4f& b, const zpScalar& alpha )
 {
-	s = a.lerp( b, alpha.getFloat() );
+	s = a.lerp( b, zpMath::AsFloat( alpha ) );
 }
 
 zpPackedColor::zpPackedColor()
