@@ -147,6 +147,9 @@ void zpParticleEmitterComponent::pause( zp_bool isPaused )
 
 void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera* camera )
 {
+	zpTransformComponent* trans = getParentObject()->getComponents()->getTransformComponent();
+	const zpVector4f& worldPos = trans->getWorldPosition();
+
 	zpParticleEffect* effect = m_effects.begin();
 	zpParticleEffect* end = m_effects.end();
 	for( ; effect != end; ++effect )
@@ -172,12 +175,13 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 		}
 
 		i->beginDrawImmediate( m_layer, m_queue, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &effect->material );
-
-		//if( !effect->isWorldSpace )
-		//{
-		//	i->setMatrix( getParentObject()->getComponents()->getTransformComponent()->getWorldTransform() );
-		//}
 		i->setSortBias( effect->sortBias );
+
+		// simulate in local space
+		if( !effect->isWorldSpace )
+		{
+			i->setMatrix( trans->getWorldTransform() );
+		}
 
 		// setup UV rect
 		zpRectf uv( 0, 0, 1, 1 );
@@ -213,7 +217,6 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 		{
 			zpParticle* particle = *p;
 
-
 			// scale points out from the center
 			zpVector4f p0 = zpMath::Vector4( -1,  1, 0, 1 );
 			zpVector4f p1 = zpMath::Vector4(  1,  1, 0, 1 );
@@ -230,11 +233,11 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 			zpVector4f look, right, up;
 			//if( effect->isBillboard )
 			//{
-			//	zpMath::Sub( look, particle->position, camera->getPosition() );
-			//	zpMath::Normalize3( look, look );
-			//	zpMath::Cross3( right, camera->getUp(), look );
-			//	zpMath::Normalize3( right, right );
-			//	zpMath::Cross3( up, look, right );
+			//	look = zpMath::Vector4Sub( particle->position, camera->getPosition() );
+			//	look = zpMath::Vector4Normalize3( look );
+			//	right = zpMath::Vector4Cross3( camera->getUp(), look );
+			//	right = zpMath::Vector4Normalize3( right );
+			//	up = zpMath::Vector4Cross3( look, right );
 			//}
 			//// otherwise, set position and rotate so the normal is facing up
 			//else
@@ -265,6 +268,8 @@ void zpParticleEmitterComponent::onRender( zpRenderingContext* i, const zpCamera
 				particle->color
 				);
 		}
+
+		i->setBoundingBoxCenter( worldPos );
 
 		i->endDrawImmediate();
 	}
@@ -297,13 +302,13 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 {
 	if( m_isPaused ) return;
 
-	zpVector4f position( getParentObject()->getComponents()->getTransformComponent()->getWorldPosition() ), pos, velocity;
+	zpVector4f position( getParentObject()->getComponents()->getTransformComponent()->getWorldPosition() ), dir, velocity;
 
-	pos = zpMath::Vector4Sub( position, m_prevPosition );
+	dir = zpMath::Vector4Sub( position, m_prevPosition );
 	m_prevPosition = position;
 
 	zpScalar dt = zpMath::Scalar( deltaTime );
-	velocity = zpMath::Vector4Mul( pos, dt );
+	velocity = zpMath::Vector4Scale( dir, dt );
 
 	zpParticleEffect* effect = m_effects.begin();
 	zpParticleEffect* end = m_effects.end();
@@ -378,10 +383,10 @@ void zpParticleEmitterComponent::onUpdate( zp_float deltaTime, zp_float realTime
 			if( particle->life < 0.f ) continue;
 
 			// calculate velocity, position and rotation
-			particle->velocity = zpMath::Vector4Madd( particle->velocity, velScale, velocity );
-			particle->velocity = zpMath::Vector4Madd( particle->velocity, dt, effect->gravity );
-			particle->position = zpMath::Vector4Madd( particle->position, dt, particle->velocity );
-			particle->rotation = zpMath::Vector4Madd( particle->rotation, dt, particle->angularVelocity );
+			particle->velocity = zpMath::Vector4Madd( particle->velocity, velocity, velScale );
+			particle->velocity = zpMath::Vector4Madd( particle->velocity, effect->gravity, dt );
+			particle->position = zpMath::Vector4Madd( particle->position, particle->velocity, dt );
+			particle->rotation = zpMath::Vector4Madd( particle->rotation, particle->angularVelocity, dt );
 
 			// get life and speed percents
 			zpScalar sLife     = zpMath::Scalar( particle->life );

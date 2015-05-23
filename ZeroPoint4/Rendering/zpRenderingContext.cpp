@@ -41,6 +41,9 @@ void zpRenderingContext::setup( zpRenderingEngine* engine, zpRenderingContextImp
 
 	m_currentVertexBuffer = &m_immediateVertexBuffers[ m_currentBufferIndex ];
 	m_currentIndexBuffer = &m_immediateIndexBuffers[ m_currentBufferIndex ];
+
+	m_scratchVertexBuffer.reserve( ZP_RENDERING_IMMEDIATE_VERTEX_BUFFER_SIZE );
+	m_scratchIndexBuffer.reserve( ZP_RENDERING_IMMEDIATE_INDEX_BUFFER_SIZE );
 }
 void zpRenderingContext::destroy()
 {
@@ -54,6 +57,9 @@ void zpRenderingContext::destroy()
 	flush();
 
 	m_renderingStats.clear();
+
+	m_scratchVertexBuffer.destroy();
+	m_scratchIndexBuffer.destroy();
 }
 
 void zpRenderingContext::setRenderTarget( zp_uint startIndex, zp_uint count, zpTexture* const* targets, zpDepthStencilBuffer* depthStencilBuffer )
@@ -153,6 +159,7 @@ void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue que
 	m_currentCommnad->vertexOffset = 0;
 	m_currentCommnad->indexOffset = 0;
 	m_currentCommnad->matrix = zpMath::MatrixIdentity();
+	m_currentCommnad->boundingBox.reset();
 
 	m_currentCommnad->vertexStride = VertexFormatStrides[ vertexFormat ];
 }
@@ -639,6 +646,8 @@ void zpRenderingContext::endDrawImmediate()
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 
+	m_currentCommnad->boundingBox.setCenter( m_currentCommnad->matrix.m_m4 );
+
 	m_currentCommnad->vertexOffset = m_immediateVertexSize;
 	m_currentCommnad->indexOffset = m_immediateIndexSize;
 
@@ -679,9 +688,9 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.sortKey = command.material->getData()->materialId;
 		command.sortBias = command.material->getData()->sortBias;
 
-		command.boundingBox.add( b->m_boundingBox );
-
 		command.vertexStride = VertexFormatStrides[ command.vertexFormat ];
+
+		command.boundingBox.setCenter( matrix.m_m4 );
 	}
 }
 

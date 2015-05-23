@@ -412,15 +412,15 @@ namespace zpMath
 		si = ScalarSin( rad );
 		co = ScalarCos( rad );
 
-		t0 = Vector4Scale( Vector4GetY( a ), co );
-		t1 = Vector4Scale( Vector4GetZ( a ), si );
-		y =  Vector4Sub( t0, t1 );
+		t0 = ScalarMul( Vector4GetY( a ), co );
+		t1 = ScalarMul( Vector4GetZ( a ), si );
+		y =  ScalarSub( t0, t1 );
 
-		t0 = Vector4Scale( Vector4GetY( a ), si );
-		t1 = Vector4Scale( Vector4GetZ( a ), co );
-		z =  Vector4Add( t0, t1 );
+		t0 = ScalarMul( Vector4GetY( a ), si );
+		t1 = ScalarMul( Vector4GetZ( a ), co );
+		z =  ScalarAdd( t0, t1 );
 
-		return Vector4( Scalar( 0.f ), y, z, Scalar( 0.f ) );
+		return Vector4( Scalar( 0.f ), y, z, Scalar( 1.f ) );
 	}
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4RotateY( zpVector4fParamF a, zpScalarParamF rad )
 	{
@@ -430,15 +430,15 @@ namespace zpMath
 		co = ScalarCos( rad );
 		nsi = ScalarNeg( si );
 
-		t0 = Vector4Scale( Vector4GetX( a ), co );
-		t1 = Vector4Scale( Vector4GetZ( a ), si );
-		x = Vector4Add( t0, t1 );
+		t0 = ScalarMul( Vector4GetX( a ), co );
+		t1 = ScalarMul( Vector4GetZ( a ), si );
+		x =  ScalarAdd( t0, t1 );
 
-		t0 = Vector4Scale( Vector4GetX( a ), nsi );
-		t1 = Vector4Scale( Vector4GetZ( a ), co );
-		z = Vector4Add( t0, t1 );
+		t0 = ScalarMul( Vector4GetX( a ), nsi );
+		t1 = ScalarMul( Vector4GetZ( a ), co );
+		z =  ScalarAdd( t0, t1 );
 
-		return Vector4( x, Scalar( 0.f ), z, Scalar( 0.f ) );
+		return Vector4( x, Scalar( 0.f ), z, Scalar( 1.f ) );
 	}
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4RotateZ( zpVector4fParamF a, zpScalarParamF rad )
 	{
@@ -447,15 +447,15 @@ namespace zpMath
 		si = ScalarSin( rad );
 		co = ScalarCos( rad );
 
-		t0 = Vector4Scale( Vector4GetX( a ), co );
-		t1 = Vector4Scale( Vector4GetY( a ), si );
-		y = Vector4Sub( t0, t1 );
+		t0 = ScalarMul( Vector4GetX( a ), co );
+		t1 = ScalarMul( Vector4GetY( a ), si );
+		y =  ScalarSub( t0, t1 );
 
-		t0 = Vector4Scale( Vector4GetX( a ), si );
-		t1 = Vector4Scale( Vector4GetY( a ), co );
-		x = Vector4Add( t0, t1 );
+		t0 = ScalarMul( Vector4GetX( a ), si );
+		t1 = ScalarMul( Vector4GetY( a ), co );
+		x =  ScalarAdd( t0, t1 );
 
-		return Vector4( x, y, Scalar( 0.f ), Scalar( 0.f ) );
+		return Vector4( x, y, Scalar( 0.f ), Scalar( 1.f ) );
 	}
 
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromAxisAngle( zpVector4fParamF a, zpScalarParamF b )

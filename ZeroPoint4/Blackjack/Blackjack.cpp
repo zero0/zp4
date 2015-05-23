@@ -171,7 +171,7 @@ public:
 			zp_bool rightButton = mouse->isButtonDown( ZP_MOUSE_BUTTON_RIGHT );
 			if( leftButton && !rightButton )
 			{
-				zpVector4f lootTo( forward );
+				zpVector4f lootTo = forward;
 				zpScalar x, y, rt;
 				
 				x = zpMath::Scalar( (zp_float)mouseDelta.getX() );
@@ -192,7 +192,7 @@ public:
 			}
 			else if( rightButton && !leftButton )
 			{
-				zpVector4f lootAt( m_editorCamera->getLookAt() );
+				zpVector4f lootAt = m_editorCamera->getLookAt();
 				zpScalar x, y;
 				x = zpMath::Scalar( (zp_float)mouseDelta.getX() );
 				y = zpMath::Scalar( (zp_float)mouseDelta.getY() );
