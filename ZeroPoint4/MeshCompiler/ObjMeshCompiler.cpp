@@ -36,12 +36,12 @@ VertexFormat _objToMeshData( const zpString& inputFile, MeshData& meshData, zp_b
 			if( zp_strstr( l, "v " ) == l )
 			{
 				sscanf_s( l, "v %f %f %f", &x, &y, &z );
-				verts.pushBack( zpVector4f( x, y, z, 1.0f ) );
+				verts.pushBack( zpMath::Vector4( x, y, z, 1.0f ) );
 			}
 			else if( zp_strstr( l, "vn " ) == l )
 			{
 				sscanf_s( l, "vn %f %f %f", &x, &y, &z );
-				normals.pushBack( zpVector4f( x, y, z, 0.0f ) );
+				normals.pushBack( zpMath::Vector4( x, y, z, 0.0f ) );
 			}
 			else if( zp_strstr( l, "vt " ) == l )
 			{
@@ -292,8 +292,8 @@ VertexFormat _objToMeshData( const zpString& inputFile, MeshData& meshData, zp_b
 				MeshDataPart& part = meshData.parts.pushBackEmpty();
 				part.vertexOffset = meshData.vertex.size();
 				part.indexOffset = meshData.index.size();
-				part.boundingBox.setMin( zpVector4f( ZP_FLT_MAX, ZP_FLT_MAX, ZP_FLT_MAX, 1.0f ) );
-				part.boundingBox.setMax( zpVector4f( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN, 1.0f ) );
+				part.boundingBox.setMin( zpMath::Vector4( ZP_FLT_MAX, ZP_FLT_MAX, ZP_FLT_MAX, 1.0f ) );
+				part.boundingBox.setMax( zpMath::Vector4( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN, 1.0f ) );
 
 				uniqueCount = 0;
 				indexCount = 0;
@@ -332,9 +332,9 @@ zp_bool ObjMessCompiler::compileMesh()
 {
 	VertexFormat format = VF_NONE;
 
-	format = _objToMeshData( m_inputFile, m_data, true );
+	format = _objToMeshData( m_inputFile, m_mesh, true );
 	
-	formatToString( format, m_data.format );
+	formatToString( format, m_mesh.format );
 
 #if 0
 	zpArrayList< zp_float > verts;
@@ -584,7 +584,7 @@ zp_bool ObjMessCompiler::compileMesh()
 		// push all ordered verts to single buffer and create mesh parts from full buffer
 		zp_int indexCount = 0;
 		zp_int vertexCount = 0;
-		m_data.parts.reserve( materialVertices.size() );
+		m_mesh.parts.reserve( materialVertices.size() );
 
 		zpArrayList< zpString > keys;
 		materialVertices.keys( keys );
@@ -594,7 +594,7 @@ zp_bool ObjMessCompiler::compileMesh()
 			const zpArrayList< const Vertex* >& mv = materialVertices[ *kb ];
 			if( mv.isEmpty() ) continue;
 
-			MeshDataPart& part = m_data.parts.pushBackEmpty();
+			MeshDataPart& part = m_mesh.parts.pushBackEmpty();
 			part.material = *kb;
 			part.indexOffset = indexCount;
 			part.vertexOffset = vertexCount;
@@ -603,12 +603,12 @@ zp_bool ObjMessCompiler::compileMesh()
 			for( const Vertex* const* start = mv.begin(), * const* end = mv.end(); start != end; ++start )
 			{
 				const Vertex* v = *start;
-				m_data.vertex.write( v->v );
-				m_data.vertex.write( v->n );
-				m_data.vertex.write( v->t );
+				m_mesh.vertex.write( v->v );
+				m_mesh.vertex.write( v->n );
+				m_mesh.vertex.write( v->t );
 				++vertexCount;
 
-				m_data.index.write< zp_ushort >( indexCount );
+				m_mesh.index.write< zp_ushort >( indexCount );
 				++indexCount;
 
 				part.boundingBox.add( v->v );
@@ -619,7 +619,7 @@ zp_bool ObjMessCompiler::compileMesh()
 		}
 
 		// select vertex format
-		formatToString( format, m_data.format );
+		formatToString( format, m_mesh.format );
 		
 		ok = format != VF_NONE;
 	}

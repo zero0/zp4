@@ -146,7 +146,8 @@ zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpVector4f
 
 	return type;
 }
-zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpRay& b ) {
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpRay& b )
+{
 	return ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBoundingAABB& b )
@@ -158,7 +159,7 @@ zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBounding
 	zpScalar d, r;
 	zpScalar nd;
 	zpScalar dpr, dmr;
-	zp_int c;
+	zp_int cp, cn;
 
 	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
 	for( zp_uint i = 0; i < zpFrustumPlane_Count; ++i )
@@ -174,15 +175,15 @@ zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpBounding
 		dpr = zpMath::ScalarAdd( d, r );
 		dmr = zpMath::ScalarSub( d, r );
 
-		c = zpMath::ScalarCmp( dpr, nd );
-		if( c < 0 )
+		cp = zpMath::ScalarCmp( dpr, nd );
+		cn = zpMath::ScalarCmp( dmr, nd );
+
+		if( cp < 0 )
 		{
 			type = ZP_COLLISION_TYPE_NONE;
 			break;
 		}
-		
-		c = zpMath::ScalarCmp( dmr, nd );
-		if( c < 0 )
+		else if( cn < 0 )
 		{
 			type = ZP_COLLISION_TYPE_INTERSECT;
 		}

@@ -15,7 +15,13 @@ enum VertexFormat : zp_int
 	VF_VERTEX_NORMAL =				VF_VERTEX | VF_NORMAL,
 	VF_VERTEX_TEXTURE =				VF_VERTEX | VF_TEXTURE,
 	VF_VERTEX_NORMAL_TEXTURE =		VF_VERTEX | VF_NORMAL | VF_TEXTURE,
+};
 
+enum MeshOutputFiles
+{
+	ZP_MESH_OUTPUT_MESH =		1 << 0,
+	ZP_MESH_OUTPUT_SKELETON =	1 << 1,
+	ZP_MESH_OUTPUT_ANIMATION =	1 << 2,
 };
 
 struct MaterialData
@@ -42,16 +48,34 @@ struct MeshData
 	zpArrayList< MeshDataPart > parts;
 };
 
-struct MeshJoint
+struct MeshSkeletonBone
 {
 	zpString name;
-	zp_int parent;
-	zpMatrix4f transform;
+	zpArrayList< zp_int > controlPointIndicies;
+	zpArrayList< zp_float > controlPointWeights;
+	zpMatrix4f bindPose;
 };
 
-struct MeshAnimationData
+struct MeshSkeleton
 {
-	zpArrayList< MeshJoint > joints;
+	zpArrayList< MeshSkeletonBone > bones;
+};
+
+struct MeshAnimationClip
+{
+	zp_float startTime;
+	zp_float endTime;
+	zp_float fps;
+	zpArrayList< zpMatrix4f > keyFrames;
+	zpArrayList< zp_float > keyFrameTimes;
+};
+
+struct MeshAnimation
+{
+	zp_float startTime;
+	zp_float endTime;
+	zp_float fps;
+	zpArrayList< MeshAnimationClip > clips;
 };
 
 class BaseMeshCompiler
@@ -69,11 +93,17 @@ public:
 protected:
 	virtual zp_bool compileMesh() = 0;
 
+	void compileMeshToFile();
+	void compileSkeletonToFile();
+	void compileAnimationToFile();
+
 protected:
 	zpString m_inputFile;
 	zpString m_outputFile;
 
-	MeshData m_data;
+	MeshData m_mesh;
+	MeshSkeleton m_skeleton;
+	MeshAnimation m_animation;
 };
 
 #endif

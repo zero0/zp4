@@ -36,8 +36,9 @@ public:
 
 	static zpConsole* getInstance();
 
-	const zpString& getTitle() const;
+	zpString getTitle() const;
 	void setTitle( const zpString& title );
+	void setTitle( const zp_char* title );
 
 	void create( zp_ushort bufferSize = ZP_CONSOLE_DEFAULT_BUFFER_SIZE );
 	void destroy();
@@ -71,8 +72,6 @@ private:
 	zpConsoleColorType m_defaultColor;
 
 	void* m_hConsole;
-	
-	zpString m_title;
 };
 
 void zp_printfc( zpConsoleColorType color, const char* text, ... );

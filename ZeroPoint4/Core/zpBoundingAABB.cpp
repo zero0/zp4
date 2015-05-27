@@ -49,7 +49,7 @@ void zpBoundingAABB::setMinMax( const zpVector4f& min, const zpVector4f& max )
 {
 	m_extent = zpMath::Vector4Sub( max, min );
 	m_extent = zpMath::Vector4Abs( m_extent );
-	m_extent = zpMath::Vector4Mul( m_extent, zpMath::Scalar( 0.5f ) );
+	m_extent = zpMath::Vector4Scale( m_extent, zpMath::Scalar( 0.5f ) );
 	m_center = zpMath::Vector4Add( min, m_extent );
 }
 
@@ -82,19 +82,19 @@ void zpBoundingAABB::generateBoundingSphere( zpBoundingSphere& sphere ) const
 zpScalar zpBoundingAABB::getWidth() const
 {
 	zpScalar s;
-	s = zpMath::Vector4Mul( zpMath::Vector4GetX( m_extent ), zpMath::Scalar( 2.f ) );
+	s = zpMath::ScalarMul( zpMath::Vector4GetX( m_extent ), zpMath::Scalar( 2.f ) );
 	return s;
 }
 zpScalar zpBoundingAABB::getHeight() const
 {
 	zpScalar s;
-	s = zpMath::Vector4Mul( zpMath::Vector4GetY( m_extent ), zpMath::Scalar( 2.f ) );
+	s = zpMath::ScalarMul( zpMath::Vector4GetY( m_extent ), zpMath::Scalar( 2.f ) );
 	return s;
 }
 zpScalar zpBoundingAABB::getDepth() const
 {
 	zpScalar s;
-	s = zpMath::Vector4Mul( zpMath::Vector4GetZ( m_extent ), zpMath::Scalar( 2.f ) );
+	s = zpMath::ScalarMul( zpMath::Vector4GetZ( m_extent ), zpMath::Scalar( 2.f ) );
 	return s;
 }
 zpVector4f zpBoundingAABB::getSize() const
@@ -118,7 +118,7 @@ void zpBoundingAABB::scale( const zpVector4f& scale )
 }
 void zpBoundingAABB::padUniform( const zpScalar& padding )
 {
-	m_extent = zpMath::Vector4Madd( m_extent, zpMath::Vector4( 1, 1, 1, 0 ) , padding );
+	m_extent = zpMath::Vector4Madd( m_extent, zpMath::Vector4( 1, 1, 1, 0 ), padding );
 }
 void zpBoundingAABB::pad( const zpVector4f& padding )
 {

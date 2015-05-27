@@ -9,7 +9,7 @@ void compileTransform( zpJson& inputObject )
 	if( transform.isObject() && !transform.isEmpty() )
 	{
 		zpMatrix4f outTransform;
-		outTransform.setIdentity();
+		outTransform = zpMath::MatrixIdentity();
 
 		zpJson& translate = transform[ "Position" ];
 		zpJson& rotation = transform[ "Rotation" ];
@@ -17,8 +17,8 @@ void compileTransform( zpJson& inputObject )
 
 		if( !translate.isEmpty() )
 		{
-			zpVector4f pos( translate[ (zp_uint)0 ].asFloat(), translate[ (zp_uint)1 ].asFloat(), translate[ (zp_uint)2 ].asFloat(), 1.0f );
-			outTransform.setRow( 3, pos );
+			zpVector4f pos = zpMath::Vector4( translate[ (zp_uint)0 ].asFloat(), translate[ (zp_uint)1 ].asFloat(), translate[ (zp_uint)2 ].asFloat(), 1.0f );
+			outTransform.m_m4 = pos;
 		}
 		if( !rotation.isEmpty() )
 		{
@@ -27,16 +27,13 @@ void compileTransform( zpJson& inputObject )
 		if( !scale.isEmpty() )
 		{
 			zpMatrix4f mat;
-			mat.setIdentity();
+			mat = zpMath::MatrixIdentity();
 
-			zpVector4f rot;
-			for( zp_uint i = 0; i < 3; ++i )
-			{
-				zpMath::Mul( rot, mat.getRow( i ), zpScalar( scale[ i ].asFloat() ) );
-				mat.setRow( i, rot );
-			}
+			mat.m_m1 = zpMath::Vector4Scale( mat.m_m1, zpMath::Scalar( scale[ (zp_uint)0 ].asFloat() ) );
+			mat.m_m2 = zpMath::Vector4Scale( mat.m_m2, zpMath::Scalar( scale[ (zp_uint)1 ].asFloat() ) );
+			mat.m_m3 = zpMath::Vector4Scale( mat.m_m3, zpMath::Scalar( scale[ (zp_uint)2 ].asFloat() ) );
 
-			zpMath::Mul( outTransform, outTransform, mat );
+			outTransform = zpMath::MatrixMul( outTransform, mat );
 		}
 
 		transform = zpJson( &outTransform, sizeof( zpMatrix4f ) );

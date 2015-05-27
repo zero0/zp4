@@ -29,6 +29,7 @@ void _getFbxAnimationData( zpFbxMeshData* data, FbxScene* scene, FbxNode* root, 
 void _getFbxMeshSkinData( zpFbxMeshData* data, FbxMesh* mesh )
 {
 	zp_int deformerCount = mesh->GetDeformerCount();
+	ZP_ALIGN16 zp_float boneData[ 16 ];
 
 	for( zp_int i = 0; i < deformerCount; ++i )
 	{
@@ -61,14 +62,15 @@ void _getFbxMeshSkinData( zpFbxMeshData* data, FbxMesh* mesh )
 				FbxAMatrix mat;
 				cluster->GetTransformLinkMatrix( mat );
 				zp_double* matData = (zp_double*)mat;
-				zp_float* boneData = bone->bindPose.getData();
 
 				for( zp_int i = 0; i < 16; ++i )
 				{
 					boneData[i] = (zp_float)matData[i];
 				}
+
+				bone->bindPose = zpMath::MatrixLoadOpenGL( boneData );
 			}
-			
+
 			zp_int indexCount = cluster->GetControlPointIndicesCount();
 			zp_int *indices = cluster->GetControlPointIndices();
 			zp_double *weights = cluster->GetControlPointWeights();
@@ -117,7 +119,7 @@ void _getFbxMeshData( zpFbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 				for( zp_int c = 0; c < controlPointCount; ++c )
 				{
 					FbxVector4& v = controlPoints[ c ];
-					meshPart.verts.pushBack( zpVector4f( (zp_float)v[0], (zp_float)v[1], (zp_float)v[2], 1 ) );
+					meshPart.verts.pushBack( zpMath::Vector4( (zp_float)v[0], (zp_float)v[1], (zp_float)v[2], 1 ) );
 				}
 
 				// vert indices
@@ -242,7 +244,7 @@ void _getFbxMeshData( zpFbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 								meshPart.normIndecies.pushBack( index );
 
 								FbxVector4 norm = elemNormal->GetDirectArray().GetAt( i );
-								meshPart.normals.pushBack( zpVector4f( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
+								meshPart.normals.pushBack( zpMath::Vector4( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
 							}
 						}
 						break;
@@ -259,7 +261,7 @@ void _getFbxMeshData( zpFbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 									FbxVector4 norm;
 									mesh->GetPolygonVertexNormal( p, s, norm );
 
-									zpVector4f normal( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 );
+									zpVector4f normal = zpMath::Vector4( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 );
 
 									zp_hash normalHash = zp_fnv1_32( normal, 0 );
 
@@ -399,7 +401,7 @@ void _getFbxMeshData( zpFbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 	}
 }
 
-VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
+VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh, MeshSkeleton* skeleton, MeshAnimation* animation )
 {
 	zp_int fmt = VF_NONE;
 	const zpFbxMeshDataPart* part = &data->parts[ 0 ];
@@ -428,6 +430,7 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
 	zpArrayList< zp_int > newIndexToMaterialName;
 	zpArrayList< zpVertexNormalTexture > newUniqueVertexBuffer;
 	zpArrayList< zp_hash > newUniqueVertexHashes;
+	zpArrayList< zpArrayList< zp_int > > vertexIndexToUniqueVertex;
 
 	zp_uint stride = 0;
 	zp_uint vertexOffset = 0;
@@ -460,22 +463,22 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
 		{
 		case VF_VERTEX:
 			{
-
+				ZP_ASSERT( false, "" );
 			}
 			break;
 		case VF_VERTEX_COLOR:
 			{
-
+				ZP_ASSERT( false, "" );
 			}
 			break;
 		case VF_VERTEX_NORMAL:
 			{
-
+				ZP_ASSERT( false, "" );
 			}
 			break;
 		case VF_VERTEX_TEXTURE:
 			{
-
+				ZP_ASSERT( false, "" );
 			}
 			break;
 		case VF_VERTEX_NORMAL_TEXTURE:
@@ -498,9 +501,14 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
 					{
 						newUniqueVertexHashes.pushBack( h );
 
+						ZP_ALIGN16 zp_float floatData[4];
+						ZP_ALIGN16 zp_float normalData[4];
+						zpMath::Vector4Store4( part->verts[ vertIdx ], floatData );
+						zpMath::Vector4Store4( part->normals[ normIdx ], normalData );
+
 						// write vertex data
-						mesh->vertex.write( part->verts[ vertIdx ] );
-						mesh->vertex.write( part->normals[ normIdx ] );
+						mesh->vertex.writeBulk( floatData, 4 );
+						mesh->vertex.writeBulk( normalData, 4 );
 						mesh->vertex.write( part->uvs[ uvIdx ] );
 
 						++uniqueCount;
@@ -533,6 +541,18 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
 
 					// write index data
 					mesh->index.write< zp_ushort >( idx );
+
+					// map old vertex index to new unified index
+					while( vertexIndexToUniqueVertex.size() < (zp_uint)( vertIdx + 1 ) )
+					{
+						vertexIndexToUniqueVertex.pushBackEmpty();
+					}
+
+					// don't add multiple remapped verts
+					if( vertexIndexToUniqueVertex[ vertIdx ].indexOf( idx ) < 0 )
+					{
+						vertexIndexToUniqueVertex[ vertIdx ].pushBackEmpty() = idx;
+					}
 				}
 			}
 			break;
@@ -584,8 +604,7 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
 				mat.append( ".materialb" );
 
 				dp.material = mat.str();
-				dp.boundingBox.setMin( zpVector4f( ZP_FLT_MAX, ZP_FLT_MAX, ZP_FLT_MAX, 1.0f ) );
-				dp.boundingBox.setMax( zpVector4f( ZP_FLT_MIN, ZP_FLT_MIN, ZP_FLT_MIN, 1.0f ) );
+				dp.boundingBox.reset();
 
 				dp.indexOffset = compPart.indexOffset + i * sizeof( zp_ushort );//mesh->index.size();
 				dp.vertexOffset = 0;
@@ -602,6 +621,37 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh )
 		MeshDataPart& end = mesh->parts.back();
 		end.indexCount = count;
 		end.vertexCount = count;
+	}
+
+	// remap skinned data vertex to compressed indexes
+	if( !data->skeleton.bones.isEmpty() )
+	{
+		skeleton->bones.reserve( data->skeleton.bones.size() );
+
+		for( zp_int s = 0, smax = data->skeleton.bones.size(); s < smax; ++s )
+		{
+			const zpFbxBone& bone = data->skeleton.bones[ s ];
+			MeshSkeletonBone& b = skeleton->bones.pushBackEmpty();
+
+			b.name = bone.name;
+			b.bindPose = bone.bindPose;
+
+			b.controlPointIndicies.reserve( bone.controlPointIndices.size() );
+			b.controlPointWeights.reserve( bone.controlPointIndices.size() );
+
+			for( zp_int c = 0, cmax = bone.controlPointIndices.size(); c < cmax; ++c )
+			{
+				zp_int index = bone.controlPointIndices[ c ];
+				zp_float weight = bone.controlPointWeights[ c ];
+
+				const zpArrayList< zp_int >& vee = vertexIndexToUniqueVertex[ index ];
+
+				vee.foreach( [ &b, &weight ]( zp_int idx ) {
+					b.controlPointIndicies.pushBackEmpty() = idx;
+					b.controlPointWeights.pushBackEmpty() = weight;
+				} );
+			}
+		}
 	}
 
 	return (VertexFormat)fmt;
@@ -653,11 +703,11 @@ zp_bool FbxMeshCompiler::compileMesh()
 	_getFbxMeshData( &meshdada, rootNode, true );
 
 	VertexFormat fmt;
-	fmt = _fbxToMeshData( &meshdada, &m_data );
+	fmt = _fbxToMeshData( &meshdada, &m_mesh, &m_skeleton, &m_animation );
 	//fmt = _fbxToMesh( &m_fbxData, &m_data );
 
 
-	formatToString( fmt, m_data.format );
+	formatToString( fmt, m_mesh.format );
 
 	ok = fmt != VF_NONE;
 

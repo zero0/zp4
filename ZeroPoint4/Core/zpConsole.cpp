@@ -12,7 +12,6 @@ zpConsole::zpConsole()
 	, m_currentColor( ZP_CONSOLE_DEFAULT_COLOR )
 	, m_defaultColor( ZP_CONSOLE_DEFAULT_COLOR )
 	, m_hConsole( ZP_NULL )
-	, m_title( "ZeroPoint Console" )
 {}
 zpConsole::~zpConsole() {
 	destroy();
@@ -23,13 +22,29 @@ zpConsole* zpConsole::getInstance() {
 	return &console;
 }
 
-const zpString& zpConsole::getTitle() const {
-	return m_title;
+zpString zpConsole::getTitle() const
+{
+	zp_uint n = 0;
+	zp_char title[ 255 ];
+
+	if( m_isCreated )
+	{
+		n = GetConsoleTitle( title, 255 );
+	}
+
+	title[ n ] = '\0';
+
+	return zpString( title );
 }
-void zpConsole::setTitle( const zpString& title ) {
-	m_title = title;
-	if( m_isCreated ) {
-		SetConsoleTitle( m_title.str() );
+void zpConsole::setTitle( const zpString& title )
+{
+	setTitle( title.str() );
+}
+void zpConsole::setTitle( const zp_char* title )
+{
+	if( m_isCreated )
+	{
+		SetConsoleTitle( title );
 	}
 }
 
@@ -43,7 +58,6 @@ void zpConsole::create( zp_ushort bufferSize ) {
 
 	// allocate a console for this app
 	AllocConsole();
-	SetConsoleTitle( m_title.str() );
 
 	// grab STD handles
 	HANDLE m_hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
