@@ -8,387 +8,341 @@ FbxMeshCompiler::~FbxMeshCompiler()
 {
 }
 
-void _getFbxAnimationData( zpFbxMeshData* data, FbxScene* scene, FbxNode* root, FbxImporter* importer )
+void _getFbxAnimationSkeletonData( zpFbxAnimationKeyFrames* keyFrames, FbxAnimEvaluator* eval, FbxNode* node, zp_float frameRate, zp_float startTime, zp_float endTime )
 {
+	FbxSkeleton* skeleton = node->GetSkeleton();
+	if( skeleton )
+	{
+		const zp_char* nodeName = node->GetName();
+		if( keyFrames->boneName == nodeName )
+		{
+			FbxTime time;
+			zp_float fps = 1.f / frameRate;
+			zp_float t = startTime;
+			ZP_ALIGN16 zp_float frameData[ 16 ];
+
+			while( t <= endTime )
+			{
+				time.SetSecondDouble( t );
+
+				FbxAMatrix globalMatrix = eval->GetNodeGlobalTransform( node, time );
+				FbxAMatrix globalParentMatrix = eval->GetNodeGlobalTransform( node->GetParent(), time );
+				FbxAMatrix globalInvParentMatrix = globalParentMatrix.Inverse();
+				FbxAMatrix localMatrix = globalInvParentMatrix * globalMatrix;
+
+				zp_double* matData = (zp_double*)localMatrix;
+
+				for( zp_int i = 0; i < 16; ++i )
+				{
+					frameData[i] = (zp_float)matData[i];
+				}
+
+				zpMatrix4f mat = zpMath::MatrixLoadOpenGL( frameData );
+				keyFrames->frames.pushBackEmpty() = mat;
+
+				t += fps;
+			}
+
+			return;
+		}
+	}
+
+	zp_int numChildren = node->GetChildCount();
+	for( zp_int i = 0; i < numChildren; ++i )
+	{
+		FbxNode* child = node->GetChild( i );
+		_getFbxAnimationSkeletonData( keyFrames, eval, child, frameRate, startTime, endTime );
+	}
+}
+
+void _getFbxAnimationData( zpFbxMeshData* data, const zp_char* animationName, FbxAnimEvaluator* eval, FbxNode* root, zp_float frameRate, zp_float startTime, zp_float endTime )
+{
+	zpFbxAnimation& anim = data->animations.pushBackEmpty();
+
+	anim.frameRate = frameRate;
+	anim.name = animationName;
+
+	zp_int keyFrames = zp_floor_to_int( ( endTime - startTime ) * frameRate );
+	zp_int numBones = data->skeleton.bones.size();
+
+	anim.boneFrames.reserve( numBones );
+	for( zp_int b = 0; b < numBones; ++b )
+	{
+		zpFbxAnimationKeyFrames& boneFrames = anim.boneFrames.pushBackEmpty();
+		boneFrames.boneName = data->skeleton.bones[ b ].name;
+
+		boneFrames.frames.reserve( keyFrames );
+
+		_getFbxAnimationSkeletonData( &boneFrames, eval, root, frameRate, startTime, endTime );
+	}
+}
+
+void _getFbxAnimationsData( zpFbxMeshData* data, FbxScene* scene, FbxImporter* importer, FbxNode* root )
+{
+	zp_float frameRate = (zp_float)FbxTime::GetFrameRate( scene->GetGlobalSettings().GetTimeMode() );
+	
+	FbxAnimEvaluator* eval = scene->GetAnimationEvaluator();
+
+	FbxArray< FbxString* > takeArray;
+	scene->FillAnimStackNameArray( takeArray );
+
 	zp_int numAnimations = scene->GetSrcObjectCount< FbxAnimStack >();
 	for( zp_int i = 0; i < numAnimations; ++i )
 	{
 		FbxAnimStack* animStack = scene->GetSrcObject< FbxAnimStack >( i );
-		FbxAnimEvaluator* eval = scene->GetAnimationEvaluator();
 
+		for( zp_int t = 0; t < takeArray.GetCount(); ++t )
+		{
+			FbxString* takeName = takeArray.GetAt( t );
+
+			FbxTakeInfo* takeInfo = scene->GetTakeInfo( *takeName );
+
+			FbxTime startTime;
+			FbxTime endTime;
+			
+			if( takeInfo )
+			{
+				startTime = takeInfo->mLocalTimeSpan.GetStart();
+				endTime = takeInfo->mLocalTimeSpan.GetStop();
+			}
+			else
+			{
+				FbxTimeSpan timeSpan;
+				scene->GetGlobalSettings().GetTimelineDefaultTimeSpan( timeSpan );
+				startTime = timeSpan.GetStart();
+				endTime = timeSpan.GetStop();
+			}
+
+			zp_float s = (zp_float)startTime.GetSecondDouble();
+			zp_float e = (zp_float)endTime.GetSecondDouble();
+
+			if( s < e )
+			{
+				_getFbxAnimationData( data, takeName->Buffer(), eval, root, frameRate, s, e );
+			}
+		}
+
+#if 0
 		const zp_char* animName = animStack->GetName();
 
 		zp_int numLayers = animStack->GetMemberCount();
 		for( zp_int l = 0; l < numLayers; ++l )
 		{
 			FbxAnimLayer* animLayer = animStack->GetMember< FbxAnimLayer >( l );
+
 		}
+#endif
 	}
 }
 
-void _getFbxMeshSkinData( zpFbxMeshData* data, FbxMesh* mesh )
+void _getFbxMeshSkinData( zpFbxMeshData* data, FbxNode* node, FbxNode* parent, zp_int depth )
 {
-	zp_int deformerCount = mesh->GetDeformerCount();
-	ZP_ALIGN16 zp_float boneData[ 16 ];
-
-	for( zp_int i = 0; i < deformerCount; ++i )
+	FbxMesh* mesh = node->GetMesh();
+	if( mesh )
 	{
-		FbxDeformer* deformer = mesh->GetDeformer( i );
+		ZP_ALIGN16 zp_float boneData[ 16 ];
 
-		if( deformer->GetDeformerType() != FbxDeformer::eSkin ) continue;
-
-		FbxSkin* skin = (FbxSkin*)deformer;
-		zp_int clusterCount = skin->GetClusterCount();
-
-		data->skeleton.bones.reserve( data->skeleton.bones.size() + clusterCount );
-		for( zp_int c = 0; c < clusterCount; ++c )
+		zp_int deformerCount = mesh->GetDeformerCount();
+		for( zp_int i = 0; i < deformerCount; ++i )
 		{
-			FbxCluster* cluster = skin->GetCluster( c );
-			FbxCluster::ELinkMode linkMode = cluster->GetLinkMode();
-			const zp_char* boneName = cluster->GetLink()->GetName();
+			FbxDeformer* deformer = mesh->GetDeformer( i );
 
-			zpFbxBone* bone;
-			zp_bool found = data->skeleton.bones.findIf( [ boneName ]( zpFbxBone& bone )
+			if( deformer->GetDeformerType() != FbxDeformer::eSkin ) continue;
+
+			FbxSkin* skin = (FbxSkin*)deformer;
+			zp_int clusterCount = skin->GetClusterCount();
+
+			data->skeleton.bones.reserve( data->skeleton.bones.size() + clusterCount );
+			for( zp_int c = 0; c < clusterCount; ++c )
 			{
-				return bone.name == boneName;
-			}, &bone );
+				FbxCluster* cluster = skin->GetCluster( c );
+				FbxCluster::ELinkMode linkMode = cluster->GetLinkMode();
+				const zp_char* boneName = cluster->GetLink()->GetName();
 
-			// if the bone was not found, add it
-			if( !found )
-			{
-				bone = &data->skeleton.bones.pushBackEmpty();
-				bone->name = boneName;
-				
-				FbxAMatrix mat;
-				cluster->GetTransformLinkMatrix( mat );
-				zp_double* matData = (zp_double*)mat;
-
-				for( zp_int i = 0; i < 16; ++i )
+				zpFbxBone* bone;
+				zp_bool found = data->skeleton.bones.findIf( [ boneName ]( zpFbxBone& bone )
 				{
-					boneData[i] = (zp_float)matData[i];
+					return bone.name == boneName;
+				}, &bone );
+
+				// if the bone was found, set bind pose
+				if( found )
+				{
+					FbxAMatrix linkMatrix;
+					cluster->GetTransformLinkMatrix( linkMatrix );
+					zp_double* matData = (zp_double*)linkMatrix;
+
+					for( zp_int i = 0; i < 16; ++i )
+					{
+						boneData[i] = (zp_float)matData[i];
+					}
+
+					bone->bindPose = zpMath::MatrixLoadOpenGL( boneData );
+
+					zp_int indexCount = cluster->GetControlPointIndicesCount();
+					zp_int *indices = cluster->GetControlPointIndices();
+					zp_double *weights = cluster->GetControlPointWeights();
+
+					bone->controlPointIndices.reserve( indexCount );
+					bone->controlPointWeights.reserve( indexCount );
+
+					for( zp_int j = 0 ; j < indexCount ; ++j )
+					{
+						zp_int vertex = indices[ j ];
+						zp_float weight = (zp_float)weights[ j ];
+
+						bone->controlPointIndices.pushBack( vertex );
+						bone->controlPointWeights.pushBack( weight );
+					}
 				}
-
-				bone->bindPose = zpMath::MatrixLoadOpenGL( boneData );
-			}
-
-			zp_int indexCount = cluster->GetControlPointIndicesCount();
-			zp_int *indices = cluster->GetControlPointIndices();
-			zp_double *weights = cluster->GetControlPointWeights();
-
-			bone->controlPointIndices.reserve( indexCount );
-			bone->controlPointWeights.reserve( indexCount );
-
-			for( zp_int j = 0 ; j < indexCount ; ++j )
-			{
-				zp_int vertex = indices[ j ];
-				zp_float weight = (zp_float)weights[ j ];
-
-				bone->controlPointIndices.pushBack( vertex );
-				bone->controlPointWeights.pushBack( weight );
+				else
+				{
+					zpLog::error() << "Unable to find bone: " << boneName << zpLog::endl;
+				}
 			}
 		}
+	}
+
+	zp_int numChildren = node->GetChildCount();
+	for( zp_int i = 0; i < numChildren; ++i )
+	{
+		FbxNode* child = node->GetChild( i );
+		_getFbxMeshSkinData( data, child, node, depth + 1 );
+	}
+}
+
+void _getFbxMeshSkeletonData( zpFbxMeshData* data, FbxNode* node, FbxNode* parent, zp_int depth )
+{
+	FbxSkeleton* skeleton = node->GetSkeleton();
+	if( skeleton )
+	{
+		zpFbxBone& bone = data->skeleton.bones.pushBackEmpty();
+		bone.name = node->GetName();
+
+		if( parent )
+		{
+			bone.parent = parent->GetName();
+		}
+		else if( data->skeleton.rootBone.isEmpty() )
+		{
+			data->skeleton.rootBone = bone.name;
+		}
+
+		//for( zp_int i = 0; i < depth; ++i ) zp_printf( ".." );
+		//zp_printfln( "%s -> %s", bone.name.str(), bone.parent.str() );
+	}
+
+	zp_int numChildren = node->GetChildCount();
+	for( zp_int i = 0; i < numChildren; ++i )
+	{
+		FbxNode* child = node->GetChild( i );
+		_getFbxMeshSkeletonData( data, child, skeleton ? node : ZP_NULL, depth + 1 );
 	}
 }
 
 void _getFbxMeshData( zpFbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 {
-	zp_int numChildren = node->GetChildCount();
-	for( zp_int i = 0; i < numChildren; ++i )
+	FbxMesh* mesh = node->GetMesh();
+	if( mesh )
 	{
-		FbxNode* child = node->GetChild( i );
-		FbxMesh* mesh = child->GetMesh();
-		if( mesh )
+		zpFbxMeshDataPart& meshPart = data->parts.pushBackEmpty();
+
+		zp_int controlPointCount = mesh->GetControlPointsCount();
+		zp_int polygonCount = mesh->GetPolygonCount();
+		zp_int normalCount = mesh->GetElementNormalCount();
+		zp_int binormalCount = mesh->GetElementBinormalCount();
+		zp_int tangentCount = mesh->GetElementTangentCount();
+		zp_int colorCount = mesh->GetElementVertexColorCount();
+		zp_int uvCount = mesh->GetElementUVCount();
+		zp_int materialCount = mesh->GetElementMaterialCount();
+		zp_int polygonSize = mesh->GetPolygonSize( 0 );
+
+		// verts
 		{
-			zpFbxMeshDataPart& meshPart = data->parts.pushBackEmpty();
+			meshPart.verts.reserve( controlPointCount );
 
-			zp_int controlPointCount = mesh->GetControlPointsCount();
-			zp_int polygonCount = mesh->GetPolygonCount();
-			zp_int normalCount = mesh->GetElementNormalCount();
-			zp_int binormalCount = mesh->GetElementBinormalCount();
-			zp_int tangentCount = mesh->GetElementTangentCount();
-			zp_int colorCount = mesh->GetElementVertexColorCount();
-			zp_int uvCount = mesh->GetElementUVCount();
-			zp_int materialCount = mesh->GetElementMaterialCount();
-			zp_int polygonSize = mesh->GetPolygonSize( 0 );
-
-			// verts
+			FbxVector4* controlPoints = mesh->GetControlPoints();
+			for( zp_int c = 0; c < controlPointCount; ++c )
 			{
-				meshPart.verts.reserve( controlPointCount );
-
-				FbxVector4* controlPoints = mesh->GetControlPoints();
-				for( zp_int c = 0; c < controlPointCount; ++c )
-				{
-					FbxVector4& v = controlPoints[ c ];
-					meshPart.verts.pushBack( zpMath::Vector4( (zp_float)v[0], (zp_float)v[1], (zp_float)v[2], 1 ) );
-				}
-
-				// vert indices
-				meshPart.vertIndecies.reserve( polygonCount * polygonSize );
-				for( zp_int p = 0; p < polygonCount; ++p )
-				{
-					zp_int index;
-					zp_int polygonSize = mesh->GetPolygonSize( p );
-					for( zp_int s = 0; s < polygonSize; ++s )
-					{
-						index = mesh->GetPolygonVertex( p, s );
-						meshPart.vertIndecies.pushBack( index );
-					}
-				}
+				FbxVector4& v = controlPoints[ c ];
+				meshPart.verts.pushBack( zpMath::Vector4( (zp_float)v[0], (zp_float)v[1], (zp_float)v[2], 1 ) );
 			}
 
-			// uvs
+			// vert indices
+			meshPart.vertIndecies.reserve( polygonCount * polygonSize );
+			for( zp_int p = 0; p < polygonCount; ++p )
 			{
+				zp_int index;
+				zp_int polygonSize = mesh->GetPolygonSize( p );
+				for( zp_int s = 0; s < polygonSize; ++s )
+				{
+					index = mesh->GetPolygonVertex( p, s );
+					meshPart.vertIndecies.pushBack( index );
+				}
+			}
+		}
+
+		// uvs
+		{
+			for( zp_int u = 0; u < uvCount; ++u )
+			{
+				FbxGeometryElementUV* elemUv = mesh->GetElementUV( u );
+
+				zp_int uvCount = elemUv->GetDirectArray().GetCount();
+				meshPart.uvs.reserve( uvCount );
 				for( zp_int u = 0; u < uvCount; ++u )
 				{
-					FbxGeometryElementUV* elemUv = mesh->GetElementUV( u );
-
-					zp_int uvCount = elemUv->GetDirectArray().GetCount();
-					meshPart.uvs.reserve( uvCount );
-					for( zp_int u = 0; u < uvCount; ++u )
-					{
-						FbxVector2 uv = elemUv->GetDirectArray().GetAt( u );
-						meshPart.uvs.pushBack( zpVector2f( (zp_float)uv.mData[0], (zp_float)uv.mData[1] ) );
-					}
-
-					zp_int index = -1;
-					switch( elemUv->GetMappingMode() )
-					{
-					case FbxGeometryElement::eByControlPoint:
-						{
-							meshPart.uvIndecies.reserve( polygonCount * polygonSize );
-							for( zp_int p = 0; p < polygonCount; ++p )
-							{
-								zp_int polygonSize = mesh->GetPolygonSize( p );
-								for( zp_int s = 0; s < polygonSize; ++s )
-								{
-									zp_int polyIdx = mesh->GetPolygonVertex( p, s );
-									switch( elemUv->GetReferenceMode() )
-									{
-									case FbxGeometryElement::eDirect:
-										index = elemUv->GetIndexArray().GetAt( polyIdx );
-										break;	
-									case FbxGeometryElement::eIndexToDirect:
-										index = polyIdx;
-										break;
-									}
-
-									meshPart.uvIndecies.pushBack( index );
-								}
-							}
-						}
-						break;
-					case FbxGeometryElement::eByPolygonVertex:
-						{
-							meshPart.uvIndecies.reserve( polygonCount * mesh->GetPolygonSize( 0 ) );
-							for( zp_int p = 0; p < polygonCount; ++p )
-							{
-								zp_int polygonSize = mesh->GetPolygonSize( p );
-								for( zp_int s = 0; s < polygonSize; ++s )
-								{
-									zp_int polyIdx = mesh->GetTextureUVIndex( p, s );
-									switch( elemUv->GetReferenceMode() )
-									{
-									case FbxGeometryElement::eDirect:
-										index = elemUv->GetIndexArray().GetAt( polyIdx );
-										break;	
-									case FbxGeometryElement::eIndexToDirect:
-										index = polyIdx;
-										break;
-									}
-
-									meshPart.uvIndecies.pushBack( index );
-								}
-							}
-						}
-						break;
-					}
+					FbxVector2 uv = elemUv->GetDirectArray().GetAt( u );
+					meshPart.uvs.pushBack( zpVector2f( (zp_float)uv.mData[0], (zp_float)uv.mData[1] ) );
 				}
 
-				// flip uvs
-				if( flipUVs )
+				zp_int index = -1;
+				switch( elemUv->GetMappingMode() )
 				{
-					zpVector2f* b = meshPart.uvs.begin();
-					zpVector2f* e = meshPart.uvs.end();
-					for( ; b != e; ++b )
+				case FbxGeometryElement::eByControlPoint:
 					{
-						b->setY( 1.0f - b->getY() );
-					}
-				}
-			}
-
-			// normals
-			{
-				zpArrayList< zp_hash > allNormalHashes;
-				for( zp_int n = 0; n < normalCount; ++n )
-				{
-					FbxGeometryElementNormal* elemNormal = mesh->GetElementNormal( n );
-					zp_int index = -1;
-					switch( elemNormal->GetMappingMode() )
-					{
-					case FbxGeometryElement::eByControlPoint:
+						meshPart.uvIndecies.reserve( polygonCount * polygonSize );
+						for( zp_int p = 0; p < polygonCount; ++p )
 						{
-							meshPart.normals.reserve( controlPointCount );
-							meshPart.normIndecies.reserve( controlPointCount );
-							for( zp_int i = 0; i < controlPointCount; ++i )
+							zp_int polygonSize = mesh->GetPolygonSize( p );
+							for( zp_int s = 0; s < polygonSize; ++s )
 							{
-								switch( elemNormal->GetReferenceMode() )
+								zp_int polyIdx = mesh->GetPolygonVertex( p, s );
+								switch( elemUv->GetReferenceMode() )
 								{
 								case FbxGeometryElement::eDirect:
-									index = i;
+									index = elemUv->GetIndexArray().GetAt( polyIdx );
 									break;	
 								case FbxGeometryElement::eIndexToDirect:
-									index = elemNormal->GetIndexArray().GetAt( i );
+									index = polyIdx;
 									break;
 								}
 
-								meshPart.normIndecies.pushBack( index );
-
-								FbxVector4 norm = elemNormal->GetDirectArray().GetAt( i );
-								meshPart.normals.pushBack( zpMath::Vector4( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
+								meshPart.uvIndecies.pushBack( index );
 							}
 						}
-						break;
-					case FbxGeometryElement::eByPolygonVertex:
-						{
-							zp_int normIdx = 0;
-							meshPart.normIndecies.reserve( meshPart.vertIndecies.size() );
-							meshPart.normals.reserve( polygonCount * polygonSize );
-							for( zp_int p = 0; p < polygonCount; ++p )
-							{
-								zp_int polygonSize = mesh->GetPolygonSize( p );
-								for( zp_int s = 0; s < polygonSize; ++s )
-								{
-									FbxVector4 norm;
-									mesh->GetPolygonVertexNormal( p, s, norm );
-
-									zpVector4f normal = zpMath::Vector4( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 );
-
-									zp_hash normalHash = zp_fnv1_32( normal, 0 );
-
-									zp_int idx = allNormalHashes.indexOf( normalHash );
-									if( idx < 0 )
-									{
-										idx = allNormalHashes.size();
-										allNormalHashes.pushBack( normalHash );
-										meshPart.normals.pushBack( normal );
-									}
-
-									meshPart.normIndecies.pushBack( idx );
-								}
-							}
-						}
-						break;
 					}
-				}
-			}
-		
-			// material
-			{
-				for( zp_int m = 0; m < materialCount; ++m )
-				{
-					FbxGeometryElementMaterial* elemMaterial = mesh->GetElementMaterial( m );
-					zp_int index = -1;
-					switch( elemMaterial->GetMappingMode() )
+					break;
+				case FbxGeometryElement::eByPolygonVertex:
 					{
-					case FbxGeometryElement::eByControlPoint:
+						meshPart.uvIndecies.reserve( polygonCount * mesh->GetPolygonSize( 0 ) );
+						for( zp_int p = 0; p < polygonCount; ++p )
 						{
-							//meshPart.colors.reserve( meshPart.colors.size() + controlPointCount );
-							//for( zp_int i = 0; i < controlPointCount; ++i )
-							//{
-							//	switch( elemMaterial->GetReferenceMode() )
-							//	{
-							//	case FbxGeometryElement::eDirect:
-							//		index = i;
-							//		break;	
-							//	case FbxGeometryElement::eIndexToDirect:
-							//		index = elemMaterial->GetIndexArray().GetAt( i );
-							//		break;
-							//	}
-							//
-							//	FbxColor color = elemMaterial->GetDirectArray().GetAt( index );
-							//	meshPart.colors.pushBack( zpColor4f( (zp_float)color.mRed, (zp_float)color.mGreen, (zp_float)color.mBlue, (zp_float)color.mAlpha ) );
-							//}
-						}
-						break;
-					case FbxGeometryElement::eAllSame:
-						{
-							switch( elemMaterial->GetReferenceMode() )
+							zp_int polygonSize = mesh->GetPolygonSize( p );
+							for( zp_int s = 0; s < polygonSize; ++s )
 							{
-							case FbxGeometryElement::eDirect:
-								index = 0;
-								break;	
-							case FbxGeometryElement::eIndexToDirect:
-								index = elemMaterial->GetIndexArray().GetAt( 0 );
-								break;
-							}
-
-							zp_int matCount = mesh->GetNode()->GetMaterialCount();
-							meshPart.materialData.materialNames.reserve( matCount );
-
-							for( zp_int m = 0; m < matCount; ++m )
-							{
-								FbxSurfaceMaterial* surfaceMaterial = mesh->GetNode()->GetMaterial( index );
-								const zp_char* name = surfaceMaterial->GetName();
-								meshPart.materialData.materialNames.pushBackEmpty() = name;
-							}
-
-							meshPart.materialData.polygonIndexToMaterialName.reserve( polygonCount );
-							for( zp_int p = 0; p < polygonCount; ++p )
-							{
-								meshPart.materialData.polygonIndexToMaterialName.pushBack( index );
-							}
-						}
-						break;
-					case FbxGeometryElement::eByPolygon:
-						{
-							zp_int matCount = mesh->GetNode()->GetMaterialCount();
-							meshPart.materialData.materialNames.reserve( matCount );
-
-							for( zp_int m = 0; m < matCount; ++m )
-							{
-								FbxSurfaceMaterial* surfaceMaterial = mesh->GetNode()->GetMaterial( m );
-								const zp_char* name = surfaceMaterial->GetName();
-								meshPart.materialData.materialNames.pushBackEmpty() = name;
-							}
-
-							meshPart.materialData.polygonIndexToMaterialName.reserve( polygonCount );
-							for( zp_int p = 0; p < polygonCount; ++p )
-							{
-								switch( elemMaterial->GetReferenceMode() )
+								zp_int polyIdx = mesh->GetTextureUVIndex( p, s );
+								switch( elemUv->GetReferenceMode() )
 								{
 								case FbxGeometryElement::eDirect:
-									index = p;
+									index = elemUv->GetIndexArray().GetAt( polyIdx );
 									break;	
 								case FbxGeometryElement::eIndexToDirect:
-									index = elemMaterial->GetIndexArray().GetAt( p );
+									index = polyIdx;
 									break;
 								}
 
-								meshPart.materialData.polygonIndexToMaterialName.pushBack( index );
-								//FbxProperty p = surfaceMaterial->FindProperty( FbxSurfaceMaterial::sDiffuse );
-								//
-								//zp_int count;
-								//count = p.GetSrcObjectCount< FbxLayeredTexture >();
-								//if( count > 0 )
-								//{
-								//	for( zp_int lc = 0; lc < count; ++lc )
-								//	{
-								//		FbxLayeredTexture* t = p.GetSrcObject< FbxLayeredTexture >( lc );
-								//		zp_printf( t->GetName() );
-								//	}
-								//}
-								//else
-								//{
-								//	count = p.GetSrcObjectCount< FbxFileTexture >();
-								//	if( count > 0 )
-								//	{
-								//		for( zp_int tc = 0; tc < count; ++tc )
-								//		{
-								//			FbxFileTexture* t = p.GetSrcObject< FbxFileTexture >( tc );
-								//			zp_printf( t->GetFileName() );
-								//		}
-								//	}
-								//}
+								meshPart.uvIndecies.pushBack( index );
 							}
 						}
 					}
@@ -396,8 +350,204 @@ void _getFbxMeshData( zpFbxMeshData* data, FbxNode* node, zp_bool flipUVs )
 				}
 			}
 
-			_getFbxMeshSkinData( data, mesh );
+			// flip uvs
+			if( flipUVs )
+			{
+				zpVector2f* b = meshPart.uvs.begin();
+				zpVector2f* e = meshPart.uvs.end();
+				for( ; b != e; ++b )
+				{
+					b->setY( 1.0f - b->getY() );
+				}
+			}
 		}
+
+		// normals
+		{
+			zpArrayList< zp_hash > allNormalHashes;
+			for( zp_int n = 0; n < normalCount; ++n )
+			{
+				FbxGeometryElementNormal* elemNormal = mesh->GetElementNormal( n );
+				zp_int index = -1;
+				switch( elemNormal->GetMappingMode() )
+				{
+				case FbxGeometryElement::eByControlPoint:
+					{
+						meshPart.normals.reserve( controlPointCount );
+						meshPart.normIndecies.reserve( controlPointCount );
+						for( zp_int i = 0; i < controlPointCount; ++i )
+						{
+							switch( elemNormal->GetReferenceMode() )
+							{
+							case FbxGeometryElement::eDirect:
+								index = i;
+								break;	
+							case FbxGeometryElement::eIndexToDirect:
+								index = elemNormal->GetIndexArray().GetAt( i );
+								break;
+							}
+
+							meshPart.normIndecies.pushBack( index );
+
+							FbxVector4 norm = elemNormal->GetDirectArray().GetAt( i );
+							meshPart.normals.pushBack( zpMath::Vector4( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 ) );
+						}
+					}
+					break;
+				case FbxGeometryElement::eByPolygonVertex:
+					{
+						zp_int normIdx = 0;
+						meshPart.normIndecies.reserve( meshPart.vertIndecies.size() );
+						meshPart.normals.reserve( polygonCount * polygonSize );
+						for( zp_int p = 0; p < polygonCount; ++p )
+						{
+							zp_int polygonSize = mesh->GetPolygonSize( p );
+							for( zp_int s = 0; s < polygonSize; ++s )
+							{
+								FbxVector4 norm;
+								mesh->GetPolygonVertexNormal( p, s, norm );
+
+								zpVector4f normal = zpMath::Vector4( (zp_float)norm.mData[0], (zp_float)norm.mData[1], (zp_float)norm.mData[2], 0 );
+
+								zp_hash normalHash = zp_fnv1_32( normal, 0 );
+
+								zp_int idx = allNormalHashes.indexOf( normalHash );
+								if( idx < 0 )
+								{
+									idx = allNormalHashes.size();
+									allNormalHashes.pushBack( normalHash );
+									meshPart.normals.pushBack( normal );
+								}
+
+								meshPart.normIndecies.pushBack( idx );
+							}
+						}
+					}
+					break;
+				}
+			}
+		}
+
+		// material
+		{
+			for( zp_int m = 0; m < materialCount; ++m )
+			{
+				FbxGeometryElementMaterial* elemMaterial = mesh->GetElementMaterial( m );
+				zp_int index = -1;
+				switch( elemMaterial->GetMappingMode() )
+				{
+				case FbxGeometryElement::eByControlPoint:
+					{
+						//meshPart.colors.reserve( meshPart.colors.size() + controlPointCount );
+						//for( zp_int i = 0; i < controlPointCount; ++i )
+						//{
+						//	switch( elemMaterial->GetReferenceMode() )
+						//	{
+						//	case FbxGeometryElement::eDirect:
+						//		index = i;
+						//		break;	
+						//	case FbxGeometryElement::eIndexToDirect:
+						//		index = elemMaterial->GetIndexArray().GetAt( i );
+						//		break;
+						//	}
+						//
+						//	FbxColor color = elemMaterial->GetDirectArray().GetAt( index );
+						//	meshPart.colors.pushBack( zpColor4f( (zp_float)color.mRed, (zp_float)color.mGreen, (zp_float)color.mBlue, (zp_float)color.mAlpha ) );
+						//}
+					}
+					break;
+				case FbxGeometryElement::eAllSame:
+					{
+						switch( elemMaterial->GetReferenceMode() )
+						{
+						case FbxGeometryElement::eDirect:
+							index = 0;
+							break;	
+						case FbxGeometryElement::eIndexToDirect:
+							index = elemMaterial->GetIndexArray().GetAt( 0 );
+							break;
+						}
+
+						zp_int matCount = mesh->GetNode()->GetMaterialCount();
+						meshPart.materialData.materialNames.reserve( matCount );
+
+						for( zp_int m = 0; m < matCount; ++m )
+						{
+							FbxSurfaceMaterial* surfaceMaterial = mesh->GetNode()->GetMaterial( index );
+							const zp_char* name = surfaceMaterial->GetName();
+							meshPart.materialData.materialNames.pushBackEmpty() = name;
+						}
+
+						meshPart.materialData.polygonIndexToMaterialName.reserve( polygonCount );
+						for( zp_int p = 0; p < polygonCount; ++p )
+						{
+							meshPart.materialData.polygonIndexToMaterialName.pushBack( index );
+						}
+					}
+					break;
+				case FbxGeometryElement::eByPolygon:
+					{
+						zp_int matCount = mesh->GetNode()->GetMaterialCount();
+						meshPart.materialData.materialNames.reserve( matCount );
+
+						for( zp_int m = 0; m < matCount; ++m )
+						{
+							FbxSurfaceMaterial* surfaceMaterial = mesh->GetNode()->GetMaterial( m );
+							const zp_char* name = surfaceMaterial->GetName();
+							meshPart.materialData.materialNames.pushBackEmpty() = name;
+						}
+
+						meshPart.materialData.polygonIndexToMaterialName.reserve( polygonCount );
+						for( zp_int p = 0; p < polygonCount; ++p )
+						{
+							switch( elemMaterial->GetReferenceMode() )
+							{
+							case FbxGeometryElement::eDirect:
+								index = p;
+								break;	
+							case FbxGeometryElement::eIndexToDirect:
+								index = elemMaterial->GetIndexArray().GetAt( p );
+								break;
+							}
+
+							meshPart.materialData.polygonIndexToMaterialName.pushBack( index );
+							//FbxProperty p = surfaceMaterial->FindProperty( FbxSurfaceMaterial::sDiffuse );
+							//
+							//zp_int count;
+							//count = p.GetSrcObjectCount< FbxLayeredTexture >();
+							//if( count > 0 )
+							//{
+							//	for( zp_int lc = 0; lc < count; ++lc )
+							//	{
+							//		FbxLayeredTexture* t = p.GetSrcObject< FbxLayeredTexture >( lc );
+							//		zp_printf( t->GetName() );
+							//	}
+							//}
+							//else
+							//{
+							//	count = p.GetSrcObjectCount< FbxFileTexture >();
+							//	if( count > 0 )
+							//	{
+							//		for( zp_int tc = 0; tc < count; ++tc )
+							//		{
+							//			FbxFileTexture* t = p.GetSrcObject< FbxFileTexture >( tc );
+							//			zp_printf( t->GetFileName() );
+							//		}
+							//	}
+							//}
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	zp_int numChildren = node->GetChildCount();
+	for( zp_int i = 0; i < numChildren; ++i )
+	{
+		FbxNode* child = node->GetChild( i );
+		_getFbxMeshData( data, child, flipUVs );
 	}
 }
 
@@ -626,14 +776,28 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh, MeshSkel
 	// remap skinned data vertex to compressed indexes
 	if( !data->skeleton.bones.isEmpty() )
 	{
-		skeleton->bones.reserve( data->skeleton.bones.size() );
+		zp_int numBones = data->skeleton.bones.size();
+		skeleton->bones.reserve( numBones );
+		skeleton->boneNames.reserve( numBones );
 
-		for( zp_int s = 0, smax = data->skeleton.bones.size(); s < smax; ++s )
+		// store bone names
+		for( zp_int s = 0; s < numBones; ++s )
+		{
+			skeleton->boneNames.pushBackEmpty() = data->skeleton.bones[ s ].name;
+		}
+
+		// build bone structure
+		for( zp_int s = 0; s < numBones; ++s )
 		{
 			const zpFbxBone& bone = data->skeleton.bones[ s ];
 			MeshSkeletonBone& b = skeleton->bones.pushBackEmpty();
 
-			b.name = bone.name;
+			zp_int boneIndex = skeleton->boneNames.indexOf( bone.name );
+			zp_int parentIndex = skeleton->boneNames.indexOf( bone.parent );
+
+			b.name = boneIndex;
+			b.parent = parentIndex;
+
 			b.bindPose = bone.bindPose;
 
 			b.controlPointIndicies.reserve( bone.controlPointIndices.size() );
@@ -652,6 +816,12 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh, MeshSkel
 				} );
 			}
 		}
+	}
+
+	// store animations
+	if( !data->animations.isEmpty() )
+	{
+
 	}
 
 	return (VertexFormat)fmt;
@@ -698,12 +868,19 @@ zp_bool FbxMeshCompiler::compileMesh()
 	//m_fbxData.parts.reserve( 10 );
 	//_getFbxInfo( &m_fbxData, rootNode, true );
 
-	zpFbxMeshData meshdada;
-	meshdada.parts.reserve( 10 );
-	_getFbxMeshData( &meshdada, rootNode, true );
+	zpFbxMeshData meshData;
+	meshData.parts.reserve( 10 );
+
+	_getFbxMeshData( &meshData, rootNode, true );
+
+	_getFbxMeshSkeletonData( &meshData, rootNode, ZP_NULL, 0 );
+
+	_getFbxMeshSkinData( &meshData, rootNode, ZP_NULL, 0 );
+
+	_getFbxAnimationsData( &meshData, scene, importer, rootNode );
 
 	VertexFormat fmt;
-	fmt = _fbxToMeshData( &meshdada, &m_mesh, &m_skeleton, &m_animation );
+	fmt = _fbxToMeshData( &meshData, &m_mesh, &m_skeleton, &m_animation );
 	//fmt = _fbxToMesh( &m_fbxData, &m_data );
 
 

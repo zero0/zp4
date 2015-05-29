@@ -11,6 +11,7 @@ struct zpFbxMaterialData
 
 struct zpFbxBone
 {
+	zpString parent;
 	zpString name;
 	zpArrayList< zp_int > controlPointIndices;
 	zpArrayList< zp_float > controlPointWeights;
@@ -19,6 +20,7 @@ struct zpFbxBone
 
 struct zpFbxSkeleton
 {
+	zpString rootBone;
 	zpArrayList< zpFbxBone > bones;
 };
 
@@ -40,29 +42,26 @@ struct zpFbxMeshDataPart
 	zpArrayList< zpVector4f > tangents;
 
 	zpArrayList< zpColor4f > colors;
-
-
 };
 
-struct zpFbxAnimationFrame
+struct zpFbxAnimationKeyFrames
 {
-	zp_float time;
-	zpMatrix4f transform;
+	zpString boneName;
+	zpArrayList< zpMatrix4f > frames;
 };
 
 struct zpFbxAnimation
 {
-	zp_float startTime;
-	zp_float endTime;
-	zp_float fps;
-	zpArrayList< zpFbxAnimationFrame > frames;
+	zp_float frameRate;
+	zpString name;
+	zpArrayList< zpFbxAnimationKeyFrames > boneFrames;
 };
 
 struct zpFbxMeshData
 {
 	zpArrayList< zpFbxMeshDataPart > parts;
 	zpFbxSkeleton skeleton;
-	zpFbxAnimation animation;
+	zpArrayList< zpFbxAnimation > animations;
 };
 
 struct zpVertexNormalTexture

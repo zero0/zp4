@@ -50,7 +50,8 @@ struct MeshData
 
 struct MeshSkeletonBone
 {
-	zpString name;
+	zp_int parent;
+	zp_int name;
 	zpArrayList< zp_int > controlPointIndicies;
 	zpArrayList< zp_float > controlPointWeights;
 	zpMatrix4f bindPose;
@@ -58,23 +59,25 @@ struct MeshSkeletonBone
 
 struct MeshSkeleton
 {
+	zpArrayList< zpString > boneNames;
 	zpArrayList< MeshSkeletonBone > bones;
+};
+
+struct MeshBoneAnimation
+{
+	zpString boneName;
+	zpArrayList< zpMatrix4f > keyFrames;
 };
 
 struct MeshAnimationClip
 {
-	zp_float startTime;
-	zp_float endTime;
-	zp_float fps;
-	zpArrayList< zpMatrix4f > keyFrames;
-	zpArrayList< zp_float > keyFrameTimes;
+	zp_float frameRate;
+	zpString name;
+	zpArrayList< MeshBoneAnimation > boneFrames;
 };
 
 struct MeshAnimation
 {
-	zp_float startTime;
-	zp_float endTime;
-	zp_float fps;
 	zpArrayList< MeshAnimationClip > clips;
 };
 

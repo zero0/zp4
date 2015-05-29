@@ -1,5 +1,7 @@
 #include "Main.h"
 
+#define MESH_COMPILER_OUTPUT_JSON	1
+
 BaseMeshCompiler::BaseMeshCompiler()
 {
 }
@@ -83,6 +85,24 @@ void BaseMeshCompiler::compileMeshToFile()
 		p[ "BoundingBox" ] = zpJson( boundingData );
 	}
 
+#if MESH_COMPILER_OUTPUT_JSON
+	zpString jsonFileName( m_outputFile );
+	jsonFileName.append( ".txt" );
+
+	zpJsonWriter writer;
+	const zp_char* jsonText = writer.styleWrite( data );
+
+	zpFile jsonFile( jsonFileName );
+	if( jsonFile.open( ZP_FILE_MODE_ASCII_TRUNCATE_WRITE ) )
+	{
+		zpStringBuffer buff;
+		buff.append( jsonText );
+
+		jsonFile.writeBuffer( buff );
+		jsonFile.close();
+	}
+#endif
+
 	if( !zpBison::compileToFile( m_outputFile, data ) )
 	{
 		zpLog::error() << "Unable to compile output file '" << m_outputFile << "'" << zpLog::endl;
@@ -101,11 +121,19 @@ void BaseMeshCompiler::compileSkeletonToFile()
 		skeletonOutputFile.append( "skeletonb" );
 	
 		zpJson data;
+		zpJson& boneNames = data[ "BoneNames" ];
 		zpJson& bones = data[ "Bones" ];
 
 		ZP_ALIGN16 zp_float matrix[16];
 		zpDataBuffer dataBuffer;
 
+		// store bone names
+		for( zp_int i = 0, imax = m_skeleton.boneNames.size(); i < imax; ++i )
+		{
+			boneNames[ i ] = zpJson( m_skeleton.boneNames[ i ] );
+		}
+
+		// store bone data
 		for( zp_int i = 0, imax = m_skeleton.bones.size(); i < imax; ++i )
 		{
 			const MeshSkeletonBone& meshBone = m_skeleton.bones[ i ];
@@ -116,6 +144,7 @@ void BaseMeshCompiler::compileSkeletonToFile()
 			dataBuffer.reset();
 			dataBuffer.writeBulk( matrix, 16 );
 
+			b[ "Parent" ] = zpJson( meshBone.parent );
 			b[ "BindPose" ] = zpJson( dataBuffer );
 
 			if( !meshBone.controlPointIndicies.isEmpty() )
@@ -135,8 +164,23 @@ void BaseMeshCompiler::compileSkeletonToFile()
 			}
 		}
 
-		//zpJsonWriter writer;
-		//const zp_char* jsonText = writer.styleWrite( data );
+#if MESH_COMPILER_OUTPUT_JSON
+		zpString jsonFileName( skeletonOutputFile );
+		jsonFileName.append( ".txt" );
+
+		zpJsonWriter writer;
+		const zp_char* jsonText = writer.styleWrite( data );
+
+		zpFile jsonFile( jsonFileName );
+		if( jsonFile.open( ZP_FILE_MODE_ASCII_TRUNCATE_WRITE ) )
+		{
+			zpStringBuffer buff;
+			buff.append( jsonText );
+
+			jsonFile.writeBuffer( buff );
+			jsonFile.close();
+		}
+#endif
 
 		if( !zpBison::compileToFile( skeletonOutputFile, data ) )
 		{
@@ -150,7 +194,41 @@ void BaseMeshCompiler::compileSkeletonToFile()
 }
 void BaseMeshCompiler::compileAnimationToFile()
 {
+	if( !m_animation.clips.isEmpty() )
+	{
+		zp_int idx = m_outputFile.lastIndexOf( '.' ) + 1;
+		zpString animationOutputFile = m_outputFile.substring( 0, idx );
+		animationOutputFile.append( "animb" );
 
+		zpJson data;
+
+#if MESH_COMPILER_OUTPUT_JSON
+		zpString jsonFileName( animationOutputFile );
+		jsonFileName.append( ".txt" );
+
+		zpJsonWriter writer;
+		const zp_char* jsonText = writer.styleWrite( data );
+
+		zpFile jsonFile( jsonFileName );
+		if( jsonFile.open( ZP_FILE_MODE_ASCII_TRUNCATE_WRITE ) )
+		{
+			zpStringBuffer buff;
+			buff.append( jsonText );
+
+			jsonFile.writeBuffer( buff );
+			jsonFile.close();
+		}
+#endif
+
+		if( !zpBison::compileToFile( animationOutputFile, data ) )
+		{
+			zpLog::error() << "Unable to compile output file '" << animationOutputFile << "'" << zpLog::endl;
+		}
+		else
+		{
+			zpLog::message() << "Successfully compiled '" << animationOutputFile << "'" << zpLog::endl;
+		}
+	}
 }
 
 /************************************************************************/
