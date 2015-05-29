@@ -821,7 +821,25 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh, MeshSkel
 	// store animations
 	if( !data->animations.isEmpty() )
 	{
+		zp_int numAnimations = data->animations.size();
+		animation->clips.reserve( numAnimations );
 
+		for( zp_int a = 0; a < numAnimations; ++a )
+		{
+			const zpFbxAnimation& anim = data->animations[ a ];
+
+			MeshAnimationClip& meshAnim = animation->clips.pushBackEmpty();
+			meshAnim.name = anim.name;
+			meshAnim.frameRate = anim.frameRate;
+			meshAnim.boneFrames.reserve( anim.boneFrames.size() );
+
+			for( zp_int f = 0; f < anim.boneFrames.size(); ++f )
+			{
+				MeshBoneAnimation& meshBoneAnim = meshAnim.boneFrames.pushBackEmpty();
+				meshBoneAnim.boneName = anim.boneFrames[ f ].boneName;
+				meshBoneAnim.keyFrames = anim.boneFrames[ f ].frames;
+			}
+		}
 	}
 
 	return (VertexFormat)fmt;

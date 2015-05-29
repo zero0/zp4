@@ -200,7 +200,35 @@ void BaseMeshCompiler::compileAnimationToFile()
 		zpString animationOutputFile = m_outputFile.substring( 0, idx );
 		animationOutputFile.append( "animb" );
 
+		ZP_ALIGN16 zp_float matrix[16];
+		zpDataBuffer dataBuffer;
+
 		zpJson data;
+
+		for( zp_uint i = 0; i < m_animation.clips.size(); ++i )
+		{
+			MeshAnimationClip& clip = m_animation.clips[ i ];
+			zpJson& jsonClip = data[ clip.name ];
+			
+			jsonClip[ "FrameRate" ] = zpJson( clip.frameRate );
+
+			zpJson& keyFrames = jsonClip[ "KeyFrames" ];
+			for( zp_uint b = 0; b < clip.boneFrames.size(); ++b )
+			{
+				MeshBoneAnimation& boneAnim = clip.boneFrames[ b ];
+
+				dataBuffer.reset();
+				dataBuffer.reserve( boneAnim.keyFrames.size() * sizeof( matrix ) );
+
+				for( zp_uint k = 0; k < boneAnim.keyFrames.size(); ++k )
+				{
+					zpMath::MatrixStoreOpenGL( boneAnim.keyFrames[ k ], matrix );
+					dataBuffer.writeBulk( matrix, 16 );
+				}
+
+				keyFrames[ boneAnim.boneName ] = zpJson( dataBuffer );
+			}
+		}
 
 #if MESH_COMPILER_OUTPUT_JSON
 		zpString jsonFileName( animationOutputFile );

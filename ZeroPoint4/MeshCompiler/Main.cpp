@@ -49,7 +49,6 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 
 			ZP_SAFE_DELETE( compiler );
 		}
-		zpConsole::getInstance()->destroy();
 	}
 
 	mem->shutdown();
