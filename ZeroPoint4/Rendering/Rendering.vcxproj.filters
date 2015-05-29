@@ -78,9 +78,6 @@
     <ClInclude Include="zpUIResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpAnimatedMeshResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpDeferredRenderingComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -121,6 +118,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpDynamicAtlas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpSkeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

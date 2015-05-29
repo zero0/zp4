@@ -92,7 +92,7 @@
     <ClInclude Include="zpMesh.h" />
     <ClInclude Include="zpRenderingPipeline.h" />
     <ClInclude Include="zpUIManager.h" />
-    <ClInclude Include="zpAnimatedMeshResource.h" />
+    <ClInclude Include="zpSkeleton.h" />
     <ClInclude Include="zpBufferData.h" />
     <ClInclude Include="zpDeferredRenderingComponent.h" />
     <ClInclude Include="zpDepthStencilBuffer.h" />

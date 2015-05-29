@@ -126,12 +126,18 @@ void BaseMeshCompiler::compileSkeletonToFile()
 
 		ZP_ALIGN16 zp_float matrix[16];
 		zpDataBuffer dataBuffer;
+		zpDataBuffer indexBuffer;
+		zpDataBuffer weightBuffer;
 
 		// store bone names
 		for( zp_int i = 0, imax = m_skeleton.boneNames.size(); i < imax; ++i )
 		{
 			boneNames[ i ] = zpJson( m_skeleton.boneNames[ i ] );
 		}
+
+		// store indexes
+		zp_int indexStart = 0;
+		zp_int weightStart = 0;
 
 		// store bone data
 		for( zp_int i = 0, imax = m_skeleton.bones.size(); i < imax; ++i )
@@ -147,22 +153,37 @@ void BaseMeshCompiler::compileSkeletonToFile()
 			b[ "Parent" ] = zpJson( meshBone.parent );
 			b[ "BindPose" ] = zpJson( dataBuffer );
 
-			if( !meshBone.controlPointIndicies.isEmpty() )
+			if( meshBone.controlPointIndicies.isEmpty() )
 			{
-				dataBuffer.reset();
-				dataBuffer.writeBulk( meshBone.controlPointIndicies.begin(), meshBone.controlPointIndicies.size() );
+				b[ "IndexStart" ] = zpJson( 0 );
+				b[ "IndexCount" ] = zpJson( 0 );
+			}
+			else
+			{
+				b[ "IndexStart" ] = zpJson( indexStart );
+				b[ "IndexCount" ] = zpJson( meshBone.controlPointIndicies.size() );
 
-				b[ "Indices" ] = zpJson( dataBuffer );
+				indexBuffer.writeBulk( meshBone.controlPointIndicies.begin(), meshBone.controlPointIndicies.size() );
+				indexStart += meshBone.controlPointIndicies.size();
 			}
 
-			if( !meshBone.controlPointWeights.isEmpty() )
+			if( meshBone.controlPointWeights.isEmpty() )
 			{
-				dataBuffer.reset();
-				dataBuffer.writeBulk( meshBone.controlPointWeights.begin(), meshBone.controlPointWeights.size() );
+				b[ "WeightStart" ] = zpJson( 0 );
+				b[ "WeightCount" ] = zpJson( 0 );
+			}
+			else
+			{
+				b[ "WeightStart" ] = zpJson( weightStart );
+				b[ "WeightCount" ] = zpJson( meshBone.controlPointWeights.size() );
 
-				b[ "Weights" ] = zpJson( dataBuffer );
+				weightBuffer.writeBulk( meshBone.controlPointWeights.begin(), meshBone.controlPointWeights.size() );
+				weightStart += meshBone.controlPointWeights.size();
 			}
 		}
+
+		data[ "Indices" ] = zpJson( indexBuffer );
+		data[ "Weights" ] = zpJson( indexBuffer );
 
 #if MESH_COMPILER_OUTPUT_JSON
 		zpString jsonFileName( skeletonOutputFile );
