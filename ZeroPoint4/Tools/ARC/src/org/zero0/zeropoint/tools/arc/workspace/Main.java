@@ -1,8 +1,12 @@
 package org.zero0.zeropoint.tools.arc.workspace;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import jdbm.RecordManager;
+import jdbm.RecordManagerFactory;
 import net.winstone.Server;
 import net.winstone.boot.BootStrap;
 
@@ -51,6 +55,18 @@ public final class Main
 
 		new Workspace( shell );
 		
+		Properties props = new Properties();
+		RecordManager recman = null;
+		try
+		{
+			recman = RecordManagerFactory.createRecordManager( "db/fruits", props );
+		}
+		catch( IOException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
 		shell.open();
 		while( !shell.isDisposed() )
 		{
@@ -60,6 +76,16 @@ public final class Main
 			}
 		}
 
+		try
+		{
+			if( recman != null ) recman.close();
+		}
+		catch( IOException e )
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		s.shutdown();
 
 		System.setProperty( "java.endorsed.dirs", endorsed );

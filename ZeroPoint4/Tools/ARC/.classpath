@@ -21,6 +21,7 @@
 	<classpathentry kind="lib" path="lib/jasper-compiler.jar"/>
 	<classpathentry kind="lib" path="lib/jasper-runtime.jar"/>
 	<classpathentry kind="lib" path="lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Justin/Documents/My Projects/zp4/ZeroPoint4/Tools/ARC/lib/jdbm-1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_21"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
