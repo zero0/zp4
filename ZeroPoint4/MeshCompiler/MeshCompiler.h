@@ -63,10 +63,17 @@ struct MeshSkeleton
 	zpArrayList< MeshSkeletonBone > bones;
 };
 
+struct AnimationKeyFrame
+{
+	zpVector4f position;
+	zpQuaternion4f rotataion;
+	zpVector4f scale;
+};
+
 struct MeshBoneAnimation
 {
 	zpString boneName;
-	zpArrayList< zpMatrix4f > keyFrames;
+	zpArrayList< AnimationKeyFrame > keyFrames;
 };
 
 struct MeshAnimationClip

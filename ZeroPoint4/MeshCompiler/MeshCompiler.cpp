@@ -221,7 +221,7 @@ void BaseMeshCompiler::compileAnimationToFile()
 		zpString animationOutputFile = m_outputFile.substring( 0, idx );
 		animationOutputFile.append( "animb" );
 
-		ZP_ALIGN16 zp_float matrix[16];
+		ZP_ALIGN16 zp_float matrix[12];
 		zpDataBuffer dataBuffer;
 
 		zpJson data;
@@ -233,22 +233,39 @@ void BaseMeshCompiler::compileAnimationToFile()
 			
 			jsonClip[ "FrameRate" ] = zpJson( clip.frameRate );
 
+			zp_uint maxNumFrames = 0;
+
 			zpJson& keyFrames = jsonClip[ "KeyFrames" ];
+			zpJson& boneNames = jsonClip[ "BoneNames" ];
+			zpJson& numFrames = jsonClip[ "NumFrames" ];
 			for( zp_uint b = 0; b < clip.boneFrames.size(); ++b )
 			{
 				MeshBoneAnimation& boneAnim = clip.boneFrames[ b ];
 
-				dataBuffer.reset();
-				dataBuffer.reserve( boneAnim.keyFrames.size() * sizeof( matrix ) );
+				zp_uint numKeyFrames = boneAnim.keyFrames.size();
 
-				for( zp_uint k = 0; k < boneAnim.keyFrames.size(); ++k )
+				maxNumFrames = ZP_MAX( maxNumFrames, numKeyFrames );
+
+				dataBuffer.reset();
+				dataBuffer.reserve( numKeyFrames * sizeof( matrix ) );
+
+				for( zp_uint k = 0; k < numKeyFrames; ++k )
 				{
-					zpMath::MatrixStoreOpenGL( boneAnim.keyFrames[ k ], matrix );
-					dataBuffer.writeBulk( matrix, 16 );
+					AnimationKeyFrame& kf = boneAnim.keyFrames[ k ];
+
+					zpMath::Vector4Store4( kf.position, matrix + 0 );
+					zpMath::QuaternionStore4( kf.rotataion, matrix + 4 );
+					zpMath::Vector4Store4( kf.scale, matrix + 8 );
+
+					dataBuffer.writeBulk( matrix, 12 );
 				}
 
-				keyFrames[ boneAnim.boneName ] = zpJson( dataBuffer );
+				keyFrames[ b ] = zpJson( dataBuffer );
+				boneNames[ b ] = zpJson( boneAnim.boneName );
+				numFrames[ b ] = zpJson( numKeyFrames );
 			}
+
+			jsonClip[ "MaxFrames" ] = zpJson( maxNumFrames );
 		}
 
 #if MESH_COMPILER_OUTPUT_JSON

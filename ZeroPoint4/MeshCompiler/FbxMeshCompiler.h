@@ -44,10 +44,17 @@ struct zpFbxMeshDataPart
 	zpArrayList< zpColor4f > colors;
 };
 
+struct zpFbxAnimationKeyFrame
+{
+	zpVector4f position;
+	zpQuaternion4f rotataion;
+	zpVector4f scale;
+};
+
 struct zpFbxAnimationKeyFrames
 {
 	zpString boneName;
-	zpArrayList< zpMatrix4f > frames;
+	zpArrayList< zpFbxAnimationKeyFrame > frames;
 };
 
 struct zpFbxAnimation

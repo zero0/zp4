@@ -30,15 +30,14 @@ void _getFbxAnimationSkeletonData( zpFbxAnimationKeyFrames* keyFrames, FbxAnimEv
 				FbxAMatrix globalInvParentMatrix = globalParentMatrix.Inverse();
 				FbxAMatrix localMatrix = globalInvParentMatrix * globalMatrix;
 
-				zp_double* matData = (zp_double*)localMatrix;
+				FbxVector4 trans = localMatrix.GetT();
+				FbxQuaternion rot = localMatrix.GetQ();
+				FbxVector4 scale = localMatrix.GetS();
 
-				for( zp_int i = 0; i < 16; ++i )
-				{
-					frameData[i] = (zp_float)matData[i];
-				}
-
-				zpMatrix4f mat = zpMath::MatrixLoadOpenGL( frameData );
-				keyFrames->frames.pushBackEmpty() = mat;
+				zpFbxAnimationKeyFrame& keyFrame = keyFrames->frames.pushBackEmpty();
+				keyFrame.position = zpMath::Vector4( trans[ 0 ], trans[ 1 ], trans[ 2 ], 1.f );
+				keyFrame.rotataion = zpMath::Quaternion( rot[ 0 ], rot[ 1 ], rot[ 2 ], rot[ 3 ] );
+				keyFrame.scale = zpMath::Vector4( scale[ 0 ], scale[ 1 ], scale[ 2 ], 0.f );
 
 				t += fps;
 			}
@@ -833,11 +832,23 @@ VertexFormat _fbxToMeshData( const zpFbxMeshData* data, MeshData* mesh, MeshSkel
 			meshAnim.frameRate = anim.frameRate;
 			meshAnim.boneFrames.reserve( anim.boneFrames.size() );
 
-			for( zp_int f = 0; f < anim.boneFrames.size(); ++f )
+			for( zp_uint f = 0; f < anim.boneFrames.size(); ++f )
 			{
 				MeshBoneAnimation& meshBoneAnim = meshAnim.boneFrames.pushBackEmpty();
 				meshBoneAnim.boneName = anim.boneFrames[ f ].boneName;
-				meshBoneAnim.keyFrames = anim.boneFrames[ f ].frames;
+
+				const zpArrayList< zpFbxAnimationKeyFrame >& fbxFrames = anim.boneFrames[ f ].frames;
+				meshBoneAnim.keyFrames.reserve( fbxFrames.size() );
+
+				for( zp_uint k = 0; k < fbxFrames.size(); ++k )
+				{
+					AnimationKeyFrame& boneKeyFrame = meshBoneAnim.keyFrames.pushBackEmpty();
+					const zpFbxAnimationKeyFrame& fbxKeyFrame = fbxFrames[ k ];
+
+					boneKeyFrame.position = fbxKeyFrame.position;
+					boneKeyFrame.rotataion = fbxKeyFrame.rotataion;
+					boneKeyFrame.scale = fbxKeyFrame.scale;
+				}
 			}
 		}
 	}
