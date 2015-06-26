@@ -1,0 +1,145 @@
+
+#ifndef ZP_MASTER_CORE_SHADERINC
+#define ZP_MASTER_CORE_SHADERINC
+
+uniform float4 _ExposureIBL;
+
+ZP_CBUFFER_START( SH, 4 )
+	float3 _SH0;
+	float3 _SH1;
+	float3 _SH2;
+	float3 _SH3;
+	float3 _SH4;
+	float3 _SH5;
+	float3 _SH6;
+	float3 _SH7;
+	float3 _SH8;
+ZP_CBUFFER_END
+
+inline float3 schlickFresnel( in float4 N, in float4 H, in float specInt, in float fresnel )
+{
+	float4 factor;
+	factor.x = saturate( dot( N.xyz, H.xyz ) );
+	factor.xy = saturate( ( factor.xx * float2( -1, -fresnel ) ) + float2( 1, 1.25 ) );
+	
+	factor.zw = factor.xy * factor.xy;
+	factor.zw *- factor.zw;
+	
+	factor.xy *= factor.zw;
+	factor.yz = float2( specIn * factor.y, specInt );
+	
+	return lerp( sqrt( factor.xyz ), factor.xyz, 1 );
+};
+
+inline float glossLOD( in float glossMap, in float shininess )
+{
+	glossMap = 1.0 - glossMap;
+	glossMap = 1.0 - ( glossMap * glossMap );
+	return 7.0 + glossMap - ( shininess * glossMap );
+}
+
+inline float4 glossSpecCubeLookup( in float3 worldRefl, in float lod )
+{
+	#ifdef ZP_MASTER_SPECULAR_IBL_2D
+		// TODO: convert world refl to UV coordinates
+		float4 spec = tex2DLod( _SpecIBL, float2( 0, 0 ), lod );
+	#else
+		float4 spec = texCUBELod( _SpecIBL, worldRefl, lod );
+	#endif
+	
+	return spec;
+}
+
+v2f_master MasterVert( vs_input_master v )
+{
+	ZP_INITIALIZE( v2f_master, o );
+	
+    o.vertex = v.vertex;
+    o.vertex = mul( o.vertex, world );
+    o.vertex = mul( o.vertex, viewProjection );
+	
+	o.texcoord = TexCoordOffset( v.texcoord, _MainTex );
+	
+	float4 worldP = mul( v.vertex, world );
+	float3 worldN = mul( v.normal.xyz, (float3x3)world );
+	worldN = normalize( worldN );
+	
+	o.normal = v.normal;
+	
+	o.worldNormal = float4( worldN, 0 );
+	o.worldPosition = worldP;
+	
+	o.lighting = float( 0, 0, 0, 1 );
+	o.lighting.rgb += _AmbientLight.rgb;
+	
+	#ifdef ZP_MASTER_SPECULAR_IBL
+		float4 worldE = WorldSpaceViewDir( v.vertex );
+		float4 worldR = reflect( -worldE, worldN );
+		
+		o.worldRefl = worldR;
+	#endif
+	
+	#ifdef ZP_MASTER_VERTEX_SH
+		float3 diffuseIBL = SHLookup( worldN );
+		o.lighting.rgb += diffuseIBL;
+	#endif
+	
+	#ifdef ZP_MASTER_VERTEX_COLOR
+		o.color = v.color;
+	#endif
+	
+	#if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
+		float3 viewDirFromLight = cameraLookTo;
+		#ifdef ZP_MASTER_APPROX_VIEW
+			o.viewDir = normalize( viewDirFromLight );
+		#else
+			o.viewDir = viewDirFromLight;
+		#endif
+	#endif
+	
+	#ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
+		float4 diffIBL = SHLookup( worldN );
+		o.vertexIBL = diffIBL;
+	#endif
+	
+	return o;
+};
+
+fixed4 MasterFrag( v2f_master in ) : SV_TARGET
+{
+	ZP_INITIALIZE( MasterInput, surfIN );
+	
+	surfIN.worldPosition = in.worldPosition;
+	surfIN.worldNormal = in.worldNormal;
+	
+	#ifdef ZP_MASTER_SPECULAR_IBL
+		#ifdef ZP_MASTER_APPROX_VIEW
+			surfIN.viewDir = in.viewDir;
+		#else
+			surfIN.viewDir = float4( normalize( in.viewDir.xyz ), 0 );
+		#endif
+	#endif
+	
+	ZP_INITIALIZE( MasterOutput, o ):
+	
+	#ifdef ZP_MASTER_NORMAL_MAP
+		o.normal = in.normal;
+	#endif
+	
+	MasterSurface( surfIN, o );
+	
+	float atten = 1;
+	fixed4 c = fixed4( 0, 0, 0, 0 );
+	
+	#if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
+		float4 lightDir = in.lightDir;
+	#else
+		float4 lightDir = _WorldLightDir;
+	#endif
+	
+	c = LightingModelMaster( o, lightDir, surfIN.viewDir, atten );
+	
+	return c;
+};
+
+#endif

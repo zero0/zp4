@@ -1,0 +1,92 @@
+
+#ifndef ZP_MASTER_INPUT_SHADERINC
+#define ZP_MASTER_INPUT_SHADERINC
+
+ZP_SAMPLER_2D( _MainTex );
+uniform float4 _Color;
+
+#if ZP_MASTER_SPECULAR_IBL
+ZP_SAMPLER_2D( _SpecTex );
+
+uniform float _SpecInt;
+uniform float _Shininess;
+uniform float _Fresnel;
+
+#if ZP_MASTER_SPECULAR_IBL_2D
+ZP_SAMPLER_2D( _SpecIBL );
+#else // !ZP_MASTER_SPEC_IB_2D
+ZP_SAMPLER_CUBE( _SpecIBL )
+#endif // ZP_MASTER_SPECULAR_IBL_2D
+
+#endif
+
+
+#if ZP_MASTER_NORMAL_MAP
+ZP_SAMPLER_2D( _BumpMap );
+#endif
+
+#if ZP_MASTER_ALPHA_CLIP
+uniform float _Cutoff;
+#endif
+
+#if ZP_MASTER_GLOW
+ZP_SAMPLER_2D( _Illum );
+uniform float4 _GlowColor;
+uniform float _GlowStrength;
+#endif
+
+struct MasterInput
+{
+	#ifdef ZP_MASTER_SPECULAR_IBL
+	float4 viewDir;
+	#endif
+	
+	float4 worldNormal;
+	float4 worldPosition;
+	
+	#ifdef ZP_MASTER_VERTEX_COLOR
+	float4 color;
+	#endif
+	
+	float2 texcoord;
+};
+
+struct MasterOutput
+{
+	float4 albedo;
+	float4 normal;
+	float4 emission;
+	float4 specular;
+};
+
+struct vs_input_master
+{
+	float4 vertex : POSITION;
+	float4 normal : NORMAL;
+	float4 color : COLOR;
+	float2 texcoord : TEXCOORD0;
+};
+
+struct v2f_master
+{
+	float4 vertex : SV_POSITION;
+	float2 texcoord : TEXCOORD0;
+	float3 normal : NORMAL;
+	float4 lighting : TEXCOORD1;
+	float3 worldNormal : TEXCOORD2;
+	float4 worldPosition : TEXCOORD3;
+#if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
+	float3 viewDir : TEXCOORD4;
+#endif
+#ifdef ZP_MASTER_SPECULAR_IBL
+	float3 worldRefl : TEXCOORD5;
+#endif
+#ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
+	float4 vertexIBL : TEXCOORD6;
+#endif
+#ifdef ZP_MASTER_VERTEX_COLOR
+	float4 color : COLOR;
+#endif
+};
+
+#endif
