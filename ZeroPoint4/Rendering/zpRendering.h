@@ -166,33 +166,19 @@ enum zpDisplayFormat : zp_uint
 
 enum zpVertexFormat
 {
+	zpVertexFormat_None,
+
 	ZP_VERTEX_FORMAT_VERTEX_COLOR,
 	ZP_VERTEX_FORMAT_VERTEX_UV,
 	ZP_VERTEX_FORMAT_VERTEX_COLOR_UV,
 	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV,
 	ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2,
+	ZP_VERTEX_FORMAT_VERTEX_NORMAL_COLOR_UV,
 
 	zpVertexFormat_Count,
 };
-enum zpVertexFormatDesc : zp_uint
-{
-	ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR =		ZP_MAKE_UINT( 'V', 'C', '\0', '\0' ),
-	ZP_VERTEX_FORMAT_DESC_VERTEX_UV =			ZP_MAKE_UINT( 'V', 'U', '\0', '\0' ),
-	ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR_UV =		ZP_MAKE_UINT( 'V', 'C', 'U', '\0' ),
-	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV =	ZP_MAKE_UINT( 'V', 'N', 'U', '\0' ),
-	ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2 =	ZP_MAKE_UINT( 'V', 'N', 'W', '\0' ),
-};
-enum zpVertexFormatStride : zp_uint
-{
-	ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR =		sizeof( zpVector4f ) + sizeof( zpColor4f ),
-	ZP_VERTEX_FORMAT_STRIDE_VERTEX_UV =			sizeof( zpVector4f ) + sizeof( zpVector2f ),
-	ZP_VERTEX_FORMAT_STRIDE_VERTEX_COLOR_UV =	sizeof( zpVector4f ) + sizeof( zpColor4f )  + sizeof( zpVector2f ),
-	ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV =	sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ),
-	ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV2 =	sizeof( zpVector4f ) + sizeof( zpVector4f ) + sizeof( zpVector2f ) + sizeof( zpVector2f ),
-};
 
-zpVertexFormatDesc VertexFormatDescs[];
-zpVertexFormatStride VertexFormatStrides[];
+const zp_char* VertexFormatShortNames[];
 
 enum zpScreenMode
 {
@@ -590,8 +576,8 @@ struct zpRenderingCommand
 	const zpBufferImpl* vertexBuffer;
 	const zpBufferImpl* indexBuffer;
 	const zpMaterialResource* material;
+	zp_hash vertexFormatHash;
 	zpVertexFormat vertexFormat;
-	zp_uint vertexStride;
 	zp_uint vertexCount;
 	zp_uint indexCount;
 	zp_uint vertexOffset;
@@ -624,6 +610,8 @@ struct zpRenderingCommand
 #include "zpDepthStencilState.h"
 #include "zpBlendState.h"
 
+#include "zpAnimation.h"
+#include "zpSkeleton.h"
 #include "zpMaterial.h"
 #include "zpMesh.h"
 #include "zpFont.h"

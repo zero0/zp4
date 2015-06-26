@@ -83,6 +83,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="zpAnimation.h" />
+    <ClInclude Include="zpAnimationEngine.h" />
     <ClInclude Include="zpAtlas.h" />
     <ClInclude Include="zpBlendState.h" />
     <ClInclude Include="zpDepthStencilState.h" />
@@ -121,6 +123,7 @@
     <ClInclude Include="zpViewport.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="zpAnimation.cpp" />
     <ClCompile Include="zpAtlas.cpp" />
     <ClCompile Include="zpBlendState.cpp" />
     <ClCompile Include="zpBuffer.cpp" />
@@ -148,6 +151,7 @@
     <ClCompile Include="zpRenderingResourceCreator.cpp" />
     <ClCompile Include="zpSamplerState.cpp" />
     <ClCompile Include="zpShader.cpp" />
+    <ClCompile Include="zpSkeleton.cpp" />
     <ClCompile Include="zpTextRenderingComponent.cpp" />
     <ClCompile Include="zpTexture.cpp" />
     <ClCompile Include="zpUIManager.cpp" />

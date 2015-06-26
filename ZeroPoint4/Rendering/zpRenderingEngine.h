@@ -59,6 +59,8 @@ public:
 	zp_bool loadShader( zpShader& shader, const zpBison::Value& shaderfile );
 	zp_bool destroyShader( zpShader& shader );
 
+	zp_bool getInputLayoutFormatAndStride( const zp_char* format, zp_hash& outHash, zp_uint& outStride ) const;
+
 	zpRenderingEngineImpl* getRenderingEngineImpl() const { return m_renderingEngine; }
 
 	const zpVector2i& getScreenSize() const { return m_screenSize; }

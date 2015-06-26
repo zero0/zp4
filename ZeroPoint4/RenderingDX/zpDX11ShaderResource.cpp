@@ -19,7 +19,7 @@ zpShaderImpl::zpShaderImpl()
 	, m_pixelShader( ZP_NULL )
 	, m_geometryShader( ZP_NULL )
 	, m_computeShader( ZP_NULL )
-	, m_vertexLayout( ZP_VERTEX_FORMAT_DESC_VERTEX_COLOR )
+	, m_vertexLayout( 0 )
 {}
 zpShaderImpl::~zpShaderImpl()
 {
@@ -36,6 +36,7 @@ void zpShaderImpl::unload()
 	ZP_SAFE_RELEASE( m_pixelShader );
 	ZP_SAFE_RELEASE( m_geometryShader );
 	ZP_SAFE_RELEASE( m_computeShader );
+	m_vertexLayout = 0;
 }
 
 #if 0

@@ -181,7 +181,7 @@ void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, cons
 		{
 			ID3D11Buffer* buffer = command->vertexBuffer->m_buffer;
 			ID3D11Buffer* index = command->indexBuffer->m_buffer;
-			ID3D11InputLayout* inputLayout = engine->getInputLayout( command->vertexFormat );
+			const zpDynamicInputLayout* inputLayout = engine->getDynamicInputLayout( command->vertexFormatHash );
 
 			const zpMaterial* mat = command->material->getData();
 			if( m_prevMaterial != mat )
@@ -194,8 +194,8 @@ void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, cons
 			zp_uint offset = command->vertexOffset;
 			m_context->IASetPrimitiveTopology( __zpToDX( command->topology ) );
 			m_context->IASetIndexBuffer( index, __zpToDX( command->indexBuffer->getFormat() ), command->indexOffset );
-			m_context->IASetVertexBuffers( 0, 1, &buffer, &command->vertexStride, &offset );
-			m_context->IASetInputLayout( inputLayout );
+			m_context->IASetVertexBuffers( 0, 1, &buffer, &inputLayout->stride, &offset );
+			m_context->IASetInputLayout( inputLayout->layout );
 
 			m_context->DrawIndexed( command->indexCount, 0, 0 );
 		}

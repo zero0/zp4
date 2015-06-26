@@ -6,11 +6,11 @@ class zpSkeletonContentManager;
 
 struct zpSkeletonBone
 {
+	zp_int parent;
 	zp_int indexStart;
 	zp_int indexCount;
 	zp_int weightStart;
 	zp_int weightCount;
-	zp_int parent;
 	zpMatrix4f bindPose;
 };
 
@@ -28,7 +28,7 @@ private:
 	zp_bool load( const zp_char* filename );
 	void unload();
 
-	friend class zpMeshContentManager;
+	friend class zpSkeletonContentManager;
 };
 
 class zpSkeletonResourceInstance : public zpResourceInstance< zpSkeletonResource >

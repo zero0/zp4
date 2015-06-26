@@ -5,10 +5,7 @@ zpMeshRendererComponent::zpMeshRendererComponent( zpObject* obj, const zpBison::
 	, m_layer( ZP_RENDERING_LAYER_DEFAULT )
 {
 	zp_bool ok = false;
-	const zp_char* meshFile = def[ "Mesh" ].asCString();
-	ok = getApplication()->getRenderPipeline()->getMeshContentManager()->getResource( meshFile, m_mesh );
-	ZP_ASSERT_WARN( ok, "Unable to load mesh %s", meshFile );
-
+	
 	const zpBison::Value& layer = def[ "Layer" ];
 	if( layer.isInt() )
 	{
@@ -22,6 +19,11 @@ zpMeshRendererComponent::zpMeshRendererComponent( zpObject* obj, const zpBison::
 		ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_material );
 		ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
 	}
+	
+	const zp_char* meshFile = def[ "Mesh" ].asCString();
+	ok = getApplication()->getRenderPipeline()->getMeshContentManager()->getResource( meshFile, m_mesh );
+	ZP_ASSERT_WARN( ok, "Unable to load mesh %s", meshFile );
+
 	//else if( material.isArray() && material.isEmpty() )
 	//{
 	//	material.foreachArray( [ this, &ok ]( zpBison::Value& mat ) {

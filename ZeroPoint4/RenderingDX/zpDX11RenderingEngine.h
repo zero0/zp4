@@ -11,6 +11,13 @@ struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
 
+struct zpDynamicInputLayout
+{
+	zp_hash hash;
+	zp_uint stride;
+	ID3D11InputLayout* layout;
+};
+
 class zpRenderingEngineImpl
 {
 public:
@@ -43,13 +50,15 @@ public:
 
 	void present( zp_bool vsync );
 
-	ID3D11InputLayout* getInputLayout( zpVertexFormat format ) const;
+	zp_bool getInputLayoutFormatAndStride( const zp_char* format, zp_hash& outHash, zp_uint& outStride ) const;
+
+	const zpDynamicInputLayout* getDynamicInputLayout( zp_hash format ) const;
 
 	zp_bool performScreenshot();
 	zp_bool takeScreenshot( zp_uint width, zp_uint height, zpDataBuffer& screenBuffer );
 
 private:
-	void createVertexLayout( zpVertexFormatDesc format, const void* data, zp_uint size );
+	zp_hash createDynamicVertexLayout( const zp_char* format, zp_uint formatLength, const void* data, zp_uint size );
 
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_d3dDevice;
@@ -58,8 +67,8 @@ private:
 
 	zpRenderingContextImpl m_immidiateContext;
 	zpRenderingEngineType m_actualRenderingEngineType;
-
-	zpFixedArrayList< ID3D11InputLayout*, zpVertexFormat_Count > m_inputLayouts;
+	
+	zpArrayList< zpDynamicInputLayout > m_dynamicInputLayouts;
 
 	zpFixedArrayList< zpSamplerStateImpl, ZP_RENDERING_MAX_SAMPLER_STATES > m_samplerStates;
 	zpFixedArrayList< zpRasterStateImpl, ZP_RENDERING_MAX_RASTER_STATES > m_rasterStates;

@@ -183,7 +183,7 @@ void BaseMeshCompiler::compileSkeletonToFile()
 		}
 
 		data[ "Indices" ] = zpJson( indexBuffer );
-		data[ "Weights" ] = zpJson( indexBuffer );
+		data[ "Weights" ] = zpJson( weightBuffer );
 
 #if MESH_COMPILER_OUTPUT_JSON
 		zpString jsonFileName( skeletonOutputFile );

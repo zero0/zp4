@@ -96,7 +96,7 @@ void zpGenerateMesh::Plane( zpArrayList< zpVector4f >& verts, zpArrayList< zpVec
 
 void zpGenerateMesh::Rebuild( zpRenderingEngine* engine, zpMesh* mesh, zpArrayList< zpVector4f >& verts, zpArrayList< zpVector4f >& normals, zpArrayList< zpVector2f >& uvs, zpArrayList< zp_short >& triangles )
 {
-	zpDataBuffer vertexData( ZP_VERTEX_FORMAT_STRIDE_VERTEX_NORMAL_UV * verts.size() );
+	zpDataBuffer vertexData( 64 * verts.size() );
 	zpDataBuffer indexData( sizeof( zp_short ) * triangles.size() );
 
 	zpBoundingAABB box;

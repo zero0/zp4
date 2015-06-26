@@ -153,6 +153,7 @@ void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue que
 	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->getBufferImpl();
 	m_currentCommnad->indexBuffer = m_currentIndexBuffer->getBufferImpl();
 	m_currentCommnad->material = material;
+	m_currentCommnad->vertexFormatHash = zp_fnv1_32_string( VertexFormatShortNames[ vertexFormat ], 0 );
 	m_currentCommnad->vertexFormat = vertexFormat;
 	m_currentCommnad->vertexCount = 0;
 	m_currentCommnad->indexCount = 0;
@@ -160,8 +161,6 @@ void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue que
 	m_currentCommnad->indexOffset = 0;
 	m_currentCommnad->matrix = zpMath::MatrixIdentity();
 	m_currentCommnad->boundingBox.reset();
-
-	m_currentCommnad->vertexStride = VertexFormatStrides[ vertexFormat ];
 }
 
 void zpRenderingContext::setBoundingBox( const zpBoundingAABB& bounding )
@@ -238,11 +237,12 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& nor
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV, "" );
 
-	ZP_ALIGN16 zp_float v[ 4 ];
+	ZP_ALIGN16 zp_float v[ 8 ];
 	zpMath::Vector4Store4( pos, v + 0 );
+	zpMath::Vector4Store4( normal, v + 4 );
 
 	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
-	m_scratchVertexBuffer.write( normal );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( uv0 );
 	m_currentCommnad->vertexCount += 1;
 
@@ -253,13 +253,31 @@ void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& nor
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2, "" );
 
-	ZP_ALIGN16 zp_float v[ 4 ];
+	ZP_ALIGN16 zp_float v[ 8 ];
 	zpMath::Vector4Store4( pos, v + 0 );
+	zpMath::Vector4Store4( normal, v + 4 );
 
 	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
-	m_scratchVertexBuffer.write( normal );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
 	m_scratchVertexBuffer.write( uv0 );
 	m_scratchVertexBuffer.write( uv1 );
+	m_currentCommnad->vertexCount += 1;
+
+	m_currentCommnad->boundingBox.add( pos );
+}
+void zpRenderingContext::addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpColor4f& color, const zpVector2f& uv )
+{
+	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
+	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_NORMAL_COLOR_UV, "" );
+
+	ZP_ALIGN16 zp_float v[ 8 ];
+	zpMath::Vector4Store4( pos, v + 0 );
+	zpMath::Vector4Store4( normal, v + 4 );
+
+	m_scratchVertexBuffer.writeBulk( v + 0, 4 );
+	m_scratchVertexBuffer.writeBulk( v + 4, 4 );
+	m_scratchVertexBuffer.write( color );
+	m_scratchVertexBuffer.write( uv );
 	m_currentCommnad->vertexCount += 1;
 
 	m_currentCommnad->boundingBox.add( pos );
@@ -555,7 +573,7 @@ void zpRenderingContext::addQuad(
 	const zpVector4f& pos3, const zpVector4f& normal3, const zpVector2f& uv3 )
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
-	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV, "" );
+	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV, "" );
 
 	ZP_ALIGN16 zp_float v[ 16 ];
 	zpMath::Vector4Store4( pos0, v + 0 );
@@ -600,7 +618,7 @@ void zpRenderingContext::addQuad(
 
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
-	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_UV2, "" );
+	ZP_ASSERT( m_currentCommnad->vertexFormat == ZP_VERTEX_FORMAT_VERTEX_NORMAL_UV2, "" );
 
 	ZP_ALIGN16 zp_float v[ 16 ];
 	zpMath::Vector4Store4( pos0, v + 0 );
@@ -677,7 +695,8 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.vertexBuffer = m->m_vertex.getBufferImpl();
 		command.indexBuffer = m->m_index.getBufferImpl();
 		command.material = material->getResource();
-		command.vertexFormat = m->m_format;
+		command.vertexFormat = zpVertexFormat_None;
+		command.vertexFormatHash = m->m_format;
 		command.vertexCount = b->m_vertexCount;
 		command.indexCount = b->m_indexCount;
 		command.vertexOffset = b->m_vertexOffset;
@@ -687,8 +706,6 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 
 		command.sortKey = command.material->getData()->materialId;
 		command.sortBias = command.material->getData()->sortBias;
-
-		command.vertexStride = VertexFormatStrides[ command.vertexFormat ];
 
 		command.boundingBox.setCenter( matrix.m_m4 );
 	}

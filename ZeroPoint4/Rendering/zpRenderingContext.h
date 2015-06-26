@@ -54,6 +54,7 @@ public:
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0 );
 	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpVector2f& uv0, const zpVector2f& uv1 );
+	void addVertex( const zpVector4f& pos, const zpVector4f& normal, const zpColor4f& color, const zpVector2f& uv );
 
 	void addLineIndex( zp_ushort index0, zp_ushort index1 );
 	void addTriangleIndex( zp_ushort index0, zp_ushort index1, zp_ushort index2 );
@@ -79,6 +80,14 @@ public:
 		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv00, const zpVector2f& uv10,
 		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv01, const zpVector2f& uv11,
 		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv02, const zpVector2f& uv12 );
+	void addTriangle( 
+		const zpVector4f& pos0, const zpVector4f& normal0, const zpVector2f& uv0, 
+		const zpVector4f& pos1, const zpVector4f& normal1, const zpVector2f& uv1, 
+		const zpVector4f& pos2, const zpVector4f& normal2, const zpVector2f& uv2, const zpColor4f& color );
+	void addTriangle( 
+		const zpVector4f& pos0, const zpVector4f& normal0, const zpColor4f& color0, const zpVector2f& uv0, 
+		const zpVector4f& pos1, const zpVector4f& normal1, const zpColor4f& color1, const zpVector2f& uv1, 
+		const zpVector4f& pos2, const zpVector4f& normal2, const zpColor4f& color2, const zpVector2f& uv2 );
 
 	void addQuad( const zpVector4f& pos0, const zpVector4f& pos1, const zpVector4f& pos2, const zpVector4f& pos3, const zpColor4f& color );
 	void addQuad( 

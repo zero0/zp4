@@ -14,11 +14,6 @@ void zpRenderingEngineImpl::initialize()
 {
 	HRESULT hr;
 
-	while( m_inputLayouts.size() < zpVertexFormat_Count )
-	{
-		m_inputLayouts.pushBack( ZP_NULL );
-	}
-
 	// cached textures
 	m_textures.resize( ZP_RENDERING_MAX_TEXTURES );
 	zpTextureImpl* tb = m_textures.begin();
@@ -214,10 +209,12 @@ void zpRenderingEngineImpl::create( zp_handle hWindow, zp_uint width, zp_uint he
 }
 void zpRenderingEngineImpl::destroy()
 {
-	m_inputLayouts.foreach( []( ID3D11InputLayout* layout )
+	m_dynamicInputLayouts.foreach( []( zpDynamicInputLayout& layout )
 	{
-		ZP_SAFE_RELEASE( layout );
+		ZP_SAFE_RELEASE( layout.layout );
 	} );
+
+	m_dynamicInputLayouts.clear();
 
 	m_samplerStates.clear();
 	m_rasterStates.clear();
@@ -233,8 +230,7 @@ void zpRenderingEngineImpl::shutdown()
 	ZP_ASSERT( m_usedTextures.isEmpty(), "Texture still in use" );
 	ZP_ASSERT( m_usedBuffers.isEmpty(), "Buffer still in use" );
 	ZP_ASSERT( m_usedShaders.isEmpty(), "Shader still in use" );
-
-	m_inputLayouts.clear();
+	ZP_ASSERT( m_dynamicInputLayouts.isEmpty(), "Input Layouts still in use" );
 
 	m_textures.clear();
 	m_buffers.clear();
@@ -865,20 +861,9 @@ zp_bool zpRenderingEngineImpl::loadShader( zpShaderImpl* shader, const zpBison::
 		const zp_char* formatStr = format.asCString();
 		const zp_uint formatStrLen = format.size();
 
-		zp_char formatDesc[ 4 ];
-		zp_uint i = 0;
-		for( ; i < formatStrLen; ++i )
-		{
-			formatDesc[ i ] = formatStr[ i ];
-		}
-		for( ; i < 4; ++i )
-		{
-			formatDesc[ i ] = '\0';
-		}
-
-		shader->m_vertexLayout = (zpVertexFormatDesc)ZP_MAKE_UINT( formatDesc[0], formatDesc[1], formatDesc[2], formatDesc[3] );
-
-		createVertexLayout( shader->m_vertexLayout, encodedShader, encodedLength );
+		// create dynamic input layout
+		zp_hash layoutHash = createDynamicVertexLayout( formatStr, formatStrLen, encodedShader, encodedLength );
+		shader->m_vertexLayout = layoutHash;
 	}
 
 	if( !ps.isNull() )
@@ -971,10 +956,19 @@ void zpRenderingEngineImpl::present( zp_bool vsync )
 {
 	m_swapChain->Present( vsync ? 1 : 0, 0 );
 }
-ID3D11InputLayout* zpRenderingEngineImpl::getInputLayout( zpVertexFormat format ) const
+
+const zpDynamicInputLayout* zpRenderingEngineImpl::getDynamicInputLayout( zp_hash hash ) const
 {
-	return m_inputLayouts[ format ];
+	const zpDynamicInputLayout* dynInput;
+	zp_bool found = m_dynamicInputLayouts.findIf( [ hash ]( const zpDynamicInputLayout& i ) {
+		return i.hash == hash;
+	}, &dynInput );
+
+	ZP_ASSERT( found, "Unable to find input layout with hash %d", hash );
+
+	return dynInput;
 }
+
 
 zp_bool zpRenderingEngineImpl::performScreenshot()
 {
@@ -1009,7 +1003,7 @@ zp_bool zpRenderingEngineImpl::takeScreenshot( zp_uint width, zp_uint height, zp
 	return ok;
 }
 
-
+#if 0
 void zpRenderingEngineImpl::createVertexLayout( zpVertexFormatDesc format, const void* data, zp_uint size )
 {
 	ID3D11InputLayout* inputLayout;
@@ -1111,10 +1105,139 @@ void zpRenderingEngineImpl::createVertexLayout( zpVertexFormatDesc format, const
 		}
 		break;
 
+	case ZP_VERTEX_FORMAT_DESC_VERTEX_NORMAL_COLOR_UV:
+		{
+			if( !m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_COLOR_UV ] )
+			{
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "NORMAL",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
+
+				hr = m_d3dDevice->CreateInputLayout( desc, ZP_ARRAY_LENGTH( desc ), data, size, &inputLayout );
+				ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+				m_inputLayouts[ ZP_VERTEX_FORMAT_VERTEX_NORMAL_COLOR_UV ] = inputLayout;
+			}
+		}
+		break;
+
 	default:
 		ZP_ASSERT( false, "" );
 		break;
 	}
+}
+#endif
+
+zp_bool zpRenderingEngineImpl::getInputLayoutFormatAndStride( const zp_char* format, zp_hash& outHash, zp_uint& outStride ) const
+{
+	zp_hash hash = zp_fnv1_32_string( format, 0 );
+
+	const zpDynamicInputLayout* dynInput;
+	zp_bool found = m_dynamicInputLayouts.findIf( [ hash ]( const zpDynamicInputLayout& i ) {
+		return i.hash == hash;
+	}, &dynInput );
+
+	ZP_ASSERT( found, "Unable to find input layout %s", format );
+	if( found )
+	{
+		outHash = dynInput->hash;
+		outStride = dynInput->stride;
+	}
+	
+	return found;
+}
+
+zp_hash zpRenderingEngineImpl::createDynamicVertexLayout( const zp_char* format, zp_uint formatLength, const void* data, zp_uint size )
+{
+	zp_hash hash = zp_fnv1_32_string( format, 0 );
+	
+	zp_uint index;
+	zp_bool found = m_dynamicInputLayouts.findIndexIf( [ hash ]( const zpDynamicInputLayout& i ) {
+		return i.hash == hash;
+	}, index );
+
+	if( !found )
+	{
+		zpDynamicInputLayout dynInput;
+		dynInput.hash = hash;
+		dynInput.stride = 0;
+		dynInput.layout = ZP_NULL;
+
+		zpArrayList< D3D11_INPUT_ELEMENT_DESC > desc;
+		desc.reserve( formatLength );
+
+		for( zp_uint i = 0; i < formatLength; ++i )
+		{
+			const zp_char c = format[ i ];
+			switch( c )
+			{
+			case 'V':
+				{
+					D3D11_INPUT_ELEMENT_DESC d = { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, dynInput.stride, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+					desc.pushBack( d );
+
+					dynInput.stride += sizeof( zpVector4f );
+				}
+				break;
+
+			case 'N':
+				{
+					D3D11_INPUT_ELEMENT_DESC d = { "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, dynInput.stride, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+					desc.pushBack( d );
+
+					dynInput.stride += sizeof( zpVector4f );
+				}
+				break;
+
+			case 'T':
+				{
+					D3D11_INPUT_ELEMENT_DESC d = { "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, dynInput.stride, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+					desc.pushBack( d );
+
+					dynInput.stride += sizeof( zpVector4f );
+				}
+				break;
+
+			case 'B':
+				{
+					D3D11_INPUT_ELEMENT_DESC d = { "BINORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, dynInput.stride, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+					desc.pushBack( d );
+
+					dynInput.stride += sizeof( zpVector4f );
+				}
+				break;
+
+			case 'C':
+				{
+					D3D11_INPUT_ELEMENT_DESC d = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, dynInput.stride, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+					desc.pushBack( d );
+
+					dynInput.stride += sizeof( zpColor4f );
+				}
+				break;
+
+			case 'U':
+				{
+					D3D11_INPUT_ELEMENT_DESC d = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, dynInput.stride, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+					desc.pushBack( d );
+
+					dynInput.stride += sizeof( zpVector2f );
+				}
+				break;
+			}
+		}
+
+		HRESULT hr = m_d3dDevice->CreateInputLayout( desc.begin(), desc.size(), data, size, &dynInput.layout );
+		ZP_ASSERT( SUCCEEDED( hr ), "" );
+
+		m_dynamicInputLayouts.pushBack( dynInput );
+	}
+
+	return hash;
 }
 
 #if 0

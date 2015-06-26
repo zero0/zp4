@@ -208,6 +208,12 @@ zp_bool zpRenderingEngine::destroyShader( zpShader& shader )
 	return shader.m_shader == ZP_NULL;
 }
 
+zp_bool zpRenderingEngine::getInputLayoutFormatAndStride( const zp_char* format, zp_hash& outHash, zp_uint& outStride ) const
+{
+	zp_bool found = m_renderingEngine->getInputLayoutFormatAndStride( format, outHash, outStride );
+	return found;
+}
+
 zp_bool zpRenderingEngine::performScreenshot()
 {
 	zp_bool ok = m_renderingEngine->performScreenshot();
