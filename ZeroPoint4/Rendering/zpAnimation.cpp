@@ -16,15 +16,43 @@ zp_bool zpAnimationResource::load( const zp_char* filename )
 
 			clip.animationName = key.asCString();
 			clip.frameRate = value[ "FrameRate" ].asFloat();
+			clip.maxFrames = value[ "MaxFrames" ].asInt();
 
 			const zpBison::Value& keyFrames = value[ "KeyFrames" ];
-			clip.boneNames.reserve( keyFrames.size() );
 			clip.keyFrames.reserve( keyFrames.size() );
+			keyFrames.foreachArray( [ &clip ]( const zpBison::Value& k ) {
+				const zp_float* data = (const zp_float*)k.asData();
+				zp_uint count = k.size() / ( sizeof( zpVector4f ) + sizeof( zpQuaternion4f ) + sizeof( zpVector4f ) );
+				zpArrayList< zpMatrix4f >& frames = clip.keyFrames.pushBackEmpty();
 
-			keyFrames.foreachObject( [ &clip ]( const zpBison::Value& boneName, const zpBison::Value& keyFrameList ) {
-				clip.boneNames.pushBackEmpty() = boneName.asCString();
+				for( zp_uint i = 0; i < count; ++i )
+				{
+					zpVector4f animPos = zpMath::Vector4Load4( data );
+					data += sizeof( zpVector4f );
 
+					zpQuaternion4f animRot = zpMath::QuaternionLoad4( data );
+					data += sizeof( zpQuaternion4f );
+					
+					zpVector4f animScale = zpMath::Vector4Load4( data );
+					data += sizeof( zpVector4f );
+
+					zpMatrix4f mat = zpMath::TRS( animPos, animRot, animScale );
+					frames.pushBackEmpty() = mat;
+				}
 			} );
+
+			const zpBison::Value& boneNames = value[ "BoneNames" ];
+			clip.boneNames.reserve( boneNames.size() );
+			boneNames.foreachArray( [ &clip ]( const zpBison::Value& b ) {
+				clip.boneNames.pushBackEmpty() = b.asCString();
+			} );
+
+			const zpBison::Value& numFrames = value[ "NumFrames" ];
+			clip.numFrames.reserve( numFrames.size() );
+			numFrames.foreachArray( [ &clip ]( const zpBison::Value& f ) {
+				clip.numFrames.pushBackEmpty() = f.asInt();
+			} );
+			
 		} );
 	}
 
@@ -32,7 +60,7 @@ zp_bool zpAnimationResource::load( const zp_char* filename )
 }
 void zpAnimationResource::unload()
 {
-
+	m_resource.clips.clear();
 }
 
 

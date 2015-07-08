@@ -459,6 +459,14 @@ zpMeshContentManager* zpRenderingPipeline::getMeshContentManager()
 {
 	return &m_meshContent;
 }
+zpSkeletonContentManager* zpRenderingPipeline::getSkeletonContentManager()
+{
+	return &m_skeletonContent;
+}
+zpAnimationContentManager* zpRenderingPipeline::getAnimationContentManager()
+{
+	return &m_animationContent;
+}
 zpFontContentManager* zpRenderingPipeline::getFontContentManager()
 {
 	return &m_fontContent;

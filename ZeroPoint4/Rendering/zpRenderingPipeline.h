@@ -48,6 +48,8 @@ public:
 	zpShaderContentManager* getShaderContentManager();
 	zpTextureContentManager* getTextureContentManager();
 	zpMeshContentManager* getMeshContentManager();
+	zpSkeletonContentManager* getSkeletonContentManager();
+	zpAnimationContentManager* getAnimationContentManager();
 	zpFontContentManager* getFontContentManager();
 
 	void onFocusGained();
@@ -89,6 +91,8 @@ private:
 	zpShaderContentManager m_shaderContent;
 	zpTextureContentManager m_textureContent;
 	zpMeshContentManager m_meshContent;
+	zpSkeletonContentManager m_skeletonContent;
+	zpAnimationContentManager m_animationContent;
 	zpFontContentManager m_fontContent;
 
 	zpBuffer m_constantBuffers[ zpConstantBufferSlot_Count ];

@@ -612,6 +612,7 @@ struct zpRenderingCommand
 
 #include "zpAnimation.h"
 #include "zpSkeleton.h"
+#include "zpAnimationEngine.h"
 #include "zpMaterial.h"
 #include "zpMesh.h"
 #include "zpFont.h"

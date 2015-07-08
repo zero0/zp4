@@ -68,6 +68,7 @@
   <ItemGroup>
     <ClInclude Include="zpAllComponents.h" />
     <ClInclude Include="zpAllGameManagers.h" />
+    <ClInclude Include="zpAnimatedMeshRendererComponent.h" />
     <ClInclude Include="zpApplication.h" />
     <ClInclude Include="zpCharacterComponent.h" />
     <ClInclude Include="zpPlayerComponent.h" />
@@ -105,6 +106,7 @@
   <ItemGroup>
     <ClCompile Include="zpAllComponents.cpp" />
     <ClCompile Include="zpAllGameManagers.cpp" />
+    <ClCompile Include="zpAnimatedMeshRendererComponent.cpp" />
     <ClCompile Include="zpApplication.cpp" />
     <ClCompile Include="zpPlayerComponent.cpp" />
     <ClCompile Include="zpRectTransformComponent.cpp" />

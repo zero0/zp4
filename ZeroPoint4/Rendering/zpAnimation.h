@@ -6,7 +6,9 @@ struct zpAnimationClip
 {
 	zpString animationName;
 	zp_float frameRate;
+	zp_int maxFrames;
 
+	zpArrayList< zp_int > numFrames;
 	zpArrayList< zpString > boneNames;
 	zpArrayList< zpArrayList< zpMatrix4f > > keyFrames;
 };

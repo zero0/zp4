@@ -27,6 +27,7 @@ class zpAudioListenerComponent;
 class zpLightComponent;
 class zpCameraComponent;
 class zpMeshRendererComponent;
+class zpAnimatedMeshRendererComponent;
 class zpParticleEmitterComponent;
 class zpSkyBoxComponent;
 
@@ -67,6 +68,7 @@ class zpOctreeNode;
 #include "zpLightComponent.h"
 #include "zpCameraComponent.h"
 #include "zpMeshRendererComponent.h"
+#include "zpAnimatedMeshRendererComponent.h"
 #include "zpParticleEmitterComponent.h"
 #include "zpSkyBoxComponent.h"
 

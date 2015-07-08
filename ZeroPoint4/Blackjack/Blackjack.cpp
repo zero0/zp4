@@ -193,19 +193,28 @@ public:
 			else if( rightButton && !leftButton )
 			{
 				zpVector4f lootAt = m_editorCamera->getLookAt();
-				zpScalar x, y;
+				zpScalar x, y, rt;
 				x = zpMath::Scalar( (zp_float)mouseDelta.getX() );
 				y = zpMath::Scalar( (zp_float)mouseDelta.getY() );
+				rt = zpMath::Scalar( realTime );
+
+				x = zpMath::ScalarMul( x, rt );
+				y = zpMath::ScalarMul( y, rt );
 				y = zpMath::ScalarNeg( y );
 
 				x = zpMath::ScalarDegToRad( x );
 				y = zpMath::ScalarDegToRad( y );
 
-				zpVector4f camPos( pos );
-				camPos = zpMath::Vector4Sub( camPos, lootAt );
+				zpVector4f camPos = pos;
+				zpVector4f dir;
+				dir = zpMath::Vector4Sub( lootAt, camPos );
+
+				camPos = zpMath::Vector4Add( camPos, dir );
 				camPos = zpMath::Vector4RotateY( camPos, x );
 				camPos = zpMath::Vector4RotateX( camPos, y );
-				camPos = zpMath::Vector4Add( camPos, lootAt );
+
+				dir = zpMath::Vector4Neg( dir );
+				camPos = zpMath::Vector4Add( camPos, dir );
 
 				m_editorCamera->setPosition( camPos );
 				m_editorCamera->setLookAt( lootAt );

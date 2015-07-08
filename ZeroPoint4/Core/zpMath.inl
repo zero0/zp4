@@ -420,7 +420,7 @@ namespace zpMath
 		t1 = ScalarMul( Vector4GetZ( a ), co );
 		z =  ScalarAdd( t0, t1 );
 
-		return Vector4( Scalar( 0.f ), y, z, Scalar( 1.f ) );
+		return Vector4( Scalar( 0.f ), y, z, Vector4GetW( a ) );
 	}
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4RotateY( zpVector4fParamF a, zpScalarParamF rad )
 	{
@@ -438,7 +438,7 @@ namespace zpMath
 		t1 = ScalarMul( Vector4GetZ( a ), co );
 		z =  ScalarAdd( t0, t1 );
 
-		return Vector4( x, Scalar( 0.f ), z, Scalar( 1.f ) );
+		return Vector4( x, Scalar( 0.f ), z, Vector4GetW( a ) );
 	}
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4RotateZ( zpVector4fParamF a, zpScalarParamF rad )
 	{
@@ -455,7 +455,7 @@ namespace zpMath
 		t1 = ScalarMul( Vector4GetY( a ), co );
 		x =  ScalarAdd( t0, t1 );
 
-		return Vector4( x, y, Scalar( 0.f ), Scalar( 1.f ) );
+		return Vector4( x, y, Scalar( 0.f ), Vector4GetW( a ) );
 	}
 
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromAxisAngle( zpVector4fParamF a, zpScalarParamF b )

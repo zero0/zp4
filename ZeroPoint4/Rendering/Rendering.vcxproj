@@ -124,6 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpAnimation.cpp" />
+    <ClCompile Include="zpAnimationEngine.cpp" />
     <ClCompile Include="zpAtlas.cpp" />
     <ClCompile Include="zpBlendState.cpp" />
     <ClCompile Include="zpBuffer.cpp" />

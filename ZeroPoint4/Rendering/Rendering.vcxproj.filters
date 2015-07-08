@@ -224,6 +224,9 @@
     <ClCompile Include="zpAnimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="zpAnimationEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpImmediateBuffer.inl">
