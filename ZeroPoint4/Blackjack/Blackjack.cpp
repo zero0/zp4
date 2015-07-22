@@ -12,7 +12,7 @@ struct Character
 	zp_uint num;
 };
 
-void bProtoDBCreateCharacter( void* data, zp_uint stride, const zpBison::Value& def )
+void zpProtoDBCreateCharacter( void* data, zp_uint stride, const zpBison::Value& def )
 {
 	Character* c = (Character*)data;
 	c->num = def[ "num" ].asInt();
@@ -33,16 +33,18 @@ public:
 
 		zpProtoDBManager* p = app->getProtoDBManager();
 
-		//p->initialize( 10 );
-		//ZP_PROTODB_CATEGORY( p, Character, bProtoDBCreateCharacter );
+		p->setProtoDBFile( "data/protodb.jsonb" );
+		p->initialize( 10 );
+		ZP_PROTODB_CATEGORY( p, Character );
 		
-		//p->setup();
+		p->setup();
 	}
 	void onLeavePhase( zpApplication* app )
 	{
 		zp_printfln( "Leave ProtoDB Phase..." );
 		zpProtoDBManager* p = app->getProtoDBManager();
-		//p->shutdown();
+		p->teardown();
+		p->destroy();
 	}
 
 	zpApplicationPhaseResult onUpdatePhase( zpApplication* app, zp_float deltaTime, zp_float realTime )
@@ -126,6 +128,10 @@ public:
 		m_editorCamera->setDepthStencilBuffer( app->getRenderPipeline()->getRenderingEngine()->getBackBufferDepthStencilBuffer() );
 
 		app->setApplicationPaused( true );
+
+		zpProtoDBHandle c;
+		app->getProtoDBManager()->getPrototype( "Character", "proto_blackjack1", c );
+		zp_printfln( "Character num %d", c.getData< Character >()->num );
 	}
 	void onLeaveState( zpApplication* app )
 	{

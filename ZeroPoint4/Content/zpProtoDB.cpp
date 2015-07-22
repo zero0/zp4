@@ -1,15 +1,20 @@
 #include "zpContent.h"
 
 zpProtoDBHandle::zpProtoDBHandle()
-	: m_category()
-	, m_protoId()
+	: m_category( ZP_NULL )
+	, m_protoId( ZP_NULL )
 	, m_protoDB( ZP_NULL )
+	, m_mod( 0 )
 	, m_index( ZP_PROTODB_INVALID_HANDLE )
 	, m_data( ZP_NULL )
 {}
 zpProtoDBHandle::~zpProtoDBHandle()
 {
 	invalidate();
+
+	m_category = ZP_NULL;
+	m_protoId = ZP_NULL;
+	m_protoDB = ZP_NULL;
 }
 
 zp_bool zpProtoDBHandle::isValid() const
@@ -19,27 +24,51 @@ zp_bool zpProtoDBHandle::isValid() const
 
 const void* zpProtoDBHandle::getData() const
 {
+	if( m_mod != m_protoDB->getModVersion() )
+	{
+		m_index = ZP_PROTODB_INVALID_HANDLE;
+		m_data = ZP_NULL;
+	}
+
 	if( m_index == ZP_PROTODB_INVALID_HANDLE )
 	{
-		m_index = m_protoDB->m_entries.indexOf( m_protoId );
+		m_index = m_protoDB->findProtoEntry( m_protoId );
+		m_data = ZP_NULL;
 	}
+	
 	if( m_data == ZP_NULL )
 	{
-		m_data = (void*)( m_protoDB->m_database.getData() + ( m_index * m_protoDB->m_stride ) );
+		m_data = m_protoDB->getProtoEntry( m_index );
 	}
+
 	return m_data;
 }
 
-const zpString& zpProtoDBHandle::getProtoId() const
+const zp_char* zpProtoDBHandle::getProtoId() const
 {
 	return m_protoId;
 }
+const zp_char* zpProtoDBHandle::getCategory() const
+{
+	return m_category;
+}
 
-void zpProtoDBHandle::invalidate() const
+void zpProtoDBHandle::invalidate()
 {
 	m_index = ZP_PROTODB_INVALID_HANDLE;
 	m_data = ZP_NULL;
 }
+void zpProtoDBHandle::setup( const zp_char* category, const zp_char* protoId, const zpProtoDB* protoDB, zp_int index )
+{
+	m_category = category;
+	m_protoId = protoId;
+	m_protoDB = protoDB;
+	m_mod = protoDB->getModVersion();
+	m_index = index;
+	m_data = ZP_NULL;
+}
+
+
 
 
 zpProtoDB::zpProtoDB()
@@ -51,14 +80,20 @@ void zpProtoDB::initialize( zpProtoDBCreateFunc create, zp_uint stride )
 {
 	m_create = create;
 	m_stride = stride;
+	m_mod = 0;
 }
 
-void zpProtoDB::setup( const zpBison::Value& protoDb )
+void zpProtoDB::setup( const zp_char* category, const zpBison::Value& protoDb )
 {
+	m_category = category;
+
 	// setup database
 	zp_uint count = protoDb.size();
 	m_database.reserve( m_stride * count );
 	m_entries.reserve( count );
+
+	// increment mod count
+	++m_mod;
 
 	zp_byte* data = (zp_byte*)m_database.getData();
 	protoDb.foreachObject( [ this, &data ]( const zpBison::Value& k, const zpBison::Value& v )
@@ -71,7 +106,7 @@ void zpProtoDB::setup( const zpBison::Value& protoDb )
 	} );
 }
 
-void zpProtoDB::shutdown()
+void zpProtoDB::teardown()
 {
 	m_entries.clear();
 	m_database.clear();
@@ -79,7 +114,28 @@ void zpProtoDB::shutdown()
 
 void zpProtoDB::destroy()
 {
+	m_entries.destroy();
+	m_database.destroy();
 }
+
+zp_int zpProtoDB::findProtoEntry( const zp_char* protoId ) const
+{
+	zp_uint index;
+	zp_bool ok = m_entries.findIndexIf( [ protoId ]( const zpString& s ) { return s == protoId; }, index );
+	return ok ? (zp_int)index : ZP_PROTODB_INVALID_HANDLE;
+}
+
+const void* zpProtoDB::getProtoEntry( zp_int index ) const
+{
+	const void* d = (const void*)( m_database.getData() + ( index * m_stride ) );
+	return d;
+}
+
+const zpArrayList< zpString > zpProtoDB::getAllProtoIDs() const
+{
+	return m_entries;
+}
+
 
 
 
@@ -94,17 +150,6 @@ void zpProtoDBManager::initialize( zp_uint numCatagories )
 {
 	m_catagories.reserve( numCatagories );
 	m_protoDBs.reserve( numCatagories );
-
-	if( m_handles.size() == 0 )
-	{
-		m_handles.resize( 64 );
-		zpProtoDBHandle* b = m_handles.begin();
-		zpProtoDBHandle* e = m_handles.end();
-		for( ; b != e; ++b )
-		{
-			m_freeHandles.pushBack( b );
-		}
-	}
 }
 void zpProtoDBManager::initializeCategory( const zp_char* category, zpProtoDBCreateFunc create, zp_uint stride )
 {
@@ -131,14 +176,14 @@ void zpProtoDBManager::setup()
 	for( zp_uint i = 0, imax = m_catagories.size(); i < imax; ++i )
 	{
 		const zp_char* cat = m_catagories[ i ].str();
-		m_protoDBs[ i ].setup( root[ cat ] );
+		m_protoDBs[ i ].setup( cat, root[ cat ] );
 	}
 }
-void zpProtoDBManager::shutdown()
+void zpProtoDBManager::teardown()
 {
 	m_protoDBs.foreach( []( zpProtoDB& db )
 	{
-		db.shutdown();
+		db.teardown();
 	} );
 }
 void zpProtoDBManager::destroy()
@@ -154,7 +199,7 @@ void zpProtoDBManager::destroy()
 
 void zpProtoDBManager::reloadProtoDB()
 {
-	shutdown();
+	teardown();
 	setup();
 }
 
@@ -179,48 +224,19 @@ const zpString& zpProtoDBManager::getProtoDBFile() const
 	return m_protoDbFile;
 }
 
-const zpProtoDBHandle* zpProtoDBManager::getHandle( const zp_char* category, const zp_char* protoId )
+zp_bool zpProtoDBManager::getPrototype( const zp_char* category, const zp_char* protoId, zpProtoDBHandle& handle )
 {
-	ZP_ASSERT( !m_freeHandles.isEmpty(), "Ran out of ProtoDB Handles" );
-
 	zp_bool ok;
-	zp_uint cat, proto;
-	ok = m_catagories.findIndexIf( [ category ]( const zpString& c ) { return c == category; }, cat );
-	if( !ok ) return ZP_NULL;
+	zp_uint index;
+	const zpProtoDB* db;
 
-	zpProtoDB* db = &m_protoDBs[ cat ];
-	ok = db->m_entries.findIndexIf( [ protoId ]( const zpString& p ) { return p == protoId; }, proto );
-	if( !ok ) return ZP_NULL;
+	ok = m_protoDBs.findIf( [ category ]( const zpProtoDB& protoDB ) { return protoDB.getCategory() == category; }, &db );
+	if( !ok ) return false;
 
+	index = db->findProtoEntry( protoId );
+	if( index == ZP_PROTODB_INVALID_HANDLE ) return false;
 
-	zpProtoDBHandle* handle = m_freeHandles.back();
-	m_freeHandles.popBack();
-	m_usedHandles.pushBack( handle );
+	handle.setup( category, protoId, db, index );
 
-	handle->m_category = category;
-	handle->m_protoId = protoId;
-	handle->m_protoDB = db;
-	handle->m_index = proto;
-	handle->m_data = ZP_NULL;
-
-	return handle;
-}
-
-void zpProtoDBManager::releaseHandle( zpProtoDBHandle*& handle )
-{
-	handle->invalidate();
-	m_usedHandles.eraseAll( handle );
-	m_freeHandles.pushBack( handle );
-
-	handle = ZP_NULL;
-}
-
-void zpProtoDBManager::invalidateHandles()
-{
-	zpProtoDBHandle** b = m_usedHandles.begin();
-	zpProtoDBHandle** e = m_usedHandles.begin();
-	for( ; b != e; ++b )
-	{
-		(*b)->invalidate();
-	}
+	return true;
 }
