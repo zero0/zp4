@@ -21,6 +21,9 @@ public:
 	void setColor( const zpColor4f& topColor, const zpColor4f& bottomColor );
 	void setColor( const zpColor4f& bottomLeft, const zpColor4f& topLeft, const zpColor4f& topRight, const zpColor4f& bottomRight );
 
+	zp_float getAlpha() const;
+	void setAlpha( zp_float a );
+
 	const zpString& getText() const;
 	void setText( const zpString& text );
 	void setText( const zp_char* text );
@@ -51,13 +54,9 @@ private:
 
 	zpMaterialResourceInstance m_material;
 
-	zp_float m_textHeight;
-	zpFontAlignment m_fontAlignment;
-
 	zp_int m_depth;
 
 	zpWidgetType m_type;
-	zpString m_text;
 
 	zpVector4f m_border;
 
@@ -65,6 +64,10 @@ private:
 	zpColor4f m_colorTopLeft;
 	zpColor4f m_colorTopRight;
 	zpColor4f m_colorBottomRight;
+
+	zp_float m_textHeight;
+	zpFontAlignment m_textAlignment;
+	zpString m_text;
 };
 
 class zpWidgetComponentPool : public zpContentPool< zpWidgetComponent, 8 >

@@ -281,10 +281,10 @@ void zpRectTransformComponent::onUpdateAnchors()
 			s2x = zpMath::AsFloat( zpMath::Vector4GetX( sides[2] ) );
 			s3y = zpMath::AsFloat( zpMath::Vector4GetY( sides[3] ) );
 
-			zp_lerp< zp_float >( lt, s0x, s2x, m_leftAnchor.relative   );
-			zp_lerp< zp_float >( rt, s0x, s2x, m_rightAnchor.relative  );
-			zp_lerp< zp_float >( bt, s3y, s1y, m_bottomAnchor.relative );
-			zp_lerp< zp_float >( tt, s3y, s1y, m_topAnchor.relative    );
+			lt = zp_lerp< zp_float >( s0x, s2x, m_leftAnchor.relative   );
+			rt = zp_lerp< zp_float >( s0x, s2x, m_rightAnchor.relative  );
+			bt = zp_lerp< zp_float >( s3y, s1y, m_bottomAnchor.relative );
+			tt = zp_lerp< zp_float >( s3y, s1y, m_topAnchor.relative    );
 
 			lt += m_leftAnchor.absolute;
 			rt += m_rightAnchor.absolute;
@@ -298,8 +298,8 @@ void zpRectTransformComponent::onUpdateAnchors()
 	}
 
 	zp_float nx, ny;
-	zp_lerp( nx, lt, rt, pvt.getX() );
-	zp_lerp( ny, bt, tt, pvt.getY() );
+	nx = zp_lerp( lt, rt, pvt.getX() );
+	ny = zp_lerp( bt, tt, pvt.getY() );
 
 	zpVector4f newPos = zpMath::Vector4( nx, ny, zpMath::AsFloat( zpMath::Vector4GetZ( pos ) ), 1 );
 	zp_int w = zp_floor_to_int( rt - lt + 0.5f );

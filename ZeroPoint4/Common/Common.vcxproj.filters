@@ -159,6 +159,9 @@
     <ClInclude Include="zpAnimatedMeshRendererComponent.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="zpUICanvasComponent.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -259,6 +262,9 @@
     </ClCompile>
     <ClCompile Include="zpAnimatedMeshRendererComponent.cpp">
       <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="zpUICanvasComponent.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

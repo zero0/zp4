@@ -4,16 +4,16 @@ zpWidgetComponent::zpWidgetComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 	, m_isAdded( false )
 	, m_canvas( ZP_NULL )
-	, m_textHeight( 12.f )
-	, m_fontAlignment( ZP_FONT_ALIGNMENT_LEFT )
+	, m_textAlignment( ZP_FONT_ALIGNMENT_LEFT )
 	, m_depth( 0 )
 	, m_type( ZP_WIDGET_CONTAINER )
-	, m_text()
 	, m_border( zpMath::Vector4( 0, 0, 0, 0 ) )
 	, m_colorBottomLeft( 1, 1, 1, 1 )
 	, m_colorTopLeft( 1, 1, 1, 1 )
 	, m_colorTopRight( 1, 1, 1, 1 )
 	, m_colorBottomRight( 1, 1, 1, 1 )
+	, m_textHeight( 12.f )
+	, m_text()
 {
 
 }
@@ -162,7 +162,7 @@ void zpWidgetComponent::fillSprite( zpRenderingContext* context )
 }
 void zpWidgetComponent::fillLabel( zpRenderingContext* context )
 {
-	context->addText( m_text, m_textHeight, zpVector2f( 0, 0 ), m_fontAlignment, m_colorTopLeft, m_colorBottomLeft );
+	context->addText( m_text, m_textHeight, zpVector2f( 0, 0 ), m_textAlignment, m_colorTopLeft, m_colorBottomLeft );
 }
 
 

@@ -776,6 +776,8 @@ void zpApplication::processFrame()
 		m_componentPoolMeshRenderer.render( i );
 		ZP_PROFILE_END( RENDER_MESHES );
 
+		m_componentPoolUICanvas.render( i );
+
 		// render particles for each camera
 		ZP_PROFILE_START( RENDER_PARTICLES );
 		m_componentPoolParticleEmitter.render( i, ZP_NULL );

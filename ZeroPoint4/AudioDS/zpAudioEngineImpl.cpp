@@ -16,8 +16,7 @@ ZP_FORCE_INLINE DWORD __zpToDS( zpAudioSpeakerMode t )
 
 ZP_FORCE_INLINE LONG __zpNormalizeVolume( zp_float volume )
 {
-	LONG vol;
-	zp_lerp< LONG >( vol, DSBVOLUME_MIN, DSBVOLUME_MAX, volume );
+	LONG vol = zp_lerp< LONG >( DSBVOLUME_MIN, DSBVOLUME_MAX, volume );
 	return vol;
 }
 ZP_FORCE_INLINE zp_float __zpUnNormalizeVolume( LONG volume )

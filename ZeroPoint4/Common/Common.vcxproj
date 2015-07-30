@@ -100,6 +100,7 @@
     <ClInclude Include="zpTags.h" />
     <ClInclude Include="zpPhantomComponent.h" />
     <ClInclude Include="zpCanvasComponent.h" />
+    <ClInclude Include="zpUICanvasComponent.h" />
     <ClInclude Include="zpWidgetComponent.h" />
     <ClInclude Include="zpWorld.h" />
   </ItemGroup>
@@ -139,6 +140,7 @@
     <ClCompile Include="zpTags.cpp" />
     <ClCompile Include="zpPhantomComponent.cpp" />
     <ClCompile Include="zpCanvasComponent.cpp" />
+    <ClCompile Include="zpUICanvasComponent.cpp" />
     <ClCompile Include="zpWidgetComponent.cpp" />
     <ClCompile Include="zpWorld.cpp" />
   </ItemGroup>

@@ -32,10 +32,11 @@ ZP_FORCE_INLINE void zp_clamp( T& s, const T& val, const T& low, const T& high )
 }
 
 template<typename T>
-ZP_FORCE_INLINE void zp_lerp( T& s, const T& low, const T& high, zp_float alpha )
+ZP_FORCE_INLINE T zp_lerp( const T& low, const T& high, zp_float alpha )
 {
 	zp_saturate( alpha, alpha );
-	s = low + (T)( ( high - low ) * alpha );
+	T s = low + (T)( ( high - low ) * alpha );
+	return s;
 }
 
 zp_float zp_cos( zp_float v );

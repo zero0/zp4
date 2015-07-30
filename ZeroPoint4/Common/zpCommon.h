@@ -88,6 +88,7 @@ class zpOctreeNode;
 #include "zpRectTransformComponent.h"
 #include "zpCanvasComponent.h"
 #include "zpWidgetComponent.h"
+#include "zpUICanvasComponent.h"
 
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"
