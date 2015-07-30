@@ -10,8 +10,28 @@
                 0
             ]
         },
-        "MeshRenderer": {
-            "Mesh": "meshes/runt.meshb"
+        "UICanvas": {
+            "Layer": 2,
+			"UI" : [
+				{
+					"Name" : "asdf",
+					"Position" : [ 10, 100 ],
+					"Width" : 100,
+					"Height" : 10,
+					"Alpha" : 1,
+					"Material" : "materials/canvas.materialb",
+					"Color" : [ 1, 0, 0, 1 ]
+				},
+				{
+					"Name" : "qwerty",
+					"Position" : [ 10, 100 ],
+					"Width" : 10,
+					"Height" : 100,
+					"Alpha" : 1,
+					"Material" : "materials/canvas.materialb",
+					"Color" : [ 1, 0, 0, 1 ]
+				}
+			]
         }
     }
 }

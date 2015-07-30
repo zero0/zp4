@@ -1,0 +1,37 @@
+{
+    "Shader" : "shaders/TransparentDiffuse.shaderb",
+    "Textures" :
+    {
+        "_MainTex" :
+        {
+            "Texture" : "textures/Torchanimation_135.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        }
+    },
+    "Globals" :
+    {
+        "_Color" :
+        {
+            "Type" : "Color",
+            "Value": [ 1, 1, 1, 1 ]
+        }
+    },
+    "BlendMode" :
+    {
+        "RenderTargets" :
+        [
+            {
+                "SrcBlend" : "SrcAlpha",
+                "DestBlend" : "InvSrcAlpha",
+                "BlendOp" : "Add"
+            }
+        ]
+    },
+    "Depth" :
+    {
+        "DepthEnabled" : true,
+        "DepthWriteMaskAll" : false
+    }
+}
