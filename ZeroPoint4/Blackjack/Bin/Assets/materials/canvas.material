@@ -4,7 +4,7 @@
     {
         "_MainTex" :
         {
-            "Texture" : "textures/ex_Fire.textureb",
+            "Texture" : "textures/test.textureb",
             "Scale" : [ 1, 1 ],
             "Offset" : [ 0, 0 ],
             "Sampler" : {}

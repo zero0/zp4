@@ -1,0 +1,30 @@
+{
+    "Name": "EditorUI",
+    "Tags": [],
+    "Layer": "Default",
+    "Components": {
+        "Transform": {},
+        "UICanvas": {
+            "Layer": 2,
+			"UI" : [
+				{
+					"ID" : 1,
+					"Name" : "Top Bar",
+					"Position" : [ 0, 0 ],
+					"Width" : 100,
+					"Height" : 100,
+					"Alpha" : 1,
+					"Material" : "materials/canvas.materialb",
+					"Color" : [ 1, 1, 1, 1 ],
+					"Depth" : 1,
+					"Alignment" : {
+						"Left" :   { "Widget" :  0, "Relative" : 0.0, "Absolute" :  10 },
+						"Bottom" : { "Widget" :  0, "Relative" : 1.0, "Absolute" : -10 },
+						"Right" :  { "Widget" :  0, "Relative" : 1.0, "Absolute" : -10 },
+						"Top" :    { "Widget" :  0, "Relative" : 0.0, "Absolute" :  10 }
+					}
+				}
+			]
+        }
+    }
+}

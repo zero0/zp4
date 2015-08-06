@@ -15,16 +15,16 @@
 			"UI" : [
 				{
 					"Name" : "asdf",
-					"Position" : [ 10, 100 ],
+					"Position" : [ 300, 300 ],
 					"Width" : 100,
-					"Height" : 10,
+					"Height" : 100,
 					"Alpha" : 1,
 					"Material" : "materials/canvas.materialb",
-					"Color" : [ 1, 0, 0, 1 ]
+					"Color" : [ 0, 1, 0, 1 ]
 				},
 				{
 					"Name" : "qwerty",
-					"Position" : [ 10, 100 ],
+					"Position" : [ 10, 10 ],
 					"Width" : 10,
 					"Height" : 100,
 					"Alpha" : 1,

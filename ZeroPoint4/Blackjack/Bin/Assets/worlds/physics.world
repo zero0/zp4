@@ -72,9 +72,6 @@
                     0
                 ]
             }
-        },
-		{
-			"Object" : "objects/runt.objectb"
-		}
+        }
     ]
 }
