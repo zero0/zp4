@@ -132,11 +132,17 @@ public:
 		zpProtoDBHandle c;
 		app->getProtoDBManager()->getPrototype( "Character", "proto_blackjack1", c );
 		zp_printfln( "Character num %d", c.getData< Character >()->num );
+
+		m_editorUI = app->getObjectContentManager()->createObject( "objects/editor_ui.objectb" );
+		m_editorUI->initialize();
 	}
 	void onLeaveState( zpApplication* app )
 	{
 		app->getRenderPipeline()->releaseCamera( m_editorCamera );
 		m_editorCamera = ZP_NULL;
+
+		m_editorUI->destroy();
+		m_editorUI = ZP_NULL;
 
 		const zpArrayList< zpCamera* >& cameras = app->getRenderPipeline()->getUsedCameras( ZP_CAMERA_TYPE_MAIN );
 		cameras.foreach( []( zpCamera* c ) { c->setActive( true ); } );
@@ -234,6 +240,7 @@ public:
 
 private:
 	zpCamera* m_editorCamera;
+	zpObject* m_editorUI;
 };
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )

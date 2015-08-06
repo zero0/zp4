@@ -104,6 +104,7 @@ struct zpUIWidget
 	zpMatrix4f transform;
 	zpMatrix4f worldTransform;
 
+	zpRectf uv;
 	zpVector4f border;
 	zpVector4f drawRegion;
 
@@ -208,8 +209,6 @@ private:
 
 	void createUIFromData( const zpBison::Value& def );
 	void createWidgetFromData( const zpBison::Value& def, zp_int parent );
-
-	void getWidgetSides( zpUIWidget* widget, zpUIWidget* relativeTo, zpVector4f* sides );
 
 	zp_uint m_layer;
 	zp_int m_ids;

@@ -66,7 +66,7 @@ private:
 	zpArrayList< zpTransformComponent* > m_children;
 };
 
-class zpTransformComponentPool : public zpContentPool< zpTransformComponent, 8 >
+class zpTransformComponentPool : public zpContentPool< zpTransformComponent, 64 >
 {
 public:
 	zpTransformComponentPool();

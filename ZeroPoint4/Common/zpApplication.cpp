@@ -592,7 +592,7 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	{
 		loaded = m_renderingPipeline.getShaderContentManager()->reloadResource( filename );
 	}
-	else if( strFilename.endsWith( ".png" ) )
+	else if( strFilename.endsWith( ".textureb" ) )
 	{
 		loaded = m_renderingPipeline.getTextureContentManager()->reloadResource( filename );
 	}
@@ -776,7 +776,10 @@ void zpApplication::processFrame()
 		m_componentPoolMeshRenderer.render( i );
 		ZP_PROFILE_END( RENDER_MESHES );
 
+		// render UI
+		ZP_PROFILE_START( RENDER_UI );
 		m_componentPoolUICanvas.render( i );
+		ZP_PROFILE_END( RENDER_UI );
 
 		// render particles for each camera
 		ZP_PROFILE_START( RENDER_PARTICLES );
@@ -1036,10 +1039,11 @@ void zpApplication::onGUI()
 		zp_float renderFrameMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_FRAME		, m_timer.getSecondsPerTick() );
 		zp_float renderMeshesMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_MESHES		, m_timer.getSecondsPerTick() );
 		zp_float renderParticlesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PARTICLES	, m_timer.getSecondsPerTick() );
+		zp_float renderUIMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_UI			, m_timer.getSecondsPerTick() );
 		zp_float renderPresentMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT		, m_timer.getSecondsPerTick() );
 		zp_float renderDebugMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER		, m_timer.getSecondsPerTick() );
 
-		zpRectf rect( 5, 5, 320, 200 );
+		zpRectf rect( 5, 5, 320, 230 );
 		m_gui.beginWindow( "Rendering", rect, rect );
 
 		buff << "Submit    " << renderAllMs * 1000.f << " ms";
@@ -1059,6 +1063,10 @@ void zpApplication::onGUI()
 		buff.clear();
 
 		buff << "Particles " << renderParticlesMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "UI        " << renderUIMs * 1000.f << " ms";
 		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
 		buff.clear();
 

@@ -1,5 +1,7 @@
 #include "zpCommon.h"
 
+#define ZP_UI_CANVAS_FLIP_Y		1
+
 static const zpVector2f s_rectPivots[] =
 {
 	zpVector2f( 0.0f, 1.0f ),
@@ -14,6 +16,20 @@ static const zpVector2f s_rectPivots[] =
 	zpVector2f( 0.5f, 0.0f ),
 	zpVector2f( 1.0f, 0.0f ),
 };
+
+/*
+ZP_UI_WIDGET_PIVOT_TOP_LEFT,
+ZP_UI_WIDGET_PIVOT_TOP,
+ZP_UI_WIDGET_PIVOT_TOP_RIGHT,
+
+ZP_UI_WIDGET_PIVOT_LEFT,
+ZP_UI_WIDGET_PIVOT_CENTER,
+ZP_UI_WIDGET_PIVOT_RIGHT,
+
+ZP_UI_WIDGET_PIVOT_BOTTOM_LEFT,
+ZP_UI_WIDGET_PIVOT_BOTTOM,
+ZP_UI_WIDGET_PIVOT_BOTTOM_RIGHT,
+*/
 
 static void GetWidgetDrawingDimensions( zpUIWidget* widget, zp_float* dim )
 {
@@ -46,34 +62,126 @@ static void BasicSpriteFill( zpUIWidget* widget, zpUIDrawCall* drawCall )
 	zp_float v[4];
 	GetWidgetDrawingDimensions( widget, v );
 
-	zpVector4f c0 = zpMath::Vector4( v[0], v[1], 0, 0 );
-	zpVector4f c1 = zpMath::Vector4( v[0], v[3], 0, 0 );
-	zpVector4f c2 = zpMath::Vector4( v[2], v[3], 0, 0 );
-	zpVector4f c3 = zpMath::Vector4( v[2], v[1], 0, 0 );
-	
-	zpVector4f worldPosition = widget->worldTransform.m_m4;
-	c0 = zpMath::Vector4Add( worldPosition, c0 );
-	c1 = zpMath::Vector4Add( worldPosition, c1 );
-	c2 = zpMath::Vector4Add( worldPosition, c2 );
-	c3 = zpMath::Vector4Add( worldPosition, c3 );
+	zpVector4f tl = zpMath::Vector4( v[0], v[3], 0, 1 );
+	zpVector4f tr = zpMath::Vector4( v[2], v[3], 0, 1 );
+	zpVector4f br = zpMath::Vector4( v[2], v[1], 0, 1 );
+	zpVector4f bl = zpMath::Vector4( v[0], v[1], 0, 1 );
 
-	drawCall->pos.pushBack( c0 );
-	drawCall->pos.pushBack( c1 );
-	drawCall->pos.pushBack( c2 );
-	drawCall->pos.pushBack( c3 );
+	zpMatrix4f world = widget->worldTransform;
+	tl = zpMath::MatrixTransform( world, tl );
+	tr = zpMath::MatrixTransform( world, tr );
+	br = zpMath::MatrixTransform( world, br );
+	bl = zpMath::MatrixTransform( world, bl );
 
-	zpRectf uv( 0, 0, 1, 1 );
-	drawCall->uvs.pushBack( uv.getTopLeft() );
-	drawCall->uvs.pushBack( uv.getTopRight() );
-	drawCall->uvs.pushBack( uv.getBottomRight() );
-	drawCall->uvs.pushBack( uv.getBottomLeft() );
-	
+	drawCall->pos.pushBack( tl );
+	drawCall->pos.pushBack( tr );
+	drawCall->pos.pushBack( br );
+	drawCall->pos.pushBack( bl );
+
+	drawCall->uvs.pushBack( widget->uv.getTopLeft() );
+	drawCall->uvs.pushBack( widget->uv.getTopRight() );
+	drawCall->uvs.pushBack( widget->uv.getBottomRight() );
+	drawCall->uvs.pushBack( widget->uv.getBottomLeft() );
+
 	drawCall->cols.pushBack( widget->colorTopLeft );
 	drawCall->cols.pushBack( widget->colorTopRight );
 	drawCall->cols.pushBack( widget->colorBottomRight );
 	drawCall->cols.pushBack( widget->colorBottomLeft );
 }
 
+static void SlicedSpriteFill( zpUIWidget* widget, zpUIDrawCall* drawCall )
+{
+	const zpVector2f& offset = s_rectPivots[ widget->pivot ];
+
+	zp_float dr[4];
+	GetWidgetDrawingDimensions( widget, dr );
+
+	ZP_ALIGN16 zp_float br[4];
+	zpMath::Vector4Store4( widget->border, br );
+
+	zpRectf innerUV = widget->uv;
+	zpRectf outerUV = widget->uv;
+
+	zpVector2f c[4];
+	c[0] = zpVector2f( dr[0], dr[1] );
+	c[1] = zpVector2f( dr[0] + br[0], dr[1] + br[1] );
+	c[2] = zpVector2f( dr[2] - br[2], dr[3] - br[3] );
+	c[3] = zpVector2f( dr[2], dr[3] );
+
+	zpVector2f uvs[4];
+	uvs[0] = zpVector2f( outerUV.getLeft(), outerUV.getBottom() );
+	uvs[1] = zpVector2f( innerUV.getLeft(), innerUV.getBottom() );
+	uvs[2] = zpVector2f( innerUV.getRight(), innerUV.getTop() );
+	uvs[3] = zpVector2f( outerUV.getRight(), outerUV.getTop() );
+
+	for( zp_int x = 0; x < 3; ++x )
+	{
+		zp_int x2 = x + 1;
+
+		for( zp_int y = 0; y < 3; ++y )
+		{
+			zp_int y2 = y + 1;
+
+			drawCall->pos.pushBack( zpMath::Vector4( c[x].getX(),  c[y].getY(),  0, 1 ) );
+			drawCall->pos.pushBack( zpMath::Vector4( c[x].getX(),  c[y2].getY(), 0, 1 ) );
+			drawCall->pos.pushBack( zpMath::Vector4( c[x2].getX(), c[y2].getY(), 0, 1 ) );
+			drawCall->pos.pushBack( zpMath::Vector4( c[x2].getX(), c[y].getY(),  0, 1 ) );
+
+			drawCall->uvs.pushBack( zpVector2f( uvs[x].getX(),  uvs[y].getY() ) );
+			drawCall->uvs.pushBack( zpVector2f( uvs[x].getX(),  uvs[y2].getY() ) );
+			drawCall->uvs.pushBack( zpVector2f( uvs[x2].getX(), uvs[y2].getY() ) );
+			drawCall->uvs.pushBack( zpVector2f( uvs[x2].getX(), uvs[y].getY() ) );
+
+			drawCall->cols.pushBack( widget->colorTopLeft );
+			drawCall->cols.pushBack( widget->colorTopLeft );
+			drawCall->cols.pushBack( widget->colorTopLeft );
+			drawCall->cols.pushBack( widget->colorTopLeft );
+		}
+	}
+}
+
+static void TextFill( zpUIWidget* widget, zpUIDrawCall* drawCall )
+{
+
+}
+
+
+static void GetWidgetSides( zpUIWidget* widget, zpUIWidget* relativeTo, zp_float* sides )
+{
+	const zpVector2f& offset = s_rectPivots[ widget->pivot ];
+
+	zp_float x0 = -offset.getX() * widget->width;
+	zp_float y0 = -offset.getY() * widget->height;
+	zp_float x1 = x0 + widget->width;
+	zp_float y1 = y0 + widget->height;
+	zp_float cx = ( x0 + x1 ) * 0.5f;
+	zp_float cy = ( y0 + y1 ) * 0.5f;
+
+	zpVector4f a = zpMath::Vector4( x0, cy, 0.f, 1.f );
+	zpVector4f b = zpMath::Vector4( cx, y1, 0.f, 1.f );
+	zpVector4f c = zpMath::Vector4( x1, cy, 0.f, 1.f );
+	zpVector4f d = zpMath::Vector4( cx, y0, 0.f, 1.f );
+
+	zpMatrix4f world = widget->worldTransform;
+	a = zpMath::MatrixTransform( world, a );
+	b = zpMath::MatrixTransform( world, b );
+	c = zpMath::MatrixTransform( world, c );
+	d = zpMath::MatrixTransform( world, d );
+
+	if( relativeTo != ZP_NULL )
+	{
+		zpMatrix4f inv = zpMath::Invert( relativeTo->worldTransform );
+		a = zpMath::MatrixTransform( inv, a );
+		b = zpMath::MatrixTransform( inv, b );
+		c = zpMath::MatrixTransform( inv, c );
+		d = zpMath::MatrixTransform( inv, d );
+	}
+
+	sides[0] = zpMath::AsFloat( zpMath::Vector4GetX( a ) );
+	sides[1] = zpMath::AsFloat( zpMath::Vector4GetY( b ) );
+	sides[2] = zpMath::AsFloat( zpMath::Vector4GetX( c ) );
+	sides[3] = zpMath::AsFloat( zpMath::Vector4GetY( d ) );
+}
 zpUIWidget::zpUIWidget()
 	: id( ZP_UI_WIDGET_INVALID_ID )
 	, name()
@@ -86,6 +194,7 @@ zpUIWidget::zpUIWidget()
 	, pivot( ZP_UI_WIDGET_PIVOT_TOP_LEFT )
 	, transform( zpMath::MatrixIdentity() )
 	, worldTransform( zpMath::MatrixIdentity() )
+	, uv( 0, 0, 1, 1 )
 	, border( zpMath::Vector4( 0, 0, 0, 0 ) )
 	, drawRegion( zpMath::Vector4( 0, 0, 1, 1 ) )
 	, offset( 0, 0 )
@@ -134,7 +243,7 @@ zpUICanvasComponent::zpUICanvasComponent( zpObject* obj, const zpBison::Value& d
 	widget->height = screenSize.getY();
 	widget->aspectRatioLock = ZP_UI_WIDGET_LOCK_ASPECT_RATIO_BASED_ON_HEIGHT;
 	widget->aspectRatio = (zp_float)widget->width / (zp_float)widget->height;
-	widget->pivot = ZP_UI_WIDGET_PIVOT_CENTER;
+	widget->pivot = ZP_UI_WIDGET_PIVOT_TOP_LEFT;
 
 	// create rest of the objects
 	createUIFromData( def[ "UI" ] );
@@ -453,6 +562,7 @@ void zpUICanvasComponent::onCreate()
 }
 void zpUICanvasComponent::onInitialize()
 {
+	//updateWidget( ZP_UI_WIDGET_ROOT_ID, -1, 0.f, 0.f );
 }
 void zpUICanvasComponent::onDestroy()
 {
@@ -504,37 +614,31 @@ void zpUICanvasComponent::updateWidget( zp_int w, zp_uint frameCount, zp_float d
 	{
 		widget->frameUpdated = frameCount;
 
-		if( widget->parent != ZP_UI_WIDGET_INVALID_ID )
-		{
-			zpUIWidget* parent = getWidget( widget->parent );
-			widget->worldTransform = zpMath::MatrixMul( parent->worldTransform, widget->transform );
-		}
-		
 		zp_bool isAnchored = false;
 		zp_int anchor;
 
-		anchor = widget->anchors[0].widget;
+		anchor = widget->anchors[ ZP_UI_WIDGET_ANCHOR_SIDE_LEFT ].widget;
 		if( anchor != ZP_UI_WIDGET_INVALID_ID )
 		{
 			isAnchored = true;
 			updateWidget( anchor, frameCount, deltaTime, realTime );
 		}
 
-		anchor = widget->anchors[1].widget;
+		anchor = widget->anchors[ ZP_UI_WIDGET_ANCHOR_SIDE_BOTTOM ].widget;
 		if( anchor != ZP_UI_WIDGET_INVALID_ID )
 		{
 			isAnchored = true;
 			updateWidget( anchor, frameCount, deltaTime, realTime );
 		}
 
-		anchor = widget->anchors[2].widget;
+		anchor = widget->anchors[ ZP_UI_WIDGET_ANCHOR_SIDE_RIGHT ].widget;
 		if( anchor != ZP_UI_WIDGET_INVALID_ID )
 		{
 			isAnchored = true;
 			updateWidget( anchor, frameCount, deltaTime, realTime );
 		}
 
-		anchor = widget->anchors[3].widget;
+		anchor = widget->anchors[ ZP_UI_WIDGET_ANCHOR_SIDE_TOP ].widget;
 		if( anchor != ZP_UI_WIDGET_INVALID_ID )
 		{
 			isAnchored = true;
@@ -544,6 +648,12 @@ void zpUICanvasComponent::updateWidget( zp_int w, zp_uint frameCount, zp_float d
 		if( isAnchored )
 		{
 			updateWidgetAnchors( widget );
+		}
+
+		if( widget->parent != ZP_UI_WIDGET_INVALID_ID )
+		{
+			zpUIWidget* parent = getWidget( widget->parent );
+			widget->worldTransform = zpMath::MatrixMul( parent->worldTransform, widget->transform );
 		}
 	}
 
@@ -556,12 +666,18 @@ void zpUICanvasComponent::updateWidgetAnchors( zpUIWidget* widget )
 	zpUIWidgetAnchor* b = widget->anchors + ZP_UI_WIDGET_ANCHOR_SIDE_BOTTOM;
 	zpUIWidgetAnchor* r = widget->anchors + ZP_UI_WIDGET_ANCHOR_SIDE_RIGHT;
 	zpUIWidgetAnchor* t = widget->anchors + ZP_UI_WIDGET_ANCHOR_SIDE_TOP;
-	zpVector4f sides[4];
+	zp_float sides[4];
 	
 	ZP_ALIGN16 zp_float pos[4];
 	zpMath::Vector4Store4( widget->transform.m_m4, pos );
 
 	const zpVector2f& pvt = s_rectPivots[ widget->pivot ];
+
+	zpUIWidget* parent = ZP_NULL;
+	//if( widget->parent != ZP_UI_WIDGET_INVALID_ID )
+	//{
+	//	parent = getWidget( widget->parent );
+	//}
 
 	if( l->widget == b->widget && l->widget == r->widget && l->widget == t->widget )
 	{
@@ -575,12 +691,12 @@ void zpUICanvasComponent::updateWidgetAnchors( zpUIWidget* widget )
 		else
 		{
 			zpUIWidget* relateTo = getWidget( l->widget );
-			getWidgetSides( widget, relateTo, sides );
+			GetWidgetSides( relateTo, parent, sides );
 
-			zp_float s0x = zpMath::AsFloat( zpMath::Vector4GetX( sides[0] ) );
-			zp_float s1y = zpMath::AsFloat( zpMath::Vector4GetY( sides[1] ) );
-			zp_float s2x = zpMath::AsFloat( zpMath::Vector4GetX( sides[2] ) );
-			zp_float s3y = zpMath::AsFloat( zpMath::Vector4GetY( sides[3] ) );
+			zp_float s0x = sides[0];
+			zp_float s1y = sides[1];
+			zp_float s2x = sides[2];
+			zp_float s3y = sides[3];
 
 			lt = zp_lerp< zp_float >( s0x, s2x, l->relative ) + l->absolute;
 			rt = zp_lerp< zp_float >( s0x, s2x, r->relative ) + r->absolute;
@@ -594,10 +710,10 @@ void zpUICanvasComponent::updateWidgetAnchors( zpUIWidget* widget )
 		if( l->widget != ZP_UI_WIDGET_INVALID_ID )
 		{
 			zpUIWidget* relateTo = getWidget( l->widget );
-			getWidgetSides( widget, relateTo, sides );
+			GetWidgetSides( relateTo, parent, sides );
 
-			zp_float s0x = zpMath::AsFloat( zpMath::Vector4GetX( sides[0] ) );
-			zp_float s2x = zpMath::AsFloat( zpMath::Vector4GetX( sides[2] ) );
+			zp_float s0x = sides[0];
+			zp_float s2x = sides[2];
 
 			lt = zp_lerp< zp_float >( s0x, s2x, l->relative ) + l->absolute;
 		}
@@ -610,10 +726,10 @@ void zpUICanvasComponent::updateWidgetAnchors( zpUIWidget* widget )
 		if( r->widget != ZP_UI_WIDGET_INVALID_ID )
 		{
 			zpUIWidget* relateTo = getWidget( r->widget );
-			getWidgetSides( widget, relateTo, sides );
+			GetWidgetSides( relateTo, parent, sides );
 
-			zp_float s0x = zpMath::AsFloat( zpMath::Vector4GetX( sides[0] ) );
-			zp_float s2x = zpMath::AsFloat( zpMath::Vector4GetX( sides[2] ) );
+			zp_float s0x = sides[0];
+			zp_float s2x = sides[2];
 
 			rt = zp_lerp< zp_float >( s0x, s2x, r->relative ) + r->absolute;
 		}
@@ -625,11 +741,11 @@ void zpUICanvasComponent::updateWidgetAnchors( zpUIWidget* widget )
 		// bottom
 		if( b->widget != ZP_UI_WIDGET_INVALID_ID )
 		{
-			zpUIWidget* relateTo = getWidget( r->widget );
-			getWidgetSides( widget, relateTo, sides );
+			zpUIWidget* relateTo = getWidget( b->widget );
+			GetWidgetSides( relateTo, parent, sides );
 
-			zp_float s1y = zpMath::AsFloat( zpMath::Vector4GetY( sides[1] ) );
-			zp_float s3y = zpMath::AsFloat( zpMath::Vector4GetY( sides[3] ) );
+			zp_float s1y = sides[1];
+			zp_float s3y = sides[3];
 
 			bt = zp_lerp< zp_float >( s3y, s1y, b->relative ) + b->absolute;
 		}
@@ -641,11 +757,11 @@ void zpUICanvasComponent::updateWidgetAnchors( zpUIWidget* widget )
 		// top
 		if( t->widget != ZP_UI_WIDGET_INVALID_ID )
 		{
-			zpUIWidget* relateTo = getWidget( r->widget );
-			getWidgetSides( widget, relateTo, sides );
+			zpUIWidget* relateTo = getWidget( t->widget );
+			GetWidgetSides( relateTo, parent, sides );
 
-			zp_float s1y = zpMath::AsFloat( zpMath::Vector4GetY( sides[1] ) );
-			zp_float s3y = zpMath::AsFloat( zpMath::Vector4GetY( sides[3] ) );
+			zp_float s1y = sides[1];
+			zp_float s3y = sides[3];
 
 			tt = zp_lerp< zp_float >( s3y, s1y, t->relative ) + t->absolute;
 		}
@@ -724,6 +840,16 @@ void zpUICanvasComponent::fillWidget( zp_int w )
 	widget->children.foreach( [ this ]( zp_int child ) { fillWidget( child ); } );
 }
 
+ZP_FORCE_INLINE void _CreateAnchorFromData( zpUIWidgetAnchor* anchor, const zpBison::Value& data )
+{
+	if( !data.isEmpty() )
+	{
+		anchor->widget =   data[ "Widget" ].asInt();
+		anchor->relative = data[ "Relative" ].asFloat();
+		anchor->absolute = data[ "Absolute" ].asInt();
+	}
+}
+
 void zpUICanvasComponent::createUIFromData( const zpBison::Value& def )
 {
 	if( !def.isEmpty() )
@@ -745,20 +871,31 @@ void zpUICanvasComponent::createWidgetFromData( const zpBison::Value& def, zp_in
 		widget->depth = parentWidget->children.size();
 		parentWidget->children.pushBack( widget->id );
 
+		widget->pivot = ZP_UI_WIDGET_PIVOT_TOP_LEFT;
+
 		widget->name = def[ "Name" ].asCString();
 		//widget->tag = def[ "Tag" ].asCString();
 
-		zpVector4f p = zpMath::Vector4( 0, 0, 0, 1 );
-		zpQuaternion4f r = zpMath::Quaternion( 0, 0, 0, 0 );
-		zpVector4f s = zpMath::Vector4( 1, 1, 1, 0 );
+		const zpBison::Value& id = def[ "ID" ];
+		if( id.isIntegral() )
+		{
+			widget->id = id.asInt();
+		}
+
+		const zpBison::Value& depth = def[ "Depth" ];
+		if( depth.isIntegral() )
+		{
+			widget->depth = depth.asInt();
+		}
+
+		widget->transform = zpMath::MatrixIdentity();
 
 		const zpBison::Value& pos = def[ "Position" ];
 		if( !pos.isEmpty() )
 		{
-			p = zpMath::Vector4( pos[ 0 ].asFloat(), pos[ 1 ].asFloat(), 0.f, 1.f );
+			widget->transform.m_m4 = zpMath::Vector4( pos[ 0 ].asFloat(), pos[ 1 ].asFloat(), 0.f, 1.f );
 		}
 
-		widget->transform = zpMath::TRS( p, r, s );
 		widget->worldTransform = widget->transform;
 
 		const zpBison::Value& border = def[ "Border" ];
@@ -781,6 +918,7 @@ void zpUICanvasComponent::createWidgetFromData( const zpBison::Value& def, zp_in
 
 		widget->width = def[ "Width" ].asInt();
 		widget->height = def[ "Height" ].asInt();
+		widget->aspectRatio = (zp_float)widget->width / (zp_float)widget->height;
 
 		widget->alpha = def[ "Alpha" ].asFloat();
 
@@ -802,44 +940,17 @@ void zpUICanvasComponent::createWidgetFromData( const zpBison::Value& def, zp_in
 
 		const zpBison::Value& children = def[ "Children" ];
 
+		const zpBison::Value& alignment = def[ "Alignment" ];
+		if( !alignment.isEmpty() )
+		{
+			_CreateAnchorFromData( widget->anchors + ZP_UI_WIDGET_ANCHOR_SIDE_LEFT,   alignment[ "Left" ] );
+			_CreateAnchorFromData( widget->anchors + ZP_UI_WIDGET_ANCHOR_SIDE_BOTTOM, alignment[ "Bottom" ] );
+			_CreateAnchorFromData( widget->anchors + ZP_UI_WIDGET_ANCHOR_SIDE_RIGHT,  alignment[ "Right" ] );
+			_CreateAnchorFromData( widget->anchors + ZP_UI_WIDGET_ANCHOR_SIDE_TOP,    alignment[ "Top" ] );
+		}
 	}
 }
 
-void zpUICanvasComponent::getWidgetSides( zpUIWidget* widget, zpUIWidget* relativeTo, zpVector4f* sides )
-{
-	const zpVector2f& offset = s_rectPivots[ widget->pivot ];
-
-	zp_float x0 = -offset.getX() * widget->width;
-	zp_float y0 = -offset.getY() * widget->height;
-	zp_float x1 = x0 + widget->width;
-	zp_float y1 = y0 + widget->height;
-	zp_float cx = ( x0 + x1 ) * 0.5f;
-	zp_float cy = ( y0 + y1 ) * 0.5f;
-
-	zpVector4f a = zpMath::Vector4( x0, cy, 0.f, 1.f );
-	zpVector4f b = zpMath::Vector4( cx, y1, 0.f, 1.f );
-	zpVector4f c = zpMath::Vector4( x1, cy, 0.f, 1.f );
-	zpVector4f d = zpMath::Vector4( cx, y0, 0.f, 1.f );
-
-	a = zpMath::MatrixTransform( widget->worldTransform, a );
-	b = zpMath::MatrixTransform( widget->worldTransform, b );
-	c = zpMath::MatrixTransform( widget->worldTransform, c );
-	d = zpMath::MatrixTransform( widget->worldTransform, d );
-
-	if( relativeTo != ZP_NULL )
-	{
-		zpMatrix4f inv = zpMath::Invert( relativeTo->worldTransform );
-		a = zpMath::MatrixTransform( inv, a );
-		b = zpMath::MatrixTransform( inv, b );
-		c = zpMath::MatrixTransform( inv, c );
-		d = zpMath::MatrixTransform( inv, d );
-	}
-
-	sides[0] = a;
-	sides[1] = b;
-	sides[2] = c;
-	sides[3] = d;
-}
 
 
 
