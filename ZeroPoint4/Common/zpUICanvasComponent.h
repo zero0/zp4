@@ -43,21 +43,22 @@ enum zpUIWidgetLockAspectRatio
 
 enum zpUIWidgetPivot
 {
-	ZP_UI_WIDGET_PIVOT_TOP_LEFT,
-	ZP_UI_WIDGET_PIVOT_TOP,
-	ZP_UI_WIDGET_PIVOT_TOP_RIGHT,
+	ZP_UI_WIDGET_PIVOT_BOTTOM_LEFT,
+	ZP_UI_WIDGET_PIVOT_BOTTOM,
+	ZP_UI_WIDGET_PIVOT_BOTTOM_RIGHT,
 
 	ZP_UI_WIDGET_PIVOT_LEFT,
 	ZP_UI_WIDGET_PIVOT_CENTER,
 	ZP_UI_WIDGET_PIVOT_RIGHT,
 
-	ZP_UI_WIDGET_PIVOT_BOTTOM_LEFT,
-	ZP_UI_WIDGET_PIVOT_BOTTOM,
-	ZP_UI_WIDGET_PIVOT_BOTTOM_RIGHT,
+	ZP_UI_WIDGET_PIVOT_TOP_LEFT,
+	ZP_UI_WIDGET_PIVOT_TOP,
+	ZP_UI_WIDGET_PIVOT_TOP_RIGHT,
 };
 
 enum
 {
+	ZP_UI_WIDGET_UNLINKED = -2,
 	ZP_UI_WIDGET_INVALID_ID = -1,
 	ZP_UI_WIDGET_ROOT_ID = 0,
 };
@@ -105,8 +106,8 @@ struct zpUIWidget
 	zpMatrix4f worldTransform;
 
 	zpRectf uv;
-	zpVector4f border;
-	zpVector4f drawRegion;
+	zp_float border[4];
+	zp_float drawRegion[4];
 
 	zpVector2f offset;
 	zp_int width;
@@ -143,6 +144,7 @@ public:
 	zp_int addWidget( zp_int parent );
 
 	void removeWidget( zp_int w );
+	void removeWidgetChildren( zp_int w );
 	void removeAllWidgets();
 
 	void addWidgetChild( zp_int parent, zp_int child );
@@ -200,7 +202,7 @@ private:
 	zpUIWidget* getWidget( zp_int w );
 	const zpUIWidget* getWidget( zp_int w ) const;
 
-	void updateWidget( zp_int w, zp_uint frameCount, zp_float deltaTime, zp_float realTime );
+	void updateWidget( zp_int w, zp_uint frameCount );
 	void updateWidgetAnchors( zpUIWidget* w );
 
 	void sortWidget( zp_uint w );
@@ -212,8 +214,10 @@ private:
 
 	zp_uint m_layer;
 	zp_int m_ids;
-	zpArrayList< zpUIWidget > m_widgets;
 
+	zpVector2i m_screenSize;
+
+	zpArrayList< zpUIWidget > m_widgets;
 	zpArrayList< zpUIDrawCall > m_drawCalls;
 };
 
