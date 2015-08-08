@@ -539,7 +539,7 @@ zp_bool zpRenderingEngineImpl::destroyDepthStencilBuffer( zpDepthStencilBufferIm
 
 zpRasterStateImpl* zpRenderingEngineImpl::createRasterState( const zpRasterStateDesc& desc )
 {
-	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpSamplerStateDesc ), 0 );
+	zp_hash descHash = zp_fnv1_32_data( &desc, sizeof( zpRasterStateDesc ), 0 );
 
 	zpRasterStateImpl* raster = ZP_NULL;
 	zpRasterStateImpl* s = m_rasterStates.begin();
