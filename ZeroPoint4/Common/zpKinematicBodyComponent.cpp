@@ -27,11 +27,14 @@ void zpKinematicBodyComponent::walk( const zpVector4f& direction, const zpScalar
 	zpVector4f dir;
 	dir = zpMath::Vector4Scale( direction, speed );
 
+	m_kinematicBody.setAcceleration( zpMath::Vector4Scale( direction, zpMath::Scalar( -10 ) ) );
 	m_kinematicBody.setWalkDirection( dir );
 }
 void zpKinematicBodyComponent::stop()
 {
-	m_kinematicBody.setWalkDirection( zpMath::Vector4( 0, 0, 0, 0 ) );
+	zpVector4f z = zpMath::Vector4( 0, 0, 0, 0 );
+	m_kinematicBody.setWalkDirection( z );
+	m_kinematicBody.setAcceleration( z );
 }
 
 void zpKinematicBodyComponent::onCreate()

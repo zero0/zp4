@@ -22,9 +22,10 @@ public:
 	zp_bool canJump() const;
 	zp_bool onGround() const;
 
-	void warp( const zpVector4f& position );
+	void warp( zpVector4fParamF position );
 
-	void setWalkDirection( const zpVector4f& direction );
+	void setWalkDirection( zpVector4fParamF direction );
+	void setAcceleration( zpVector4fParamF acceleration );
 
 	zp_handle getKinematicController() const;
 	zp_handle getCollisionGhost() const;

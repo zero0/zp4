@@ -150,27 +150,50 @@ public:
 		//}
 	}
 
-	void setAcceleration( const zpVector4f& acceleration )
+	void setAcceleration( zpVector4fParamF acceleration )
 	{
 		m_acceleration = acceleration;
 	}
 
 	void setWalkDirection( const btVector3& walkDirection )
 	{
+		zpVector4f dir = _btVector3ToVector4Normal( walkDirection );
+		setWalkDirection( dir );
+	}
+	void setWalkDirection( zpVector4fParamF walkDirection )
+	{
 		m_useWalkDirection = true;
-		m_walkDirection = _btVector3ToVector4Normal( walkDirection );
-		//m_walkDirection = walkDirection;
-		//m_normalizedWalkDirection.normalize();
-		m_normalizedWalkDirection = zpMath::Vector4Normalize3( m_walkDirection );
+		m_walkVelocity = zpMath::AsFloat( zpMath::Vector4Length3( walkDirection ) );
+		if( zp_approximate( m_walkVelocity, 0.f ) )
+		{
+			m_normalizedWalkDirection = zpMath::Vector4( 0, 0, 0, 0 );
+		}
+		else
+		{
+			m_normalizedWalkDirection = zpMath::Vector4Normalize3( walkDirection );
+		}
+		m_walkDirection = m_normalizedWalkDirection;
 		m_velocityTimeInterval = 0.f;
 	}
 	void setVelocityForTimeInterval( const btVector3& velocity, btScalar timeInterval )
 	{
+		zpVector4f v = _btVector3ToVector4Normal( velocity );
+		setVelocityForTimeInterval( v, timeInterval );
+	}
+	void setVelocityForTimeInterval( zpVector4fParamF velocity, zp_float timeInterval )
+	{
 		m_useWalkDirection = false;
-		//m_walkDirection = velocity;
-		m_velocity = _btVector3ToVector4Normal( velocity );
-		//m_normalizedWalkDirection.normalize();
-		m_normalizedWalkDirection = zpMath::Vector4Normalize3( m_normalizedWalkDirection );
+		m_walkVelocity = zpMath::AsFloat( zpMath::Vector4Length3( velocity ) );
+		if( zp_approximate( m_walkVelocity, 0.f ) )
+		{
+			m_normalizedWalkDirection = zpMath::Vector4( 0, 0, 0, 0 );
+		}
+		else
+		{
+			m_normalizedWalkDirection = zpMath::Vector4Normalize3( m_walkDirection );
+		}
+		m_walkDirection = m_normalizedWalkDirection;
+		m_velocity = velocity;
 		m_velocityTimeInterval = timeInterval;
 	}
 	void reset()
@@ -210,10 +233,10 @@ public:
 
 	void playerStep( btCollisionWorld* collisionWorld, btScalar dt )
 	{
-		if( !m_useWalkDirection && m_velocityTimeInterval < ZP_EPSILON )
-		{
-			return;
-		}
+		//if( !m_useWalkDirection && m_velocityTimeInterval < ZP_EPSILON )
+		//{
+		//	return;
+		//}
 
 		m_wasOnGround = onGround();
 
@@ -422,31 +445,48 @@ public:
 
 	void stepForwardAndStrafe( btCollisionWorld* collisionWorld, btScalar dt )
 	{
-		zpScalar sdt = zpMath::Scalar( dt );
+		zpScalar sdt;
 
 		zpVector4f a;
 		zpVector4f move;
 
-		//btVector3 v = m_acceleration * dt + m_velocity;
-		m_velocity = zpMath::Vector4ScaleAdd( m_acceleration, sdt, m_velocity );
-
-		//btVector3 move = v * dt + btScalar( 0.5f ) * m_acceleration * dt * dt;
-		zpScalar sdt2;
-		sdt2 = zpMath::ScalarMul( sdt, sdt );
-		sdt2 = zpMath::ScalarMul( sdt2, zpMath::Scalar( 0.5f ) );
-		a = zpMath::Vector4Scale( m_acceleration, sdt2 );
-
-		move = zpMath::Vector4Mul( m_velocity, sdt );
-		move = zpMath::Vector4Add( move, a );
-
-		//btVector3 move = m_walkDirection * m_walkVelocity;
-		if( !m_useWalkDirection )
+		if( m_useWalkDirection )
 		{
-			btScalar time = ( dt < m_velocityTimeInterval ) ? dt : m_velocityTimeInterval;
+			sdt = zpMath::Scalar( dt );
+
+			//btVector3 v = m_acceleration * dt + m_velocity;
+			m_velocity = zpMath::Vector4ScaleAdd( m_acceleration, sdt, m_velocity );
+
+			//btVector3 move = v * dt + btScalar( 0.5f ) * m_acceleration * dt * dt;
+			zpScalar sdt2;
+			sdt2 = zpMath::ScalarMul( sdt, sdt );
+			a = zpMath::Vector4Scale( m_acceleration, sdt2 );
+			a = zpMath::Vector4Scale( a, zpMath::Scalar( 0.5f ) );
+
+			//btVector3 move = m_walkDirection * m_walkVelocity;
+			move = zpMath::Vector4Scale( m_velocity, sdt );
+			move = zpMath::Vector4Sub( move, a );
+		}
+		else
+		{
+			zp_float time = ( dt < m_velocityTimeInterval ) ? dt : m_velocityTimeInterval;
 			m_velocityTimeInterval -= dt;
 
+			if( m_velocityTimeInterval < 0.f )
+			{
+				return;
+			}
+			
 			//move *= time;
-			move = zpMath::Vector4Scale( move, zpMath::Scalar( time ) );
+			move = zpMath::Vector4Scale( m_velocity, zpMath::Scalar( time ) );
+			//sdt = zpMath::Scalar( time );
+		}
+
+
+		zpScalar d = zpMath::Vector4Dot3( move, move );
+		if( zpMath::ScalarCmp0( d ) == 0 )
+		{
+			return;
 		}
 
 		btTransform start, end;
@@ -482,7 +522,7 @@ public:
 			end.setOrigin( e );
 
 			zpVector4f neg;
-			neg = zpMath::Vector4Sub( m_currentPosition, m_targetPosition );
+			neg = zpMath::Vector4Neg( move );
 			neg = zpMath::Vector4Normalize3( neg );
 
 			//btVector3 negDirection = m_currentPosition - m_targetPosition;
@@ -781,7 +821,7 @@ zp_bool zpKinematicBody::onGround() const
 	return controller->onGround();
 }
 
-void zpKinematicBody::warp( const zpVector4f& position )
+void zpKinematicBody::warp( zpVector4fParamF position )
 {
 	btVector3 pos;
 	pos = _zpVector4ToVector3( position );
@@ -790,11 +830,15 @@ void zpKinematicBody::warp( const zpVector4f& position )
 	controller->warp( pos );
 }
 
-void zpKinematicBody::setWalkDirection( const zpVector4f& direction )
+void zpKinematicBody::setWalkDirection( zpVector4fParamF direction )
 {
 	zpKinematicCharacterController* controller = (zpKinematicCharacterController*)m_controller;
-	//controller->setWalkDirection( dir );
-	controller->setAcceleration( direction );
+	controller->setWalkDirection( direction );
+}
+void zpKinematicBody::setAcceleration( zpVector4fParamF acceleration )
+{
+	zpKinematicCharacterController* controller = (zpKinematicCharacterController*)m_controller;
+	controller->setAcceleration( acceleration );
 }
 
 zp_handle zpKinematicBody::getKinematicController() const

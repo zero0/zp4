@@ -72,8 +72,7 @@ void zpControllerPlayerInput::update( zp_float deltaTime, zp_float realTime )
 			walk = zpMath::Vector4Add( walk, zpMath::Vector4( 0, 0, 1, 0 ) );
 			keyPressed = true;
 		}
-
-		if( m_keyboard->isKeyDown( ZP_KEY_CODE_S ) )
+		else if( m_keyboard->isKeyDown( ZP_KEY_CODE_S ) )
 		{
 			walk = zpMath::Vector4Add( walk, zpMath::Vector4( 0, 0, -1, 0 ) );
 			keyPressed = true;
@@ -84,16 +83,10 @@ void zpControllerPlayerInput::update( zp_float deltaTime, zp_float realTime )
 			walk = zpMath::Vector4Add( walk, zpMath::Vector4( -1, 0, 0, 0 ) );
 			keyPressed = true;
 		}
-
-		if( m_keyboard->isKeyDown( ZP_KEY_CODE_D ) )
+		else if( m_keyboard->isKeyDown( ZP_KEY_CODE_D ) )
 		{
 			walk = zpMath::Vector4Add( walk, zpMath::Vector4( 1, 0, 0, 0 ) );
 			keyPressed = true;
-		}
-
-		if( keyPressed )
-		{
-			walk = zpMath::Vector4Normalize3( walk );
 		}
 
 		if( m_keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) )
@@ -101,12 +94,20 @@ void zpControllerPlayerInput::update( zp_float deltaTime, zp_float realTime )
 			speed = zpMath::ScalarMul( speed, zpMath::Scalar( 3 ) );
 		}
 
+		if( keyPressed )
+		{
+			walk = zpMath::Vector4Normalize3( walk );
+			kinematic->walk( walk, speed );
+		}
+		else
+		{
+			kinematic->stop();
+		}
+
 		if( m_keyboard->isKeyPressed( ZP_KEY_CODE_SPACE ) )
 		{
 			kinematic->jump();
 		}
-
-		kinematic->walk( walk, speed );
 	}
 }
 
