@@ -9,19 +9,13 @@
 
 ZP_FORCE_INLINE zpVector4f _btVector3ToVector4Position( const btVector3& s )
 {
-	ZP_ALIGN16 btVector3FloatData data;
-	s.serializeFloat( data );
-
-	zpVector4f a = zpMath::Vector4Load4( data.m_floats );
+	zpVector4f a = zpMath::Vector4( s.x(), s.y(), s.z(), 1.f );
 	return a;
 }
 
 ZP_FORCE_INLINE zpVector4f _btVector3ToVector4Normal( const btVector3& s )
 {
-	ZP_ALIGN16 btVector3FloatData data;
-	s.serializeFloat( data );
-
-	zpVector4f a = zpMath::Vector4Load4( data.m_floats );
+	zpVector4f a = zpMath::Vector4( s.x(), s.y(), s.z(), 0.f );
 	return a;
 }
 
@@ -234,41 +228,11 @@ public:
 		}
 		m_verticalOffset = m_verticalVelocity * dt;
 
-		btTransform xform;
-		xform = m_ghost->getWorldTransform();
-
 		// 1 stepUp
 		stepUp( collisionWorld, dt );
 
-		// 2 walk forward
-		zpScalar sdt = zpMath::Scalar( dt );
-
-		zpVector4f a;
-		zpVector4f move;
-
-		//btVector3 v = m_acceleration * dt + m_velocity;
-		m_velocity = zpMath::Vector4Madd( m_velocity, sdt, m_acceleration );
-
-		//btVector3 move = v * dt + btScalar( 0.5f ) * m_acceleration * dt * dt;
-		zpScalar sdt2;
-		sdt2 = zpMath::ScalarMul( sdt, sdt );
-		sdt2 = zpMath::ScalarMul( sdt2, zpMath::Scalar( 0.5f ) );
-		a = zpMath::Vector4Scale( m_acceleration, sdt2 );
-
-		move = zpMath::Vector4Mul( m_velocity, sdt );
-		move = zpMath::Vector4Add( move, a );
-
-		//btVector3 move = m_walkDirection * m_walkVelocity;
-		if( !m_useWalkDirection )
-		{
-			btScalar time = ( dt < m_velocityTimeInterval ) ? dt : m_velocityTimeInterval;
-			m_velocityTimeInterval -= dt;
-
-			//move *= time;
-			move = zpMath::Vector4Scale( move, zpMath::Scalar( time ) );
-		}
-
-		stepForwardAndStrafe( collisionWorld, dt, move );
+		// 2 walk forward and strafe
+		stepForwardAndStrafe( collisionWorld, dt );
 
 		// 3 stepDown
 		stepDown( collisionWorld, dt );
@@ -276,6 +240,8 @@ public:
 		btVector3 pos;
 		pos = _zpVector4ToVector3( m_currentPosition );
 
+		btTransform xform;
+		xform = m_ghost->getWorldTransform();
 		xform.setOrigin( pos );
 		m_ghost->setWorldTransform( xform );
 	}
@@ -363,10 +329,11 @@ public:
 						zpScalar d;
 
 						worldOnB = _btVector3ToVector4Normal( pt.m_normalWorldOnB );
+						worldOnB = zpMath::Vector4Normalize3( worldOnB );
 
 						d = zpMath::ScalarMul( directionSign, zpMath::Scalar( dist ) );
 						d = zpMath::ScalarMul( d, zpMath::Scalar( 0.2f ) );
-						m_currentPosition = zpMath::Vector4ScaleAdd( m_currentPosition, d, worldOnB );
+						m_currentPosition = zpMath::Vector4Madd( m_currentPosition, d, worldOnB );
 
 						penetration = true;
 					}
@@ -453,8 +420,35 @@ public:
 		}
 	}
 
-	void stepForwardAndStrafe( btCollisionWorld* collisionWorld, btScalar dt, const zpVector4f& move )
+	void stepForwardAndStrafe( btCollisionWorld* collisionWorld, btScalar dt )
 	{
+		zpScalar sdt = zpMath::Scalar( dt );
+
+		zpVector4f a;
+		zpVector4f move;
+
+		//btVector3 v = m_acceleration * dt + m_velocity;
+		m_velocity = zpMath::Vector4ScaleAdd( m_acceleration, sdt, m_velocity );
+
+		//btVector3 move = v * dt + btScalar( 0.5f ) * m_acceleration * dt * dt;
+		zpScalar sdt2;
+		sdt2 = zpMath::ScalarMul( sdt, sdt );
+		sdt2 = zpMath::ScalarMul( sdt2, zpMath::Scalar( 0.5f ) );
+		a = zpMath::Vector4Scale( m_acceleration, sdt2 );
+
+		move = zpMath::Vector4Mul( m_velocity, sdt );
+		move = zpMath::Vector4Add( move, a );
+
+		//btVector3 move = m_walkDirection * m_walkVelocity;
+		if( !m_useWalkDirection )
+		{
+			btScalar time = ( dt < m_velocityTimeInterval ) ? dt : m_velocityTimeInterval;
+			m_velocityTimeInterval -= dt;
+
+			//move *= time;
+			move = zpMath::Vector4Scale( move, zpMath::Scalar( time ) );
+		}
+
 		btTransform start, end;
 		start.setIdentity();
 		end.setIdentity();

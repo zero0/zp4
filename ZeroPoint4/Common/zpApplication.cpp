@@ -652,15 +652,7 @@ void zpApplication::handleInput()
 	{
 		m_displayStats.toggle( ZP_APPLICATION_STATS_RENDERING_CMDS );
 	}
-	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F8 ) )
-	{
-		zpMemorySystem::getInstance()->takeMemorySnapshot( m_timer.getTime(), ZP_MEMORY_KB( 2.5f ) );
-	}
-	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
-	{
-		restart();
-	}
-	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F10 ) )
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F5 ) )
 	{
 		zp_bool wasSet = m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS );
 		zp_bool isSet = m_displayStats.toggle( ZP_APPLICATION_STATS_DRAW_PHYSICS );
@@ -674,6 +666,14 @@ void zpApplication::handleInput()
 		{
 			m_physicsEngine.setDebugDrawer( ZP_NULL );
 		}
+	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F8 ) )
+	{
+		zpMemorySystem::getInstance()->takeMemorySnapshot( m_timer.getTime(), ZP_MEMORY_KB( 2.5f ) );
+	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
+	{
+		restart();
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F11 ) )
 	{

@@ -35,6 +35,9 @@ ZP_COMPONENT_DEF( Canvas )
 ZP_COMPONENT_DEF( Widget )
 ZP_COMPONENT_DEF( UICanvas )
 
+// Player
+ZP_COMPONENT_DEF( Player )
+
 //#include "Audio/zpAudioComponents.inl"
 //#include "Physics/zpPhysicsComponents.inl"
 //#include "Rendering/zpRenderingComponents.inl"
