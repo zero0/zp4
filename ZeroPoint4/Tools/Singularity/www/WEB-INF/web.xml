@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
+    <display-name>Servlet 2.4 Examples</display-name>
+    <description>
+        Servlet 2.4 Examples.
+    </description>
+
+    <servlet>
+        <servlet-name>SingularityServlet</servlet-name>
+        <servlet-class>org.zero0.singularity.web.SingularityServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SingularityServlet</servlet-name>
+        <url-pattern>/s/*</url-pattern>
+    </servlet-mapping>
+</web-app>
