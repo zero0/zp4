@@ -84,6 +84,23 @@ public:
 
 	zp_int getObjectCount() const;
 
+	template<typename Func>
+	void foreachNode( Func func )
+	{
+		func( this );
+	
+		if( !m_isLeaf )
+		{
+			zpTransformOctreeNode** b = m_children.begin();
+			zpTransformOctreeNode** e = m_children.end();
+			for( ; b != e; ++b )
+			{
+				zpTransformOctreeNode* node = *b;
+				node->foreachNode( func );
+			}
+		}
+	}
+
 private:
 	enum zpTransformOctreeNodeSide
 	{
@@ -133,6 +150,12 @@ public:
 
 	void update();
 
+	template<typename Func>
+	void foreachNode( Func func )
+	{
+		m_root->foreachNode( func );
+	}
+
 private:
 	zpTransformOctreeNode* m_root;
 
@@ -149,6 +172,8 @@ public:
 	virtual ~zpTransformComponentPool();
 
 	void update( zp_float deltaTime, zp_float realTime );
+
+	zpTransformOctree* getTree() { return &m_octree; }
 
 protected:
 	void onCreate( zpTransformComponent* t );

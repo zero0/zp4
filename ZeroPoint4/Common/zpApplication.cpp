@@ -667,6 +667,10 @@ void zpApplication::handleInput()
 			m_physicsEngine.setDebugDrawer( ZP_NULL );
 		}
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F6 ) )
+	{
+		m_displayStats.toggle( ZP_APPLICATION_STATS_DRAW_OCTREE );
+	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F8 ) )
 	{
 		zpMemorySystem::getInstance()->takeMemorySnapshot( m_timer.getTime(), ZP_MEMORY_KB( 2.5f ) );
@@ -686,6 +690,56 @@ void zpApplication::handleInput()
 		zpRenderingContext* context = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
 		context->beginDrawImmediate( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE_DEBUG, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_defaultMaterial );
 		m_physicsEngine.debugDraw();
+		context->endDrawImmediate();
+	}
+
+	// draw octree
+	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_OCTREE ) )
+	{
+		zpRenderingContext* context = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
+		context->beginDrawImmediate( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE_DEBUG, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_defaultMaterial );
+		
+		zpTransformOctree* tree = m_componentPoolTransform.getTree();
+		tree->foreachNode( [ context ]( zpTransformOctreeNode* node ) {
+			const zpBoundingAABB& aabb = node->getBounts();
+			zpVector4f edgeCoord = zpMath::Vector4( 1, 1, 1, 0 );
+			zpVector4f pa, pb;
+			zpVector4f center = aabb.getCenter();
+			zpVector4f halfExt = aabb.getExtents();
+			//halfExt = zpMath::Vector4Scale( halfExt, zpMath::Scalar( 0.5f ) );
+			
+			zp_int i, j;
+
+			ZP_ALIGN16 zp_float e[4];
+
+			for( i = 0; i < 4; ++i )
+			{
+				for( j = 0; j < 3; ++j )
+				{
+					pa = zpMath::Vector4Mul( edgeCoord, halfExt );
+					pa = zpMath::Vector4Add( pa, center );
+
+					zp_int otherCoord = j % 3;
+					zpMath::Vector4Store4( edgeCoord, e );
+					e[ otherCoord ] *= -1.f;
+					edgeCoord = zpMath::Vector4Load4( e );
+
+					pb = zpMath::Vector4Mul( edgeCoord, halfExt );
+					pb = zpMath::Vector4Add( pb, center );
+
+					context->addLine( pa, pb, zpColor4f( j/3.f, i/4.f, 0.f, 1.f ) );
+				}
+
+				edgeCoord = zpMath::Vector4( -1, -1, -1, 0 );
+				if( i < 3 )
+				{
+					zpMath::Vector4Store4( edgeCoord, e );
+					e[ i ] *= -1.f;
+					edgeCoord = zpMath::Vector4Load4( e );
+				}
+			}
+		} );
+
 		context->endDrawImmediate();
 	}
 }

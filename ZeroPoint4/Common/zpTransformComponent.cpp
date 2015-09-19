@@ -491,7 +491,7 @@ void zpTransformOctreeNode::subdivide()
 		zpMath::Vector4( -1, -1, -1, 0 ),
 	};
 
-	quartSize = zpMath::Vector4Mul( halfSize, zpMath::Scalar( 0.5f ) );
+	quartSize = zpMath::Vector4Scale( halfSize, zpMath::Scalar( 0.5f ) );
 
 	zpTransformOctreeNode** b = m_children.begin();
 	zpTransformOctreeNode** e = m_children.end();
@@ -502,7 +502,7 @@ void zpTransformOctreeNode::subdivide()
 
 		zpBoundingAABB bounds;
 		bounds.setCenter( c );
-		bounds.setExtents( halfSize );
+		bounds.setExtents( quartSize );
 
 		zpTransformOctreeNode* n = *b;
 		n->setup( bounds, m_tree, this );
