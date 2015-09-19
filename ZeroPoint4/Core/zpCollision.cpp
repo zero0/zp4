@@ -3,22 +3,15 @@
 zpCollision::zpCollision() {}
 zpCollision::~zpCollision() {}
 
-zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpVector4f& b )
+zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, zpVector4fParamF b )
 {
-	zpScalar x = zpMath::Vector4GetX( b );
-	zpScalar y = zpMath::Vector4GetY( b );
-	zpScalar z = zpMath::Vector4GetZ( b );
-	
-	zpVector4f min = a.getMin();
-	zpVector4f max = a.getMax();
+	zpVector4f pointDiff = zpMath::Vector4Sub( a.getCenter(), b );
+	pointDiff = zpMath::Vector4Abs( pointDiff );
 
-	return
-		zpMath::ScalarCmp( x, zpMath::Vector4GetX( min ) ) > 0 &&
-		zpMath::ScalarCmp( y, zpMath::Vector4GetY( min ) ) > 0 &&
-		zpMath::ScalarCmp( z, zpMath::Vector4GetZ( min ) ) > 0 &&
-		zpMath::ScalarCmp( x, zpMath::Vector4GetX( max ) ) < 0 &&
-		zpMath::ScalarCmp( y, zpMath::Vector4GetY( max ) ) < 0 &&
-		zpMath::ScalarCmp( z, zpMath::Vector4GetZ( max ) ) < 0 ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
+	zpVector4fCmp cmp = zpMath::Vector4Cmp( pointDiff, a.getExtents() );
+
+	zp_bool collision = cmp.cmpX != 1 && cmp.cmpY != 1 && cmp.cmpZ != 1;
+	return collision ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpRay& b )
 {
@@ -39,14 +32,21 @@ zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpRay
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBoundingAABB& b )
 {
-	return ZP_COLLISION_TYPE_NONE;
+	zpVector4f extDiff = zpMath::Vector4Add( a.getExtents(), b.getExtents() );
+	zpVector4f pointDiff = zpMath::Vector4Sub( a.getCenter(), b.getCenter() );
+	pointDiff = zpMath::Vector4Abs( pointDiff );
+
+	zpVector4fCmp cmp = zpMath::Vector4Cmp( pointDiff, extDiff );
+
+	zp_bool collision = cmp.cmpX != 1 && cmp.cmpY != 1 && cmp.cmpZ != 1;
+	return collision ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
 }
 zpCollisionType zpCollision::testCollision( const zpBoundingAABB& a, const zpBoundingSphere& b )
 {
 	return ZP_COLLISION_TYPE_NONE;
 }
 
-zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpVector4f& b )
+zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, zpVector4fParamF b )
 {
 	zpVector4f dist;
 	zpScalar d;
@@ -127,7 +127,7 @@ zpCollisionType zpCollision::testCollision( const zpBoundingSphere& a, const zpB
 	return c == 0 ? ZP_COLLISION_TYPE_INTERSECT : c < 0 ? ZP_COLLISION_TYPE_CONTAINS : ZP_COLLISION_TYPE_NONE;
 }
 
-zpCollisionType zpCollision::testCollision( const zpFrustum& a, const zpVector4f& b )
+zpCollisionType zpCollision::testCollision( const zpFrustum& a, zpVector4fParamF b )
 {
 	zpCollisionType type = ZP_COLLISION_TYPE_CONTAINS;
 

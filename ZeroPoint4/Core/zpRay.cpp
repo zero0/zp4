@@ -4,7 +4,7 @@ zpRay::zpRay()
 	: m_origin()
 	, m_direction()
 {}
-zpRay::zpRay( const zpVector4f& origin, const zpVector4f& direction )
+zpRay::zpRay( zpVector4fParamF origin, zpVector4fParamF direction )
 	: m_origin( origin )
 	, m_direction( direction )
 {
@@ -31,31 +31,31 @@ void zpRay::operator=( zpRay&& ray )
 	m_direction = ray.m_direction;
 }
 
-const zpVector4f& zpRay::getOrigin() const
+zpVector4f zpRay::getOrigin() const
 {
 	return m_origin;
 }
-void zpRay::setOrigin( const zpVector4f& origin )
+void zpRay::setOrigin( zpVector4fParamF origin )
 {
 	m_origin = origin;
 }
 
-const zpVector4f& zpRay::getDirection() const
+zpVector4f zpRay::getDirection() const
 {
 	return m_direction;
 }
-void zpRay::setDirection( const zpVector4f& direction )
+void zpRay::setDirection( zpVector4fParamF direction )
 {
 	m_direction = zpMath::Vector4Normalize3( direction );
 }
 
-zpVector4f zpRay::getPointAt( const zpScalar& t ) const
+zpVector4f zpRay::getPointAt( zpScalarParamF t ) const
 {
 	zpVector4f p;
 	p = zpMath::Vector4Madd( m_origin, m_direction, t );
 	return p;
 }
-zp_bool zpRay::isPointOnRay( const zpVector4f& point ) const
+zp_bool zpRay::isPointOnRay( zpVector4fParamF point ) const
 {
 	zpVector4f r;
 	r = zpMath::Vector4Sub( point, m_origin );

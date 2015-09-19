@@ -5,7 +5,7 @@
 class zpRay {
 public:
 	zpRay();
-	zpRay( const zpVector4f& origin, const zpVector4f& direction );
+	zpRay( zpVector4fParamF origin, zpVector4fParamF direction );
 	zpRay( const zpRay& ray );
 	zpRay( zpRay&& ray );
 	~zpRay();
@@ -13,14 +13,14 @@ public:
 	void operator=( const zpRay& ray );
 	void operator=( zpRay&& ray );
 
-	const zpVector4f& getOrigin() const;
-	void setOrigin( const zpVector4f& origin );
+	zpVector4f getOrigin() const;
+	void setOrigin( zpVector4fParamF origin );
 
-	const zpVector4f& getDirection() const;
-	void setDirection( const zpVector4f& direction );
+	zpVector4f getDirection() const;
+	void setDirection( zpVector4fParamF direction );
 
-	zpVector4f getPointAt( const zpScalar& t ) const;
-	zp_bool isPointOnRay( const zpVector4f& point ) const;
+	zpVector4f getPointAt( zpScalarParamF t ) const;
+	zp_bool isPointOnRay( zpVector4fParamF point ) const;
 
 private:
 	zpVector4f m_origin;

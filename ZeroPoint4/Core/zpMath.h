@@ -186,6 +186,18 @@ class zpBoundingAABB;
 class zpBoundingSphere;
 class zpCollision;
 
+union zpVector4fCmp
+{
+	zp_int cmp[4];
+	struct
+	{
+		zp_int cmpX;
+		zp_int cmpY;
+		zp_int cmpZ;
+		zp_int cmpW;
+	};
+
+};
 namespace zpMath
 {
 	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL Scalar( zp_float s );
@@ -294,6 +306,7 @@ namespace zpMath
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Min( zpVector4fParamF a, zpVector4fParamF b );
 
 	ZP_FORCE_INLINE zp_int ZP_VECTORCALL ScalarCmp( zpScalarParamF a, zpScalarParamF b );
+	ZP_FORCE_INLINE zpVector4fCmp ZP_VECTORCALL Vector4Cmp( zpVector4fParamF a, zpVector4fParamF b );
 
 	//
 	// Common functions

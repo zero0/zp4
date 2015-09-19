@@ -53,7 +53,7 @@ void zpBoundingAABB::setMinMax( zpVector4fParamF min, zpVector4fParamF max )
 	m_center = zpMath::Vector4Add( min, m_extent );
 }
 
-const zpVector4f& zpBoundingAABB::getCenter() const
+zpVector4f zpBoundingAABB::getCenter() const
 {
 	return m_center;
 }
@@ -61,7 +61,7 @@ void zpBoundingAABB::setCenter( zpVector4fParamF center )
 {
 	m_center = center;
 }
-const zpVector4f& zpBoundingAABB::getExtents() const
+zpVector4f zpBoundingAABB::getExtents() const
 {
 	return m_extent;
 }

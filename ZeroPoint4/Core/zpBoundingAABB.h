@@ -20,8 +20,8 @@ public:
 	void setMax( zpVector4fParamF max );
 	void setMinMax( zpVector4fParamF min, zpVector4fParamF max );
 
-	const zpVector4f& getCenter() const;
-	const zpVector4f& getExtents() const;
+	zpVector4f getCenter() const;
+	zpVector4f getExtents() const;
 
 	void setCenter(  zpVector4fParamF center );
 	void setExtents( zpVector4fParamF extents );

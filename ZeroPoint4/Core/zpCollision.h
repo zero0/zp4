@@ -14,17 +14,17 @@ class zpCollision {
 public:
 	~zpCollision();
 
-	static zpCollisionType testCollision( const zpBoundingAABB& a, const zpVector4f& b );
+	static zpCollisionType testCollision( const zpBoundingAABB& a, zpVector4fParamF b );
 	static zpCollisionType testCollision( const zpBoundingAABB& a, const zpRay& b );
 	static zpCollisionType testCollision( const zpBoundingAABB& a, const zpBoundingAABB& b );
 	static zpCollisionType testCollision( const zpBoundingAABB& a, const zpBoundingSphere& b );
 	
-	static zpCollisionType testCollision( const zpBoundingSphere& a, const zpVector4f& b );
+	static zpCollisionType testCollision( const zpBoundingSphere& a, zpVector4fParamF b );
 	static zpCollisionType testCollision( const zpBoundingSphere& a, const zpRay& b );
 	static zpCollisionType testCollision( const zpBoundingSphere& a, const zpBoundingAABB& b );
 	static zpCollisionType testCollision( const zpBoundingSphere& a, const zpBoundingSphere& b );
 
-	static zpCollisionType testCollision( const zpFrustum& a, const zpVector4f& b );
+	static zpCollisionType testCollision( const zpFrustum& a, zpVector4fParamF b );
 	static zpCollisionType testCollision( const zpFrustum& a, const zpRay& b );
 	static zpCollisionType testCollision( const zpFrustum& a, const zpBoundingAABB& b );
 	static zpCollisionType testCollision( const zpFrustum& a, const zpBoundingSphere& b );
