@@ -8,21 +8,21 @@ public:
 	zpTransformComponent( zpObject* obj, const zpBison::Value& def );
 	virtual ~zpTransformComponent();
 
-	void setLocalTransform( const zpVector4f& localPosition, const zpQuaternion4f& localRotation );
-	void setLocalTransform( const zpVector4f& localPosition, const zpQuaternion4f& localRotation, const zpVector4f& localScale );
+	void setLocalTransform( zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation );
+	void setLocalTransform( zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation, zpVector4fParamF localScale );
 
-	void setLocalPosition( const zpVector4f& localPosition );
-	void setLocalScale( const zpVector4f& localScale );
-	void setLocalRotation( const zpQuaternion4f& localRotation );
+	void setLocalPosition( zpVector4fParamF localPosition );
+	void setLocalScale( zpVector4fParamF localScale );
+	void setLocalRotation( zpQuaternion4fParamF localRotation );
 
-	const zpVector4f& getLocalPosition() const;
-	const zpQuaternion4f& getLocalRotation() const;
-	const zpVector4f& getLocalScale() const;
+	zpVector4f getLocalPosition() const;
+	zpQuaternion4f getLocalRotation() const;
+	zpVector4f getLocalScale() const;
 
-	const zpVector4f& getWorldPosition() const;
+	zpVector4f getWorldPosition() const;
 
-	const zpMatrix4f& getWorldTransform() const;
-	const zpMatrix4f& getLocalTransform() const;
+	zpMatrix4f getWorldTransform() const;
+	zpMatrix4f getLocalTransform() const;
 
 	const zpArrayList< zpTransformComponent* >& getChildren() const;
 
@@ -35,11 +35,11 @@ public:
 	zpTransformComponent* removeChild( zp_uint index );
 
 	void addChild( zpTransformComponent* child );
-	void addChild( zpTransformComponent* child, const zpVector4f& localPosition );
-	void addChild( zpTransformComponent* child, const zpVector4f& localPosition, const zpQuaternion4f& localRotation );
-	void addChild( zpTransformComponent* child, const zpVector4f& localPosition, const zpQuaternion4f& localRotation, const zpVector4f& localScale );
+	void addChild( zpTransformComponent* child, zpVector4fParamF localPosition );
+	void addChild( zpTransformComponent* child, zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation );
+	void addChild( zpTransformComponent* child, zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation, zpVector4fParamF localScale );
 
-	void translate( const zpVector4f& dir );
+	void translate( zpVector4fParamF dir );
 
 protected:
 	void onCreate();
@@ -66,6 +66,82 @@ private:
 	zpArrayList< zpTransformComponent* > m_children;
 };
 
+class zpTransformOctree;
+
+class zpTransformOctreeNode
+{
+public:
+	zpTransformOctreeNode();
+	~zpTransformOctreeNode();
+
+	zp_bool insert( zpTransformComponent* obj );
+	zp_bool remove( zpTransformComponent* obj );
+
+	void setup( const zpBoundingAABB& bounds, zpTransformOctree* tree, zpTransformOctreeNode* parent );
+	void teardown();
+
+	const zpBoundingAABB& getBounts() const;
+
+	zp_int getObjectCount() const;
+
+private:
+	enum zpTransformOctreeNodeSide
+	{
+		TNW,
+		TNE,
+		TSW,
+		TSE,
+
+		BNW,
+		BNE,
+		BSW,
+		BSE,
+
+		zpTransformOctreeNodeSide_Count,
+	};
+
+	zp_bool add( zpTransformComponent* obj );
+	void subdivide();
+
+	zp_bool m_isLeaf;
+	zp_uint m_maxObjectCount;
+
+	zpBoundingAABB m_bounds;
+
+	zpTransformOctree* m_tree;
+	zpTransformOctreeNode* m_parent;
+	zpFixedArrayList< zpTransformOctreeNode*, zpTransformOctreeNodeSide_Count > m_children;
+
+	zpFixedArrayList< zpTransformComponent*, 32 > m_objects;
+};
+
+class zpTransformOctree
+{
+public:
+	void insert( zpTransformComponent* obj );
+	void remove( zpTransformComponent* obj );
+
+	void setup();
+	void teardown();
+
+	const zpBoundingAABB& getBounts() const;
+
+	zp_int getObjectCount() const;
+
+	zpTransformOctreeNode* createNode();
+	void destroyNode( zpTransformOctreeNode* node );
+
+	void update();
+
+private:
+	zpTransformOctreeNode* m_root;
+
+	zpFixedArrayList< zpTransformOctreeNode, 128 > m_nodes;
+
+	zpFixedArrayList< zpTransformOctreeNode*, 128 > m_usedNodes;
+	zpFixedArrayList< zpTransformOctreeNode*, 128 > m_freeNodes;
+};
+
 class zpTransformComponentPool : public zpContentPool< zpTransformComponent, 64 >
 {
 public:
@@ -73,6 +149,13 @@ public:
 	virtual ~zpTransformComponentPool();
 
 	void update( zp_float deltaTime, zp_float realTime );
+
+protected:
+	void onCreate( zpTransformComponent* t );
+	void onDestroy( zpTransformComponent* t );
+
+private:
+	zpTransformOctree m_octree;
 };
 
 #endif

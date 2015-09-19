@@ -757,9 +757,9 @@ void as_Register_zpBoundingAABB( asIScriptEngine* engine )
 	//r = engine->RegisterObjectMethod( ZP_SCRIPT_BOUNDBOXAABB, "void opAssign( const " ZP_SCRIPT_BOUNDBOXAABB "& in )", asMETHODPR( zpBoundingAABB, operator=, ( const zpBoundingAABB& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_BOUNDBOXAABB, "" ZP_SCRIPT_VECTOR4 " get_min() const", asMETHODPR( zpBoundingAABB, getMin, () const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( ZP_SCRIPT_BOUNDBOXAABB, "void set_min( const " ZP_SCRIPT_VECTOR4 "& in )", asMETHODPR( zpBoundingAABB, setMin, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_BOUNDBOXAABB, "void set_min( const " ZP_SCRIPT_VECTOR4 "& in )", asMETHODPR( zpBoundingAABB, setMin, ( zpVector4fParamF ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_BOUNDBOXAABB, "" ZP_SCRIPT_VECTOR4 " get_max() const", asMETHODPR( zpBoundingAABB, getMax, () const, zpVector4f ), asCALL_THISCALL ); AS_ASSERT( r );
-	r = engine->RegisterObjectMethod( ZP_SCRIPT_BOUNDBOXAABB, "void set_max( const " ZP_SCRIPT_VECTOR4 "& in )", asMETHODPR( zpBoundingAABB, setMax, ( const zpVector4f& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_BOUNDBOXAABB, "void set_max( const " ZP_SCRIPT_VECTOR4 "& in )", asMETHODPR( zpBoundingAABB, setMax, ( zpVector4fParamF ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 }
 #pragma endregion
 

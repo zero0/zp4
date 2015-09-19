@@ -32,7 +32,7 @@ public:
 	zpBufferImpl* createBuffer( zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride, const void* data );
 	zp_bool destroyBuffer( zpBufferImpl* buffer );
 
-	zpTextureImpl* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data = ZP_NULL, zp_uint strideInBytes = 0, zp_uint mipLevels = 1 );
+	zpTextureImpl* createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data = ZP_NULL, zp_uint strideInBytes = 0, zp_uint mipLevels = 1,zp_uint maxMipLevel = 0, zp_uint arraySize = 1 );
 	zpTextureImpl* createTextureFromFile( const zpString& filename );
 	zp_bool destroyTexture( zpTextureImpl* texture );
 

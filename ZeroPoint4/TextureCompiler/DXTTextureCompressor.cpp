@@ -24,55 +24,60 @@ struct BC3Block
 zp_int FloatToInt( zp_float a, zp_int l )
 {
 	zp_int i = (zp_int)( a + 0.5f );
-	zp_clamp( i, i, 0, l );
+	i = zp_clamp( i, 0, l );
 	return i;
 }
 
 zpVector4f MakeColorRGB( const zp_byte* rgb )
 {
-	zpVector4f c( (zp_float)rgb[0] / 255.f, (zp_float)rgb[1] / 255.f, (zp_float)rgb[2] / 255.f, 1 );
+	zpVector4f c = zpMath::Vector4( (zp_float)rgb[0] / 255.f, (zp_float)rgb[1] / 255.f, (zp_float)rgb[2] / 255.f, 1 );
 	return c;
 }
 zpVector4f MakeColorRGBA( const zp_byte* rgba )
 {
-	zpVector4f c( (zp_float)rgba[0] / 255.f, (zp_float)rgba[1] / 255.f, (zp_float)rgba[2] / 255.f, (zp_float)rgba[3] / 255.f );
+	zpVector4f c = zpMath::Vector4( (zp_float)rgba[0] / 255.f, (zp_float)rgba[1] / 255.f, (zp_float)rgba[2] / 255.f, (zp_float)rgba[3] / 255.f );
 	return c;
 }
-zp_ushort Vector4To565( const zpVector4f& c )
+zp_ushort Vector4To565( zpVector4fParamF c )
 {
-	zp_int cr = FloatToInt( 31.0f * c.getX().getFloat(), 31 );
-	zp_int cg = FloatToInt( 63.0f * c.getY().getFloat(), 63 );
-	zp_int cb = FloatToInt( 31.0f * c.getZ().getFloat(), 31 );
+	ZP_ALIGN16 zp_float v[4];
+
+	zpVector4f s = zpMath::Vector4Mul( c, zpMath::Vector4( 31.f, 63.f, 31.f, 0.f ) );
+	zpMath::Vector4Store4( s, v );
+
+	zp_int cr = FloatToInt( v[0], 31 );
+	zp_int cg = FloatToInt( v[1], 63 );
+	zp_int cb = FloatToInt( v[2], 31 );
 
 	return ( cr << 11 ) | ( cg << 5 ) | cb;
 }
 
-zp_float DistanceColor( const zpVector4f& a, const zpVector4f& b )
+zp_float DistanceColor( zpVector4fParamF a, zpVector4fParamF b )
 {
 	zpVector4f s;
 	zpScalar d;
 	
-	zpMath::Sub( s, a, b );
-	zpMath::Dot3( d, s, s );
-	return d.getFloat();
+	s = zpMath::Vector4Sub( a, b );
+	d = zpMath::Vector4Dot3( s, s );
+	return zpMath::AsFloat( d );
 }
 
-zp_byte ScalarTo8( const zpScalar& a )
+zp_byte ScalarTo8( zpScalarParamF a )
 {
-	zp_float d;
-	zp_clamp( d, a.getFloat(), 0.f, 1.f );
+	zp_float d = zpMath::AsFloat( a );
+	d = zp_clamp( d, 0.f, 1.f );
 
 	return (zp_byte)zp_floor_to_int( d * 255.f );
 }
 
-zp_float DistanceAlpha( const zpScalar& a, const zpScalar& b )
+zp_float DistanceAlpha( zpScalarParamF a, zpScalarParamF b )
 {
 	zpScalar d;
 
-	zpMath::Sub( d, a, b );
-	zpMath::Mul( d, d, d );
+	d = zpMath::ScalarSub( a, b );
+	d = zpMath::ScalarMul( d, d );
 
-	return d.getFloat();
+	return zpMath::AsFloat( d );
 }
 
 void DXTTextureCompressor::compress( const ImageData& inputImage, ImageData& compiledImage )
@@ -123,8 +128,8 @@ void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& 
 			zp_bool isTransparent[ COMPRESSED_BLOCK_SIZE ];
 			zp_bool hasTransparentPixel = false;
 
-			color0 = zpVector4f( 1, 1, 1, 1 );
-			color1 = zpVector4f( 0, 0, 0, 1 );
+			color0 = zpMath::Vector4( 1, 1, 1, 1 );
+			color1 = zpMath::Vector4( 0, 0, 0, 1 );
 
 			// find min and max
 			for( zp_uint py = 0; py < COMPRESSED_BLOCK_STRIDE; ++py )
@@ -135,7 +140,7 @@ void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& 
 
 					if( x + px > inputImage.width || y + py > inputImage.height )
 					{
-						c = zpVector4f( 0, 0, 0, 1 );
+						c = zpMath::Vector4( 0, 0, 0, 1 );
 					}
 					else
 					{
@@ -143,7 +148,7 @@ void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& 
 						{
 							c = MakeColorRGBA( &image[ stride * ( ( x + px ) + ( ( y + py ) * inputImage.width ) ) ] );
 							
-							zp_bool transparent = c.getW().getFloat() < 1.f;
+							zp_bool transparent = zpMath::ScalarCmp( zpMath::Vector4GetW( c ), zpMath::Scalar( 1.f ) ) < 0;
 							isTransparent[ px + ( py * COMPRESSED_BLOCK_STRIDE ) ] = transparent;
 							hasTransparentPixel |= transparent;
 						}
@@ -168,13 +173,13 @@ void DXTTextureCompressor::compressBC1( const ImageData& inputImage, ImageData& 
 
 			if( hasTransparentPixel )
 			{
-				zpMath::Lerp( color2, color0, color1, zpScalar( 1.f / 2.f ) );
-				color3 = zpVector4f( 0, 0, 0, 0 );
+				color2 = zpMath::Vector4Lerp( color0, color1, zpMath::Scalar( 1.f / 2.f ) );
+				color3 = zpMath::Vector4( 0, 0, 0, 0 );
 			}
 			else
 			{
-				zpMath::Lerp( color2, color0, color1, zpScalar( 1.f / 3.f ) );
-				zpMath::Lerp( color3, color0, color1, zpScalar( 2.f / 3.f ) );
+				color2 = zpMath::Vector4Lerp( color0, color1, zpMath::Scalar( 1.f / 3.f ) );
+				color3 = zpMath::Vector4Lerp( color0, color1, zpMath::Scalar( 2.f / 3.f ) );
 			}
 
 			BC1Block block;
@@ -314,11 +319,11 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 
 			zpVector4f pixels[ COMPRESSED_BLOCK_SIZE ];
 
-			color0 = zpVector4f( 1, 1, 1, 1 );
-			color1 = zpVector4f( 0, 0, 0, 1 );
+			color0 = zpMath::Vector4( 1, 1, 1, 1 );
+			color1 = zpMath::Vector4( 0, 0, 0, 1 );
 
-			alpha0 = zpScalar( 1 );
-			alpha1 = zpScalar( 0 );
+			alpha0 = zpMath::Scalar( 1 );
+			alpha1 = zpMath::Scalar( 0 );
 
 			// find min and max color
 			for( zp_uint py = 0; py < COMPRESSED_BLOCK_STRIDE; ++py )
@@ -329,7 +334,7 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 
 					if( x + px > inputImage.width || y + py > inputImage.height )
 					{
-						c = zpVector4f( 0, 0, 0, 1 );
+						c = zpMath::Vector4( 0, 0, 0, 1 );
 					}
 					else
 					{
@@ -354,21 +359,21 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 						}
 
 						// find min alpha
-						if( c.getW().getFloat() < alpha0.getFloat() )
+						if( zpMath::ScalarCmp( zpMath::Vector4GetW( c ), alpha0 ) < 0 )
 						{
-							alpha0 = c.getW();
+							alpha0 = zpMath::Vector4GetW( c );
 						}
 						// find max alpha
-						if( c.getW().getFloat() > alpha1.getFloat() )
+						if( zpMath::ScalarCmp( zpMath::Vector4GetW( c ), alpha0 ) > 0 )
 						{
-							alpha1 = c.getW();
+							alpha1 = zpMath::Vector4GetW( c );
 						}
 					}
 				}
 			}
 
-			zpMath::Lerp( color2, color0, color1, zpScalar( 1.f / 3.f ) );
-			zpMath::Lerp( color3, color0, color1, zpScalar( 2.f / 3.f ) );
+			color2 = zpMath::Vector4Lerp( color0, color1, zpMath::Scalar( 1.f / 3.f ) );
+			color3 = zpMath::Vector4Lerp( color0, color1, zpMath::Scalar( 2.f / 3.f ) );
 
 			BC3Block block;
 			block.alpha_0 = ScalarTo8( alpha0 );
@@ -433,10 +438,10 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 			{
 				zp_move_swap( block.alpha_0, block.alpha_1 );
 			
-				zpMath::Lerp( alpha2, alpha0, alpha1, zpScalar( 1.f / 5.f ) );
-				zpMath::Lerp( alpha3, alpha0, alpha1, zpScalar( 2.f / 5.f ) );
-				zpMath::Lerp( alpha4, alpha0, alpha1, zpScalar( 3.f / 5.f ) );
-				zpMath::Lerp( alpha5, alpha0, alpha1, zpScalar( 4.f / 5.f ) );
+				alpha2 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 1.f / 5.f ) );
+				alpha3 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 2.f / 5.f ) );
+				alpha4 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 3.f / 5.f ) );
+				alpha5 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 4.f / 5.f ) );
 				alpha6 = alpha0;
 				alpha7 = alpha1;
 			}
@@ -444,12 +449,12 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 			else
 			{
 			
-				zpMath::Lerp( alpha2, alpha0, alpha1, zpScalar( 1.f / 7.f ) );
-				zpMath::Lerp( alpha3, alpha0, alpha1, zpScalar( 2.f / 7.f ) );
-				zpMath::Lerp( alpha4, alpha0, alpha1, zpScalar( 3.f / 7.f ) );
-				zpMath::Lerp( alpha5, alpha0, alpha1, zpScalar( 4.f / 7.f ) );
-				zpMath::Lerp( alpha6, alpha0, alpha1, zpScalar( 5.f / 7.f ) );
-				zpMath::Lerp( alpha7, alpha0, alpha1, zpScalar( 6.f / 7.f ) );
+				alpha2 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 1.f / 7.f ) );
+				alpha3 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 2.f / 7.f ) );
+				alpha4 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 3.f / 7.f ) );
+				alpha5 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 4.f / 7.f ) );
+				alpha6 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 5.f / 7.f ) );
+				alpha7 = zpMath::ScalarLerp( alpha0, alpha1, zpMath::Scalar( 6.f / 7.f ) );
 			}
 
 			zpScalar allAlphas[8] =
@@ -467,7 +472,7 @@ void DXTTextureCompressor::compressBC3( const ImageData& inputImage, ImageData& 
 			// compress alphas
 			for( zp_int j = 0; j < COMPRESSED_BLOCK_SIZE; ++j )
 			{
-				const zpScalar c = pixels[ j ].getW();
+				zpScalar c = zpMath::Vector4GetW( pixels[ j ] );
 
 				zp_byte index = 0;
 				zp_float dist = ZP_FLT_MAX;

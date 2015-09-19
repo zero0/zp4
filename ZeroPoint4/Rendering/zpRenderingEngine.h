@@ -43,7 +43,7 @@ public:
 	void createBuffer( zpBuffer& outBuffer, zpBufferType type, zpBufferBindType bind, zp_uint size, zp_uint stride = 0, const void* data = 0 );
 	zp_bool destroyBuffer( zpBuffer& buffer );
 
-	zp_bool createTexture( zpTexture& texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data = ZP_NULL, zp_uint strideInBytes = 0, zp_uint mipLevels = 1 );
+	zp_bool createTexture( zpTexture& texture, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data = ZP_NULL, zp_uint strideInBytes = 0, zp_uint mipLevels = 1, zp_uint maxMipLevel = 0, zp_uint arraySize = 1 );
 	zp_bool createTextureFromFile( zpTexture& texture, const zpString& filename );
 	zp_bool destroyTexture( zpTexture& texture );
 

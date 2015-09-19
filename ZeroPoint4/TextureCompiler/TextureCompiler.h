@@ -35,15 +35,15 @@ private:
 
 	zpString m_compression;
 
-	zpString m_inputFile;
+	zpArrayList< zpString > m_inputFiles;
 	zpString m_outputFile;
 
 	TextureFormat m_desiredFormat;
 	TextureCompression m_desiredCompressionType;
 	TextureCompression m_desiredCompression;
 
-	ImageData m_rawImage;
-	ImageData m_compressedImage;
+	zpArrayList< ImageData > m_rawImages;
+	zpArrayList< ImageData > m_compressedImages;
 };
 
 #endif

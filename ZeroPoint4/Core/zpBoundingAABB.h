@@ -16,15 +16,15 @@ public:
 
 	zpVector4f getMin() const;
 	zpVector4f getMax() const;
-	void setMin( const zpVector4f& min );
-	void setMax( const zpVector4f& max );
-	void setMinMax( const zpVector4f& min, const zpVector4f& max );
+	void setMin( zpVector4fParamF min );
+	void setMax( zpVector4fParamF max );
+	void setMinMax( zpVector4fParamF min, zpVector4fParamF max );
 
 	const zpVector4f& getCenter() const;
 	const zpVector4f& getExtents() const;
 
-	void setCenter( const zpVector4f& center );
-	void setExtents( const zpVector4f& extents );
+	void setCenter(  zpVector4fParamF center );
+	void setExtents( zpVector4fParamF extents );
 
 	void generateBoundingSphere( zpBoundingSphere& sphere ) const;
 
@@ -33,15 +33,15 @@ public:
 	zpScalar getDepth() const;
 	zpVector4f getSize() const;
 
-	void translate( const zpVector4f& translate );
-	void scaleUniform( const zpScalar& scale );
-	void scale( const zpVector4f& scale );
-	void padUniform( const zpScalar& padding );
-	void pad( const zpVector4f& padding );
+	void translate( zpVector4fParamF translate );
+	void scaleUniform( zpScalarParamF scale );
+	void scale( zpVector4fParamF scale );
+	void padUniform( zpScalarParamF padding );
+	void pad( zpVector4fParamF padding );
 
 	void add( zp_float x, zp_float y, zp_float z );
-	void add( const zpScalar& x, const zpScalar& y, const zpScalar& z );
-	void add( const zpVector4f& point );
+	void add( zpScalarParamF x, zpScalarParamF y, zpScalarParamF z );
+	void add( zpVector4fParamF point );
 	void add( const zpBoundingAABB& box );
 	void add( const zpBoundingSphere& sphere );
 

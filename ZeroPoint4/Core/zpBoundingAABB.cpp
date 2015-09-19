@@ -37,15 +37,15 @@ zpVector4f zpBoundingAABB::getMax() const
 	max = zpMath::Vector4Add( m_center, m_extent );
 	return max;
 }
-void zpBoundingAABB::setMin( const zpVector4f& min )
+void zpBoundingAABB::setMin( zpVector4fParamF min )
 {
 	setMinMax( min, getMax() );
 }
-void zpBoundingAABB::setMax( const zpVector4f& max )
+void zpBoundingAABB::setMax( zpVector4fParamF max )
 {
 	setMinMax( getMin(), max );
 }
-void zpBoundingAABB::setMinMax( const zpVector4f& min, const zpVector4f& max )
+void zpBoundingAABB::setMinMax( zpVector4fParamF min, zpVector4fParamF max )
 {
 	m_extent = zpMath::Vector4Sub( max, min );
 	m_extent = zpMath::Vector4Abs( m_extent );
@@ -57,7 +57,7 @@ const zpVector4f& zpBoundingAABB::getCenter() const
 {
 	return m_center;
 }
-void zpBoundingAABB::setCenter( const zpVector4f& center )
+void zpBoundingAABB::setCenter( zpVector4fParamF center )
 {
 	m_center = center;
 }
@@ -65,7 +65,7 @@ const zpVector4f& zpBoundingAABB::getExtents() const
 {
 	return m_extent;
 }
-void zpBoundingAABB::setExtents( const zpVector4f& extents )
+void zpBoundingAABB::setExtents( zpVector4fParamF extents )
 {
 	m_extent = extents;
 }
@@ -104,23 +104,23 @@ zpVector4f zpBoundingAABB::getSize() const
 	return s;
 }
 
-void zpBoundingAABB::translate( const zpVector4f& translate )
+void zpBoundingAABB::translate( zpVector4fParamF translate )
 {
 	m_center = zpMath::Vector4Add( m_center, translate );
 }
-void zpBoundingAABB::scaleUniform( const zpScalar& scale )
+void zpBoundingAABB::scaleUniform( zpScalarParamF scale )
 {
 	m_extent = zpMath::Vector4Scale( m_extent, scale );
 }
-void zpBoundingAABB::scale( const zpVector4f& scale )
+void zpBoundingAABB::scale( zpVector4fParamF scale )
 {
 	m_extent = zpMath::Vector4Mul( m_extent, scale );
 }
-void zpBoundingAABB::padUniform( const zpScalar& padding )
+void zpBoundingAABB::padUniform( zpScalarParamF padding )
 {
 	m_extent = zpMath::Vector4Madd( m_extent, zpMath::Vector4( 1, 1, 1, 0 ), padding );
 }
-void zpBoundingAABB::pad( const zpVector4f& padding )
+void zpBoundingAABB::pad( zpVector4fParamF padding )
 {
 	m_extent = zpMath::Vector4Add( m_extent, padding );
 }
@@ -129,11 +129,11 @@ void zpBoundingAABB::add( zp_float x, zp_float y, zp_float z )
 {
 	add( zpMath::Vector4( x, y, z, 0.f ) );
 }
-void zpBoundingAABB::add( const zpScalar& x, const zpScalar& y, const zpScalar& z )
+void zpBoundingAABB::add( zpScalarParamF x, zpScalarParamF y, zpScalarParamF z )
 {
 	add( zpMath::Vector4( x, y, z, zpMath::Scalar( 0.f ) ) );
 }
-void zpBoundingAABB::add( const zpVector4f& point )
+void zpBoundingAABB::add( zpVector4fParamF point )
 {
 	zpVector4f min = getMin();
 	zpVector4f max = getMax();

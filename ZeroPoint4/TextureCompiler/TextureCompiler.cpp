@@ -65,7 +65,12 @@ zp_bool TextureCompiler::initialize( const zpArrayList< zpString >& args )
 	m_desiredFormat = TEXTURE_FORMAT_NONE;
 	m_desiredCompression = TEXTURE_COMPRESSION_NONE;
 
-	args.foreach( [ this ]( const zpString& arg ) {
+	zp_bool isCubeMap = false;
+
+	for( zp_uint i = 0, imax = args.size(); i < imax; ++i )
+	{
+		const zpString& arg = args[ i ];
+
 		if( arg.startsWith( "-F" ) )
 		{
 			const zp_char* desiredFormat = arg.str() + 2;
@@ -90,9 +95,57 @@ zp_bool TextureCompiler::initialize( const zpArrayList< zpString >& args )
 				}
 			}
 		}
-	} );
+		else if( arg.startsWith( "-3" ) )
+		{
+			if( !isCubeMap )
+			{
+				m_inputFiles.reserve( TextureCubeFaceOrder_Count );
+				m_inputFiles.resize( TextureCubeFaceOrder_Count );
+			}
 
-	m_inputFile = args[ args.size() - 2 ];
+			isCubeMap = true;
+			zp_char face = arg.charAt( 2 );
+			const zp_char* cubeMapFile = arg.str() + 3;
+
+			TextureCubeFaceOrder face;
+			switch( face )
+			{
+				// positive
+			case 'X':
+				face = TEXTURE_CUBE_FACE_P_X;
+				break;
+				// negative
+			case 'x':
+				face = TEXTURE_CUBE_FACE_N_X;
+				break;
+
+				// positive
+			case 'Y':
+				face = TEXTURE_CUBE_FACE_P_Y;
+				break;
+				// negative
+			case 'y':
+				face = TEXTURE_CUBE_FACE_N_Y;
+				break;
+
+				// positive
+			case 'Z':
+				face = TEXTURE_CUBE_FACE_P_Z;
+				break;
+				// negative
+			case 'z':
+				face = TEXTURE_CUBE_FACE_N_Z;
+				break;
+			}
+
+			m_inputFiles[ face ] = cubeMapFile;
+		}
+	}
+
+	if( !isCubeMap )
+	{
+		m_inputFiles.pushBackEmpty() = args[ args.size() - 2 ];
+	}
 	m_outputFile = args[ args.size() - 1 ];
 
 	return true;

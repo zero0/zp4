@@ -20,24 +20,48 @@
 #define ZP_MAX( a, b )	( ( (a) > (b) ) ? (a) : (b) )
 
 template<typename T>
-ZP_FORCE_INLINE void zp_saturate( T& s, const T& val )
+ZP_FORCE_INLINE T zp_min( T a, T b )
 {
-	s = val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val;
+	T s = ( a < b ) ? a : b;
+	return s;
 }
 
 template<typename T>
-ZP_FORCE_INLINE void zp_clamp( T& s, const T& val, const T& low, const T& high )
+ZP_FORCE_INLINE T zp_max( T a, T b )
 {
-	s = val > high ? high : val < low ? low : val;
+	T s = ( a > b ) ? a : b;
+	return s;
 }
 
 template<typename T>
-ZP_FORCE_INLINE T zp_lerp( const T& low, const T& high, zp_float alpha )
+ZP_FORCE_INLINE T zp_saturate( T val )
 {
-	zp_saturate( alpha, alpha );
+	T s = val > (T)1 ? (T)1 : val < (T)0 ? (T)0 : val;
+	return s;
+}
+
+template<typename T>
+ZP_FORCE_INLINE T zp_clamp( T val, T low, T high )
+{
+	T s = val > high ? high : val < low ? low : val;
+	return s;
+}
+
+template<typename T>
+ZP_FORCE_INLINE T zp_lerp( T low, T high, zp_float alpha )
+{
+	alpha = zp_saturate( alpha );
 	T s = low + (T)( ( high - low ) * alpha );
 	return s;
 }
+
+template<typename T>
+ZP_FORCE_INLINE T zp_abs( T val )
+{
+	T s = val < (T)0 ? -val : val;
+	return s;
+}
+
 
 zp_float zp_cos( zp_float v );
 zp_float zp_sin( zp_float v );
@@ -63,11 +87,6 @@ zp_float zp_fmod( zp_float x, zp_float y );
 
 zp_bool zp_approximate( zp_float a, zp_float b );
 
-template<typename T>
-ZP_FORCE_INLINE void zp_abs( T& a, const T& value )
-{
-	a = value > (T)0 ? value : -value;
-}
 
 #if ZP_USE_SIMD
 #include "zpBaseTypesSimd.inl"

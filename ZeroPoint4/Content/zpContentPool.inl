@@ -48,6 +48,8 @@ T* zpContentPool<T, Count>::create( const R& param )
 
 		zp_zero_memory( ptr );
 		new (ptr) T( param );
+
+		onCreate( ptr );
 	}
 
 	return ptr;
@@ -65,6 +67,8 @@ T* zpContentPool<T, Count>::create( const R0& param0, const R1& param1 )
 
 		zp_zero_memory( ptr );
 		new (ptr) T( param0, param1 );
+
+		onCreate( ptr );
 	}
 
 	return ptr;
@@ -76,10 +80,11 @@ void zpContentPool<T, Count>::destroy( T* obj )
 	zp_int at = m_used.indexOf( obj );
 	if( at >= 0 )
 	{
-		T* ptr =  m_used[ at ];
-		ptr->~T();
+		onDestroy( obj );
 
-		m_free.pushBack( ptr );
+		obj->~T();
+
+		m_free.pushBack( obj );
 		m_used.erase( at );
 	}
 }

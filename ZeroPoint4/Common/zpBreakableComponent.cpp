@@ -99,7 +99,7 @@ zp_int zpBreakableComponent::getMaxHealthAsInt() const
 
 void zpBreakableComponent::setHealth( zp_float health )
 {
-	zp_clamp( m_health, health, 0.0f, m_maxHealth );
+	m_health = zp_clamp( health, 0.0f, m_maxHealth );
 }
 void zpBreakableComponent::setMaxHeath( zp_float maxHealth, zpBreakableSetMaxHealthType scale )
 {
@@ -136,7 +136,7 @@ void zpBreakableComponent::gainHealth( zp_float change )
 	else if( change > 0.0f )
 	{
 		zp_int prevHealth = getHealthAsInt();
-		zp_clamp( m_health, m_health + change, 0.0f, m_maxHealth );
+		m_health = zp_clamp( m_health + change, 0.0f, m_maxHealth );
 		zp_int curHealth = getHealthAsInt();
 
 		if( prevHealth != curHealth )
@@ -154,7 +154,7 @@ void zpBreakableComponent::loseHealth( zp_float change )
 	else if( change > 0.0f )
 	{
 		zp_int prevHealth = getHealthAsInt();
-		zp_clamp( m_health, m_health - change, 0.0f, m_maxHealth );
+		m_health = zp_clamp( m_health - change, 0.0f, m_maxHealth );
 		zp_int curHealth = getHealthAsInt();
 
 		if( prevHealth != curHealth )

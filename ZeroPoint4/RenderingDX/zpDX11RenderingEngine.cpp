@@ -313,7 +313,7 @@ zp_bool zpRenderingEngineImpl::destroyBuffer( zpBufferImpl* buffer )
 	return buffer == ZP_NULL;
 }
 
-zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data, zp_uint strideInBytes, zp_uint mipLevels )
+zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, const void* data, zp_uint strideInBytes, zp_uint mipLevels, zp_uint maxMipLevel, zp_uint arraySize )
 {
 	HRESULT hr;
 	ID3D11Resource* texture = ZP_NULL;
@@ -330,7 +330,7 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 
 	D3D11_TEXTURE2D_DESC texDesc;
 	zp_zero_memory( &texDesc );
-	texDesc.ArraySize = 1;
+
 	switch( type )
 	{
 	case ZP_TEXTURE_TYPE_TEXTURE:
@@ -344,26 +344,33 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 		break;
 	}
 
+	texDesc.ArraySize = arraySize;
 	texDesc.CPUAccessFlags = __zpToDX( access );
 	texDesc.Format = __zpToDX( format );
 	texDesc.Width = width;
 	texDesc.Height = height;
 	texDesc.MipLevels = type == ZP_TEXTURE_TYPE_TEXTURE ? mipLevels : 1;
-	texDesc.MiscFlags = 0;
+	texDesc.MiscFlags = dimension == ZP_TEXTURE_DIMENSION_CUBE_MAP ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Usage = data == ZP_NULL ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
 	
 	// create the texture with or without data
-	if( data )
+	if( data != ZP_NULL )
 	{
-		D3D11_SUBRESOURCE_DATA subData;
-		zp_zero_memory( &subData );
-		subData.pSysMem = data;
-		subData.SysMemPitch = strideInBytes * ( width >> 2 );
-		subData.SysMemSlicePitch = subData.SysMemPitch * ( height >> 2 );
+		const zp_byte* d = (const zp_byte*)data;
 
-		hr = m_d3dDevice->CreateTexture2D( &texDesc, &subData, (ID3D11Texture2D**)&texture );
+		zpFixedArrayList< D3D11_SUBRESOURCE_DATA, 6 > pData;
+		for( zp_uint i = 0; i < texDesc.ArraySize; ++i )
+		{
+			D3D11_SUBRESOURCE_DATA& subData = pData.pushBackEmpty();
+			zp_zero_memory( &subData );
+			subData.SysMemPitch = strideInBytes * ( width >> 2 );
+			subData.SysMemSlicePitch = subData.SysMemPitch * ( height >> 2 );
+			subData.pSysMem = d + ( i * subData.SysMemSlicePitch );
+		}
+
+		hr = m_d3dDevice->CreateTexture2D( &texDesc, pData.begin(), (ID3D11Texture2D**)&texture );
 	}
 	else
 	{
@@ -388,14 +395,17 @@ zpTextureImpl* zpRenderingEngineImpl::createTexture( zp_uint width, zp_uint heig
 		case ZP_TEXTURE_DIMENSION_1D:
 			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
 			srvDesc.Texture1D.MipLevels = texDesc.MipLevels;
+			srvDesc.Texture1D.MostDetailedMip = maxMipLevel;
 			break;
 		case ZP_TEXTURE_DIMENSION_2D:
 			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+			srvDesc.Texture2D.MostDetailedMip = maxMipLevel;
 			break;
 		case ZP_TEXTURE_DIMENSION_CUBE_MAP:
 			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 			srvDesc.TextureCube.MipLevels = texDesc.MipLevels;
+			srvDesc.TextureCube.MostDetailedMip = maxMipLevel;
 			break;
 		}
 

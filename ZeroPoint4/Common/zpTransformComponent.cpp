@@ -79,7 +79,7 @@ zpTransformComponent::~zpTransformComponent()
 {
 }
 
-void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, const zpQuaternion4f& localRotation )
+void zpTransformComponent::setLocalTransform( zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation )
 {
 	m_localPosition = localPosition;
 	m_localRotation = localRotation;
@@ -88,7 +88,7 @@ void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, c
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 
 }
-void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, const zpQuaternion4f& localRotation, const zpVector4f& localScale )
+void zpTransformComponent::setLocalTransform( zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation, zpVector4fParamF localScale )
 {
 	m_localPosition = localPosition;
 	m_localRotation = localRotation;
@@ -98,21 +98,21 @@ void zpTransformComponent::setLocalTransform( const zpVector4f& localPosition, c
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 
-void zpTransformComponent::setLocalPosition( const zpVector4f& localPosition )
+void zpTransformComponent::setLocalPosition( zpVector4fParamF localPosition )
 {
 	m_localPosition = localPosition;
 
 	m_localTransform = zpMath::TRS( m_localPosition, m_localRotation, m_localScale );
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
-void zpTransformComponent::setLocalScale( const zpVector4f& localScale )
+void zpTransformComponent::setLocalScale( zpVector4fParamF localScale )
 {
 	m_localScale = localScale;
 
 	m_localTransform = zpMath::TRS( m_localPosition, m_localRotation, m_localScale );
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
-void zpTransformComponent::setLocalRotation( const zpQuaternion4f& localRotation )
+void zpTransformComponent::setLocalRotation( zpQuaternion4fParamF localRotation )
 {
 	m_localRotation = localRotation;
 
@@ -120,29 +120,29 @@ void zpTransformComponent::setLocalRotation( const zpQuaternion4f& localRotation
 	getParentObject()->setFlag( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
 }
 
-const zpVector4f& zpTransformComponent::getLocalPosition() const
+zpVector4f zpTransformComponent::getLocalPosition() const
 {
 	return m_localPosition;
 }
-const zpQuaternion4f& zpTransformComponent::getLocalRotation() const
+zpQuaternion4f zpTransformComponent::getLocalRotation() const
 {
 	return m_localRotation;
 }
-const zpVector4f& zpTransformComponent::getLocalScale() const
+zpVector4f zpTransformComponent::getLocalScale() const
 {
 	return m_localScale;
 }
 
-const zpVector4f& zpTransformComponent::getWorldPosition() const
+zpVector4f zpTransformComponent::getWorldPosition() const
 {
 	return m_worldTransform.r[ 3 ];
 }
 
-const zpMatrix4f& zpTransformComponent::getWorldTransform() const
+zpMatrix4f zpTransformComponent::getWorldTransform() const
 {
 	return m_worldTransform;
 }
-const zpMatrix4f& zpTransformComponent::getLocalTransform() const
+zpMatrix4f zpTransformComponent::getLocalTransform() const
 {
 	return m_localTransform;
 }
@@ -212,23 +212,23 @@ void zpTransformComponent::addChild( zpTransformComponent* child )
 
 	child->m_parent = this;
 }
-void zpTransformComponent::addChild( zpTransformComponent* child, const zpVector4f& localPosition )
+void zpTransformComponent::addChild( zpTransformComponent* child, zpVector4fParamF localPosition )
 {
 	addChild( child );
 	child->setLocalPosition( localPosition );
 }
-void zpTransformComponent::addChild( zpTransformComponent* child, const zpVector4f& localPosition, const zpQuaternion4f& localRotation )
+void zpTransformComponent::addChild( zpTransformComponent* child, zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation )
 {
 	addChild( child );
 	child->setLocalTransform( localPosition, localRotation );
 }
-void zpTransformComponent::addChild( zpTransformComponent* child, const zpVector4f& localPosition, const zpQuaternion4f& localRotation, const zpVector4f& localScale )
+void zpTransformComponent::addChild( zpTransformComponent* child, zpVector4fParamF localPosition, zpQuaternion4fParamF localRotation, zpVector4fParamF localScale )
 {
 	addChild( child );
 	child->setLocalTransform( localPosition, localRotation, localScale );
 }
 
-void zpTransformComponent::translate( const zpVector4f& dir )
+void zpTransformComponent::translate( zpVector4fParamF dir )
 {
 	zpVector4f pos;
 	pos = zpMath::Vector4Add( m_localPosition, dir );
@@ -294,17 +294,325 @@ zp_int zpTransformComponent::findChildDirect( zpTransformComponent* child )
 	return i;
 }
 
+
+zpTransformOctreeNode::zpTransformOctreeNode()
+	: m_isLeaf( true )
+	, m_maxObjectCount( 32 )
+	, m_tree( ZP_NULL )
+	, m_parent( ZP_NULL )
+{}
+zpTransformOctreeNode::~zpTransformOctreeNode()
+{}
+zp_bool zpTransformOctreeNode::insert( zpTransformComponent* obj )
+{
+	zpVector4f pos = obj->getWorldPosition();
+
+	// if there is no collision in with the node, return false
+	if( !ZP_IS_COLLISION( m_bounds, pos ) )
+	{
+		return false;
+	}
+
+	// if the node is a leaf and it was successfully added, return true
+	if( m_isLeaf && add( obj ) )
+	{
+		return true;
+	}
+
+	// if there are no children, subdivide the node since it failed to add
+	if( m_children.isEmpty() )
+	{
+		subdivide();
+	}
+
+	// if the node is a leaf and there is no room left of objects, convert to a link
+	if( m_isLeaf && m_objects.size() == m_maxObjectCount )
+	{
+		m_isLeaf = false;
+	}
+
+	// if the node is a link and there are objects, push all objects to children
+	if( !m_isLeaf && m_objects.size() > 0 )
+	{
+		zpTransformComponent** b = m_objects.begin();
+		zpTransformComponent** e = m_objects.begin();
+		for( ; b != e; ++b )
+		{
+			zpTransformComponent* o = *b;
+
+			if( m_children[ TNW ]->insert( o ) ) continue;
+			if( m_children[ TNE ]->insert( o ) ) continue;
+			if( m_children[ TSW ]->insert( o ) ) continue;
+			if( m_children[ TSE ]->insert( o ) ) continue;
+
+			if( m_children[ BNW ]->insert( o ) ) continue;
+			if( m_children[ BNE ]->insert( o ) ) continue;
+			if( m_children[ BSW ]->insert( o ) ) continue;
+			if( m_children[ BSE ]->insert( o ) ) continue;
+		}
+
+		// destroy the objects list to not leak memory
+		m_objects.destroy();
+	}
+
+	if( m_children[ TNW ]->insert( obj ) ) return true;
+	if( m_children[ TNE ]->insert( obj ) ) return true;
+	if( m_children[ TSW ]->insert( obj ) ) return true;
+	if( m_children[ TSE ]->insert( obj ) ) return true;
+
+	if( m_children[ BNW ]->insert( obj ) ) return true;
+	if( m_children[ BNE ]->insert( obj ) ) return true;
+	if( m_children[ BSW ]->insert( obj ) ) return true;
+	if( m_children[ BSE ]->insert( obj ) ) return true;
+
+	return false;
+}
+zp_bool zpTransformOctreeNode::remove( zpTransformComponent* obj )
+{
+	zp_bool removed = false;
+
+	// if leaf, remove from objects
+	if( m_isLeaf )
+	{
+		zp_int index = m_objects.indexOf( obj );
+		if( index >= 0 )
+		{
+			m_objects.erase( index );
+			removed = true;
+		}
+	}
+	// otherwise, try removing from children
+	else
+	{
+		zpTransformOctreeNode** b = m_children.begin();
+		zpTransformOctreeNode** e = m_children.end();
+		for( zp_int i = 0; b != e && !removed; ++b, ++i )
+		{
+			removed = (*b)->remove( obj );
+		}
+
+		// if the object was removed, see if there are any objects left in the tree
+		if( removed )
+		{
+			// if the count is zero, remove children and become a leaf again
+			zp_int count = getObjectCount();
+			if( count == 0 )
+			{
+				// convert back to a leaf
+				m_isLeaf = true;
+
+				// destroy child nodes
+				zpTransformOctreeNode** b = m_children.begin();
+				zpTransformOctreeNode** e = m_children.end();
+				for( zp_int i = 0; b != e && !removed; ++b, ++i )
+				{
+					zpTransformOctreeNode* node = *b;
+					node->teardown();
+					m_tree->destroyNode( node );
+				}
+
+				m_children.clear();
+			}
+		}
+	}
+
+	return removed;
+}
+
+void zpTransformOctreeNode::setup( const zpBoundingAABB& bounds, zpTransformOctree* tree, zpTransformOctreeNode* parent )
+{
+	m_bounds = bounds;
+	m_tree = tree;
+	m_parent = parent;
+}
+void zpTransformOctreeNode::teardown()
+{
+
+}
+
+const zpBoundingAABB& zpTransformOctreeNode::getBounts() const
+{
+	return m_bounds;
+}
+
+zp_int zpTransformOctreeNode::getObjectCount() const
+{
+	zp_int count = 0;
+
+	if( m_isLeaf )
+	{
+		count = m_objects.size();
+	}
+	else
+	{
+		const zpTransformOctreeNode* const* b = m_children.begin();
+		const zpTransformOctreeNode* const* e = m_children.end();
+		for( ; b != e; ++b )
+		{
+			count += (*b)->getObjectCount();
+		}
+	}
+
+	return count;
+}
+
+zp_bool zpTransformOctreeNode::add( zpTransformComponent* obj )
+{
+	if( m_objects.size() < m_maxObjectCount )
+	{
+		m_objects.pushBack( obj );
+		return true;
+	}
+
+	return false;
+}
+void zpTransformOctreeNode::subdivide()
+{
+	for( zp_uint i = 0; i < zpTransformOctreeNodeSide_Count; ++i )
+	{
+		zpTransformOctreeNode* node = m_tree->createNode();
+		m_children.pushBack( node );
+	}
+
+	zpVector4f center = m_bounds.getCenter();
+	zpVector4f halfSize = m_bounds.getExtents();
+	zpVector4f quartSize;
+	zpVector4f c;
+
+	static const zpVector4f offsets[] =
+	{
+		zpMath::Vector4(  1,  1,  1, 0 ),
+		zpMath::Vector4( -1,  1,  1, 0 ),
+		zpMath::Vector4(  1,  1, -1, 0 ),
+		zpMath::Vector4( -1,  1, -1, 0 ),
+		zpMath::Vector4(  1, -1,  1, 0 ),
+		zpMath::Vector4( -1, -1,  1, 0 ),
+		zpMath::Vector4(  1, -1, -1, 0 ),
+		zpMath::Vector4( -1, -1, -1, 0 ),
+	};
+
+	quartSize = zpMath::Vector4Mul( halfSize, zpMath::Scalar( 0.5f ) );
+
+	zpTransformOctreeNode** b = m_children.begin();
+	zpTransformOctreeNode** e = m_children.end();
+	for( zp_int i = 0; b != e; ++b, ++i )
+	{
+		c = zpMath::Vector4Mul( offsets[ i ], quartSize );
+		c = zpMath::Vector4Add( c, center );
+
+		zpBoundingAABB bounds;
+		bounds.setCenter( c );
+		bounds.setExtents( halfSize );
+
+		zpTransformOctreeNode* n = *b;
+		n->setup( bounds, m_tree, this );
+	}
+}
+
+
+void zpTransformOctree::insert( zpTransformComponent* obj )
+{
+	// if there is no root, create one around the first object
+	if( m_root == ZP_NULL )
+	{
+		m_root = createNode();
+
+		zpBoundingAABB bounds;
+		bounds.setCenter( obj->getWorldPosition() );
+		bounds.setExtents( zpMath::Vector4( 100.f, 100.f, 100.f, 0 ) );
+
+		m_root->setup( bounds, this, ZP_NULL );
+	}
+
+	zp_bool insertedIntoTree = m_root->insert( obj );
+
+	// if not inserted into tree, expand tree to surround the item
+	if( !insertedIntoTree )
+	{
+
+	}
+}
+void zpTransformOctree::remove( zpTransformComponent* obj )
+{
+	m_root->remove( obj );
+}
+
+void zpTransformOctree::setup()
+{
+	m_nodes.resize( 128 );
+
+	zpTransformOctreeNode* b = m_nodes.begin();
+	zpTransformOctreeNode* e = m_nodes.end();
+	for( ; b != e; ++b )
+	{
+		m_freeNodes.pushBack( b );
+	}
+}
+void zpTransformOctree::teardown()
+{
+	m_root->teardown();
+
+	destroyNode( m_root );
+	m_root = ZP_NULL;
+}
+
+const zpBoundingAABB& zpTransformOctree::getBounts() const
+{
+	return m_root->getBounts();
+}
+
+zp_int zpTransformOctree::getObjectCount() const
+{
+	return m_root->getObjectCount();
+}
+
+zpTransformOctreeNode* zpTransformOctree::createNode()
+{
+	zpTransformOctreeNode* node = m_freeNodes.back();
+	m_freeNodes.popBack();
+	m_usedNodes.pushBack( node );
+
+	return node;
+}
+void zpTransformOctree::destroyNode( zpTransformOctreeNode* node )
+{
+	zp_int index = m_usedNodes.indexOf( node );
+	m_usedNodes.erase( index );
+	m_freeNodes.pushBack( node );
+}
+
+void zpTransformOctree::update()
+{
+
+}
+
+
 zpTransformComponentPool::zpTransformComponentPool()
 {
+	m_octree.setup();
 }
 zpTransformComponentPool::~zpTransformComponentPool()
 {
+	m_octree.teardown();
 }
 
 void zpTransformComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
+	// update transforms
 	m_used.foreach( [ &deltaTime, &realTime ]( zpTransformComponent* o )
 	{
 		o->update( deltaTime, realTime );
 	} );
+
+	// update octree
+	m_octree.update();
+}
+
+void zpTransformComponentPool::onCreate( zpTransformComponent* t )
+{
+	m_octree.insert( t );
+}
+void zpTransformComponentPool::onDestroy( zpTransformComponent* t )
+{
+	m_octree.remove( t );
 }

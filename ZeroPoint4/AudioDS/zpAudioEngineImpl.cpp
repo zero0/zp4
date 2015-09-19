@@ -25,7 +25,7 @@ ZP_FORCE_INLINE zp_float __zpUnNormalizeVolume( LONG volume )
 }
 ZP_FORCE_INLINE LONG __zpNormalizePan( zp_float pan )
 {
-	zp_clamp( pan, pan, -1.0f, 1.0f );
+	pan = zp_clamp( pan, -1.0f, 1.0f );
 	return (LONG)( pan * DSBPAN_RIGHT );
 }
 ZP_FORCE_INLINE zp_float __zpUnNormalizePan( LONG pan )
@@ -225,7 +225,7 @@ zp_bool zpAudioEngineImpl::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType
 	zp_zero_memory( &desc );
 	desc.dwSize = sizeof( DSBUFFERDESC );
 	desc.dwFlags = DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME;
-	zp_clamp< DWORD >( desc.dwBufferBytes, bufferSize, DSBSIZE_MIN, DSBSIZE_MAX );
+	desc.dwBufferBytes = zp_clamp< DWORD >( bufferSize, DSBSIZE_MIN, DSBSIZE_MAX );
 	desc.dwReserved = 0;
 	desc.lpwfxFormat = &format;
 	desc.guid3DAlgorithm = GUID_NULL;

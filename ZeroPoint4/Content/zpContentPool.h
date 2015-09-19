@@ -3,7 +3,7 @@
 #define ZP_CONTENT_POOL_H
 
 template<typename T, zp_uint Count>
-class zpContentPool
+ZP_ABSTRACT_CLASS zpContentPool
 {
 public:
 	zpContentPool();
@@ -26,6 +26,9 @@ public:
 	zp_uint getUsedCount() const;
 
 protected:
+	virtual void onCreate( T* o ) {}
+	virtual void onDestroy( T* o ) {}
+
 	zpFixedArrayList< T*, Count > m_used;
 	zpFixedArrayList< T*, Count > m_free;
 
