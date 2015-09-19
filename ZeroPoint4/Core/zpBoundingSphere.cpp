@@ -4,7 +4,7 @@ zpBoundingSphere::zpBoundingSphere()
 	: m_center( zpMath::Vector4( 0, 0, 0, 0 ) )
 	, m_radius( zpMath::Scalar( ZP_FLT_MIN ) )
 {}
-zpBoundingSphere::zpBoundingSphere( const zpVector4f& center, const zpScalar& radius )
+zpBoundingSphere::zpBoundingSphere( zpVector4fParamF center, zpScalarParamF radius )
 	: m_center( center )
 	, m_radius( radius )
 {}
@@ -30,20 +30,20 @@ void zpBoundingSphere::operator=( zpBoundingSphere&& sphere )
 	m_radius = sphere.m_radius;
 }
 
-const zpVector4f& zpBoundingSphere::getCenter() const
+zpVector4f zpBoundingSphere::getCenter() const
 {
 	return m_center;
 }
-void zpBoundingSphere::setCenter( const zpVector4f& center )
+void zpBoundingSphere::setCenter( zpVector4fParamF center )
 {
 	m_center = center;
 }
 
-const zpScalar& zpBoundingSphere::getRadius() const
+zpScalar zpBoundingSphere::getRadius() const
 {
 	return m_radius;
 }
-void zpBoundingSphere::setRadius( const zpScalar& radius )
+void zpBoundingSphere::setRadius( zpScalarParamF radius )
 {
 	m_radius = radius;
 }
@@ -63,15 +63,15 @@ void zpBoundingSphere::generateBoundingAABB( zpBoundingAABB& box ) const
 	box.setMax( max );
 }
 
-void zpBoundingSphere::translate( const zpVector4f& translate )
+void zpBoundingSphere::translate( zpVector4fParamF translate )
 {
 	m_center = zpMath::Vector4Add( m_center, translate );
 }
-void zpBoundingSphere::scale( const zpScalar& scale )
+void zpBoundingSphere::scale( zpScalarParamF scale )
 {
 	m_radius = zpMath::ScalarMul( m_radius, scale );
 }
-void zpBoundingSphere::pad( const zpScalar& padding )
+void zpBoundingSphere::pad( zpScalarParamF padding )
 {
 	m_radius = zpMath::ScalarAdd( m_radius, padding );
 }
@@ -80,11 +80,11 @@ void zpBoundingSphere::add( zp_float x, zp_float y, zp_float z )
 {
 	add( zpMath::Vector4( x, y, z, 0 ) );
 }
-void zpBoundingSphere::add( const zpScalar& x, const zpScalar& y, const zpScalar& z )
+void zpBoundingSphere::add( zpScalarParamF x, zpScalarParamF y, zpScalarParamF z )
 {
 	add( zpMath::Vector4( x, y, z, zpMath::Scalar( 0 ) ) );
 }
-void zpBoundingSphere::add( const zpVector4f& point )
+void zpBoundingSphere::add( zpVector4fParamF point )
 {
 	zpVector4f dist;
 	zpScalar d;

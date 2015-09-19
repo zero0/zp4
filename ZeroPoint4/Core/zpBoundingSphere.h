@@ -7,7 +7,7 @@ class zpBoundingAABB;
 class zpBoundingSphere {
 public:
 	zpBoundingSphere();
-	zpBoundingSphere( const zpVector4f& center, const zpScalar& radius );
+	zpBoundingSphere( zpVector4fParamF center, zpScalarParamF radius );
 	zpBoundingSphere( const zpBoundingSphere& sphere );
 	zpBoundingSphere( zpBoundingSphere&& sphere );
 	~zpBoundingSphere();
@@ -15,21 +15,21 @@ public:
 	void operator=( const zpBoundingSphere& sphere );
 	void operator=( zpBoundingSphere&& sphere );
 
-	const zpVector4f& getCenter() const;
-	void setCenter( const zpVector4f& center );
+	zpVector4f getCenter() const;
+	void setCenter( zpVector4fParamF center );
 	
-	const zpScalar& getRadius() const;
-	void setRadius( const zpScalar& radius );
+	zpScalar getRadius() const;
+	void setRadius( zpScalarParamF radius );
 
 	void generateBoundingAABB( zpBoundingAABB& box ) const;
 
-	void translate( const zpVector4f& translate );
-	void scale( const zpScalar& scale );
-	void pad( const zpScalar& padding );
+	void translate( zpVector4fParamF translate );
+	void scale( zpScalarParamF scale );
+	void pad( zpScalarParamF padding );
 	
 	void add( zp_float x, zp_float y, zp_float z );
-	void add( const zpScalar& x, const zpScalar& y, const zpScalar& z );
-	void add( const zpVector4f& point );
+	void add( zpScalarParamF x, zpScalarParamF y, zpScalarParamF z );
+	void add( zpVector4fParamF point );
 	void add( const zpBoundingAABB& box );
 	void add( const zpBoundingSphere& sphere );
 
