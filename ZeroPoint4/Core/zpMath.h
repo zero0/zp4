@@ -319,6 +319,7 @@ namespace zpMath
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Perpendicular3( zpVector4fParamF a );
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Madd( zpVector4fParamF a, zpVector4fParamF b, zpScalarParamF c );
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarMadd( zpScalarParamF a, zpScalarParamF b, zpScalarParamF c );
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4MulAdd( zpVector4fParamF a, zpVector4fParamF b, zpVector4fParamF c );
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4ScaleAdd( zpVector4fParamF a, zpScalarParamF b, zpVector4fParamF c );
@@ -354,6 +355,9 @@ namespace zpMath
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL Invert( zpMatrix4fParamF a );
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Lerp( zpVector4fParamF a, zpVector4fParamF b, zpScalarParamF alpha );
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Smoothstep( zpVector4fParamF a, zpVector4fParamF b, zpScalarParamF alpha );
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Smootherstep( zpVector4fParamF a, zpVector4fParamF b, zpScalarParamF alpha );
+	
 	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarLerp( zpScalarParamF a, zpScalarParamF b, zpScalarParamF alpha );
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4RotateX( zpVector4fParamF a, zpScalarParamF rad );

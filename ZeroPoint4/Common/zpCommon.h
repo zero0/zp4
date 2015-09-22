@@ -35,6 +35,7 @@ class zpRigidBodyComponent;
 class zpKinematicBodyComponent;
 class zpPhantomComponent;
 
+class zpTweenComponent;
 class zpBreakableComponent;
 class zpTransformComponent;
 class zpProjectileComponent;
@@ -78,6 +79,7 @@ class zpOctreeNode;
 #include "zpPhantomComponent.h"
 
 // Common
+#include "zpTweenComponent.h"
 #include "zpBreakableComponent.h"
 #include "zpTransformComponent.h"
 #include "zpProjectileComponent.h"

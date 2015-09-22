@@ -111,6 +111,10 @@ void zpObjectContentManager::update()
 	for( ; b != e; ++b )
 	{
 		zpObject* o = *b;
+		if( !o->isFlagSet( ZP_OBJECT_FLAG_INITIALIZED ) )
+		{
+			o->initialize();
+		}
 		if( o->isFlagSet( ZP_OBJECT_FLAG_CAN_UPDATE ) )
 		{
 			o->update();

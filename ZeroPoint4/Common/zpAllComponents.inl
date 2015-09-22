@@ -27,6 +27,7 @@ ZP_COMPONENT_DEF( Phantom )
 
 // Common
 ZP_COMPONENT_DEF( Breakable )
+ZP_COMPONENT_DEF( Tween )
 ZP_COMPONENT_DEF( Projectile )
 ZP_COMPONENT_DEF( Spawner )
 

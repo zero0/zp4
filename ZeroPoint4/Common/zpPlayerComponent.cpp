@@ -48,7 +48,7 @@ zpControllerPlayerInput::~zpControllerPlayerInput()
 void zpControllerPlayerInput::setup( zpPlayerComponent* player )
 {
 	m_player = player;
-	m_controller = m_player->getApplication()->getInputManager()->getController( ZP_CONTROLLER_1 );
+	//m_controller = m_player->getApplication()->getInputManager()->getController( ZP_CONTROLLER_1 );
 	m_keyboard = m_player->getApplication()->getInputManager()->getKeyboard();
 }
 void zpControllerPlayerInput::teardown()

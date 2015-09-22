@@ -503,7 +503,6 @@ void zpApplication::update()
 
 	m_gui.startGUI();
 	onGUI();
-	//if( m_inEditMode ) guiEditMode();
 	m_gui.endGUI();
 }
 void zpApplication::simulate()
@@ -706,7 +705,6 @@ void zpApplication::handleInput()
 			zpVector4f pa, pb;
 			zpVector4f center = aabb.getCenter();
 			zpVector4f halfExt = aabb.getExtents();
-			//halfExt = zpMath::Vector4Scale( halfExt, zpMath::Scalar( 0.5f ) );
 			
 			zp_int i, j;
 

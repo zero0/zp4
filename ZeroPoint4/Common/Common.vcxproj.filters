@@ -162,6 +162,9 @@
     <ClInclude Include="zpUICanvasComponent.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
+    <ClInclude Include="zpTweenComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">
@@ -265,6 +268,9 @@
     </ClCompile>
     <ClCompile Include="zpUICanvasComponent.cpp">
       <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="zpTweenComponent.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

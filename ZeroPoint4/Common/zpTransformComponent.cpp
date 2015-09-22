@@ -237,11 +237,9 @@ void zpTransformComponent::translate( zpVector4fParamF dir )
 
 void zpTransformComponent::onCreate()
 {
-
 }
 void zpTransformComponent::onInitialize()
 {
-
 }
 void zpTransformComponent::onDestroy()
 {

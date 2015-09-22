@@ -34,6 +34,11 @@ namespace zpMath
 	{
 		return Vector4Add( a, Vector4Scale( b, c ) );
 	}
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarMadd( zpScalarParamF a, zpScalarParamF b, zpScalarParamF c )
+	{
+		return ScalarAdd( a, ScalarMul( b, c ) );
+	}
+
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4MulAdd( zpVector4fParamF a, zpVector4fParamF b, zpVector4fParamF c )
 	{
@@ -400,6 +405,28 @@ namespace zpMath
 	{
 		return Vector4Madd( a, Vector4Sub( b, a ), alpha );
 	}
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Smoothstep( zpVector4fParamF a, zpVector4fParamF b, zpScalarParamF alpha )
+	{
+		// x*x*(3 - 2*x);
+		zpScalar x;
+
+		x = ScalarSub( Scalar( 3 ), ScalarAdd( alpha, alpha ) );
+		x = ScalarMul( ScalarMul( alpha, alpha ), x );
+
+		return Vector4Lerp( a, b, x );
+	}
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Smootherstep( zpVector4fParamF a, zpVector4fParamF b, zpScalarParamF alpha )
+	{
+		// x*x*x*(x*(x*6 - 15) + 10);
+		zpScalar x;
+
+		x = ScalarSub( ScalarMul( alpha, Scalar( 6 ) ), Scalar( 15 ) );
+		x = ScalarAdd( ScalarMul( alpha, x ), Scalar( 10 ) );
+		x = ScalarMul( alpha, ScalarMul( alpha, ScalarMul( alpha, x ) ) );
+
+		return Vector4Lerp( a, b, x );
+	}
+
 	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL ScalarLerp( zpScalarParamF a, zpScalarParamF b, zpScalarParamF alpha )
 	{
 		return Vector4Madd( a, ScalarSub( b, a ), alpha );

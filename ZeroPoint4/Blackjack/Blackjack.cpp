@@ -134,7 +134,14 @@ public:
 		zp_printfln( "Character num %d", c.getData< Character >()->num );
 
 		m_editorUI = app->getObjectContentManager()->createObject( "objects/editor_ui.objectb" );
-		m_editorUI->initialize();
+
+		m_runt = app->getObjectContentManager()->createObject( "objects/runt.objectb" );
+
+		zpTweenComponent* tween = m_runt->getComponents()->addTweenComponent( zpBison::null );
+		tween->initialize();
+		zpTweenAction* a = tween->tweenToPosition( zpMath::Vector4( 10, 0, 0, 1 ), 2, 0, false, false );
+		a->flags.mark( ZP_TWEEN_FLAGS_REPEAT );
+		a->method = ZP_TWEEN_METHOD_SMOOTHSTEP;
 	}
 	void onLeaveState( zpApplication* app )
 	{
@@ -143,6 +150,9 @@ public:
 
 		m_editorUI->destroy();
 		m_editorUI = ZP_NULL;
+
+		m_runt->destroy();
+		m_runt = ZP_NULL;
 
 		const zpArrayList< zpCamera* >& cameras = app->getRenderPipeline()->getUsedCameras( ZP_CAMERA_TYPE_MAIN );
 		cameras.foreach( []( zpCamera* c ) { c->setActive( true ); } );
@@ -241,6 +251,7 @@ public:
 private:
 	zpCamera* m_editorCamera;
 	zpObject* m_editorUI;
+	zpObject* m_runt;
 };
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
