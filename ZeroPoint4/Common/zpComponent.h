@@ -2,7 +2,7 @@
 #ifndef ZP_COMPONENT_H
 #define ZP_COMPONENT_H
 
-enum zpComponentFlag
+enum zpComponentFlag : zp_byte
 {
 	ZP_COMPONENT_FLAG_ENABLED,
 	ZP_COMPONENT_FLAG_CREATED,
@@ -49,9 +49,9 @@ protected:
 	virtual void onEnabled() {};
 	virtual void onDisabled() {};
 
-	zpFlag8 m_flags;
-
 	zpObject* m_parentObject;
+
+	zpFlag8 m_flags;
 };
 
 #endif

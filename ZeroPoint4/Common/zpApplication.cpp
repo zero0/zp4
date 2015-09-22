@@ -236,6 +236,8 @@ void zpApplication::initialize()
 }
 void zpApplication::setup()
 {
+	m_profiler.setup();
+
 	zpMemorySystem* mem = zpMemorySystem::getInstance();
 
 #undef ZP_COMPONENT_DEF
@@ -338,6 +340,8 @@ void zpApplication::teardown()
 #undef ZP_COMPONENT_DEF
 
 	garbageCollect();
+
+	m_profiler.teardown();
 }
 zp_int zpApplication::shutdown()
 {
@@ -637,7 +641,11 @@ void zpApplication::handleInput()
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F1 ) )
 	{
-		m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
+		zp_bool marked = m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
+		if( marked )
+		{
+			m_profiler.printProfile( ZP_PROFILER_STEP_PHYSICS_UPDATE, m_timer.getSecondsPerTick() );
+		}
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F2 ) )
 	{
@@ -885,6 +893,8 @@ void zpApplication::processFrame()
 
 	zp_sleep( (zp_uint)sleepTime );
 	ZP_PROFILE_END( SLEEP );
+
+	ZP_PROFILE_FINALIZE();
 }
 
 void zpApplication::addPhase( zpApplicationPhase* phase )
@@ -1080,7 +1090,21 @@ void zpApplication::onGUI()
 		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME, m_timer.getSecondsPerTick() );
 		buff << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
 
+		zpRectf rect( 5, 5, 320, 24 + ( ZP_PROFILER_MAX_FRAMES * 5 ) + 24 );
+		m_gui.beginWindow( "FPS Stats", rect, rect );
 		m_gui.label( 24, buff.str(), zpColor4f( 1, 1, 1, 1 ) );
+		
+		m_gui.setMargin( 0, 1 );
+		
+		const zpProfilerTimeline& timeline = m_profiler.getTimeline( ZP_PROFILER_STEP_FRAME );
+		zp_long maxTime = m_profiler.getMaxTime( ZP_PROFILER_STEP_FRAME );
+		for( zp_int i = 0; i < ZP_PROFILER_MAX_FRAMES; ++i )
+		{
+			zp_float percent = (zp_float)( timeline.frames[ i ].endTime - timeline.frames[ i ].startTime ) / (zp_float)maxTime;
+			m_gui.box( percent, 4, zpColor4f( 0, 1, 1, 1 ) );
+		}
+
+		m_gui.endWindow();
 	}
 
 	// draw rendering stats

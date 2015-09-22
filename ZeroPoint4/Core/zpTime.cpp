@@ -70,7 +70,7 @@ void zpTime::tick()
 	else
 	{
 		m_deltaTime = m_wallClockDeltaTime;
-		m_deltaTime = ZP_MIN( 0, m_deltaTime );
+		m_deltaTime = ZP_MAX( 0, m_deltaTime );
 	}
 	m_previousTime = m_currentTime;
 

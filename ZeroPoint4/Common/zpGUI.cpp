@@ -14,6 +14,7 @@ void zpGUI::setup()
 
 	m_mainColor.set( 0.1f, 0.1f, 0.1f, 1 );
 	m_backgroundColor.set( 0.8f, 0.8f, 0.8f, 1 );
+	m_margin.set( 2, 2 );
 }
 void zpGUI::teardown()
 {
@@ -41,7 +42,7 @@ void zpGUI::beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& out
 
 	m_widgetStack.pushBack( window );
 
-	zpGUIWidget* label = addWidget( 16 );
+	zpGUIWidget* label = addWidget( 1.f, 16 );
 	label->type = ZP_GUI_WIDGET_LABEL;
 	label->text = title;
 	label->color = m_mainColor;
@@ -62,19 +63,27 @@ void zpGUI::beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& out
 void zpGUI::endWindow()
 {
 	m_widgetStack.popBack();
+	m_margin.set( 2, 2 );
+}
+
+void zpGUI::box( zp_float widthPrecent, zp_float size, const zpColor4f& color )
+{
+	zpGUIWidget* box = addWidget( widthPrecent, size );
+	box->type = ZP_GUI_WIDGET_CONTAINER;
+	box->color = color;
 }
 
 void zpGUI::label( zp_float size, const zp_char* text, const zpColor4f& color )
 {
-	zpGUIWidget* label = addWidget( size );
-	label-> type = ZP_GUI_WIDGET_LABEL;
+	zpGUIWidget* label = addWidget( 1.f, size );
+	label->type = ZP_GUI_WIDGET_LABEL;
 	label->text = text;
 	label->color = color;
 }
 
 zp_bool zpGUI::button( zp_float size, const zp_char* text )
 {
-	zpGUIWidget* button = addWidget( size + 4.0f );
+	zpGUIWidget* button = addWidget( 1.f, size + 4.0f );
 	button->type = ZP_GUI_WIDGET_CONTAINER;
 
 	zpRectf worldRect;
@@ -85,7 +94,7 @@ zp_bool zpGUI::button( zp_float size, const zp_char* text )
 
 	button->color = over ? isDown ? m_backgroundColor * 0.4f : m_backgroundColor * 0.6f : m_backgroundColor * 0.8f;
 
-	zpGUIWidget* labal = addChildWidget( size, button );
+	zpGUIWidget* labal = addChildWidget( 1.f, size, button );
 	labal->type = ZP_GUI_WIDGET_LABEL;
 	labal->text = text;
 	labal->color = m_mainColor;
@@ -95,7 +104,7 @@ zp_bool zpGUI::button( zp_float size, const zp_char* text )
 
 zp_bool zpGUI::text( zp_float size, const zp_char* text, const zpColor4f& color, zp_char* outText )
 {
-	zpGUIWidget* label = addWidget( size );
+	zpGUIWidget* label = addWidget( 1.f, size );
 	label->type = ZP_GUI_WIDGET_LABEL;
 	label->text = text;
 
@@ -112,7 +121,7 @@ zp_bool zpGUI::text( zp_float size, const zp_char* text, const zpColor4f& color,
 
 void zpGUI::startGUI()
 {
-	
+	m_margin.set( 2, 2 );
 }
 void zpGUI::endGUI()
 {
@@ -135,7 +144,12 @@ void zpGUI::endGUI()
 	m_allWidgets.reset();
 }
 
-zpGUI::zpGUIWidget* zpGUI::addWidget( zp_float height )
+void zpGUI::setMargin( zp_float w, zp_float h )
+{
+	m_margin.set( w, h );
+}
+
+zpGUI::zpGUIWidget* zpGUI::addWidget( zp_float widthPercent, zp_float height )
 {
 	zpGUIWidget* window = ZP_NULL;
 
@@ -144,15 +158,14 @@ zpGUI::zpGUIWidget* zpGUI::addWidget( zp_float height )
 		window = m_widgetStack.back();
 
 	}
-	return addChildWidget( height, window );
+	return addChildWidget( widthPercent, height, window );
 }
-zpGUI::zpGUIWidget* zpGUI::addChildWidget( zp_float height, zpGUIWidget* parent )
+zpGUI::zpGUIWidget* zpGUI::addChildWidget( zp_float widthPercent, zp_float height, zpGUIWidget* parent )
 {
 	zpGUIWidget* widget = &m_allWidgets.pushBackEmpty();
 
-	zpVector2f margin( 2, 2 );
-	zpVector2f pos = margin;
-	zpVector2f size( margin.getX(), height );
+	zpVector2f pos = m_margin;
+	zpVector2f size( m_margin.getX(), height );
 
 	widget->parent = parent;
 	if( parent != ZP_NULL )
@@ -161,10 +174,10 @@ zpGUI::zpGUIWidget* zpGUI::addChildWidget( zp_float height, zpGUIWidget* parent 
 		zpGUIWidget** e = parent->children.end();
 		for( ; b != e; ++b )
 		{
-			pos.setY( pos.getY() + (*b)->localRect.getSize().getY() + margin.getY() );
+			pos.setY( pos.getY() + (*b)->localRect.getSize().getY() + m_margin.getY() );
 		}
 
-		size.setX( parent->localRect.getSize().getX() - ( margin.getX() * 2.f ) );
+		size.setX( widthPercent * ( parent->localRect.getSize().getX() - ( m_margin.getX() * 2.f ) ) );
 
 		parent->children.pushBack( widget );
 	}

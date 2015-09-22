@@ -679,8 +679,6 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 {
 	ZP_ASSERT( m_currentCommnad == ZP_NULL, "" );
 
-	zpVector4f c, center( matrix.r[ 3 ] );
-
 	const zpMesh* m = mesh->getResource()->getData();
 	const zpMeshPart* b = m->m_parts.begin();
 	const zpMeshPart* e = m->m_parts.end();
@@ -922,6 +920,13 @@ void zpRenderingContext::addText( const zp_char* text, zp_float size, const zpVe
 
 	zpVector2f u0, u1, u2, u3, invSize( 1.f / font->scaleW, 1.f / font->scaleH );
 	zpVector4f cursor( position ), p0, p1, p2, p3, offset = zpMath::Vector4( 0, 0, 0, 1 );
+
+	ZP_UNUSED( cursor );
+	ZP_UNUSED( p0 );
+	ZP_UNUSED( p1 );
+	ZP_UNUSED( p2 );
+	ZP_UNUSED( p3 );
+
 	for( ; *text != '\0'; ++text )
 	{
 		zp_int c = (zp_int)*text;

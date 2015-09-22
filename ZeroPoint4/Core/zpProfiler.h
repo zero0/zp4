@@ -33,6 +33,11 @@ enum zpProfilerSteps
 	zpProfilerSteps_Count,
 };
 
+enum
+{
+	ZP_PROFILER_MAX_FRAMES = 2 * 60
+};
+
 #if ZP_USE_PROFILER
 #define ZP_PROFILE_START( step )	m_profiler.start( ZP_PROFILER_STEP_##step, m_timer.getTime() )
 #define ZP_PROFILE_END( step )		m_profiler.end( ZP_PROFILER_STEP_##step, m_timer.getTime() )
@@ -43,12 +48,41 @@ enum zpProfilerSteps
 #define ZP_PROFILE_FINALIZE()		(void)0
 #endif
 
+struct zpProfilerPart
+{
+	zp_long prevStartTime;
+	zp_long prevEndTime;
+
+	zp_long currentStartTime;
+	zp_long currentEndTime;
+
+	zp_long maxTime;
+	zp_long minTime;
+	zp_long averageTime;
+
+	zp_long samples;
+};
+
+struct zpProfilerFrame
+{
+	zp_long startTime;
+	zp_long endTime;
+};
+
+struct zpProfilerTimeline
+{
+	zpProfilerFrame frames[ ZP_PROFILER_MAX_FRAMES ];
+};
+
 class zpProfiler
 {
 	ZP_NON_COPYABLE( zpProfiler );
 public:
 	zpProfiler();
 	~zpProfiler();
+
+	void setup();
+	void teardown();
 
 	void start( zpProfilerSteps step, zp_long time );
 	void end( zpProfilerSteps step, zp_long time );
@@ -64,22 +98,13 @@ public:
 
 	void printProfile( zpProfilerSteps step, zp_float secondsPerTick );
 
+	const zpProfilerTimeline& getTimeline( zpProfilerSteps step ) const { return m_frames[ step ]; }
+
 private:
-	struct zpProfilerPart
-	{
-		zp_long prevStartTime;
-		zp_long prevEndTime;
-
-		zp_long currentStartTime;
-		zp_long currentEndTime;
-
-		zp_long maxTime;
-		zp_long averageTime;
-
-		zp_long samples;
-	};
+	zp_int m_currentFrame;
 
 	zpFixedArrayList< zpProfilerPart, zpProfilerSteps_Count > m_profiles;
+	zpFixedArrayList< zpProfilerTimeline, zpProfilerSteps_Count > m_frames;
 };
 
 #endif

@@ -16,7 +16,7 @@ enum zpGUIWidgetType
 
 enum
 {
-	ZP_GUI_NUM_WIDGETS = 64
+	ZP_GUI_NUM_WIDGETS = 256
 };
 
 class zpGUI
@@ -30,6 +30,8 @@ public:
 
 	void beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& outPos );
 	void endWindow();
+
+	void box( zp_float widthPercent, zp_float size, const zpColor4f& color );
 
 	void label( zp_float size, const zp_char* text, const zpColor4f& color );
 
@@ -49,6 +51,8 @@ public:
 	void startGUI();
 	void endGUI();
 
+	void setMargin( zp_float w, zp_float h );
+
 private:
 	struct zpGUIWidget
 	{
@@ -62,8 +66,8 @@ private:
 		zpArrayList< zpGUIWidget* > children;
 	};
 
-	zpGUIWidget* addWidget( zp_float height );
-	zpGUIWidget* addChildWidget( zp_float height, zpGUIWidget* parent );
+	zpGUIWidget* addWidget( zp_float widthPercent, zp_float height );
+	zpGUIWidget* addChildWidget( zp_float widthPercent, zp_float height, zpGUIWidget* parent );
 
 	void drawWidgets();
 	void drawWidget( zpGUIWidget* widget );
@@ -83,6 +87,7 @@ private:
 
 	zpColor4f m_mainColor;
 	zpColor4f m_backgroundColor;
+	zpVector2f m_margin;
 
 	zpMaterialResourceInstance m_guiMaterial;
 	zpFontResourceInstance m_guiFont;

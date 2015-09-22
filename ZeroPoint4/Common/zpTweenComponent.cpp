@@ -65,7 +65,8 @@ void zpTweenComponent::cancelTween( zp_int id )
 	if( found )
 	{
 		zpTweenAction* a = m_usedTweens[ index ];
-		a->currentTime = a->maxTime + 1.f;
+		a->flags.mark( ZP_TWEEN_FLAGS_SHOULD_DESTROY );
+		a->flags.unmark( ZP_TWEEN_FLAGS_IS_ACTIVE );
 	}
 }
 void zpTweenComponent::cancelAllTweens()
@@ -75,7 +76,8 @@ void zpTweenComponent::cancelAllTweens()
 	for( ; b != e; ++b )
 	{
 		zpTweenAction* a = *b;
-		a->currentTime = a->maxTime + 1.f;
+		a->flags.mark( ZP_TWEEN_FLAGS_SHOULD_DESTROY );
+		a->flags.unmark( ZP_TWEEN_FLAGS_IS_ACTIVE );
 	}
 }
 
@@ -116,15 +118,13 @@ zpTweenAction* zpTweenComponent::tweenToPosition( zpVector4fParamF endPosition, 
 
 void zpTweenComponent::onCreate()
 {
-	int i = 0; i++;
 }
 void zpTweenComponent::onInitialize()
 {
-	int i = 0; i++;
 }
 void zpTweenComponent::onDestroy()
 {
-
+	
 }
 
 void zpTweenComponent::onUpdate( zp_float deltaTime, zp_float realTime )
@@ -147,6 +147,11 @@ void zpTweenComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 			if( a->flags.isMarked( ZP_TWEEN_FLAGS_REPEAT ) )
 			{
 				a->currentTime = a->currentTime - a->maxTime;
+
+				if( a->flags.isMarked( ZP_TWEEN_FLAGS_PING_PONG ) )
+				{
+					a->flags.toggle( ZP_TWEEN_FLAGS_FLIP_DIRECTION );
+				}
 			}
 			else
 			{
@@ -166,8 +171,19 @@ void zpTweenComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 			zp_float time = zp_min( a->currentTime, a->maxTime );
 			zpScalar t = zpMath::Scalar( time / a->maxTime );
 
-			zpVector4f sp = a->start.position;
-			zpVector4f ep = a->end.position;
+			zpVector4f sp;
+			zpVector4f ep;
+
+			if( a->flags.isMarked( ZP_TWEEN_FLAGS_FLIP_DIRECTION ) )
+			{
+				sp = a->end.position;
+				ep = a->start.position;
+			}
+			else
+			{
+				sp = a->start.position;
+				ep = a->end.position;
+			}
 
 			// update the t based on the tween method
 			switch( a->method )
@@ -195,13 +211,46 @@ void zpTweenComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 				break;
 
 			case ZP_TWEEN_METHOD_QUAD_IN:
-				t = zpMath::ScalarMul( t, t );
+				{
+					t = zpMath::ScalarMul( t, t );
+				}
 				break;
 
 			case ZP_TWEEN_METHOD_QUAD_OUT:
-				t = zpMath::ScalarMul( t, zpMath::ScalarSub( t, zpMath::Scalar( 2 ) ) );
-				t = zpMath::ScalarNeg( t );
+				{
+					t = zpMath::ScalarMul( t, zpMath::ScalarSub( t, zpMath::Scalar( 2 ) ) );
+					t = zpMath::ScalarNeg( t );
+				}
 				break;
+
+			case ZP_TWEEN_METHOD_QUAR_IN_OUT:
+				{
+					
+				}
+				break;
+
+			case ZP_TWEEN_METHOD_CUBIC_IN:
+				{
+					t = zpMath::ScalarMul( t, zpMath::ScalarMul( t, t ) );
+				}
+				break;
+
+			case ZP_TWEEN_METHOD_CUBIC_OUT:
+				{
+					t = zpMath::ScalarSub( t, zpMath::Scalar( 1 ) );
+					t = zpMath::ScalarMul( t, zpMath::ScalarMul( t, t ) );
+					t = zpMath::ScalarAdd( t, zpMath::Scalar( 1 ) );
+				}
+				break;
+
+			case ZP_TWEEN_METHOD_CUBIC_IN_OUT:
+				{
+
+				}
+				break;
+
+			default:
+				ZP_ASSERT( false, "Unknown Tween Method" );
 			}
 
 			// tween methods boil down to lerp
@@ -225,7 +274,7 @@ void zpTweenComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 		}
 	}
 
-	// update transform component based on current tweens
+	// update transform component based on current active tweens
 	zpTransformComponent* t = getParentObject()->getComponents()->getTransformComponent();
 
 	b = m_usedTweens.begin();
@@ -233,7 +282,10 @@ void zpTweenComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 	for( ; b != e; ++b )
 	{
 		zpTweenAction* a = *b;
-		t->setLocalTransform( a->current.position, a->current.rotation, a->current.scale );
+		if( a->flags.isMarked( ZP_TWEEN_FLAGS_IS_ACTIVE ) )
+		{
+			t->setLocalTransform( a->current.position, a->current.rotation, a->current.scale );
+		}
 	}
 }
 void zpTweenComponent::onSimulate()

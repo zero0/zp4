@@ -138,9 +138,9 @@ public:
 		m_runt = app->getObjectContentManager()->createObject( "objects/runt.objectb" );
 
 		zpTweenComponent* tween = m_runt->getComponents()->addTweenComponent( zpBison::null );
-		tween->initialize();
-		zpTweenAction* a = tween->tweenToPosition( zpMath::Vector4( 10, 0, 0, 1 ), 2, 0, false, false );
+		zpTweenAction* a = tween->tweenToPosition( zpMath::Vector4( 0, 0, 10, 1 ), 2, 0, false, false );
 		a->flags.mark( ZP_TWEEN_FLAGS_REPEAT );
+		a->flags.mark( ZP_TWEEN_FLAGS_PING_PONG );
 		a->method = ZP_TWEEN_METHOD_SMOOTHSTEP;
 	}
 	void onLeaveState( zpApplication* app )

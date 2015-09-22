@@ -21,6 +21,7 @@ void zpKeyboard::poll()
 		for( zp_uint k = 0; k < ZP_INPUT_MAX_KEYS; ++k )
 		{
 			m_keyPressBuffer[ k ] = KEY_UP;
+
 			if( m_keyBuffer[ k ] == KEY_DOWN )
 			{
 				if( m_keyDownBuffer[ k ] == KEY_DOWN )
@@ -37,6 +38,7 @@ void zpKeyboard::poll()
 						listener->onKeyDown( (zpKeyCode)k );
 					} );
 				}
+
 				m_keyDownBuffer[ k ] = KEY_DOWN;
 			}
 			else if( m_keyDownBuffer[ k ] == KEY_DOWN )
