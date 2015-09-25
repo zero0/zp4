@@ -8,8 +8,6 @@
 zpApplication::zpApplication()
 	: m_isRunning( false )
 	, m_restartApplication( false )
-	, m_hasNextWorld( false )
-	, m_addNextWorld( false )
 	, m_shouldGarbageCollect( false )
 	, m_shouldReloadAllResources( false )
 	, m_isApplicationPaused( false )
@@ -388,38 +386,8 @@ void zpApplication::update()
 	// clear application step
 	m_isApplicationStepped = false;
 
-	// update phases
-	ZP_PROFILE_START( UPDATE_PHASE );
-	updatePhase( deltaTime, realTime );
-	ZP_PROFILE_END( UPDATE_PHASE );
-
-	// update state
-	ZP_PROFILE_START( UPDATE_STATE );
-	updateState( deltaTime, realTime );
-	ZP_PROFILE_END( UPDATE_STATE );
-
-	zp_bool initalizeCurrentWorld = false;
-	if( m_hasNextWorld && !m_nextWorldFilename.isEmpty() )
+	if( !m_nextWorldFilename.isEmpty() )
 	{
-		//// if the next world should be added
-		//if( m_addNextWorld )
-		//{
-		//	m_worldContent.createWorld( m_nextWorldFilename.str(), true );
-		//}
-		//// otherwise, do a world swap
-		//else
-		//{
-		//	// if the current world is set, it's a world swap, unload objects
-		//	if( m_currentWorld != ZP_NULL )
-		//	{
-		//		m_currentWorld->setFlag( ZP_WORLD_FLAG_SHOULD_DESTROY );
-		//		m_objectContent.destroyAllObjects( true );
-		//	}
-		//
-		//	// create the new world and mark for create
-		//	m_currentWorld = m_worldContent.createWorld( m_nextWorldFilename.str(), false );
-		//}
-
 		// destroy old world and objects
 		if( m_currentWorld != ZP_NULL )
 		{
@@ -429,27 +397,13 @@ void zpApplication::update()
 
 		// load the loading world and create it's objects
 		m_currentWorld = m_worldContent.createWorld( m_loadingWorldFilename.str(), false );
-		initalizeCurrentWorld = true;
 
 		// step load the next world
 		m_nextWorld = m_worldContent.createWorld( m_nextWorldFilename.str(), false );
 		m_nextWorld->setFlag( ZP_WORLD_FLAG_STEP_CREATE );
 
-		/*
-		destroy objects in current world
-		destroy current world
-		current = loading scene
-		next = next scene
-
-		current is done, destroy current
-		current = next
-		next = null
-		*/
-
 		// reset state
 		m_nextWorldFilename.clear();
-		m_hasNextWorld = false;
-		m_addNextWorld = false;
 	}
 
 	// if the next world is done loading
@@ -463,27 +417,29 @@ void zpApplication::update()
 		m_currentWorld = m_nextWorld;
 		m_nextWorld = ZP_NULL;
 
-		// initialize all objects in the world
-		initalizeCurrentWorld = true;
-
 		// collect garbage next frame
 		garbageCollect();
 	}
 
-	// update object, delete any etc
-	ZP_PROFILE_START( OBJECT_UPDATE );
-	m_objectContent.update();
-	ZP_PROFILE_END( OBJECT_UPDATE );
+	// update phases
+	ZP_PROFILE_START( UPDATE_PHASE );
+	updatePhase( deltaTime, realTime );
+	ZP_PROFILE_END( UPDATE_PHASE );
+
+	// update state
+	ZP_PROFILE_START( UPDATE_STATE );
+	updateState( deltaTime, realTime );
+	ZP_PROFILE_END( UPDATE_STATE );
 
 	// update world, delete, create objects, etc.
 	ZP_PROFILE_START( WORLD_UPDATE );
 	m_worldContent.update();
 	ZP_PROFILE_END( WORLD_UPDATE );
 
-	if( initalizeCurrentWorld )
-	{
-		m_objectContent.initializeAllObjectsInWorld( m_currentWorld );
-	}
+	// update object, delete any etc
+	ZP_PROFILE_START( OBJECT_UPDATE );
+	m_objectContent.update();
+	ZP_PROFILE_END( OBJECT_UPDATE );
 
 	// update physics
 	ZP_PROFILE_START( PHYSICS_UPDATE );
@@ -595,9 +551,7 @@ zp_bool zpApplication::handleDragAndDrop( const zp_char* filename, zp_int x, zp_
 	}
 	else if( strFilename.endsWith( ".worldb" ) )
 	{
-		m_nextWorldFilename = filename;
-		m_hasNextWorld = true;
-		loaded = true;
+		loadWorld( strFilename.str() );
 	}
 	else if( strFilename.endsWith( ".shaderb" ) )
 	{
@@ -646,6 +600,10 @@ void zpApplication::handleInput()
 	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_1 ) )
 	{
 		loadWorld( "worlds/physics.worldb" );
+	}
+	else if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) && keyboard->isKeyPressed( ZP_KEY_CODE_2 ) )
+	{
+		loadWorld( "worlds/test.worldb" );
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F1 ) )
 	{
@@ -760,14 +718,10 @@ void zpApplication::handleInput()
 
 void zpApplication::loadWorld( const zp_char* worldFilename )
 {
-	m_addNextWorld = false;
-	m_hasNextWorld = true;
 	m_nextWorldFilename = worldFilename;
 }
 void zpApplication::loadWorldAdditive( const zp_char* worldFilename )
 {
-	m_addNextWorld = true;
-	m_hasNextWorld = true;
 	m_nextWorldFilename = worldFilename;
 }
 zp_float zpApplication::getLoadingWorldProgress() const
@@ -1092,10 +1046,12 @@ void zpApplication::onGUI()
 {
 	zpFixedStringBuffer< 64 > buff;
 
+	zp_float secondsPerTick = m_timer.getSecondsPerTick();
+
 	// draw FPS
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
 	{
-		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME, m_timer.getSecondsPerTick() );
+		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME, secondsPerTick );
 		buff << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
 
 #if 0
@@ -1123,15 +1079,15 @@ void zpApplication::onGUI()
 	// draw rendering stats
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_RENDERING ) )
 	{
-		zp_float renderAllMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER				, m_timer.getSecondsPerTick() );
-		zp_float renderBeginMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_BEGIN		, m_timer.getSecondsPerTick() );
-		zp_float renderFrameMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_FRAME		, m_timer.getSecondsPerTick() );
-		zp_float renderMeshesMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_MESHES		, m_timer.getSecondsPerTick() );
-		zp_float renderParticlesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PARTICLES	, m_timer.getSecondsPerTick() );
-		zp_float renderUIMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_UI			, m_timer.getSecondsPerTick() );
-		zp_float renderPresentMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT		, m_timer.getSecondsPerTick() );
-		zp_float renderDebugMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER		, m_timer.getSecondsPerTick() );
-		zp_float renderGUIMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DRAW_GUI			, m_timer.getSecondsPerTick() );
+		zp_float renderAllMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER				, secondsPerTick );
+		zp_float renderBeginMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_BEGIN		, secondsPerTick );
+		zp_float renderFrameMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_FRAME		, secondsPerTick );
+		zp_float renderMeshesMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_MESHES		, secondsPerTick );
+		zp_float renderParticlesMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PARTICLES	, secondsPerTick );
+		zp_float renderUIMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_UI			, secondsPerTick );
+		zp_float renderPresentMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT		, secondsPerTick );
+		zp_float renderDebugMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER		, secondsPerTick );
+		zp_float renderGUIMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DRAW_GUI			, secondsPerTick );
 
 		zpRectf rect( 5, 5, 320, 230 );
 		m_gui.beginWindow( "Rendering", rect, rect );
@@ -1178,17 +1134,17 @@ void zpApplication::onGUI()
 	// draw update stats
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_UPDATE ) )
 	{
-		zp_float updateMs =			 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE			, m_timer.getSecondsPerTick() );
-		zp_float simulateMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SIMULATE		, m_timer.getSecondsPerTick() );
-		zp_float sleepMs =			 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SLEEP			, m_timer.getSecondsPerTick() );
-		zp_float objectUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_OBJECT_UPDATE	, m_timer.getSecondsPerTick() );
-		zp_float worldUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_WORLD_UPDATE	, m_timer.getSecondsPerTick() );
-		zp_float scriptUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE	, m_timer.getSecondsPerTick() );
-		zp_float inputUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE	, m_timer.getSecondsPerTick() );
-		zp_float audioUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE	, m_timer.getSecondsPerTick() );
-		zp_float physicsUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_PHYSICS_UPDATE	, m_timer.getSecondsPerTick() );
-		zp_float phaseUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE_PHASE	, m_timer.getSecondsPerTick() );
-		zp_float stateUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE_STATE	, m_timer.getSecondsPerTick() );
+		zp_float updateMs =			 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE			, secondsPerTick );
+		zp_float simulateMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SIMULATE		, secondsPerTick );
+		zp_float sleepMs =			 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SLEEP			, secondsPerTick );
+		zp_float objectUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_OBJECT_UPDATE	, secondsPerTick );
+		zp_float worldUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_WORLD_UPDATE	, secondsPerTick );
+		zp_float scriptUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE	, secondsPerTick );
+		zp_float inputUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE	, secondsPerTick );
+		zp_float audioUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE	, secondsPerTick );
+		zp_float physicsUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_PHYSICS_UPDATE	, secondsPerTick );
+		zp_float phaseUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE_PHASE	, secondsPerTick );
+		zp_float stateUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE_STATE	, secondsPerTick );
 
 		zpRectf rect( 5, 5, 320, 320 );
 		m_gui.beginWindow( "Update", rect, rect );

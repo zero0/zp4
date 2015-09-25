@@ -170,25 +170,28 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 
 				if( found )
 				{
+					zp_float* ptr = (zp_float*)( buffer + var->offset );
 					if( zp_strcmp( globalType, "Float" ) == 0 )
 					{
 						zp_float val = value.asFloat();
-						( *(zp_float*)( buffer + var->offset ) ) = val;
+						*ptr = val;
 					}
 					else if( zp_strcmp( globalType, "Float2" ) == 0 )
 					{
 						zpVector2f val( value[ 0 ].asFloat(), value[ 1 ].asFloat() );
-						( *(zpVector2f*)( buffer + var->offset ) ) = val;
+						ptr[ 0 ] = val.getX();
+						ptr[ 1 ] = val.getY();
 					}
 					else if( zp_strcmp( globalType, "Float4" ) == 0 )
 					{
 						zpVector4f val = zpMath::Vector4( value[ 0 ].asFloat(), value[ 1 ].asFloat(), value[ 2 ].asFloat(), value[ 3 ].asFloat() );
-						( *(zpVector4f*)( buffer + var->offset ) ) = val;
+						zpMath::Vector4Store4( val, ptr );
 					}
 					else if( zp_strcmp( globalType, "Color" ) == 0 )
 					{
 						zpColor4f val( value[ 0 ].asFloat(), value[ 1 ].asFloat(), value[ 2 ].asFloat(), value[ 3 ].asFloat() );
 						( *(zpColor4f*)( buffer + var->offset ) ) = val;
+						val.store4( ptr );
 					}
 					//else if( zp_strcmp( globalType, "float4x4" ) == 0 )
 					//{

@@ -190,8 +190,6 @@ private:
 
 	zp_bool m_isRunning;
 	zp_bool m_restartApplication;
-	zp_bool m_hasNextWorld;
-	zp_bool m_addNextWorld;
 	zp_bool m_shouldGarbageCollect;
 	zp_bool m_shouldReloadAllResources;
 	zp_bool m_isApplicationPaused;
