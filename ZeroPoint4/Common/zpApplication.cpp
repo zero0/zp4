@@ -389,10 +389,14 @@ void zpApplication::update()
 	m_isApplicationStepped = false;
 
 	// update phases
+	ZP_PROFILE_START( UPDATE_PHASE );
 	updatePhase( deltaTime, realTime );
+	ZP_PROFILE_END( UPDATE_PHASE );
 
 	// update state
+	ZP_PROFILE_START( UPDATE_STATE );
 	updateState( deltaTime, realTime );
+	ZP_PROFILE_END( UPDATE_STATE );
 
 	zp_bool initalizeCurrentWorld = false;
 	if( m_hasNextWorld && !m_nextWorldFilename.isEmpty() )
@@ -497,7 +501,9 @@ void zpApplication::update()
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
+	ZP_PROFILE_START( RENDERING_UPDATE );
 	m_renderingPipeline.update();
+	ZP_PROFILE_END( RENDERING_UPDATE );
 
 	ZP_PROFILE_START( AUDIO_UPDATE );
 	m_audioEngine.update();
@@ -505,9 +511,11 @@ void zpApplication::update()
 
 	handleInput();
 
+	ZP_PROFILE_START( DRAW_GUI );
 	m_gui.startGUI();
 	onGUI();
 	m_gui.endGUI();
+	ZP_PROFILE_END( DRAW_GUI );
 }
 void zpApplication::simulate()
 {
@@ -1123,6 +1131,7 @@ void zpApplication::onGUI()
 		zp_float renderUIMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_UI			, m_timer.getSecondsPerTick() );
 		zp_float renderPresentMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_RENDER_PRESENT		, m_timer.getSecondsPerTick() );
 		zp_float renderDebugMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DEBUG_RENDER		, m_timer.getSecondsPerTick() );
+		zp_float renderGUIMs =		 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_DRAW_GUI			, m_timer.getSecondsPerTick() );
 
 		zpRectf rect( 5, 5, 320, 230 );
 		m_gui.beginWindow( "Rendering", rect, rect );
@@ -1159,6 +1168,10 @@ void zpApplication::onGUI()
 		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
 		buff.clear();
 
+		buff << "GUI       " << renderGUIMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 1, 0, 0, 1 ) );
+		buff.clear();
+
 		m_gui.endWindow();
 	}
 
@@ -1173,9 +1186,11 @@ void zpApplication::onGUI()
 		zp_float scriptUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SCRIPT_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float inputUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_INPUT_UPDATE	, m_timer.getSecondsPerTick() );
 		zp_float audioUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_AUDIO_UPDATE	, m_timer.getSecondsPerTick() );
-		zp_float physicsUpdaateMS =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_PHYSICS_UPDATE	, m_timer.getSecondsPerTick() );
+		zp_float physicsUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_PHYSICS_UPDATE	, m_timer.getSecondsPerTick() );
+		zp_float phaseUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE_PHASE	, m_timer.getSecondsPerTick() );
+		zp_float stateUpdateMs =	 m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE_STATE	, m_timer.getSecondsPerTick() );
 
-		zpRectf rect( 5, 5, 320, 260 );
+		zpRectf rect( 5, 5, 320, 320 );
 		m_gui.beginWindow( "Update", rect, rect );
 
 		buff << "Update   " << updateMs * 1000.f << " ms";
@@ -1210,7 +1225,15 @@ void zpApplication::onGUI()
 		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
 		buff.clear();
 
-		buff << "Physics  " << physicsUpdaateMS * 1000.f << " ms";
+		buff << "Physics  " << physicsUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "Phase    " << phaseUpdateMs * 1000.f << " ms";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
+		buff.clear();
+
+		buff << "State    " << stateUpdateMs * 1000.f << " ms";
 		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 1, 1 ) );
 		buff.clear();
 
