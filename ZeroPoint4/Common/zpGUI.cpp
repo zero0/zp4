@@ -2,24 +2,40 @@
 
 void zpGUI::create()
 {
-	m_renderingContext = m_application->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
 
-	m_isDrawingWidgets = false;
-	m_currentlySelected = ZP_NULL;
 }
 void zpGUI::setup()
 {
+	m_isDrawingWidgets = false;
+	m_currentlySelected = ZP_NULL;
+
 	m_application->getRenderPipeline()->getMaterialContentManager()->getResource( "materials/gui.materialb", m_guiMaterial );
 	m_application->getRenderPipeline()->getFontContentManager()->getResource( "fonts/arial32.fontb", m_guiFont );
 
 	m_mainColor.set( 0.1f, 0.1f, 0.1f, 1 );
 	m_backgroundColor.set( 0.8f, 0.8f, 0.8f, 1 );
 	m_margin.set( 2, 2 );
+
+	m_allWidgets.resize( ZP_GUI_NUM_WIDGETS );
+
+	zpGUIWidget* b = m_allWidgets.begin();
+	zpGUIWidget* e = m_allWidgets.end();
+	for( ; b != e; ++b )
+	{
+		m_freeWidgets.pushBack( b );
+	}
 }
 void zpGUI::teardown()
 {
+	ZP_ASSERT( m_usedWidgets.isEmpty(), "" );
+
 	m_guiMaterial.release();
 	m_guiFont.release();
+
+	m_usedWidgets.clear();
+	m_freeWidgets.clear();
+	m_allWidgets.clear();
+	m_widgetStack.clear();
 }
 void zpGUI::destroy()
 {
@@ -28,7 +44,10 @@ void zpGUI::destroy()
 
 void zpGUI::beginWindow( const zp_char* title, const zpRectf& rect, zpRectf& outPos )
 {
-	zpGUIWidget* window = &m_allWidgets.pushBackEmpty();
+	zpGUIWidget* window = m_freeWidgets.back();
+	m_freeWidgets.popBack();
+	m_usedWidgets.pushBack( window );
+
 	window->type = ZP_GUI_WIDGET_CONTAINER;
 	window->localRect = rect;
 	window->parent = ZP_NULL;
@@ -127,21 +146,21 @@ void zpGUI::endGUI()
 {
 	ZP_ASSERT_WARN( m_widgetStack.isEmpty(), "Widget still on stack" );
 
-	m_renderingContext->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
-	m_isDrawingWidgets = true;
+	// draw widgets
+	zpRenderingContext* context = m_application->getRenderPipeline()->getRenderingEngine()->getImmediateRenderingContext();
+	drawWidgets( context );
 
-	drawWidgets();
-
-	if( m_isDrawingWidgets )
+	// push used widgets back to the free list
+	zpGUIWidget** b = m_usedWidgets.begin();
+	zpGUIWidget** e = m_usedWidgets.end();
+	for( ; b != e; ++b )
 	{
-		m_renderingContext->endDrawImmediate();
+		zpGUIWidget* w = *b;
+		w->children.clear();
+		m_freeWidgets.pushBack( w );
 	}
-	else
-	{
-		m_renderingContext->endDrawFont();
-	}
-
-	m_allWidgets.reset();
+	m_usedWidgets.reset();
+	m_widgetStack.reset();
 }
 
 void zpGUI::setMargin( zp_float w, zp_float h )
@@ -162,7 +181,9 @@ zpGUI::zpGUIWidget* zpGUI::addWidget( zp_float widthPercent, zp_float height )
 }
 zpGUI::zpGUIWidget* zpGUI::addChildWidget( zp_float widthPercent, zp_float height, zpGUIWidget* parent )
 {
-	zpGUIWidget* widget = &m_allWidgets.pushBackEmpty();
+	zpGUIWidget* widget = m_freeWidgets.back();
+	m_freeWidgets.popBack();
+	m_usedWidgets.pushBack( widget );
 
 	zpVector2f pos = m_margin;
 	zpVector2f size( m_margin.getX(), height );
@@ -190,10 +211,16 @@ void zpGUI::getWorldRect( zpGUIWidget* widget, zpRectf& outWorldRect )
 {
 	outWorldRect = widget->localRect;
 
-	while( ( widget = widget->parent ) != ZP_NULL )
+	zpVector2f pos = outWorldRect.getPosition();
+
+	zpGUIWidget* parent = widget->parent;
+	while( parent != ZP_NULL )
 	{
-		outWorldRect.setPosition( outWorldRect.getPosition() + widget->localRect.getPosition() );
+		pos += parent->localRect.getPosition();
+		parent = parent->parent;
 	}
+
+	outWorldRect.setPosition( pos );
 }
 zp_bool zpGUI::isMouseOverWidget( zpGUIWidget* widget, zpRectf& outWorldRect, zpVector2i& mousePos, zpVector2i& mouseDelta, zp_bool& isDown, zp_bool& isPressed  )
 {
@@ -220,16 +247,36 @@ zp_bool zpGUI::isMouseOverWidget( zpGUIWidget* widget, zpRectf& outWorldRect, zp
 	return outWorldRect.contains( mousePos );
 }
 
-void zpGUI::drawWidgets()
+void zpGUI::drawWidgets( zpRenderingContext* context )
 {
-	zpGUIWidget* b = m_allWidgets.begin();
-	zpGUIWidget* e = m_allWidgets.end();
+	// begin immediate mode
+	context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+	m_isDrawingWidgets = true;
+
+	// draw widgets
+	zpGUIWidget** b = m_usedWidgets.begin();
+	zpGUIWidget** e = m_usedWidgets.end();
 	for( ; b != e; ++b )
 	{
-		if( b->parent == ZP_NULL ) drawWidget( b );
+		zpGUIWidget* w = *b;
+		if( w->parent == ZP_NULL )
+		{
+			drawWidget( context, w );
+		}
 	}
+
+	// end immediate mode
+	if( m_isDrawingWidgets )
+	{
+		context->endDrawImmediate();
+	}
+	else
+	{
+		context->endDrawFont();
+	}
+
 }
-void zpGUI::drawWidget( zpGUIWidget* widget )
+void zpGUI::drawWidget( zpRenderingContext* context, zpGUIWidget* widget )
 {
 	zpRectf worldRect;
 	getWorldRect( widget, worldRect );
@@ -240,12 +287,12 @@ void zpGUI::drawWidget( zpGUIWidget* widget )
 		{
 			if( !m_isDrawingWidgets )
 			{
-				m_renderingContext->endDrawFont();
-				m_renderingContext->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+				context->endDrawFont();
+				context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
 				m_isDrawingWidgets = true;
 			}
 
-			m_renderingContext->addQuad(
+			context->addQuad(
 				worldRect.getTopLeft().asVector4(),
 				worldRect.getTopRight().asVector4(),
 				worldRect.getBottomRight().asVector4(),
@@ -256,7 +303,7 @@ void zpGUI::drawWidget( zpGUIWidget* widget )
 			zpGUIWidget** e = widget->children.end();
 			for( ; b != e; ++b )
 			{
-				drawWidget( *b );
+				drawWidget( context, *b );
 			}
 		}
 		break;
@@ -264,12 +311,12 @@ void zpGUI::drawWidget( zpGUIWidget* widget )
 		{
 			if( !m_isDrawingWidgets )
 			{
-				m_renderingContext->endDrawFont();
-				m_renderingContext->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+				context->endDrawFont();
+				context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
 				m_isDrawingWidgets = true;
 			}
 
-			m_renderingContext->addQuad(
+			context->addQuad(
 				worldRect.getTopLeft().asVector4(),
 				worldRect.getTopRight().asVector4(),
 				worldRect.getBottomRight().asVector4(),
@@ -281,12 +328,12 @@ void zpGUI::drawWidget( zpGUIWidget* widget )
 		{
 			if( m_isDrawingWidgets )
 			{
-				m_renderingContext->endDrawImmediate();
-				m_renderingContext->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, &m_guiFont );
+				context->endDrawImmediate();
+				context->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, &m_guiFont );
 				m_isDrawingWidgets = false;
 			}
 
-			m_renderingContext->addText( widget->text.str(), worldRect.getSize().getY(), worldRect.getPosition(), ZP_FONT_ALIGNMENT_LEFT, widget->color );
+			context->addText( widget->text.str(), worldRect.getSize().getY(), worldRect.getPosition(), ZP_FONT_ALIGNMENT_LEFT, widget->color );
 		}
 		break;
 	}

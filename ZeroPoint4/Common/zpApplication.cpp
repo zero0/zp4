@@ -21,7 +21,7 @@ zpApplication::zpApplication()
 	, m_currentWorld( ZP_NULL )
 	, m_nextWorld( ZP_NULL )
 	, m_lastTime( 0 )
-	, m_simulateHz( 1000000 / 60 )
+	, m_simulateHz( 1000000 / 60.f )
 	, m_totalFrameTimeMs( 1000.f / 60.f )
 	, m_statsTimer( 0 )
 	, m_frameCount( 0 )
@@ -843,13 +843,11 @@ void zpApplication::processFrame()
 	// sleep for the remainder of the frame
 	zp_long endTime = m_timer.getTime();
 
-	zp_long diff = ( endTime - startTime );
-	zp_float d = m_timer.getSecondsPerTick() * (zp_float)diff * 1000.f;
+	zp_long diff = ( endTime - startTime ) * 1000L;
+	zp_float d = m_timer.getSecondsPerTick() * (zp_float)diff;
 	zp_float sleepTime = m_totalFrameTimeMs - d;
 	while( sleepTime < 0.f )
 	{
-		zp_sleep( (zp_uint)m_totalFrameTimeMs );
-		sleepTime = zp_fmod( sleepTime, -m_totalFrameTimeMs );
 		sleepTime += m_totalFrameTimeMs;
 	}
 

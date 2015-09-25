@@ -69,8 +69,8 @@ private:
 	zpGUIWidget* addWidget( zp_float widthPercent, zp_float height );
 	zpGUIWidget* addChildWidget( zp_float widthPercent, zp_float height, zpGUIWidget* parent );
 
-	void drawWidgets();
-	void drawWidget( zpGUIWidget* widget );
+	void drawWidgets( zpRenderingContext* context );
+	void drawWidget( zpRenderingContext* context, zpGUIWidget* widget );
 
 	void getWorldRect( zpGUIWidget* widget, zpRectf& outWorldRect );
 	zp_bool isMouseOverWidget( zpGUIWidget* widget, zpRectf& outWorldRect, zpVector2i& mousePos, zpVector2i& mouseDelta, zp_bool& isDown, zp_bool& isPressed );
@@ -79,11 +79,13 @@ private:
 	zpGUIWidget* m_currentlySelected;
 
 	zpApplication* m_application;
-	zpRenderingContext* m_renderingContext;
 
 	zpGUIWidget* m_selectedWidget;
 	zpFixedArrayList< zpGUIWidget, ZP_GUI_NUM_WIDGETS > m_allWidgets;
-	zpFixedArrayList< zpGUIWidget*, ZP_GUI_NUM_WIDGETS > m_widgetStack;
+	zpFixedArrayList< zpGUIWidget*, ZP_GUI_NUM_WIDGETS > m_freeWidgets;
+	zpFixedArrayList< zpGUIWidget*, ZP_GUI_NUM_WIDGETS > m_usedWidgets;
+
+	zpFixedArrayList< zpGUIWidget*, 8 > m_widgetStack;
 
 	zpColor4f m_mainColor;
 	zpColor4f m_backgroundColor;
