@@ -52,8 +52,6 @@ public:
 	zpAudioContentManager();
 	virtual ~zpAudioContentManager();
 
-	zpAudioEngine* getAudioEngine() { return &m_engine; }
-
 private:
 	zp_bool createResource( zpAudioResource* res, const zp_char* filename );
 	void destroyResource( zpAudioResource* res );
@@ -61,8 +59,6 @@ private:
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;
-
-	zpAudioEngine m_engine;
 };
 
 

@@ -1,4 +1,5 @@
 #include "zpAudio.h"
+#include "Common/zpCommon.h"
 
 #define CHECK_WAVE_ID( id, a, b, c, d )		( (id)[0] == (a) && (id)[1] == (b) && (id)[2] == (c) && (id)[3] == (d) )
 
@@ -164,14 +165,14 @@ zpAudioContentManager::~zpAudioContentManager()
 {}
 zp_bool zpAudioContentManager::createResource( zpAudioResource* res, const zp_char* filename )
 {
-	return res->load( filename, &m_engine );
+	return res->load( filename, getApplication()->getAudioEngine() );
 }
 void zpAudioContentManager::destroyResource( zpAudioResource* res )
 {
-	res->unload( &m_engine );
+	res->unload( getApplication()->getAudioEngine() );
 }
 void zpAudioContentManager::initializeInstance( zpAudioResourceInstance& instance )
 {
-	instance.m_engine = &m_engine;
+	instance.m_engine = getApplication()->getAudioEngine();
 	instance.m_engine->cloneSoundBuffer( *instance.getResource()->getData(), instance.m_instanceAudioBuffer );
 }

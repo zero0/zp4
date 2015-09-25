@@ -143,6 +143,7 @@ public:
 	zpRenderingPipeline* getRenderPipeline() { return &m_renderingPipeline; }
 
 	zpPhysicsEngine* getPhysicsEngine() { return &m_physicsEngine; }
+	zpAudioEngine* getAudioEngine() { return &m_audioEngine; }
 
 	zpTextContentManager* getTextContentManager() { return &m_textContent; }
 	zpObjectContentManager* getObjectContentManager() { return &m_objectContent; }
@@ -243,6 +244,7 @@ private:
 	zpTextContentManager m_textContent;
 
 	zpPhysicsEngine m_physicsEngine;
+	zpAudioEngine m_audioEngine;
 
 	zpEventManager m_eventManager;
 

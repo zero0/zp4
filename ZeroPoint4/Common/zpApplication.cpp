@@ -225,7 +225,7 @@ void zpApplication::initialize()
 	m_gui.setApplication( this );
 	m_gui.create();
 
-	m_audioContent.getAudioEngine()->create( m_window.getWindowHandle() );
+	m_audioEngine.create( m_window.getWindowHandle() );
 
 	zpAngelScript::createInstance();
 	zpAngelScript::getInstance()->createEngine( this );
@@ -363,7 +363,7 @@ zp_int zpApplication::shutdown()
 
 	m_protoDBManager.destroy();
 
-	m_audioContent.getAudioEngine()->destroy();
+	m_audioEngine.destroy();
 
 	if( m_console )
 	{
@@ -500,7 +500,7 @@ void zpApplication::update()
 	m_renderingPipeline.update();
 
 	ZP_PROFILE_START( AUDIO_UPDATE );
-	m_audioContent.getAudioEngine()->update();
+	m_audioEngine.update();
 	ZP_PROFILE_END( AUDIO_UPDATE );
 
 	handleInput();
@@ -1090,10 +1090,15 @@ void zpApplication::onGUI()
 		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME, m_timer.getSecondsPerTick() );
 		buff << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
 
+#if 0
 		zpRectf rect( 5, 5, 320, 24 + ( ZP_PROFILER_MAX_FRAMES * 5 ) + 24 );
+#else
+		zpRectf rect( 5, 5, 320, 50 );
+#endif
 		m_gui.beginWindow( "FPS Stats", rect, rect );
-		m_gui.label( 24, buff.str(), zpColor4f( 1, 1, 1, 1 ) );
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 0, 1 ) );
 		
+#if 0
 		m_gui.setMargin( 0, 1 );
 		
 		const zpProfilerTimeline& timeline = m_profiler.getTimeline( ZP_PROFILER_STEP_FRAME );
@@ -1103,7 +1108,7 @@ void zpApplication::onGUI()
 			zp_float percent = (zp_float)( timeline.frames[ i ].endTime - timeline.frames[ i ].startTime ) / (zp_float)maxTime;
 			m_gui.box( percent, 4, zpColor4f( 0, 1, 1, 1 ) );
 		}
-
+#endif
 		m_gui.endWindow();
 	}
 

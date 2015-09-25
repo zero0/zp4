@@ -2,7 +2,7 @@
 
 zpAudioListenerComponent::zpAudioListenerComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
-	, m_engine( getApplication()->getAudioContentManager()->getAudioEngine() )
+	, m_engine( getApplication()->getAudioEngine() )
 {
 	const zpBison::Value& rolloff = def[ "Rolloff" ];
 	const zpBison::Value& dist = def[ "Distance" ];
