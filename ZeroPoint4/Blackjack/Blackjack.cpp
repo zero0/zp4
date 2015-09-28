@@ -162,42 +162,98 @@ public:
 
 	void onUpdateState( zpApplication* app, zp_float deltaTime, zp_float realTime )
 	{
+		zp_bool cameraUpdated = false;
+
 		const zpKeyboard* keyboard = app->getInputManager()->getKeyboard();
 		const zpMouse* mouse = app->getInputManager()->getMouse();
 
-		const zpVector4f& pos = m_editorCamera->getPosition();
-		const zpVector4f& forward = m_editorCamera->getLookTo();
-		const zpVector4f& up = m_editorCamera->getUp();
-
+		zpVector4f pos = m_editorCamera->getPosition();
+		zpVector4f forward = m_editorCamera->getLookTo();
+		zpVector4f up = m_editorCamera->getUp();
 		zpVector4f right = zpMath::Vector4Cross3( forward, up );
+		zpScalar rt = zpMath::Scalar( realTime );
 
 		zp_int w = mouse->getScrollWheelDelta();
 		const zpVector2i& mouseDelta = mouse->getDelta();
 
 		if( w != 0 )
 		{
+			w *= 6;
 			if( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) )
 			{
 				w *= 6;
 			}
 
-			zpVector4f f = zpMath::Vector4Scale( forward, zpMath::Scalar( (zp_float)w ) );
-			f = zpMath::Vector4Add( pos, f );
-
-			m_editorCamera->setPosition( f );
+			pos = zpMath::Vector4Madd( pos, forward, zpMath::ScalarMul( zpMath::Scalar( (zp_float)w ), rt ) );
+			cameraUpdated = true;
 		}
 
 		if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) )
 		{
+			if( keyboard->isKeyDown( ZP_KEY_CODE_W ) )
+			{
+				pos = zpMath::Vector4Madd( pos, forward, zpMath::ScalarMul( zpMath::Scalar( 3.f ), rt ) );
+				cameraUpdated = true;
+			}
+			else if( keyboard->isKeyDown( ZP_KEY_CODE_S ) )
+			{
+				pos = zpMath::Vector4Madd( pos, forward, zpMath::ScalarMul( zpMath::Scalar( -3.f ), rt ) );
+				cameraUpdated = true;
+			}
+
+			if( keyboard->isKeyDown( ZP_KEY_CODE_A ) )
+			{
+				pos = zpMath::Vector4Madd( pos, right, zpMath::ScalarMul( zpMath::Scalar( 3.f ), rt ) );
+				cameraUpdated = true;
+			}
+			else if( keyboard->isKeyDown( ZP_KEY_CODE_D ) )
+			{
+				pos = zpMath::Vector4Madd( pos, right, zpMath::ScalarMul( zpMath::Scalar( -3.f ), rt ) );
+				cameraUpdated = true;
+			}
+
+
 			zp_bool leftButton = mouse->isButtonDown( ZP_MOUSE_BUTTON_LEFT );
 			zp_bool rightButton = mouse->isButtonDown( ZP_MOUSE_BUTTON_RIGHT );
+
+			if( leftButton || rightButton )
+			{
+				zpScalar x, y;
+
+				x = zpMath::Scalar( (zp_float)mouseDelta.getX() * realTime );
+				y = zpMath::Scalar( (zp_float)mouseDelta.getY() * realTime );
+
+				if( leftButton && !rightButton )
+				{
+					zpVector4f r, u;
+					r = zpMath::Vector4Scale( right, x );
+					u = zpMath::Vector4Scale( up, y );
+					pos = zpMath::Vector4Add( pos, zpMath::Vector4Add( r, u ) );
+					cameraUpdated = true;
+				}
+				else if( !leftButton && rightButton )
+				{
+					// pitch
+					zpQuaternion4f pitch;
+					pitch = zpMath::QuaternionFromAxisAngle( right, zpMath::ScalarDegToRad( y ) );
+					//pitch = zpMath::QuaternionFromEulerAngle( y, x, zpMath::Scalar( 0.f ) );
+
+					//up = zpMath::QuaternionTransform( pitch, up );
+					//forward = zpMath::QuaternionTransform( pitch, forward );
+
+					// rot Y
+					zpMatrix4f rotY = zpMath::QuaternionToMatrix( pitch ); //zpMath::MatrixRotationY( zpMath::ScalarDegToRad( x ) );
+					
+					up = zpMath::MatrixTransformNormal3( rotY, up );
+					forward = zpMath::MatrixTransformNormal3( rotY, forward );
+					cameraUpdated = true;
+				}
+			}
+#if 0
 			if( leftButton && !rightButton )
 			{
 				zpVector4f lootTo = forward;
-				zpScalar x, y, rt;
 				
-				x = zpMath::Scalar( (zp_float)mouseDelta.getX() );
-				y = zpMath::Scalar( (zp_float)mouseDelta.getY() );
 				rt = zpMath::Scalar( realTime );
 
 				x = zpMath::ScalarMul( x, rt );
@@ -245,6 +301,14 @@ public:
 			{
 
 			}
+#endif
+		}
+	
+		if( cameraUpdated )
+		{
+			m_editorCamera->setPosition( pos );
+			m_editorCamera->setLookTo( forward );
+			m_editorCamera->setUp( up );
 		}
 	}
 

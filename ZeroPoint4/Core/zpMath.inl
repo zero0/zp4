@@ -111,6 +111,16 @@ namespace zpMath
 
 		return col;
 	}
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL MatrixTransformNormal3( zpMatrix4fParamF a, zpVector4fParamC b )
+	{
+		zpVector4f col;
+
+		col = MatrixTransform( a, Vector4Normalize3( b ) );
+		col = Vector4Normalize3( col );
+
+		return col;
+	}
+
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixMul( zpMatrix4fParamF a, zpMatrix4fParamC b )
 	{
 		zpMatrix4f s;
@@ -503,7 +513,7 @@ namespace zpMath
 		t = Vector4Mul( a, dv );
 		t = Vector4Mul( t, av );
 
-		zp_float buff[4];
+		ZP_ALIGN16 zp_float buff[4];
 		Vector4Store4( t, buff );
 		
 		return Quaternion( buff[0], buff[1], buff[2], buff[3] );
@@ -583,10 +593,10 @@ namespace zpMath
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixLoadOpenGL( const zp_float* matrix )
 	{
 		zpMatrix4f s;
-		s.r[ 0 ] = Vector4Load4( matrix + 0 );
-		s.r[ 1 ] = Vector4Load4( matrix + 4 );
-		s.r[ 2 ] = Vector4Load4( matrix + 8 );
-		s.r[ 3 ] = Vector4Load4( matrix + 12 );
+		s.m_m1 = Vector4Load4( matrix + 0 );
+		s.m_m2 = Vector4Load4( matrix + 4 );
+		s.m_m3 = Vector4Load4( matrix + 8 );
+		s.m_m4 = Vector4Load4( matrix + 12 );
 
 		return s;
 	}
@@ -596,6 +606,59 @@ namespace zpMath
 		Vector4Store4( a.r[ 1 ], matrix + 4 );
 		Vector4Store4( a.r[ 2 ], matrix + 8 );
 		Vector4Store4( a.r[ 3 ], matrix + 12 );
+	}
+
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationX( zpScalarParamF rad )
+	{
+		zp_float r = AsFloat( rad );
+		zp_float c = zp_cos( r );
+		zp_float s = zp_sin( r );
+		zp_float n = -s;
+
+		zpMatrix4f a;
+		a.m_m1 = Vector4( 1, 0, 0, 0 );
+		a.m_m2 = Vector4( 0, c, n, 0 );
+		a.m_m3 = Vector4( 0, s, c, 0 );
+		a.m_m4 = Vector4( 0, 0, 0, 1 );
+
+		return a;
+	}
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationY( zpScalarParamF rad )
+	{
+		zp_float r = AsFloat( rad );
+		zp_float c = zp_cos( r );
+		zp_float s = zp_sin( r );
+		zp_float n = -s;
+
+		zpMatrix4f a;
+		a.m_m1 = Vector4( c, 0, s, 0 );
+		a.m_m2 = Vector4( 0, 1, 0, 0 );
+		a.m_m3 = Vector4( n, 0, c, 0 );
+		a.m_m4 = Vector4( 0, 0, 0, 1 );
+
+		return a;
+	}
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationZ( zpScalarParamF rad )
+	{
+		zp_float r = AsFloat( rad );
+		zp_float c = zp_cos( r );
+		zp_float s = zp_sin( r );
+		zp_float n = -s;
+
+		zpMatrix4f a;
+		a.m_m1 = Vector4( c, n, 0, 0 );
+		a.m_m2 = Vector4( s, c, 0, 0 );
+		a.m_m3 = Vector4( 0, 0, 1, 0 );
+		a.m_m4 = Vector4( 0, 0, 0, 1 );
+
+		return a;
+	}
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationAxis( zpVector4fParamF axis, zpScalarParamF rad )
+	{
+		zpMatrix4f a;
+
+		
+		return a;
 	}
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Reflect( zpVector4fParamF a, zpVector4fParamF n )

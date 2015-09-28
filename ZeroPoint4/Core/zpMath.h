@@ -340,6 +340,7 @@ namespace zpMath
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionNormalize4( zpQuaternion4fParamF a );
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL MatrixTransform( zpMatrix4fParamF a, zpVector4fParamC b );
+	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL MatrixTransformNormal3( zpMatrix4fParamF a, zpVector4fParamC b );
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixScale( zpMatrix4fParamF a, zpScalarParamC b );
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixMul( zpMatrix4fParamF a, zpMatrix4fParamC b );
 
@@ -367,9 +368,9 @@ namespace zpMath
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromEulerAngle( zpScalarParamF yaw, zpScalarParamF pitch, zpScalarParamF roll );
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromAxisAngle( zpVector4fParamF axis, zpScalarParamF angle );
 
+	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetYaw( zpQuaternion4fParamF a );
 	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetRoll( zpQuaternion4fParamF a );
 	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetPitch( zpQuaternion4fParamF a );
-	ZP_FORCE_INLINE zpScalar ZP_VECTORCALL QuaternionGetYaw( zpQuaternion4fParamF a );
 
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionConjugate( zpQuaternion4fParamF a );
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL QuaternionTransform( zpQuaternion4fParamF a, zpVector4fParamF b );
@@ -382,6 +383,11 @@ namespace zpMath
 
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixLoadOpenGL( const zp_float* matrix );
 	ZP_FORCE_INLINE void ZP_VECTORCALL MatrixStoreOpenGL( zpMatrix4fParamF a, zp_float* matrix );
+
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationX( zpScalarParamF rad );
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationY( zpScalarParamF rad );
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationZ( zpScalarParamF rad );
+	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL MatrixRotationAxis( zpVector4fParamF axis, zpScalarParamF rad );
 
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4Reflect( zpVector4fParamF a, zpVector4fParamF n );
 };
