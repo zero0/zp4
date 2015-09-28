@@ -746,7 +746,8 @@ void zpRenderingPipeline::useCamera( zpRenderingContext* i, zpCamera* camera, zp
 	}
 
 	// if the camera needs to updated, update the camera data
-	if( camera->update() || m_prevCamera != camera )
+	zp_bool cameraUpdated = camera->update();
+	if( cameraUpdated || m_prevCamera != camera )
 	{
 		m_prevCamera = camera;
 		i->update( cameraBuffer, &camera->getCameraBufferData(), sizeof( zpCameraBufferData ) );

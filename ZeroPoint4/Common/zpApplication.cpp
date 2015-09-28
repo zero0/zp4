@@ -21,7 +21,7 @@ zpApplication::zpApplication()
 	, m_currentWorld( ZP_NULL )
 	, m_nextWorld( ZP_NULL )
 	, m_lastTime( 0 )
-	, m_simulateHz( 1000000 / 60.f )
+	, m_simulateHz( 1000000 / 60 )
 	, m_totalFrameTimeMs( 1000.f / 60.f )
 	, m_statsTimer( 0 )
 	, m_frameCount( 0 )
@@ -218,8 +218,6 @@ void zpApplication::initialize()
 	re->setVSyncEnabled( render[ "VSync" ].asBool() );
 	re->setup( m_window.getWindowHandle(), m_window.getScreenSize() );
 
-	m_lastTime = m_timer.getTime();
-
 	m_gui.setApplication( this );
 	m_gui.create();
 
@@ -273,6 +271,8 @@ void zpApplication::setup()
 	m_renderingPipeline.getMaterialContentManager()->getResource( appOptions[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
 
 	m_editorStateName = appOptions[ "EditorStateName" ].asCString();
+
+	m_lastTime = m_timer.getTime();
 }
 
 void zpApplication::run()
@@ -734,6 +734,8 @@ void zpApplication::processFrame()
 	m_timer.tick();
 	zp_long startTime = m_timer.getTime();
 
+	ZP_PROFILE_START( PROCESS_FRAME );
+
 	ZP_PROFILE_START( FRAME );
 
 	if( m_shouldGarbageCollect )
@@ -853,6 +855,8 @@ void zpApplication::processFrame()
 
 	zp_sleep( (zp_uint)sleepTime );
 	ZP_PROFILE_END( SLEEP );
+
+	ZP_PROFILE_END( PROCESS_FRAME );
 
 	ZP_PROFILE_FINALIZE();
 }
@@ -1050,7 +1054,11 @@ void zpApplication::onGUI()
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
 	{
 		zp_float frameMs = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FRAME, secondsPerTick );
-		buff << frameMs * 1000.f << " ms " << ( 1.f / ( frameMs ) ) << " fps";
+		zp_float procFramMS = m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_PROCESS_FRAME, secondsPerTick );
+
+		buff << frameMs * 1000.f << " ms ";
+		buff << ( 1.f / ( frameMs ) ) << " fps ";
+		buff << ( 1.f / ( procFramMS ) ) << " actual fps ";
 
 #if 0
 		zpRectf rect( 5, 5, 320, 24 + ( ZP_PROFILER_MAX_FRAMES * 5 ) + 24 );

@@ -37,41 +37,41 @@ public:
 
 	void setProjectionType( zpCameraProjection type );
 
-	void setOrthoRect( const zpRecti& rect ) { m_orthoRect = rect; }
+	void setOrthoRect( const zpRecti& rect );
 
 	void setNearFar( zp_float nearDist, zp_float farDist );
 	void setFovy( zp_float fovy );
 	void setAspectRatio( zp_float aspectRatio );
 
-	void setPosition( const zpVector4f& position );
-	void setLookTo( const zpVector4f& lookTo );
-	void setLookAt( const zpVector4f& lookAt );
-	void setUp( const zpVector4f& up );
+	void setPosition( zpVector4fParamF position );
+	void setLookTo( zpVector4fParamF lookTo );
+	void setLookAt( zpVector4fParamF lookAt );
+	void setUp( zpVector4fParamF up );
 
 	zp_float getAspectRation() const;
 	zp_float getFovy() const;
-	zp_float getNear() const { return m_bufferData.zNear; }
-	zp_float getFar() const { return m_bufferData.zFar; }
+	zp_float getNear() const;
+	zp_float getFar() const;
 	zp_float getNearFarDistance() const;
 
-	const zpVector4f& getPosition() const;
-	const zpVector4f& getLookTo() const;
-	const zpVector4f& getLookAt() const;
-	const zpVector4f& getUp() const;
+	zpVector4f getPosition() const;
+	zpVector4f getLookTo() const;
+	zpVector4f getLookAt() const;
+	zpVector4f getUp() const;
 
 	const zpFrustum& getFrustum() const;
 
-	const zpMatrix4f& getView() const;
-	const zpMatrix4f& getProjection() const;
-	const zpMatrix4f& getViewProjection() const;
-	const zpMatrix4f& getInvViewProjection() const;
+	zpMatrix4f getView() const;
+	zpMatrix4f getProjection() const;
+	zpMatrix4f getViewProjection() const;
+	zpMatrix4f getInvViewProjection() const;
 	const zpCameraBufferData& getCameraBufferData() const;
 
-	const zpViewport& getViewport() const { return m_viewport; }
-	void setViewport( const zpViewport& viewport ) { m_viewport = viewport; }
+	const zpViewport& getViewport() const;
+	void setViewport( const zpViewport& viewport );
 
-	const zpRecti& getClipRect() const { return m_clipRect; }
-	void setClipRect( const zpRecti& clip ) { m_clipRect = clip; }
+	const zpRecti& getClipRect() const;
+	void setClipRect( const zpRecti& clip );
 
 	void generateRay( const zpVector2i& screenSize, const zpVector2i& windowPosition, zpRay& outRay ) const;
 

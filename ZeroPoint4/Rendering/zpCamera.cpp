@@ -116,6 +116,12 @@ void zpCamera::setProjectionType( zpCameraProjection type )
 	m_isProjectionDirty = true;
 }
 
+void zpCamera::setOrthoRect( const zpRecti& rect )
+{
+	m_orthoRect = rect;
+	m_isProjectionDirty = true;
+}
+
 void zpCamera::setNearFar( zp_float nearDist, zp_float farDist )
 {
 	m_bufferData.zNear = nearDist;
@@ -133,12 +139,12 @@ void zpCamera::setAspectRatio( zp_float aspectRatio )
 	m_isProjectionDirty = true;
 }
 
-void zpCamera::setPosition( const zpVector4f& position )
+void zpCamera::setPosition( zpVector4fParamF position )
 {
 	m_bufferData.position = position;
 	m_isViewDirty = true;
 }
-void zpCamera::setLookTo( const zpVector4f& lookTo )
+void zpCamera::setLookTo( zpVector4fParamF lookTo )
 {
 	// set look to
 	m_bufferData.lookTo = zpMath::Vector4Normalize3( lookTo );
@@ -152,7 +158,7 @@ void zpCamera::setLookTo( const zpVector4f& lookTo )
 
 	m_isViewDirty = true;
 }
-void zpCamera::setLookAt( const zpVector4f& lookAt )
+void zpCamera::setLookAt( zpVector4fParamF lookAt )
 {
 	// set look at
 	m_lookAt = lookAt;
@@ -164,7 +170,7 @@ void zpCamera::setLookAt( const zpVector4f& lookAt )
 
 	m_isViewDirty = true;
 }
-void zpCamera::setUp( const zpVector4f& up )
+void zpCamera::setUp( zpVector4fParamF up )
 {
 	m_bufferData.up = zpMath::Vector4Normalize3( up );
 	m_isViewDirty = true;
@@ -178,24 +184,32 @@ zp_float zpCamera::getFovy() const
 {
 	return m_bufferData.fovy;
 }
+zp_float zpCamera::getNear() const
+{
+	return m_bufferData.zNear;
+};
+zp_float zpCamera::getFar() const
+{
+	return m_bufferData.zFar;
+};
 zp_float zpCamera::getNearFarDistance() const
 {
 	return m_bufferData.zFar - m_bufferData.zNear;
 }
 
-const zpVector4f& zpCamera::getPosition() const
+zpVector4f zpCamera::getPosition() const
 {
 	return m_bufferData.position;
 }
-const zpVector4f& zpCamera::getLookTo() const
+zpVector4f zpCamera::getLookTo() const
 {
 	return m_bufferData.lookTo;
 }
-const zpVector4f& zpCamera::getLookAt() const
+zpVector4f zpCamera::getLookAt() const
 {
 	return m_lookAt;
 }
-const zpVector4f& zpCamera::getUp() const
+zpVector4f zpCamera::getUp() const
 {
 	return m_bufferData.up;
 }
@@ -205,25 +219,43 @@ const zpFrustum& zpCamera::getFrustum() const
 	return m_frustum;
 }
 
-const zpMatrix4f& zpCamera::getView() const
+zpMatrix4f zpCamera::getView() const
 {
 	return m_view;
 }
-const zpMatrix4f& zpCamera::getProjection() const
+zpMatrix4f zpCamera::getProjection() const
 {
 	return m_projection;
 }
-const zpMatrix4f& zpCamera::getViewProjection() const
+zpMatrix4f zpCamera::getViewProjection() const
 {
 	return m_bufferData.viewProjection;
 }
-const zpMatrix4f& zpCamera::getInvViewProjection() const
+zpMatrix4f zpCamera::getInvViewProjection() const
 {
 	return m_bufferData.invViewProjection;
 }
 const zpCameraBufferData& zpCamera::getCameraBufferData() const
 {
 	return m_bufferData;
+}
+
+const zpViewport& zpCamera::getViewport() const
+{
+	return m_viewport;
+}
+void zpCamera::setViewport( const zpViewport& viewport )
+{
+	m_viewport = viewport;
+}
+
+const zpRecti& zpCamera::getClipRect() const
+{
+	return m_clipRect;
+}
+void zpCamera::setClipRect( const zpRecti& clip )
+{
+	m_clipRect = clip;
 }
 
 void zpCamera::generateRay( const zpVector2i& screenSize, const zpVector2i& windowPosition, zpRay& outRay ) const
