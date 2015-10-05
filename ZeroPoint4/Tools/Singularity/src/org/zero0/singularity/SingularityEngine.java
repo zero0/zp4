@@ -20,6 +20,7 @@ import net.winstone.core.WinstoneRequest;
 import net.winstone.core.WinstoneResponse;
 import net.winstone.core.listener.Listener;
 import net.winstone.core.listener.RequestHandlerThread;
+import net.winstone.jndi.resources.DataSourceConfig;
 
 import org.zero0.json.Factory;
 import org.zero0.json.Value;
@@ -27,6 +28,13 @@ import org.zero0.singularity.util.FileUtil;
 
 public class SingularityEngine
 {
+	private static SingularityEngine instance;
+	
+	public static SingularityEngine getInstance()
+	{
+		return instance;
+	}
+	
 	private List< SingularityProject > projects = new ArrayList< SingularityProject >();
 	
 	private Value config = Factory.Null;
@@ -61,6 +69,8 @@ public class SingularityEngine
 	
 	public void setup()
 	{
+		instance = this;
+		
 		setupConfig();
 		
 		createProjects();
@@ -75,6 +85,8 @@ public class SingularityEngine
 		projects.clear();
 		
 		config = Factory.Null;
+		
+		instance = null;
 	}
 	
 	private void setupConfig()
@@ -112,12 +124,13 @@ public class SingularityEngine
 	
 	private void setupServer()
 	{
-		//System.setProperty( "java.endorsed.dirs", "" );
+		System.setProperty( "java.endorsed.dirs", "" );
 		
 		Map< String, String > arguments = new HashMap< String, String >();
 		arguments.put( "webroot", "./www" );
 		arguments.put( "useJasper", "true" );
 		arguments.put( "directoryListings", "false" );
+		arguments.put( "fork", "true" );
 		
 		BootStrap b = new BootStrap( arguments );
 		server = b.boot();

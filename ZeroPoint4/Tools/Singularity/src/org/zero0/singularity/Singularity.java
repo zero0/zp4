@@ -9,7 +9,6 @@ import java.util.zip.ZipFile;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -201,17 +200,12 @@ public final class Singularity
 	{
 		menu = new Menu( shell, SWT.POP_UP );
 		
-		Image image = new Image (display, 16, 16);
-		Image image2 = new Image (display, 16, 16);
-		GC gc = new GC( image2 );
-		gc.setBackground( display.getSystemColor( SWT.COLOR_BLACK ) );
-		gc.fillRectangle( image2.getBounds() );
-		gc.dispose();
+		Image image = getIcon( "weather_sun" );
 		
 		trayItem = new TrayItem( tray, SWT.NONE );
 		trayItem.setToolTipText( "Singularity" );
-		trayItem.setImage (image2);
-		trayItem.setHighlightImage (image);
+		trayItem.setImage( image );
+		trayItem.setHighlightImage( image );
 		
 		buildMenu();
 	}
@@ -301,7 +295,7 @@ public final class Singularity
 			@Override
 			public void handleEvent( Event event )
 			{
-				restart();				
+				restart();
 			}
 		} );
 		
