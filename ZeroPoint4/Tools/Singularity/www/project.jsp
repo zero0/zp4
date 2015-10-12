@@ -6,6 +6,8 @@ String id = request.getParameter("id");
 SingularityProject project = engine.getProject( id );
 String name = project.getName();
 List< String > taskNames = project.getTaskNames();
+SingularityEnvironment env = project.getEnvironment();
+List< String > envVariables = env.getVariableKeys();
 %>
 
 <s:master-page page="template.jsp">
@@ -41,7 +43,28 @@ List< String > taskNames = project.getTaskNames();
         </table>
       </div>
       <div class="container">
-        <h2>Environment</h2>
+        <h2>Environment Variables</h2>
+        <table class="table table-striped table-hover">
+          <colgroup>
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Value</th>
+              <th>Raw</th>
+            </tr>
+          </thead>
+          <tfoot></tfoot>
+          <tbody>
+            <% for( int i = 0, imax = envVariables.size(); i < imax; ++i ) { String envVar = envVariables.get( i ); %>
+            <tr>
+              <td><%=envVar%></td>
+              <td><%=env.getVariable( envVar )%></td>
+              <td><%=env.getVariableRaw( envVar )%></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
       </div>
     </div>
   </s:content>

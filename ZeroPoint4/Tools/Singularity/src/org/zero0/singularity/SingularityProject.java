@@ -58,9 +58,11 @@ public class SingularityProject
 		name = config.get( "name" ).asString();
 		description = config.get( "description" ).asString();
 		
-		createCommands();
+		Value env = config.get( "environment" );
+		createEnvironment( env );
 		
-		createEnvironment();
+		Value cmds = config.get( "commands" );
+		createCommands( cmds );
 		
 		createTasks( projectRoot );
 	}
@@ -74,14 +76,37 @@ public class SingularityProject
 		tasks.clear();
 	}
 	
-	private void createEnvironment()
+	private void createEnvironment( Value env )
 	{
-
+		if( !env.isEmpty() )
+		{
+			List< String > names = env.getMemberNames();
+			for( String envName : names )
+			{
+				Value envVar = env.get( envName );
+				
+				if( envVar.isInt() || envVar.isLong() )
+				{
+					environment.setVariable( envName, envVar.asInt() );
+				}
+				else if( envVar.isFloat() )
+				{
+					environment.setVariable( envName, envVar.asFloat() );
+				}
+				else if( envVar.isBoolean() )
+				{
+					environment.setVariable( envName, envVar.asBoolean() );
+				}
+				else
+				{
+					environment.setVariable( envName, envVar.asString() );
+				}
+			}
+		}
 	}
 	
-	private void createCommands()
+	private void createCommands( Value cmds )
 	{
-		Value cmds = config.get( "commands" );
 		if( !cmds.isEmpty() )
 		{
 			ClassLoader cl = ClassLoader.getSystemClassLoader();

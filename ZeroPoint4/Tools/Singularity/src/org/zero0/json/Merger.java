@@ -22,6 +22,12 @@ public final class Merger
 			
 		case Array:
 			Value a = target[0];
+			if( a.isNull() )
+			{
+				a = Factory.createArray( null );
+				target[0] = a;
+			}
+			
 			int size = options.getSize();
 			for( int i = 0; i < size; ++i )
 			{
@@ -33,6 +39,11 @@ public final class Merger
 			
 		case Object:
 			Value o = target[0];
+			if( o.isNull() )
+			{
+				o = Factory.createObject( null );
+				target[0] = o;
+			}
 			
 			List< String > names = options.getMemberNames();
 			for( int i = 0, imax = names.size(); i < imax; ++i )
