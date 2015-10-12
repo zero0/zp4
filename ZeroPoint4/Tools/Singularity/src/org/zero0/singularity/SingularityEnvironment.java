@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import com.sun.xml.internal.ws.developer.UsesJAXBContext;
 
 public class SingularityEnvironment
 {
-	private ArrayList< HashMap<String,ISingularityEnvironmentVariable<?>>> variables = new ArrayList< HashMap< String, ISingularityEnvironmentVariable< ? > > >();
+	private List< HashMap<String,ISingularityEnvironmentVariable<?>>> variables = new ArrayList< HashMap< String, ISingularityEnvironmentVariable< ? > > >();
 	
 	public SingularityEnvironment()
 	{
-		variables.add( new HashMap<String, ISingularityEnvironmentVariable<?>>() );
+		HashMap<String,ISingularityEnvironmentVariable<?>> p = new HashMap<String, ISingularityEnvironmentVariable<?>>();
+		variables.add( p );
 	}
 	
 	public void pushEnvironment()
@@ -39,20 +37,44 @@ public class SingularityEnvironment
 		return p;
 	}
 	
-	public String getVariable( String key )
+	public List< String > getVariableKeys()
+	{
+		Map<String,ISingularityEnvironmentVariable<?>> p = getCurrentVariables();
+		
+		List< String > keys = new ArrayList< String >( p.keySet() );
+		return keys;
+	}
+	
+	public String getVariableString( String key )
 	{
 		Map<String,ISingularityEnvironmentVariable<?>> p = getCurrentVariables();
 		
 		ISingularityEnvironmentVariable< ? > r = p.get( key );
+		SingularityEnvironmentVariableString s = (SingularityEnvironmentVariableString) r;
 		
-		String t = r.toString();
-		return t;
+		return s.getValue();
+	}
+	
+	public int getVariableInteger( String key )
+	{
+		Map<String,ISingularityEnvironmentVariable<?>> p = getCurrentVariables();
+		
+		ISingularityEnvironmentVariable< ? > r = p.get( key );
+		SingularityEnvironmentVariableInteger s = (SingularityEnvironmentVariableInteger) r;
+		
+		return s.getValue();
 	}
 	
 	public void setVariable( String key, String value )
 	{
 		Map<String,ISingularityEnvironmentVariable<?>> p = getCurrentVariables();
 		p.put( key, new SingularityEnvironmentVariableString( value ) );
+	}
+	
+	public void setVariable( String key, int value )
+	{
+		Map<String,ISingularityEnvironmentVariable<?>> p = getCurrentVariables();
+		p.put( key, new SingularityEnvironmentVariableInteger( value ) );
 	}
 	
 	public static String getVar( SingularityEnvironment env, String key )

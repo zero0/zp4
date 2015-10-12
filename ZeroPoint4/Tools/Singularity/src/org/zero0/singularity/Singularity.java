@@ -119,7 +119,7 @@ public final class Singularity
 	public void setup()
 	{
 		engine = new SingularityEngine();
-
+		
 		Display.setAppName( "Singularity" );
 		
 		display = new Display();

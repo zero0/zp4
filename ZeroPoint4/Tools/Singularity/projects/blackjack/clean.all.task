@@ -1,3 +1,13 @@
 {
-    "" : ""
+    "task" : "job",
+    "args" : {
+        "jobs" : [
+            {
+                "task" : "echo",
+                "args" : {
+                    "text" : "Hello Tasks!"
+                }
+            }
+        ]
+    }
 }

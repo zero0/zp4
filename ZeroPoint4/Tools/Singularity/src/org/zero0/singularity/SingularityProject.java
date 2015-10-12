@@ -6,21 +6,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import org.zero0.json.Value;
 import org.zero0.json.Merger;
+import org.zero0.json.Value;
 import org.zero0.singularity.util.FileUtil;
 
 public class SingularityProject
 {
+	private final Object lock = new Object();
+	
 	private String id;
 	private String name;
+	private String description;
 	private Value config;
 	
 	private SingularityEnvironment environment = new SingularityEnvironment();
 	private Map< String, Class< ? extends SingularityTask > > commands = new HashMap< String, Class< ? extends SingularityTask > >();
 	
 	private List< SingularityTask > tasks = new ArrayList< SingularityTask >();
+	private List< SingularityTaskExecutionInfo > infos = new ArrayList< SingularityTaskExecutionInfo >();
+	
+	private ExecutorService exec;
 	
 	public String getId()
 	{
@@ -34,11 +42,13 @@ public class SingularityProject
 	
 	public String getDescription()
 	{
-		return config.get( "description" ).asString();
+		return description;
 	}
 	
 	public void setup( File projectRoot, Value engineConfig )
 	{
+		exec = Executors.newCachedThreadPool();
+		
 		id = projectRoot.getName();
 		
 		File configFile = new File( projectRoot, id + ".config" );
@@ -46,6 +56,7 @@ public class SingularityProject
 		config = Merger.merge( config, engineConfig );
 		
 		name = config.get( "name" ).asString();
+		description = config.get( "description" ).asString();
 		
 		createCommands();
 		
@@ -56,6 +67,8 @@ public class SingularityProject
 	
 	public void teardown()
 	{
+		infos.clear();
+		
 		commands.clear();
 		
 		tasks.clear();
@@ -68,11 +81,11 @@ public class SingularityProject
 	
 	private void createCommands()
 	{
-		ClassLoader cl = ClassLoader.getSystemClassLoader();
-		
 		Value cmds = config.get( "commands" );
 		if( !cmds.isEmpty() )
 		{
+			ClassLoader cl = ClassLoader.getSystemClassLoader();
+			
 			List< String > names = cmds.getMemberNames();
 			for( String cmdName : names )
 			{
@@ -143,5 +156,88 @@ public class SingularityProject
 	public SingularityEnvironment getEnvironment()
 	{
 		return environment;
+	}
+	
+	public List< SingularityTaskExecutionInfo > getTaskInfo( String taskName )
+	{
+		List< SingularityTaskExecutionInfo > taskInfos = new ArrayList< SingularityTaskExecutionInfo >();
+		
+		synchronized( lock )
+		{
+			for( int i = 0, imax = infos.size(); i < imax; ++i )
+			{
+				SingularityTaskExecutionInfo t = infos.get( i );
+				if( t.getTaskName().equals( taskName ) )
+				{
+					taskInfos.add( t );
+				}
+			}
+		}
+		
+		return taskInfos;
+	}
+	
+	public List< String > getTaskNames()
+	{
+		List< String > taskNames = new ArrayList< String >( tasks.size() );
+		for( int i = 0, imax = tasks.size(); i < imax; ++i )
+		{
+			SingularityTask t = tasks.get( i );
+			taskNames.add( t.getName() );
+		}
+		
+		return taskNames;
+	}
+	
+	public SingularityTask getTask( String taskName )
+	{
+		SingularityTask task = null;
+		for( int i = 0, imax = tasks.size(); i < imax; ++i )
+		{
+			SingularityTask t = tasks.get( i );
+			if( t.getName() == taskName )
+			{
+				task = t;
+				break;
+			}
+		}
+		
+		return task;
+	}
+	
+	public void executeTask( final String taskName )
+	{
+		SingularityTask task = getTask( taskName );
+		
+		if( task != null )
+		{
+			final ISingularityTaskExecution e = task.execute();
+			
+			exec.execute( new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					SingularityTaskExecutionInfo info = new SingularityTaskExecutionInfo( infos.size(), taskName );
+					synchronized( lock )
+					{
+						infos.add( info );
+					}
+					
+					info.start();
+					
+					SingularityTaskExecutionResult result;
+
+					do
+					{
+						result = e.onRunStep( info );
+						Thread.yield();
+					}
+					while( result == SingularityTaskExecutionResult.InProgress );
+					
+					info.end( result );
+				}
+			} );
+		}
 	}
 }

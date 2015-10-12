@@ -1,23 +1,17 @@
-package org.zero0.singularity.cmd;
+package org.zero0.singularity.task;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.zero0.json.Value;
+import org.zero0.singularity.ISingularityTaskExecution;
 import org.zero0.singularity.SingularityTask;
-import org.zero0.singularity.SingularityTaskExecutionResult;
 
-public class CopyCommand extends SingularityTask
+public class CopyTask extends SingularityTask
 {
 	List< String > input = new ArrayList< String >();
 	List< String > output = new ArrayList< String >();
 	
-	@Override
-	protected SingularityTaskExecutionResult onRun()
-	{
-		return SingularityTaskExecutionResult.Success;
-	}
-
 	@Override
 	protected void onSetup( Value config )
 	{
@@ -49,5 +43,12 @@ public class CopyCommand extends SingularityTask
 				input.add( in.get( i ).asString() );
 			}
 		}
+	}
+
+	@Override
+	protected ISingularityTaskExecution onExecute()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

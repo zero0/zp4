@@ -2,8 +2,6 @@ package org.zero0.singularity.web;
 
 import java.io.IOException;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,12 +38,7 @@ public class SingularityServlet extends HttpServlet
 		
 		String[] args = path.split( "/" );
 		
-		if( args.length == 0 )
-		{
-			RequestDispatcher disp = req.getRequestDispatcher( "../project.jsp" );
-			disp.include( req, resp );
-		}
-		else
+		if( args.length > 0 )
 		{
 			
 		}

@@ -1,26 +1,13 @@
 package org.zero0.singularity;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.winstone.Server;
-import net.winstone.Winstone;
 import net.winstone.boot.BootStrap;
-import net.winstone.core.WinstoneInputStream;
-import net.winstone.core.WinstoneOutputStream;
-import net.winstone.core.WinstoneRequest;
-import net.winstone.core.WinstoneResponse;
-import net.winstone.core.listener.Listener;
-import net.winstone.core.listener.RequestHandlerThread;
-import net.winstone.jndi.resources.DataSourceConfig;
 
 import org.zero0.json.Factory;
 import org.zero0.json.Value;
@@ -40,6 +27,11 @@ public class SingularityEngine
 	private Value config = Factory.Null;
 	
 	private Server server;
+	
+	public SingularityProject getProject( int index )
+	{
+		return projects.get( index );
+	}
 	
 	public SingularityProject getProject( String id )
 	{
@@ -65,6 +57,16 @@ public class SingularityEngine
 			ids.add( proj.getId() );
 		}
 		return ids;
+	}
+	
+	public String getProjectId( int index )
+	{
+		return projects.get( index ).getId();
+	}
+	
+	public int getNumProjects()
+	{
+		return projects.size();
 	}
 	
 	public void setup()
@@ -117,7 +119,7 @@ public class SingularityEngine
 		SingularityProject proj = null;
 		
 		proj = new SingularityProject();
-		proj.setup( projectRoot, config.get( "config" ) );
+		proj.setup( projectRoot, config );
 		
 		return proj;
 	}
@@ -129,6 +131,7 @@ public class SingularityEngine
 		Map< String, String > arguments = new HashMap< String, String >();
 		arguments.put( "webroot", "./www" );
 		arguments.put( "useJasper", "true" );
+		arguments.put( "fork", "true" );
 		arguments.put( "directoryListings", "false" );
 		arguments.put( "fork", "true" );
 		
