@@ -193,7 +193,7 @@ void zpStringBuffer::append( const zp_char* value, zp_size_t length )
 {
 	if( value == ZP_NULL ) return;
 
-	if( length < 0 )
+	if( length == zpString::npos )
 	{
 		length = zp_strlen( value );
 	}

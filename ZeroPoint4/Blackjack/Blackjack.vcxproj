@@ -87,11 +87,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)Bin\Platform_$(PlatformShortName)\</OutDir>
-    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(ProjectDir)Bin\Platform_$(PlatformShortName)\</OutDir>
-    <TargetName>$(ProjectName)_d</TargetName>
+    <OutDir>$(ProjectDir)Bin\Platform_$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_x64|Win32'">
     <OutDir>$(ProjectDir)Bin\Platform_$(PlatformShortName)\</OutDir>
@@ -119,13 +119,13 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Physics\lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Rendering\lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Audio\lib\$(ProcessorArchitectureAsPlatform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(SolutionDir)Physics\lib\$(ProcessorArchitecture)\;$(SolutionDir)Rendering\lib\$(ProcessorArchitecture)\;$(SolutionDir)Audio\lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetPath)" "$(ProjectDir)$(TargetFileName)"
-copy "$(SolutionDir)Audio\bin\$(ProcessorArchitectureAsPlatform)\*" "$(ProjectDir)Bin\"
-copy "$(SolutionDir)Rendering\bin\$(ProcessorArchitectureAsPlatform)\*" "$(ProjectDir)Bin\"</Command>
+copy "$(SolutionDir)Audio\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\"
+copy "$(SolutionDir)Rendering\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

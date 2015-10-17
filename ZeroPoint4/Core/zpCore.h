@@ -318,6 +318,7 @@ void zp_zero_memory_array( T (&arr)[Size] )
 template<typename T, typename LessFunc>
 void zp_qsort( T* arr, zp_size_t l, zp_size_t r, LessFunc cmp )
 {
+	return;
 	zp_size_t i = l, j = r;
 	zp_size_t p = ( l + r ) / 2;
 

@@ -7,7 +7,7 @@ class zpStringBuffer
 public:
 	enum : zp_size_t
 	{
-		npos = -1,
+		npos = (zp_size_t)-1,
 	};
 
 	zpStringBuffer();

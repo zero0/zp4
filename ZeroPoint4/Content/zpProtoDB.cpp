@@ -154,7 +154,7 @@ void zpProtoDBManager::initialize( zp_uint numCatagories )
 void zpProtoDBManager::initializeCategory( const zp_char* category, zpProtoDBCreateFunc create, zp_uint stride )
 {
 	zpString cat( category );
-	if( m_catagories.indexOf( cat ) < 0 )
+	if( m_catagories.indexOf( cat ) == zpArrayList< zpString >::npos )
 	{
 		m_catagories.pushBack( cat );
 		m_protoDBs.pushBackEmpty().initialize( create, stride );
