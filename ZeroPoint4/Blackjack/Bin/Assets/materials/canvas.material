@@ -34,8 +34,8 @@
         "DepthEnabled" : true,
         "DepthWriteMaskAll" : false
     },
-	"Raster" :
-	{
-		"CullMode" : "None"
-	}
+    "Raster" :
+    {
+        "CullMode" : "None"
+    }
 }

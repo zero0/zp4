@@ -6,15 +6,12 @@
     "Components": {
         "Transform": {
             "Scale": [
-                20,
+                50,
                 2,
-                20
+                50
             ]
         },
-        "MeshRenderer": {
-            "Mesh": "meshes/cube.meshb",
-            "Material" : "materials/cube.materialb"
-        },
+
         "RigidBody": {
             "Mass": 0,
             "Group": "Main",
@@ -23,9 +20,9 @@
                 "Shape": "Box",
                 "Size": {
                     "Extents": [
-                        10,
+                        25,
                         1,
-                        10
+                        25
                     ]
                 }
             }
