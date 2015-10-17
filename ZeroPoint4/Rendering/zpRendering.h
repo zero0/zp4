@@ -47,7 +47,7 @@ enum
 };
 
 #if ZP_RENDERING_TYPE == ZP_DX11
-#include "RenderingDX\zpDX11Lib.inc"
+#include "RenderingDX\zpDX11Lib.inl"
 #elif ZP_RENDERING_TYPE == ZP_GL2
 #include "RenderingOpenGL\zpOpenGLLib.inc"
 #else

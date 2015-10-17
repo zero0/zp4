@@ -1,2 +1,2 @@
 #include "zpPhysics.h"
-#include "zpPhysicsLib.inc"
+#include "zpPhysicsLib.inl"

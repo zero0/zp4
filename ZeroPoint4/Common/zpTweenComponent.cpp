@@ -41,7 +41,7 @@ zp_bool zpTweenComponent::isComplete( zp_int id ) const
 {
 	zp_bool complete = true;
 
-	zp_uint index;
+	zp_size_t index;
 	zp_bool found = m_usedTweens.findIndexIf( [ &id ]( zpTweenAction* a ) {
 		return a->id == id;
 	}, index );
@@ -57,7 +57,7 @@ zp_bool zpTweenComponent::isComplete( zp_int id ) const
 
 void zpTweenComponent::cancelTween( zp_int id )
 {
-	zp_uint index;
+	zp_size_t index;
 	zp_bool found = m_usedTweens.findIndexIf( [ &id ]( zpTweenAction* a ) {
 		return a->id == id;
 	}, index );

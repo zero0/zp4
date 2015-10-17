@@ -1164,7 +1164,7 @@ zp_hash zpRenderingEngineImpl::createDynamicVertexLayout( const zp_char* format,
 {
 	zp_hash hash = zp_fnv1_32_string( format, 0 );
 	
-	zp_uint index;
+	zp_size_t index;
 	zp_bool found = m_dynamicInputLayouts.findIndexIf( [ hash ]( const zpDynamicInputLayout& i ) {
 		return i.hash == hash;
 	}, index );

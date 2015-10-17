@@ -92,14 +92,14 @@
     <ClInclude Include="zpDX11VertexLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpDX11Lib.inc">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpDX11DepthStencilState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zpDX11BlendState.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zpDX11Lib.inl">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

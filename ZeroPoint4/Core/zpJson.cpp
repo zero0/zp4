@@ -157,7 +157,7 @@ zpJsonType zpJson::type() const
 {
 	return m_type;
 }
-zp_uint zpJson::size() const
+zp_size_t zpJson::size() const
 {
 	switch( m_type )
 	{
@@ -653,7 +653,7 @@ zp_bool zpJsonParser::parseFile( const zpString& filename, zpJson& outJson )
 		if( !jsonBuffer.isEmpty() )
 		{
 			const zp_char* json = jsonBuffer.str();
-			const zp_uint length = jsonBuffer.length();
+			const zp_size_t length = jsonBuffer.length();
 
 			m_start = json;
 			m_current = m_start;

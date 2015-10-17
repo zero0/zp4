@@ -21,14 +21,14 @@ zpEventManager::~zpEventManager()
 
 void zpEventManager::addEventListener( const zp_char* eventName, zpEventListener* listener, zpEventHandler& handler )
 {
-	zp_uint e = findEventAndCreate( eventName );
+	zp_size_t e = findEventAndCreate( eventName );
 	handler.m_handlesEvent = e;
 
 	m_eventListeners[ e ].pushBack( listener );
 }
 void zpEventManager::addEventListener( const zpString& eventName, zpEventListener* listener, zpEventHandler& handler )
 {
-	zp_uint e = findEventAndCreate( eventName );
+	zp_size_t e = findEventAndCreate( eventName );
 	handler.m_handlesEvent = e;
 
 	m_eventListeners[ e ].pushBack( listener );
@@ -36,7 +36,7 @@ void zpEventManager::addEventListener( const zpString& eventName, zpEventListene
 
 void zpEventManager::removeEventListener( const zp_char* eventName, zpEventListener* listener, zpEventHandler& handler )
 {
-	zp_uint e;
+	zp_size_t e;
 	if( findEvent( eventName, e ) )
 	{
 		m_eventListeners[ e ].eraseAll( listener );
@@ -45,7 +45,7 @@ void zpEventManager::removeEventListener( const zp_char* eventName, zpEventListe
 }
 void zpEventManager::removeEventListener( const zpString& eventName, zpEventListener* listener, zpEventHandler& handler )
 {
-	zp_uint e;
+	zp_size_t e;
 	if( findEvent( eventName, e ) )
 	{
 		m_eventListeners[ e ].eraseAll( listener );
@@ -55,7 +55,7 @@ void zpEventManager::removeEventListener( const zpString& eventName, zpEventList
 
 void zpEventManager::removeAllEventListeners( const zp_char* eventName )
 {
-	zp_uint e;
+	zp_size_t e;
 	if( findEvent( eventName, e ) )
 	{
 		m_eventListeners[ e ].clear();
@@ -63,7 +63,7 @@ void zpEventManager::removeAllEventListeners( const zp_char* eventName )
 }
 void zpEventManager::removeAllEventListeners( const zpString& eventName )
 {
-	zp_uint e;
+	zp_size_t e;
 	if( findEvent( eventName, e ) )
 	{
 		m_eventListeners[ e ].clear();
@@ -72,7 +72,7 @@ void zpEventManager::removeAllEventListeners( const zpString& eventName )
 
 void zpEventManager::sendEvent( const zp_char* eventName, zpObject* sender )
 {
-	zp_uint e;
+	zp_size_t e;
 	if( findEvent( eventName, e ) )
 	{
 		m_eventListeners[ e ].foreach( [ &e, sender ]( zpEventListener* listener )
@@ -83,7 +83,7 @@ void zpEventManager::sendEvent( const zp_char* eventName, zpObject* sender )
 }
 void zpEventManager::sendEvent( const zpString& eventName, zpObject* sender )
 {
-	zp_uint e;
+	zp_size_t e;
 	if( findEvent( eventName, e ) )
 	{
 		m_eventListeners[ e ].foreach( [ &e, sender ]( zpEventListener* listener )
@@ -93,25 +93,25 @@ void zpEventManager::sendEvent( const zpString& eventName, zpObject* sender )
 	}
 }
 
-zp_bool zpEventManager::findEvent( const zp_char* eventName, zp_uint& index )
+zp_bool zpEventManager::findEvent( const zp_char* eventName, zp_size_t& index )
 {
 	return m_eventNames.findIndexIf( [ eventName ]( const zpString& e )
 	{
 		return e == eventName;
 	}, index );
 }
-zp_bool zpEventManager::findEvent( const zpString& eventName, zp_uint& index )
+zp_bool zpEventManager::findEvent( const zpString& eventName, zp_size_t& index )
 {
-	zp_int i = m_eventNames.indexOf( eventName );
-	if( i < 0 ) return false;
+	zp_size_t i = m_eventNames.indexOf( eventName );
+	if( i == zpArrayList< zpString >::npos ) return false;
 
-	index = (zp_uint)i;
+	index = i;
 	return true;
 }
 
-zp_uint zpEventManager::findEventAndCreate( const zp_char* eventName )
+zp_size_t zpEventManager::findEventAndCreate( const zp_char* eventName )
 {
-	zp_uint index;
+	zp_size_t index;
 	zp_bool found = m_eventNames.findIndexIf( [ eventName ]( const zpString& e )
 	{
 		return e == eventName;
@@ -127,15 +127,15 @@ zp_uint zpEventManager::findEventAndCreate( const zp_char* eventName )
 	return index;
 }
 
-zp_uint zpEventManager::findEventAndCreate( const zpString& eventName )
+zp_size_t zpEventManager::findEventAndCreate( const zpString& eventName )
 {
-	zp_int index = m_eventNames.indexOf( eventName );
-	if( index < 0 )
+	zp_size_t index = m_eventNames.indexOf( eventName );
+	if( index == zpArrayList< zpString >::npos )
 	{
 		index = m_eventNames.size();
 		m_eventNames.pushBackEmpty() = eventName;
 		m_eventListeners.pushBackEmpty();
 	}
 
-	return (zp_uint)index;
+	return index;
 }

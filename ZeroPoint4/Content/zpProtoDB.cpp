@@ -120,7 +120,7 @@ void zpProtoDB::destroy()
 
 zp_int zpProtoDB::findProtoEntry( const zp_char* protoId ) const
 {
-	zp_uint index;
+	zp_size_t index;
 	zp_bool ok = m_entries.findIndexIf( [ protoId ]( const zpString& s ) { return s == protoId; }, index );
 	return ok ? (zp_int)index : ZP_PROTODB_INVALID_HANDLE;
 }

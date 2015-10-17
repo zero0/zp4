@@ -6,10 +6,11 @@
 #define ZP_DEBUG				1
 #endif
 
-#if _WIN32
-#define ZP_WIN_32				1
-#elif _WIN64
+#if defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_IA64)
 #define ZP_WIN_64				1
+#endif
+#if defined(_WIN32)
+#define ZP_WIN_32				1
 #endif
 
 #define ZP_USE_COLOR_CONSOLE	0
@@ -95,8 +96,8 @@
 #include "zpBaseTypes.h"
 
 #if ZP_USE_MEMORY_SYSTEM
-void* operator new( zp_uint size );
-void* operator new[]( zp_uint size );
+void* operator new( zp_size_t size );
+void* operator new[]( zp_size_t size );
 
 void operator delete( void* ptr );
 void operator delete[]( void* ptr );
@@ -116,30 +117,30 @@ void zp_printfln( const zp_char* text, ... );
 #define zp_printfln( text, ... ) (void)0
 #endif
 
-void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... );
+void zp_snprintf( zp_char* dest, zp_size_t destSize, zp_size_t maxCount, const zp_char* format, ... );
 
-void* zp_malloc( zp_uint size );
-void* zp_calloc( zp_uint num, zp_uint size );
-void* zp_realloc( void* ptr, zp_uint size );
+void* zp_malloc( zp_size_t size );
+void* zp_calloc( zp_size_t num, zp_size_t size );
+void* zp_realloc( void* ptr, zp_size_t size );
 
-void* zp_aligned_malloc( zp_uint size, zp_uint alignment );
-void* zp_aligned_calloc( zp_uint size, zp_uint count, zp_uint alignment );
-void* zp_aligned_realloc( void* ptr, zp_uint size, zp_uint alignment );
-zp_uint zp_aligned_memsize( void* ptr, zp_uint alignment );
+void* zp_aligned_malloc( zp_size_t size, zp_size_t alignment );
+void* zp_aligned_calloc( zp_size_t size, zp_size_t count, zp_size_t alignment );
+void* zp_aligned_realloc( void* ptr, zp_size_t size, zp_size_t alignment );
+zp_size_t zp_aligned_memsize( void* ptr, zp_size_t alignment );
 
 void zp_free( void* ptr );
 void zp_aligned_free( void* ptr );
 
-void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size );
-void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size );
-void* zp_memset( void* dest, zp_int value, zp_uint size );
-zp_int zp_memcmp( const void* ptr1, const void* ptr2, zp_uint size );
+void* zp_memcpy( void* dest, zp_size_t destSize, const void* src, zp_size_t size );
+void* zp_memmove( void* dest, zp_size_t destSize, const void* src, zp_size_t size );
+void* zp_memset( void* dest, zp_int value, zp_size_t size );
+zp_int zp_memcmp( const void* ptr1, const void* ptr2, zp_size_t size );
 
-template<zp_uint Size>
+template<zp_size_t Size>
 zp_char* zp_strcpy( zp_char (&destString)[Size], const zp_char* srcString ) { return zp_strcpy( destString, Size, srcString ); }
-zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* srcString );
-zp_char* zp_strncpy( zp_char* destString, zp_uint numElements, const zp_char* srcString, zp_uint maxCount );
-zp_uint zp_strlen( const zp_char* srcString );
+zp_char* zp_strcpy( zp_char* destString, zp_size_t numElements, const zp_char* srcString );
+zp_char* zp_strncpy( zp_char* destString, zp_size_t numElements, const zp_char* srcString, zp_size_t maxCount );
+zp_size_t zp_strlen( const zp_char* srcString );
 zp_int zp_strcmp( const zp_char* str1, const zp_char* str2 );
 zp_char* zp_strstr( zp_char* str, const zp_char* subStr );
 const zp_char* zp_strstr(  const zp_char* str, const zp_char* subStr );
@@ -181,7 +182,7 @@ ZP_FORCE_INLINE zp_hash zp_fnv1_32( const T& d, zp_hash h = 0 )
 {
 	return zp_fnv1_32_data( (const void*)&d, sizeof( T ), h );
 }
-zp_hash zp_fnv1_32_data( const void* d, zp_uint l, zp_hash h );
+zp_hash zp_fnv1_32_data( const void* d, zp_size_t l, zp_hash h );
 zp_hash zp_fnv1_32_string( const zp_char* c, zp_hash h );
 
 template<typename T>
@@ -225,7 +226,6 @@ template<typename T> class zpFlag;
 template<typename T> class zpLinkedList;
 template<typename T> class zpIntrusiveList;
 template<typename F, typename S> class zpPair;
-template<typename T, zp_uint Size> class zpArray;
 template<typename T> class zpArrayList;
 template<typename K, typename V> class zpMap;
 template<typename F, typename S> class zpHashMap;
@@ -256,6 +256,7 @@ class zpXmlParser;
 #include "zpTween.h"
 
 #include "zpDelegate.h"
+#include "zpThread.h"
 
 #include "zpRenderable.h"
 #include "zpSerializable.h"
@@ -269,7 +270,6 @@ class zpXmlParser;
 #include "zpLinkedList.h"
 #include "zpIntrusiveList.h"
 #include "zpPair.h"
-#include "zpArray.h"
 #include "zpArrayList.h"
 #include "zpHashMap.h"
 #include "zpMap.h"
@@ -305,21 +305,21 @@ void zp_zero_memory( T* ptr )
 	zp_memset( ptr, 0, sizeof( T ) );
 }
 template<typename T>
-void zp_zero_memory_array( T* ptr, zp_uint count )
+void zp_zero_memory_array( T* ptr, zp_size_t count )
 {
 	zp_memset( ptr, 0, count * sizeof( T ) );
 }
-template<typename T, zp_uint Size>
+template<typename T, zp_size_t Size>
 void zp_zero_memory_array( T (&arr)[Size] )
 {
 	zp_memset( arr, 0, Size * sizeof( T ) );
 }
 
 template<typename T, typename LessFunc>
-void zp_qsort( T* arr, zp_int l, zp_int r, LessFunc cmp )
+void zp_qsort( T* arr, zp_size_t l, zp_size_t r, LessFunc cmp )
 {
-	zp_int i = l, j = r;
-	zp_int p = ( l + r ) / 2;
+	zp_size_t i = l, j = r;
+	zp_size_t p = ( l + r ) / 2;
 
 	while( i <= j )
 	{
@@ -387,20 +387,20 @@ void zp_qsort( T* arr, zp_int l, zp_int r, LessFunc cmp )
 #endif
 }
 
-template<typename T, zp_uint Size, typename LessFunc>
+template<typename T, zp_size_t Size, typename LessFunc>
 void zp_qsort( T (&arr)[Size], LessFunc cmp )
 {
 	zp_qsort( arr, 0, Size - 1, cmp );
 }
 
 template<typename T, typename LessFunc>
-void zp_qsort( T* arr, zp_uint count, LessFunc cmp )
+void zp_qsort( T* arr, zp_size_t count, LessFunc cmp )
 {
 	zp_qsort( arr, 0, count - 1, cmp );
 }
 
-zp_bool zp_base64_encode( const void* data, zp_uint length, zpStringBuffer& outEncode );
-zp_bool zp_base64_decode( const zp_char* data, zp_uint length, zpDataBuffer& outDecode );
+zp_bool zp_base64_encode( const void* data, zp_size_t length, zpStringBuffer& outEncode );
+zp_bool zp_base64_decode( const zp_char* data, zp_size_t length, zpDataBuffer& outDecode );
 
 void zpCoreRegisterSerializables();
 

@@ -45,7 +45,7 @@ public:
 	void operator=( zpJson&& json );
 
 	zpJsonType type() const;
-	zp_uint size() const;
+	zp_size_t size() const;
 	zp_bool isEmpty() const;
 	void clear();
 

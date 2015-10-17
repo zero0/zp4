@@ -14,13 +14,13 @@ zpArrayList<T>::zpArrayList( const zpArrayList& arr )
 	, m_isFixed( false )
 {
 	ensureCapacity( arr.m_size );
-	for( zp_uint i = 0; i < arr.m_size; ++i )
+	for( zp_size_t i = 0; i < arr.m_size; ++i )
 	{
 		pushBack( arr[ i ] );
 	}
 }
 template<typename T>
-zpArrayList<T>::zpArrayList( T* fixedArray, zp_uint count )
+zpArrayList<T>::zpArrayList( T* fixedArray, zp_size_t count )
 	: m_array( fixedArray )
 	, m_size( 0 )
 	, m_capacity( count )
@@ -36,7 +36,7 @@ zpArrayList<T>::zpArrayList( zpArrayList&& arr )
 	if( arr.m_isFixed )
 	{
 		ensureCapacity( arr.m_size );
-		for( zp_uint i = 0; i < arr.m_size; ++i )
+		for( zp_size_t i = 0; i < arr.m_size; ++i )
 		{
 			pushBack( arr[ i ] );
 		}
@@ -62,7 +62,7 @@ void zpArrayList<T>::operator=( const zpArrayList& arr )
 {
 	clear();
 	ensureCapacity( arr.m_size );
-	for( zp_uint i = 0; i < arr.m_size; ++i )
+	for( zp_size_t i = 0; i < arr.m_size; ++i )
 	{
 		pushBack( arr[ i ] );
 	}
@@ -74,7 +74,7 @@ void zpArrayList<T>::operator=( zpArrayList&& arr )
 	if( arr.m_isFixed )
 	{
 		ensureCapacity( arr.m_size );
-		for( zp_uint i = 0; i < arr.m_size; ++i )
+		for( zp_size_t i = 0; i < arr.m_size; ++i )
 		{
 			pushBack( arr[ i ] );
 		}
@@ -91,27 +91,27 @@ void zpArrayList<T>::operator=( zpArrayList&& arr )
 }
 
 template<typename T>
-T& zpArrayList<T>::operator[]( zp_uint index )
+T& zpArrayList<T>::operator[]( zp_size_t index )
 {
 	ZP_ASSERT( index < m_size, "zpArrayList: Index %d out of bounds %d", index, m_size );
 	return m_array[ index ];
 }
 template<typename T>
-const T& zpArrayList<T>::operator[]( zp_uint index ) const
-{
-	ZP_ASSERT( index < m_size, "zpArrayList: Index %d out of bounds %d", index, m_size );
-	return m_array[ index ];
-}
-
-template<typename T>
-const T& zpArrayList<T>::at( zp_uint index ) const
+const T& zpArrayList<T>::operator[]( zp_size_t index ) const
 {
 	ZP_ASSERT( index < m_size, "zpArrayList: Index %d out of bounds %d", index, m_size );
 	return m_array[ index ];
 }
 
 template<typename T>
-zp_uint zpArrayList<T>::size() const
+const T& zpArrayList<T>::at( zp_size_t index ) const
+{
+	ZP_ASSERT( index < m_size, "zpArrayList: Index %d out of bounds %d", index, m_size );
+	return m_array[ index ];
+}
+
+template<typename T>
+zp_size_t zpArrayList<T>::size() const
 {
 	return m_size;
 }
@@ -147,7 +147,7 @@ void zpArrayList<T>::pushFront( const T& val )
 {
 	ensureCapacity( m_size + 1 );
 
-	for( zp_uint i = m_size + 1; i >= 1; --i )
+	for( zp_size_t i = m_size + 1; i >= 1; --i )
 	{
 		m_array[ i ] = zp_move( m_array[ i - 1 ] );
 	}
@@ -177,7 +177,7 @@ void zpArrayList<T>::popFront()
 	ZP_ASSERT( m_size > 0, "zpArrayList: popFront empty array" );
 
 	m_array->~T();
-	for( zp_uint i = 1; i < m_size; ++i )
+	for( zp_size_t i = 1; i < m_size; ++i )
 	{
 		m_array[ i - 1 ] = zp_move( m_array[ i ] );
 	}
@@ -185,7 +185,7 @@ void zpArrayList<T>::popFront()
 }
 
 template<typename T>
-void zpArrayList<T>::erase( zp_uint index )
+void zpArrayList<T>::erase( zp_size_t index )
 {
 	ZP_ASSERT( index < m_size, "zpArrayList: Index out of bound of Array. Index: %d Size: %d", index, m_size );
 
@@ -194,10 +194,10 @@ void zpArrayList<T>::erase( zp_uint index )
 	--m_size;
 }
 template<typename T>
-zp_uint zpArrayList<T>::eraseAll( const T& val )
+zp_size_t zpArrayList<T>::eraseAll( const T& val )
 {
-	zp_uint count = 0;
-	for( zp_uint i = 0; i < m_size; ++i )
+	zp_size_t count = 0;
+	for( zp_size_t i = 0; i < m_size; ++i )
 	{
 		if( m_array[ i ] == val )
 		{
@@ -212,7 +212,7 @@ zp_uint zpArrayList<T>::eraseAll( const T& val )
 template<typename T>
 void zpArrayList<T>::clear()
 {
-	for( zp_uint i = 0; i < m_size; ++i )
+	for( zp_size_t i = 0; i < m_size; ++i )
 	{
 		( m_array + i )->~T();
 	}
@@ -226,13 +226,13 @@ void zpArrayList<T>::reset()
 }
 
 template<typename T>
-void zpArrayList<T>::reserve( zp_uint size )
+void zpArrayList<T>::reserve( zp_size_t size )
 {
 	ensureCapacity( size );
 }
 
 template<typename T>
-void zpArrayList<T>::resize( zp_uint size )
+void zpArrayList<T>::resize( zp_size_t size )
 {
 	ensureCapacity( size );
 	m_size = size;
@@ -251,18 +251,18 @@ void zpArrayList<T>::destroy()
 }
 
 template<typename T>
-zp_int zpArrayList<T>::indexOf( const T& val ) const
+zp_size_t zpArrayList<T>::indexOf( const T& val ) const
 {
-	for( zp_uint i = 0; i < m_size; ++i )
+	for( zp_size_t i = 0; i < m_size; ++i )
 	{
 		if( m_array[ i ] == val ) return i;
 	}
 	return npos;
 }
 template<typename T>
-zp_int zpArrayList<T>::lastIndexOf( const T& val ) const
+zp_size_t zpArrayList<T>::lastIndexOf( const T& val ) const
 {
-	for( zp_int i = (zp_int)m_size; i-- > 0; )
+	for( zp_size_t i = (zp_int)m_size; i-- > 0; )
 	{
 		if( m_array[ i ] == val ) return i;
 	}
@@ -270,7 +270,7 @@ zp_int zpArrayList<T>::lastIndexOf( const T& val ) const
 }
 
 template<typename T>
-void zpArrayList<T>::ensureCapacity( zp_uint size )
+void zpArrayList<T>::ensureCapacity( zp_size_t size )
 {
 	// if the array is already large enough, return
 	if( size <= m_capacity ) return;
@@ -292,7 +292,7 @@ void zpArrayList<T>::ensureCapacity( zp_uint size )
 	T* newArray = new T[ m_capacity ];
 	if( m_array )
 	{
-		for( zp_uint i = 0; i < m_size; ++i )
+		for( zp_size_t i = 0; i < m_size; ++i )
 		{
 			newArray[ i ] = zp_move( m_array[ i ] );
 		}
@@ -353,7 +353,7 @@ const T* zpArrayList<T>::end() const
 template<typename T> template<typename Func>
 zp_bool zpArrayList<T>::findIf( Func func, const T** found ) const
 {
-	for( zp_uint i = 0; i < m_size; ++i )
+	for( zp_size_t i = 0; i < m_size; ++i )
 	{
 		if( func( m_array[ i ] ) )
 		{
@@ -366,7 +366,7 @@ zp_bool zpArrayList<T>::findIf( Func func, const T** found ) const
 template<typename T> template<typename Func>
 zp_bool zpArrayList<T>::findIf( Func func, T** found )
 {
-	for( zp_uint i = 0; i < m_size; ++i )
+	for( zp_size_t i = 0; i < m_size; ++i )
 	{
 		if( func( m_array[ i ] ) )
 		{
@@ -378,9 +378,9 @@ zp_bool zpArrayList<T>::findIf( Func func, T** found )
 }
 
 template<typename T> template<typename Func>
-zp_bool zpArrayList<T>::findIndexIf( Func func, zp_uint& index ) const
+zp_bool zpArrayList<T>::findIndexIf( Func func, zp_size_t& index ) const
 {
-	for( zp_uint i = 0; i < m_size; ++i )
+	for( zp_size_t i = 0; i < m_size; ++i )
 	{
 		if( func( m_array[ i ] ) )
 		{
@@ -456,7 +456,7 @@ void zpArrayList<T>::sort( Func func )
 }
 
 
-template<typename T, zp_uint Size>
+template<typename T, zp_size_t Size>
 zpFixedArrayList<T, Size>::zpFixedArrayList()
 	: zpArrayList<T>( m_fixedArray, Size )
 {}

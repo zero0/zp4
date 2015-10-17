@@ -53,12 +53,12 @@ public:
 	zp_bool open( zpFileMode mode );
 	void close();
 
-	zp_int readFile( zpStringBuffer& buffer );
-	zp_int readLine( zpStringBuffer& buffer );
+	zp_size_t readFile( zpStringBuffer& buffer );
+	zp_size_t readLine( zpStringBuffer& buffer );
 	zp_bool isEOF() const;
 
-	zp_int readFileBinary( zpArrayList<zp_byte>& buffer );
-	zp_int readFileBinary( zpDataBuffer& buffer );
+	zp_size_t readFileBinary( zpArrayList<zp_byte>& buffer );
+	zp_size_t readFileBinary( zpDataBuffer& buffer );
 	
 	zp_bool readByte( zp_byte& value ) const;
 	zp_bool readChar( zp_char& value ) const;
@@ -69,10 +69,10 @@ public:
 	zp_bool readDouble( zp_double& value ) const;
 
 	template<typename T>
-	zp_int readData( T& value ) const
+	zp_size_t readData( T& value ) const
 	{
 		ZP_ASSERT( isBinaryFile(), "zpFile: Can only read data from a binary file" );
-		zp_int count = 0;
+		zp_size_t count = 0;
 #if ZP_USE_SAFE_FUNCTIONS
 		count = fread_s( &value, sizeof( T ), sizeof( T ), 1, (FILE*)m_file );
 #else
@@ -88,16 +88,16 @@ public:
 	zp_bool writeLong( zp_long value );
 	zp_bool writeFloat( zp_float value );
 	zp_bool writeDouble( zp_double value );
-	zp_int writeFormat( const zp_char* format, ... );
-	zp_int writeBuffer( const zpStringBuffer& buffer );
-	zp_int writeBuffer( const zpDataBuffer& buffer );
-	zp_int writeBuffer( const void* data, zp_uint size );
+	zp_size_t writeFormat( const zp_char* format, ... );
+	zp_size_t writeBuffer( const zpStringBuffer& buffer );
+	zp_size_t writeBuffer( const zpDataBuffer& buffer );
+	zp_size_t writeBuffer( const void* data, zp_size_t size );
 
 	template<typename T>
-	zp_int writeData( const T& value )
+	zp_size_t writeData( const T& value )
 	{
 		ZP_ASSERT( isBinaryFile(), "zpFile: Can only write data to a binary file" );
-		zp_int count = fwrite( &value, sizeof( T ), 1, (FILE*)m_file );
+		zp_size_t count = fwrite( &value, sizeof( T ), 1, (FILE*)m_file );
 		return count;
 	}
 

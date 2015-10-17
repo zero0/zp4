@@ -7,12 +7,12 @@
 
 
 #if ZP_USE_MEMORY_SYSTEM
-void* operator new( zp_uint size )
+void* operator new( zp_size_t size )
 {
 	void* ptr = zpMemorySystem::getInstance()->allocate( size );
 	return ptr;
 }
-void* operator new[]( zp_uint size )
+void* operator new[]( zp_size_t size )
 {
 	void* ptr = zpMemorySystem::getInstance()->allocate( size );
 	return ptr;
@@ -163,7 +163,7 @@ void zp_printfln( const zp_char* text, ... )
 }
 #endif
 
-void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_char* format, ... )
+void zp_snprintf( zp_char* dest, zp_size_t destSize, zp_size_t maxCount, const zp_char* format, ... )
 {
 	va_list vl;
 	va_start( vl, format );
@@ -175,32 +175,32 @@ void zp_snprintf( zp_char* dest, zp_uint destSize, zp_uint maxCount, const zp_ch
 	va_end( vl );
 }
 
-void* zp_malloc( zp_uint size )
+void* zp_malloc( zp_size_t size )
 {
 	return malloc( size );
 }
-void* zp_calloc( zp_uint num, zp_uint size )
+void* zp_calloc( zp_size_t num, zp_size_t size )
 {
 	return calloc( num, size );
 }
-void* zp_realloc( void* ptr, zp_uint size )
+void* zp_realloc( void* ptr, zp_size_t size )
 {
 	return realloc( ptr, size );
 }
 
-void* zp_aligned_malloc( zp_uint size, zp_uint alignment )
+void* zp_aligned_malloc( zp_size_t size, zp_size_t alignment )
 {
 	return _aligned_malloc( size, alignment );
 }
-void* zp_aligned_calloc( zp_uint size, zp_uint count, zp_uint alignment )
+void* zp_aligned_calloc( zp_size_t size, zp_size_t count, zp_size_t alignment )
 {
 	return _aligned_recalloc( ZP_NULL, count, size, alignment );
 }
-void* zp_aligned_realloc( void* ptr, zp_uint size, zp_uint alignment )
+void* zp_aligned_realloc( void* ptr, zp_size_t size, zp_size_t alignment )
 {
 	return _aligned_realloc( ptr, size, alignment );
 }
-zp_uint zp_aligned_memsize( void* ptr, zp_uint alignment )
+zp_size_t zp_aligned_memsize( void* ptr, zp_size_t alignment )
 {
 	return _aligned_msize( ptr, alignment, 0 );
 }
@@ -212,7 +212,7 @@ void zp_aligned_free( void* ptr ) {
 	_aligned_free( ptr );
 }
 
-void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size )
+void* zp_memcpy( void* dest, zp_size_t destSize, const void* src, zp_size_t size )
 {
 #if ZP_USE_SAFE_FUNCTIONS
 	memcpy_s( dest, destSize, src, size );
@@ -221,7 +221,7 @@ void* zp_memcpy( void* dest, zp_uint destSize, const void* src, zp_uint size )
 	return memcpy( dest, src, size );
 #endif
 }
-void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size )
+void* zp_memmove( void* dest, zp_size_t destSize, const void* src, zp_size_t size )
 {
 #if ZP_USE_SAFE_FUNCTIONS
 	memmove_s( dest, destSize, src, size );
@@ -230,16 +230,16 @@ void* zp_memmove( void* dest, zp_uint destSize, const void* src, zp_uint size )
 	return memmove( dest, src, size );
 #endif
 }
-void* zp_memset( void* dest, zp_int value, zp_uint size )
+void* zp_memset( void* dest, zp_int value, zp_size_t size )
 {
 	return memset( dest, value, size );
 }
-zp_int zp_memcmp( const void* ptr1, const void* ptr2, zp_uint size )
+zp_int zp_memcmp( const void* ptr1, const void* ptr2, zp_size_t size )
 {
 	return memcmp( ptr1, ptr2, size );
 }
 
-zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* srcString )
+zp_char* zp_strcpy( zp_char* destString, zp_size_t numElements, const zp_char* srcString )
 {
 #if ZP_USE_SAFE_FUNCTIONS
 	return strcpy_s( destString, numElements, srcString ) == 0 ? destString : ZP_NULL;
@@ -247,7 +247,7 @@ zp_char* zp_strcpy( zp_char* destString, zp_uint numElements, const zp_char* src
 	return strcpy( destString, numElements, srcString );
 #endif
 }
-zp_char* zp_strncpy( zp_char* destString, zp_uint numElements, const zp_char* srcString, zp_uint maxCount )
+zp_char* zp_strncpy( zp_char* destString, zp_size_t numElements, const zp_char* srcString, zp_size_t maxCount )
 {
 #if ZP_USE_SAFE_FUNCTIONS
 	strncpy_s( destString, numElements, srcString, maxCount );
@@ -257,7 +257,7 @@ zp_char* zp_strncpy( zp_char* destString, zp_uint numElements, const zp_char* sr
 	return strncpy( destString, srcString, maxCount );
 #endif
 }
-zp_uint zp_strlen( const zp_char* srcString )
+zp_size_t zp_strlen( const zp_char* srcString )
 {
 	return srcString ? strlen( srcString ) : 0;
 }
@@ -386,7 +386,7 @@ void zp_sleep( zp_uint milliseconds )
 #endif
 }
 
-zp_hash zp_fnv1_32_data( const void* d, zp_uint l, zp_hash h )
+zp_hash zp_fnv1_32_data( const void* d, zp_size_t l, zp_hash h )
 {
 	const zp_byte* s = (const zp_byte*)d;
 	
@@ -421,11 +421,11 @@ const zp_byte fromBase64Chars[] = {
 };
 const zp_char padCharacter = '=';
 
-zp_bool zp_base64_encode( const void* data, zp_uint length, zpStringBuffer& outEncode )
+zp_bool zp_base64_encode( const void* data, zp_size_t length, zpStringBuffer& outEncode )
 {
 	const zp_byte* encode = (const zp_byte*)data;
-	zp_uint padding = length % 3;
-	zp_uint count = length / 3;
+	zp_size_t padding = length % 3;
+	zp_size_t count = length / 3;
 	zp_dword n;
 
 	outEncode.clear();
@@ -470,21 +470,21 @@ zp_bool zp_base64_encode( const void* data, zp_uint length, zpStringBuffer& outE
 
 	return true;
 }
-zp_bool zp_base64_decode( const zp_char* data, zp_uint length, zpDataBuffer& outDecode )
+zp_bool zp_base64_decode( const zp_char* data, zp_size_t length, zpDataBuffer& outDecode )
 {
 	if( ( length % 4 ) != 0 || length == 0 )
 	{
 		return false;
 	}
 
-	zp_uint padding = 0;
+	zp_size_t padding = 0;
 	padding += data[ length - 1 ] == padCharacter ? 1 : 0;
 	padding += data[ length - 2 ] == padCharacter ? 1 : 0;
 
 	outDecode.reset();
 	outDecode.reserve( ( ( length / 4 ) * 3 ) - padding );
 
-	zp_uint count = length - 4;
+	zp_size_t count = length - 4;
 	zp_dword n;
 	for( zp_uint i = 0; i < count; i += 4 )
 	{

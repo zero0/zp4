@@ -68,11 +68,11 @@ zpMessageTypeSystem* zpMessageTypeSystem::getInstance() {
 }
 
 zpMessageType zpMessageTypeSystem::getMessageType( const zpString& msg ) const {
-	zp_uint index = m_names.indexOf( msg );
+	zp_size_t index = m_names.indexOf( msg );
 	return m_types[ index ];
 }
 const zpString& zpMessageTypeSystem::getMessageName( zpMessageType msg ) const {
-	zp_uint index = m_types.indexOf( msg );
+	zp_size_t index = m_types.indexOf( msg );
 	return m_names[ index ];
 }
 

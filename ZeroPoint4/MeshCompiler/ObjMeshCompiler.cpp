@@ -2,6 +2,93 @@
 #include <stdio.h>
 
 #define TO_STR( v )	#v
+#define STR_BUFF	255
+
+struct MaterialPart
+{
+	zpString name;
+	zpColor4f ambientColor;
+	zpColor4f diffuseColor;
+	zpColor4f specularColor;
+	zp_float specularPower;
+	zpString diffuseMap;
+	zpString specularMap;
+	zpString normalMap;
+};
+
+void _mtlToMaterial( const zpString& materialFile, zpArrayList< MaterialPart >& materialParts )
+{
+	zp_float r, g, b;
+	zp_char buff[ STR_BUFF ];
+
+	zpStringBuffer line;
+	zpFile mtlFile( materialFile );
+	if( mtlFile.open( ZP_FILE_MODE_ASCII_READ ) )
+	{
+		while( !mtlFile.isEOF() )
+		{
+			zp_int count = mtlFile.readLine( line );
+			if( count == 0 || line[ 0 ] == '#' ) continue;
+
+			const zp_char* l = line.str();
+
+			if( zp_strstr( l, "newmtl " ) == l )
+			{
+				MaterialPart& part = materialParts.pushBackEmpty();
+				sscanf_s( l, "newmtl %s", buff );
+				part.name = buff;
+			}
+			else if( zp_strstr( l, "Ka " ) == l )
+			{
+				sscanf_s( l, "Ka %f %f %f", &r, &g, &b );
+				MaterialPart& part = materialParts.back();
+				part.ambientColor.set( r, g, b, 1.f );
+			}
+			else if( zp_strstr( l, "Kd " ) == l )
+			{
+				sscanf_s( l, "Kd %f %f %f", &r, &g, &b );
+				MaterialPart& part = materialParts.back();
+				part.diffuseColor.set( r, g, b, 1.f );
+			}
+			else if( zp_strstr( l, "Ks " ) == l )
+			{
+				sscanf_s( l, "Ks %f %f %f", &r, &g, &b );
+				MaterialPart& part = materialParts.back();
+				part.specularColor.set( r, g, b, 1.f );
+			}
+			else if( zp_strstr( l, "Ns " ) == l )
+			{
+				sscanf_s( l, "Ns %f", &r );
+				MaterialPart& part = materialParts.back();
+				part.specularPower = r;
+			}
+			else if( zp_strstr( l, "d " ) == l )
+			{
+				sscanf_s( l, "d %f", &r );
+				MaterialPart& part = materialParts.back();
+				part.diffuseColor.setAlpha( r );
+			}
+			else if( zp_strstr( l, "map_Kd " ) == l )
+			{
+				MaterialPart& part = materialParts.back();
+				sscanf_s( l, "map_Kd %s", buff );
+				part.diffuseMap = buff;
+			}
+			else if( zp_strstr( l, "map_Ks " ) == l )
+			{
+				MaterialPart& part = materialParts.back();
+				sscanf_s( l, "map_Ks %s", buff );
+				part.specularMap = buff;
+			}
+			else if( zp_strstr( l, "map_bump " ) == l )
+			{
+				MaterialPart& part = materialParts.back();
+				sscanf_s( l, "map_bump %s", buff );
+				part.normalMap = buff;
+			}
+		}
+	}
+}
 
 VertexFormat _objToMeshData( const zpString& inputFile, MeshData& meshData, zp_bool flipUV )
 {
@@ -20,6 +107,7 @@ VertexFormat _objToMeshData( const zpString& inputFile, MeshData& meshData, zp_b
 	zp_int indexCount = 0;
 	zp_int index = 0;
 
+	zpArrayList< zpString > materialFiles;
 	zpArrayList< zp_hash > newUniqueVertexHashes;
 
 	zpStringBuffer line;
@@ -302,10 +390,10 @@ VertexFormat _objToMeshData( const zpString& inputFile, MeshData& meshData, zp_b
 			{
 				meshData.parts.back().material = ( l + 7 );
 			}
-			//else if( zp_strstr( l, "mtllib " ) == l )
-			//{
-			//
-			//}
+			else if( zp_strstr( l, "mtllib " ) == l )
+			{
+				materialFiles.pushBackEmpty() = ( l + 7 );
+			}
 		}
 
 		if( !meshData.parts.isEmpty() )
@@ -320,6 +408,8 @@ VertexFormat _objToMeshData( const zpString& inputFile, MeshData& meshData, zp_b
 	meshData.parts.eraseIf( []( MeshDataPart& part ) {
 		return part.indexCount == 0 || part.vertexCount == 0;
 	} );
+
+	// convert each material to a material file
 
 	return format;
 }

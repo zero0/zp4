@@ -25,7 +25,7 @@ zpStringBuffer::zpStringBuffer( const zpStringBuffer& buff )
 {
 	append( buff.m_buffer, buff.m_length );
 }
-zpStringBuffer::zpStringBuffer( zp_char* buffer, zp_uint size )
+zpStringBuffer::zpStringBuffer( zp_char* buffer, zp_size_t size )
 	: m_buffer( buffer )
 	, m_length( 0 )
 	, m_capacity( size )
@@ -87,11 +87,11 @@ void zpStringBuffer::operator=( const zpStringBuffer& buff )
 //	}
 //}
 
-zp_char& zpStringBuffer::operator[]( zp_uint index )
+zp_char& zpStringBuffer::operator[]( zp_size_t index )
 {
 	return m_buffer[ index ];
 }
-zp_char zpStringBuffer::operator[]( zp_uint index ) const
+zp_char zpStringBuffer::operator[]( zp_size_t index ) const
 {
 	return m_buffer[ index ];
 }
@@ -169,15 +169,15 @@ zp_bool zpStringBuffer::isEmpty() const
 {
 	return m_length == 0;
 }
-zp_uint zpStringBuffer::length() const
+zp_size_t zpStringBuffer::length() const
 {
 	return m_length;
 }
-zp_uint zpStringBuffer::capacity() const
+zp_size_t zpStringBuffer::capacity() const
 {
 	return m_capacity;
 }
-zp_uint zpStringBuffer::size() const
+zp_size_t zpStringBuffer::size() const
 {
 	return m_length;
 }
@@ -189,7 +189,7 @@ void zpStringBuffer::append( zp_char value )
 	m_length++;
 	m_buffer[ m_length ] = '\0';
 }
-void zpStringBuffer::append( const zp_char* value, zp_int length )
+void zpStringBuffer::append( const zp_char* value, zp_size_t length )
 {
 	if( value == ZP_NULL ) return;
 
@@ -289,9 +289,9 @@ void zpStringBuffer::append( zp_double value )
 	append( buff );
 }
 
-void zpStringBuffer::erase( zp_uint start, zp_int length )
+void zpStringBuffer::erase( zp_size_t start, zp_size_t length )
 {
-	zp_uint end = start;
+	zp_size_t end = start;
 	if( length < 0 )
 	{
 		end = m_length + length;
@@ -314,12 +314,12 @@ void zpStringBuffer::clear()
 	}
 }
 
-zp_int zpStringBuffer::indexOf( zp_char ch, zp_uint fromIndex ) const
+zp_size_t zpStringBuffer::indexOf( zp_char ch, zp_size_t fromIndex ) const
 {
 	if( fromIndex > m_length ) return npos;
 
-	zp_int pos = npos;
-	for( zp_uint i = fromIndex; i < m_length; ++i )
+	zp_size_t pos = npos;
+	for( zp_size_t i = fromIndex; i < m_length; ++i )
 	{
 		if( m_buffer[i] == ch )
 		{
@@ -330,17 +330,17 @@ zp_int zpStringBuffer::indexOf( zp_char ch, zp_uint fromIndex ) const
 
 	return pos;
 }
-zp_int zpStringBuffer::indexOf( const zpString& string, zp_uint fromIndex ) const
+zp_size_t zpStringBuffer::indexOf( const zpString& string, zp_size_t fromIndex ) const
 {
 	if( string.length() > m_length ) return npos;
 
 	zp_char first = string[ 0 ];
-	zp_uint count = m_length - string.length();
-	zp_uint j;
-	zp_uint end;
-	zp_uint k;
+	zp_size_t count = m_length - string.length();
+	zp_size_t j;
+	zp_size_t end;
+	zp_size_t k;
 
-	for( zp_uint i = fromIndex; i <= count; ++i )
+	for( zp_size_t i = fromIndex; i <= count; ++i )
 	{
 		// find the first character
 		if( m_buffer[ i ] != first )
@@ -375,12 +375,12 @@ const zp_char* zpStringBuffer::str() const
 	return m_buffer;
 }
 
-void zpStringBuffer::reserve( zp_uint size )
+void zpStringBuffer::reserve( zp_size_t size )
 {
 	ensureCapacity( size + 1 );
 }
 
-void zpStringBuffer::ensureCapacity( zp_uint size )
+void zpStringBuffer::ensureCapacity( zp_size_t size )
 {
 	if( size > m_capacity )
 	{

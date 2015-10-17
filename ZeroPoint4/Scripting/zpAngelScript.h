@@ -39,7 +39,7 @@ public:
 	zpApplication* getApplication() const { return m_application; }
 
 private:
-	static void* allocate( zp_uint size );
+	static void* allocate( zp_size_t size );
 	static void deallocate( void* ptr );
 
 	static zpAngelScript* s_instance;

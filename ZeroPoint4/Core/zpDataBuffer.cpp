@@ -8,7 +8,7 @@ zpDataBuffer::zpDataBuffer()
 	, m_size( 0 )
 	, m_isFixed( false )
 {}
-zpDataBuffer::zpDataBuffer( zp_uint capacity )
+zpDataBuffer::zpDataBuffer( zp_size_t capacity )
 	: m_data( ZP_NULL )
 	, m_capacity( 0 )
 	, m_size( 0 )
@@ -24,7 +24,7 @@ zpDataBuffer::zpDataBuffer( const zpDataBuffer& other )
 {
 	readIn( other );
 }
-zpDataBuffer::zpDataBuffer( zp_byte* data, zp_uint capacity )
+zpDataBuffer::zpDataBuffer( zp_byte* data, zp_size_t capacity )
 	: m_data( data )
 	, m_capacity( capacity )
 	, m_size( 0 )
@@ -51,17 +51,17 @@ const zp_byte* zpDataBuffer::getData() const
 	return m_data;
 }
 
-zp_uint zpDataBuffer::size() const
+zp_size_t zpDataBuffer::size() const
 {
 	return m_size;
 }
 
-zp_uint zpDataBuffer::capacity() const
+zp_size_t zpDataBuffer::capacity() const
 {
 	return m_capacity;
 }
 
-void zpDataBuffer::ensureCapacity( zp_uint capacity )
+void zpDataBuffer::ensureCapacity( zp_size_t capacity )
 {
 	if( capacity > m_capacity )
 	{
@@ -86,11 +86,11 @@ void zpDataBuffer::ensureCapacity( zp_uint capacity )
 	}
 }
 
-void zpDataBuffer::reserve( zp_uint size )
+void zpDataBuffer::reserve( zp_size_t size )
 {
 	ensureCapacity( size );
 }
-void zpDataBuffer::resize( zp_uint size )
+void zpDataBuffer::resize( zp_size_t size )
 {
 	m_size = size;
 }

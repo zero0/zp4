@@ -120,7 +120,7 @@ void zpProperties::load( const zpString& file )
 	zpFile f( file );
 	if( f.open( ZP_FILE_MODE_ASCII_READ ) )
 	{
-		zp_uint pos;
+		zp_size_t pos;
 
 		zpStringBuffer buff;
 		zpString str, line, key, value;
@@ -195,7 +195,7 @@ zpProperties zpProperties::getSubProperties( const zpString& subPropertyName ) c
 
 	m_properties.foreach( [ &sub, &subPropertyName, &prop ]( const zpString& key, const zpString& value )
 	{
-		zp_uint pos = key.indexOf( subPropertyName );
+		zp_size_t pos = key.indexOf( subPropertyName );
 		if( pos != zpString::npos )
 		{
 			key.substring( prop, pos + subPropertyName.length() );

@@ -48,11 +48,11 @@ public:
 	void sendEvent( const zpString& eventName, zpObject* sender );
 
 private:
-	zp_bool findEvent( const zp_char* eventName, zp_uint& index );
-	zp_bool findEvent( const zpString& eventName, zp_uint& index );
+	zp_bool findEvent( const zp_char* eventName, zp_size_t& index );
+	zp_bool findEvent( const zpString& eventName, zp_size_t& index );
 
-	zp_uint findEventAndCreate( const zp_char* eventName );
-	zp_uint findEventAndCreate( const zpString& eventName );
+	zp_size_t findEventAndCreate( const zp_char* eventName );
+	zp_size_t findEventAndCreate( const zpString& eventName );
 
 	zpArrayList< zpString > m_eventNames;
 	zpArrayList< zpArrayList< zpEventListener* > > m_eventListeners;

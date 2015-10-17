@@ -14,6 +14,8 @@
 #define ZP_W64
 #endif
 
+typedef size_t zp_size_t;
+
 typedef unsigned __int16 zp_ushort;
 typedef unsigned __int32 zp_uint;
 typedef unsigned __int64 zp_ulong;
@@ -45,7 +47,6 @@ typedef zp_uint zp_dword;
 typedef zp_ulong zp_qword;
 
 typedef zp_uint zp_hash;
-typedef size_t zp_size;
 
 template<typename T>
 T zp_limit_min();

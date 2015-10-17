@@ -87,9 +87,6 @@
     <ClInclude Include="zpArrayList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zpArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="zpRenderable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -168,6 +165,9 @@
     <ClInclude Include="zpQuaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="zpBaseTypesFpu.inl">
@@ -204,9 +204,6 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpMap.inl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="zpArray.inl">
       <Filter>Source Files</Filter>
     </None>
     <None Include="zpVector4.inl">
@@ -338,6 +335,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="zpStackTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zpThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

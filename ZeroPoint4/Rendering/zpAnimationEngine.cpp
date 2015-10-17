@@ -25,7 +25,7 @@ void zpAnimationController::setAnimation( const zpAnimationResourceInstance& ani
 
 void zpAnimationController::play( const zpString& animationName )
 {
-	zp_uint index;
+	zp_size_t index;
 	zp_bool found = m_animation.getResource()->getData()->clips.findIndexIf( [ &animationName ]( const zpAnimationClip& c ) {
 		return c.animationName == animationName;
 	}, index );
@@ -41,7 +41,7 @@ void zpAnimationController::play( const zpString& animationName )
 }
 void zpAnimationController::crossFade( const zpString& animationName, zp_float crossFadeTime )
 {
-	zp_uint index;
+	zp_size_t index;
 	zp_bool found = m_animation.getResource()->getData()->clips.findIndexIf( [ &animationName ]( const zpAnimationClip& c ) {
 		return c.animationName == animationName;
 	}, index );

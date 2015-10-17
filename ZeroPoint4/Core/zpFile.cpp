@@ -216,18 +216,18 @@ void zpFile::close()
 	}
 }
 
-zp_int zpFile::readFile( zpStringBuffer& buffer )
+zp_size_t zpFile::readFile( zpStringBuffer& buffer )
 {
 	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
 	ZP_ASSERT( !isBinaryFile(), "zpFile: Trying to read binary file as ascii" );
 
 	buffer.clear();
-	buffer.reserve( (zp_uint)getFileSize() );
+	buffer.reserve( (zp_size_t)getFileSize() );
 
-	zp_int count = 0;
+	zp_size_t count = 0;
 	zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 	FILE* f = (FILE*)m_file;
-	zp_uint s;
+	zp_size_t s;
 	while(
 		feof( f ) == 0 && 
 #if ZP_USE_SAFE_FUNCTIONS
@@ -243,19 +243,19 @@ zp_int zpFile::readFile( zpStringBuffer& buffer )
 
 	return count;
 }
-zp_int zpFile::readLine( zpStringBuffer& buffer )
+zp_size_t zpFile::readLine( zpStringBuffer& buffer )
 {
 	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
 	ZP_ASSERT( !isBinaryFile(), "zpFile: Trying to read binary file as ascii" );
 
 	buffer.clear();
 
-	zp_int count = 0;
+	zp_size_t count = 0;
 	zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 	FILE* f = (FILE*)m_file;
 
 	zp_bool newLineFound = false;
-	zp_uint len = 0;
+	zp_size_t len = 0;
 	while( !newLineFound && fgets( buff, sizeof( buff ), f ) != ZP_NULL )
 	{
 		len = zp_strlen( buff );
@@ -275,19 +275,19 @@ zp_bool zpFile::isEOF() const
 }
 
 
-zp_int zpFile::readFileBinary( zpArrayList<zp_byte>& buffer )
+zp_size_t zpFile::readFileBinary( zpArrayList<zp_byte>& buffer )
 {
 	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
 	ZP_ASSERT( isBinaryFile(), "zpFile: Trying to read ascii file as binary" );
 	
-	zp_int count = 0;
+	zp_size_t count = 0;
 	zp_char buff[ ZP_FILE_BUFFER_SIZE ];
 	FILE* f = (FILE*)m_file;
 
 	buffer.reset();
-	buffer.reserve( (zp_uint)getFileSize() );
+	buffer.reserve( (zp_size_t)getFileSize() );
 
-	zp_uint s;
+	zp_size_t s;
 	while(
 		feof( f ) == 0 && 
 #if ZP_USE_SAFE_FUNCTIONS
@@ -297,26 +297,26 @@ zp_int zpFile::readFileBinary( zpArrayList<zp_byte>& buffer )
 #endif
 		)
 	{
-		for( zp_uint i = 0; i < s; ++i ) buffer.pushBack( buff[ s ] );
+		for( zp_size_t i = 0; i < s; ++i ) buffer.pushBack( buff[ s ] );
 		count += s;
 	}
 
 	return count;
 }
 
-zp_int zpFile::readFileBinary( zpDataBuffer& buffer )
+zp_size_t zpFile::readFileBinary( zpDataBuffer& buffer )
 {
 	ZP_ASSERT( m_file != ZP_NULL, "zpFile: File not open" );
 	ZP_ASSERT( isBinaryFile(), "zpFile: Trying to read ascii file as binary" );
 
-	zp_int count = 0;
+	zp_size_t count = 0;
 	zp_byte buff[ ZP_FILE_BUFFER_SIZE ];
 	FILE* f = (FILE*)m_file;
 
 	buffer.reset();
-	buffer.reserve( (zp_uint)getFileSize() );
+	buffer.reserve( (zp_size_t)getFileSize() );
 
-	zp_uint s;
+	zp_size_t s;
 	while(
 		feof( f ) == 0 && 
 #if ZP_USE_SAFE_FUNCTIONS
@@ -583,9 +583,9 @@ zp_bool zpFile::writeDouble( zp_double value )
 	}
 	return true;
 }
-zp_int zpFile::writeFormat( const zp_char* format, ... )
+zp_size_t zpFile::writeFormat( const zp_char* format, ... )
 {
-	zp_int count = 0;
+	zp_size_t count = 0;
 
 	if( m_file ) {
 		va_list args;
@@ -601,9 +601,9 @@ zp_int zpFile::writeFormat( const zp_char* format, ... )
 	return count;
 }
 
-zp_int zpFile::writeBuffer( const zpStringBuffer& buffer )
+zp_size_t zpFile::writeBuffer( const zpStringBuffer& buffer )
 {
-	zp_int count = 0;
+	zp_size_t count = 0;
 
 	if( m_file )
 	{
@@ -613,9 +613,9 @@ zp_int zpFile::writeBuffer( const zpStringBuffer& buffer )
 	return count;
 }
 
-zp_int zpFile::writeBuffer( const zpDataBuffer& buffer )
+zp_size_t zpFile::writeBuffer( const zpDataBuffer& buffer )
 {
-	zp_int count = 0;
+	zp_size_t count = 0;
 
 	if( m_file )
 	{
@@ -625,9 +625,9 @@ zp_int zpFile::writeBuffer( const zpDataBuffer& buffer )
 	return count;
 }
 
-zp_int zpFile::writeBuffer( const void* data, zp_uint size )
+zp_size_t zpFile::writeBuffer( const void* data, zp_size_t size )
 {
-	zp_int count = 0;
+	zp_size_t count = 0;
 
 	if( m_file )
 	{
@@ -672,7 +672,7 @@ void zpFile::getFileExtension( zpString& out ) const
 {
 	if( !m_filename.isEmpty() )
 	{
-		zp_int pos = m_filename.lastIndexOf( '.' );
+		zp_size_t pos = m_filename.lastIndexOf( '.' );
 		if( pos != zpString::npos )
 		{
 			out = m_filename.substring( pos + 1 );
@@ -683,7 +683,7 @@ void zpFile::getFileDirectory( zpString& out ) const
 {
 	if( !m_filename.isEmpty() )
 	{
-		zp_int pos = m_filename.lastIndexOf( zpFile::sep );
+		zp_size_t pos = m_filename.lastIndexOf( zpFile::sep );
 		if( pos != zpString::npos )
 		{
 			out = m_filename.substring( 0, pos );

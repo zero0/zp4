@@ -15,8 +15,7 @@ void zpTags::clear()
 
 zp_int zpTags::getTag( const zpString& tag )
 {
-	zp_uint index;
-
+	zp_size_t index;
 	if( !m_tags.findIndexIf( [ &tag ]( const zpString& t ) {
 		return tag == t;
 	}, index ) )
@@ -29,8 +28,7 @@ zp_int zpTags::getTag( const zpString& tag )
 }
 zp_int zpTags::getTag( const zp_char* tag )
 {
-	zp_uint index;
-
+	zp_size_t index;
 	if( !m_tags.findIndexIf( [ &tag ]( const zpString& t ) {
 		return tag == t;
 	}, index ) )

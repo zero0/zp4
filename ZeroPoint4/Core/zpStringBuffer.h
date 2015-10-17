@@ -2,9 +2,13 @@
 #ifndef ZP_STRING_BUFFER_H
 #define ZP_STRING_BUFFER_H
 
-class zpStringBuffer {
+class zpStringBuffer
+{
 public:
-	static const zp_int npos = -1;
+	enum : zp_size_t
+	{
+		npos = -1,
+	};
 
 	zpStringBuffer();
 	zpStringBuffer( const zpString& str );
@@ -15,8 +19,8 @@ public:
 	void operator=( const zpStringBuffer& buff );
 	//void operator=( zpStringBuffer&& buff );
 
-	zp_char& operator[]( zp_uint index );
-	zp_char operator[]( zp_uint index ) const;
+	zp_char& operator[]( zp_size_t index );
+	zp_char operator[]( zp_size_t index ) const;
 
 	zpStringBuffer& operator<<( zp_char value );
 	zpStringBuffer& operator<<( const zp_char* value );
@@ -36,12 +40,12 @@ public:
 	zpStringBuffer& operator<<( zp_double value );
 	
 	zp_bool isEmpty() const;
-	zp_uint length() const;
-	zp_uint capacity() const;
-	zp_uint size() const;
+	zp_size_t length() const;
+	zp_size_t capacity() const;
+	zp_size_t size() const;
 
 	void append( zp_char value );
-	void append( const zp_char* value, zp_int length = npos );
+	void append( const zp_char* value, zp_size_t length = npos );
 	void append( const zpString& value );
 
 	void append( zp_sbyte value );
@@ -57,30 +61,30 @@ public:
 	void append( zp_float value );
 	void append( zp_double value );
 
-	void erase( zp_uint start, zp_int length = 0 );
+	void erase( zp_size_t start, zp_size_t length = 0 );
 	void clear();
 
-	zp_int indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
-	zp_int indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
+	zp_size_t indexOf( zp_char ch, zp_size_t fromIndex = 0 ) const;
+	zp_size_t indexOf( const zpString& string, zp_size_t fromIndex = 0 ) const;
 
 	zpString toString() const;
 	const zp_char* str() const;
 
-	void reserve( zp_uint size );
+	void reserve( zp_size_t size );
 
 protected:
-	zpStringBuffer( zp_char* buffer, zp_uint size );
+	zpStringBuffer( zp_char* buffer, zp_size_t size );
 
 private:
-	void ensureCapacity( zp_uint size );
+	void ensureCapacity( zp_size_t size );
 
 	zp_char* m_buffer;
-	zp_uint m_length;
-	zp_uint m_capacity;
+	zp_size_t m_length;
+	zp_size_t m_capacity;
 	zp_bool m_isFixed;
 };
 
-template< zp_uint Size >
+template< zp_size_t Size >
 class zpFixedStringBuffer : public zpStringBuffer
 {
 	ZP_NON_COPYABLE( zpFixedStringBuffer );
@@ -91,11 +95,11 @@ private:
 	zp_char m_fixedBuffer[ Size ];
 };
 
-template< zp_uint Size >
+template< zp_size_t Size >
 zpFixedStringBuffer<Size>::zpFixedStringBuffer()
 	: zpStringBuffer( m_fixedBuffer, Size )
 {}
-template< zp_uint Size >
+template< zp_size_t Size >
 zpFixedStringBuffer<Size>::~zpFixedStringBuffer()
 {
 	clear();

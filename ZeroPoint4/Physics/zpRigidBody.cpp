@@ -1,6 +1,6 @@
 #include "zpPhysics.h"
 
-#include "zpPhysicsLib.inc"
+#include "zpPhysicsLib.inl"
 #include "src/btBulletCollisionCommon.h"
 #include "src/btBulletDynamicsCommon.h"
 

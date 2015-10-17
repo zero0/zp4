@@ -33,7 +33,7 @@ zpMemorySystem* zpMemorySystem::getInstance()
 }
 
 #if ZP_USE_ALIGNMENT
-void* zpMemorySystem::allocate( zp_uint size ) {
+void* zpMemorySystem::allocate( zp_size_t size ) {
 	//m_memAllocated += size;
 	//++m_numAllocs;
 	return zp_aligned_malloc( size, ZP_MALLOC_ALIGNMENT );
@@ -44,7 +44,7 @@ void zpMemorySystem::deallocate( void* ptr ) {
 	zp_aligned_free( ptr );
 }
 #else
-void* zpMemorySystem::allocate( zp_uint size )
+void* zpMemorySystem::allocate( zp_size_t size )
 {
 	if( m_totalMemory == 0 ) return zp_malloc( size );
 
@@ -52,15 +52,15 @@ void* zpMemorySystem::allocate( zp_uint size )
 	m_memAllocated += size;
 	m_memUsed += size;
 
-	zp_uint alignedSize = ZP_MEMORY_ALIGN_SIZE( size + sizeof( zpMemoryBlock ) );
+	zp_size_t alignedSize = ZP_MEMORY_ALIGN_SIZE( size + sizeof( zpMemoryBlock ) );
 
-	zp_uint index = ZP_MEMORY_TABLE_INDEX( alignedSize );
+	zp_size_t index = ZP_MEMORY_TABLE_INDEX( alignedSize );
 	zpMemoryBlock* freeBlock = m_freeTable[ index ];
 
 	// if a free block was not found, find the next largest block to allocate from
 	if( freeBlock == ZP_NULL )
 	{
-		for( zp_uint i = ZP_MEMORY_BLOCK_TABLE_SIZE - 1; i != 0 ; --i )
+		for( zp_size_t i = ZP_MEMORY_BLOCK_TABLE_SIZE - 1; i != 0 ; --i )
 		{
 			freeBlock = m_freeTable[ i ];
 			if( freeBlock != ZP_NULL )
@@ -131,8 +131,8 @@ void zpMemorySystem::deallocate( void* ptr )
 	zpMemoryBlock* block = ( reinterpret_cast< zpMemoryBlock* >( ptr ) - 1 );
 
 #if ZP_MEMORY_TRACK_POINTERS
-	zp_int p = m_allocedPointers.indexOf( ptr );
-	ZP_ASSERT_WARN( p != -1, "Unknown allocation being deallocated" );
+	zp_size_t p = m_allocedPointers.indexOf( ptr );
+	ZP_ASSERT_WARN( p != zpArrayList< void* >::npos, "Unknown allocation being deallocated" );
 	m_allocedPointers.erase( p );
 	m_stackTraces.erase( p );
 #endif
@@ -186,7 +186,7 @@ void zpMemorySystem::printAllAllocatedMemoryStackTrace()
 	}
 #endif
 }
-void zpMemorySystem::printAllocatedMemoryStackTrack( zp_int index )
+void zpMemorySystem::printAllocatedMemoryStackTrack( zp_size_t index )
 {
 #if ZP_MEMORY_TRACK_POINTERS
 	m_stackTraces[ index ].print();
@@ -194,9 +194,9 @@ void zpMemorySystem::printAllocatedMemoryStackTrack( zp_int index )
 #endif
 }
 
-inline void _writeColor3( zp_byte* data, zp_uint count, const zpPackedColor& color )
+inline void _writeColor3( zp_byte* data, zp_size_t count, const zpPackedColor& color )
 {
-	for( zp_uint i = 0; i < count; ++i )
+	for( zp_size_t i = 0; i < count; ++i )
 	{
 		*data++ = color.getBlue();
 		*data++ = color.getGreen();
@@ -204,9 +204,9 @@ inline void _writeColor3( zp_byte* data, zp_uint count, const zpPackedColor& col
 	}
 }
 
-inline void _writeColor4( zp_byte* data, zp_uint count, const zpPackedColor& color )
+inline void _writeColor4( zp_byte* data, zp_size_t count, const zpPackedColor& color )
 {
-	for( zp_uint i = 0; i < count; ++i )
+	for( zp_size_t i = 0; i < count; ++i )
 	{
 		*data++ = color.getBlue();
 		*data++ = color.getGreen();
@@ -215,7 +215,7 @@ inline void _writeColor4( zp_byte* data, zp_uint count, const zpPackedColor& col
 	}
 }
 
-void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_uint strideInBytes )
+void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_size_t strideInBytes )
 {
 	const zpPackedColor colorEmpty( 10, 10, 10 );
 	const zpPackedColor colorEmptyPadding( 64, 64, 64 );
@@ -229,11 +229,11 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_uint strideInBy
 #define depth 3
 #define writeColor CONCAT( _writeColor, 3 )
 
-	zp_uint width = strideInBytes;
-	zp_uint height = m_totalAlignedMemory / strideInBytes;
+	zp_size_t width = strideInBytes;
+	zp_size_t height = m_totalAlignedMemory / strideInBytes;
 	height += ( m_totalAlignedMemory % strideInBytes > 0 ? 1 : 0 );
-	zp_uint imageSize = width * height * depth;
-	zp_uint headerSize = 18;
+	zp_size_t imageSize = width * height * depth;
+	zp_size_t headerSize = 18;
 	zp_byte* data = (zp_byte*)zp_malloc( imageSize + headerSize );
 	zp_byte* d = data; //.getData() + index;
 
@@ -244,11 +244,11 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_uint strideInBy
 	*d++ = 0; *d++ = 0; // x origin of image
 	*d++ = 0; *d++ = 0; // y origin of image
 	
-	*d++ = (width & 0x00FF);
-	*d++ = (width & 0xFF00) / 256;
+	*d++ = (zp_byte)(width & 0x00FF);
+	*d++ = (zp_byte)(width & 0xFF00) / 256;
 
-	*d++ = (height & 0x00FF);
-	*d++ = (height & 0xFF00) / 256;
+	*d++ = (zp_byte)(height & 0x00FF);
+	*d++ = (zp_byte)(height & 0xFF00) / 256;
 
 	*d++ = depth * 8;
 	*d++ = 0x24;
@@ -264,14 +264,14 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_uint strideInBy
 	d += m_alignedMemory - m_allMemory;
 
 	// write free table
-	for( zp_uint i = 0; i < ZP_MEMORY_BLOCK_TABLE_SIZE; ++i )
+	for( zp_size_t i = 0; i < ZP_MEMORY_BLOCK_TABLE_SIZE; ++i )
 	{
 		zpMemoryBlock* block = m_freeTable[ i ];
 		if( block == ZP_NULL ) continue;
 
 		do
 		{
-			zp_uint offset = (zp_byte*)block - m_alignedMemory;
+			zp_size_t offset = (zp_byte*)block - m_alignedMemory;
 
 			//_writeColor( d + offset * 4, block->alignedSize, colorUsed );
 			writeColor( d + ( offset ) * depth, sizeof( zpMemoryBlock ), colorHeader );
@@ -292,14 +292,14 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_uint strideInBy
 	}
 
 	// write block table
-	for( zp_uint i = 0; i < ZP_MEMORY_BLOCK_TABLE_SIZE; ++i )
+	for( zp_size_t i = 0; i < ZP_MEMORY_BLOCK_TABLE_SIZE; ++i )
 	{
 		zpMemoryBlock* block = m_blockTable[ i ];
 		if( block == ZP_NULL ) continue;
 
 		do
 		{
-			zp_uint offset = (zp_byte*)block - m_alignedMemory;
+			zp_size_t offset = (zp_byte*)block - m_alignedMemory;
 
 			//_writeColor( d + offset * 4, block->alignedSize, colorUsed );
 			writeColor( d + ( offset ) * depth, sizeof( zpMemoryBlock ), colorHeader );
@@ -328,7 +328,7 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_uint strideInBy
 #undef writeColor
 }
 
-void zpMemorySystem::initialize( zp_uint size ) 
+void zpMemorySystem::initialize( zp_size_t size ) 
 {
 	m_totalMemory = size;
 
@@ -394,7 +394,7 @@ void _insertBefore( zpMemoryBlock* node, zpMemoryBlock* newBlock )
 
 void zpMemorySystem::addBlock( zpMemoryBlock** table, zpMemoryBlock* block )
 {
-	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
+	zp_size_t index = ZP_MEMORY_TABLE_INDEX( block->size );
 	zpMemoryBlock* tableHead = table[ index ];
 
 	if( tableHead )
@@ -455,7 +455,7 @@ void zpMemorySystem::addBlock( zpMemoryBlock** table, zpMemoryBlock* block )
 }
 void zpMemorySystem::removeBlock( zpMemoryBlock** table, zpMemoryBlock* block )
 {
-	zp_uint index = ZP_MEMORY_TABLE_INDEX( block->size );
+	zp_size_t index = ZP_MEMORY_TABLE_INDEX( block->size );
 
 	//block->prev->next = block->next;
 	//block->next->prev = block->prev;

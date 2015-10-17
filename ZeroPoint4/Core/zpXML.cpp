@@ -233,7 +233,7 @@ zp_bool zpXmlParser::parseFile( const zpString& filename, zp_bool includeSibling
 	}
 
 	const zp_char* xml = xmlBuffer.str();
-	const zp_uint length = xmlBuffer.length();
+	const zp_size_t length = xmlBuffer.length();
 
 	enum ops
 	{
@@ -500,7 +500,7 @@ zp_bool zpXmlParser::parseNode( zpXmlNode* root, zp_bool includeSiblings )
 
 zp_bool zpXmlParser::writeToFile( zpXmlNode* root, const zpString& filename )
 {
-	zp_int count = 0;
+	zp_size_t count = 0;
 	zpFile file( filename );
 	if( file.open( ZP_FILE_MODE_ASCII_TRUNCATE_WRITE ) )
 	{

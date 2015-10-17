@@ -29,7 +29,7 @@ zpString::zpString( const zp_char* string )
 	}
 	getCharsInternal()[ m_length ] = '\0';
 }
-zpString::zpString( const zp_char* string, zp_uint length )
+zpString::zpString( const zp_char* string, zp_size_t length )
 	: m_length( length )
 	, m_hash( 0 )
 {
@@ -69,7 +69,7 @@ zpString::zpString( const zpString& string )
 	}
 	getCharsInternal()[ m_length ] = '\0';
 }
-zpString::zpString( const zpString& string, zp_uint length )
+zpString::zpString( const zpString& string, zp_size_t length )
 	: m_length( length )
 	, m_hash( 0 )
 {
@@ -241,22 +241,22 @@ zp_char* zpString::getCharsInternal()
 	return IS_STRING_PACKED( this ) ? m_chars : m_string;
 }
 
-zp_char zpString::operator[]( zp_uint index ) const
+zp_char zpString::operator[]( zp_size_t index ) const
 {
 	ZP_ASSERT( index < m_length, "zpString: Index %d out of range %d", index, m_length );
 	return str()[ index ];
 }
-zp_char& zpString::operator[]( zp_uint index )
+zp_char& zpString::operator[]( zp_size_t index )
 {
 	ZP_ASSERT( index < m_length, "zpString: Index %d out of range %d", index, m_length );
 	return getCharsInternal()[ index ];
 }
-void zpString::setCharAt( zp_uint index, zp_char ch )
+void zpString::setCharAt( zp_size_t index, zp_char ch )
 {
 	ZP_ASSERT( index < m_length, "zpString: Index %d out of range %d", index, m_length );
 	getCharsInternal()[ index ] = ch;
 }
-zp_char zpString::charAt( zp_uint index ) const
+zp_char zpString::charAt( zp_size_t index ) const
 {
 	ZP_ASSERT( index < m_length, "zpString: Index %d out of range %d", index, m_length );
 	return str()[ index ];
@@ -270,11 +270,11 @@ zp_bool zpString::startsWith( zp_char ch ) const
 }
 zp_bool zpString::startsWith( const zp_char* string ) const
 {
-	zp_uint len = zp_strlen( string );
+	zp_size_t len = zp_strlen( string );
 	if( len > m_length ) return false;
 
 	const zp_char* a = str();
-	for( zp_uint i = 0; i < len; ++i )
+	for( zp_size_t i = 0; i < len; ++i )
 	{
 		if( a[ i ] != string[ i ] ) return false;
 	}
@@ -287,7 +287,7 @@ zp_bool zpString::startsWith( const zpString& string ) const
 
 	const zp_char* a = str();
 	const zp_char* b = string.str();
-	for( zp_uint i = 0; i < string.m_length; ++i )
+	for( zp_size_t i = 0; i < string.m_length; ++i )
 	{
 		if( a[ i ] != b[ i ] ) return false;
 	}
@@ -303,11 +303,11 @@ zp_bool zpString::endsWith( zp_char ch ) const
 }
 zp_bool zpString::endsWith( const zp_char* string ) const
 {
-	zp_uint len = zp_strlen( string );
+	zp_size_t len = zp_strlen( string );
 	if( len > m_length ) return false;
 
 	const zp_char* a = str();
-	for( zp_int i = m_length - 1, j = len - 1; i >= 0 && j >= 0; --i, --j )
+	for( zp_size_t i = m_length - 1, j = len - 1; i >= 0 && j >= 0; --i, --j )
 	{
 		if( a[ i ] != string[ j ] ) return false;
 	}
@@ -320,7 +320,7 @@ zp_bool zpString::endsWith( const zpString& string ) const
 	
 	const zp_char* a = str();
 	const zp_char* b = string.str();
-	for( zp_int i = m_length - 1, j = string.m_length - 1; i >= 0 && j >= 0; --i, --j )
+	for( zp_size_t i = m_length - 1, j = string.m_length - 1; i >= 0 && j >= 0; --i, --j )
 	{
 		if( a[ i ] != b[ j ] ) return false;
 	}
@@ -328,32 +328,32 @@ zp_bool zpString::endsWith( const zpString& string ) const
 	return true;
 }
 
-zp_int zpString::indexOf( zp_char ch, zp_uint fromIndex ) const
+zp_size_t zpString::indexOf( zp_char ch, zp_size_t fromIndex ) const
 {
 	if( fromIndex > m_length ) return npos;
 
 	const zp_char* a = str();
-	for( zp_uint i = fromIndex; i < m_length; ++i )
+	for( zp_size_t i = fromIndex; i < m_length; ++i )
 	{
-		if( a[ i ] == ch ) return (zp_int)i;
+		if( a[ i ] == ch ) return i;
 	}
 
 	return npos;
 }
-zp_int zpString::indexOf( const zp_char* string, zp_uint fromIndex ) const
+zp_size_t zpString::indexOf( const zp_char* string, zp_size_t fromIndex ) const
 {
-	zp_uint len = zp_strlen( string );
+	zp_size_t len = zp_strlen( string );
 	if( len > m_length ) return npos;
 
 	const zp_char* a = str();
 
 	zp_char first = string[ 0 ];
-	zp_uint count = m_length - len;
-	zp_uint j;
-	zp_uint end;
-	zp_uint k;
+	zp_size_t count = m_length - len;
+	zp_size_t j;
+	zp_size_t end;
+	zp_size_t k;
 
-	for( zp_uint i = fromIndex; i <= count; ++i )
+	for( zp_size_t i = fromIndex; i <= count; ++i )
 	{
 		// find the first character
 		if( a[ i ] != first )
@@ -368,13 +368,13 @@ zp_int zpString::indexOf( const zp_char* string, zp_uint fromIndex ) const
 			for( k = 1; j < end && a[ j ] == string[ k ]; ++j, ++k );
 
 			// if whole string found, return index
-			if( j == end ) return (zp_int)i;
+			if( j == end ) return i;
 		}
 	}
 
 	return npos;
 }
-zp_int zpString::indexOf( const zpString& string, zp_uint fromIndex ) const
+zp_size_t zpString::indexOf( const zpString& string, zp_size_t fromIndex ) const
 {
 	if( string.m_length > m_length ) return npos;
 
@@ -382,12 +382,12 @@ zp_int zpString::indexOf( const zpString& string, zp_uint fromIndex ) const
 	const zp_char* b = string.str();
 
 	zp_char first = b[ 0 ];
-	zp_uint count = m_length - string.m_length;
-	zp_uint j;
-	zp_uint end;
-	zp_uint k;
+	zp_size_t count = m_length - string.m_length;
+	zp_size_t j;
+	zp_size_t end;
+	zp_size_t k;
 
-	for( zp_uint i = fromIndex; i <= count; ++i )
+	for( zp_size_t i = fromIndex; i <= count; ++i )
 	{
 		// find the first character
 		if( a[ i ] != first )
@@ -402,41 +402,41 @@ zp_int zpString::indexOf( const zpString& string, zp_uint fromIndex ) const
 			for( k = 1; j < end && a[ i ] == b[ k ]; ++j, ++k );
 
 			// if whole string found, return index
-			if( j == end ) return (zp_int)i;
+			if( j == end ) return i;
 		}
 	}
 
 	return npos;
 }
 
-zp_int zpString::indexOfIgnoreCase( zp_char ch, zp_uint fromIndex ) const
+zp_size_t zpString::indexOfIgnoreCase( zp_char ch, zp_size_t fromIndex ) const
 {
 	if( fromIndex > m_length ) return npos;
 
 	const zp_char* a = str();
 	zp_char l = zp_to_lower( ch );
 
-	for( zp_uint i = fromIndex; i < m_length; ++i )
+	for( zp_size_t i = fromIndex; i < m_length; ++i )
 	{
-		if( zp_to_lower( a[ i ] ) == l ) return (zp_int)i;
+		if( zp_to_lower( a[ i ] ) == l ) return i;
 	}
 
 	return npos;
 }
-zp_int zpString::indexOfIgnoreCase( const zp_char* string, zp_uint fromIndex ) const
+zp_size_t zpString::indexOfIgnoreCase( const zp_char* string, zp_size_t fromIndex ) const
 {
-	zp_uint len = zp_strlen( string );
+	zp_size_t len = zp_strlen( string );
 	if( len > m_length ) return npos;
 
 	const zp_char* a = str();
 
 	zp_char first = zp_to_lower( string[ 0 ] );
-	zp_uint count = m_length - len;
-	zp_uint j;
-	zp_uint end;
-	zp_uint k;
+	zp_size_t count = m_length - len;
+	zp_size_t j;
+	zp_size_t end;
+	zp_size_t k;
 
-	for( zp_uint i = fromIndex; i <= count; ++i )
+	for( zp_size_t i = fromIndex; i <= count; ++i )
 	{
 		// find the first character
 		if( zp_to_lower( a[ i ] ) != first )
@@ -452,13 +452,13 @@ zp_int zpString::indexOfIgnoreCase( const zp_char* string, zp_uint fromIndex ) c
 			for( k = 1; j < end && zp_to_lower( a[ i ] ) == zp_to_lower( string[ k ] ); ++j, ++k );
 
 			// if whole string found, return index
-			if( j == end ) return (zp_int)i;
+			if( j == end ) return i;
 		}
 	}
 
 	return npos;
 }
-zp_int zpString::indexOfIgnoreCase( const zpString& string, zp_uint fromIndex ) const
+zp_size_t zpString::indexOfIgnoreCase( const zpString& string, zp_size_t fromIndex ) const
 {
 	if( string.m_length > m_length ) return npos;
 
@@ -466,12 +466,12 @@ zp_int zpString::indexOfIgnoreCase( const zpString& string, zp_uint fromIndex ) 
 	const zp_char* b = string.str();
 
 	zp_char first = zp_to_lower( b[ 0 ] );
-	zp_uint count = m_length - string.m_length;
-	zp_uint j;
-	zp_uint end;
-	zp_uint k;
+	zp_size_t count = m_length - string.m_length;
+	zp_size_t j;
+	zp_size_t end;
+	zp_size_t k;
 
-	for( zp_uint i = fromIndex; i <= count; ++i )
+	for( zp_size_t i = fromIndex; i <= count; ++i )
 	{
 		// find the first character
 		if( zp_to_lower( a[ i ] ) != first )
@@ -487,48 +487,48 @@ zp_int zpString::indexOfIgnoreCase( const zpString& string, zp_uint fromIndex ) 
 			for( k = 1; j < end && zp_to_lower( a[ i ] ) == zp_to_lower( b[ k ] ); ++j, ++k );
 
 			// if whole string found, return index
-			if( j == end ) return (zp_int)i;
+			if( j == end ) return i;
 		}
 	}
 
 	return npos;
 }
 
-zp_int zpString::lastIndexOf( zp_char ch, zp_int fromIndex ) const
+zp_size_t zpString::lastIndexOf( zp_char ch, zp_size_t fromIndex ) const
 {
-	if( fromIndex > (zp_int)m_length ) return npos;
+	if( fromIndex > m_length ) return npos;
 	if( fromIndex <= 0 ) fromIndex = m_length + fromIndex;
 
 	const zp_char* a = str();
-	for( zp_uint i = fromIndex - 1; i > 0; --i )
+	for( zp_size_t i = fromIndex - 1; i > 0; --i )
 	{
 		if( a[ i ] == ch ) return i;
 	}
 
 	return npos;
 }
-zp_int zpString::lastIndexOf( const zpString& string, zp_int fromIndex ) const
+zp_size_t zpString::lastIndexOf( const zpString& string, zp_size_t fromIndex ) const
 {
-	if( fromIndex > (zp_int)m_length ) return npos;
+	if( fromIndex > m_length ) return npos;
 	if( fromIndex < 0 ) fromIndex = m_length + fromIndex;
 	ZP_ASSERT( false, "zpString::lastIndexOf not implimented" );
 
 	return npos;
 }
 
-zp_int zpString::findFirstOf( const zpString& string, zp_int fromIndex ) const
+zp_size_t zpString::findFirstOf( const zpString& string, zp_size_t fromIndex ) const
 {
-	if( fromIndex > (zp_int)m_length ) return npos;
+	if( fromIndex > m_length ) return npos;
 	if( fromIndex < 0 ) fromIndex = m_length + fromIndex;
 
 	const zp_char* a = str();
 	const zp_char* b = string.str();
 
 	zp_char ch;
-	for( zp_uint i = fromIndex; i < m_length; ++i )
+	for( zp_size_t i = fromIndex; i < m_length; ++i )
 	{
 		ch = a[ i ];
-		for( zp_uint j = 0; j < string.length(); ++j )
+		for( zp_size_t j = 0; j < string.length(); ++j )
 		{
 			if( ch == b[ j ] ) return i;
 		}
@@ -541,7 +541,7 @@ zp_bool zpString::isEmpty() const
 {
 	return m_length == 0;
 }
-zp_uint zpString::length() const
+zp_size_t zpString::length() const
 {
 	return m_length;
 }
@@ -561,13 +561,13 @@ zp_bool zpString::equalsIgnoreCase( const zpString& string ) const
 
 zp_int zpString::compareTo( const zpString& string ) const
 {
-	zp_uint count = ZP_MIN( m_length, string.m_length );
+	zp_size_t count = ZP_MIN( m_length, string.m_length );
 	zp_char sa, sb;
 
 	const zp_char* a = str();
 	const zp_char* b = string.str();
 
-	for( zp_uint i = 0; i < count; ++i )
+	for( zp_size_t i = 0; i < count; ++i )
 	{
 		sa = a[ i ];
 		sb = b[ i ];
@@ -575,17 +575,17 @@ zp_int zpString::compareTo( const zpString& string ) const
 		if( sa != sb ) return sa - sb;
 	}
 
-	return m_length - string.m_length;
+	return m_length < string.m_length ? -1 : m_length > string.m_length ? 1 : 0;
 }
 zp_int zpString::compareToIgnoreCase( const zpString& string ) const
 {
-	zp_uint count = ZP_MIN( m_length, string.m_length );
+	zp_size_t count = ZP_MIN( m_length, string.m_length );
 	zp_char sa, sb;
 	
 	const zp_char* a = str();
 	const zp_char* b = string.str();
 
-	for( zp_uint i = 0; i < count; ++i )
+	for( zp_size_t i = 0; i < count; ++i )
 	{
 		sa = zp_to_lower( a[ i ] );
 		sb = zp_to_lower( b[ i ] );
@@ -593,28 +593,28 @@ zp_int zpString::compareToIgnoreCase( const zpString& string ) const
 		if( sa != sb ) return sa - sb;
 	}
 
-	return m_length - string.m_length;
+	return m_length < string.m_length ? -1 : m_length > string.m_length ? 1 : 0;
 }
 
-zpString zpString::substring( zp_uint startIndex ) const
+zpString zpString::substring( zp_size_t startIndex ) const
 {
 	if( startIndex > m_length ) return zpString();
 
-	zp_uint count = m_length - startIndex;
+	zp_size_t count = m_length - startIndex;
 
 	return zpString( str() + startIndex, count );
 }
-zpString zpString::substring( zp_uint startIndex, zp_int endIndex ) const
+zpString zpString::substring( zp_size_t startIndex, zp_size_t endIndex ) const
 {
 	if( endIndex < 0 ) endIndex = m_length + endIndex;
-	if( (zp_uint)endIndex <= startIndex ) return zpString();
+	if( endIndex <= startIndex ) return zpString();
 
-	zp_uint count = endIndex - startIndex;
+	zp_size_t count = endIndex - startIndex;
 
 	return zpString( str() + startIndex, count );
 }
 
-void zpString::erase( zp_int startIndex, zp_uint count )
+void zpString::erase( zp_size_t startIndex, zp_size_t count )
 {
 	ZP_ASSERT( startIndex < (zp_int)m_length, "zpString: Index %d out of range %d", startIndex, m_length );
 	if( startIndex < 0 ) startIndex = m_length + startIndex;
@@ -623,10 +623,10 @@ void zpString::erase( zp_int startIndex, zp_uint count )
 	if( IS_STRING_PACKED( this ) )
 	{
 		zp_char* c = m_chars;
-		zp_uint start = startIndex;
-		zp_uint end = startIndex + count;
+		zp_size_t start = startIndex;
+		zp_size_t end = startIndex + count;
 
-		for( zp_uint j = 0; j < count && start < m_length; ++j, ++start, ++end )
+		for( zp_size_t j = 0; j < count && start < m_length; ++j, ++start, ++end )
 		{
 			c[ start ] = end > m_length ? '\0' : c[ end ];
 		}
@@ -638,10 +638,10 @@ void zpString::erase( zp_int startIndex, zp_uint count )
 		if( ( m_length - count ) < ZP_STRING_MAX_SMALL_SIZE )
 		{
 			zp_char* c = m_string;
-			zp_uint start = startIndex;
-			zp_uint end = startIndex + count;
+			zp_size_t start = startIndex;
+			zp_size_t end = startIndex + count;
 
-			for( zp_uint j = 0; j < count && start < m_length; ++j, ++start, ++end )
+			for( zp_size_t j = 0; j < count && start < m_length; ++j, ++start, ++end )
 			{
 				c[ start ] = end > m_length ? '\0' : c[ end ];
 			}
@@ -653,10 +653,10 @@ void zpString::erase( zp_int startIndex, zp_uint count )
 		else
 		{
 			zp_char* c = m_string;
-			zp_uint start = startIndex;
-			zp_uint end = startIndex + count;
+			zp_size_t start = startIndex;
+			zp_size_t end = startIndex + count;
 
-			for( zp_uint j = 0; j < count && start < m_length; ++j, ++start, ++end )
+			for( zp_size_t j = 0; j < count && start < m_length; ++j, ++start, ++end )
 			{
 				c[ start ] = end > m_length ? '\0' : c[ end ];
 			}
@@ -674,7 +674,7 @@ void zpString::append( zp_char ch )
 	++m_length;
 	c[ m_length ] = '\0';
 }
-void zpString::append( const zp_char* str, zp_int length )
+void zpString::append( const zp_char* str, zp_size_t length )
 {
 	if( length < 0 )
 	{
@@ -686,7 +686,7 @@ void zpString::append( const zp_char* str, zp_int length )
 
 		zp_char* a = ( m_length + length ) < ZP_STRING_MAX_SMALL_SIZE ? m_chars : m_string; //getCharsInternal();
 		const zp_char* b = str;
-		for( zp_int i = 0; i < length; ++i, ++m_length )
+		for( zp_size_t i = 0; i < length; ++i, ++m_length )
 		{
 			a[ m_length ] = b[ i ];
 		}
@@ -717,7 +717,7 @@ void zpString::join( zpString& string, const zpArrayList< zpString >& parts, con
 	{
 		zpStringBuffer buff;
 		buff.append( parts[ 0 ] );
-		for( zp_uint i = 1; i < parts.size(); ++i )
+		for( zp_size_t i = 1; i < parts.size(); ++i )
 		{
 			buff.append( delim );
 			buff.append( parts[ i ] );
@@ -738,7 +738,7 @@ zpString zpString::toCamelCase( zp_bool capitalFirstLetter ) const
 		zp_char c;
 		zp_bool shouldCapital = capitalFirstLetter;
 		
-		for( zp_uint i = 0; i < m_length; ++i )
+		for( zp_size_t i = 0; i < m_length; ++i )
 		{
 			c = s[ i ];
 			if( c == '_' || zp_is_whitespace( c ) )
@@ -786,8 +786,8 @@ zpString zpString::trim() const
 }
 void zpString::split( zp_char delim, zpArrayList< zpString >& parts ) const
 {
-	zp_uint from = 0;
-	zp_uint to = 0;
+	zp_size_t from = 0;
+	zp_size_t to = 0;
 
 	parts.clear();
 	while( to != npos )
@@ -809,8 +809,8 @@ void zpString::split( zp_char delim, zpArrayList< zpString >& parts ) const
 }
 void zpString::split( zp_char delim, zpArrayList< zpString >& parts, zp_int maxSplits ) const
 {
-	zp_uint from = 0;
-	zp_uint to = 0;
+	zp_size_t from = 0;
+	zp_size_t to = 0;
 
 	parts.clear();
 	while( to != npos )
@@ -832,13 +832,13 @@ void zpString::split( zp_char delim, zpArrayList< zpString >& parts, zp_int maxS
 	}
 }
 
-void zpString::ensureCapacity( zp_uint size )
+void zpString::ensureCapacity( zp_size_t size )
 {
 	if( IS_STRING_PACKED( this ) )
 	{
 		if( size >= ZP_STRING_MAX_SMALL_SIZE )
 		{
-			zp_uint cap = ZP_STRING_MAX_SMALL_SIZE;
+			zp_size_t cap = ZP_STRING_MAX_SMALL_SIZE;
 			while( cap <= size ) cap *= 2;
 
 			zp_char* buff = new zp_char[ cap ];
@@ -864,7 +864,7 @@ void zpString::ensureCapacity( zp_uint size )
 	}
 }
 
-void zpString::reserve( zp_uint size )
+void zpString::reserve( zp_size_t size )
 {
 	ensureCapacity( size );
 }

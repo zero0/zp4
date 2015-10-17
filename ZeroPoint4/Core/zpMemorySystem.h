@@ -8,8 +8,8 @@
 
 struct zpMemoryBlock
 {
-	zp_uint size;
-	zp_uint alignedSize;
+	zp_size_t size;
+	zp_size_t alignedSize;
 	zpMemoryBlock* next;
 	zpMemoryBlock* prev;
 };
@@ -20,16 +20,16 @@ public:
 	~zpMemorySystem();
 
 	static zpMemorySystem* getInstance();
-	void initialize( zp_uint size );
+	void initialize( zp_size_t size );
 	void shutdown();
 
-	void* allocate( zp_uint size );
+	void* allocate( zp_size_t size );
 	void deallocate( void* ptr );
 
 	void printAllAllocatedMemoryStackTrace();
-	void printAllocatedMemoryStackTrack( zp_int index );
+	void printAllocatedMemoryStackTrack( zp_size_t index );
 
-	void takeMemorySnapshot( zp_long currentTime, zp_uint strideInByts );
+	void takeMemorySnapshot( zp_long currentTime, zp_size_t strideInByts );
 
 private:
 	zpMemorySystem();
@@ -37,15 +37,15 @@ private:
 	void addBlock( zpMemoryBlock** table, zpMemoryBlock* block );
 	void removeBlock( zpMemoryBlock** table, zpMemoryBlock* block );
 
-	zp_uint m_totalMemory;
-	zp_uint m_totalAlignedMemory;
-	zp_uint m_allocatedMemorySize;
+	zp_size_t m_totalMemory;
+	zp_size_t m_totalAlignedMemory;
+	zp_size_t m_allocatedMemorySize;
 
-	zp_uint m_numAllocs;
-	zp_uint m_numDeallocs;
-	zp_uint m_memAllocated;
-	zp_uint m_memDeallocated;
-	zp_uint m_memUsed;
+	zp_size_t m_numAllocs;
+	zp_size_t m_numDeallocs;
+	zp_size_t m_memAllocated;
+	zp_size_t m_memDeallocated;
+	zp_size_t m_memUsed;
 #if ZP_MEMORY_TRACK_POINTERS
 	zpFixedArrayList< void*,        ZP_MEMORY_SYSTEM_TRACKED_POINTERS > m_allocedPointers;
 	zpFixedArrayList< zpStackTrace, ZP_MEMORY_SYSTEM_TRACKED_POINTERS > m_stackTraces;

@@ -1046,7 +1046,7 @@ void zpApplication::guiEditMode()
 }
 void zpApplication::onGUI()
 {
-	zpFixedStringBuffer< 64 > buff;
+	zpFixedStringBuffer< 128 > buff;
 
 	zp_float secondsPerTick = m_timer.getSecondsPerTick();
 

@@ -6,18 +6,22 @@
 
 #include <new>
 
-#if ZP_WIN_32
 #if ZP_DEBUG
+
+#if ZP_WIN_64
+#pragma comment( lib, "angelscript64d.lib" )
+#elif ZP_WIN_32
 #pragma comment( lib, "angelscriptd.lib" )
+#endif
+
 #else
+
+#if ZP_WIN_64
+#pragma comment( lib, "angelscript64.lib" )
+#elif ZP_WIN_32
 #pragma comment( lib, "angelscript.lib" )
 #endif
-#elif ZP_WIN_64
-#if ZP_DEBUG
-#pragma comment( lib, "angelscript64d.lib" )
-#else
-#pragma comment( lib, "angelscript64.lib" )
-#endif
+
 #endif
 
 #define ZP_SCRIPT_STRING "string"
@@ -237,10 +241,10 @@ void as_Register_zpString( asIScriptEngine* engine )
 	
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "void opAssign( const " ZP_SCRIPT_STRING " &in )", asMETHODPR( zpString, operator=, ( const zpString& ), void ), asCALL_THISCALL ); AS_ASSERT( r );
 	
-	r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "uint length() const", asMETHODPR( zpString, length, () const, zp_uint ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "uint length() const", asMETHODPR( zpString, length, () const, zp_size_t ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "bool isEmpty() const", asMETHODPR( zpString, isEmpty, () const, zp_bool ), asCALL_THISCALL ); AS_ASSERT( r );
 
-	r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "uint8& opIndex( uint index )", asMETHODPR( zpString, operator[], ( zp_uint index ), zp_char& ), asCALL_THISCALL ); AS_ASSERT( r );
+	r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "uint8& opIndex( uint index )", asMETHODPR( zpString, operator[], ( zp_size_t index ), zp_char& ), asCALL_THISCALL ); AS_ASSERT( r );
 	r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "const uint8 opIndex( uint index ) const", asMETHOD( zpString, charAt ), asCALL_THISCALL ); AS_ASSERT( r );
 
 	//r = engine->RegisterObjectMethod( ZP_SCRIPT_STRING, "string substring( uint start, int end = -1 ) const", asFUNCTION( as_zpString_Substring ), asCALL_CDECL_OBJFIRST ); AS_ASSERT( r );
@@ -1132,7 +1136,7 @@ void zpAngelScript::garbageCollect()
 	engine->GarbageCollect( asGC_FULL_CYCLE | asGC_DESTROY_GARBAGE );
 }
 
-void* zpAngelScript::allocate( zp_uint size )
+void* zpAngelScript::allocate( zp_size_t size )
 {
 #if ZP_USE_MEMORY_SYSTEM
 	return zpMemorySystem::getInstance()->allocate( size );

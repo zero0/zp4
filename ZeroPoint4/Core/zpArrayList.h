@@ -3,9 +3,10 @@
 #define ZP_ARRAY_LIST_H
 
 template<typename T>
-class zpArrayList {
+class zpArrayList
+{
 public:
-	enum
+	enum : zp_size_t
 	{
 		npos = -1,
 	};
@@ -18,12 +19,12 @@ public:
 	void operator=( const zpArrayList& arr );
 	void operator=( zpArrayList&& arr );
 	
-	T& operator[]( zp_uint index );
-	const T& operator[]( zp_uint index ) const;
+	T& operator[]( zp_size_t index );
+	const T& operator[]( zp_size_t index ) const;
 	
-	const T& at( zp_uint index ) const;
+	const T& at( zp_size_t index ) const;
 
-	zp_uint size() const;
+	zp_size_t size() const;
 	zp_bool isEmpty() const;
 	zp_bool isFixed() const;
 
@@ -36,17 +37,17 @@ public:
 	void popBack();
 	void popFront();
 
-	void erase( zp_uint index );
-	zp_uint eraseAll( const T& val );
+	void erase( zp_size_t index );
+	zp_size_t eraseAll( const T& val );
 
 	void clear();
 	void reset();
-	void reserve( zp_uint size );
-	void resize( zp_uint size );
+	void reserve( zp_size_t size );
+	void resize( zp_size_t size );
 	void destroy();
 
-	zp_int indexOf( const T& val ) const;
-	zp_int lastIndexOf( const T& val ) const;
+	zp_size_t indexOf( const T& val ) const;
+	zp_size_t lastIndexOf( const T& val ) const;
 
 	T& front();
 	T& back();
@@ -67,7 +68,7 @@ public:
 	zp_bool findIf( Func func, T** found );
 
 	template<typename Func>
-	zp_bool findIndexIf( Func func, zp_uint& index ) const;
+	zp_bool findIndexIf( Func func, zp_size_t& index ) const;
 	
 	template<typename Func>
 	void foreach( Func func ) const;
@@ -89,20 +90,21 @@ public:
 	void sort( Func func );
 
 protected:
-	zpArrayList( T* fixedArray, zp_uint count );
+	zpArrayList( T* fixedArray, zp_size_t count );
 
 private:
-	void ensureCapacity( zp_uint size );
+	void ensureCapacity( zp_size_t size );
 
 	T* m_array;
-	zp_uint m_size;
-	zp_uint m_capacity;
+	zp_size_t m_size;
+	zp_size_t m_capacity;
 	zp_bool m_isFixed;
 };
 
 
-template<typename T, zp_uint Size>
-class zpFixedArrayList : public zpArrayList<T> {
+template<typename T, zp_size_t Size>
+class zpFixedArrayList : public zpArrayList<T>
+{
 public:
 	zpFixedArrayList();
 

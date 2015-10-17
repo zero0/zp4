@@ -2,18 +2,19 @@
 #ifndef ZP_STRING_H
 #define ZP_STRING_H
 
-class zpString {
+class zpString
+{
 public:
-	enum
+	enum : zp_size_t
 	{
 		npos = -1,
 	};
 
 	zpString();
 	explicit zpString( const zp_char* string );
-	zpString( const zp_char* string, zp_uint length );
+	zpString( const zp_char* string, zp_size_t length );
 	zpString( const zpString& string );
-	zpString( const zpString& string, zp_uint length );
+	zpString( const zpString& string, zp_size_t length );
 	zpString( zpString&& string );
 	~zpString();
 
@@ -24,11 +25,11 @@ public:
 	operator zp_hash() const;
 	const zp_char* str() const;
 
-	zp_char operator[]( zp_uint index ) const;
-	zp_char& operator[]( zp_uint index );
-	void setCharAt( zp_uint index, zp_char ch );
-	zp_char charAt( zp_uint index ) const;
-	void set( const zp_char* str, zp_uint length );
+	zp_char operator[]( zp_size_t index ) const;
+	zp_char& operator[]( zp_size_t index );
+	void setCharAt( zp_size_t index, zp_char ch );
+	zp_char charAt( zp_size_t index ) const;
+	void set( const zp_char* str, zp_size_t length );
 
 	zp_bool startsWith( zp_char ch ) const;
 	zp_bool startsWith( const zp_char* string ) const;
@@ -38,22 +39,22 @@ public:
 	zp_bool endsWith( const zp_char* string ) const;
 	zp_bool endsWith( const zpString& string ) const;
 
-	zp_int indexOf( zp_char ch, zp_uint fromIndex = 0 ) const;
-	zp_int indexOf( const zp_char* string, zp_uint fromIndex = 0 ) const;
-	zp_int indexOf( const zpString& string, zp_uint fromIndex = 0 ) const;
+	zp_size_t indexOf( zp_char ch, zp_size_t fromIndex = 0 ) const;
+	zp_size_t indexOf( const zp_char* string, zp_size_t fromIndex = 0 ) const;
+	zp_size_t indexOf( const zpString& string, zp_size_t fromIndex = 0 ) const;
 
-	zp_int indexOfIgnoreCase( zp_char ch, zp_uint fromIndex = 0 ) const;
-	zp_int indexOfIgnoreCase( const zp_char* string, zp_uint fromIndex = 0 ) const;
-	zp_int indexOfIgnoreCase( const zpString& string, zp_uint fromIndex = 0 ) const;
+	zp_size_t indexOfIgnoreCase( zp_char ch, zp_size_t fromIndex = 0 ) const;
+	zp_size_t indexOfIgnoreCase( const zp_char* string, zp_size_t fromIndex = 0 ) const;
+	zp_size_t indexOfIgnoreCase( const zpString& string, zp_size_t fromIndex = 0 ) const;
 
-	zp_int lastIndexOf( zp_char ch, zp_int fromIndex = 0 ) const;
-	zp_int lastIndexOf( const zp_char* string, zp_int fromIndex = 0 ) const;
-	zp_int lastIndexOf( const zpString& string, zp_int fromIndex = 0 ) const;
+	zp_size_t lastIndexOf( zp_char ch, zp_size_t fromIndex = 0 ) const;
+	zp_size_t lastIndexOf( const zp_char* string, zp_size_t fromIndex = 0 ) const;
+	zp_size_t lastIndexOf( const zpString& string, zp_size_t fromIndex = 0 ) const;
 
-	zp_int findFirstOf( const zpString& string, zp_int fromIndex = 0 ) const;
+	zp_size_t findFirstOf( const zpString& string, zp_size_t fromIndex = 0 ) const;
 
 	zp_bool isEmpty() const;
-	zp_uint length() const;
+	zp_size_t length() const;
 
 	zp_bool equals( const zpString& string ) const;
 	zp_bool equalsIgnoreCase( const zpString& string ) const;
@@ -61,12 +62,12 @@ public:
 	zp_int compareTo( const zpString& string ) const;
 	zp_int compareToIgnoreCase( const zpString& string ) const;
 	
-	zpString substring( zp_uint startIndex ) const;
-	zpString substring( zp_uint startIndex, zp_int endIndex ) const;
+	zpString substring( zp_size_t startIndex ) const;
+	zpString substring( zp_size_t startIndex, zp_size_t endIndex ) const;
 
-	void erase( zp_int startIndex, zp_uint count );
+	void erase( zp_size_t startIndex, zp_size_t count );
 	void append( zp_char ch );
-	void append( const zp_char* str, zp_int length = -1 );
+	void append( const zp_char* str, zp_size_t length );
 	void append( const zpString& string );
 
 	static void toLower( zpString& string );
@@ -103,11 +104,11 @@ public:
 		}
 	}
 
-	void reserve( zp_uint size );
+	void reserve( zp_size_t size );
 	void clear();
 
 private:
-	void ensureCapacity( zp_uint size );
+	void ensureCapacity( zp_size_t size );
 	zp_char* getCharsInternal();
 
 	enum
@@ -121,11 +122,11 @@ private:
 		struct
 		{
 			zp_char* m_string;
-			zp_uint m_capacity;
+			zp_size_t m_capacity;
 		};
 	};
 
-	zp_uint m_length;
+	zp_size_t m_length;
 	mutable zp_hash m_hash;
 };
 

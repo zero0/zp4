@@ -364,7 +364,7 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 
 		// add phases
 		application->addPhase( &protoDBPhase );
-		//application->addPhase( &loadWorld );
+		application->addPhase( &loadWorld );
 		application->addPhase( &playPhase );
 
 		// add states
