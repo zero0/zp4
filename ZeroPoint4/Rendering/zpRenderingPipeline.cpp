@@ -682,7 +682,7 @@ void zpRenderingPipeline::generateDepthStencilStateDesc( const zpBison::Value& d
 	}
 }
 
-zp_uint zpRenderingPipeline::getNumCameras( zpCameraType type ) const
+zp_size_t zpRenderingPipeline::getNumCameras( zpCameraType type ) const
 {
 	return m_usedCameras[ type ].size();
 }
@@ -706,7 +706,7 @@ zpCamera* zpRenderingPipeline::getCamera( zpCameraType type )
 }
 void zpRenderingPipeline::releaseCamera( zpCamera* camera )
 {
-	zp_uint count = m_usedCameras[ camera->getCameraType() ].eraseAll( camera );
+	zp_size_t count = m_usedCameras[ camera->getCameraType() ].eraseAll( camera );
 
 	ZP_UNUSED( count );
 	ZP_ASSERT( count != 0, "Unknown camera being removed from queue" );
@@ -793,8 +793,8 @@ zpLightBufferData* zpRenderingPipeline::getLight( zpLightType type )
 }
 void zpRenderingPipeline::releaseLight( zpLightBufferData* light )
 {
-	zp_int index = m_usedLights[ light->type ].indexOf( light );
-	ZP_ASSERT( index != -1, "" );
+	zp_size_t index = m_usedLights[ light->type ].indexOf( light );
+	ZP_ASSERT( index != zpArrayList< zpLightBufferData* >::npos, "" );
 
 	m_usedLights[ light->type ].erase( index );
 
@@ -916,7 +916,7 @@ zp_bool zpRenderingPipeline::performScreenshot()
 	data.write< zp_byte >( 32 );
 	data.write< zp_byte >( 0x24 );
 
-	zp_uint index = data.size();
+	zp_size_t index = data.size();
 
 	ok = m_engine.takeScreenshot( data );
 

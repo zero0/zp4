@@ -216,14 +216,14 @@ void as_zpString_Deconstructor( zpString* self )
 //{
 //	return self->substring( start, end );
 //}
-zp_int as_zpString_IndexOf( const zpString* self, const zpString& str, zp_uint start )
+zp_int as_zpString_IndexOf( const zpString* self, const zpString& str, zp_size_t start )
 {
-	zp_uint index = self->indexOf( str, start );
+	zp_size_t index = self->indexOf( str, start );
 	return index == zpString::npos ? -1 : (zp_int)index;
 }
-zp_int as_zpString_LastIndexOf( const zpString* self, const zpString& str, zp_uint end )
+zp_int as_zpString_LastIndexOf( const zpString* self, const zpString& str, zp_size_t end )
 {
-	zp_uint index = self->lastIndexOf( str, end );
+	zp_size_t index = self->lastIndexOf( str, end );
 	return index == zpString::npos ? -1 : (zp_int)index;
 }
 

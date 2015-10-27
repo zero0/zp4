@@ -50,6 +50,7 @@ void zpRigidBody::initialize( const zpMatrix4f& transform )
 
 		btRigidBody* body = new btRigidBody( info );
 		body->setCollisionFlags( btRigidBody::CF_STATIC_OBJECT );
+		body->setUserPointer( this );
 
 		m_rigidBody = body;
 		m_motionState = ZP_NULL;
@@ -62,6 +63,7 @@ void zpRigidBody::initialize( const zpMatrix4f& transform )
 		btRigidBody::btRigidBodyConstructionInfo info( m_mass, motion, shape, inertia );
 
 		btRigidBody* body = new btRigidBody( info );
+		body->setUserPointer( this );
 
 		m_rigidBody = body;
 		m_motionState = motion;
@@ -74,6 +76,7 @@ void zpRigidBody::destroy( zpPhysicsEngine* engine )
 
 	btMotionState* motion = (btMotionState*)m_motionState;
 	btRigidBody* rigidBody = (btRigidBody*)m_rigidBody;
+	rigidBody->setUserPointer( ZP_NULL );
 
 	ZP_SAFE_DELETE( motion );
 	ZP_SAFE_DELETE( rigidBody );

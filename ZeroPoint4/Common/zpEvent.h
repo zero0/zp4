@@ -2,7 +2,7 @@
 #ifndef ZP_EVENT_H
 #define ZP_EVENT_H
 
-typedef zp_uint zpEvent;
+typedef zp_size_t zpEvent;
 ZP_PURE_INTERFACE zpEventListener;
 class zpEventManager;
 

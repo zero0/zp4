@@ -54,6 +54,7 @@ void zpRenderingContext::destroy()
 	}
 
 	clearState();
+
 	flush();
 
 	m_renderingStats.clear();
@@ -947,7 +948,7 @@ void zpRenderingContext::endDrawFont()
 
 const zpRenderingStats& zpRenderingContext::getPreviousFrameStats() const
 {
-	zp_uint index = ( ( ( (zp_int)m_currentBufferIndex ) - 1 ) + ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS ) % ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS;
+	zp_size_t index = m_currentBufferIndex == 0 ? ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS - 1 : m_currentBufferIndex - 1; //( ( ( (zp_int)m_currentBufferIndex ) - 1 ) + ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS ) % ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS;
 	return m_renderingStats[ index ];
 }
 

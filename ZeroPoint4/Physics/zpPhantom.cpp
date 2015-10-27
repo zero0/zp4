@@ -105,7 +105,7 @@ zp_bool zpPhantom::rayTest( const zpVector4f& fromWorld, const zpVector4f& toWor
 	return false;
 }
 
-void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
+void zpPhantom::processCollisions( zp_handle dymaicsWorld, zp_float timeStep )
 {
 	btDynamicsWorld* world = static_cast< btDynamicsWorld* >( dymaicsWorld );
 	btOverlappingPairCache* cache = world->getPairCache();
@@ -113,18 +113,20 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 	btManifoldArray manifolds;
 	btPairCachingGhostObject* ghost = static_cast< btPairCachingGhostObject* >( m_phantom );
 
-	const btBroadphasePairArray& pairs = ghost->getOverlappingPairCache()->getOverlappingPairArray();
-	for( zp_int i = 0; i < pairs.size(); ++i )
-	{
-		manifolds.resize( 0 );
+	zpFixedArrayList< zpPhantomCollisionHitInfo, ZP_PHANTON_MAX_TRACKED_OBJECTS > hits;
+	zpFixedArrayList< zp_handle, ZP_PHANTON_MAX_TRACKED_OBJECTS > currentlyTracked = m_trackedObjects;
 
+	const btBroadphasePairArray& pairs = ghost->getOverlappingPairCache()->getOverlappingPairArray();
+	for( zp_int i = 0, imax = pairs.size(); i < imax; ++i )
+	{
 		const btBroadphasePair& pair = pairs[ i ];
 		const btBroadphasePair* p = cache->findPair( pair.m_pProxy0, pair.m_pProxy1 );
 		if( p == ZP_NULL ) continue;
 
+		manifolds.resize( 0 );
 		p->m_algorithm->getAllContactManifolds( manifolds );
 
-		for( zp_int j = 0; j < manifolds.size(); ++j )
+		for( zp_int j = 0, jmax = manifolds.size(); j < jmax; ++j )
 		{
 			btPersistentManifold* manifold = manifolds[ j ];
 			btCollisionObject* b0 = static_cast< btCollisionObject* >( manifold->getBody0() );
@@ -132,11 +134,55 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld ) const
 
 			btCollisionObject* otherObject = m_phantom == b0 ? b1 : b0;
 
-			for( zp_int m = 0; m < manifold->getNumContacts(); ++m )
+			for( zp_int m = 0, mmax = manifold->getNumContacts(); m < mmax; ++m )
 			{
 				btManifoldPoint& point = manifold->getContactPoint( m );
 				
+				zpPhantomCollisionHitInfo& hit = hits.pushBackEmpty();
+				hit.otherObject = otherObject->getUserPointer();
+				hit.worldPositionOnA = zpMath::Vector4Load4( point.m_positionWorldOnA.m_floats );
+				hit.worldPositionOnB = zpMath::Vector4Load4( point.m_positionWorldOnB.m_floats );
+				hit.worldNormalOnB = zpMath::Vector4Load4( point.m_normalWorldOnB );
 			}
 		}
 	}
+
+	zpPhantomCollisionHitInfo* b = hits.begin();
+	zpPhantomCollisionHitInfo* e = hits.end();
+	for( ; b != e; ++b )
+	{
+		currentlyTracked.eraseAll( b->otherObject );
+
+		if( m_trackedObjects.indexOf( b->otherObject ) == zpFixedArrayList< zp_handle, ZP_PHANTON_MAX_TRACKED_OBJECTS >::npos )
+		{
+			onCollisionEnter( *b );
+
+			m_trackedObjects.pushBack( b->otherObject );
+		}
+		else
+		{
+			onCollisionStay( *b );
+		}
+	}
+
+	zp_handle* cb = currentlyTracked.begin();
+	zp_handle* ce = currentlyTracked.end();
+	for( ; cb != ce; ++cb )
+	{
+		onCollisionLeave( *cb );
+
+		m_trackedObjects.eraseAll( *cb );
+	}
+}
+
+void zpPhantom::onCollisionEnter( const zpPhantomCollisionHitInfo& hit )
+{
+	zp_printfln( "Collition Enter" );
+}
+void zpPhantom::onCollisionStay( const zpPhantomCollisionHitInfo& hit )
+{
+}
+void zpPhantom::onCollisionLeave( zp_handle otherObject )
+{
+	zp_printfln( "Collision Leave" );
 }

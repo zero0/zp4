@@ -321,12 +321,12 @@ private:
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )
 {
 	zp_int exitCode = 0;
-	zpRandom *d = zpRandom::getInstance();
 
 	zpMemorySystem* mem = zpMemorySystem::getInstance();
 	mem->initialize( ZP_MEMORY_MB( 10 ) );
 
 #if 0
+	zpRandom *d = zpRandom::getInstance();
 	for( zp_int i = 0; i < 100; ++i )
 	{
 		void* a = mem->allocate( ZP_MEMORY_MB( d->randomFloat( 0.01f, 0.1f ) ) );

@@ -63,7 +63,7 @@ public:
 	void enterEditMode();
 	void leaveEditMode();
 
-	zp_uint getNumCameras( zpCameraType type ) const;
+	zp_size_t getNumCameras( zpCameraType type ) const;
 	const zpArrayList< zpCamera* >& getUsedCameras( zpCameraType type ) const;
 
 	zpCamera* getCamera( zpCameraType type );

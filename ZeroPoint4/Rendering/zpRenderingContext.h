@@ -4,8 +4,8 @@
 
 struct zpRenderingStats
 {
-	zp_uint totalDrawCommands;
-	zp_uint totalVerticies;
+	zp_size_t totalDrawCommands;
+	zp_size_t totalVerticies;
 
 	zp_uint numDrawCommands[ zpRenderingQueue_Count ];
 	zp_uint visibleDrawCommands[ zpRenderingQueue_Count ];
@@ -181,10 +181,10 @@ private:
 	zpDataBuffer m_scratchVertexBuffer;
 	zpDataBuffer m_scratchIndexBuffer;
 
-	zp_uint m_immediateVertexSize;
-	zp_uint m_immediateIndexSize;
+	zp_size_t m_immediateVertexSize;
+	zp_size_t m_immediateIndexSize;
 
-	zp_uint m_currentBufferIndex;
+	zp_size_t m_currentBufferIndex;
 	zpBuffer* m_currentVertexBuffer;
 	zpBuffer* m_currentIndexBuffer;
 

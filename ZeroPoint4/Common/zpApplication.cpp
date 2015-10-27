@@ -111,7 +111,7 @@ void zpApplication::pushState( const zp_char* stateName )
 	if( m_allStates.findIf( [ stateName ]( zpApplicationState* s ) { return zp_strcmp( s->getStateName(), stateName ) == 0; }, &state ) )
 	{
 		zpApplicationState* s = *state;
-		ZP_ASSERT( m_stateStack.indexOf( s ) < 0, "State '%s' already in stack", stateName );
+		ZP_ASSERT( m_stateStack.indexOf( s ) == zpArrayList< zpApplicationState* >::npos, "State '%s' already in stack", stateName );
 
 		s->onEnterState( this );
 

@@ -580,8 +580,8 @@ struct zpRenderingCommand
 	zpVertexFormat vertexFormat;
 	zp_uint vertexCount;
 	zp_uint indexCount;
-	zp_uint vertexOffset;
-	zp_uint indexOffset;
+	zp_size_t vertexOffset;
+	zp_size_t indexOffset;
 	zpMatrix4f matrix;
 	zpBoundingAABB boundingBox;
 };

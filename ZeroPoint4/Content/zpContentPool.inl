@@ -77,8 +77,8 @@ T* zpContentPool<T, Count>::create( const R0& param0, const R1& param1 )
 template<typename T, zp_uint Count>
 void zpContentPool<T, Count>::destroy( T* obj )
 {
-	zp_int at = m_used.indexOf( obj );
-	if( at >= 0 )
+	zp_size_t at = m_used.indexOf( obj );
+	if( at != zpFixedArrayList< T, Count >::npos )
 	{
 		onDestroy( obj );
 

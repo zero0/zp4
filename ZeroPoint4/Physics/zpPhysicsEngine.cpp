@@ -284,9 +284,13 @@ void zpPhysicsEngine::debugDraw()
 
 void zpPhysicsEngine::fixedTimeStep( zp_float timeStep )
 {
-	m_phantoms.foreach( [ this ]( zpPhantom* p ) {
-		p->processCollisions( m_dynamicsWorld );
-	} );
+	zpPhantom** b = m_phantoms.begin();
+	zpPhantom** e = m_phantoms.end();
+
+	for( ; b != e; ++b )
+	{
+		(*b)->processCollisions( m_dynamicsWorld, timeStep );
+	}
 }
 
 zpColliderCache* zpPhysicsEngine::getColliderCache()

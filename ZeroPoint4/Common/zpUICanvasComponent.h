@@ -115,7 +115,7 @@ struct zpUIWidget
 	zp_int minWidth;
 	zp_int minHeight;
 
-	zp_int depth;
+	zp_size_t depth;
 	zp_float alpha;
 
 	zpColor4f colorBottomLeft;

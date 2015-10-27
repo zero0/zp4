@@ -38,8 +38,8 @@ private:
 	zp_float m_animationSpeed;
 	zp_int m_playDirection;
 
-	zp_int m_currentAnimationClip;
-	zp_int m_nextAnimationClip;
+	zp_size_t m_currentAnimationClip;
+	zp_size_t m_nextAnimationClip;
 
 	zpAnimationControllerPlayMode m_playMode;
 
