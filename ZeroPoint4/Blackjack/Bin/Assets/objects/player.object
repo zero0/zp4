@@ -14,10 +14,21 @@
                     "Components": {
                         "Transform": {
                             "Position": [
-                                0,
                                 4,
+                                0,
                                 0
                             ]
+                        },
+                        "Phantom" : {
+                            "Group" : "Main",
+                            "Mask" : "Main",
+                            "Collider": {
+                                "Shape": "Capsule",
+                                "Size": {
+                                    "Radius": 1,
+                                    "Height": 2
+                                }
+                            }
                         },
                         "ParticleEmitter": {
                             "Layer": 0,
