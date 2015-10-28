@@ -1,5 +1,5 @@
-#ifndef ZERO_POINT_SHADER_INC
-#define ZERO_POINT_SHADER_INC
+#ifndef ZP_SHADER_INC
+#define ZP_SHADER_INC
 
 #define ZP_INITIALIZE( Type, v )    v = (Type)0
 
@@ -42,7 +42,6 @@ ZP_CBUFFER_END
 
 uniform float4 _AmbientLight;
 
-/*
 ZP_CBUFFER_START( SH, 4 )
     float4 _SHAr;
     float4 _SHAg;
@@ -54,7 +53,6 @@ ZP_CBUFFER_START( SH, 4 )
 
     float4 _SHC;
 ZP_CBUFFER_END
-*/
 
 struct vs_input_base
 {
@@ -124,13 +122,12 @@ inline float3 ShadeSH( in float4 normal )
 // Computes world space view direction
 inline float4 WorldSpaceViewDir( in float4 v )
 {
-	return cameraPosition - mul( world, v);
+    return cameraPosition - mul( world, v );
 }
 
 inline float3 UnpackNormal( in float4 packednormal )
 {
-	return packednormal.xyz * 2 - 1;
+    return packednormal.xyz * 2 - 1;
 }
-
 
 #endif

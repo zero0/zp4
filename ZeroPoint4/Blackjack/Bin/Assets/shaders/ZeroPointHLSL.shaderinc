@@ -1,14 +1,14 @@
 
-#ifndef ZERO_POINT_HLSL_SHADER_INC
-#define ZERO_POINT_HLSL_SHADER_INC
+#ifndef ZP_HLSL_SHADER_INC
+#define ZP_HLSL_SHADER_INC
 
-#if ZP_SHADER_API_HLSL
+#ifdef ZP_SHADER_API_HLSL
 
 #pragma pack_matrix( row_major )
 
 #define uniform
 
-#if ZP_SHADER_DX9
+#ifdef ZP_SHADER_DX9
 
 #define ZP_CBUFFER_START( name, index ) ConstantBuffer name {
 #define ZP_CBUFFER_END                  };
@@ -26,23 +26,23 @@
 #define ZP_SAMPLER_1D( name )       Texture1D name;   SamplerState name##_Sampler; float4 name##_ST
 #define ZP_SAMPLER_2D( name )       Texture2D name;   SamplerState name##_Sampler; float4 name##_ST
 #define ZP_SAMPLER_3D( name )       Texture3D name;   SamplerState name##_Sampler; float4 name##_ST
-#define ZP_SAMPLER_CUBE( name )   TextureCube name; SamplerState name##_Sampler; float4 name##_ST
+#define ZP_SAMPLER_CUBE( name )     TextureCube name; SamplerState name##_Sampler; float4 name##_ST
 
 #define tex1D( name, uv )           ( name.Sample( name##_Sampler, (uv) ) )
 #define tex2D( name, uv )           ( name.Sample( name##_Sampler, (uv) ) )
 #define tex3D( name, uv )           ( name.Sample( name##_Sampler, (uv) ) )
-#define texCUBE( name, uv )       ( name.Sample( name##_Sampler, (uv) ) )
+#define texCUBE( name, uv )         ( name.Sample( name##_Sampler, (uv) ) )
 
 #define tex1DLod( name, uv, lod )           ( name.SampleLevel( name##_Sampler, (uv), (lod) ) )
 #define tex2DLod( name, uv, lod )           ( name.SampleLevel( name##_Sampler, (uv), (lod) ) )
 #define tex3DLod( name, uv, lod )           ( name.SampleLevel( name##_Sampler, (uv), (lod) ) )
-#define texCUBELod( name, uv, lod )       ( name.SampleLevel( name##_Sampler, (uv), (lod) ) )
+#define texCUBELod( name, uv, lod )         ( name.SampleLevel( name##_Sampler, (uv), (lod) ) )
 
-#define tex1DBias( name, uv, bias )           ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
-#define tex2DBias( name, uv, bias )           ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
-#define tex3DBias( name, uv, bias )           ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
-#define texCUBEBias( name, uv, bias )       ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
+#define tex1DBias( name, uv, bias )             ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
+#define tex2DBias( name, uv, bias )             ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
+#define tex3DBias( name, uv, bias )             ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
+#define texCUBEBias( name, uv, bias )           ( name.SampleBias( name##_Sampler, (uv), (lbias) ) )
 
-#endif
+#endif // ZP_SHADER_API_HLSL
 
-#endif
+#endif // ZERO_POINT_HLSL_SHADER_INC

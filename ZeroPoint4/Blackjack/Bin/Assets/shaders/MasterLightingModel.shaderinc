@@ -4,41 +4,41 @@
 
 inline float4 LightingModelMaster( in MasterOutput s, in float4 lightDir, in float4 viewDir, in float atten )
 {
-	float4 frag = float4( 0, 0, 0, s.albedo.a );
-	
-	#if defined( ZP_MASTER_DIFFUSE_DIRECT ) || defined( ZP_MASTER_SPECULAR_DIRECT )
-		float3 L = lightDir.xyz;
-		float3 N = s.normal.xyz;
-		
-		#ifdef ZP_MASTER_HQ
-			L = normalize( L );
-		#endif
-	#endif
-	
-	#ifdef ZP_MASTER_DIFFUSE_DIRECT
-		float dp = saturate( dot( N, L ) );
-		
-		float3 diff = dp * s.albedo.rgb;
-		frag.rgb = diff * light_color.rgb;
-	#endif
-	
-	#ifdef ZP_MASTER_SPECULAR_DIRECT
-		float3 H = normalize( viewDir.xyz + L );
-		float specRefl = saturate( dot( N, H ) );
-		float3 spec = pow( specRefl, s.specular.a * 512 ).rrr;
-		#ifdef ZP_MASTER_HQ
-			#if ZP_MASTER_DIFFUSE_DIRECT
-				spec *= saturate( 10 * dp );
-			#else
-				spec *= saturate( 10 * dot( N, L ) );
-			#endif
-		#endif
-		spec *= light_color.rgb;
-		frag.rgb += spec * s.specular.rgb;
-	#endif
-	
-	frag.rgb *= atten;
-	return frag;
+    float4 frag = float4( 0, 0, 0, s.albedo.a );
+
+    #if defined( ZP_MASTER_DIFFUSE_DIRECT ) || defined( ZP_MASTER_SPECULAR_DIRECT )
+        float3 L = lightDir.xyz;
+        float3 N = s.normal.xyz;
+
+        #ifdef ZP_MASTER_HQ
+            L = normalize( L );
+        #endif // ZP_MASTER_HQ
+    #endif // ZP_MASTER_DIFFUSE_DIRECT || ZP_MASTER_SPECULAR_DIRECT
+
+    #ifdef ZP_MASTER_DIFFUSE_DIRECT
+        float dp = saturate( dot( N, L ) );
+
+        float3 diff = dp * s.albedo.rgb;
+        frag.rgb = diff * light_color.rgb;
+    #endif // ZP_MASTER_DIFFUSE_DIRECT
+
+    #ifdef ZP_MASTER_SPECULAR_DIRECT
+        float3 H = normalize( viewDir.xyz + L );
+        float specRefl = saturate( dot( N, H ) );
+        float3 spec = pow( specRefl, s.specular.a * 512 ).rrr;
+        #ifdef ZP_MASTER_HQ
+            #ifdef ZP_MASTER_DIFFUSE_DIRECT
+                spec *= saturate( 10 * dp );
+            #else // !ZP_MASTER_DIFFUSE_DIRECT
+                spec *= saturate( 10 * dot( N, L ) );
+            #endif // ZP_MASTER_DIFFUSE_DIRECT
+        #endif // ZP_MASTER_HQ
+        spec *= light_color.rgb;
+        frag.rgb += spec * s.specular.rgb;
+    #endif // ZP_MASTER_SPECULAR_DIRECT
+
+    frag.rgb *= atten;
+    return frag;
 };
 
 #endif

@@ -2,110 +2,111 @@
 #ifndef ZP_MASTER_SURFACE_SHADERINC
 #define ZP_MASTER_SURFACE_SHADERINC
 
-inline void MasterSurface( in MasterInput in, inout MasterOutput out )
+inline void MasterSurface( in MasterInput input, inout MasterOutput output )
 {
-	#ifdef ZP_MASTER_ALPHA_CLIP
-		clip( OUT.Alpha - _Cutout );
-	#endif
-	
-	float4 exposureIBL = _ExposureIBL;
-	float4 baseColor = _Color;
-	
-	float2 uv_diff = in.texcoord;
-	float2 uv_bump = in.texcoord;
-	float2 uv_spec = in.texcoord;
-	
-	#ifdef ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
-		float4 diffSpec = float4( 1, 1, 1, 1 );
-	#endif
-	
-	#ifdef ZP_MASTER_VERTEX_COLOR
-	baseColor *= in.color;
-	#endif
-	
-	// diffuse
-	#if defined( ZP_MASTER_DIFFUSE_IBL ) || defined( ZP_MASTER_DIFFUSE_DIRECT )
-		float4 diff = tex2D( _MainTex, uv_diff );
-		
-		#ifdef ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
-			diffSpec = diff.aaaa;
-		#endif
-		
-		diff.rgb *= exposureIBL.w;
-		
-		out.albedo = diff;
-	#else
-		#ifdef ZP_MASTER_DIFFUSE_DIRECT
-			out.albedo.rgb = baseColor.rgb;
-		#else
-			out.albedo.rgb = float3( 0, 0, 0 );
-		#endif
-		out.albedo.a = baseColor.a;
-	#endif
-	
-	// normals
-	#ifdef ZP_MASTER_NORMAL_MAP
-		float3 localN = UnpackNormal( tex2D( _BumpMap, uv_bump ) );
-		localN = normalize( localN );
-		
-		out.normal = localN;
-		float3 worldN = localN;
-	#else
-		float3 worldN = IN.worldNormal.xyz;
-		worldN = normalize( worldN );
-		float3 localN = worldN;
-	#endif
-	
-	// flip normal
-	#ifdef ZP_MASTER_FLIP_NORMAL
-		localN *= sign( dot( localN, in.viewDir ) );
-	#endif
-	
-	// specular
-	#if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
-		#ifdef ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
-			float4 spec = diffSpec;
-		#else
-			float4 spec = tex2D( _SpecTex, uv_spec );
-		#endif
-		
-		float3 localE = normalize( in.viewDir.xyz );
-		
-		float3 schlickF = schlickFresnel( localN, localE, _SpecInt, _Fresnel );
-		float fresnel = schlickF.y;
-		
-		spec.rgb *= fresnel;
-		
-		spec.rgb *= exposureIBL.w;
-		float glossLod = glossLOD( spec.a, _Shininess );
-	#endif
-	
-	// glow
-	
-	// specular ibl
-	#ifdef ZP_MASTER_SPECULAR_IBL
-		float3 worldE = in.viewDir.xyz;
-		float3 worldP = in.worldPosition.xyz;
-		worldE = normalize( worldE );
-		
-		float3 skyR = reflect( -worldE, worldN );
-		
-		float3 specIBL = texCUBE( _SpecIBL, skyR );
-		
-		out.emission.rgb += ( specIBL.rgb * spec.rgb ) * exposureIBL.y;
-	#endif
-	
-	// diffuse ibl
-	#ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
-	
-	#else
-		
-	#endif
-	
-	// alpha
-	#ifndef ZP_MASTER_ALPHA
-		out.albedo.a = 1;
-	#endif
+#ifdef ZP_MASTER_ALPHA_CLIP
+    clip( OUT.Alpha - _Cutout );
+#endif // ZP_MASTER_ALPHA_CLIP
+
+    float4 exposureIBL = _ExposureIBL;
+    float4 baseColor = _Color;
+
+    float2 uv_diff = input.texcoord;
+    float2 uv_bump = input.texcoord;
+    float2 uv_spec = input.texcoord;
+
+#ifdef ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
+    float4 diffSpec = float4( 1, 1, 1, 1 );
+#endif // ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
+
+#ifdef ZP_MASTER_VERTEX_COLOR
+    baseColor *= input.color;
+#endif // ZP_MASTER_VERTEX_COLOR
+
+// diffuse
+#if defined( ZP_MASTER_DIFFUSE_IBL ) || defined( ZP_MASTER_DIFFUSE_DIRECT )
+    float4 diff = tex2D( _MainTex, uv_diff );
+
+    #ifdef ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
+        diffSpec = diff.aaaa;
+    #endif // ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
+
+        diff.rgb *= exposureIBL.w;
+
+        output.albedo = diff;
+#else // ZP_MASTER_DIFFUSE_IBL || ZP_MASTER_DIFFUSE_DIRECT
+    #ifdef ZP_MASTER_DIFFUSE_DIRECT
+        output.albedo.rgb = baseColor.rgb;
+    #else // !ZP_MASTER_DIFFUSE_DIRECT
+        output.albedo.rgb = float3( 0, 0, 0 );
+    #endif // ZP_MASTER_DIFFUSE_DIRECT
+    output.albedo.a = baseColor.a;
+#endif // ZP_MASTER_DIFFUSE_IBL || ZP_MASTER_DIFFUSE_DIRECT
+
+// normals
+#ifdef ZP_MASTER_NORMAL_MAP
+    float3 localN = UnpackNormal( tex2D( _BumpMap, uv_bump ) );
+    localN = normalize( localN );
+
+    output.normal = float4( localN, 0 );
+    float3 worldN = localN;
+#else // !ZP_MASTER_NORMAL_MAP
+    float3 worldN = IN.worldNormal.xyz;
+    worldN = normalize( worldN );
+    float3 localN = worldN;
+#endif // ZP_MASTER_NORMAL_MAP
+
+// flip normal
+#ifdef ZP_MASTER_FLIP_NORMAL
+    localN *= sign( dot( localN, input.viewDir ) );
+#endif // ZP_MASTER_FLIP_NORMAL
+
+// specular
+#if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
+    #ifdef ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
+        float4 spec = diffSpec;
+    #else // !ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
+        float4 spec = tex2D( _SpecTex, uv_spec );
+    #endif // ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
+
+    float3 localE = normalize( input.viewDir.xyz );
+
+    float3 schlickF = schlickFresnel( localN, localE, _SpecInt, _Fresnel );
+    float fresnel = schlickF.y;
+
+    spec.rgb *= fresnel;
+
+    spec.rgb *= exposureIBL.w;
+    float glossLod = glossLOD( spec.a, _Shininess );
+#endif // ZP_MASTER_SPECULAR_IBL || ZP_MASTER_SPECULAR_DIRECT
+
+// glow
+
+// specular ibl
+#ifdef ZP_MASTER_SPECULAR_IBL
+    float3 worldE = input.viewDir.xyz;
+    float3 worldP = input.worldPosition.xyz;
+    worldE = normalize( worldE );
+
+    float3 skyR = reflect( -worldE, worldN );
+
+    float4 specIBL = texCUBE( _SpecIBL, skyR );
+
+    output.emission.rgb += ( specIBL.rgb * spec.rgb ) * exposureIBL.y;
+#endif // ZP_MASTER_SPECULAR_IBL
+
+// diffuse ibl
+#ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
+
+#else // !ZP_MASTER_DIFFUSE_VERTEX_IBL
+
+#endif // ZP_MASTER_DIFFUSE_VERTEX_IBL
+
+// alpha
+#ifdef ZP_MASTER_ALPHA
+#else // !ZP_MASTER_ALPHA
+    output.albedo.a = 1;
+#endif // ZP_MASTER_ALPHA
 };
 
 #endif

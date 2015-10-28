@@ -5,88 +5,108 @@
 ZP_SAMPLER_2D( _MainTex );
 uniform float4 _Color;
 
-#if ZP_MASTER_SPECULAR_IBL
+#ifdef ZP_MASTER_SPECULAR_IBL
 ZP_SAMPLER_2D( _SpecTex );
 
 uniform float _SpecInt;
 uniform float _Shininess;
 uniform float _Fresnel;
 
-#if ZP_MASTER_SPECULAR_IBL_2D
+#ifdef ZP_MASTER_SPECULAR_IBL_3D
+ZP_SAMPLER_CUBE( _SpecIBL );
+#else // !ZP_MASTER_SPEC_IB_3D
 ZP_SAMPLER_2D( _SpecIBL );
-#else // !ZP_MASTER_SPEC_IB_2D
-ZP_SAMPLER_CUBE( _SpecIBL )
-#endif // ZP_MASTER_SPECULAR_IBL_2D
+#endif // ZP_MASTER_SPECULAR_IBL_3D
 
-#endif
+#endif // ZP_MASTER_SPECULAR_IBL
 
 
-#if ZP_MASTER_NORMAL_MAP
+#ifdef ZP_MASTER_NORMAL_MAP
 ZP_SAMPLER_2D( _BumpMap );
-#endif
+#endif // ZP_MASTER_NORMAL_MAP
 
-#if ZP_MASTER_ALPHA_CLIP
+#ifdef ZP_MASTER_ALPHA_CLIP
 uniform float _Cutoff;
-#endif
+#endif // ZP_MASTER_ALPHA_CLIP
 
-#if ZP_MASTER_GLOW
+#ifdef ZP_MASTER_GLOW
 ZP_SAMPLER_2D( _Illum );
 uniform float4 _GlowColor;
 uniform float _GlowStrength;
-#endif
+#endif // ZP_MASTER_GLOW
+
+uniform float4 _ExposureIBL;
+
+ZP_CBUFFER_START( SH, 4 )
+    float3 _SH0;
+    float3 _SH1;
+    float3 _SH2;
+    float3 _SH3;
+    float3 _SH4;
+    float3 _SH5;
+    float3 _SH6;
+    float3 _SH7;
+    float3 _SH8;
+ZP_CBUFFER_END
 
 struct MasterInput
 {
-	#ifdef ZP_MASTER_SPECULAR_IBL
-	float4 viewDir;
-	#endif
-	
-	float4 worldNormal;
-	float4 worldPosition;
-	
-	#ifdef ZP_MASTER_VERTEX_COLOR
-	float4 color;
-	#endif
-	
-	float2 texcoord;
+    #ifdef ZP_MASTER_SPECULAR_IBL
+    float4 viewDir;
+    #endif // ZP_MASTER_SPECULAR_IBL
+
+    float4 worldNormal;
+    float4 worldPosition;
+
+    #ifdef ZP_MASTER_VERTEX_COLOR
+    float4 color;
+    #endif // ZP_MASTER_VERTEX_COLOR
+
+    float2 texcoord;
 };
 
 struct MasterOutput
 {
-	float4 albedo;
-	float4 normal;
-	float4 emission;
-	float4 specular;
+    float4 albedo;
+    float4 normal;
+    float4 emission;
+    float4 specular;
 };
 
 struct vs_input_master
 {
-	float4 vertex : POSITION;
-	float4 normal : NORMAL;
-	float4 color : COLOR;
-	float2 texcoord : TEXCOORD0;
+    float4 vertex : POSITION;
+    float4 normal : NORMAL;
+    float4 color : COLOR;
+    float2 texcoord : TEXCOORD0;
 };
 
 struct v2f_master
 {
-	float4 vertex : SV_POSITION;
-	float2 texcoord : TEXCOORD0;
-	float3 normal : NORMAL;
-	float4 lighting : TEXCOORD1;
-	float3 worldNormal : TEXCOORD2;
-	float4 worldPosition : TEXCOORD3;
+    float4 vertex : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
+    float4 normal : NORMAL;
+    float4 lighting : TEXCOORD1;
+    float4 worldNormal : TEXCOORD2;
+    float4 worldPosition : TEXCOORD3;
+
 #if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
-	float3 viewDir : TEXCOORD4;
-#endif
+    float4 viewDir : TEXCOORD4;
+#endif // ZP_MASTER_SPECULAR_IBL || ZP_MASTER_SPECULAR_DIRECT
+
 #ifdef ZP_MASTER_SPECULAR_IBL
-	float3 worldRefl : TEXCOORD5;
-#endif
+    float4 worldRefl : TEXCOORD5;
+#endif // ZP_MASTER_SPECULAR_IBL
+
 #ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
-	float4 vertexIBL : TEXCOORD6;
-#endif
+    float4 vertexIBL : TEXCOORD6;
+#endif // ZP_MASTER_DIFFUSE_VERTEX_IBL
+
+    float4 lightDir : TEXCOORD7;
+
 #ifdef ZP_MASTER_VERTEX_COLOR
-	float4 color : COLOR;
-#endif
+    float4 color : COLOR;
+#endif // ZP_MASTER_VERTEX_COLOR
 };
 
 #endif
