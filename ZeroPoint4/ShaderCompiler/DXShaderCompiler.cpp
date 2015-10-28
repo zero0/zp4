@@ -65,7 +65,10 @@ public:
 			includeFile.readFileBinary( m_data );
 			includeFile.close();
 
-			*ppData = m_data.getData();
+			zp_byte* data = new zp_byte[ m_data.size() ];
+			zp_memcpy( data, m_data.size(), m_data.getData(), m_data.size() );
+
+			*ppData = data;
 			*pBytes = m_data.size();
 		}
 		else
@@ -78,7 +81,8 @@ public:
 
 	HRESULT __stdcall Close( LPCVOID pData )
 	{
-		m_data.destroy();
+		zp_byte* data = (zp_byte*)pData;
+		ZP_SAFE_DELETE_ARRAY( data );
 		return S_OK;
 	}
 
