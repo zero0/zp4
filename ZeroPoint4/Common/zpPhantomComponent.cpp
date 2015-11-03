@@ -6,11 +6,20 @@ zpPhantomComponent::zpPhantomComponent( zpObject* obj, const zpBison::Value& def
 	, m_addOnCreate( true )
 	, m_isAdded( false )
 {
-	m_phantom.create( getApplication()->getPhysicsEngine(), obj->getComponents()->getTransformComponent()->getWorldTransform(), def );
+	zpPhysicsEngine* engine = getApplication()->getPhysicsEngine();
+	zp_short group = engine->getCollisionMask()->getCollisionMask( def[ "Group" ].asCString() );
+	zp_short mask =  engine->getCollisionMask()->getCollisionMask( def[ "Mask" ].asCString() );
+	zpCollider* collider = engine->getColliderCache()->getCollider( def[ "Collider" ] );
+	zpMatrix4f transform = obj->getComponents()->getTransformComponent()->getWorldTransform();
+
+	m_phantom.create( transform, group, mask, collider, engine );
 }
 zpPhantomComponent::~zpPhantomComponent()
 {
-	m_phantom.destroy( getApplication()->getPhysicsEngine() );
+	zpPhysicsEngine* engine = getApplication()->getPhysicsEngine();
+	engine->getColliderCache()->removeCollider( m_phantom.getCollider() );
+
+	m_phantom.destroy( engine );
 }
 
 void zpPhantomComponent::onCollisionEnter( const zpPhantomCollisionHitInfo& hit )
@@ -59,7 +68,7 @@ void zpPhantomComponent::onInitialize()
 	if( m_addOnCreate )
 	{
 		m_phantom.setCollisionCallback( this );
-		getParentObject()->getApplication()->getPhysicsEngine()->addPhantom( &m_phantom );
+		getApplication()->getPhysicsEngine()->addPhantom( &m_phantom );
 		m_isAdded = true;
 	}
 }
@@ -67,7 +76,7 @@ void zpPhantomComponent::onDestroy()
 {
 	if( m_isAdded )
 	{
-		getParentObject()->getApplication()->getPhysicsEngine()->removePhantom( &m_phantom );
+		getApplication()->getPhysicsEngine()->removePhantom( &m_phantom );
 		m_phantom.setCollisionCallback( ZP_NULL );
 		m_isAdded = false;
 	}
@@ -77,7 +86,7 @@ void zpPhantomComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
 	if( m_isAdded )
 	{
-		const zpMatrix4f& transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
+		zpMatrix4f transform = getParentObject()->getComponents()->getTransformComponent()->getWorldTransform();
 		m_phantom.setMatrix( transform );
 	}
 }
@@ -91,7 +100,7 @@ void zpPhantomComponent::onEnabled()
 	if( m_addOnEnable && !m_isAdded )
 	{
 		m_phantom.setCollisionCallback( this );
-		getParentObject()->getApplication()->getPhysicsEngine()->addPhantom( &m_phantom );
+		getApplication()->getPhysicsEngine()->addPhantom( &m_phantom );
 		m_isAdded = true;
 	}
 }
@@ -99,7 +108,7 @@ void zpPhantomComponent::onDisabled()
 {
 	if( m_addOnEnable && m_isAdded )
 	{
-		getParentObject()->getApplication()->getPhysicsEngine()->removePhantom( &m_phantom );
+		getApplication()->getPhysicsEngine()->removePhantom( &m_phantom );
 		m_phantom.setCollisionCallback( ZP_NULL );
 		m_isAdded = false;
 	}

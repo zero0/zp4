@@ -15,11 +15,11 @@ zpPhantom::zpPhantom()
 zpPhantom::~zpPhantom()
 {}
 
-void zpPhantom::create( zpPhysicsEngine* engine, const zpMatrix4f& transform, const zpBison::Value& v )
+void zpPhantom::create( zpMatrix4fParamF transform, zp_short group, zp_short mask, zpCollider* collider, zpPhysicsEngine* engine )
 {
-	m_group = engine->getCollisionMask()->getCollisionMask( v[ "Group" ].asCString() );
-	m_mask =  engine->getCollisionMask()->getCollisionMask( v[ "Mask" ].asCString() );
-	m_collider = engine->getColliderCache()->getCollider( v[ "Collider" ] );
+	m_group = group;
+	m_mask = mask;
+	m_collider = collider;
 	btCollisionShape* shape = (btCollisionShape*)m_collider->getCollider();
 
 	btPairCachingGhostObject* ghost = new btPairCachingGhostObject();
@@ -38,7 +38,6 @@ void zpPhantom::create( zpPhysicsEngine* engine, const zpMatrix4f& transform, co
 }
 void zpPhantom::destroy( zpPhysicsEngine* engine )
 {
-	engine->getColliderCache()->removeCollider( m_collider );
 	m_collider = ZP_NULL;
 
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
@@ -47,7 +46,7 @@ void zpPhantom::destroy( zpPhysicsEngine* engine )
 	m_phantom = ZP_NULL;
 }
 
-void zpPhantom::setMatrix( const zpMatrix4f& transform )
+void zpPhantom::setMatrix( zpMatrix4fParamF transform )
 {
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
 
@@ -59,7 +58,7 @@ void zpPhantom::setMatrix( const zpMatrix4f& transform )
 
 	ghost->setWorldTransform( t );
 }
-zp_bool zpPhantom::getMatrix( zpMatrix4f& transform ) const
+zpMatrix4f zpPhantom::getMatrix() const
 {
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
 
@@ -68,8 +67,8 @@ zp_bool zpPhantom::getMatrix( zpMatrix4f& transform ) const
 	ZP_ALIGN16 zp_float matrix[ 16 ];
 	t.getOpenGLMatrix( matrix );
 
-	transform = zpMath::MatrixLoadOpenGL( matrix );
-	return true;
+	zpMatrix4f transform = zpMath::MatrixLoadOpenGL( matrix );
+	return transform;
 }
 
 zp_short zpPhantom::getGroup() const
@@ -85,8 +84,12 @@ zp_handle zpPhantom::getPhantom() const
 {
 	return m_phantom;
 }
+zpCollider* zpPhantom::getCollider() const
+{
+	return m_collider;
+}
 
-zp_bool zpPhantom::rayTest( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const
+zp_bool zpPhantom::rayTest( zpVector4fParamF fromWorld,zpVector4fParamF toWorld, zpCollisionHitResult& hit ) const
 {
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
 
@@ -95,15 +98,15 @@ zp_bool zpPhantom::rayTest( const zpVector4f& fromWorld, const zpVector4f& toWor
 
 	ghost->rayTest( from, to, cb );
 
-	if( cb.hasHit() )
+	zp_bool isHit = cb.hasHit();
+	if( isHit )
 	{
 		hit.position = zpMath::Vector4Load4( cb.m_hitPointWorld.m_floats );
 		hit.normal = zpMath::Vector4Load4( cb.m_hitNormalWorld.m_floats );
 		hit.hitObject = cb.m_collisionObject ? cb.m_collisionObject->getUserPointer() : ZP_NULL;
-		return true;
 	}
 
-	return false;
+	return isHit;
 }
 
 void zpPhantom::processCollisions( zp_handle dymaicsWorld, zp_float timeStep )

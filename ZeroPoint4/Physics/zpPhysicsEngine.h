@@ -28,8 +28,8 @@ public:
 	void update( zp_float dt );
 	void simulate();
 
-	const zpVector4f& getGravity() const;
-	void setGravity( const zpVector4f& gravity );
+	zpVector4f getGravity() const;
+	void setGravity( zpVector4fParamF gravity );
 
 	void addRigidBody( zpRigidBody* body );
 	void removeRigidBody( zpRigidBody* body );
@@ -42,7 +42,7 @@ public:
 
 	void setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps );
 
-	zp_bool raycast( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const;
+	zp_bool raycast( zpVector4fParamF fromWorld, zpVector4fParamF toWorld, zpCollisionHitResult& hit ) const;
 
 	void setDebugDrawer( zpIDebugPhysicsDebugDrawer* drawer );
 	void debugDraw();

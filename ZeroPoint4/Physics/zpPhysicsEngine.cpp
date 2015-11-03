@@ -156,11 +156,11 @@ void zpPhysicsEngine::simulate()
 	
 }
 
-const zpVector4f& zpPhysicsEngine::getGravity() const
+zpVector4f zpPhysicsEngine::getGravity() const
 {
 	return m_gravity;
 }
-void zpPhysicsEngine::setGravity( const zpVector4f& gravity )
+void zpPhysicsEngine::setGravity( zpVector4fParamF gravity )
 {
 	m_gravity = gravity;
 
@@ -226,7 +226,7 @@ void zpPhysicsEngine::setFixedTimeStep( zp_float fixedTimeStep, zp_int numSteps 
 	m_numSubStep = numSteps;
 }
 
-zp_bool zpPhysicsEngine::raycast( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const
+zp_bool zpPhysicsEngine::raycast( zpVector4fParamF fromWorld, zpVector4fParamF toWorld, zpCollisionHitResult& hit ) const
 {
 	btDiscreteDynamicsWorld* dynamicsWorld = (btDiscreteDynamicsWorld*)m_dynamicsWorld;
 
@@ -237,15 +237,15 @@ zp_bool zpPhysicsEngine::raycast( const zpVector4f& fromWorld, const zpVector4f&
 	btCollisionWorld::ClosestRayResultCallback cb( from, to );
 	dynamicsWorld->rayTest( from, to, cb );
 
-	if( cb.hasHit() )
+	zp_bool isHit = cb.hasHit();
+	if( isHit )
 	{
 		hit.position = zpMath::Vector4Load4( cb.m_hitPointWorld.m_floats );
 		hit.normal = zpMath::Vector4Load4( cb.m_hitNormalWorld.m_floats );
 		hit.hitObject = cb.m_collisionObject ? cb.m_collisionObject->getUserPointer() : ZP_NULL;
-		return true;
 	}
 
-	return false;
+	return isHit;
 }
 
 void zpPhysicsEngine::setDebugDrawer( zpIDebugPhysicsDebugDrawer* drawer )

@@ -31,18 +31,19 @@ public:
 	zpPhantom();
 	~zpPhantom();
 
-	void create( zpPhysicsEngine* engine, const zpMatrix4f& transform, const zpBison::Value& v );
+	void create( zpMatrix4fParamF transform, zp_short group, zp_short mask, zpCollider* collider, zpPhysicsEngine* engine );
 	void destroy( zpPhysicsEngine* engine );
 
-	void setMatrix( const zpMatrix4f& transform );
-	zp_bool getMatrix( zpMatrix4f& transform ) const;
+	void setMatrix( zpMatrix4fParamF transform );
+	zpMatrix4f getMatrix() const;
 
 	zp_short getGroup() const;
 	zp_short getMask() const;
 
 	zp_handle getPhantom() const;
+	zpCollider* getCollider() const;
 
-	zp_bool rayTest( const zpVector4f& fromWorld, const zpVector4f& toWorld, zpCollisionHitResult& hit ) const;
+	zp_bool rayTest( zpVector4fParamF fromWorld, zpVector4fParamF toWorld, zpCollisionHitResult& hit ) const;
 
 	void processCollisions( zp_handle dymaicsWorld, zp_float timeStep );
 
