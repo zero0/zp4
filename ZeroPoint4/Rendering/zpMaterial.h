@@ -17,8 +17,8 @@ class zpMaterialContentManager;
 struct zpMaterialGlobalVariable
 {
 	zpString name;
-	zp_uint offset;
-	zp_uint size;
+	zp_size_t offset;
+	zp_size_t size;
 };
 struct zpMaterialTexture
 {
@@ -26,7 +26,7 @@ struct zpMaterialTexture
 	zpTextureResourceInstance texture;
 	zpSamplerState sampler;
 	zpVector4f scaleOffset;
-	zp_uint slot;
+	zp_size_t slot;
 };
 struct zpMaterial
 {

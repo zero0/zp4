@@ -135,7 +135,7 @@ zpVector4f zpTransformComponent::getLocalScale() const
 
 zpVector4f zpTransformComponent::getWorldPosition() const
 {
-	return m_worldTransform.r[ 3 ];
+	return m_worldTransform.m_m4;
 }
 
 zpMatrix4f zpTransformComponent::getWorldTransform() const
@@ -162,7 +162,7 @@ void zpTransformComponent::setParent( zpTransformComponent* parent )
 	// otherwise, remove child of old parent and clear parent
 	else if( m_parent != ZP_NULL )
 	{
-		zp_int i = m_parent->findChildDirect( this );
+		zp_size_t i = m_parent->findChildDirect( this );
 		m_parent->removeChild( i );
 	}
 
@@ -181,16 +181,16 @@ zpTransformComponent* zpTransformComponent::getParent() const
 	return m_parent;
 }
 
-zp_uint zpTransformComponent::getChildCount() const
+zp_size_t zpTransformComponent::getChildCount() const
 {
 	return m_children.size();
 }
-zpTransformComponent* zpTransformComponent::getChild( zp_uint index ) const
+zpTransformComponent* zpTransformComponent::getChild( zp_size_t index ) const
 {
 	return m_children[ index ];
 }
 
-zpTransformComponent* zpTransformComponent::removeChild( zp_uint index )
+zpTransformComponent* zpTransformComponent::removeChild( zp_size_t index )
 {
 	zpTransformComponent* child = m_children[ index ];
 	m_children.erase( index );
@@ -204,7 +204,7 @@ void zpTransformComponent::addChild( zpTransformComponent* child )
 {
 	if( child->m_parent != ZP_NULL )
 	{
-		zp_int i = child->m_parent->findChildDirect( child );
+		zp_size_t i = child->m_parent->findChildDirect( child );
 		child->m_parent->removeChild( i );
 	}
 
@@ -252,7 +252,8 @@ void zpTransformComponent::onDestroy()
 
 void zpTransformComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
-	if( getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY ) )
+	zp_bool dirty = getParentObject()->isFlagSet( ZP_OBJECT_FLAG_TRANSFORM_DIRTY );
+	if( dirty )
 	{
 		m_worldTransform = m_localTransform;
 
@@ -286,16 +287,16 @@ void zpTransformComponent::onDisabled()
 	} );
 }
 
-zp_int zpTransformComponent::findChildDirect( zpTransformComponent* child )
+zp_size_t zpTransformComponent::findChildDirect( zpTransformComponent* child )
 {
-	zp_int i = m_children.indexOf( child );
+	zp_size_t i = m_children.indexOf( child );
 	return i;
 }
 
 
 zpTransformOctreeNode::zpTransformOctreeNode()
 	: m_isLeaf( true )
-	, m_maxObjectCount( 32 )
+	, m_maxObjectCount( ZP_TRANSFORM_OCTREE_MAX_OBJECTS )
 	, m_tree( ZP_NULL )
 	, m_parent( ZP_NULL )
 {}
@@ -372,8 +373,8 @@ zp_bool zpTransformOctreeNode::remove( zpTransformComponent* obj )
 	// if leaf, remove from objects
 	if( m_isLeaf )
 	{
-		zp_int index = m_objects.indexOf( obj );
-		if( index >= 0 )
+		zp_size_t index = m_objects.indexOf( obj );
+		if( index != zpArrayList< zpTransformComponent* >::npos )
 		{
 			m_objects.erase( index );
 			removed = true;
@@ -393,7 +394,7 @@ zp_bool zpTransformOctreeNode::remove( zpTransformComponent* obj )
 		if( removed )
 		{
 			// if the count is zero, remove children and become a leaf again
-			zp_int count = getObjectCount();
+			zp_size_t count = getObjectCount();
 			if( count == 0 )
 			{
 				// convert back to a leaf
@@ -433,9 +434,9 @@ const zpBoundingAABB& zpTransformOctreeNode::getBounts() const
 	return m_bounds;
 }
 
-zp_int zpTransformOctreeNode::getObjectCount() const
+zp_size_t zpTransformOctreeNode::getObjectCount() const
 {
-	zp_int count = 0;
+	zp_size_t count = 0;
 
 	if( m_isLeaf )
 	{
@@ -537,7 +538,7 @@ void zpTransformOctree::remove( zpTransformComponent* obj )
 
 void zpTransformOctree::setup()
 {
-	m_nodes.resize( 128 );
+	m_nodes.resize( ZP_TRANSFORM_OCTREE_MAX_NODES );
 
 	zpTransformOctreeNode* b = m_nodes.begin();
 	zpTransformOctreeNode* e = m_nodes.end();
@@ -559,7 +560,7 @@ const zpBoundingAABB& zpTransformOctree::getBounts() const
 	return m_root->getBounts();
 }
 
-zp_int zpTransformOctree::getObjectCount() const
+zp_size_t zpTransformOctree::getObjectCount() const
 {
 	return m_root->getObjectCount();
 }
@@ -574,7 +575,7 @@ zpTransformOctreeNode* zpTransformOctree::createNode()
 }
 void zpTransformOctree::destroyNode( zpTransformOctreeNode* node )
 {
-	zp_int index = m_usedNodes.indexOf( node );
+	zp_size_t index = m_usedNodes.indexOf( node );
 	m_usedNodes.erase( index );
 	m_freeNodes.pushBack( node );
 }

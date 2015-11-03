@@ -22,6 +22,12 @@ private:
 	friend class zpEventManager;
 };
 
+struct zpQueuedEvent
+{
+	zpString eventName;
+	zpObject* sender;
+};
+
 ZP_PURE_INTERFACE zpEventListener
 {
 public:
@@ -35,6 +41,10 @@ public:
 	zpEventManager();
 	~zpEventManager();
 
+	void setup();
+	void update();
+	void teardown();
+
 	void addEventListener( const zp_char* eventName, zpEventListener* listener, zpEventHandler& handler );
 	void addEventListener( const zpString& eventName, zpEventListener* listener, zpEventHandler& handler );
 
@@ -47,6 +57,9 @@ public:
 	void sendEvent( const zp_char* eventName, zpObject* sender );
 	void sendEvent( const zpString& eventName, zpObject* sender );
 
+	void queueEvent( const zp_char* eventName, zpObject* sender );
+	void queueEvent( const zpString& eventName, zpObject* sender );
+
 private:
 	zp_bool findEvent( const zp_char* eventName, zp_size_t& index );
 	zp_bool findEvent( const zpString& eventName, zp_size_t& index );
@@ -56,6 +69,8 @@ private:
 
 	zpArrayList< zpString > m_eventNames;
 	zpArrayList< zpArrayList< zpEventListener* > > m_eventListeners;
+
+	zpArrayList< zpQueuedEvent > m_eventQueue;
 };
 
 #endif

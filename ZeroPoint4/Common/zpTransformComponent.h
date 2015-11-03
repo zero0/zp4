@@ -29,10 +29,10 @@ public:
 	void setParent( zpTransformComponent* parent );
 	zpTransformComponent* getParent() const;
 
-	zp_uint getChildCount() const;
-	zpTransformComponent* getChild( zp_uint index ) const;
+	zp_size_t getChildCount() const;
+	zpTransformComponent* getChild( zp_size_t index ) const;
 
-	zpTransformComponent* removeChild( zp_uint index );
+	zpTransformComponent* removeChild( zp_size_t index );
 
 	void addChild( zpTransformComponent* child );
 	void addChild( zpTransformComponent* child, zpVector4fParamF localPosition );
@@ -53,7 +53,7 @@ protected:
 	void onDisabled();
 
 private:
-	zp_int findChildDirect( zpTransformComponent* child );
+	zp_size_t findChildDirect( zpTransformComponent* child );
 
 	zpVector4f m_localPosition;
 	zpQuaternion4f m_localRotation;
@@ -82,7 +82,7 @@ public:
 
 	const zpBoundingAABB& getBounts() const;
 
-	zp_int getObjectCount() const;
+	zp_size_t getObjectCount() const;
 
 	template<typename Func>
 	void foreachNode( Func func )
@@ -117,11 +117,16 @@ private:
 		zpTransformOctreeNodeSide_Count,
 	};
 
+	enum
+	{
+		ZP_TRANSFORM_OCTREE_MAX_OBJECTS = 32
+	};
+
 	zp_bool add( zpTransformComponent* obj );
 	void subdivide();
 
 	zp_bool m_isLeaf;
-	zp_uint m_maxObjectCount;
+	zp_size_t m_maxObjectCount;
 
 	zpBoundingAABB m_bounds;
 
@@ -129,11 +134,15 @@ private:
 	zpTransformOctreeNode* m_parent;
 	zpFixedArrayList< zpTransformOctreeNode*, zpTransformOctreeNodeSide_Count > m_children;
 
-	zpFixedArrayList< zpTransformComponent*, 32 > m_objects;
+	zpFixedArrayList< zpTransformComponent*, ZP_TRANSFORM_OCTREE_MAX_OBJECTS > m_objects;
 };
 
 class zpTransformOctree
 {
+	enum
+	{
+		ZP_TRANSFORM_OCTREE_MAX_NODES = 64
+	};
 public:
 	void insert( zpTransformComponent* obj );
 	void remove( zpTransformComponent* obj );
@@ -143,7 +152,7 @@ public:
 
 	const zpBoundingAABB& getBounts() const;
 
-	zp_int getObjectCount() const;
+	zp_size_t getObjectCount() const;
 
 	zpTransformOctreeNode* createNode();
 	void destroyNode( zpTransformOctreeNode* node );
@@ -159,10 +168,10 @@ public:
 private:
 	zpTransformOctreeNode* m_root;
 
-	zpFixedArrayList< zpTransformOctreeNode, 128 > m_nodes;
+	zpFixedArrayList< zpTransformOctreeNode, ZP_TRANSFORM_OCTREE_MAX_NODES > m_nodes;
 
-	zpFixedArrayList< zpTransformOctreeNode*, 128 > m_usedNodes;
-	zpFixedArrayList< zpTransformOctreeNode*, 128 > m_freeNodes;
+	zpFixedArrayList< zpTransformOctreeNode*, ZP_TRANSFORM_OCTREE_MAX_NODES > m_usedNodes;
+	zpFixedArrayList< zpTransformOctreeNode*, ZP_TRANSFORM_OCTREE_MAX_NODES > m_freeNodes;
 };
 
 class zpTransformComponentPool : public zpContentPool< zpTransformComponent, 64 >

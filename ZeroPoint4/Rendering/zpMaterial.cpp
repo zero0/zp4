@@ -122,8 +122,8 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 			m_resource.materialTextures.reserve( matTextures.size() );
 			matTextures.foreachObject( [ this, pipeline, &textures ]( const zpBison::Value& key, const zpBison::Value& textureValue ) {
 				zpString name( key.asCString() );
-				zp_int slot = textures.indexOf( name );
-				if( slot >= 0 )
+				zp_size_t slot = textures.indexOf( name );
+				if( slot != zpArrayList< zpString >::npos )
 				{
 					const zp_char* textureFile = textureValue[ "Texture" ].asCString();
 

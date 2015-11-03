@@ -243,6 +243,7 @@ void zpApplication::setup()
 
 	m_renderingPipeline.setup();
 	m_gui.setup();
+	m_eventManager.setup();
 
 	zp_bool ok;
 	ok = m_textContent.getResource( m_optionsFilename, m_appOptions );
@@ -331,6 +332,7 @@ void zpApplication::teardown()
 
 	m_renderingPipeline.teardown();
 	m_gui.teardown();
+	m_eventManager.teardown();
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )		m_componentPool##cmp.teardown();
@@ -420,6 +422,9 @@ void zpApplication::update()
 		// collect garbage next frame
 		garbageCollect();
 	}
+
+	// pump queued events
+	m_eventManager.update();
 
 	// update phases
 	ZP_PROFILE_START( UPDATE_PHASE );

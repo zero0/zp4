@@ -6,13 +6,14 @@
 #include "src/BulletCollision/CollisionDispatch/btGhostObject.h"
 
 zpPhantom::zpPhantom()
-{
-	
-}
+	: m_phantom( ZP_NULL )
+	, m_collider( ZP_NULL )
+	, m_group( 0 )
+	, m_mask( 0 )
+	, m_collisionCallback( ZP_NULL )
+{}
 zpPhantom::~zpPhantom()
-{
-	
-}
+{}
 
 void zpPhantom::create( zpPhysicsEngine* engine, const zpMatrix4f& transform, const zpBison::Value& v )
 {
@@ -116,6 +117,7 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld, zp_float timeStep )
 	zpFixedArrayList< zpPhantomCollisionHitInfo, ZP_PHANTON_MAX_TRACKED_OBJECTS > hits;
 	zpFixedArrayList< zp_handle, ZP_PHANTON_MAX_TRACKED_OBJECTS > currentlyTracked = m_trackedObjects;
 
+	// determine collisions
 	const btBroadphasePairArray& pairs = ghost->getOverlappingPairCache()->getOverlappingPairArray();
 	for( zp_int i = 0, imax = pairs.size(); i < imax; ++i )
 	{
@@ -147,6 +149,7 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld, zp_float timeStep )
 		}
 	}
 
+	// track new and persisting collisions
 	zpPhantomCollisionHitInfo* b = hits.begin();
 	zpPhantomCollisionHitInfo* e = hits.end();
 	for( ; b != e; ++b )
@@ -165,6 +168,7 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld, zp_float timeStep )
 		}
 	}
 
+	// determine the collisions that have left
 	zp_handle* cb = currentlyTracked.begin();
 	zp_handle* ce = currentlyTracked.end();
 	for( ; cb != ce; ++cb )
@@ -175,14 +179,24 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld, zp_float timeStep )
 	}
 }
 
+void zpPhantom::setCollisionCallback( zpPhantomCollisionCallback* callback )
+{
+	m_collisionCallback = callback;
+}
+zpPhantomCollisionCallback* zpPhantom::getCollisionCallback() const
+{
+	return m_collisionCallback;
+}
+
 void zpPhantom::onCollisionEnter( const zpPhantomCollisionHitInfo& hit )
 {
-	zp_printfln( "Collition Enter" );
+	if( m_collisionCallback ) m_collisionCallback->onCollisionEnter( hit );
 }
 void zpPhantom::onCollisionStay( const zpPhantomCollisionHitInfo& hit )
 {
+	if( m_collisionCallback ) m_collisionCallback->onCollisionStay( hit );
 }
 void zpPhantom::onCollisionLeave( zp_handle otherObject )
 {
-	zp_printfln( "Collision Leave" );
+	if( m_collisionCallback ) m_collisionCallback->onCollisionLeave( otherObject );
 }

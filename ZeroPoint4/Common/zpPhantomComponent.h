@@ -2,11 +2,15 @@
 #ifndef ZP_PHANTOM_COMPONENT_H
 #define ZP_PHANTOM_COMPONENT_H
 
-class zpPhantomComponent : public zpComponent
+class zpPhantomComponent : public zpComponent, public zpPhantomCollisionCallback
 {
 public:
 	zpPhantomComponent( zpObject* obj, const zpBison::Value& def );
 	virtual ~zpPhantomComponent();
+
+	void onCollisionEnter( const zpPhantomCollisionHitInfo& hit );
+	void onCollisionStay( const zpPhantomCollisionHitInfo& hit );
+	void onCollisionLeave( zp_handle otherObject );
 
 protected:
 	void onCreate();
@@ -27,11 +31,11 @@ private:
 	zpPhantom m_phantom;
 
 	zpString m_eventOnEnter;
-	zpString m_eventOnOverlap;
+	zpString m_eventOnStay;
 	zpString m_eventOnLeave;
 
 	zpString m_messageOnEnter;
-	zpString m_messageOnOverlap;
+	zpString m_messageOnStay;
 	zpString m_messageOnLeave;
 };
 
