@@ -59,7 +59,11 @@ zpCollider* zpColliderCache::getCollider( const zpBison::Value& v )
 	zp_hash h = generateColliderHash( v, shape, p, d, s );
 
 	zpColliderPair* cp = ZP_NULL;
-	if( m_colliders.find( h, &cp ) )
+	zp_bool found = m_colliders.findIf( [ h ]( const zpColliderPair& pair ) {
+		return pair.hash == h;
+	}, &cp );
+
+	if( found )
 	{
 		cp->refCount++;
 	}
@@ -115,28 +119,46 @@ zpCollider* zpColliderCache::getCollider( const zpBison::Value& v )
 
 		collider->setUserPointer( (void*)h );
 
-		cp = &m_colliders[ h ];
+		// find a zero-ref count object first
+		zp_bool found = m_colliders.findIf( []( const zpColliderPair& pair ) {
+			return pair.refCount == 0;
+		}, &cp );
+
+		// otherwise, push back a new collider
+		if( !found )
+		{
+			cp = &m_colliders.pushBackEmpty();
+		}
 		
+		cp->hash = h;
 		cp->refCount = 1;
-		cp->collider.m_collider = collider;
-		cp->collider.m_shape = shape;
+		cp->collider = new zpCollider;
+		cp->collider->m_collider = collider;
+		cp->collider->m_shape = shape;
 	}
 
-	return &cp->collider;
+	return cp->collider;
 }
 void zpColliderCache::removeCollider( zpCollider* collider )
 {
 	btCollisionShape* c = (btCollisionShape*)collider->getCollider();
 	zp_hash h = (zp_hash)c->getUserPointer();
 
-	zpColliderPair* cp = ZP_NULL;
-	if( m_colliders.find( h, &cp ) )
+	zp_size_t index;
+	zp_bool found = m_colliders.findIndexIf( [ h ]( const zpColliderPair& pair ) {
+		return pair.hash == h;
+	}, index );
+
+	if( found )
 	{
+		zpColliderPair* cp = &m_colliders[ index ];
+
 		--cp->refCount;
 		if( cp->refCount == 0 )
 		{
 			ZP_SAFE_DELETE( c );
-			m_colliders.erase( h );
+			ZP_SAFE_DELETE( cp->collider );
+			m_colliders.erase( index );
 		}
 	}
 }
