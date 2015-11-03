@@ -340,13 +340,13 @@ void zpMemorySystem::initialize( zp_size_t size )
 	m_totalAlignedMemory = ZP_MEMORY_ALIGN_SIZE( size );
 	m_allocatedMemorySize = m_totalAlignedMemory + ZP_MEMORY_INCREMENT_SIZE + sizeof( zpMemoryBlock );
 
-	m_allMemory = (zp_byte*)zp_malloc( m_allocatedMemorySize + sizeof( zp_uint ) );
+	m_allMemory = (zp_byte*)zp_malloc( m_allocatedMemorySize + sizeof( zp_size_t ) );
 #if ZP_DEBUG
 	zp_memset( m_allMemory, 0, m_allocatedMemorySize );
-	*( (zp_uint*)( m_allMemory + m_allocatedMemorySize ) ) = ZP_MEMORY_SYSTEM_END_CANARY;
+	*( (zp_size_t*)( m_allMemory + m_allocatedMemorySize ) ) = ZP_MEMORY_SYSTEM_END_CANARY;
 #endif
 
-	zp_int distance = ZP_MEMORY_INCREMENT_SIZE - ( (zp_int)m_allMemory & ZP_MEMORY_INCREMENT_MASK );
+	zp_size_t distance = ZP_MEMORY_INCREMENT_SIZE - ( (zp_size_t)m_allMemory & ZP_MEMORY_INCREMENT_MASK );
 	m_alignedMemory = m_allMemory + distance;
 
 	zpMemoryBlock* block = reinterpret_cast< zpMemoryBlock* >( m_alignedMemory );
@@ -357,7 +357,9 @@ void zpMemorySystem::initialize( zp_size_t size )
 }
 void zpMemorySystem::shutdown()
 {
-	ZP_ASSERT( *( (zp_uint*)( m_allMemory + m_allocatedMemorySize ) ) == ZP_MEMORY_SYSTEM_END_CANARY, "Buffer overrun" );
+#if ZP_DEBUG
+	ZP_ASSERT( *( (zp_size_t*)( m_allMemory + m_allocatedMemorySize ) ) == ZP_MEMORY_SYSTEM_END_CANARY, "Buffer overrun" );
+#endif
 
 #if ZP_MEMORY_TRACK_POINTERS
 	if( !m_stackTraces.isEmpty() )
