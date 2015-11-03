@@ -11,7 +11,10 @@
                 50
             ]
         },
-
+        "MeshRenderer": {
+            "Mesh": "meshes/cube.meshb",
+            "Material" : "materials/cube.materialb"
+        },
         "RigidBody": {
             "Mass": 0,
             "Group": "Main",

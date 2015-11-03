@@ -4,7 +4,7 @@
     {
         "_MainTex" :
         {
-            "Texture" : "textures/test.textureb",
+            "Texture" : "textures/checker_d.textureb",
             "Scale" : [ 1, 1 ],
             "Offset" : [ 0, 0 ],
             "Sampler" : {}

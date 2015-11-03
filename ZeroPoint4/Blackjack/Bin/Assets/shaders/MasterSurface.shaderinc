@@ -31,10 +31,10 @@ inline void MasterSurface( in MasterInput input, inout MasterOutput output )
         diffSpec = diff.aaaa;
     #endif // ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
 
-        diff.rgb *= exposureIBL.w;
+    diff.rgb *= exposureIBL.w;
 
-        output.albedo = diff;
-#else // ZP_MASTER_DIFFUSE_IBL || ZP_MASTER_DIFFUSE_DIRECT
+    output.albedo = diff;
+#else // !ZP_MASTER_DIFFUSE_IBL || !ZP_MASTER_DIFFUSE_DIRECT
     #ifdef ZP_MASTER_DIFFUSE_DIRECT
         output.albedo.rgb = baseColor.rgb;
     #else // !ZP_MASTER_DIFFUSE_DIRECT
@@ -90,7 +90,11 @@ inline void MasterSurface( in MasterInput input, inout MasterOutput output )
 
     float3 skyR = reflect( -worldE, worldN );
 
+#ifdef ZP_MASTER_SPECULAR_IBL_3D
     float4 specIBL = texCUBE( _SpecIBL, skyR );
+#else // !ZP_MASTER_SPECULAR_IBL_3D
+    float4 specIBL = tex2D( _SpecIBL, skyR.xy ); // TODO: convert to lat-laung for 2D specular
+#endif // ZP_MASTER_SPECULAR_IBL_3D
 
     output.emission.rgb += ( specIBL.rgb * spec.rgb ) * exposureIBL.y;
 #endif // ZP_MASTER_SPECULAR_IBL

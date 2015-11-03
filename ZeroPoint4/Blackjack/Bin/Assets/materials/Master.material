@@ -1,0 +1,50 @@
+{
+    "Shader" : "shaders/Master Bumped Specular IBL.shaderb",
+    "Textures" :
+    {
+        "_MainTex" :
+        {
+            "Texture" : "textures/checker_d.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        },
+        "_BumpMap" :
+        {
+            "Texture" : "textures/checker_n.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        },
+        "_SpecTex" :
+        {
+            "Texture" : "textures/checker_s.textureb",
+            "Scale" : [ 1, 1 ],
+            "Offset" : [ 0, 0 ],
+            "Sampler" : {}
+        }
+    },
+    "Globals" :
+    {
+        "_Color" :
+        {
+            "Type" : "Color",
+            "Value": [ 1, 1, 1, 1 ]
+        },
+        "_SpecInt" :
+        {
+            "Type" : "Float",
+            "Value" : 1
+        },
+        "_Shininess" :
+        {
+            "Type" : "Float",
+            "Value" : 1
+        },
+        "_Fresnel" :
+        {
+            "Type" : "Float",
+            "Value" : 1
+        }
+    }
+}

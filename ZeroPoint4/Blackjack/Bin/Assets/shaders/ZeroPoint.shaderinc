@@ -127,7 +127,7 @@ inline float4 WorldSpaceViewDir( in float4 v )
 
 inline float3 UnpackNormal( in float4 packednormal )
 {
-    return packednormal.xyz * 2 - 1;
+    return ( packednormal.xyz * 2 ) - 1;
 }
 
 #endif
