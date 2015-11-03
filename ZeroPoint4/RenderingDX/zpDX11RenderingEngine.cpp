@@ -1150,7 +1150,6 @@ zp_bool zpRenderingEngineImpl::getInputLayoutFormatAndStride( const zp_char* for
 		return i.hash == hash;
 	}, &dynInput );
 
-	ZP_ASSERT( found, "Unable to find input layout %s", format );
 	if( found )
 	{
 		outHash = dynInput->hash;

@@ -26,7 +26,7 @@ void zpPhantom::create( zpPhysicsEngine* engine, const zpMatrix4f& transform, co
 	ghost->setCollisionShape( shape );
 	ghost->setCollisionFlags( ghost->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE );
 
-	zp_float matrix[16];
+	ZP_ALIGN16 zp_float matrix[16];
 	zpMath::MatrixStoreOpenGL( transform, matrix );
 
 	btTransform trans;
@@ -50,7 +50,7 @@ void zpPhantom::setMatrix( const zpMatrix4f& transform )
 {
 	btPairCachingGhostObject* ghost = (btPairCachingGhostObject*)m_phantom;
 
-	zp_float matrix[16];
+	ZP_ALIGN16 zp_float matrix[16];
 	zpMath::MatrixStoreOpenGL( transform, matrix );
 
 	btTransform t;
@@ -64,7 +64,7 @@ zp_bool zpPhantom::getMatrix( zpMatrix4f& transform ) const
 
 	const btTransform& t = ghost->getWorldTransform();
 
-	zp_float matrix[ 16 ];
+	ZP_ALIGN16 zp_float matrix[ 16 ];
 	t.getOpenGLMatrix( matrix );
 
 	transform = zpMath::MatrixLoadOpenGL( matrix );

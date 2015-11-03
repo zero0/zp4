@@ -93,10 +93,7 @@
     <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;$(ProjectDir)lib\x86\</LibraryPath>
     <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(DXSDK_DIR)Lib\x86\;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;$(ProjectDir)lib\x86\</LibraryPath>
-    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
-  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -214,7 +211,7 @@
       <AdditionalLibraryDirectories>$(ProjectDir)lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy "$(ProjectDir)bin\$(ProcessorArchitecture)\*" "$(TargetDir)"</Command>
+      <Command>copy "$(ProjectDir)bin\$(ProcessorArchitectureAsPlatform)\*" "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

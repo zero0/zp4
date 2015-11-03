@@ -95,7 +95,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_x64|Win32'">
     <OutDir>$(ProjectDir)Bin\Platform_$(PlatformShortName)\</OutDir>
-    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_x64|x64'">
     <OutDir>$(ProjectDir)Bin\Platform_$(PlatformShortName)\</OutDir>
@@ -103,9 +103,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)Bin\Platform_$(PlatformShortName)\</OutDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(ProjectDir)Bin\Platform_$(PlatformShortName)\</OutDir>
+    <OutDir>$(ProjectDir)Bin\Platform_$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)$(PlatformArchitecture)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -229,14 +231,12 @@ copy "$(SolutionDir)Rendering\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitecture)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitecture)\;$(SolutionDir)Physics\lib\$(ProcessorArchitecture)\;$(SolutionDir)Rendering\lib\$(ProcessorArchitecture)\;$(SolutionDir)Audio\lib\$(ProcessorArchitecture)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Configuration)\;$(DXSDK_DIR)Lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Scripting\lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Physics\lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Rendering\lib\$(ProcessorArchitectureAsPlatform)\;$(SolutionDir)Audio\lib\$(ProcessorArchitectureAsPlatform)\</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT.lib</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(ProjectDir)$(TargetFileName)"
-copy "$(SolutionDir)Audio\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\"
-copy "$(SolutionDir)Rendering\bin\$(ProcessorArchitecture)\*" "$(ProjectDir)Bin\"</Command>
+      <Command>copy "$(TargetPath)" "$(ProjectDir)$(TargetFileName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -19,7 +19,7 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 
 		zp_uint stride;
 		zp_bool found = pipeline->getRenderingEngine()->getInputLayoutFormatAndStride( formatStr, m_resource.m_format, stride );
-		ZP_ASSERT( found, "" );
+		ZP_ASSERT( found, "Unable to find Input Layout %s for mesh %s", formatStr, filename );
 
 		const zpBison::Value& vertex = root[ "Vertex" ];
 		const zpBison::Value& index = root[ "Index" ];
