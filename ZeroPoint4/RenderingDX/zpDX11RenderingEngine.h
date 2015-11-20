@@ -10,6 +10,7 @@ struct ID3D11DeviceContext;
 struct ID3D11Texture2D;
 struct ID3D11RenderTargetView;
 struct ID3D11DepthStencilView;
+struct ID3DUserDefinedAnnotation;
 
 struct zpDynamicInputLayout
 {
@@ -62,6 +63,7 @@ private:
 
 	IDXGISwapChain* m_swapChain;
 	ID3D11Device* m_d3dDevice;
+	ID3DUserDefinedAnnotation* m_perf;
 
 	ID3D11Texture2D* m_screenshotTexture;
 

@@ -11,6 +11,8 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 	
 	if( ok )
 	{
+		zpRenderingEngine* engine = pipeline->getRenderingEngine();
+
 		const zpBison::Value& root = mesh.root();
 
 		const zpBison::Value format = root[ "Format" ];
@@ -18,7 +20,7 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 		const zp_uint formatStrLen = format.size();
 
 		zp_uint stride;
-		zp_bool found = pipeline->getRenderingEngine()->getInputLayoutFormatAndStride( formatStr, m_resource.m_format, stride );
+		zp_bool found = engine->getInputLayoutFormatAndStride( formatStr, m_resource.m_format, stride );
 		ZP_ASSERT( found, "Unable to find Input Layout %s for mesh %s", formatStr, filename );
 
 		const zpBison::Value& vertex = root[ "Vertex" ];
@@ -27,8 +29,8 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 		//m_resource.m_vertexData.writeBulk( vertex.asData(), vertex.size() );
 		//m_resource.m_indexData.writeBulk( index.asData(), index.size() );
 
-		pipeline->getRenderingEngine()->createBuffer( m_resource.m_vertex, ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, vertex.size(), stride, vertex.asData() );
-		pipeline->getRenderingEngine()->createBuffer( m_resource.m_index, ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_IMMUTABLE, index.size(), sizeof( zp_ushort ), index.asData() );
+		engine->createBuffer( m_resource.m_vertex, ZP_BUFFER_TYPE_VERTEX, ZP_BUFFER_BIND_IMMUTABLE, vertex.size(), stride, vertex.asData() );
+		engine->createBuffer( m_resource.m_index, ZP_BUFFER_TYPE_INDEX, ZP_BUFFER_BIND_IMMUTABLE, index.size(), sizeof( zp_ushort ), index.asData() );
 
 		const zpBison::Value parts = root[ "Parts" ];
 		m_resource.m_parts.reserve( parts.size() );
@@ -46,7 +48,7 @@ zp_bool zpMeshResource::load( const zp_char* filename, zpRenderingPipeline* pipe
 			zpBoundingAABB* box = (zpBoundingAABB*)v[ "BoundingBox" ].asData();
 			if( box )
 			{
-				mp.m_boundingBox = *box;
+				//mp.m_boundingBox = *box;
 			}
 		}
 	}
