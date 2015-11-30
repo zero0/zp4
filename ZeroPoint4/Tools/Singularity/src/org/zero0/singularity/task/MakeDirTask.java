@@ -11,18 +11,26 @@ import org.zero0.singularity.SingularityTaskExecutionResult;
 
 public class MakeDirTask extends SingularityTask
 {
-	private String dir;
+	private SingularityFileSet dir;
+	private int index;
+	private boolean verbose;
+	private boolean failOnError;
 
 	@Override
 	protected void onSetup( Value config )
 	{
-		dir = config.get( "dir" ).asString(); 
+		Value dirConfig = config.get( "dir" );
+		verbose = config.get( "verbose" ).asBoolean();
+		failOnError = config.get( "failOnError" ).asBoolean();
+
+		dir = getProject().createFileSetFromData( dirConfig );
+		index = 0;
 	}
 
 	@Override
 	protected void onTeardown()
 	{
-
+		index = 0;
 	}
 
 	@Override
@@ -33,12 +41,38 @@ public class MakeDirTask extends SingularityTask
 			@Override
 			public SingularityTaskExecutionResult onRunStep( SingularityTaskExecutionInfo info )
 			{
-				SingularityFileSet set = SingularityFileSet.Create( new File( dir ) );
+				SingularityTaskExecutionResult r = SingularityTaskExecutionResult.InProgress;
 
-				File f = new File( set.getFile( 0 ) );
-				
-				boolean ok = f.mkdir();
-				return ok ? SingularityTaskExecutionResult.Success : SingularityTaskExecutionResult.Failure;
+				if( index < dir.getNumFiles() )
+				{
+					File f = dir.getFile( index++ );
+					{
+						boolean ok = f.mkdir();
+
+						if( ok )
+						{
+							if( verbose ) {
+								info.getOut().println( "Created Directory " + f.getName() );
+							}
+						}
+						else
+						{
+							if( failOnError ) {
+								r = SingularityTaskExecutionResult.Failure;
+							}
+							if( verbose ) {
+								info.getErr().println( "Failed to create Directory " + f.getName() );
+							}
+						}
+					}
+				}
+				else
+				{
+					r = SingularityTaskExecutionResult.Success;
+					index = 0;
+				}
+
+				return r;
 			}
 		};
 	}

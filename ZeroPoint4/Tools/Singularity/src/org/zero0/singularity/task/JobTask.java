@@ -52,8 +52,10 @@ public class JobTask extends SingularityTask
 			{
 				SingularityTaskExecutionResult result = SingularityTaskExecutionResult.Success;
 				
-				if( currentTask != tasks.size() )
+				if( currentTask < tasks.size() )
 				{
+					info.setProgress( currentTask / tasks.size() );
+					
 					if( currentExec == null )
 					{
 						SingularityTask task = tasks.get( currentTask );
@@ -74,5 +76,4 @@ public class JobTask extends SingularityTask
 			}
 		};
 	}
-
 }

@@ -133,7 +133,6 @@ public class SingularityEngine
 		arguments.put( "useJasper", "true" );
 		arguments.put( "fork", "true" );
 		arguments.put( "directoryListings", "false" );
-		arguments.put( "fork", "true" );
 		
 		BootStrap b = new BootStrap( arguments );
 		server = b.boot();

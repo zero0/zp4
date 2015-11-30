@@ -1,48 +1,50 @@
 package org.zero0.singularity;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.PrintStream;
 
 public final class SingularityTaskExecutionInfo
 {
 	private final int id;
-	private final String taskName;
+	private final String name;
 	
+	private boolean isRunning;
+	private float progress;
 	private long startTime;
 	private long endTime;
 	private SingularityTaskExecutionResult result;
 	
-	private StringWriter outString;
-	private StringWriter errString;
+	private PrintStream out;
+	private PrintStream err;
 	
-	private PrintWriter out;
-	private PrintWriter err;
-	
-	public SingularityTaskExecutionInfo( int id, String taskName )
+	public SingularityTaskExecutionInfo( int taskId, String taskName, PrintStream stdOut, PrintStream stdErr )
 	{
-		this.id = id;
-		this.taskName = taskName;
+		id = taskId;
+		name = taskName;
 		
+		progress = 0f;
 		startTime = 0L;
 		endTime = 0L;
-		result = null;
+		result = SingularityTaskExecutionResult.None;
 		
-		outString = new StringWriter();
-		errString = new StringWriter();
+		out = stdOut;
+		err = stdErr;
 		
-		out = new PrintWriter( outString );
-		err = new PrintWriter( errString );
+		isRunning = false;
 	}
 	
 	public void start()
 	{
-		this.startTime = System.currentTimeMillis();
+		isRunning = true;
+		progress = 0f;
+		startTime = System.currentTimeMillis();
 	}
 	
-	public void end( SingularityTaskExecutionResult result )
+	public void end( SingularityTaskExecutionResult r )
 	{
-		this.endTime = System.currentTimeMillis();
-		this.result = result;
+		endTime = System.currentTimeMillis();
+		progress = 1f;
+		result = r;
+		isRunning = false;
 	}
 	
 	public int getId()
@@ -50,9 +52,24 @@ public final class SingularityTaskExecutionInfo
 		return id;
 	}
 	
-	public String getTaskName()
+	public String getName()
 	{
-		return taskName;
+		return name;
+	}
+	
+	public boolean isRunning()
+	{
+		return isRunning;
+	}
+	
+	public float getProgress()
+	{
+		return progress;
+	}
+	
+	public void setProgress( float p )
+	{
+		progress = Math.min( Math.max( p, 0f ), 1f );
 	}
 	
 	public long getStartTime()
@@ -70,12 +87,12 @@ public final class SingularityTaskExecutionInfo
 		return result;
 	}
 	
-	public PrintWriter getOut()
+	public PrintStream getOut()
 	{
 		return out;
 	}
 	
-	public PrintWriter getErr()
+	public PrintStream getErr()
 	{
 		return err;
 	}

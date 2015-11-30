@@ -2,8 +2,9 @@ package org.zero0.singularity;
 
 public enum SingularityTaskExecutionResult
 {
-	InProgress,
+	None,
 	
+	InProgress,
 	Success,
 	Failure,
 	Canceled,

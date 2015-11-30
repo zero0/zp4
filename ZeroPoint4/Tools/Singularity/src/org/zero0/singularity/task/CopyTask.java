@@ -1,46 +1,70 @@
 package org.zero0.singularity.task;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.zero0.json.Value;
 import org.zero0.singularity.ISingularityTaskExecution;
+import org.zero0.singularity.SingularityFileSet;
+import org.zero0.singularity.SingularityProject;
 import org.zero0.singularity.SingularityTask;
+import org.zero0.singularity.SingularityTaskExecutionInfo;
+import org.zero0.singularity.SingularityTaskExecutionResult;
 
 public class CopyTask extends SingularityTask
 {
-	List< String > input = new ArrayList< String >();
-	List< String > output = new ArrayList< String >();
+	enum CopyTaskType
+	{
+		None,
+		
+		FileToFile,
+		DirectoryToDirectory,
+	};
+	
+	private SingularityFileSet input;
+	private SingularityFileSet output;
+	private boolean forceOverride;
+	private boolean verbose;
+	private CopyTaskType copyType;
 	
 	@Override
 	protected void onSetup( Value config )
 	{
 		Value in = config.get( "input" );
 		Value out = config.get( "output" );
-	
-		AsStringOrArray( in, input );
-		AsStringOrArray( out, output );
+		Value force = config.get( "force" );
+		Value verb = config.get( "verbose" );
+		
+		copyType = CopyTaskType.None;
+		
+		input = new SingularityFileSet();
+		input = new SingularityFileSet();
+		
+		AsStringOrArray( getProject(), in, input );
+		AsStringOrArray( getProject(), out, output );
+		
+		forceOverride = force.isBoolean() ? force.asBoolean() : false;
+		verbose = verb.isBoolean() ? verb.asBoolean() : false;
 	}
 
 	@Override
 	protected void onTeardown()
 	{
-		input.clear();
-		output.clear();
 	}
 	
-	private static void AsStringOrArray( Value in, List< String > input )
+	private static void AsStringOrArray( SingularityProject proj, Value in, SingularityFileSet input )
 	{
 		if( in.isString() )
 		{
-			input.add( in.asString() );
+			String s = in.asString();
+			
+			proj.appendToFileSet( input, s, true );
 		}
 		else if( in.isArray() )
 		{
 			int size = in.getSize();
 			for( int i = 0; i < size; ++i )
 			{
-				input.add( in.get( i ).asString() );
+				String s = in.get( i ).asString();
+				
+				proj.appendToFileSet( input, s, true );
 			}
 		}
 	}
@@ -48,7 +72,31 @@ public class CopyTask extends SingularityTask
 	@Override
 	protected ISingularityTaskExecution onExecute()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return new ISingularityTaskExecution()
+		{
+			private int index = 0;
+			
+			@Override
+			public SingularityTaskExecutionResult onRunStep( SingularityTaskExecutionInfo info )
+			{
+				if( copyType == CopyTaskType.None )
+				{
+					return SingularityTaskExecutionResult.Failure;
+				}
+				
+				SingularityTaskExecutionResult r;
+				
+				if( index < input.getNumFiles() )
+				{
+					r = SingularityTaskExecutionResult.InProgress;
+				}
+				else
+				{
+					r = SingularityTaskExecutionResult.Success;
+				}
+				
+				return r;
+			}
+		};
 	}
 }

@@ -1,13 +1,20 @@
 {
     "task" : "job",
-    "args" : {
-        "jobs" : [
-            {
-                "task" : "echo",
-                "args" : {
-                    "text" : "Hello Tasks!"
-                }
+    "jobs" : [
+        {
+            "task" : "echo",
+            "msg" : "Hello ${project.name} Tasks!"
+        },
+        {
+            "task" : "mkdir",
+            "verbose" : true,
+            "dir" : {
+                "path" : "${asset.dst.dir}/created"
             }
-        ]
-    }
+        },
+        {
+            "task" : "echo",
+            "msg" : "After mkdir, '${asset.dst.dir}/created' should be created"
+        }
+    ]
 }
