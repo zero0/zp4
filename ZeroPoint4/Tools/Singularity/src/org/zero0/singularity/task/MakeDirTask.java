@@ -47,20 +47,27 @@ public class MakeDirTask extends SingularityTask
 				{
 					File f = dir.getFile( index++ );
 					{
-						boolean ok = f.mkdir();
+						boolean ok = true;
+						if( !f.exists() )
+						{
+							ok = f.mkdir();
+						}
 
 						if( ok )
 						{
-							if( verbose ) {
+							if( verbose )
+							{
 								info.getOut().println( "Created Directory " + f.getName() );
 							}
 						}
 						else
 						{
-							if( failOnError ) {
+							if( failOnError )
+							{
 								r = SingularityTaskExecutionResult.Failure;
 							}
-							if( verbose ) {
+							if( verbose )
+							{
 								info.getErr().println( "Failed to create Directory " + f.getName() );
 							}
 						}
