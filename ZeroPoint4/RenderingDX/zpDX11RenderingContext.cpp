@@ -290,6 +290,16 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 #endif
 }
 
+
+void zpRenderingContextImpl::set( ID3D11DeviceContext* context )
+{
+	m_context = context;
+}
+ID3D11DeviceContext* zpRenderingContextImpl::get() const
+{
+	return m_context;
+}
+
 #if 0
 zpDX11RenderingContext::zpDX11RenderingContext() :
 	m_context( ZP_NULL ),

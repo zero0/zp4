@@ -73,7 +73,6 @@ const zp_char* g_stencilOp[] =
 	"Decr",
 };
 
-
 #define ENUM_COUNT( e ) e##_count
 #define ENUM_STR( e ) g_##e
 
@@ -364,11 +363,13 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 
 			// 3) render opaque commands
 			i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
+			processRenderingQueue( ZP_RENDERING_QUEUE_BACKGROUND, false );
 			processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE, true );
 			processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE_DEBUG, false );
 
 			// 4) render skybox commands
 			processRenderingQueue( ZP_RENDERING_QUEUE_SKYBOX, false );
+			processRenderingQueue( ZP_RENDERING_QUEUE_ALPHATEST, true );
 
 			// 5) render transparent commands
 			i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );

@@ -3,6 +3,7 @@
 #define ZP_DX11_RENDERING_CONTEXT_H
 
 struct ID3D11DeviceContext;
+struct ID3DUserDefinedAnnotation;
 
 class zpRenderingContextImpl
 {
@@ -37,13 +38,14 @@ public:
 	void processCommand( zpRenderingEngineImpl* engine, const zpRenderingCommand* command );
 	void processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands );
 
-	void set( ID3D11DeviceContext* context ) { m_context = context; }
-	ID3D11DeviceContext* get() const { return m_context; }
+	void set( ID3D11DeviceContext* context );
+	ID3D11DeviceContext* get() const;
 
 private:
 	void bindMaterial( const zpMaterial* material );
 
 	ID3D11DeviceContext* m_context;
+	ID3DUserDefinedAnnotation* m_perf;
 
 	const zpMaterial* m_prevMaterial;
 };

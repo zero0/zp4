@@ -44,6 +44,8 @@ struct zpMaterial
 	zp_ushort materialId;
 	zp_ushort sortBias;
 
+	zpRenderingQueue queue;
+
 	friend class zpMaterialResource;
 };
 

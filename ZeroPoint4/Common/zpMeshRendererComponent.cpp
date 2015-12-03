@@ -39,10 +39,10 @@ void zpMeshRendererComponent::render( zpRenderingContext* i )
 {
 	// get the world transform from the object or the calculated one from the attachment component
 	zpTransformComponent* attachment = getParentObject()->getComponents()->getTransformComponent();
-	const zpMatrix4f& transform = attachment->getWorldTransform();
+	zpMatrix4f transform = attachment->getWorldTransform();
 
 	// draw mesh
-	i->drawMesh( m_layer, ZP_RENDERING_QUEUE_OPAQUE, &m_mesh, transform, &m_material );
+	i->drawMesh( m_layer, m_material.getResource()->getData()->queue, &m_mesh, transform, &m_material );
 }
 
 void zpMeshRendererComponent::setRenderLayer( zp_uint layer )

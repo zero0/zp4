@@ -14,6 +14,20 @@ const zp_char* VertexFormatShortNames[] =
 	"",		// zpVertexFormat_Count,
 };
 
+const zp_char* g_renderingQueues[] =
+{
+	"Background",
+	"Opaque",
+	"OpaqueDebug",
+	"Skybox",
+	"AlphaTest",
+	"Transparent",
+	"TransparentDebug",
+	"Overlay",
+	"UI",
+	"UIDebug"
+};
+
 zpSamplerStateDesc::zpSamplerStateDesc()
 	: cmpFunc( ZP_COMPARISON_FUNC_NEVER )
 	, minFilter (ZP_TEXTURE_FILTER_POINT )

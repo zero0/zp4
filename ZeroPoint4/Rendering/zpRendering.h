@@ -64,10 +64,14 @@ enum zpCameraType : zp_byte
 
 enum zpRenderingQueue : zp_byte
 {
+	ZP_RENDERING_QUEUE_BACKGROUND,
+
 	ZP_RENDERING_QUEUE_OPAQUE,
 	ZP_RENDERING_QUEUE_OPAQUE_DEBUG,
 
 	ZP_RENDERING_QUEUE_SKYBOX,
+
+	ZP_RENDERING_QUEUE_ALPHATEST,
 
 	ZP_RENDERING_QUEUE_TRANSPARENT,
 	ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG,
@@ -79,6 +83,8 @@ enum zpRenderingQueue : zp_byte
 
 	zpRenderingQueue_Count,
 };
+
+const zp_char* g_renderingQueues[];
 
 enum zpRenderingEngineType
 {

@@ -1222,6 +1222,17 @@ void zpApplication::onGUI()
 		m_gui.label( 24, buff.str(), zpColor4f( 1, 1, 0, 1 ) );
 		buff.clear();
 
+		for( zp_size_t i = 0; i < zpRenderingQueue_Count; ++i )
+		{
+			zp_uint numCommands = stats.numDrawCommands[ i ];
+			if( numCommands )
+			{
+				buff << g_renderingQueues[ i ] << "  " << stats.visibleDrawCommands[ i ] << "/" << numCommands;
+				m_gui.label( 24, buff.str(), zpColor4f( 1, 1, 0, 1 ) );
+				buff.clear();
+			}
+		}
+
 		m_gui.endWindow();
 	}
 }

@@ -56,6 +56,22 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 			pipeline->getRenderingEngine()->createRasterState( m_resource.raster, rasterDesc );
 		}
 
+		// load render queue
+		m_resource.queue = ZP_RENDERING_QUEUE_OPAQUE;
+		const zpBison::Value& renderQueue = materialRoot[ "Queue" ];
+		if( !renderQueue.isEmpty() )
+		{
+			const zp_char* renderQueueStr = renderQueue.asCString();
+			for( zp_int i = 0; i < zpRenderingQueue_Count; ++i )
+			{
+				if( zp_strcmp( renderQueueStr, g_renderingQueues[ i ] ) == 0 )
+				{
+					m_resource.queue = (zpRenderingQueue)i;
+					break;
+				}
+			}
+		}
+
 		//
 		// Load Shader slots
 		//
