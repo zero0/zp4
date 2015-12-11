@@ -363,21 +363,21 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 
 			// 3) render opaque commands
 			i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
-			processRenderingQueue( ZP_RENDERING_QUEUE_BACKGROUND, false );
-			processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE, true );
-			processRenderingQueue( ZP_RENDERING_QUEUE_OPAQUE_DEBUG, false );
+			processRenderingQueue( i, ZP_RENDERING_QUEUE_BACKGROUND );
+			processRenderingQueueWithLighting( i, ZP_RENDERING_QUEUE_OPAQUE );
+			processRenderingQueue( i, ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
 
 			// 4) render skybox commands
-			processRenderingQueue( ZP_RENDERING_QUEUE_SKYBOX, false );
-			processRenderingQueue( ZP_RENDERING_QUEUE_ALPHATEST, true );
+			processRenderingQueue( i, ZP_RENDERING_QUEUE_SKYBOX );
+			processRenderingQueueWithLighting( i, ZP_RENDERING_QUEUE_ALPHATEST );
 
 			// 5) render transparent commands
 			i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );
-			processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT, true );
-			processRenderingQueue( ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG, false );
+			processRenderingQueueWithLighting( i, ZP_RENDERING_QUEUE_TRANSPARENT );
+			processRenderingQueue( i, ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
 
 			// 6) render overlay commands
-			processRenderingQueue( ZP_RENDERING_QUEUE_OVERLAY, false );
+			processRenderingQueue( i, ZP_RENDERING_QUEUE_OVERLAY );
 		}
 	}
 
@@ -413,8 +413,8 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 			i->preprocessCommands( camera, camera->getRenderLayers() );
 			useCamera( i, camera, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_CAMERA ] );
 
-			processRenderingQueue( ZP_RENDERING_QUEUE_UI, false );
-			processRenderingQueue( ZP_RENDERING_QUEUE_UI_DEBUG, false );
+			processRenderingQueue( i, ZP_RENDERING_QUEUE_UI );
+			processRenderingQueue( i, ZP_RENDERING_QUEUE_UI_DEBUG );
 		}
 	}
 
@@ -802,10 +802,8 @@ void zpRenderingPipeline::releaseLight( zpLightBufferData* light )
 	m_freeLights.pushBack( light );
 }
 
-void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool useLighting )
+void zpRenderingPipeline::processRenderingQueue( zpRenderingContext* i, zpRenderingQueue layer )
 {
-	zpRenderingContext* i = m_engine.getImmediateRenderingContext();
-
 	const zpArrayList< zpRenderingCommand* >& queue = i->getFilteredCommands( layer );
 
 	//m_numTotalDrawCommands += queue.size();
@@ -816,80 +814,95 @@ void zpRenderingPipeline::processRenderingQueue( zpRenderingQueue layer, zp_bool
 	if( cmd != end )
 	{
 		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ] );
-	
-		if( useLighting )
+		
+		zpDrawCallBufferData drawCallData;
+		for( ; cmd != end; ++cmd )
 		{
-			i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_LIGHT, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ] );
+			drawCallData.world = (*cmd)->matrix;
+			i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], &drawCallData, sizeof( zpDrawCallBufferData ) );
 
-			zpDrawCallBufferData drawCallData;
-			for( ; cmd != end; ++cmd )
-			{
-				drawCallData.world = (*cmd)->matrix;
-				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], &drawCallData, sizeof( zpDrawCallBufferData ) );
-
-				// base pass with 1 directional
-				// additional passes with each other light
-				zpLightBufferData** b, **e;
-
-				// directional light base pass
-				b = m_usedLights[ ZP_LIGHT_TYPE_DIRECTIONAL ].begin();
-				e = m_usedLights[ ZP_LIGHT_TYPE_DIRECTIONAL ].end();
-				if( b != e )
-				{
-					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
-					i->processCommand( *cmd );
-
-					for( ++b; b != e; ++b )
-					{
-						i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
-						i->processCommand( *cmd );
-					}
-				}
-				// no directional lights, just render normally
-				else
-				{
-					i->processCommand( *cmd );
-				}
-
-				zpBoundingSphere lightSphere;
-				b = m_usedLights[ ZP_LIGHT_TYPE_POINT ].begin();
-				e = m_usedLights[ ZP_LIGHT_TYPE_POINT ].end();
-				for( ; b != e; ++b )
-				{
-					zpLightBufferData* data = *b;
-
-					lightSphere.setCenter( data->position );
-					lightSphere.setRadius( zpMath::Scalar( data->radius ) );
-					if( ZP_IS_COLLISION( (*cmd)->boundingBox, lightSphere ) )
-					{
-						i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
-						i->processCommand( *cmd );
-					}
-				}
-
-				b = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].begin();
-				e = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].end();
-				for( ; b != e; ++b )
-				{
-					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
-					i->processCommand( *cmd );
-				}
-
-				//m_numTotalVerticies += (*cmd)->vertexCount;
-			}
-		}
-		else
-		{
-			zpDrawCallBufferData drawCallData;
-			for( ; cmd != end; ++cmd )
-			{
-				drawCallData.world = (*cmd)->matrix;
-				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], &drawCallData, sizeof( zpDrawCallBufferData ) );
-
-				i->processCommand( *cmd );
-			}
+			i->processCommand( *cmd );
 		}
 	}
+}
+void zpRenderingPipeline::processRenderingQueueWithLighting( zpRenderingContext* i, zpRenderingQueue layer )
+{
+	const zpArrayList< zpRenderingCommand* >& queue = i->getFilteredCommands( layer );
+
+	//m_numTotalDrawCommands += queue.size();
+
+	const zpRenderingCommand* const* cmd = queue.begin();
+	const zpRenderingCommand* const* end = queue.end();
+
+	if( cmd != end )
+	{
+		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ] );
+		
+		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_SH, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_SH ] );
+		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_LIGHT, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ] );
+
+		zpDrawCallBufferData drawCallData;
+		for( ; cmd != end; ++cmd )
+		{
+			drawCallData.world = (*cmd)->matrix;
+			i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ], &drawCallData, sizeof( zpDrawCallBufferData ) );
+
+			// base pass with 1 directional
+			// additional passes with each other light
+			zpLightBufferData** b, **e;
+
+			// directional light base pass
+			b = m_usedLights[ ZP_LIGHT_TYPE_DIRECTIONAL ].begin();
+			e = m_usedLights[ ZP_LIGHT_TYPE_DIRECTIONAL ].end();
+			if( b != e )
+			{
+				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
+				i->processCommand( *cmd );
+
+				for( ++b; b != e; ++b )
+				{
+					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
+					i->processCommand( *cmd );
+				}
+			}
+			// no directional lights, just render normally
+			else
+			{
+				i->processCommand( *cmd );
+			}
+
+			zpBoundingSphere lightSphere;
+			b = m_usedLights[ ZP_LIGHT_TYPE_POINT ].begin();
+			e = m_usedLights[ ZP_LIGHT_TYPE_POINT ].end();
+			for( ; b != e; ++b )
+			{
+				zpLightBufferData* data = *b;
+
+				lightSphere.setCenter( data->position );
+				lightSphere.setRadius( zpMath::Scalar( data->radius ) );
+				if( ZP_IS_COLLISION( (*cmd)->boundingBox, lightSphere ) )
+				{
+					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
+					i->processCommand( *cmd );
+				}
+			}
+
+			b = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].begin();
+			e = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].end();
+			for( ; b != e; ++b )
+			{
+				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
+				i->processCommand( *cmd );
+			}
+
+			//m_numTotalVerticies += (*cmd)->vertexCount;
+		}
+	}
+}
+
+zpBuffer& zpRenderingPipeline::getConstantBuffer( zpConstantBufferSlot constantBufferSlot )
+{
+	return m_constantBuffers[ constantBufferSlot ];
 }
 
 zp_bool zpRenderingPipeline::performScreenshot()

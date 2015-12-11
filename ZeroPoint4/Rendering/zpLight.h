@@ -22,17 +22,41 @@ struct zpLightBufferData
 	zpLightType type;
 };
 
-struct zpSphericalHarmonicsData
+union zpSphericalHarmonicsData
 {
-	zpVector4f _SHAr;
-	zpVector4f _SHAg;
-	zpVector4f _SHAb;
+	//zpVector4f SHAr;
+	//zpVector4f SHAg;
+	//zpVector4f SHAb;
+	//
+	//zpVector4f SHBr;
+	//zpVector4f SHBg;
+	//zpVector4f SHBb;
+	//
+	//zpVector4f SHC;
 
-	zpVector4f _SHBr;
-	zpVector4f _SHBg;
-	zpVector4f _SHBb;
+	struct
+	{
+		zpVector4f SH0;
+		zpVector4f SH1;
+		zpVector4f SH2;
+		zpVector4f SH3;
+		zpVector4f SH4;
+		zpVector4f SH5;
+		zpVector4f SH6;
+		zpVector4f SH7;
+		zpVector4f SH8;
+	};
 
-	zpVector4f _SHC;
+	zpVector4f SH[ 9 ];
+};
+
+class zpSH
+{
+	ZP_NON_COPYABLE( zpSH );
+public:
+	static void eval( zpSphericalHarmonicsData& result );
+
+private:
 };
 
 #endif

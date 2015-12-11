@@ -77,7 +77,10 @@ public:
 	zpLightBufferData* getLight( zpLightType type );
 	void releaseLight( zpLightBufferData* light );
 
-	void processRenderingQueue( zpRenderingQueue layer, zp_bool useLighting );
+	void processRenderingQueue( zpRenderingContext* i, zpRenderingQueue layer );
+	void processRenderingQueueWithLighting( zpRenderingContext* i, zpRenderingQueue layer );
+
+	zpBuffer& getConstantBuffer( zpConstantBufferSlot constantBufferSlot );
 
 private:
 	void useCamera( zpRenderingContext* i, zpCamera* camera, zpBuffer* cameraBuffer );

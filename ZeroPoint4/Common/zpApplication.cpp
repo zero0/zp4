@@ -661,6 +661,13 @@ void zpApplication::handleInput()
 	{
 		m_renderingPipeline.takeScreenshot( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) ? ZP_SCREENSHOT_TYPE_NO_UI : ZP_SCREENSHOT_TYPE_ALL, ".", m_timer.getTime() );
 	}
+	else if( keyboard->isKeyPressed( ZP_KEY_CODE_C ) )
+	{
+		zp_float x = zpRandom::getInstance()->randomFloat( -5, 5 );
+		zp_float z = zpRandom::getInstance()->randomFloat( -5, 5 );
+		zpObject* obj = getObjectContentManager()->createObject( "objects/cube.objectb" );
+		obj->getComponents()->getTransformComponent()->setLocalPosition( zpMath::Vector4( x, 10, z, 1 ) );
+	}
 
 	// draw physics debug
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS ) )

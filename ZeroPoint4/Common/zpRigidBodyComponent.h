@@ -26,7 +26,7 @@ private:
 	zpRigidBody m_rigidBody;
 };
 
-class zpRigidBodyComponentPool : public zpContentPool< zpRigidBodyComponent, 8 >
+class zpRigidBodyComponentPool : public zpContentPool< zpRigidBodyComponent, 64 >
 {
 public:
 	zpRigidBodyComponentPool();

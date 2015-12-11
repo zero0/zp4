@@ -104,8 +104,8 @@ void zpRigidBody::getPositionRotation( zpVector4f& position, zpQuaternion4f& rot
 	btTransform t;
 	motion->getWorldTransform( t );
 
-	const btVector3& o = t.getOrigin();
-	const btQuaternion& q = t.getRotation();
+	const btVector3 o = t.getOrigin();
+	const btQuaternion q = t.getRotation();
 
 	position = zpMath::Vector4( o.x(), o.y(), o.z(), 1.f );
 	rotation = zpMath::Quaternion( q.x(), q.y(), q.z(), q.w() );

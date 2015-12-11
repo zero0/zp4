@@ -24,6 +24,7 @@ protected:
 private:
 	zp_uint m_layer;
 	zpMaterialResourceInstance m_material;
+	zpSphericalHarmonicsData m_shData;
 };
 
 class zpSkyBoxComponentPool : public zpContentPool< zpSkyBoxComponent, 4 >

@@ -36,13 +36,14 @@ void zpRigidBodyComponent::onDestroy()
 
 void zpRigidBodyComponent::onUpdate( zp_float deltaTime, zp_float realTime )
 {
-	if( m_isAdded && !m_rigidBody.isStatic() )
+	zpTransformComponent* t = getParentObject()->getComponents()->getTransformComponent();
+	if( t != ZP_NULL && m_isAdded && !m_rigidBody.isStatic() )
 	{
 		zpVector4f pos;
 		zpQuaternion4f rot;
 		m_rigidBody.getPositionRotation( pos, rot );
 	
-		getParentObject()->getComponents()->getTransformComponent()->setLocalTransform( pos, rot );
+		t->setLocalTransform( pos, rot );
 	}
 }
 void zpRigidBodyComponent::onSimulate()

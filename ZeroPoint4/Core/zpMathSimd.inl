@@ -262,9 +262,9 @@ namespace zpMath
 	ZP_FORCE_INLINE zpMatrix4f ZP_VECTORCALL QuaternionToMatrix( zpQuaternion4fParamF a )
 	{
 		zp_float x = AsFloat( QuaternionGetX( a ) );
-		zp_float y = AsFloat( QuaternionGetX( a ) );
-		zp_float z = AsFloat( QuaternionGetX( a ) );
-		zp_float w = AsFloat( QuaternionGetX( a ) );
+		zp_float y = AsFloat( QuaternionGetY( a ) );
+		zp_float z = AsFloat( QuaternionGetZ( a ) );
+		zp_float w = AsFloat( QuaternionGetW( a ) );
 
 		zp_float xx = x * x;
 		zp_float xy = x * y;
@@ -277,9 +277,9 @@ namespace zpMath
 		zp_float zw = z * w;
 
 		zpMatrix4f s;
-		s.r[ 0 ] = Vector4( 1 - 2 * (yy + zz), 2 * (xy - zw), 2 * (xz + yw), 0 );
-		s.r[ 1 ] = Vector4( 2 * (xy + zw), 1 - 2 * (xx + zz), 2 * (yz - xw), 0 );
-		s.r[ 2 ] = Vector4( 2 * (xz - yw), 2 * (yz + xw), 1 - 2 * (xx + yy), 0 );
+		s.r[ 0 ] = Vector4( 1 - 2 * (yy + zz),     2 * (xy + zw),     2 * (xz - yw), 0 );
+		s.r[ 1 ] = Vector4(     2 * (xy - zw), 1 - 2 * (xx + zz),     2 * (yz + xw), 0 );
+		s.r[ 2 ] = Vector4(     2 * (xz + yw),     2 * (yz - xw), 1 - 2 * (xx + yy), 0 );
 		s.r[ 3 ] = Vector4( 0, 0, 0, 1 );
 
 		return s;

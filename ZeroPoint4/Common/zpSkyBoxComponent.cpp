@@ -15,12 +15,25 @@ zpSkyBoxComponent::zpSkyBoxComponent( zpObject* obj, const zpBison::Value& def )
 	const zp_char* materialFile = def[ "Material" ].asCString();
 	ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_material );
 	ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
+
+	m_shData.SH0 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH1 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH2 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH3 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH4 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH5 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH6 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH7 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH8 = zpMath::Vector4( 0, 0, 0, 0 );
 }
 zpSkyBoxComponent::~zpSkyBoxComponent()
 {}
 
 void zpSkyBoxComponent::render( zpRenderingContext* i )
 {
+	zpBuffer& shBuffer = getApplication()->getRenderPipeline()->getConstantBuffer( ZP_CONSTANT_BUFFER_SLOT_SH );
+	i->update( &shBuffer, &m_shData, sizeof( zpSphericalHarmonicsData ) );
+
 	i->beginDrawImmediate( m_layer, ZP_RENDERING_QUEUE_SKYBOX, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &m_material );
 
 	i->addVertex( zpMath::Vector4( -1, -1, -1,  1 ), zpVector2f( 0, 0 ), zpColor4f( 1, 1, 1, 1 ) );
@@ -87,7 +100,9 @@ void zpSkyBoxComponent::onDestroy()
 }
 
 void zpSkyBoxComponent::onUpdate( zp_float deltaTime, zp_float realTime )
-{}
+{
+	
+}
 void zpSkyBoxComponent::onSimulate()
 {}
 

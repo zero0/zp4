@@ -36,7 +36,7 @@ private:
 };
 
 
-class zpMeshRendererComponentPool : public zpContentPool< zpMeshRendererComponent, 8 >
+class zpMeshRendererComponentPool : public zpContentPool< zpMeshRendererComponent, 64 >
 {
 public:
 	zpMeshRendererComponentPool();

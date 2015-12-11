@@ -177,7 +177,7 @@ private:
 };
 
 
-class zpParticleEmitterComponentPool : public zpContentPool< zpParticleEmitterComponent, 8 >
+class zpParticleEmitterComponentPool : public zpContentPool< zpParticleEmitterComponent, 64 >
 {
 public:
 	zpParticleEmitterComponentPool();

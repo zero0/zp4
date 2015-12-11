@@ -573,8 +573,7 @@ namespace zpMath
 		sm.m_m3 = Vector4Mul( sm.m_m3, s );
 
 		zpMatrix4f m;
-		m = MatrixMul( sm, rm );
-		m = MatrixMul( m, pm );
+		m = MatrixMul( sm, MatrixMul( rm, pm ) );
 
 		return m;
 	}
