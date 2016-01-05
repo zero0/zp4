@@ -2,6 +2,7 @@
 
 zpAnimatedMeshRendererComponent::zpAnimatedMeshRendererComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
+	, m_layer( ZP_RENDERING_LAYER_DEFAULT )
 {
 	zp_bool ok = false;
 
@@ -19,17 +20,17 @@ zpAnimatedMeshRendererComponent::zpAnimatedMeshRendererComponent( zpObject* obj,
 		ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
 	}
 
-	const zp_char* meshFile = def[ "Mesh" ].asCString();
-	ok = getApplication()->getRenderPipeline()->getMeshContentManager()->getResource( meshFile, m_mesh );
-	ZP_ASSERT_WARN( ok, "Unable to load mesh %s", meshFile );
+	//const zp_char* meshFile = def[ "Mesh" ].asCString();
+	//ok = getApplication()->getRenderPipeline()->getMeshContentManager()->getResource( meshFile, m_mesh );
+	//ZP_ASSERT_WARN( ok, "Unable to load mesh %s", meshFile );
 
-	const zp_char* skeleton = def[ "Skeleton" ].asCString();
-	ok = getApplication()->getRenderPipeline()->getSkeletonContentManager()->getResource( skeleton, m_skeleton );
-	ZP_ASSERT_WARN( ok, "Unable to load skeleton %s", skeleton );
+	//const zp_char* skeleton = def[ "Skeleton" ].asCString();
+	//ok = getApplication()->getRenderPipeline()->getSkeletonContentManager()->getResource( skeleton, m_skeleton );
+	//ZP_ASSERT_WARN( ok, "Unable to load skeleton %s", skeleton );
 
-	const zp_char* animation = def[ "Animation" ].asCString();
-	ok = getApplication()->getRenderPipeline()->getAnimationContentManager()->getResource( animation, m_animation );
-	ZP_ASSERT_WARN( ok, "Unable to load animation %s", animation );
+	//const zp_char* animation = def[ "Animation" ].asCString();
+	//ok = getApplication()->getRenderPipeline()->getAnimationContentManager()->getResource( animation, m_animation );
+	//ZP_ASSERT_WARN( ok, "Unable to load animation %s", animation );
 }
 zpAnimatedMeshRendererComponent::~zpAnimatedMeshRendererComponent()
 {
@@ -38,7 +39,33 @@ zpAnimatedMeshRendererComponent::~zpAnimatedMeshRendererComponent()
 
 void zpAnimatedMeshRendererComponent::render( zpRenderingContext* i )
 {
+	zpTransformComponent* attachment = getParentObject()->getComponents()->getTransformComponent();
+	zpMatrix4f transform = attachment->getWorldTransform();
 
+	i->beginDrawImmediate( m_layer, ZP_RENDERING_QUEUE_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_NORMAL_COLOR_UV, &m_material );
+	i->setMatrix( transform );
+
+	zp_float v = 2.0f;
+
+	zpVector4f p0, p1, p2, p3;
+	p0 = zpMath::Vector4(  v, 0,  v, 1 );
+	p1 = zpMath::Vector4(  v, 0, -v, 1 );
+	p2 = zpMath::Vector4( -v, 0, -v, 1 );
+	p3 = zpMath::Vector4( -v, 0,  v, 1 );
+
+	zpVector2f uv0( 0, 0 ), uv1( 0, 1 ), uv2( 1, 0 ), uv3( 1, 1 );
+	zpColor4f c( 1, 1, 1, 1 );
+	zpVector4f n = zpMath::Vector4( 0, 1, 0, 0 );
+
+	i->addVertex( p0, n, c, uv0 );
+	i->addVertex( p1, n, c, uv1 );
+	i->addVertex( p2, n, c, uv2 );
+	i->addVertex( p3, n, c, uv3 );
+
+	i->addTriangleIndex( 0, 1, 2 );
+	i->addTriangleIndex( 2, 3, 0 );
+
+	i->endDrawImmediate();
 }
 
 void zpAnimatedMeshRendererComponent::setRenderLayer( zp_uint layer )
@@ -121,5 +148,8 @@ void zpAnimatedMeshRendererComponentPool::simulate()
 
 void zpAnimatedMeshRendererComponentPool::render( zpRenderingContext* i )
 {
-
+	m_used.foreach( [ i ]( zpAnimatedMeshRendererComponent* o )
+	{
+		o->render( i );
+	} );
 }

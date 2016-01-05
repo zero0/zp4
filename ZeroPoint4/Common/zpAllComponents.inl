@@ -17,6 +17,7 @@ ZP_COMPONENT_DEF( AudioListener )
 ZP_COMPONENT_DEF( Light )
 ZP_COMPONENT_DEF( Camera )
 ZP_COMPONENT_DEF( MeshRenderer )
+ZP_COMPONENT_DEF( AnimatedMeshRenderer )
 ZP_COMPONENT_DEF( ParticleEmitter )
 ZP_COMPONENT_DEF( SkyBox )
 

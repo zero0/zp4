@@ -155,6 +155,7 @@ void zpApplication::processCommandLine( const zpArrayList< zpString >& args )
 void zpApplication::initialize()
 {
 	m_textContent.setApplication( this );
+	m_prefabContent.setApplication( this );
 	m_objectContent.setApplication( this );
 	m_worldContent.setApplication( this );
 	m_scriptContent.setApplication( this );
@@ -673,7 +674,7 @@ void zpApplication::handleInput()
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_PHYSICS ) )
 	{
 		zpRenderingContext* context = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
-		context->beginDrawImmediate( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE_DEBUG, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_defaultMaterial );
+		context->beginDrawImmediate( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_defaultMaterial );
 		m_physicsEngine.debugDraw();
 		context->endDrawImmediate();
 	}
@@ -682,7 +683,7 @@ void zpApplication::handleInput()
 	if( m_displayStats.isMarked( ZP_APPLICATION_STATS_DRAW_OCTREE ) )
 	{
 		zpRenderingContext* context = m_renderingPipeline.getRenderingEngine()->getImmediateRenderingContext();
-		context->beginDrawImmediate( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE_DEBUG, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_defaultMaterial );
+		context->beginDrawImmediate( ZP_RENDERING_LAYER_DEFAULT, ZP_RENDERING_QUEUE_OPAQUE, ZP_TOPOLOGY_LINE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_defaultMaterial );
 		
 		zpTransformOctree* tree = m_componentPoolTransform.getTree();
 		tree->foreachNode( [ context ]( zpTransformOctreeNode* node ) {
@@ -812,6 +813,10 @@ void zpApplication::processFrame()
 		m_componentPoolMeshRenderer.render( i );
 		ZP_PROFILE_END( RENDER_MESHES );
 
+		ZP_PROFILE_START( RENDER_ANIMATED_MESHES );
+		m_componentPoolAnimatedMeshRenderer.render( i );
+		ZP_PROFILE_END( RENDER_ANIMATED_MESHES );
+
 		// render UI
 		ZP_PROFILE_START( RENDER_UI );
 		m_componentPoolUICanvas.render( i );
@@ -887,6 +892,7 @@ void zpApplication::addState( zpApplicationState* state )
 void zpApplication::runGarbageCollect()
 {
 	m_textContent.garbageCollect();
+	m_prefabContent.garbageCollect();
 	m_objectContent.garbageCollect();
 	m_worldContent.garbageCollect();
 	m_scriptContent.garbageCollect();
@@ -901,6 +907,7 @@ void zpApplication::runGarbageCollect()
 void zpApplication::runReloadAllResources()
 {
 	m_textContent.reloadAllResources();
+	m_prefabContent.reloadAllResources();
 	m_objectContent.reloadAllResources();
 	m_worldContent.reloadAllResources();
 	m_scriptContent.reloadAllResources();
@@ -919,6 +926,7 @@ void zpApplication::runReloadAllResources()
 void zpApplication::runReloadChangedResources()
 {
 	m_textContent.reloadChangedResources();
+	m_prefabContent.reloadChangedResources();
 	m_objectContent.reloadChangedResources();
 	m_worldContent.reloadChangedResources();
 	m_scriptContent.reloadChangedResources();

@@ -365,7 +365,6 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 			i->setBlendState( ZP_NULL, ZP_NULL, 0xFFFFFFFF );
 			processRenderingQueue( i, ZP_RENDERING_QUEUE_BACKGROUND );
 			processRenderingQueueWithLighting( i, ZP_RENDERING_QUEUE_OPAQUE );
-			processRenderingQueue( i, ZP_RENDERING_QUEUE_OPAQUE_DEBUG );
 
 			// 4) render skybox commands
 			processRenderingQueue( i, ZP_RENDERING_QUEUE_SKYBOX );
@@ -374,7 +373,6 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 			// 5) render transparent commands
 			i->setBlendState( &m_alphaBlend, ZP_NULL, 0xFFFFFFFF );
 			processRenderingQueueWithLighting( i, ZP_RENDERING_QUEUE_TRANSPARENT );
-			processRenderingQueue( i, ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG );
 
 			// 6) render overlay commands
 			processRenderingQueue( i, ZP_RENDERING_QUEUE_OVERLAY );
@@ -414,7 +412,6 @@ void zpRenderingPipeline::submitRendering( zpRenderingContext* i )
 			useCamera( i, camera, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_CAMERA ] );
 
 			processRenderingQueue( i, ZP_RENDERING_QUEUE_UI );
-			processRenderingQueue( i, ZP_RENDERING_QUEUE_UI_DEBUG );
 		}
 	}
 
@@ -837,8 +834,8 @@ void zpRenderingPipeline::processRenderingQueueWithLighting( zpRenderingContext*
 	if( cmd != end )
 	{
 		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_PER_DRAW_CALL ] );
+		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_VERTEX_SHADER | ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_SH, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_SH ] );
 		
-		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_SH, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_SH ] );
 		i->setConstantBuffer( ZP_RESOURCE_BIND_SLOT_PIXEL_SHADER, ZP_CONSTANT_BUFFER_SLOT_LIGHT, &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ] );
 
 		zpDrawCallBufferData drawCallData;

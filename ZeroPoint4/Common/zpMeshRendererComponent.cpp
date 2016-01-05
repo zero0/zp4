@@ -3,6 +3,8 @@
 zpMeshRendererComponent::zpMeshRendererComponent( zpObject* obj, const zpBison::Value& def )
 	: zpComponent( obj )
 	, m_layer( ZP_RENDERING_LAYER_DEFAULT )
+	, m_castsShadowMask( 0xFF )
+	, m_receivesShadowMask( 0xFF )
 {
 	zp_bool ok = false;
 	
@@ -65,10 +67,26 @@ void zpMeshRendererComponent::setMaterialOverride( const zp_char* materialFile )
 }
 void zpMeshRendererComponent::resetMaterialOverride()
 {
-	
-
 	//m_materials.release();
 	//m_hasMaterialOverride = false;
+}
+
+void zpMeshRendererComponent::setCastsShadow( zp_uint shadowIndex, zp_bool castsShadow )
+{
+	m_castsShadowMask.setMarked( shadowIndex, castsShadow );
+}
+zp_bool zpMeshRendererComponent::getCastsShadow( zp_uint shadowIndex ) const
+{
+	return m_castsShadowMask.isMarked( shadowIndex );
+}
+
+void zpMeshRendererComponent::setReceivesShadow( zp_uint shadowIndex, zp_bool receivesShadow )
+{
+	m_receivesShadowMask.setMarked( shadowIndex, receivesShadow );
+}
+zp_bool zpMeshRendererComponent::getReceivesShadow( zp_uint shadowIndex ) const
+{
+	return m_receivesShadowMask.isMarked( shadowIndex );
 }
 
 void zpMeshRendererComponent::onCreate() {}

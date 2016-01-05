@@ -8,8 +8,9 @@ void compileTransform( zpJson& inputObject )
 	zpJson& transform = inputObject[ "Transform" ];
 	if( transform.isObject() && !transform.isEmpty() )
 	{
-		zpMatrix4f outTransform;
-		outTransform = zpMath::MatrixIdentity();
+		zpVector4f pos = zpMath::Vector4( 0, 0, 0, 1 );
+		zpQuaternion4f rot = zpMath::Quaternion( 0, 0, 0, 1 );
+		zpVector4f scl = zpMath::Vector4( 0, 0, 0, 0 );
 
 		zpJson& translate = transform[ "Position" ];
 		zpJson& rotation = transform[ "Rotation" ];
@@ -17,24 +18,32 @@ void compileTransform( zpJson& inputObject )
 
 		if( !translate.isEmpty() )
 		{
-			zpVector4f pos = zpMath::Vector4( translate[ (zp_uint)0 ].asFloat(), translate[ (zp_uint)1 ].asFloat(), translate[ (zp_uint)2 ].asFloat(), 1.0f );
-			outTransform.m_m4 = pos;
+			zp_float x = translate[ (zp_uint)0 ].asFloat();
+			zp_float y = translate[ (zp_uint)1 ].asFloat();
+			zp_float z = translate[ (zp_uint)2 ].asFloat();
+
+			pos = zpMath::Vector4( x, y, z, 1.f );
 		}
+
 		if( !rotation.isEmpty() )
 		{
+			zp_float x = rotation[ (zp_uint)0 ].asFloat();
+			zp_float y = rotation[ (zp_uint)1 ].asFloat();
+			zp_float z = rotation[ (zp_uint)2 ].asFloat();
 
+			rot = zpMath::QuaternionFromEulerAngle( x, y, z );
 		}
+
 		if( !scale.isEmpty() )
 		{
-			zpMatrix4f mat;
-			mat = zpMath::MatrixIdentity();
+			zp_float x = scale[ (zp_uint)0 ].asFloat();
+			zp_float y = scale[ (zp_uint)1 ].asFloat();
+			zp_float z = scale[ (zp_uint)2 ].asFloat();
 
-			mat.m_m1 = zpMath::Vector4Scale( mat.m_m1, zpMath::Scalar( scale[ (zp_uint)0 ].asFloat() ) );
-			mat.m_m2 = zpMath::Vector4Scale( mat.m_m2, zpMath::Scalar( scale[ (zp_uint)1 ].asFloat() ) );
-			mat.m_m3 = zpMath::Vector4Scale( mat.m_m3, zpMath::Scalar( scale[ (zp_uint)2 ].asFloat() ) );
-
-			outTransform = zpMath::MatrixMul( outTransform, mat );
+			scl = zpMath::Vector4( x, y, z, 0.f );
 		}
+
+		zpMatrix4f outTransform = zpMath::TRS( pos, rot, scl );
 
 		transform = zpJson( &outTransform, sizeof( zpMatrix4f ) );
 	}
@@ -88,6 +97,24 @@ zp_bool compileObject( zpJsonParser& parser, zpArrayList< zpString >& processedF
 		//compileTransform( inputObject );
 
 		zpJson::mergeJson( outObject, inputObject );
+	}
+
+	return ok;
+}
+
+zp_bool compilePrefab( zpJsonParser& parser, zpArrayList< zpString >& processedFiles, const zpString& srcFile, zpJson& outPrefab )
+{
+	zp_bool ok = false;
+
+	if( parser.parseFile( srcFile, outPrefab ) )
+	{
+		ok = true;
+
+		//zpJson& objects = outWorld[ "Objects" ];
+		//objects.foreachArray( []( zpJson& value )
+		//{
+		//	compileTransform( value );
+		//} );
 	}
 
 	return ok;
@@ -149,6 +176,11 @@ zp_int main( zp_int argCount, const zp_char* args[] )
 		if( inputFile.endsWith( ".object" ) )
 		{
 			ok = compileObject( parser, processedFiles, inputFile, outputJson );
+		}
+		// compile prefab
+		else if( inputFile.endsWith( ".prefab" ) )
+		{
+			ok = compilePrefab( parser, processedFiles, inputFile, outputJson );
 		}
 		// compile world
 		else if( inputFile.endsWith( ".world" ) )

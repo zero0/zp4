@@ -3,7 +3,7 @@
 
 #define ZP_MATERIAL_GLOBAL_CBUFFER	"$Globals"
 
-zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* pipeline, zp_ushort materialId )
+zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* pipeline, zp_uint materialId )
 {
 	zp_bool ok;
 	m_filename = filename;
@@ -26,7 +26,7 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 		const zpBison::Value& materialRoot = material.root();
 
 		// load sort bias
-		zp_ushort sortBias = materialRoot[ "SortBias" ].asInt();
+		zp_int sortBias = materialRoot[ "SortBias" ].asInt();
 		m_resource.sortBias = sortBias;
 
 		// load blend mode for the material
@@ -149,7 +149,7 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 
 					zpMaterialTexture& t = m_resource.materialTextures.pushBackEmpty();
 					t.name = name;
-					t.scaleOffset = zpMath::Vector4( textureOffset[ 0 ].asFloat(), textureOffset[ 1 ].asFloat(), textureScale[ 0 ].asFloat(), textureScale[ 1 ].asFloat() );
+					t.scaleOffset = zpMath::Vector4( textureScale[ 0 ].asFloat(), textureScale[ 1 ].asFloat(), textureOffset[ 0 ].asFloat(), textureOffset[ 1 ].asFloat() );
 
 					zp_bool ok = pipeline->getTextureContentManager()->getResource( textureFile, t.texture );
 					ZP_ASSERT( ok, "Failed to get texture %s", textureFile );
@@ -171,6 +171,30 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 
 			zp_byte* buffer;
 			cxt->map( &m_resource.globalVariables, (void**)&buffer );
+
+			if( !m_resource.materialTextures.isEmpty() )
+			{
+				zpFixedStringBuffer< 64 > textureST;
+				for( zp_size_t i = 0; i < m_resource.materialTextures.size(); ++i )
+				{
+					const zpMaterialTexture& matTexture = m_resource.materialTextures[ i ];
+					
+					textureST.clear();
+					textureST << matTexture.name << "_ST";
+
+					zpMaterialGlobalVariable* var;
+					zp_bool found = m_resource.globalVariablesDef.findIf( [ &textureST ]( const zpMaterialGlobalVariable& def ){
+						return def.name == textureST.str();
+					}, &var );
+					ZP_ASSERT_WARN( found, "Shader did not define global %s", textureST.str() );
+
+					if( found )
+					{
+						zp_float* ptr = (zp_float*)( buffer + var->offset );
+						zpMath::Vector4Store4( matTexture.scaleOffset, ptr );
+					}
+				}
+			}
 
 			matGlobals.foreachObject( [ this, buffer ]( const zpBison::Value& globalKey, const zpBison::Value& globalValue ) {
 				const zp_char* globalName = globalKey.asCString();

@@ -8,6 +8,86 @@
 #error( "No rendering engine selected!" )
 #endif
 
+struct zpSortKeyParts
+{
+	zpRenderingViewport viewport;
+	zpRenderingQueue queue;
+	zp_uint transparentType;
+	zp_uint depth;
+	zp_uint material;
+	zp_uint pass;
+};
+
+struct zpSortKeyCommandParts
+{
+	zpRenderingViewport viewport;
+	zpRenderingQueue queue;
+	zp_uint transparentType;
+	zp_uint sequence;
+	zp_uint renderingCommand;
+};
+
+ZP_FORCE_INLINE zp_ulong _GenerateSortKey( zpRenderingViewport viewport, zpRenderingQueue queue, zp_uint transparentType, zp_uint depth, zp_uint material, zp_uint pass )
+{
+	//    6         5         4         3         2         1         0
+	// 3210987654321098765432109876543210987654321098765432109876543210
+	// vvvqqqttcddddddddddddddddddddddddmmmmmmmmmmmmmmmmmmmmmmmmppppppp
+	// vvvqqqttcsssssssssssssssssssssssoooooooooooooooooooooooooooooooo
+
+	zp_ulong key = 0L;
+	key |= ( ( 0x00000007L & (zp_ulong)viewport        ) << 61 );
+	key |= ( ( 0x00000007L & (zp_ulong)queue           ) << 58 );
+	key |= ( ( 0x00000003L & (zp_ulong)transparentType ) << 56 );
+	key |= ( ( 0x00000001L & (zp_ulong)0               ) << 55 );
+	key |= ( ( 0x00FFFFFFL & (zp_ulong)depth           ) << 31 );
+	key |= ( ( 0x00FFFFFFL & (zp_ulong)material        ) << 7 );
+	key |= ( ( 0x00000007L & (zp_ulong)pass            ) << 0 );
+
+	return key;
+}
+
+ZP_FORCE_INLINE zp_ulong _GenerateSortKeyForCommand( zpRenderingViewport viewport, zpRenderingQueue queue, zp_uint transparentType, zp_uint sequence, zp_uint renderingCommand )
+{
+	zp_ulong key = 0L;
+	key |= ( ( 0x00000007L & (zp_long)viewport         ) << 61 );
+	key |= ( ( 0x00000007L & (zp_long)queue            ) << 58 );
+	key |= ( ( 0x00000003L & (zp_long)transparentType  ) << 56 );
+	key |= ( ( 0x00000001L & (zp_long)1                ) << 55 );
+	key |= ( ( 0x00FFFFFFL & (zp_long)sequence         ) << 31 );
+	key |= ( ( 0x7FFFFFFFL & (zp_long)renderingCommand ) << 0 );
+
+	return key;
+}
+
+ZP_FORCE_INLINE void _ParseSortKey( zp_ulong sortKey, zpRenderingViewport& viewport, zpRenderingQueue& queue, zp_uint& transparentType, zp_uint& depth, zp_uint& material, zp_uint& pass )
+{
+	viewport        = (zpRenderingViewport)( 0x00000007L & ( sortKey >> 61 ) );
+	queue           = (zpRenderingQueue)   ( 0x00000007L & ( sortKey >> 58 ) );
+	transparentType =                      ( 0x00000003L & ( sortKey >> 56 ) );
+	//0             =                      ( 0x00000001L & ( sortKey >> 55 ) );
+	depth           =                      ( 0x00FFFFFFL & ( sortKey >> 31 ) );
+	material        =                      ( 0x00FFFFFFL & ( sortKey >> 7  ) );
+	pass            =                      ( 0x00000007L & ( sortKey >> 0  ) );
+}
+
+ZP_FORCE_INLINE void _ParseSortKeyForCommand( zp_ulong sortKey, zpRenderingViewport& viewport, zpRenderingQueue& queue, zp_uint& transparentType, zp_uint& sequence, zp_uint& renderingCommand )
+{
+	viewport         = (zpRenderingViewport)( 0x00000007L & ( sortKey >> 61 ) );
+	queue            = (zpRenderingQueue)   ( 0x00000007L & ( sortKey >> 58 ) );
+	transparentType  =                      ( 0x00000003L & ( sortKey >> 56 ) );
+	//1              =                      ( 0x00000001L & ( sortKey >> 55 ) );
+	sequence         =                      ( 0x00FFFFFFL & ( sortKey >> 31 ) );
+	renderingCommand =                      ( 0x7FFFFFFFL & ( sortKey >> 0  ) );
+}
+
+ZP_FORCE_INLINE zp_int _CompareSortKey( zp_ulong a, zp_ulong b )
+{
+	zp_ulong sortA = ( a << 9 );
+	zp_ulong sortB = ( b << 9 );
+
+	return sortA < sortB ? -1 : sortA > sortB ? 1 : 0;
+}
+
 zpRenderingContext::zpRenderingContext()
 	: m_renderContextImpl( ZP_NULL )
 	, m_renderingEngine( ZP_NULL )
@@ -147,8 +227,8 @@ void zpRenderingContext::beginDrawImmediate( zp_uint layer, zpRenderingQueue que
 	m_currentCommnad->type = ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE;
 	m_currentCommnad->layer = layer;
 	m_currentCommnad->queue = queue;
-	m_currentCommnad->sortKey = material->getData()->materialId;
-	m_currentCommnad->sortBias = material->getData()->sortBias;
+	m_currentCommnad->sortKey = 0L;
+	m_currentCommnad->sortBias = 0;
 
 	m_currentCommnad->topology = topology;
 	m_currentCommnad->vertexBuffer = m_currentVertexBuffer->getBufferImpl();
@@ -183,7 +263,7 @@ void zpRenderingContext::setMatrix( const zpMatrix4f& matrix )
 
 	m_currentCommnad->matrix = matrix;
 }
-void zpRenderingContext::setSortBias( zp_ushort bias )
+void zpRenderingContext::setSortBias( zp_int bias )
 {
 	ZP_ASSERT( m_currentCommnad != ZP_NULL, "" );
 
@@ -703,8 +783,8 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.boundingBox = b->m_boundingBox;
 		command.matrix = matrix;
 
-		command.sortKey = command.material->getData()->materialId;
-		command.sortBias = command.material->getData()->sortBias;
+		command.sortKey = 0L;
+		command.sortBias = 0;
 
 		command.boundingBox.setCenter( matrix.m_m4 );
 	}
@@ -752,7 +832,6 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 	for( zp_uint i = 0; i < zpRenderingQueue_Count; ++i )
 	{
 		m_filteredCommands[ i ].reset();
-		m_filteredCommands[ i ].reserve( 10 );
 	}
 
 	const zpFrustum& frustum = camera->getFrustum();
@@ -775,7 +854,6 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 			// no sort key needed for non-sorted queues
 		case ZP_RENDERING_QUEUE_SKYBOX:
 		case ZP_RENDERING_QUEUE_UI:
-		case ZP_RENDERING_QUEUE_UI_DEBUG:
 			stats.visibleDrawCommands[ cmd->queue ]++;
 			m_filteredCommands[ cmd->queue ].pushBack( cmd );
 			break;
@@ -795,15 +873,9 @@ void zpRenderingContext::preprocessCommands( zpCamera* camera, zp_uint layer )
 	m_filteredCommands[ ZP_RENDERING_QUEUE_OPAQUE ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
 		return cmd0->sortKey < cmd1->sortKey;
 	} );
-	m_filteredCommands[ ZP_RENDERING_QUEUE_OPAQUE_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
-		return cmd0->sortKey < cmd1->sortKey;
-	} );
 
 	// sort transparent back to front
 	m_filteredCommands[ ZP_RENDERING_QUEUE_TRANSPARENT ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
-		return cmd0->sortKey > cmd1->sortKey;
-	} );
-	m_filteredCommands[ ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG ].sort( []( zpRenderingCommand* cmd0, zpRenderingCommand* cmd1 ) {
 		return cmd0->sortKey > cmd1->sortKey;
 	} );
 }
@@ -946,6 +1018,16 @@ void zpRenderingContext::endDrawFont()
 	m_currentFont = ZP_NULL;
 }
 
+zpRenderingContextImpl* zpRenderingContext::getRenderingContextImpl() const
+{
+	return m_renderContextImpl;
+}
+
+const zpArrayList< zpRenderingCommand* >& zpRenderingContext::getFilteredCommands( zpRenderingQueue layer ) const
+{
+	return m_filteredCommands[ layer ];
+}
+
 const zpRenderingStats& zpRenderingContext::getPreviousFrameStats() const
 {
 	zp_size_t index = m_currentBufferIndex == 0 ? ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS - 1 : m_currentBufferIndex - 1; //( ( ( (zp_int)m_currentBufferIndex ) - 1 ) + ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS ) % ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS;
@@ -962,8 +1044,11 @@ void zpRenderingContext::generateSortKeyForCommand( zpRenderingCommand* command,
 	dist = zpMath::ScalarMul( dist, dist );
 	len = zpMath::ScalarDiv( len, dist );
 
-	zp_ushort distKey = command->sortBias + (zp_ushort)( zpMath::AsFloat( len ) * (zp_float)zp_limit_max<zp_ushort>() );
-	zp_uint matKey = command->sortKey;
+	const zpMaterial* mat = command->material->getData();
+	
+	zp_uint matKey = mat->materialId;
+	zp_uint distKey = zpMath::AsFloat( len ) * 0x00FFFFFF;
+	distKey += command->sortBias + mat->sortBias;
 
-	command->sortKey = ( distKey << 16 ) | ( matKey & 0xFFFF );
+	command->sortKey = _GenerateSortKey( ZP_RENDERING_VIEWPORT_FULLSCREEN, command->queue, ZP_RENDERING_SORT_ORDER_OPAQUE, distKey, matKey, 0 );
 }

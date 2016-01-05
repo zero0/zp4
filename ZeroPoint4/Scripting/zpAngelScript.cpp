@@ -834,13 +834,10 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	// Rendering Queue
 	r = engine->RegisterEnum(      ZP_SCRIPT_RENDERING_QUEUE ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "Opaque",				ZP_RENDERING_QUEUE_OPAQUE ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "OpaqueDebug",			ZP_RENDERING_QUEUE_OPAQUE_DEBUG ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "Skybox",				ZP_RENDERING_QUEUE_SKYBOX ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "Transparent",			ZP_RENDERING_QUEUE_TRANSPARENT ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "TransparentDebug",	ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "Overlay",				ZP_RENDERING_QUEUE_OVERLAY ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "Transparent",		ZP_RENDERING_QUEUE_TRANSPARENT ); AS_ASSERT( r );
+	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "Overlay",			ZP_RENDERING_QUEUE_OVERLAY ); AS_ASSERT( r );
 	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "UI",					ZP_RENDERING_QUEUE_UI ); AS_ASSERT( r );
-	r = engine->RegisterEnumValue( ZP_SCRIPT_RENDERING_QUEUE, "UIDebug",				ZP_RENDERING_QUEUE_UI_DEBUG ); AS_ASSERT( r );
 
 	// Topology
 	r = engine->RegisterEnum(      ZP_SCRIPT_TOPOLOGY ); AS_ASSERT( r );
@@ -866,7 +863,7 @@ void as_Register_Rendering( asIScriptEngine* engine, zpApplication* app )
 	r = engine->RegisterGlobalFunction( "void SetBoundingBox( const " ZP_SCRIPT_BOUNDBOXAABB "& in )", asMETHODPR( zpRenderingContext, setBoundingBox, ( const zpBoundingAABB& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void SetBoundingBoxCenter( const " ZP_SCRIPT_VECTOR4 "& in )", asMETHODPR( zpRenderingContext, setBoundingBoxCenter, ( const zpVector4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void SetMatrix( const " ZP_SCRIPT_MATRIX4 "& in )", asMETHODPR( zpRenderingContext, setMatrix, ( const zpMatrix4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
-	r = engine->RegisterGlobalFunction( "void SetSortBias( int )", asMETHODPR( zpRenderingContext, setSortBias, ( zp_ushort ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
+	r = engine->RegisterGlobalFunction( "void SetSortBias( int )", asMETHODPR( zpRenderingContext, setSortBias, ( zp_int ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 
 	r = engine->RegisterGlobalFunction( "void AddVertex( const " ZP_SCRIPT_VECTOR4 "& in, const " ZP_SCRIPT_COLOR "& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpColor4f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );
 	r = engine->RegisterGlobalFunction( "void AddVertex( const " ZP_SCRIPT_VECTOR4 "& in, const " ZP_SCRIPT_VECTOR2 "& in )", asMETHODPR( zpRenderingContext, addVertex, ( const zpVector4f&, const zpVector2f& ), void ), asCALL_THISCALL_ASGLOBAL, i ); AS_ASSERT( r );

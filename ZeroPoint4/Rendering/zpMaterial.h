@@ -41,8 +41,8 @@ struct zpMaterial
 
 	zpArrayList< zpMaterialTexture > materialTextures;
 
-	zp_ushort materialId;
-	zp_ushort sortBias;
+	zp_uint materialId;
+	zp_int sortBias;
 
 	zpRenderingQueue queue;
 
@@ -52,7 +52,7 @@ struct zpMaterial
 class zpMaterialResource : public zpResource< zpMaterial >
 {
 private:
-	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline, zp_ushort materialId );
+	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline, zp_uint materialId );
 	void unload( zpRenderingPipeline* pipeline );
 
 	friend class zpMaterialContentManager;
@@ -72,7 +72,7 @@ private:
 	void destroyResource( zpMaterialResource* res );
 	void initializeInstance( zpMaterialResourceInstance& instance ) {}
 
-	zp_ushort m_currentMaterialId;
+	zp_uint m_currentMaterialId;
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

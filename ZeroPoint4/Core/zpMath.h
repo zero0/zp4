@@ -365,6 +365,7 @@ namespace zpMath
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4RotateY( zpVector4fParamF a, zpScalarParamF rad );
 	ZP_FORCE_INLINE zpVector4f ZP_VECTORCALL Vector4RotateZ( zpVector4fParamF a, zpScalarParamF rad );
 
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromEulerAngle( zp_float yaw, zp_float pitch, zp_float roll );
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromEulerAngle( zpScalarParamF yaw, zpScalarParamF pitch, zpScalarParamF roll );
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromAxisAngle( zpVector4fParamF axis, zpScalarParamF angle );
 

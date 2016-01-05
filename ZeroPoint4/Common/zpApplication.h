@@ -146,6 +146,8 @@ public:
 	zpAudioEngine* getAudioEngine() { return &m_audioEngine; }
 
 	zpTextContentManager* getTextContentManager() { return &m_textContent; }
+
+	zpPrefabContentManager* getPrefabContentManager() { return &m_prefabContent; }
 	zpObjectContentManager* getObjectContentManager() { return &m_objectContent; }
 	zpScriptContentManager* getScriptContentManager() { return &m_scriptContent; }
 	zpAudioContentManager* getAudioContentManager() { return &m_audioContent; }
@@ -235,6 +237,7 @@ private:
 	zpInputManager m_inputManager;
 	zpRenderingPipeline m_renderingPipeline;
 	
+	zpPrefabContentManager m_prefabContent;
 	zpObjectContentManager m_objectContent;
 	zpWorldContentManager m_worldContent;
 	zpScriptContentManager m_scriptContent;

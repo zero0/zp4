@@ -519,6 +519,35 @@ namespace zpMath
 		return Quaternion( buff[0], buff[1], buff[2], buff[3] );
 	}
 
+	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromEulerAngle( zp_float yaw, zp_float pitch, zp_float roll )
+	{
+		zp_float y, p, r;
+		y = yaw;
+		p = pitch;
+		r = roll;
+
+		zp_float hr = r * 0.5f;
+		zp_float shr = zp_sin(hr);
+		zp_float chr = zp_cos(hr);
+		zp_float hp = p * 0.5f;
+		zp_float shp = zp_sin(hp);
+		zp_float chp = zp_cos(hp);
+		zp_float hy = y * 0.5f;
+		zp_float shy = zp_sin(hy);
+		zp_float chy = zp_cos(hy);
+		zp_float chy_shp = chy * shp;
+		zp_float shy_chp = shy * chp;
+		zp_float chy_chp = chy * chp;
+		zp_float shy_shp = shy * shp;
+
+		zp_float sx = (chy_shp * chr) + (shy_chp * shr); // cos(yaw/2) * sin(pitch/2) * cos(roll/2) + sin(yaw/2) * cos(pitch/2) * sin(roll/2)
+		zp_float sy = (shy_chp * chr) - (chy_shp * shr); // sin(yaw/2) * cos(pitch/2) * cos(roll/2) - cos(yaw/2) * sin(pitch/2) * sin(roll/2)
+		zp_float sz = (chy_chp * shr) - (shy_shp * chr); // cos(yaw/2) * cos(pitch/2) * sin(roll/2) - sin(yaw/2) * sin(pitch/2) * cos(roll/2)
+		zp_float sw = (chy_chp * chr) + (shy_shp * shr); // cos(yaw/2) * cos(pitch/2) * cos(roll/2) + sin(yaw/2) * sin(pitch/2) * sin(roll/2)
+
+		return zpMath::Quaternion( sx, sy, sz, sw );
+	}
+
 	ZP_FORCE_INLINE zpQuaternion4f ZP_VECTORCALL QuaternionFromEulerAngle( zpScalarParamF yaw, zpScalarParamF pitch, zpScalarParamF roll )
 	{
 		zp_float y, p, r;

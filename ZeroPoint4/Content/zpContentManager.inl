@@ -280,6 +280,8 @@ void zpContentManager<Resource, ResourceInstance, ImplManager, ResourceCount>::r
 					res->m_isLoadedFromFile = true;
 					res->m_lastTimeLoaded = mtime;
 				}
+
+				zp_printfln( "Asset %s reloaded at %d", filename.str(), mtime );
 			}
 		}
 	}

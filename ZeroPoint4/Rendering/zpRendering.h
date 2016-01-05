@@ -59,29 +59,45 @@ enum zpCameraType : zp_byte
 	ZP_CAMERA_TYPE_MAIN,
 	ZP_CAMERA_TYPE_UI,
 
-	zpCameraType_Count,
+	zpCameraType_Count
 };
 
 enum zpRenderingQueue : zp_byte
 {
 	ZP_RENDERING_QUEUE_BACKGROUND,
-
 	ZP_RENDERING_QUEUE_OPAQUE,
-	ZP_RENDERING_QUEUE_OPAQUE_DEBUG,
-
 	ZP_RENDERING_QUEUE_SKYBOX,
-
 	ZP_RENDERING_QUEUE_ALPHATEST,
-
 	ZP_RENDERING_QUEUE_TRANSPARENT,
-	ZP_RENDERING_QUEUE_TRANSPARENT_DEBUG,
-
 	ZP_RENDERING_QUEUE_OVERLAY,
-
 	ZP_RENDERING_QUEUE_UI,
-	ZP_RENDERING_QUEUE_UI_DEBUG,
 
-	zpRenderingQueue_Count,
+	zpRenderingQueue_Count
+};
+
+enum zpRenderingViewport : zp_byte
+{
+	ZP_RENDERING_VIEWPORT_FULLSCREEN,
+
+	ZP_RENDERING_VIEWPORT_SPLIT_TOP,
+	ZP_RENDERING_VIEWPORT_SPLIT_BOTTOM,
+
+	ZP_RENDERING_VIEWPORT_QUAD_TOP_LEFT,
+	ZP_RENDERING_VIEWPORT_QUAD_TOP_RIGHT,
+	ZP_RENDERING_VIEWPORT_QUAD_BOTTOM_LEFT,
+	ZP_RENDERING_VIEWPORT_QUAD_BOTTOM_RIGHT,
+
+	zpRenderingViewport_Count
+};
+
+enum zpRenderingSortOrder : zp_byte
+{
+	ZP_RENDERING_SORT_ORDER_NO_SORT,
+	ZP_RENDERING_SORT_ORDER_OPAQUE,
+	ZP_RENDERING_SORT_ORDER_ALPHA_TEST,
+	ZP_RENDERING_SORT_ORDER_TRANSPARENT,
+
+	zpRenderingTransparencyType_Count
 };
 
 const zp_char* g_renderingQueues[];
@@ -570,13 +586,25 @@ class zpMaterialResourceInstance;
 class zpMeshResourceInstance;
 class zpAtlasResourceInstance;
 
+#if 0
+struct zpRenderingSortKey
+{
+		zp_uint viewport : 3;
+		zp_uint layer : 3;
+		zp_uint transparent : 1;
+		zp_uint command : 1;
+		zp_uint depth : 24;
+		zp_uint material : 30;
+		zp_uint pass : 2;
+};
+#endif
 struct zpRenderingCommand
 {
 	zpRenderingCommandType type;
 	zpRenderingQueue queue;
 	zp_uint layer;
-	zp_uint sortKey;
-	zp_ushort sortBias;
+	zp_ulong sortKey;
+	zp_int sortBias;
 
 	zpTopology topology;
 	const zpBufferImpl* vertexBuffer;

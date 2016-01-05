@@ -173,6 +173,7 @@
     <ClInclude Include="zpApplication.h" />
     <ClInclude Include="zpCharacterComponent.h" />
     <ClInclude Include="zpPlayerComponent.h" />
+    <ClInclude Include="zpPrefab.h" />
     <ClInclude Include="zpRectTransformComponent.h" />
     <ClInclude Include="zpSkyBoxComponent.h" />
     <ClInclude Include="zpSpawnerComponent.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="zpAnimatedMeshRendererComponent.cpp" />
     <ClCompile Include="zpApplication.cpp" />
     <ClCompile Include="zpPlayerComponent.cpp" />
+    <ClCompile Include="zpPrefab.cpp" />
     <ClCompile Include="zpRectTransformComponent.cpp" />
     <ClCompile Include="zpSkyBoxComponent.cpp" />
     <ClCompile Include="zpSpawnerComponent.cpp" />

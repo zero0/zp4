@@ -47,7 +47,7 @@ public:
 	void setBoundingBoxCenter( const zpVector4f& center );
 
 	void setMatrix( const zpMatrix4f& matrix );
-	void setSortBias( zp_ushort bias );
+	void setSortBias( zp_int bias );
 
 	void addVertex( const zpVector4f& pos, const zpColor4f& color );
 	void addVertex( const zpVector4f& pos, const zpVector2f& uv0 );
@@ -157,9 +157,9 @@ public:
 		addText( text.str(), size, position, alignment, colorTop, colorBottom );
 	}
 
-	zpRenderingContextImpl* getRenderingContextImpl() const { return m_renderContextImpl; }
+	zpRenderingContextImpl* getRenderingContextImpl() const;
 
-	const zpArrayList< zpRenderingCommand* >& getFilteredCommands( zpRenderingQueue layer ) const { return m_filteredCommands[ layer ]; }
+	const zpArrayList< zpRenderingCommand* >& getFilteredCommands( zpRenderingQueue layer ) const;
 
 	const zpRenderingStats& getPreviousFrameStats() const;
 
@@ -175,9 +175,10 @@ private:
 	zpRenderingEngine* m_renderingEngine;
 
 	zpRenderingCommand* m_currentCommnad;
+
 	zpFixedArrayList< zpRenderingCommand, ZP_RENDERING_MAX_COMMNADS > m_renderingCommands;
-	//zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_VERTEX_BUFFER_SIZE > m_scratchVertexBuffer;
-	//zpFixedDataBuffer< ZP_RENDERING_IMMEDIATE_SCRATCH_INDEX_BUFFER_SIZE > m_scratchIndexBuffer;
+	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingQueue_Count ];
+	
 	zpDataBuffer m_scratchVertexBuffer;
 	zpDataBuffer m_scratchIndexBuffer;
 
@@ -193,7 +194,6 @@ private:
 	
 	zpFixedArrayList< zpRenderingStats, ZP_RENDERING_MAX_IMMEDIATE_SWAP_BUFFERS > m_renderingStats;
 
-	zpArrayList< zpRenderingCommand* > m_filteredCommands[ zpRenderingQueue_Count ];
 
 	const zpFontResourceInstance* m_currentFont;
 

@@ -16,15 +16,15 @@ zpSkyBoxComponent::zpSkyBoxComponent( zpObject* obj, const zpBison::Value& def )
 	ok = getApplication()->getRenderPipeline()->getMaterialContentManager()->getResource( materialFile, m_material );
 	ZP_ASSERT_WARN( ok, "Unable to load material %s", materialFile );
 
-	m_shData.SH0 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH1 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH2 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH3 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH4 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH5 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH6 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH7 = zpMath::Vector4( 0, 0, 0, 0 );
-	m_shData.SH8 = zpMath::Vector4( 0, 0, 0, 0 );
+	m_shData.SH0 = zpMath::Vector4(  0.690826f,  0.791972f,  1.156998f, 0.f );
+	m_shData.SH1 = zpMath::Vector4( -0.032214f, -0.032154f, -0.031143f, 0.f );
+	m_shData.SH2 = zpMath::Vector4(  0.181760f,  0.213785f,  0.350721f, 0.f );
+	m_shData.SH3 = zpMath::Vector4(  0.174773f,  0.165067f,  0.134813f, 0.f );
+	m_shData.SH4 = zpMath::Vector4( -0.140021f, -0.133054f, -0.109773f, 0.f );
+	m_shData.SH5 = zpMath::Vector4(  0.003920f,  0.002716f, -0.001993f, 0.f );
+	m_shData.SH6 = zpMath::Vector4( -0.285459f, -0.332236f, -0.476629f, 0.f );
+	m_shData.SH7 = zpMath::Vector4( -0.021688f, -0.022507f, -0.025049f, 0.f );
+	m_shData.SH8 = zpMath::Vector4(  0.056419f,  0.054559f,  0.047959f, 0.f );
 }
 zpSkyBoxComponent::~zpSkyBoxComponent()
 {}

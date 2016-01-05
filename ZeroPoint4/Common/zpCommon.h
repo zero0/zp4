@@ -95,6 +95,7 @@ class zpOctreeNode;
 #include "zpAllComponents.h"
 #include "zpAllGameManagers.h"
 
+#include "zpPrefab.h"
 #include "zpObject.h"
 #include "zpWorld.h"
 #include "zpApplication.h"

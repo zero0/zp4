@@ -17,6 +17,12 @@ public:
 	void setMaterialOverride( const zp_char* materialFile );
 	void resetMaterialOverride();
 
+	void setCastsShadow( zp_uint shadowIndex, zp_bool castsShadow );
+	zp_bool getCastsShadow( zp_uint shadowIndex ) const;
+
+	void setReceivesShadow( zp_uint shadowIndex, zp_bool receivesShadow );
+	zp_bool getReceivesShadow( zp_uint shadowIndex ) const;
+
 protected:
 	void onCreate();
 	void onInitialize();
@@ -30,6 +36,9 @@ protected:
 
 private:
 	zp_uint m_layer;
+
+	zpFlag8 m_castsShadowMask;
+	zpFlag8 m_receivesShadowMask;
 
 	zpMeshResourceInstance m_mesh;
 	zpMaterialResourceInstance m_material;

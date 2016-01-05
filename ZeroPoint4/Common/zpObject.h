@@ -48,6 +48,10 @@ public:
 
 	zpAllComponents* getComponents();
 
+	zp_uint getPrefabID() const;
+	zp_uint getID() const;
+	void setID( zp_uint id );
+
 	void setFlag( zpObjectFlag flag );
 	void unsetFlag( zpObjectFlag flag );
 	zp_bool isFlagSet( zpObjectFlag flag ) const;
@@ -91,6 +95,8 @@ private:
 	zpFlag32 m_layers;
 	zpFlag32 m_flags;
 	zp_long m_lastLoadTime;
+	zp_uint m_prefabId;
+	zp_uint m_instanceId;
 	zpAllComponents m_components;
 
 	zpApplication* m_application;
@@ -102,6 +108,9 @@ private:
 class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 16 >, public zpContentPool< zpObject, 64 >
 {
 public:
+	zpObjectContentManager();
+	virtual ~zpObjectContentManager();
+
 	zpObject* createObject();
 	zpObject* createObject( const zp_char* filename );
 	zpObject* createObject( const zpBison::Value& def );
@@ -121,6 +130,8 @@ private:
 	zp_bool createResource( zpObjectResource* res, const zp_char* filename );
 	void destroyResource( zpObjectResource* res );
 	void initializeInstance( zpObjectResourceInstance& instance ) {}
+
+	zp_uint m_numObjects;
 
 	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
 	friend class zpContentManager;

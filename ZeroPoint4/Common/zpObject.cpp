@@ -13,9 +13,17 @@ void zpObjectResource::unload()
 	m_filename.clear();
 }
 
+zpObjectContentManager::zpObjectContentManager()
+	: m_numObjects( 0 )
+{}
+zpObjectContentManager::~zpObjectContentManager()
+{}
+
 zpObject* zpObjectContentManager::createObject()
 {
 	zpObject* o = create( getApplication() );
+	o->setID( ++m_numObjects );
+
 	return o;
 }
 zpObject* zpObjectContentManager::createObject( const zp_char* filename )
@@ -27,6 +35,7 @@ zpObject* zpObjectContentManager::createObject( const zp_char* filename )
 	ZP_ASSERT( ok, "Failed to get %s", filename );
 
 	o = create( getApplication(), obj );
+	o->setID( ++m_numObjects );
 
 	return o;
 }
@@ -35,6 +44,7 @@ zpObject* zpObjectContentManager::createObject( const zpBison::Value& def )
 	zpObject* o = ZP_NULL;
 
 	o = create( getApplication(), def );
+	o->setID( ++m_numObjects );
 
 	return o;
 }
@@ -153,6 +163,8 @@ zpObject::zpObject( zpApplication* application )
 	, m_tags()
 	, m_flags()
 	, m_lastLoadTime( 0 )
+	, m_prefabId( 0 )
+	, m_instanceId( 0 )
 	, m_components()
 	, m_application( application )
 	, m_world( ZP_NULL )
@@ -166,6 +178,8 @@ zpObject::zpObject( zpApplication* application, const zpObjectResourceInstance& 
 	, m_tags()
 	, m_flags()
 	, m_lastLoadTime( res.getResource()->getLastTimeLoaded() )
+	, m_prefabId( 0 )
+	, m_instanceId( 0 )
 	, m_components()
 	, m_application( application )
 	, m_world( ZP_NULL )
@@ -179,6 +193,8 @@ zpObject::zpObject( zpApplication* application, const zpBison::Value& root )
 	, m_tags()
 	, m_flags()
 	, m_lastLoadTime( 0 )
+	, m_prefabId( 0 )
+	, m_instanceId( 0 )
 	, m_components()
 	, m_application( application )
 	, m_world( ZP_NULL )
@@ -195,6 +211,19 @@ zpObject::~zpObject()
 zpAllComponents* zpObject::getComponents()
 {
 	return &m_components;
+}
+
+zp_uint zpObject::getPrefabID() const
+{
+	return m_prefabId;
+}
+zp_uint zpObject::getID() const
+{
+	return m_instanceId;
+}
+void zpObject::setID( zp_uint id )
+{
+	m_instanceId = id;
 }
 
 void zpObject::setFlag( zpObjectFlag flag )
@@ -331,6 +360,12 @@ void zpObject::destroy()
 
 void zpObject::load( zp_bool isInitialLoad, const zpBison::Value& root )
 {
+	const zpBison::Value& id = root[ "_id" ];
+	if( id.isIntegral() )
+	{
+		m_prefabId = (zp_uint)id.asInt();
+	}
+
 	// set the name of the object if given
 	const zpBison::Value& name = root[ "Name" ];
 	if( name.isString() )

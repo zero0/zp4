@@ -250,7 +250,7 @@ zp_bool zpGUI::isMouseOverWidget( zpGUIWidget* widget, zpRectf& outWorldRect, zp
 void zpGUI::drawWidgets( zpRenderingContext* context )
 {
 	// begin immediate mode
-	context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+	context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
 	m_isDrawingWidgets = true;
 
 	// draw widgets
@@ -288,7 +288,7 @@ void zpGUI::drawWidget( zpRenderingContext* context, zpGUIWidget* widget )
 			if( !m_isDrawingWidgets )
 			{
 				context->endDrawFont();
-				context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+				context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
 				m_isDrawingWidgets = true;
 			}
 
@@ -312,7 +312,7 @@ void zpGUI::drawWidget( zpRenderingContext* context, zpGUIWidget* widget )
 			if( !m_isDrawingWidgets )
 			{
 				context->endDrawFont();
-				context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
+				context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR, &m_guiMaterial );
 				m_isDrawingWidgets = true;
 			}
 
@@ -329,7 +329,7 @@ void zpGUI::drawWidget( zpRenderingContext* context, zpGUIWidget* widget )
 			if( m_isDrawingWidgets )
 			{
 				context->endDrawImmediate();
-				context->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI_DEBUG, &m_guiFont );
+				context->beginDrawFont( 1 << 4, ZP_RENDERING_QUEUE_UI, &m_guiFont );
 				m_isDrawingWidgets = false;
 			}
 
