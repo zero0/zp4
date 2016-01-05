@@ -20,7 +20,7 @@ v2f main_vs( vs_input_base v )
     o.position = mul( o.position, world );
     o.position = mul( o.position, viewProjection );
     o.normal = normalize( v.normal );
-    o.uv = v.texcoord;
+    o.uv = TexCoordOffset( v.texcoord, _MainTex );
 
     return o;
 }

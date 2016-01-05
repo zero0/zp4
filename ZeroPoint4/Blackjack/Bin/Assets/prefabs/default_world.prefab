@@ -1,23 +1,39 @@
-<zpWorld name="default">
-	<zpGameObject>
-		<Transform />
-		<Components>
-			<Component>
-				<zpLoadContentComponent disable-world-when-loading="true">
-					<Content file="simple.shader" alias="simple" immediate="false" />
-					<Content file="test.png" alias="test_texture" immediate="false" />
-					
-					<Content file="fullscreenNoAlpha.shader" alias="fullscreenNoAlpha" immediate="true" />
-				</zpLoadContentComponent>
-			</Component>
-			<Component>
-				<zpDeferredRenderingComponent>
-				
-				</zpDeferredRenderingComponent>
-			</Component>
-		</Components>
-		<Children>
-			
-		</Children>
-	</zpGameObject>
-</zpWorld>
+{
+    "Objects" :
+    [
+        {
+            "_id" : 100000,
+            "Name" : "",
+            "Tags" : [],
+            "Layer" : "Default",
+            "IsStatic" : false
+        },
+        {
+            "_id" : 200000,
+            "Name" : "",
+            "Tags" : [],
+            "Layer" : "Default",
+            "IsStatic" : false
+        }
+    ],
+    "Components" :
+    [
+        {
+            "_id" : 1005000,
+            "_object_id" : 100000,
+            "Transform" :
+            {
+                "Children" :
+                [
+                    200000
+                ]
+            }
+        },
+        {
+            "_id" : 1005001,
+            "_object_id" : 100000,
+            "MeshRenderer" :
+            {}
+        }
+    ]
+}

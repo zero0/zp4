@@ -45,6 +45,16 @@
         {
             "Type" : "Float",
             "Value" : 1
+        },
+        "_ExposureIBL" :
+        {
+            "Type" : "Float4",
+            "Value" : [ 1, 1, 1, 1 ]
+        },
+        "_AmbientLight" :
+        {
+            "Type" : "Float4",
+            "Value" : [ 1, 1, 1, 1 ]
         }
     }
 }

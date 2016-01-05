@@ -36,4 +36,25 @@ inline float4 glossSpecCubeLookup( in float3 worldRefl, in float lod )
     return spec;
 };
 
+inline float3 SHLookup( in float4 normal )
+{
+    float3 x1, x2, x3;
+
+    // Linear + constant polynomial terms
+    x1.r = dot( _SHAr, normal );
+    x1.g = dot( _SHAg, normal );
+    x1.b = dot( _SHAb, normal );
+
+    // 4 of the quadratic polynomials
+    float4 vB = normal.xyzz * normal.yzzx;
+    x2.r = dot( _SHBr, vB );
+    x2.g = dot( _SHBg, vB );
+    x2.b = dot( _SHBb, vB );
+
+    // Final quadratic polynomial
+    float vC = normal.x * normal.x - normal.y * normal.y;
+    x3 = _SHC.rgb * vC;
+    return x1 + x2 + x3;
+};
+
 #endif

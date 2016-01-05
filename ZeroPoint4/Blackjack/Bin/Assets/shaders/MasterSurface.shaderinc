@@ -51,7 +51,7 @@ inline void MasterSurface( in MasterInput input, inout MasterOutput output )
     output.normal = float4( localN, 0 );
     float3 worldN = localN;
 #else // !ZP_MASTER_NORMAL_MAP
-    float3 worldN = IN.worldNormal.xyz;
+    float3 worldN = input.worldNormal.xyz;
     worldN = normalize( worldN );
     float3 localN = worldN;
 #endif // ZP_MASTER_NORMAL_MAP

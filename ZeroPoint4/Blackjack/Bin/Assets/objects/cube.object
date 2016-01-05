@@ -6,9 +6,9 @@
     "Layer": "Default",
     "Components": {
         "Transform": {},
-        "MeshRenderer": {
+        "AnimatedMeshRenderer": {
             "Mesh": "meshes/cube.meshb",
-            "Material" : "materials/cube.materialb"
+            "Material" : "materials/Master.materialb"
         },
         "RigidBody": {
             "Mass": 1,

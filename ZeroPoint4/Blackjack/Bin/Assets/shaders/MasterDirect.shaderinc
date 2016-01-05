@@ -50,7 +50,7 @@ v2f_master MasterVert( vs_input_master v )
     #endif
 
     #ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
-        float3 diffIBL = SHLookup( worldN );
+        float3 diffIBL = SHLookup( o.worldNormal );
         o.vertexIBL = float4( diffIBL, 1 );
     #endif // ZP_MASTER_DIFFUSE_VERTEX_IBL
 
@@ -88,7 +88,7 @@ float4 MasterFrag( v2f_master v ) : SV_TARGET
     #else
         float4 lightDir = _WorldLightDir;
     #endif // ZP_MASTER_SPECULAR_IBL || ZP_MASTER_SPECULAR_DIRECT
-
+lightDir = float4( 0, 0, -1, 0 );
     c = LightingModelMaster( o, lightDir, surfIN.viewDir, atten );
 
     return c;
