@@ -45,7 +45,7 @@ void zpAnimatedMeshRendererComponent::render( zpRenderingContext* i )
 	i->beginDrawImmediate( m_layer, ZP_RENDERING_QUEUE_OPAQUE, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_NORMAL_COLOR_UV, &m_material );
 	i->setMatrix( transform );
 
-	zp_float v = 2.0f;
+	zp_float v = 4.0f;
 
 	zpVector4f p0, p1, p2, p3;
 	p0 = zpMath::Vector4(  v, 0,  v, 1 );
@@ -53,14 +53,21 @@ void zpAnimatedMeshRendererComponent::render( zpRenderingContext* i )
 	p2 = zpMath::Vector4( -v, 0, -v, 1 );
 	p3 = zpMath::Vector4( -v, 0,  v, 1 );
 
-	zpVector2f uv0( 0, 0 ), uv1( 0, 1 ), uv2( 1, 0 ), uv3( 1, 1 );
-	zpColor4f c( 1, 1, 1, 1 );
+	zpVector2f uv0( 0, 1 );
+	zpVector2f uv1( 0, 0 );
+	zpVector2f uv2( 1, 0 );
+	zpVector2f uv3( 1, 1 );
+
+	zpColor4f c0( 1, 0, 0, 1 );
+	zpColor4f c1( 0, 1, 0, 1 );
+	zpColor4f c2( 0, 0, 1, 1 );
+	zpColor4f c3( 1, 1, 1, 1 );
 	zpVector4f n = zpMath::Vector4( 0, 1, 0, 0 );
 
-	i->addVertex( p0, n, c, uv0 );
-	i->addVertex( p1, n, c, uv1 );
-	i->addVertex( p2, n, c, uv2 );
-	i->addVertex( p3, n, c, uv3 );
+	i->addVertex( p0, n, c0, uv0 );
+	i->addVertex( p1, n, c1, uv1 );
+	i->addVertex( p2, n, c2, uv2 );
+	i->addVertex( p3, n, c3, uv3 );
 
 	i->addTriangleIndex( 0, 1, 2 );
 	i->addTriangleIndex( 2, 3, 0 );

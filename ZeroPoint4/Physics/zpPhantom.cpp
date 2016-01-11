@@ -118,7 +118,14 @@ void zpPhantom::processCollisions( zp_handle dymaicsWorld, zp_float timeStep )
 	btPairCachingGhostObject* ghost = static_cast< btPairCachingGhostObject* >( m_phantom );
 
 	zpFixedArrayList< zpPhantomCollisionHitInfo, ZP_PHANTON_MAX_TRACKED_OBJECTS > hits;
-	zpFixedArrayList< zp_handle, ZP_PHANTON_MAX_TRACKED_OBJECTS > currentlyTracked = m_trackedObjects;
+
+	zpFixedArrayList< zp_handle, ZP_PHANTON_MAX_TRACKED_OBJECTS > currentlyTracked;
+	zp_handle* bh = m_trackedObjects.begin();
+	zp_handle* eh = m_trackedObjects.end();
+	for( ; bh != eh; ++bh )
+	{
+		currentlyTracked.pushBack( bh );
+	}
 
 	// determine collisions
 	const btBroadphasePairArray& pairs = ghost->getOverlappingPairCache()->getOverlappingPairArray();

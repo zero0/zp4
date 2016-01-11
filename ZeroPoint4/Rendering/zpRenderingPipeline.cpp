@@ -268,6 +268,7 @@ void zpRenderingPipeline::setup()
 	m_debugUICamera = cam;
 
 	m_dirLight = getLight( ZP_LIGHT_TYPE_DIRECTIONAL );
+	m_dirLight->position = zpMath::Vector4( 0, 0, 0, 1 );
 	m_dirLight->direction = zpMath::Vector4Normalize3( zpMath::Vector4( 1, -1, 1, 0 ) );
 	m_dirLight->color = zpColor4f( 1, 1, 1, 1 );
 }
@@ -855,8 +856,10 @@ void zpRenderingPipeline::processRenderingQueueWithLighting( zpRenderingContext*
 			{
 				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
 				i->processCommand( *cmd );
+				
+				++b;
 
-				for( ++b; b != e; ++b )
+				for( ; b != e; ++b )
 				{
 					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
 					i->processCommand( *cmd );
@@ -868,28 +871,34 @@ void zpRenderingPipeline::processRenderingQueueWithLighting( zpRenderingContext*
 				i->processCommand( *cmd );
 			}
 
-			zpBoundingSphere lightSphere;
 			b = m_usedLights[ ZP_LIGHT_TYPE_POINT ].begin();
 			e = m_usedLights[ ZP_LIGHT_TYPE_POINT ].end();
-			for( ; b != e; ++b )
+			if( b != e )
 			{
-				zpLightBufferData* data = *b;
-
-				lightSphere.setCenter( data->position );
-				lightSphere.setRadius( zpMath::Scalar( data->radius ) );
-				if( ZP_IS_COLLISION( (*cmd)->boundingBox, lightSphere ) )
+				zpBoundingSphere lightSphere;
+				for( ; b != e; ++b )
 				{
-					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
-					i->processCommand( *cmd );
+					zpLightBufferData* data = *b;
+
+					lightSphere.setCenter( data->position );
+					lightSphere.setRadius( zpMath::Scalar( data->radius ) );
+					if( ZP_IS_COLLISION( (*cmd)->boundingBox, lightSphere ) )
+					{
+						i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
+						i->processCommand( *cmd );
+					}
 				}
 			}
 
 			b = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].begin();
 			e = m_usedLights[ ZP_LIGHT_TYPE_SPOT ].end();
-			for( ; b != e; ++b )
+			if( b != e )
 			{
-				i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
-				i->processCommand( *cmd );
+				for( ; b != e; ++b )
+				{
+					i->update( &m_constantBuffers[ ZP_CONSTANT_BUFFER_SLOT_LIGHT ], *b, sizeof( zpLightBufferData ) );
+					i->processCommand( *cmd );
+				}
 			}
 
 			//m_numTotalVerticies += (*cmd)->vertexCount;

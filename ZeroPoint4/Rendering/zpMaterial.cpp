@@ -206,7 +206,6 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 				zp_bool found = m_resource.globalVariablesDef.findIf( [ globalName ]( const zpMaterialGlobalVariable& def ){
 					return def.name == globalName;
 				}, &var );
-				ZP_ASSERT_WARN( found, "Shader did not define global %s", globalName );
 
 				if( found )
 				{
@@ -238,6 +237,10 @@ zp_bool zpMaterialResource::load( const zp_char* filename, zpRenderingPipeline* 
 					//	zpVector4f val( value[ 0 ].asFloat(), value[ 1 ].asFloat(), value[ 2 ].asFloat(), value[ 3 ].asFloat() );
 					//	( *(zpVector4f*)( buffer + var->offset ) ) = val;
 					//}
+				}
+				else
+				{
+					zp_printfln( "Shader did not define global %s", globalName );
 				}
 			} );
 
