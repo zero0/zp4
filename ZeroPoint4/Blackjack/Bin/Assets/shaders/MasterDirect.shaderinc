@@ -6,13 +6,11 @@ v2f_master MasterVert( vs_input_master v )
 {
     v2f_master o = (v2f_master)0;
 
-    o.vertex = v.vertex;
-    o.vertex = mul( o.vertex, world );
-    o.vertex = mul( o.vertex, viewProjection );
+    float4 worldP = mul( v.vertex, world );
+    o.vertex = mul( worldP, viewProjection );
 
     o.texcoord = TexCoordOffset( v.texcoord, _MainTex );
 
-    float4 worldP = mul( v.vertex, world );
     float3 worldN = mul( v.normal.xyz, (float3x3)world );
     worldN = normalize( worldN );
 
@@ -24,17 +22,14 @@ v2f_master MasterVert( vs_input_master v )
     o.lighting = float4( 0, 0, 0, 1 );
     o.lighting.rgb += _AmbientLight.rgb;
 
+    o.lightDir = light_direction;
+
     #ifdef ZP_MASTER_SPECULAR_IBL
         float4 worldE = WorldSpaceViewDir( v.vertex );
         float4 worldR = reflect( -worldE, o.worldNormal );
 
         o.worldRefl = worldR;
     #endif // ZP_MASTER_SPECULAR_IBL
-
-    #ifdef ZP_MASTER_VERTEX_SH
-        float3 diffuseIBL = SHLookup( o.worldNormal );
-        o.lighting.rgb += diffuseIBL;
-    #endif // ZP_MASTER_VERTEX_SH
 
     #ifdef ZP_MASTER_VERTEX_COLOR
         o.color = v.color;
@@ -47,7 +42,7 @@ v2f_master MasterVert( vs_input_master v )
         #else
             o.viewDir = viewDirFromLight;
         #endif
-    #endif
+    #endif // defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
 
     #ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
         float3 diffIBL = SHLookup( o.worldNormal );
@@ -61,16 +56,22 @@ float4 MasterFrag( v2f_master v ) : SV_TARGET
 {
     MasterInput surfIN = (MasterInput)0;
 
+    surfIN.texcoord = v.texcoord;
+
     surfIN.worldPosition = v.worldPosition;
     surfIN.worldNormal = v.worldNormal;
 
-    #ifdef ZP_MASTER_SPECULAR_IBL
+    #ifdef ZP_MASTER_VERTEX_COLOR
+    surfIN.color = v.color;
+    #endif // ZP_MASTER_VERTEX_COLOR
+
+    #if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
         #ifdef ZP_MASTER_APPROX_VIEW
             surfIN.viewDir = v.viewDir;
         #else
             surfIN.viewDir = float4( normalize( v.viewDir.xyz ), 0 );
         #endif // ZP_MASTER_APPROX_VIEW
-    #endif // ZP_MASTER_SPECULAR_IBL
+    #endif // defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
 
     MasterOutput o = (MasterOutput)0;
 
@@ -82,14 +83,25 @@ float4 MasterFrag( v2f_master v ) : SV_TARGET
 
     float atten = 1;
     float4 c = float4( 0, 0, 0, 0 );
+    float4 viewDir = cameraLookTo;
+    float4 lightDir = light_direction;
 
     #if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
-        float4 lightDir = v.lightDir;
+        lightDir = v.lightDir;
+        viewDir = surfIN.viewDir;
     #else
-        float4 lightDir = _WorldLightDir;
+        //float4 lightDir = v.lightDir; //_WorldLightDir;
     #endif // ZP_MASTER_SPECULAR_IBL || ZP_MASTER_SPECULAR_DIRECT
-lightDir = float4( 0, 0, -1, 0 );
-    c = LightingModelMaster( o, lightDir, surfIN.viewDir, atten );
+
+    #if defined( ZP_MASTER_DIFFUSE_IBL ) || defined( ZP_MASTER_DIFFUSE_DIRECT ) || defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
+    c = LightingModelMaster( o, lightDir, viewDir, atten );
+    #else
+    c = o.albedo;
+    #endif
+
+    #ifdef ZP_MASTER_DIFFUSE_VERTEX_IBL
+    c *= v.vertexIBL;
+    #endif // ZP_MASTER_DIFFUSE_VERTEX_IBL
 
     return c;
 };

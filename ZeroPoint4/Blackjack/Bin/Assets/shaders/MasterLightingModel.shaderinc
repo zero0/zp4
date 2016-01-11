@@ -4,7 +4,7 @@
 
 inline float4 LightingModelMaster( in MasterOutput s, in float4 lightDir, in float4 viewDir, in float atten )
 {
-    float4 frag = float4( 0, 0, 0, s.albedo.a );
+    float4 frag = s.albedo;
 
     #if defined( ZP_MASTER_DIFFUSE_DIRECT ) || defined( ZP_MASTER_SPECULAR_DIRECT )
         float3 L = lightDir.xyz;
@@ -18,8 +18,7 @@ inline float4 LightingModelMaster( in MasterOutput s, in float4 lightDir, in flo
     #ifdef ZP_MASTER_DIFFUSE_DIRECT
         float dp = saturate( dot( N, L ) );
 
-        float3 diff = dp * s.albedo.rgb;
-        frag.rgb = diff * light_color.rgb;
+        frag.rgb *= dp * light_color.rgb;
     #endif // ZP_MASTER_DIFFUSE_DIRECT
 
     #ifdef ZP_MASTER_SPECULAR_DIRECT

@@ -12,9 +12,9 @@ uniform float _SpecInt;
 uniform float _Shininess;
 uniform float _Fresnel;
 
-#ifdef ZP_MASTER_SPECULAR_IBL_3D
+#if defined( ZP_MASTER_SPECULAR_IBL_3D )
 ZP_SAMPLER_CUBE( _SpecIBL );
-#else // !ZP_MASTER_SPEC_IB_3D
+#elif defined( ZP_MASTER_SPECULAR_IBL_2D )
 ZP_SAMPLER_2D( _SpecIBL );
 #endif // ZP_MASTER_SPECULAR_IBL_3D
 

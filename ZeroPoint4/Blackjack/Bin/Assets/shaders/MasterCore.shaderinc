@@ -26,11 +26,13 @@ inline float glossLOD( in float glossMap, in float shininess )
 
 inline float4 glossSpecCubeLookup( in float3 worldRefl, in float lod )
 {
-    #ifdef ZP_MASTER_SPECULAR_IBL_3D
+    #if defined( ZP_MASTER_SPECULAR_IBL_3D )
         float4 spec = texCUBELod( _SpecIBL, worldRefl, lod );
-    #else
+    #elif defined( ZP_MASTER_SPECULAR_IBL_2D )
         // TODO: convert world refl to UV coordinates
         float4 spec = tex2DLod( _SpecIBL, float2( 0, 0 ), lod );
+    #else
+        float4 spec = float4( 1, 1, 1, 1 );
     #endif // ZP_MASTER_SPECULAR_IBL_3D
 
     return spec;

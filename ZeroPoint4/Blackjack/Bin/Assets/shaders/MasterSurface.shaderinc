@@ -4,10 +4,6 @@
 
 inline void MasterSurface( in MasterInput input, inout MasterOutput output )
 {
-#ifdef ZP_MASTER_ALPHA_CLIP
-    clip( OUT.Alpha - _Cutout );
-#endif // ZP_MASTER_ALPHA_CLIP
-
     float4 exposureIBL = _ExposureIBL;
     float4 baseColor = _Color;
 
@@ -24,31 +20,35 @@ inline void MasterSurface( in MasterInput input, inout MasterOutput output )
 #endif // ZP_MASTER_VERTEX_COLOR
 
 // diffuse
-#if defined( ZP_MASTER_DIFFUSE_IBL ) || defined( ZP_MASTER_DIFFUSE_DIRECT )
     float4 diff = tex2D( _MainTex, uv_diff );
+    diff *= baseColor;
 
+#if defined( ZP_MASTER_DIFFUSE_IBL ) || defined( ZP_MASTER_DIFFUSE_DIRECT )
     #ifdef ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
         diffSpec = diff.aaaa;
     #endif // ZP_MASTER_DIFFUSE_SPECULAR_COMBINED
 
     diff.rgb *= exposureIBL.w;
 
-    output.albedo = diff;
 #else // !ZP_MASTER_DIFFUSE_IBL || !ZP_MASTER_DIFFUSE_DIRECT
     #ifdef ZP_MASTER_DIFFUSE_DIRECT
-        output.albedo.rgb = baseColor.rgb;
+        //output.albedo.rgb = baseColor.rgb;
     #else // !ZP_MASTER_DIFFUSE_DIRECT
-        output.albedo.rgb = float3( 0, 0, 0 );
+        //output.albedo.rgb = float3( 0, 0, 0 );
     #endif // ZP_MASTER_DIFFUSE_DIRECT
-    output.albedo.a = baseColor.a;
+    //output.albedo.a = baseColor.a;
 #endif // ZP_MASTER_DIFFUSE_IBL || ZP_MASTER_DIFFUSE_DIRECT
+    output.albedo = diff;
+
+#ifdef ZP_MASTER_ALPHA_CLIP
+    clip( diff.a - _Cutout );
+#endif // ZP_MASTER_ALPHA_CLIP
 
 // normals
 #ifdef ZP_MASTER_NORMAL_MAP
     float3 localN = UnpackNormal( tex2D( _BumpMap, uv_bump ) );
     localN = normalize( localN );
 
-    output.normal = float4( localN, 0 );
     float3 worldN = localN;
 #else // !ZP_MASTER_NORMAL_MAP
     float3 worldN = input.worldNormal.xyz;
@@ -60,6 +60,8 @@ inline void MasterSurface( in MasterInput input, inout MasterOutput output )
 #ifdef ZP_MASTER_FLIP_NORMAL
     localN *= sign( dot( localN, input.viewDir ) );
 #endif // ZP_MASTER_FLIP_NORMAL
+
+    output.normal = float4( localN, 0 );
 
 // specular
 #if defined( ZP_MASTER_SPECULAR_IBL ) || defined( ZP_MASTER_SPECULAR_DIRECT )
@@ -78,6 +80,7 @@ inline void MasterSurface( in MasterInput input, inout MasterOutput output )
 
     spec.rgb *= exposureIBL.w;
     float glossLod = glossLOD( spec.a, _Shininess );
+    output.specular = spec;
 #endif // ZP_MASTER_SPECULAR_IBL || ZP_MASTER_SPECULAR_DIRECT
 
 // glow
@@ -90,10 +93,12 @@ inline void MasterSurface( in MasterInput input, inout MasterOutput output )
 
     float3 skyR = reflect( -worldE, worldN );
 
-#ifdef ZP_MASTER_SPECULAR_IBL_3D
+#if defined( ZP_MASTER_SPECULAR_IBL_3D )
     float4 specIBL = texCUBE( _SpecIBL, skyR );
-#else // !ZP_MASTER_SPECULAR_IBL_3D
+#elif defined( ZP_MASTER_SPECULAR_IBL_2D  )
     float4 specIBL = tex2D( _SpecIBL, skyR.xy ); // TODO: convert to lat-laung for 2D specular
+#else
+    float4 specIBL = float4( 1, 1, 1, 1 );
 #endif // ZP_MASTER_SPECULAR_IBL_3D
 
     output.emission.rgb += ( specIBL.rgb * spec.rgb ) * exposureIBL.y;

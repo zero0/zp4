@@ -122,12 +122,12 @@ inline float3 ShadeSH( in float4 normal )
 // Computes world space view direction
 inline float4 WorldSpaceViewDir( in float4 v )
 {
-    return cameraPosition - mul( world, v );
+    return normalize( cameraPosition - mul( v, world ) );
 }
 
 inline float3 UnpackNormal( in float4 packednormal )
 {
-    return ( packednormal.xyz * 2 ) - 1;
+    return ( packednormal.xyz * 0.5 ) - 0.5;
 }
 
 #endif
