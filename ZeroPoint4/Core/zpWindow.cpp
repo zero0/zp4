@@ -248,7 +248,7 @@ void zpWindow::windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam )
 		{
 			if( lParam )
 			{
-				setTitle( zpString( (zp_char*)lParam ) );
+				setTitle( (zp_char*)lParam );
 			}
 		}
 		break;
@@ -345,25 +345,4 @@ void zpWindow::resizeWindow()
 	RECT rc = { 0, 0, m_screenSize.getX(), m_screenSize.getY() };
 	AdjustWindowRectEx( &rc, __zpStyleToWS( m_style ), false, 0 );
 	m_windowSize.set( rc.right - rc.left, rc.bottom - rc.top );
-}
-
-void zpWindow::serialize( zpSerializedOutput* out ) {
-	out->writeBlock( ZP_SERIALIZE_TYPE_THIS );
-
-	out->writeString( m_title, "@title" );
-
-	zpSerializableObject<zpVector2i>::serializeFromBlock( out, "Position", m_position );
-	zpSerializableObject<zpVector2i>::serializeFromBlock( out, "ScreenSize", m_screenSize );
-
-	out->endBlock();
-}
-void zpWindow::deserialize( zpSerializedInput* in ) {
-	in->readBlock( ZP_SERIALIZE_TYPE_THIS );
-
-	in->readString( &m_title, "@title" );
-
-	zpSerializableObject<zpVector2i>::deserializeToBlock( in, "Position", m_position );
-	zpSerializableObject<zpVector2i>::deserializeToBlock( in, "ScreenSize", m_screenSize );
-
-	in->endBlock();
 }

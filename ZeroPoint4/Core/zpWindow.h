@@ -80,9 +80,6 @@ public:
 	void removeDragDropListener( zpWindowDragDropListener* listener );
 	void removeAllDragDropListeners();
 
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
-
 private:
 	typedef zpArrayList<zpWindowFocusListener*> zpWindowFocusListenerList;
 	typedef zpArrayList<zpWindowProcListener*> zpWindowProcListenerList;

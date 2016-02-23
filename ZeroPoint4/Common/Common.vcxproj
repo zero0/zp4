@@ -177,6 +177,7 @@
     <ClInclude Include="zpRectTransformComponent.h" />
     <ClInclude Include="zpSkyBoxComponent.h" />
     <ClInclude Include="zpSpawnerComponent.h" />
+    <ClInclude Include="zpStateMachine.h" />
     <ClInclude Include="zpTransformComponent.h" />
     <ClInclude Include="zpAudioEmitterComponent.h" />
     <ClInclude Include="zpAudioListenerComponent.h" />

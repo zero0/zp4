@@ -774,7 +774,7 @@ void zpRenderingContext::drawMesh( zp_uint layer, zpRenderingQueue queue, zpMesh
 		command.vertexBuffer = m->m_vertex.getBufferImpl();
 		command.indexBuffer = m->m_index.getBufferImpl();
 		command.material = material->getResource();
-		command.vertexFormat = zpVertexFormat_None;
+		command.vertexFormat = ZP_VERTEX_FORMAT_NONE;
 		command.vertexFormatHash = m->m_format;
 		command.vertexCount = b->m_vertexCount;
 		command.indexCount = b->m_indexCount;

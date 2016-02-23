@@ -118,6 +118,8 @@ public:
 
 	void onEnterState( zpApplication* app )
 	{
+		zp_bool ok;
+
 		const zpArrayList< zpCamera* >& cameras = app->getRenderPipeline()->getUsedCameras( ZP_CAMERA_TYPE_MAIN );
 		cameras.foreach( []( zpCamera* c ) { c->setActive( false ); } );
 
@@ -142,6 +144,12 @@ public:
 		a->flags.mark( ZP_TWEEN_FLAGS_REPEAT );
 		a->flags.mark( ZP_TWEEN_FLAGS_PING_PONG );
 		a->method = ZP_TWEEN_METHOD_SMOOTHSTEP;
+
+		ok = app->getRenderPipeline()->getSkeletonContentManager()->getResource( "meshes/runt.skeletonb", m_skeleton );
+		ZP_ASSERT_WARN( ok, "skeleton" );
+
+		ok = app->getRenderPipeline()->getAnimationContentManager()->getResource( "meshes/runt.animb", m_anim );
+		ZP_ASSERT_WARN( ok, "animation" );
 	}
 	void onLeaveState( zpApplication* app )
 	{
@@ -153,6 +161,9 @@ public:
 
 		m_runt->destroy();
 		m_runt = ZP_NULL;
+
+		m_skeleton.release();
+		m_anim.release();
 
 		const zpArrayList< zpCamera* >& cameras = app->getRenderPipeline()->getUsedCameras( ZP_CAMERA_TYPE_MAIN );
 		cameras.foreach( []( zpCamera* c ) { c->setActive( true ); } );
@@ -316,6 +327,9 @@ private:
 	zpCamera* m_editorCamera;
 	zpObject* m_editorUI;
 	zpObject* m_runt;
+
+	zpSkeletonResourceInstance m_skeleton;
+	zpAnimationResourceInstance m_anim;
 };
 
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow )

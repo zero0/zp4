@@ -31,6 +31,11 @@ zp_bool zpSkeletonResource::load( const zp_char* filename )
 			bone.weightStart = b[ "WeightStart" ].asInt();
 			bone.weightCount = b[ "WeightCount" ].asInt();
 			bone.bindPose = *(const zpMatrix4f*)b[ "BindPose" ].asData();
+
+			if( bone.parent < 0 )
+			{
+				m_resource.rootBoneIndex = m_resource.bones.size() - 1;
+			}
 		} );
 
 		// build indecies

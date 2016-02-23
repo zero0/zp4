@@ -21,6 +21,51 @@ enum zpJsonType
 	zpJsonType_Force32 = ZP_FORECE_32BIT,
 };
 
+namespace zpJsonImpl
+{
+	ZP_PURE_INTERFACE Value
+	{
+	public:
+		zpJsonType type() const;
+		zp_size_t size() const;
+		zp_bool isEmpty() const;
+
+		zp_bool isNull() const;
+		zp_bool isBool() const;
+		zp_bool isInt() const;
+		zp_bool isUInt() const;
+		zp_bool isLong() const;
+		zp_bool isULong() const;
+		zp_bool isFloat() const;
+		zp_bool isDouble() const;
+		zp_bool isString() const;
+		zp_bool isArray() const;
+		zp_bool isObject() const;
+		zp_bool isData() const;
+
+		zp_bool isIntegral() const;
+		zp_bool isReal() const;
+		zp_bool isNumeric() const;
+
+		zp_bool asBool() const;
+		zp_int asInt() const;
+		zp_uint asUInt() const;
+		zp_long asLong() const;
+		zp_ulong asULong() const;
+		zp_float asFloat() const;
+		zp_double asDouble() const;
+		zpString asString() const;
+		zpString asData() const;
+		const zp_char* asCString() const;
+
+		const zpJson& operator[]( zp_uint index ) const;
+		const zpJson& operator[]( const zp_char* key ) const;
+		const zpJson& operator[]( const zpString& key ) const;
+
+		void memberNames( zpArrayList< zpString >& names ) const;
+	};
+}
+
 class zpJson
 {
 public:
@@ -128,7 +173,7 @@ private:
 		zpArrayList< zpJson >* m_array;
 		zpHashMap< zpString, zpJson >* m_object;
 
-		zp_lptr m_data;
+		zp_handle m_data;
 	};
 };
 

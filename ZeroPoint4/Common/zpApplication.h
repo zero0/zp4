@@ -184,10 +184,6 @@ private:
 	void runReloadChangedResources();
 #endif
 
-	void enterEditMode();
-	void leaveEditMode();
-
-	void guiEditMode();
 	void onGUI();
 
 	zp_bool m_isRunning;
@@ -210,6 +206,7 @@ private:
 	zpProfiler m_profiler;
 	zpConsole* m_console;
 	zpTime m_timer;
+	zpMemorySystem* m_memory;
 
 	zpWorld* m_currentWorld;
 	zpWorld* m_nextWorld;

@@ -5,6 +5,57 @@
 #define ZP_APPLICATION_DEFAULT_WINDOW_WIDTH		640
 #define ZP_APPLICATION_DEFAULT_WINDOW_HEIGHT	480
 
+enum zpProfilerSteps
+{
+	ZP_PROFILER_STEP_PROCESS_FRAME,
+	ZP_PROFILER_STEP_FRAME,
+	ZP_PROFILER_STEP_UPDATE,
+	ZP_PROFILER_STEP_SIMULATE,
+	ZP_PROFILER_STEP_RENDER_PARTICLES,
+	ZP_PROFILER_STEP_RENDER_MESHES,
+	ZP_PROFILER_STEP_RENDER_ANIMATED_MESHES,
+	ZP_PROFILER_STEP_RENDER_SKYBOX,
+	ZP_PROFILER_STEP_RENDER_UI,
+	ZP_PROFILER_STEP_RENDER_FRAME,
+	ZP_PROFILER_STEP_RENDER_BEGIN,
+	ZP_PROFILER_STEP_RENDER,
+	ZP_PROFILER_STEP_DEBUG_RENDER,
+	ZP_PROFILER_STEP_RENDER_PRESENT,
+	ZP_PROFILER_STEP_OBJECT_UPDATE,
+	ZP_PROFILER_STEP_WORLD_UPDATE,
+	ZP_PROFILER_STEP_PHYSICS_UPDATE,
+	ZP_PROFILER_STEP_SCRIPT_UPDATE,
+	ZP_PROFILER_STEP_SCRIPT_PROC_THREADS,
+	ZP_PROFILER_STEP_EVENT_UPDATE,
+
+	ZP_PROFILER_STEP_DRAW_GUI,
+
+	ZP_PROFILER_STEP_UPDATE_PHASE,
+	ZP_PROFILER_STEP_UPDATE_STATE,
+
+	ZP_PROFILER_STEP_INPUT_UPDATE,
+	ZP_PROFILER_STEP_AUDIO_UPDATE,
+	ZP_PROFILER_STEP_RENDERING_UPDATE,
+
+	ZP_PROFILER_STEP_GARBAGE_COLLECT,
+	ZP_PROFILER_STEP_RELOAD_ALL,
+	ZP_PROFILER_STEP_HOT_RELOAD,
+
+	ZP_PROFILER_STEP_SLEEP,
+
+	zpProfilerSteps_Count,
+};
+
+#if ZP_USE_PROFILER
+#define ZP_PROFILE_START( step )	m_profiler.start( (zp_size_t)(ZP_PROFILER_STEP_##step) )
+#define ZP_PROFILE_END( step )		m_profiler.end( (zp_size_t)(ZP_PROFILER_STEP_##step) )
+#define ZP_PROFILE_FINALIZE()		m_profiler.finalize()
+#else
+#define ZP_PROFILE_START( step )	(void)0
+#define ZP_PROFILE_END( step )		(void)0
+#define ZP_PROFILE_FINALIZE()		(void)0
+#endif
+
 zpApplication::zpApplication()
 	: m_isRunning( false )
 	, m_restartApplication( false )
@@ -18,6 +69,7 @@ zpApplication::zpApplication()
 	, m_configFilename( ZP_APPLICATION_DEFAULT_CONFIG_FILE )
 	, m_console( ZP_NULL )
 	, m_timer()
+	, m_memory( ZP_NULL )
 	, m_currentWorld( ZP_NULL )
 	, m_nextWorld( ZP_NULL )
 	, m_lastTime( 0 )
@@ -170,9 +222,9 @@ void zpApplication::initialize()
 	m_renderingPipeline.getMeshContentManager()->setApplication( this );
 	m_renderingPipeline.getFontContentManager()->setApplication( this );
 	
-	zpMemorySystem* mem = zpMemorySystem::getInstance();
-	m_objectContent.setup( mem );
-	m_worldContent.setup( mem );
+	m_memory = zpMemorySystem::getInstance();
+	m_objectContent.setup( m_memory );
+	m_worldContent.setup( m_memory );
 
 	zp_bool ok;
 	ok = m_textContent.getResource( m_configFilename, m_appConfig );
@@ -233,12 +285,10 @@ void zpApplication::initialize()
 }
 void zpApplication::setup()
 {
-	m_profiler.setup();
-
-	zpMemorySystem* mem = zpMemorySystem::getInstance();
+	m_profiler.setup( zpProfilerSteps_Count, &m_timer, m_memory );
 
 #undef ZP_COMPONENT_DEF
-#define ZP_COMPONENT_DEF( cmp )			m_componentPool##cmp.setup( mem );
+#define ZP_COMPONENT_DEF( cmp )			m_componentPool##cmp.setup( m_memory );
 	#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
@@ -425,7 +475,9 @@ void zpApplication::update()
 	}
 
 	// pump queued events
+	ZP_PROFILE_START( EVENT_UPDATE );
 	m_eventManager.update();
+	ZP_PROFILE_END( EVENT_UPDATE );
 
 	// update phases
 	ZP_PROFILE_START( UPDATE_PHASE );
@@ -464,7 +516,7 @@ void zpApplication::update()
 #undef ZP_COMPONENT_DEF
 
 	ZP_PROFILE_START( RENDERING_UPDATE );
-	m_renderingPipeline.update();
+	m_renderingPipeline.update( deltaTime, realTime );
 	ZP_PROFILE_END( RENDERING_UPDATE );
 
 	ZP_PROFILE_START( AUDIO_UPDATE );
@@ -474,9 +526,10 @@ void zpApplication::update()
 	handleInput();
 
 	ZP_PROFILE_START( DRAW_GUI );
-	m_gui.startGUI();
-	onGUI();
-	m_gui.endGUI();
+	if( !m_displayStats.isZero() )
+	{
+		onGUI();
+	}
 	ZP_PROFILE_END( DRAW_GUI );
 }
 void zpApplication::simulate()
@@ -652,7 +705,7 @@ void zpApplication::handleInput()
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F8 ) )
 	{
-		zpMemorySystem::getInstance()->takeMemorySnapshot( m_timer.getTime(), ZP_MEMORY_KB( 2.5f ) );
+		m_memory->takeMemorySnapshot( m_timer.getTime(), ZP_MEMORY_KB( 3.0f ) );
 	}
 	else if( keyboard->isKeyPressed( ZP_KEY_CODE_F9 ) )
 	{
@@ -941,132 +994,11 @@ void zpApplication::runReloadChangedResources()
 }
 #endif
 
-void zpApplication::enterEditMode()
-{
-	zp_printfln( "enter edit" );
-#if 0
-	class EditorCameraController : public zpCameraState
-	{
-	public:
-		~EditorCameraController() {}
-
-		void onEnter( zpCamera* camera )
-		{
-			startPos = camera->getPosition();
-			startLook = camera->getLookTo();
-			startUp = camera->getUp();
-		};
-		void onLeave( zpCamera* camera )
-		{
-			camera->setPosition( startPos );
-			camera->setLookTo( startLook );
-			camera->setUp( startUp );
-		};
-
-		zp_bool onUpdate( zpApplication* app, zpCamera* camera )
-		{
-			const zpMouse* mouse = app->getInputManager()->getMouse();
-			const zpKeyboard* keyboard = app->getInputManager()->getKeyboard();
-			zp_float dt = zpTime::getInstance()->getWallClockDeltaSeconds();
-
-			const zpVector4f& pos = camera->getPosition();
-			const zpVector4f& forward = camera->getLookTo();
-			const zpVector4f& up = camera->getUp();
-
-			zpVector4f right;
-			zpMath::Cross3( right, forward, up );
-
-			zp_int w = mouse->getScrollWheelDelta();
-			const zpVector2i& mouseDelta = mouse->getDelta();
-
-			if( w != 0 )
-			{
-				if( keyboard->isKeyDown( ZP_KEY_CODE_SHIFT ) )
-				{
-					w *= 6;
-				}
-
-				zpVector4f f;
-				zpMath::Mul( f, forward, zpScalar( (zp_float)w ) );
-				zpMath::Add( f, pos, f );
-				
-				camera->setPosition( f );
-			}
-			
-			if( keyboard->isKeyDown( ZP_KEY_CODE_CONTROL ) )
-			{
-				zp_bool leftButton = mouse->isButtonDown( ZP_MOUSE_BUTTON_LEFT );
-				zp_bool rightButton = mouse->isButtonDown( ZP_MOUSE_BUTTON_RIGHT );
-				if( leftButton && !rightButton )
-				{
-					zpVector4f lootTo( camera->getLookTo() );
-
-					zpVector4f r, u;
-					zpMath::Mul( r, right, zpScalar( dt * mouseDelta.getX() ) );
-					zpMath::Mul( u, up, zpScalar( dt * mouseDelta.getY() ) );
-					zpMath::Add( r, r, u );
-					zpMath::Add( r, r, pos );
-					
-					camera->setPosition( r );
-					camera->setLookTo( lootTo );
-				}
-				else if( rightButton && !leftButton )
-				{
-					zpVector4f lootAt( camera->getLookAt() );
-
-					zpVector4f camPos( pos );
-					zpMath::Sub( camPos, camPos, lootAt );
-					zpMath::RotateY( camPos, camPos, zpScalar( ZP_DEG_TO_RAD( mouseDelta.getX() ) ) );
-					zpMath::RotateX( camPos, camPos, zpScalar( ZP_DEG_TO_RAD( -mouseDelta.getY() ) ) );
-					zpMath::Add( camPos, camPos, lootAt );
-
-					camera->setPosition( camPos );
-					camera->setLookAt( lootAt );
-				}
-				else if( rightButton && leftButton )
-				{
-
-				}
-			}
-
-			return false;
-		};
-
-	private:
-		zpVector4f startPos, startLook, startUp;
-	};
-
-	m_renderingPipeline.pushCameraState< EditorCameraController >( ZP_CAMERA_TYPE_MAIN );
-#endif
-
-	m_timer.setTimeScale( 0.f );
-}
-void zpApplication::leaveEditMode()
-{
-	m_timer.setTimeScale( 1.f );
-
-	zp_printfln( "leave edit" );
-}
-
-void zpApplication::guiEditMode()
-{
-	static zpRectf window( 10, 10, 320, 480 );
-	m_gui.beginWindow( "Application", window, window );
-
-	m_gui.button( 22, "Click Me" );
-	m_gui.button( 22, "Click Me" );
-	m_gui.label( 16, "First Label Here", zpColor4f( 1, 1, 1, 1 ) );
-	if( m_gui.button( 22, "Click Me" ) )
-	{
-		zp_printfln( "Clicked!" );
-	}
-	m_gui.label( 16, "Label Here", zpColor4f( 1, 1, 1, 1 ) );
-
-	m_gui.endWindow();
-}
 void zpApplication::onGUI()
 {
-	zpFixedStringBuffer< 128 > buff;
+	m_gui.startGUI();
+
+	zpFixedStringBuffer< 256 > buff;
 
 	zp_float secondsPerTick = m_timer.getSecondsPerTick();
 
@@ -1086,8 +1018,14 @@ void zpApplication::onGUI()
 		zpRectf rect( 5, 5, 320, 50 );
 #endif
 		m_gui.beginWindow( "FPS Stats", rect, rect );
-		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 0, 1 ) );
 		
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 0, 1 ) );
+		buff.clear();
+
+		buff << "Mem Used " << m_profiler.getPreviousMemoryUsed( ZP_PROFILER_STEP_FRAME ) << "B";
+		m_gui.label( 24, buff.str(), zpColor4f( 0, 0, 0, 1 ) );
+		buff.clear();
+
 #if 0
 		m_gui.setMargin( 0, 1 );
 		
@@ -1250,4 +1188,6 @@ void zpApplication::onGUI()
 
 		m_gui.endWindow();
 	}
+
+	m_gui.endGUI();
 }

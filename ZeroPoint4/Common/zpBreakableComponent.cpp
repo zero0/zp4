@@ -171,15 +171,20 @@ void zpBreakableComponent::loseHealth( zp_float change )
 
 void zpBreakableComponent::doBreak()
 {
-	const zpVector4f& worldPos = getParentObject()->getComponents()->getTransformComponent()->getWorldPosition();
+	zpTransformComponent* t = getParentObject()->getComponents()->getTransformComponent();
+
+	zpVector4f worldPos = t->getWorldPosition();
 	zpObjectContentManager* objectContent = getApplication()->getObjectContentManager();
 
 	// replace object with same transform
 	if( !m_replacementObject.isEmpty() )
 	{
+		zpQuaternion4f worldRot = t->getLocalRotation();
+		zpVector4f worldScale = t->getLocalScale();
+
 		zpObject* replacement = objectContent->createObject( m_replacementObject.str() );
 		zpTransformComponent* transform = replacement->getComponents()->getTransformComponent();
-		transform->setLocalPosition( worldPos );
+		transform->setLocalTransform( worldPos, worldRot, worldScale );
 	}
 
 	// create objects at same position as broken object

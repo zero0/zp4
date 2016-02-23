@@ -244,11 +244,11 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_size_t strideIn
 	*d++ = 0; *d++ = 0; // x origin of image
 	*d++ = 0; *d++ = 0; // y origin of image
 	
-	*d++ = (zp_byte)(width & 0x00FF);
-	*d++ = (zp_byte)(width & 0xFF00) / 256;
+	*d++ = (zp_byte)(width & 0xFF);
+	*d++ = (zp_byte)((width >> 8) & 0xFF);
 
-	*d++ = (zp_byte)(height & 0x00FF);
-	*d++ = (zp_byte)(height & 0xFF00) / 256;
+	*d++ = (zp_byte)(height & 0xFF);
+	*d++ = (zp_byte)((height >> 8) & 0xFF);
 
 	*d++ = depth * 8;
 	*d++ = 0x24;
@@ -326,6 +326,11 @@ void zpMemorySystem::takeMemorySnapshot( zp_long currentTime, zp_size_t strideIn
 #undef CONCAT
 #undef depth
 #undef writeColor
+}
+
+zp_size_t zpMemorySystem::getMemoryUsed() const
+{
+	return m_memUsed;
 }
 
 void zpMemorySystem::initialize( zp_size_t size ) 

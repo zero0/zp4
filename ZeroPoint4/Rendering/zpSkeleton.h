@@ -16,6 +16,7 @@ struct zpSkeletonBone
 
 struct zpSkeleton
 {
+	zp_int rootBoneIndex;
 	zpArrayList< zp_int > indecies;
 	zpArrayList< zp_float > weights;
 	zpArrayList< zpString > boneNames;

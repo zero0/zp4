@@ -31,6 +31,8 @@ public:
 
 	void takeMemorySnapshot( zp_long currentTime, zp_size_t strideInByts );
 
+	zp_size_t getMemoryUsed() const;
+
 private:
 	zpMemorySystem();
 

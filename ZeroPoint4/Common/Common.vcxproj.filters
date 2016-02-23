@@ -168,6 +168,9 @@
     <ClInclude Include="zpPrefab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="zpStateMachine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="zpCommon.cpp">

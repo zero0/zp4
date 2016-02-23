@@ -24,16 +24,20 @@ zp_bool zpAnimationResource::load( const zp_char* filename )
 				const zp_float* data = (const zp_float*)k.asData();
 				zp_uint count = k.size() / ( sizeof( zpVector4f ) + sizeof( zpQuaternion4f ) + sizeof( zpVector4f ) );
 				zpArrayList< zpMatrix4f >& frames = clip.keyFrames.pushBackEmpty();
+				ZP_ALIGN16 zp_float buff[4];
 
 				for( zp_uint i = 0; i < count; ++i )
 				{
-					zpVector4f animPos = zpMath::Vector4Load4( data );
+					zp_memcpy( buff, sizeof( zpVector4f ), data, sizeof( zpVector4f ) );
+					zpVector4f animPos = zpMath::Vector4Load4( buff );
 					data += sizeof( zpVector4f );
 
-					zpQuaternion4f animRot = zpMath::QuaternionLoad4( data );
+					zp_memcpy( buff, sizeof( zpQuaternion4f ), data, sizeof( zpQuaternion4f ) );
+					zpQuaternion4f animRot = zpMath::QuaternionLoad4( buff );
 					data += sizeof( zpQuaternion4f );
 					
-					zpVector4f animScale = zpMath::Vector4Load4( data );
+					zp_memcpy( buff, sizeof( zpVector4f ), data, sizeof( zpVector4f ) );
+					zpVector4f animScale = zpMath::Vector4Load4( buff );
 					data += sizeof( zpVector4f );
 
 					zpMatrix4f mat = zpMath::TRS( animPos, animRot, animScale );

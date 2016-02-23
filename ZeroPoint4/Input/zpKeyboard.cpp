@@ -172,10 +172,12 @@ void zpKeyboard::removeAllListeners()
 void zpKeyboard::onFocusGained()
 {
 	m_hasFocus = true;
+	zp_memset( m_keyBuffer, KEY_UP, sizeof( m_keyDownBuffer ) );
 }
 void zpKeyboard::onFocusLost()
 {
 	m_hasFocus = false;
+	zp_memset( m_keyBuffer, KEY_UP, sizeof( m_keyDownBuffer ) );
 }
 
 void zpKeyboard::onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam )

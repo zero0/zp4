@@ -37,7 +37,7 @@ public:
 	void teardown();
 	void shutdown();
 
-	void update();
+	void update( zp_float dt, zp_float rt );
 
 	void beginFrame( zpRenderingContext* i, zpTime* time );
 	void submitRendering( zpRenderingContext* i );
@@ -51,6 +51,7 @@ public:
 	zpSkeletonContentManager* getSkeletonContentManager();
 	zpAnimationContentManager* getAnimationContentManager();
 	zpFontContentManager* getFontContentManager();
+	zpAnimationEngine* getAnimationEngine();
 
 	void onFocusGained();
 	void onFocusLost();
@@ -97,6 +98,7 @@ private:
 	zpSkeletonContentManager m_skeletonContent;
 	zpAnimationContentManager m_animationContent;
 	zpFontContentManager m_fontContent;
+	zpAnimationEngine m_animationEngine;
 
 	zpBuffer m_constantBuffers[ zpConstantBufferSlot_Count ];
 

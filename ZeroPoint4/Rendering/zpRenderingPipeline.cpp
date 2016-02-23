@@ -297,8 +297,10 @@ void zpRenderingPipeline::shutdown()
 	m_engine.shutdown();
 }
 
-void zpRenderingPipeline::update()
+void zpRenderingPipeline::update( zp_float dt, zp_float rt )
 {
+	m_animationEngine.processAnimations( dt, rt );
+	m_animationEngine.flushAnimationQueue();
 }
 
 void zpRenderingPipeline::beginFrame( zpRenderingContext* i, zpTime* time )
@@ -469,6 +471,10 @@ zpAnimationContentManager* zpRenderingPipeline::getAnimationContentManager()
 zpFontContentManager* zpRenderingPipeline::getFontContentManager()
 {
 	return &m_fontContent;
+}
+zpAnimationEngine* zpRenderingPipeline::getAnimationEngine()
+{
+	return &m_animationEngine;
 }
 
 void zpRenderingPipeline::onFocusGained()

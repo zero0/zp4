@@ -22,9 +22,11 @@ public:
 	void play( const zpString& animationName );
 	void crossFade( const zpString& animationName, zp_float crossFadeTime );
 
-	void update( zp_float dt );
+	void update( zp_float dt, zp_float rt );
 
 private:
+	zp_bool m_useRealTime;
+
 	zp_int m_currentKeyFrame;
 	zp_int m_nextKeyFrame;
 	zp_float m_keyFrameDelta;
@@ -63,7 +65,7 @@ public:
 
 	void queueAnimation( zpMesh* mesh, zpSkeleton* skeleton, zpAnimationController* animController );
 
-	void processAnimations( zp_float dt );
+	void processAnimations( zp_float dt, zp_float rt );
 
 	void flushAnimationQueue();
 

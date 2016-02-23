@@ -1,60 +1,10 @@
 #ifndef ZP_PROFILER_H
 #define ZP_PROFILER_H
 
-enum zpProfilerSteps
-{
-	ZP_PROFILER_STEP_PROCESS_FRAME,
-	ZP_PROFILER_STEP_FRAME,
-	ZP_PROFILER_STEP_UPDATE,
-	ZP_PROFILER_STEP_SIMULATE,
-	ZP_PROFILER_STEP_RENDER_PARTICLES,
-	ZP_PROFILER_STEP_RENDER_MESHES,
-	ZP_PROFILER_STEP_RENDER_ANIMATED_MESHES,
-	ZP_PROFILER_STEP_RENDER_SKYBOX,
-	ZP_PROFILER_STEP_RENDER_UI,
-	ZP_PROFILER_STEP_RENDER_FRAME,
-	ZP_PROFILER_STEP_RENDER_BEGIN,
-	ZP_PROFILER_STEP_RENDER,
-	ZP_PROFILER_STEP_DEBUG_RENDER,
-	ZP_PROFILER_STEP_RENDER_PRESENT,
-	ZP_PROFILER_STEP_OBJECT_UPDATE,
-	ZP_PROFILER_STEP_WORLD_UPDATE,
-	ZP_PROFILER_STEP_PHYSICS_UPDATE,
-	ZP_PROFILER_STEP_SCRIPT_UPDATE,
-	ZP_PROFILER_STEP_SCRIPT_PROC_THREADS,
-
-	ZP_PROFILER_STEP_DRAW_GUI,
-
-	ZP_PROFILER_STEP_UPDATE_PHASE,
-	ZP_PROFILER_STEP_UPDATE_STATE,
-
-	ZP_PROFILER_STEP_INPUT_UPDATE,
-	ZP_PROFILER_STEP_AUDIO_UPDATE,
-	ZP_PROFILER_STEP_RENDERING_UPDATE,
-
-	ZP_PROFILER_STEP_GARBAGE_COLLECT,
-	ZP_PROFILER_STEP_RELOAD_ALL,
-	ZP_PROFILER_STEP_HOT_RELOAD,
-
-	ZP_PROFILER_STEP_SLEEP,
-
-	zpProfilerSteps_Count,
-};
-
 enum
 {
 	ZP_PROFILER_MAX_FRAMES = 2 * 60
 };
-
-#if ZP_USE_PROFILER
-#define ZP_PROFILE_START( step )	m_profiler.start( ZP_PROFILER_STEP_##step, m_timer.getTime() )
-#define ZP_PROFILE_END( step )		m_profiler.end( ZP_PROFILER_STEP_##step, m_timer.getTime() )
-#define ZP_PROFILE_FINALIZE()		m_profiler.finalize()
-#else
-#define ZP_PROFILE_START( step )	(void)0
-#define ZP_PROFILE_END( step )		(void)0
-#define ZP_PROFILE_FINALIZE()		(void)0
-#endif
 
 struct zpProfilerPart
 {
@@ -63,6 +13,12 @@ struct zpProfilerPart
 
 	zp_long currentStartTime;
 	zp_long currentEndTime;
+
+	zp_size_t prevStartMemory;
+	zp_size_t prevEndMemory;
+
+	zp_size_t currentStartMemory;
+	zp_size_t currentEndMemory;
 
 	zp_long maxTime;
 	zp_long minTime;
@@ -75,6 +31,9 @@ struct zpProfilerFrame
 {
 	zp_long startTime;
 	zp_long endTime;
+
+	zp_size_t startMemory;
+	zp_size_t endMemory;
 };
 
 struct zpProfilerTimeline
@@ -89,30 +48,37 @@ public:
 	zpProfiler();
 	~zpProfiler();
 
-	void setup();
+	void setup( zp_size_t numSteps, zpTime* time, zpMemorySystem* mem );
 	void teardown();
 
-	void start( zpProfilerSteps step, zp_long time );
-	void end( zpProfilerSteps step, zp_long time );
+	void start( zp_size_t step );
+	void end( zp_size_t step );
 
 	void reset();
 	void finalize();
 
-	zp_long getPreviousTime( zpProfilerSteps step );
-	zp_long getAverageTime( zpProfilerSteps step );
-	zp_long getMaxTime( zpProfilerSteps step );
+	zp_long getPreviousTime( zp_size_t step ) const;
+	zp_long getAverageTime( zp_size_t step ) const;
+	zp_long getMaxTime( zp_size_t step ) const;
 
-	zp_float getPreviousTimeSeconds( zpProfilerSteps step, zp_float secondsPerTick );
+	zp_size_t getPreviousMemoryUsed( zp_size_t step ) const;
 
-	void printProfile( zpProfilerSteps step, zp_float secondsPerTick );
+	zp_float getPreviousTimeSeconds( zp_size_t step, zp_float secondsPerTick ) const;
 
-	const zpProfilerTimeline& getTimeline( zpProfilerSteps step ) const { return m_frames[ step ]; }
+	void printProfile( zp_size_t step, zp_float secondsPerTick ) const;
+
+	const zpProfilerTimeline& getTimeline( zp_size_t step ) const;
 
 private:
-	zp_int m_currentFrame;
+	zp_size_t m_currentFrame;
+	zp_size_t m_previousFrame;
+	zp_size_t m_numSteps;
 
-	zpFixedArrayList< zpProfilerPart, zpProfilerSteps_Count > m_profiles;
-	zpFixedArrayList< zpProfilerTimeline, zpProfilerSteps_Count > m_frames;
+	zpTime* m_time;
+	zpMemorySystem* m_mem;
+
+	zpArrayList< zpProfilerPart > m_profiles;
+	zpArrayList< zpProfilerTimeline > m_frames;
 };
 
 #endif
