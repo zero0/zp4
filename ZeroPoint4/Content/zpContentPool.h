@@ -6,33 +6,33 @@ template<typename T, zp_uint Count>
 ZP_ABSTRACT_CLASS zpContentPool
 {
 public:
-	zpContentPool();
-	~zpContentPool();
+    zpContentPool();
+    ~zpContentPool();
 
-	void setup( zpMemorySystem* memory );
-	void teardown();
+    void setup( zpMemorySystem* memory );
+    void teardown();
 
-	template<typename R>
-	T* create( const R& param );
+    template<typename R>
+    T* create( const R& param );
 
-	template<typename R0, typename R1>
-	T* create( const R0& param0, const R1& param1 );
+    template<typename R0, typename R1>
+    T* create( const R0& param0, const R1& param1 );
 
-	void destroy( T* obj );
+    void destroy( T* obj );
 
-	zp_uint size() const;
+    zp_uint size() const;
 
-	T* getUsed( zp_uint index );
-	zp_uint getUsedCount() const;
+    T* getUsed( zp_uint index );
+    zp_uint getUsedCount() const;
 
 protected:
-	virtual void onCreate( T* o ) {}
-	virtual void onDestroy( T* o ) {}
+    virtual void onCreate( T* o ) {}
+    virtual void onDestroy( T* o ) {}
 
-	zpFixedArrayList< T*, Count > m_used;
-	zpFixedArrayList< T*, Count > m_free;
+    zpFixedArrayList< T*, Count > m_used;
+    zpFixedArrayList< T*, Count > m_free;
 
-	zpMemorySystem* m_memory;
+    zpMemorySystem* m_memory;
 };
 
 #include "zpContentPool.inl"

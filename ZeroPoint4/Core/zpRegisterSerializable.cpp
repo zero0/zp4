@@ -10,10 +10,10 @@ zpRegisterSerializable::~zpRegisterSerializable() {}
 void zpRegisterSerializable::operator=( const zpRegisterSerializable& ) {}
 
 void zpRegisterSerializable::registerSerializable( const zpString& name, zpRegisterSerializable::CreateSerializableFunction createFunc ) {
-	s_creators[ name ] = createFunc;
+    s_creators[ name ] = createFunc;
 }
 
 zpSerializable* zpRegisterSerializable::createSerializable( const zpString& name ) {
-	return s_creators[ name ]();
+    return s_creators[ name ]();
 }
 #endif

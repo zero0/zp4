@@ -4,7 +4,7 @@
 
 ZP_PURE_INTERFACE zpRenderable {
 public:
-	virtual void render() = 0;
+    virtual void render() = 0;
 };
 
 #endif

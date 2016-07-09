@@ -4,45 +4,45 @@
 
 class zpRegisterSerializable {
 public:
-	~zpRegisterSerializable();
+    ~zpRegisterSerializable();
 
-	typedef zpSerializable* (*CreateSerializableFunction)();
+    typedef zpSerializable* (*CreateSerializableFunction)();
 
-	template<typename T>
-	static void registerSerializable() {
-		registerSerializable( zpString( ZP_SERIALIZE_TYPE( T ) ), zpRegisterSerializable::template defaultCreateSerializable<T> );
-	}
+    template<typename T>
+    static void registerSerializable() {
+        registerSerializable( zpString( ZP_SERIALIZE_TYPE( T ) ), zpRegisterSerializable::template defaultCreateSerializable<T> );
+    }
 
-	template<typename T>
-	static void registerSerializable( CreateSerializableFunction createFunc ) {
-		registerSerializable( zpString( ZP_SERIALIZE_TYPE( T ) ), createFunc );
-	}
+    template<typename T>
+    static void registerSerializable( CreateSerializableFunction createFunc ) {
+        registerSerializable( zpString( ZP_SERIALIZE_TYPE( T ) ), createFunc );
+    }
 
-	template<typename T>
-	static void registerSerializable( const zpString& name ) {
-		registerSerializable( name, zpRegisterSerializable::template defaultCreateSerializable<T> );
-	}
+    template<typename T>
+    static void registerSerializable( const zpString& name ) {
+        registerSerializable( name, zpRegisterSerializable::template defaultCreateSerializable<T> );
+    }
 
-	static void registerSerializable( const zpString& name, CreateSerializableFunction createFunc );
+    static void registerSerializable( const zpString& name, CreateSerializableFunction createFunc );
 
-	template<typename T>
-	static T* createSerializable( const zpString& name ) {
-		return (T*)createSerializable( name );
-	};
+    template<typename T>
+    static T* createSerializable( const zpString& name ) {
+        return (T*)createSerializable( name );
+    };
 
-	static zpSerializable* createSerializable( const zpString& name );
+    static zpSerializable* createSerializable( const zpString& name );
 
 private:
-	zpRegisterSerializable();
-	zpRegisterSerializable( const zpRegisterSerializable& );
-	void operator=( const zpRegisterSerializable& );
+    zpRegisterSerializable();
+    zpRegisterSerializable( const zpRegisterSerializable& );
+    void operator=( const zpRegisterSerializable& );
 
-	template<typename T>
-	static zpSerializable* defaultCreateSerializable() {
-		return (zpSerializable*)new T();
-	}
+    template<typename T>
+    static zpSerializable* defaultCreateSerializable() {
+        return (zpSerializable*)new T();
+    }
 
-	static zpHashMap<zpString, CreateSerializableFunction> s_creators;
+    static zpHashMap<zpString, CreateSerializableFunction> s_creators;
 };
 
 #endif

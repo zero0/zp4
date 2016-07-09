@@ -7,27 +7,27 @@ class zpShaderImpl;
 class zpShader
 {
 public:
-	zpShader();
-	~zpShader();
+    zpShader();
+    ~zpShader();
 
-	zpShaderImpl* getShaderImpl() const;
-	const zpBison& getShaderData() const;
+    zpShaderImpl* getShaderImpl() const;
+    const zpBison& getShaderData() const;
 
 protected:
-	zpShaderImpl* m_shader;
-	zpBison m_shaderData;
+    zpShaderImpl* m_shader;
+    zpBison m_shaderData;
 
-	friend class zpRenderingEngine;
-	friend class zpShaderResource;
+    friend class zpRenderingEngine;
+    friend class zpShaderResource;
 };
 
 class zpShaderResource : public zpResource< zpShader >
 {
 private:
-	zp_bool load( const zp_char* filename, zpRenderingEngine* engine );
-	void unload( zpRenderingEngine* engine );
+    zp_bool load( const zp_char* filename, zpRenderingEngine* engine );
+    void unload( zpRenderingEngine* engine );
 
-	friend class zpShaderContentManager;
+    friend class zpShaderContentManager;
 
 private:
 };
@@ -38,12 +38,12 @@ class zpShaderResourceInstance : public zpResourceInstance< zpShaderResource >
 class zpShaderContentManager : public zpContentManager< zpShaderResource, zpShaderResourceInstance, zpShaderContentManager, 128 >
 {
 private:
-	zp_bool createResource( zpShaderResource* res, const zp_char* filename );
-	void destroyResource( zpShaderResource* res );
-	void initializeInstance( zpShaderResourceInstance& instance ) {}
+    zp_bool createResource( zpShaderResource* res, const zp_char* filename );
+    void destroyResource( zpShaderResource* res );
+    void initializeInstance( zpShaderResourceInstance& instance ) {}
 
-	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
-	friend class zpContentManager;
+    template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+    friend class zpContentManager;
 };
 
 #endif

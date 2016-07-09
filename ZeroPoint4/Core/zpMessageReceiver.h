@@ -4,7 +4,7 @@
 
 ZP_PURE_INTERFACE zpMessageReceiver {
 public:
-	virtual void receiveMessage( const zpMessage& message ) = 0;
+    virtual void receiveMessage( const zpMessage& message ) = 0;
 };
 
 #endif

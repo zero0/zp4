@@ -4,9 +4,9 @@
 class PNGTextureReader : public TextureReader
 {
 public:
-	virtual ~PNGTextureReader() {}
+    virtual ~PNGTextureReader() {}
 
-	zp_bool getTextureBytes( const zpDataBuffer& data, ImageData& imageData );
+    zp_bool getTextureBytes( const zpDataBuffer& data, ImageData& imageData );
 };
 
 #endif

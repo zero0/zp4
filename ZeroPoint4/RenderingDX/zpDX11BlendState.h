@@ -7,16 +7,16 @@ struct ID3D11BlendState;
 class zpBlendStateImpl
 {
 public:
-	zpBlendStateImpl();
-	~zpBlendStateImpl();
+    zpBlendStateImpl();
+    ~zpBlendStateImpl();
 
 private:
-	ID3D11BlendState* m_blend;;
-	zp_hash m_descHash;
-	zpBlendStateDesc m_desc;
+    ID3D11BlendState* m_blend;;
+    zp_hash m_descHash;
+    zpBlendStateDesc m_desc;
 
-	friend class zpRenderingEngineImpl;
-	friend class zpRenderingContextImpl;
+    friend class zpRenderingEngineImpl;
+    friend class zpRenderingContextImpl;
 };
 
 #endif

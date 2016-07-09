@@ -8,28 +8,28 @@ class zpObjectResource;
 
 enum zpObjectFlag : zp_uint
 {
-	ZP_OBJECT_FLAG_ENABLED,
-	ZP_OBJECT_FLAG_CREATED,
-	ZP_OBJECT_FLAG_INITIALIZED,
-	ZP_OBJECT_FLAG_SHOULD_DESTROY,
-	ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD,
-	ZP_OBJECT_FLAG_STATIC,
-	ZP_OBJECT_FLAG_TRANSFORM_DIRTY,
-	zpObjectFlag_Count,
+    ZP_OBJECT_FLAG_ENABLED,
+    ZP_OBJECT_FLAG_CREATED,
+    ZP_OBJECT_FLAG_INITIALIZED,
+    ZP_OBJECT_FLAG_SHOULD_DESTROY,
+    ZP_OBJECT_FLAG_DONT_DESTROY_ON_UNLOAD,
+    ZP_OBJECT_FLAG_STATIC,
+    ZP_OBJECT_FLAG_TRANSFORM_DIRTY,
+    zpObjectFlag_Count,
 
-	ZP_OBJECT_FLAG_USER0,
-	zpObjectFlagUser_Count = 31,
+    ZP_OBJECT_FLAG_USER0,
+    zpObjectFlagUser_Count = 31,
 
-	ZP_OBJECT_FLAG_CAN_UPDATE = 1 << ZP_OBJECT_FLAG_ENABLED | 1 << ZP_OBJECT_FLAG_CREATED | 1 << ZP_OBJECT_FLAG_INITIALIZED,
+    ZP_OBJECT_FLAG_CAN_UPDATE = 1 << ZP_OBJECT_FLAG_ENABLED | 1 << ZP_OBJECT_FLAG_CREATED | 1 << ZP_OBJECT_FLAG_INITIALIZED,
 };
 
 class zpObjectResource : public zpResource< zpBison >
 {
 private:
-	zp_bool load( const zp_char* filename );
-	void unload();
+    zp_bool load( const zp_char* filename );
+    void unload();
 
-	friend class zpObjectContentManager;
+    friend class zpObjectContentManager;
 };
 
 class zpObjectResourceInstance : public zpResourceInstance< zpObjectResource >
@@ -38,103 +38,103 @@ class zpObjectResourceInstance : public zpResourceInstance< zpObjectResource >
 
 class zpObject
 {
-	friend class zpObjectContentManager;
+    friend class zpObjectContentManager;
 
 public:
-	zpObject( zpApplication* application );
-	zpObject( zpApplication* application, const zpObjectResourceInstance& res );
-	zpObject( zpApplication* application, const zpBison::Value& root );
-	~zpObject();
+    zpObject( zpApplication* application );
+    zpObject( zpApplication* application, const zpObjectResourceInstance& res );
+    zpObject( zpApplication* application, const zpBison::Value& root );
+    ~zpObject();
 
-	zpAllComponents* getComponents();
+    zpAllComponents* getComponents();
 
-	zp_uint getPrefabID() const;
-	zp_uint getID() const;
-	void setID( zp_uint id );
+    zp_uint getPrefabID() const;
+    zp_uint getID() const;
+    void setID( zp_uint id );
 
-	void setFlag( zpObjectFlag flag );
-	void unsetFlag( zpObjectFlag flag );
-	zp_bool isFlagSet( zpObjectFlag flag ) const;
+    void setFlag( zpObjectFlag flag );
+    void unsetFlag( zpObjectFlag flag );
+    zp_bool isFlagSet( zpObjectFlag flag ) const;
 
-	void setEnabled( zp_bool enabled );
-	zp_bool isEnabled() const;
+    void setEnabled( zp_bool enabled );
+    zp_bool isEnabled() const;
 
-	const zpString& getName() const;
-	void setName( const zpString& name );
+    const zpString& getName() const;
+    void setName( const zpString& name );
 
-	const zpFlag64& getTags() const;
-	void clearTags();
+    const zpFlag64& getTags() const;
+    void clearTags();
 
-	zp_bool hasTag( const zp_char* tag ) const;
-	void addTag( const zp_char* tag );
-	void removeTag( const zp_char* tag );
+    zp_bool hasTag( const zp_char* tag ) const;
+    void addTag( const zp_char* tag );
+    void removeTag( const zp_char* tag );
 
-	zp_bool hasTag( const zpString& tag ) const;
-	void addTag( const zpString& tag );
-	void removeTag( const zpString& tag );
+    zp_bool hasTag( const zpString& tag ) const;
+    void addTag( const zpString& tag );
+    void removeTag( const zpString& tag );
 
-	const zpFlag32& getLayers() const;
-	void setLayers( const zpFlag32& layers );
-	zp_bool isOnLayer( zp_uint layer ) const;
+    const zpFlag32& getLayers() const;
+    void setLayers( const zpFlag32& layers );
+    zp_bool isOnLayer( zp_uint layer ) const;
 
-	zpApplication* getApplication() const;
+    zpApplication* getApplication() const;
 
-	zpWorld* getWorld() const;
-	void setWorld( zpWorld* world );
+    zpWorld* getWorld() const;
+    void setWorld( zpWorld* world );
 
-	void initialize();
-	void update();
-	void destroy();
+    void initialize();
+    void update();
+    void destroy();
 
 private:
-	void load( zp_bool isInitialLoad, const zpBison::Value& root );
-	void unload();
+    void load( zp_bool isInitialLoad, const zpBison::Value& root );
+    void unload();
 
-	zpString m_name;
-	zpFlag64 m_tags;
-	zpFlag32 m_layers;
-	zpFlag32 m_flags;
-	zp_long m_lastLoadTime;
-	zp_uint m_prefabId;
-	zp_uint m_instanceId;
-	zpAllComponents m_components;
+    zpString m_name;
+    zpFlag64 m_tags;
+    zpFlag32 m_layers;
+    zpFlag32 m_flags;
+    zp_long m_lastLoadTime;
+    zp_uint m_prefabId;
+    zp_uint m_instanceId;
+    zpAllComponents m_components;
 
-	zpApplication* m_application;
-	zpWorld* m_world;
+    zpApplication* m_application;
+    zpWorld* m_world;
 
-	zpObjectResourceInstance m_object;
+    zpObjectResourceInstance m_object;
 };
 
 class zpObjectContentManager : public zpContentManager< zpObjectResource, zpObjectResourceInstance, zpObjectContentManager, 16 >, public zpContentPool< zpObject, 64 >
 {
 public:
-	zpObjectContentManager();
-	virtual ~zpObjectContentManager();
+    zpObjectContentManager();
+    virtual ~zpObjectContentManager();
 
-	zpObject* createObject();
-	zpObject* createObject( const zp_char* filename );
-	zpObject* createObject( const zpBison::Value& def );
+    zpObject* createObject();
+    zpObject* createObject( const zp_char* filename );
+    zpObject* createObject( const zpBison::Value& def );
 
-	void initializeAllObjectsInWorld( zpWorld* world );
+    void initializeAllObjectsInWorld( zpWorld* world );
 
-	void destroyAllObjects();
-	void destroyAllObjectsInWorld( zpWorld* world );
+    void destroyAllObjects();
+    void destroyAllObjectsInWorld( zpWorld* world );
 
-	void getAllObjectsInLayer( zp_uint layer, zpArrayList< zpObject* >& objects ) const;
-	void getAllObjectsWithTag( zp_int tag, zpArrayList< zpObject* >& objects ) const;
+    void getAllObjectsInLayer( zp_uint layer, zpArrayList< zpObject* >& objects ) const;
+    void getAllObjectsWithTag( zp_int tag, zpArrayList< zpObject* >& objects ) const;
 
-	void update();
-	void simulate();
+    void update();
+    void simulate();
 
 private:
-	zp_bool createResource( zpObjectResource* res, const zp_char* filename );
-	void destroyResource( zpObjectResource* res );
-	void initializeInstance( zpObjectResourceInstance& instance ) {}
+    zp_bool createResource( zpObjectResource* res, const zp_char* filename );
+    void destroyResource( zpObjectResource* res );
+    void initializeInstance( zpObjectResourceInstance& instance ) {}
 
-	zp_uint m_numObjects;
+    zp_uint m_numObjects;
 
-	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
-	friend class zpContentManager;
+    template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+    friend class zpContentManager;
 };
 
 #endif

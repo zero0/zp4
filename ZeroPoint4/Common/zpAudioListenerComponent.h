@@ -5,38 +5,38 @@
 class zpAudioListenerComponent : public zpComponent
 {
 public:
-	zpAudioListenerComponent( zpObject* obj, const zpBison::Value& def );
-	virtual ~zpAudioListenerComponent();
+    zpAudioListenerComponent( zpObject* obj, const zpBison::Value& def );
+    virtual ~zpAudioListenerComponent();
 
-	void setRolloffFactor( zp_float rolloff );
-	void setDistanceFactor( zp_float dist );
-	void setDopplerFactor( zp_float doppler );
+    void setRolloffFactor( zp_float rolloff );
+    void setDistanceFactor( zp_float dist );
+    void setDopplerFactor( zp_float doppler );
 
 protected:
-	void onCreate();
-	void onInitialize();
-	void onDestroy(); 
+    void onCreate();
+    void onInitialize();
+    void onDestroy(); 
 
-	void onUpdate( zp_float deltaTime, zp_float realTime );
-	void onSimulate();
+    void onUpdate( zp_float deltaTime, zp_float realTime );
+    void onSimulate();
 
-	void onEnabled();
-	void onDisabled();
+    void onEnabled();
+    void onDisabled();
 
 private:
-	zpAudioEngine* m_engine;
-	zpVector4f m_oldPosition;
+    zpAudioEngine* m_engine;
+    zpVector4f m_oldPosition;
 };
 
 
 class zpAudioListenerComponentPool : public zpContentPool< zpAudioListenerComponent, 1 >
 {
 public:
-	zpAudioListenerComponentPool();
-	virtual ~zpAudioListenerComponentPool();
+    zpAudioListenerComponentPool();
+    virtual ~zpAudioListenerComponentPool();
 
-	void update( zp_float deltaTime, zp_float realTime );
-	void simulate();
+    void update( zp_float deltaTime, zp_float realTime );
+    void simulate();
 };
 
 #endif

@@ -9,14 +9,14 @@
 #endif
 
 zpSamplerState::zpSamplerState()
-	: m_samplerState( ZP_NULL )
+    : m_samplerState( ZP_NULL )
 {}
 zpSamplerState::~zpSamplerState()
 {
-	//ZP_SAFE_DELETE( m_samplerState );
+    //ZP_SAFE_DELETE( m_samplerState );
 }
 
 zpSamplerStateImpl* zpSamplerState::getSamplerStateImpl() const
 {
-	return m_samplerState;
+    return m_samplerState;
 }

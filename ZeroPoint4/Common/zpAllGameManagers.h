@@ -9,23 +9,23 @@
 class zpAllGameManagers : public zpSerializable
 {
 public:
-	zpAllGameManagers();
-	~zpAllGameManagers();
+    zpAllGameManagers();
+    ~zpAllGameManagers();
 
 #undef ZP_GAME_MANAGER_DEF
 #define ZP_GAME_MANAGER_DEF( mng ) zp##mng* get##mng();
 #include "zpAllGameManagers.inl"
 
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
+    void serialize( zpSerializedOutput* out );
+    void deserialize( zpSerializedInput* in );
 
-	void update();
-	void simulate();
+    void update();
+    void simulate();
 
-	void create();
-	void destroy();
+    void create();
+    void destroy();
 
-	//void setGame( zpGame* game );
+    //void setGame( zpGame* game );
 
 private:
 #undef ZP_GAME_MANAGER_DEF

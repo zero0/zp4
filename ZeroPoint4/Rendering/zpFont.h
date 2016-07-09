@@ -4,66 +4,66 @@
 
 enum zpFontAlignment
 {
-	ZP_FONT_ALIGNMENT_LEFT,
-	ZP_FONT_ALIGNMENT_CENTER,
-	ZP_FONT_ALIGNMENT_RIGHT,
+    ZP_FONT_ALIGNMENT_LEFT,
+    ZP_FONT_ALIGNMENT_CENTER,
+    ZP_FONT_ALIGNMENT_RIGHT,
 
-	zpFontAlignment_Count,
+    zpFontAlignment_Count,
 };
 
 struct zpFontGlyphKerning
 {
-	zp_char first;
-	zp_char second;
-	zp_int amount;
+    zp_char first;
+    zp_char second;
+    zp_int amount;
 };
 
 struct zpFontGlyph
 {
-	zp_char character;
-	zp_int x;
-	zp_int y;
-	zp_int width;
-	zp_int height;
-	zp_int xOffset;
-	zp_int yOffset;
-	zp_int xAdvance;
-	zp_int page;
-	zp_int channel;
+    zp_char character;
+    zp_int x;
+    zp_int y;
+    zp_int width;
+    zp_int height;
+    zp_int xOffset;
+    zp_int yOffset;
+    zp_int xAdvance;
+    zp_int page;
+    zp_int channel;
 };
 
 struct zpFontSet
 {
-	zpString face;
-	zpString charset;
+    zpString face;
+    zpString charset;
 
-	zp_int size;
-	zp_int stretchH;
-	zp_int aa;
-	zp_int outline;
+    zp_int size;
+    zp_int stretchH;
+    zp_int aa;
+    zp_int outline;
 
-	zpRecti padding;
-	zpVector2i spacing;
+    zpRecti padding;
+    zpVector2i spacing;
 
-	zp_bool isBold;
-	zp_bool isItalic;
-	zp_bool isUnicode;
-	zp_bool isSmooth;
+    zp_bool isBold;
+    zp_bool isItalic;
+    zp_bool isUnicode;
+    zp_bool isSmooth;
 
-	zp_int lineHeight;
-	zp_int base;
-	zp_int scaleW;
-	zp_int scaleH;
+    zp_int lineHeight;
+    zp_int base;
+    zp_int scaleW;
+    zp_int scaleH;
 
-	zp_bool isPacked;
-	zp_int alphaChannel;
-	zp_int redChannel;
-	zp_int greenChannel;
-	zp_int blueChannel;
+    zp_bool isPacked;
+    zp_int alphaChannel;
+    zp_int redChannel;
+    zp_int greenChannel;
+    zp_int blueChannel;
 
-	zpFixedArrayList< zpFontGlyph, 256 > glyphs;
-	zpFixedArrayList< zpMaterialResourceInstance, 2 > pages;
-	zpArrayList< zpFontGlyphKerning > kernings;
+    zpFixedArrayList< zpFontGlyph, 256 > glyphs;
+    zpFixedArrayList< zpMaterialResourceInstance, 2 > pages;
+    zpArrayList< zpFontGlyphKerning > kernings;
 };
 
 class zpFontResource;
@@ -73,10 +73,10 @@ class zpFontContentManager;
 class zpFontResource : public zpResource< zpFontSet >
 {
 private:
-	zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline );
-	void unload( zpRenderingPipeline* pipeline);
+    zp_bool load( const zp_char* filename, zpRenderingPipeline* pipeline );
+    void unload( zpRenderingPipeline* pipeline);
 
-	friend class zpFontContentManager;
+    friend class zpFontContentManager;
 };
 
 
@@ -86,12 +86,12 @@ class zpFontResourceInstance : public zpResourceInstance< zpFontResource >
 class zpFontContentManager : public zpContentManager< zpFontResource, zpFontResourceInstance, zpFontContentManager, 4 >
 {
 private:
-	zp_bool createResource( zpFontResource* res, const zp_char* filename );
-	void destroyResource( zpFontResource* res );
-	void initializeInstance( zpFontResourceInstance& instance ) {}
+    zp_bool createResource( zpFontResource* res, const zp_char* filename );
+    void destroyResource( zpFontResource* res );
+    void initializeInstance( zpFontResourceInstance& instance ) {}
 
-	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
-	friend class zpContentManager;
+    template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+    friend class zpContentManager;
 };
 
 #endif

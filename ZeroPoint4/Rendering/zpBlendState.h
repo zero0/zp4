@@ -7,15 +7,15 @@ class zpBlendStateImpl;
 class zpBlendState
 {
 public:
-	zpBlendState();
-	~zpBlendState();
+    zpBlendState();
+    ~zpBlendState();
 
-	zpBlendStateImpl* getBlendStateImpl() const;
+    zpBlendStateImpl* getBlendStateImpl() const;
 
 private:
-	zpBlendStateImpl* m_blendState;
+    zpBlendStateImpl* m_blendState;
 
-	friend class zpRenderingEngine;
+    friend class zpRenderingEngine;
 };
 
 #endif

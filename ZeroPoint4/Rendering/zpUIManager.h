@@ -4,22 +4,22 @@
 
 class zpUIManager {
 public:
-	zpUIManager();
-	virtual ~zpUIManager();
+    zpUIManager();
+    virtual ~zpUIManager();
 
-	void serialize( zpSerializedOutput* out );
-	void deserialize( zpSerializedInput* in );
-	
-	void receiveMessage( const zpMessage& message );
+    void serialize( zpSerializedOutput* out );
+    void deserialize( zpSerializedInput* in );
+    
+    void receiveMessage( const zpMessage& message );
 
 protected:
-	void onCreate();
-	void onDestroy();
+    void onCreate();
+    void onDestroy();
 
-	void onUpdate();
+    void onUpdate();
 
-	void onEnabled();
-	void onDisabled();
+    void onEnabled();
+    void onDisabled();
 
 private:
 

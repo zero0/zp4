@@ -6,10 +6,10 @@ class BaseMeshCompiler;
 class ObjMessCompiler : public BaseMeshCompiler
 {
 public:
-	virtual ~ObjMessCompiler();
+    virtual ~ObjMessCompiler();
 
 protected:
-	zp_bool compileMesh();
+    zp_bool compileMesh();
 };
 
 #endif

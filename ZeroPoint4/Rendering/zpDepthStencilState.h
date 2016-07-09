@@ -7,15 +7,15 @@ class zpDepthStencilStateImpl;
 class zpDepthStencilState
 {
 public:
-	zpDepthStencilState();
-	~zpDepthStencilState();
+    zpDepthStencilState();
+    ~zpDepthStencilState();
 
-	zpDepthStencilStateImpl* getDepthStencilStateImpl() const;
+    zpDepthStencilStateImpl* getDepthStencilStateImpl() const;
 
 private:
-	zpDepthStencilStateImpl* m_depthStencilState;
+    zpDepthStencilStateImpl* m_depthStencilState;
 
-	friend class zpRenderingEngine;
+    friend class zpRenderingEngine;
 };
 
 #endif

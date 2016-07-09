@@ -4,42 +4,42 @@
 class zpKinematicBodyComponent : public zpComponent
 {
 public:
-	zpKinematicBodyComponent( zpObject* obj, const zpBison::Value& def );
-	virtual ~zpKinematicBodyComponent();
+    zpKinematicBodyComponent( zpObject* obj, const zpBison::Value& def );
+    virtual ~zpKinematicBodyComponent();
 
-	zp_bool canJump() const;
+    zp_bool canJump() const;
 
-	void jump();
-	void walk( const zpVector4f& direction, const zpScalar& speed );
-	void stop();
+    void jump();
+    void walk( const zpVector4f& direction, const zpScalar& speed );
+    void stop();
 
 protected:
-	void onCreate();
-	void onInitialize();
-	void onDestroy();
+    void onCreate();
+    void onInitialize();
+    void onDestroy();
 
-	void onUpdate( zp_float deltaTime, zp_float realTime );
-	void onSimulate();
+    void onUpdate( zp_float deltaTime, zp_float realTime );
+    void onSimulate();
 
-	void onEnabled();
-	void onDisabled();
+    void onEnabled();
+    void onDisabled();
 
 private:
-	zp_bool m_addOnEnable;
-	zp_bool m_addOnCreate;
-	zp_bool m_isAdded;
+    zp_bool m_addOnEnable;
+    zp_bool m_addOnCreate;
+    zp_bool m_isAdded;
 
-	zpKinematicBody m_kinematicBody;
+    zpKinematicBody m_kinematicBody;
 };
 
 class zpKinematicBodyComponentPool : public zpContentPool< zpKinematicBodyComponent, 8 >
 {
 public:
-	zpKinematicBodyComponentPool();
-	virtual ~zpKinematicBodyComponentPool();
+    zpKinematicBodyComponentPool();
+    virtual ~zpKinematicBodyComponentPool();
 
-	void update( zp_float deltaTime, zp_float realTime );
-	void simulate();
+    void update( zp_float deltaTime, zp_float realTime );
+    void simulate();
 };
 
 #endif

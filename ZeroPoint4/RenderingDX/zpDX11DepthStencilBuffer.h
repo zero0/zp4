@@ -8,25 +8,25 @@ struct ID3D11Texture2D;
 class zpDepthStencilBufferImpl
 {
 public:
-	~zpDepthStencilBufferImpl();
+    ~zpDepthStencilBufferImpl();
 
-	zp_uint getWidth() const;
-	zp_uint getHeight() const;
+    zp_uint getWidth() const;
+    zp_uint getHeight() const;
 
-	zpDisplayFormat getDisplayFormat() const;
+    zpDisplayFormat getDisplayFormat() const;
 
 private:
-	zpDepthStencilBufferImpl();
+    zpDepthStencilBufferImpl();
 
-	ID3D11DepthStencilView* m_depthStencilView;
-	ID3D11Texture2D* m_depthTexture;
+    ID3D11DepthStencilView* m_depthStencilView;
+    ID3D11Texture2D* m_depthTexture;
 
-	zpDisplayFormat m_format;
-	zp_uint m_width;
-	zp_uint m_height;
+    zpDisplayFormat m_format;
+    zp_uint m_width;
+    zp_uint m_height;
 
-	friend class zpRenderingContextImpl;
-	friend class zpRenderingEngineImpl;
+    friend class zpRenderingContextImpl;
+    friend class zpRenderingEngineImpl;
 };
 
 #endif

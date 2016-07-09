@@ -5,10 +5,10 @@
 template<typename T>
 class zpSingleton {
 public:
-	static T& getInstance() {
-		static T obj;
-		return obj;
-	}
+    static T& getInstance() {
+        static T obj;
+        return obj;
+    }
 };
 
 #endif

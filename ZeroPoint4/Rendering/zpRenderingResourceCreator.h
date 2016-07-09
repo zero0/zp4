@@ -4,10 +4,10 @@
 
 class zpRenderingResourceCreator {
 public:
-	zpRenderingResourceCreator();
-	virtual ~zpRenderingResourceCreator();
+    zpRenderingResourceCreator();
+    virtual ~zpRenderingResourceCreator();
 
-	//zpResource* createResource( const zpString& filename );
+    //zpResource* createResource( const zpString& filename );
 };
 
 #endif

@@ -6,48 +6,48 @@ class zpTextureImpl;
 
 enum zpTextureDimension
 {
-	ZP_TEXTURE_DIMENSION_UNKNOWN,
-	ZP_TEXTURE_DIMENSION_1D,
-	ZP_TEXTURE_DIMENSION_2D,
-	ZP_TEXTURE_DIMENSION_3D,
-	ZP_TEXTURE_DIMENSION_CUBE_MAP,
+    ZP_TEXTURE_DIMENSION_UNKNOWN,
+    ZP_TEXTURE_DIMENSION_1D,
+    ZP_TEXTURE_DIMENSION_2D,
+    ZP_TEXTURE_DIMENSION_3D,
+    ZP_TEXTURE_DIMENSION_CUBE_MAP,
 };
 
 enum zpTextureType
 {
-	ZP_TEXTURE_TYPE_TEXTURE,
-	ZP_TEXTURE_TYPE_RENDER_TARGET,
-	ZP_TEXTURE_TYPE_RENDER_TEXTURE
+    ZP_TEXTURE_TYPE_TEXTURE,
+    ZP_TEXTURE_TYPE_RENDER_TARGET,
+    ZP_TEXTURE_TYPE_RENDER_TEXTURE
 };
 
 class zpTexture
 {
 public:
-	zpTexture();
-	~zpTexture();
+    zpTexture();
+    ~zpTexture();
 
-	zpTextureDimension getTextureDimension() const;
-	zpTextureType getTextureType() const;
+    zpTextureDimension getTextureDimension() const;
+    zpTextureType getTextureType() const;
 
-	zp_uint getWidth() const;
-	zp_uint getHeight() const;
+    zp_uint getWidth() const;
+    zp_uint getHeight() const;
 
-	zpTextureImpl* getTextureImpl() const;
+    zpTextureImpl* getTextureImpl() const;
 
 private:
-	zpTextureImpl* m_textureImpl;
+    zpTextureImpl* m_textureImpl;
 
-	friend class zpRenderingEngine;
+    friend class zpRenderingEngine;
 };
 
 
 class zpTextureResource : public zpResource< zpTexture >
 {
 private:
-	zp_bool load( const zp_char* filename, zpRenderingEngine* engine );
-	void unload( zpRenderingEngine* engine );
+    zp_bool load( const zp_char* filename, zpRenderingEngine* engine );
+    void unload( zpRenderingEngine* engine );
 
-	friend class zpTextureContentManager;
+    friend class zpTextureContentManager;
 };
 
 class zpTextureResourceInstance : public zpResourceInstance< zpTextureResource >
@@ -56,15 +56,15 @@ class zpTextureResourceInstance : public zpResourceInstance< zpTextureResource >
 class zpTextureContentManager : public zpContentManager< zpTextureResource, zpTextureResourceInstance, zpTextureContentManager, 128 >
 {
 public:
-	zp_bool getResourceWithoutLoadTexture( zpTextureResourceInstance& outInstance, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
+    zp_bool getResourceWithoutLoadTexture( zpTextureResourceInstance& outInstance, zp_uint width, zp_uint height, zpTextureType type, zpTextureDimension dimension, zpDisplayFormat format, zpCpuAccess access, void* data = ZP_NULL, zp_uint mipLevels = 1 );
 
 private:
-	zp_bool createResource( zpTextureResource* res, const zp_char* filename );
-	void destroyResource( zpTextureResource* res );
-	void initializeInstance( zpTextureResourceInstance& instance ) {}
+    zp_bool createResource( zpTextureResource* res, const zp_char* filename );
+    void destroyResource( zpTextureResource* res );
+    void initializeInstance( zpTextureResourceInstance& instance ) {}
 
-	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
-	friend class zpContentManager;
+    template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+    friend class zpContentManager;
 };
 
 #endif

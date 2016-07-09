@@ -7,16 +7,16 @@
 //#include "Scripting/zpScripting.h"
 
 zpAllGameManagers::zpAllGameManagers()
-	: zpSerializable()
+    : zpSerializable()
 #undef ZP_GAME_MANAGER_DEF
 #define ZP_GAME_MANAGER_DEF( mng ) , m_##mng( new zp##mng )
-	#include "zpAllGameManagers.inl"
+    #include "zpAllGameManagers.inl"
 {}
 zpAllGameManagers::~zpAllGameManagers()
 {
 #undef ZP_GAME_MANAGER_DEF
 #define ZP_GAME_MANAGER_DEF( mng ) ZP_SAFE_DELETE( m_##mng );
-	#include "zpAllGameManagers.inl"
+    #include "zpAllGameManagers.inl"
 }
 
 #undef ZP_GAME_MANAGER_DEF

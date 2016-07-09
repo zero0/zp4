@@ -4,35 +4,35 @@
 class zpCameraComponent : public zpComponent
 {
 public:
-	zpCameraComponent( zpObject* obj, const zpBison::Value& def );
-	virtual ~zpCameraComponent();
+    zpCameraComponent( zpObject* obj, const zpBison::Value& def );
+    virtual ~zpCameraComponent();
 
-	zpCamera* getCamera() { return m_camera; }
+    zpCamera* getCamera() { return m_camera; }
 
 protected:
-	void onCreate();
-	void onInitialize();
-	void onDestroy();
+    void onCreate();
+    void onInitialize();
+    void onDestroy();
 
-	void onUpdate( zp_float deltaTime, zp_float realTime );
-	void onSimulate();
+    void onUpdate( zp_float deltaTime, zp_float realTime );
+    void onSimulate();
 
-	void onEnabled();
-	void onDisabled();
+    void onEnabled();
+    void onDisabled();
 
 private:
-	zpCamera* m_camera;
+    zpCamera* m_camera;
 };
 
 
 class zpCameraComponentPool : public zpContentPool< zpCameraComponent, 8 >
 {
 public:
-	zpCameraComponentPool();
-	virtual ~zpCameraComponentPool();
+    zpCameraComponentPool();
+    virtual ~zpCameraComponentPool();
 
-	void update( zp_float deltaTime, zp_float realTime );
-	void simulate();
+    void update( zp_float deltaTime, zp_float realTime );
+    void simulate();
 };
 
 #endif

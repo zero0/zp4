@@ -4,7 +4,7 @@
 
 ZP_PURE_INTERFACE zpVertexLayout {
 public:
-	virtual zp_uint getStride() const = 0;
+    virtual zp_uint getStride() const = 0;
 };
 
 #endif

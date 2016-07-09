@@ -4,19 +4,19 @@
 
 class zpDX11TextureResource : public zpTextureResource {
 public:
-	~zpDX11TextureResource();
+    ~zpDX11TextureResource();
 
-	zp_bool load();
-	void unload();
+    zp_bool load();
+    void unload();
 
-	zpTexture* getTexture() const;
+    zpTexture* getTexture() const;
 
 private:
-	zpDX11TextureResource();
+    zpDX11TextureResource();
 
-	//zpDX11Texture m_texture;
+    //zpDX11Texture m_texture;
 
-	//friend class zpDX11RenderingEngine;
+    //friend class zpDX11RenderingEngine;
 };
 
 #endif

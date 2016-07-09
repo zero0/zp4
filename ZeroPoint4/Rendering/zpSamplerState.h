@@ -7,15 +7,15 @@ class zpSamplerStateImpl;
 class zpSamplerState
 {
 public:
-	zpSamplerState();
-	~zpSamplerState();
+    zpSamplerState();
+    ~zpSamplerState();
 
-	zpSamplerStateImpl* getSamplerStateImpl() const;
+    zpSamplerStateImpl* getSamplerStateImpl() const;
 
 private:
-	zpSamplerStateImpl* m_samplerState;
+    zpSamplerStateImpl* m_samplerState;
 
-	friend class zpRenderingEngine;
+    friend class zpRenderingEngine;
 };
 
 #endif

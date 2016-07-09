@@ -10,22 +10,22 @@ ZP_PURE_INTERFACE zpIState
 class zpStateMachine
 {
 public:
-	void setup();
-	void teardown();
+    void setup();
+    void teardown();
 
-	void update( zp_float dt, zp_float rt );
+    void update( zp_float dt, zp_float rt );
 
-	void addState();
+    void addState();
 
-	void swapState( const zp_char* stateName );
-	void pushState( const zp_char* stateName );
-	void popState();
+    void swapState( const zp_char* stateName );
+    void pushState( const zp_char* stateName );
+    void popState();
 
-	zpIState* getCurrentState() const;
+    zpIState* getCurrentState() const;
 
 private:
-	zpArrayList< zpIState* > m_allStates;
-	zpArrayList< zpIState* > m_stateStack;
+    zpArrayList< zpIState* > m_allStates;
+    zpArrayList< zpIState* > m_stateStack;
 };
 
 #endif

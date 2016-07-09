@@ -8,16 +8,16 @@ zp_handle zp_create_thread( zpThreadProc func, zp_handle param );
 
 class zpThread
 {
-	ZP_NON_COPYABLE( zpThread );
+    ZP_NON_COPYABLE( zpThread );
 public:
-	zpThread();
-	~zpThread();
+    zpThread();
+    ~zpThread();
 
-	void start();
-	void stop();
+    void start();
+    void stop();
 
 private:
-	zp_handle m_threadHandle;
+    zp_handle m_threadHandle;
 };
 
 #endif

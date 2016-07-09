@@ -2,34 +2,34 @@
 #include "zpRenderingImpl.inl"
 
 zpBuffer::zpBuffer()
-	: m_buffer( ZP_NULL )
+    : m_buffer( ZP_NULL )
 {}
 zpBuffer::~zpBuffer()
 {
-	m_buffer = ZP_NULL;
+    m_buffer = ZP_NULL;
 }
 zp_uint zpBuffer::getSize() const
 {
-	return m_buffer->getSize();
+    return m_buffer->getSize();
 }
 zp_uint zpBuffer::getStride() const
 {
-	return m_buffer->getStride();
+    return m_buffer->getStride();
 }
 zpBufferType zpBuffer::getBufferType() const
 {
-	return m_buffer->getBufferType();
+    return m_buffer->getBufferType();
 }
 zpDisplayFormat zpBuffer::getFormat() const
 {
-	return m_buffer->getFormat();
+    return m_buffer->getFormat();
 }
 zpBufferBindType zpBuffer::getBufferBindType() const
 {
-	return m_buffer->getBufferBindType();
+    return m_buffer->getBufferBindType();
 }
 
 zpBufferImpl* zpBuffer::getBufferImpl() const
 {
-	return m_buffer;
+    return m_buffer;
 }

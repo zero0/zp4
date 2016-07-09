@@ -3,9 +3,9 @@
 #include "zpDX11Util.h"
 
 zpRasterStateImpl::zpRasterStateImpl()
-	: m_raster( ZP_NULL )
+    : m_raster( ZP_NULL )
 {}
 zpRasterStateImpl::~zpRasterStateImpl()
 {
-	ZP_SAFE_RELEASE( m_raster );
+    ZP_SAFE_RELEASE( m_raster );
 }

@@ -4,30 +4,30 @@
 
 struct zpDrawCallBufferData
 {
-	zpMatrix4f world;
+    zpMatrix4f world;
 };
 
 struct zpFrameBufferData
 {
-	zp_float deltaTime;
-	zp_float actualDeltaTime;
-	zp_float fixedDeltaTime;
-	zp_float timeFromStart;
+    zp_float deltaTime;
+    zp_float actualDeltaTime;
+    zp_float fixedDeltaTime;
+    zp_float timeFromStart;
 };
 
 struct zpCameraBufferData
 {
-	zpMatrix4f viewProjection;
-	zpMatrix4f invViewProjection;
+    zpMatrix4f viewProjection;
+    zpMatrix4f invViewProjection;
 
-	zpVector4f up;
-	zpVector4f lookTo;
-	zpVector4f position;
+    zpVector4f up;
+    zpVector4f lookTo;
+    zpVector4f position;
 
-	zp_float zNear;
-	zp_float zFar;
-	zp_float fovy;
-	zp_float aspectRatio;
+    zp_float zNear;
+    zp_float zFar;
+    zp_float fovy;
+    zp_float aspectRatio;
 };
 
 #endif

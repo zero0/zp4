@@ -5,29 +5,29 @@
 class zpTextResource : public zpResource< zpBison >
 {
 private:
-	zp_bool load( const zp_char* filename );
-	void unload();
+    zp_bool load( const zp_char* filename );
+    void unload();
 
-	friend class zpTextContentManager;
+    friend class zpTextContentManager;
 };
 
 class zpTextResourceInstance : public zpResourceInstance< zpTextResource >
 {
-	friend class zpTextContentManager;
+    friend class zpTextContentManager;
 };
 
 class zpTextContentManager : public zpContentManager< zpTextResource, zpTextResourceInstance, zpTextContentManager, 16 >
 {
 public:
-	zp_bool getResourceWithoutLoadJson( zpTextResourceInstance& outInstance, const zpJson& json );
+    zp_bool getResourceWithoutLoadJson( zpTextResourceInstance& outInstance, const zpJson& json );
 
 private:
-	zp_bool createResource( zpTextResource* res, const zp_char* filename );
-	void destroyResource( zpTextResource* res );
-	void initializeInstance( zpTextResourceInstance& instance ) {}
+    zp_bool createResource( zpTextResource* res, const zp_char* filename );
+    void destroyResource( zpTextResource* res );
+    void initializeInstance( zpTextResourceInstance& instance ) {}
 
-	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
-	friend class zpContentManager;
+    template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+    friend class zpContentManager;
 };
 
 #endif

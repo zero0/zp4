@@ -4,63 +4,63 @@
 
 enum
 {
-	ZP_SCRIPT_THREAD_COUNT = 32,
-	ZP_SCRIPT_COROUTINE_COUNT = 8,
+    ZP_SCRIPT_THREAD_COUNT = 32,
+    ZP_SCRIPT_COROUTINE_COUNT = 8,
 };
 
 class zpAngelScript
 {
 public:
-	~zpAngelScript();
+    ~zpAngelScript();
 
-	static void createInstance();
-	static zpAngelScript* getInstance();
-	static void destroyInstance();
+    static void createInstance();
+    static zpAngelScript* getInstance();
+    static void destroyInstance();
 
-	zp_handle getEngine() const;
+    zp_handle getEngine() const;
 
-	zp_bool createEngine( zpApplication* app );
-	void destroyEngine();
+    zp_bool createEngine( zpApplication* app );
+    void destroyEngine();
 
-	void processThreads( zp_long time );
+    void processThreads( zp_long time );
 
-	zp_handle createScriptObject( zp_handle objectType );
-	void destroyScriptObject( zp_handle object, zp_handle objectType );
+    zp_handle createScriptObject( zp_handle objectType );
+    void destroyScriptObject( zp_handle object, zp_handle objectType );
 
-	void callObjectMethod( zp_handle object, zp_handle method );
-	void callObjectMethodImmidiate( zp_handle object, zp_handle method );
+    void callObjectMethod( zp_handle object, zp_handle method );
+    void callObjectMethodImmidiate( zp_handle object, zp_handle method );
 
-	void sleep( zp_uint milliseconds );
-	void yield();
-	void createCoRoutine( const zp_char* methodName );
+    void sleep( zp_uint milliseconds );
+    void yield();
+    void createCoRoutine( const zp_char* methodName );
 
-	void garbageCollect();
+    void garbageCollect();
 
-	zpApplication* getApplication() const { return m_application; }
+    zpApplication* getApplication() const { return m_application; }
 
 private:
-	static void* allocate( zp_size_t size );
-	static void deallocate( void* ptr );
+    static void* allocate( zp_size_t size );
+    static void deallocate( void* ptr );
 
-	static zpAngelScript* s_instance;
-	zpAngelScript();
+    static zpAngelScript* s_instance;
+    zpAngelScript();
 
-	zpApplication* m_application;
+    zpApplication* m_application;
 
-	zp_handle m_engine;
-	zp_handle m_immidiateContext;
+    zp_handle m_engine;
+    zp_handle m_immidiateContext;
 
-	struct zpScriptThreadContext
-	{
-		zp_long sleepUntil;
-		zp_uint currentCoRoutine;
-		zpFixedArrayList< zp_handle, ZP_SCRIPT_COROUTINE_COUNT > coRoutines;
-	};
+    struct zpScriptThreadContext
+    {
+        zp_long sleepUntil;
+        zp_uint currentCoRoutine;
+        zpFixedArrayList< zp_handle, ZP_SCRIPT_COROUTINE_COUNT > coRoutines;
+    };
 
-	zp_int m_currentThread;
-	zpFixedArrayList< zpScriptThreadContext, ZP_SCRIPT_THREAD_COUNT > m_threadContexts;
-	zpArrayList< zpScriptThreadContext* > m_usedThreads;
-	zpArrayList< zpScriptThreadContext* > m_freeThreads;
+    zp_int m_currentThread;
+    zpFixedArrayList< zpScriptThreadContext, ZP_SCRIPT_THREAD_COUNT > m_threadContexts;
+    zpArrayList< zpScriptThreadContext* > m_usedThreads;
+    zpArrayList< zpScriptThreadContext* > m_freeThreads;
 };
 
 #endif

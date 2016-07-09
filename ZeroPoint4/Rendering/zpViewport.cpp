@@ -1,20 +1,20 @@
 #include "zpRendering.h"
 
 zpViewport::zpViewport()
-	: width( 0 )
-	, height( 0 )
-	, minDepth( 0 )
-	, maxDepth( 0 )
-	, topX( 0 )
-	, topY( 0 )
+    : width( 0 )
+    , height( 0 )
+    , minDepth( 0 )
+    , maxDepth( 0 )
+    , topX( 0 )
+    , topY( 0 )
 {}
 //zpViewport::zpViewport( zp_float width, zp_float height, zp_float minDepth, zp_float maxDepth, zp_float topX, zp_float topY )
-//	: m_width( width )
-//	, m_height( height )
-//	, m_minDepth( minDepth )
-//	, m_maxDepth( maxDepth )
-//	, m_topX( topX )
-//	, m_topY( topY )
+//    : m_width( width )
+//    , m_height( height )
+//    , m_minDepth( minDepth )
+//    , m_maxDepth( maxDepth )
+//    , m_topX( topX )
+//    , m_topY( topY )
 //{}
 //
 //zp_float zpViewport::getWidth() const { return m_width; }

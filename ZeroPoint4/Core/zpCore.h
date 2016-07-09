@@ -3,95 +3,95 @@
 #define ZP_CORE_H
 
 #if defined(DEBUG) || defined(_DEBUG)
-#define ZP_DEBUG				1
+#define ZP_DEBUG                1
 #endif
 
 #if defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_IA64)
-#define ZP_WIN_64				1
+#define ZP_WIN_64                1
 #endif
 #if defined(_WIN32)
-#define ZP_WIN_32				1
+#define ZP_WIN_32                1
 #endif
 
-#define ZP_USE_COLOR_CONSOLE	0
-#define ZP_USE_FAST_MATH		0
-#define ZP_USE_SAFE_FUNCTIONS	1
-#define ZP_USE_CONSOLE_PRINT	1
-#define ZP_USE_DEBUG_PRINT		1
-#define ZP_USE_PRINT			1
-#define ZP_USE_PROFILER			1
-#define ZP_USE_ALIGNMENT		0
-#define ZP_USE_LOGGING			1
-#define ZP_USE_ASSERTIONS		1
-#define ZP_USE_MEMORY_SYSTEM	1
-#define ZP_USE_HOT_RELOAD		1
+#define ZP_USE_COLOR_CONSOLE    0
+#define ZP_USE_FAST_MATH        0
+#define ZP_USE_SAFE_FUNCTIONS    1
+#define ZP_USE_CONSOLE_PRINT    1
+#define ZP_USE_DEBUG_PRINT        1
+#define ZP_USE_PRINT            1
+#define ZP_USE_PROFILER            1
+#define ZP_USE_ALIGNMENT        0
+#define ZP_USE_LOGGING            1
+#define ZP_USE_ASSERTIONS        1
+#define ZP_USE_MEMORY_SYSTEM    1
+#define ZP_USE_HOT_RELOAD        1
 
 //#ifdef _WIN32
-//#define ZP_USE_SIMD			0
+//#define ZP_USE_SIMD            0
 //#elif defined(_WIN64)
-#define ZP_USE_SIMD				1
+#define ZP_USE_SIMD                1
 //#endif
 
 
 #if ZP_USE_ALIGNMENT
-#define ZP_MALLOC_ALIGNMENT		16
+#define ZP_MALLOC_ALIGNMENT        16
 #endif
 
-#define ZP_FORECE_32BIT			0x7FFFFFFF
+#define ZP_FORECE_32BIT            0x7FFFFFFF
 
 #if ZP_DEBUG
-#define ZP_ON_DEBUG( code )			do { code ; } while( 0 )
+#define ZP_ON_DEBUG( code )            do { code ; } while( 0 )
 #else
-#define ZP_ON_DEBUG( code )			(void)0
+#define ZP_ON_DEBUG( code )            (void)0
 #endif
 
 #if ZP_USE_ASSERTIONS
-#define ZP_ASSERT( test, msg, ... )			if( !(test) ) { zp_assert( __FILE__, __LINE__, msg, __VA_ARGS__ ); }
-#define ZP_ASSERT_WARN( test, msg, ... )	if( !(test) ) { zp_assert_warning( __FILE__, __LINE__, msg, __VA_ARGS__ ); }
+#define ZP_ASSERT( test, msg, ... )            if( !(test) ) { zp_assert( __FILE__, __LINE__, msg, __VA_ARGS__ ); }
+#define ZP_ASSERT_WARN( test, msg, ... )    if( !(test) ) { zp_assert_warning( __FILE__, __LINE__, msg, __VA_ARGS__ ); }
 #else
-#define ZP_ASSERT( test, msg, ... )			(void)0
-#define ZP_ASSERT_WARN( test, msg, ... )	(void)0
+#define ZP_ASSERT( test, msg, ... )            (void)0
+#define ZP_ASSERT_WARN( test, msg, ... )    (void)0
 #endif
 
-#define ZP_STDCALL					__stdcall
-#define ZP_FASTCALL					__fastcall
+#define ZP_STDCALL                    __stdcall
+#define ZP_FASTCALL                    __fastcall
 
 #if ZP_WIN_32
-#define ZP_VECTORCALL				__fastcall
+#define ZP_VECTORCALL                __fastcall
 #elif ZP_WIN_64
-#define ZP_VECTORCALL				__vectorcall
+#define ZP_VECTORCALL                __vectorcall
 #endif
 
-#define ZP_INLINE					inline
-#define ZP_FORCE_INLINE				__forceinline
-#define ZP_NO_VTABLE				__declspec( novtable )
-#define ZP_ALIGN(x)					__declspec( align( x ) )
-#define ZP_ALIGN16					ZP_ALIGN( 16 )
+#define ZP_INLINE                    inline
+#define ZP_FORCE_INLINE                __forceinline
+#define ZP_NO_VTABLE                __declspec( novtable )
+#define ZP_ALIGN(x)                    __declspec( align( x ) )
+#define ZP_ALIGN16                    ZP_ALIGN( 16 )
 
-#define ZP_PURE_INTERFACE			class ZP_NO_VTABLE
-#define ZP_ABSTRACT_CLASS			class ZP_NO_VTABLE
+#define ZP_PURE_INTERFACE            class ZP_NO_VTABLE
+#define ZP_ABSTRACT_CLASS            class ZP_NO_VTABLE
 
-#define ZP_UNUSED( v )				(void)v
+#define ZP_UNUSED( v )                (void)v
 
-#define ZP_SAFE_DELETE( p )			{ if( (p) ) { delete (p); (p) = ZP_NULL; } }
-#define ZP_SAFE_DELETE_ARRAY( a )	{ if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
-#define ZP_SAFE_RELEASE( r )		{ if( (r) ) { (r)->Release(); (r) = ZP_NULL; } }
-#define ZP_SAFE_REMOVE_REF( r )		{ if( (r) ) { (r)->removeReference(); (r) = ZP_NULL; } }
-#define ZP_SAFE_FREE( p )			{ if( (p) ) { zp_free( (p) ); (p) = ZP_NULL; } }
+#define ZP_SAFE_DELETE( p )            { if( (p) ) { delete (p); (p) = ZP_NULL; } }
+#define ZP_SAFE_DELETE_ARRAY( a )    { if( (a) ) { delete[] (a); (a) = ZP_NULL; } }
+#define ZP_SAFE_RELEASE( r )        { if( (r) ) { (r)->Release(); (r) = ZP_NULL; } }
+#define ZP_SAFE_REMOVE_REF( r )        { if( (r) ) { (r)->removeReference(); (r) = ZP_NULL; } }
+#define ZP_SAFE_FREE( p )            { if( (p) ) { zp_free( (p) ); (p) = ZP_NULL; } }
 
-#define ZP_ARRAY_LENGTH( a )		( sizeof( (a) ) / sizeof( (a)[0] ) )
+#define ZP_ARRAY_LENGTH( a )        ( sizeof( (a) ) / sizeof( (a)[0] ) )
 
-#define ZP_NON_COPYABLE( t )		private: t( const t& ){} t& operator=( const t& ){}
+#define ZP_NON_COPYABLE( t )        private: t( const t& ){} t& operator=( const t& ){}
 
-#define ZP_MEMORY_KB( s )			(zp_int)( (s) * 1024 )
-#define ZP_MEMORY_MB( s )			(zp_int)( ZP_MEMORY_KB(s) * 1024 )
+#define ZP_MEMORY_KB( s )            (zp_int)( (s) * 1024 )
+#define ZP_MEMORY_MB( s )            (zp_int)( ZP_MEMORY_KB(s) * 1024 )
 
-#define ZP_MAKE_UINT( a, b, c, d )					(zp_uint)( ( (a) & 0xFF ) << 24 | ( (b) & 0xFF ) << 16 | ( (c) & 0xFF ) << 8 | ( (d) & 0xFF ) )
-#define ZP_MAKE_ULONG( a, b, c, d, e, f, g, h )		(zp_ulong)( ZP_MAKE_UINT( a, b, c, d ) ) << 32 | (zp_ulong)( ZP_MAKE_UINT( e, f, g, h ) )
-#define ZP_MAKE_CHAR4( a, b, c, d )					{ (a), (b), (c), (d) }
-#define ZP_MAKE_FOURCC( a, b, c, d )				(zp_uint)( ( (a) & 0xFF ) << 0 | ( (b) & 0xFF ) << 8 | ( (c) & 0xFF ) << 16 | ( (d) & 0xFF ) << 24 )
+#define ZP_MAKE_UINT( a, b, c, d )                    (zp_uint)( ( (a) & 0xFF ) << 24 | ( (b) & 0xFF ) << 16 | ( (c) & 0xFF ) << 8 | ( (d) & 0xFF ) )
+#define ZP_MAKE_ULONG( a, b, c, d, e, f, g, h )        (zp_ulong)( ZP_MAKE_UINT( a, b, c, d ) ) << 32 | (zp_ulong)( ZP_MAKE_UINT( e, f, g, h ) )
+#define ZP_MAKE_CHAR4( a, b, c, d )                    { (a), (b), (c), (d) }
+#define ZP_MAKE_FOURCC( a, b, c, d )                (zp_uint)( ( (a) & 0xFF ) << 0 | ( (b) & 0xFF ) << 8 | ( (c) & 0xFF ) << 16 | ( (d) & 0xFF ) << 24 )
 
-#define ZP_REGISTER_SERIALIZABLES( pack )	pack##RegisterSerializables()
+#define ZP_REGISTER_SERIALIZABLES( pack )    pack##RegisterSerializables()
 
 #include "zpBaseTypes.h"
 
@@ -180,7 +180,7 @@ void zp_sleep( zp_uint milliseconds );
 template<typename T>
 ZP_FORCE_INLINE zp_hash zp_fnv1_32( const T& d, zp_hash h = 0 )
 {
-	return zp_fnv1_32_data( (const void*)&d, sizeof( T ), h );
+    return zp_fnv1_32_data( (const void*)&d, sizeof( T ), h );
 }
 zp_hash zp_fnv1_32_data( const void* d, zp_size_t l, zp_hash h );
 zp_hash zp_fnv1_32_string( const zp_char* c, zp_hash h );
@@ -188,22 +188,22 @@ zp_hash zp_fnv1_32_string( const zp_char* c, zp_hash h );
 template<typename T>
 ZP_FORCE_INLINE T&& zp_move( T& v )
 {
-	return (T&&)v;
+    return (T&&)v;
 }
 
 template<typename T>
 ZP_FORCE_INLINE void zp_swap( T& a, T& b )
 {
-	T temp( a );
-	a = b;
-	b = temp;
+    T temp( a );
+    a = b;
+    b = temp;
 }
 template<typename T>
 ZP_FORCE_INLINE void zp_move_swap( T& a, T& b )
 {
-	T temp( zp_move( a ) );
-	a = zp_move( b );
-	b = zp_move( temp );
+    T temp( zp_move( a ) );
+    a = zp_move( b );
+    b = zp_move( temp );
 }
 
 class zpStackTrace;
@@ -302,102 +302,102 @@ class zpXmlParser;
 template<typename T>
 void zp_zero_memory( T* ptr )
 {
-	zp_memset( ptr, 0, sizeof( T ) );
+    zp_memset( ptr, 0, sizeof( T ) );
 }
 template<typename T>
 void zp_zero_memory_array( T* ptr, zp_size_t count )
 {
-	zp_memset( ptr, 0, count * sizeof( T ) );
+    zp_memset( ptr, 0, count * sizeof( T ) );
 }
 template<typename T, zp_size_t Size>
 void zp_zero_memory_array( T (&arr)[Size] )
 {
-	zp_memset( arr, 0, Size * sizeof( T ) );
+    zp_memset( arr, 0, Size * sizeof( T ) );
 }
 
 template<typename T, typename LessFunc>
 void zp_qsort( T* arr, zp_size_t l, zp_size_t r, LessFunc cmp )
 {
-	return;
-	zp_size_t i = l, j = r;
-	zp_size_t p = ( l + r ) / 2;
+    return;
+    zp_size_t i = l, j = r;
+    zp_size_t p = ( l + r ) / 2;
 
-	while( i <= j )
-	{
-		while( cmp( arr[ i ], arr[ p ] ) )
-		{
-			i++;
-		}
-		while( cmp( arr[ p ], arr[ j ] ) )
-		{
-			j--;
-		}
-		if( i <= j )
-		{
-			zp_move_swap( arr[ i ], arr[ j ] );
-			i++;
-			j--;
-		}
-	}
+    while( i <= j )
+    {
+        while( cmp( arr[ i ], arr[ p ] ) )
+        {
+            i++;
+        }
+        while( cmp( arr[ p ], arr[ j ] ) )
+        {
+            j--;
+        }
+        if( i <= j )
+        {
+            zp_move_swap( arr[ i ], arr[ j ] );
+            i++;
+            j--;
+        }
+    }
 
-	if( l < j )
-	{
-		zp_qsort( arr, l, j, cmp );
-	}
-	if( i < r )
-	{
-		zp_qsort( arr, i, r, cmp );
-	}
+    if( l < j )
+    {
+        zp_qsort( arr, l, j, cmp );
+    }
+    if( i < r )
+    {
+        zp_qsort( arr, i, r, cmp );
+    }
 
 #if 0
-	if( r <= l ) return;
-	zp_int i = l - 1, j = r;
-	zp_int p = l - 1, q = r;
-	zp_int k;
+    if( r <= l ) return;
+    zp_int i = l - 1, j = r;
+    zp_int p = l - 1, q = r;
+    zp_int k;
 
-	while( true ) {
-		while( cmp( arr[ ++i ], arr[ r ] ) )
-		{}
-		while( cmp( arr[ r ], arr[ --j ] ) )
-		{
-			if( j == l ) break;
-		}
-		if( i >= j ) break;
+    while( true ) {
+        while( cmp( arr[ ++i ], arr[ r ] ) )
+        {}
+        while( cmp( arr[ r ], arr[ --j ] ) )
+        {
+            if( j == l ) break;
+        }
+        if( i >= j ) break;
 
-		zp_move_swap( arr[ i ], arr[ j ] );
+        zp_move_swap( arr[ i ], arr[ j ] );
 
-		if( arr[ i ] == arr[ r ] ) zp_move_swap( arr[ ++p ], arr[ i ] );
-		if( arr[ j ] == arr[ r ] ) zp_move_swap( arr[ --q ], arr[ j ] );
-	}
+        if( arr[ i ] == arr[ r ] ) zp_move_swap( arr[ ++p ], arr[ i ] );
+        if( arr[ j ] == arr[ r ] ) zp_move_swap( arr[ --q ], arr[ j ] );
+    }
 
-	zp_move_swap( arr[ i ], arr[ r ] );
-	j = i - 1;
-	i = i + 1;
-	
-	for( k = l; k <= p; k++ )
-	{
-		zp_move_swap( arr[ k ], arr[ j-- ] );
-	}
-	for( k = r - 1; k >= q; k-- )
-	{
-		zp_move_swap( arr[ k ], arr[ i++ ] );
-	}
+    zp_move_swap( arr[ i ], arr[ r ] );
+    j = i - 1;
+    i = i + 1;
+    
+    for( k = l; k <= p; k++ )
+    {
+        zp_move_swap( arr[ k ], arr[ j-- ] );
+    }
+    for( k = r - 1; k >= q; k-- )
+    {
+        zp_move_swap( arr[ k ], arr[ i++ ] );
+    }
 
-	zp_qsort( arr, l, j, cmp );
-	zp_qsort( arr, i, r, cmp );
+    zp_qsort( arr, l, j, cmp );
+    zp_qsort( arr, i, r, cmp );
 #endif
 }
 
 template<typename T, zp_size_t Size, typename LessFunc>
 void zp_qsort( T (&arr)[Size], LessFunc cmp )
 {
-	zp_qsort( arr, 0, Size - 1, cmp );
+    zp_qsort( arr, 0, Size - 1, cmp );
 }
 
 template<typename T, typename LessFunc>
 void zp_qsort( T* arr, zp_size_t count, LessFunc cmp )
 {
-	zp_qsort( arr, 0, count - 1, cmp );
+    zp_qsort( arr, 0, count - 1, cmp );
 }
 
 zp_bool zp_base64_encode( const void* data, zp_size_t length, zpStringBuffer& outEncode );

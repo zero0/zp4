@@ -6,19 +6,19 @@ template< typename Component, typename ComponentManager, zp_uint Count >
 class zpComponentManager
 {
 public:
-	zpComponentManager();
-	~zpComponentManager();
+    zpComponentManager();
+    ~zpComponentManager();
 
-	void update();
-	void simlate();
+    void update();
+    void simlate();
 
-	Component* createComponent( const zpBison::Value& componentData );
-	void destroyComponent( Component* component );
+    Component* createComponent( const zpBison::Value& componentData );
+    void destroyComponent( Component* component );
 
 protected:
-	zp_uint m_firstFree;
-	zp_bool m_isUsed[ Count ];
-	zp_byte m_pool[ sizeof( Component ) * Count ];
+    zp_uint m_firstFree;
+    zp_bool m_isUsed[ Count ];
+    zp_byte m_pool[ sizeof( Component ) * Count ];
 };
 
 #include "zpComponentManager.inl"
@@ -26,42 +26,42 @@ protected:
 #if 0
 enum zpGameManagerFlag
 {
-	ZP_GAME_MANAGER_FLAG_ENABLED,
-	ZP_GAME_MANAGER_FLAG_CREATED,
+    ZP_GAME_MANAGER_FLAG_ENABLED,
+    ZP_GAME_MANAGER_FLAG_CREATED,
 };
 
 ZP_ABSTRACT_CLASS zpGameManager : public zpMessageReceiver, public zpSerializable
 {
 public:
-	zpGameManager();
-	virtual ~zpGameManager();
+    zpGameManager();
+    virtual ~zpGameManager();
 
-	void create();
-	void destroy();
+    void create();
+    void destroy();
 
-	void update();
-	void simulate();
+    void update();
+    void simulate();
 
-	void setEnabled( zp_bool enabled );
-	zp_bool isEnabled() const;
+    void setEnabled( zp_bool enabled );
+    zp_bool isEnabled() const;
 
-	void setGame( zpGame* game );
-	zpGame* getGame() const;
+    void setGame( zpGame* game );
+    zpGame* getGame() const;
 
 protected:
-	virtual void onCreate() = 0;
-	virtual void onDestroy() = 0;
+    virtual void onCreate() = 0;
+    virtual void onDestroy() = 0;
 
-	virtual void onUpdate() = 0;
-	virtual void onSimulate() {};
+    virtual void onUpdate() = 0;
+    virtual void onSimulate() {};
 
-	virtual void onEnabled() = 0;
-	virtual void onDisabled() = 0;
+    virtual void onEnabled() = 0;
+    virtual void onDisabled() = 0;
 
 private:
-	zpFlag8 m_flags;
+    zpFlag8 m_flags;
 
-	zpGame* m_game;
+    zpGame* m_game;
 };
 #endif
 

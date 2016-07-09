@@ -7,20 +7,20 @@ class zpDepthStencilBufferImpl;
 class zpDepthStencilBuffer
 {
 public:
-	zpDepthStencilBuffer();
-	~zpDepthStencilBuffer();
+    zpDepthStencilBuffer();
+    ~zpDepthStencilBuffer();
 
-	zp_uint getWidth() const;
-	zp_uint getHeight() const;
+    zp_uint getWidth() const;
+    zp_uint getHeight() const;
 
-	zpDisplayFormat getDisplayFormat() const;
+    zpDisplayFormat getDisplayFormat() const;
 
-	zpDepthStencilBufferImpl* getDepthStencilBufferImpl() const;
+    zpDepthStencilBufferImpl* getDepthStencilBufferImpl() const;
 
 private:
-	zpDepthStencilBufferImpl* m_impl;
+    zpDepthStencilBufferImpl* m_impl;
 
-	friend class zpRenderingEngine;
+    friend class zpRenderingEngine;
 };
 
 #endif

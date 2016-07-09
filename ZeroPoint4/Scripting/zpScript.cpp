@@ -3,125 +3,125 @@
 
 zp_handle zpScriptResource::getMethod( const zp_char* methodName ) const
 {
-	zp_handle method = ZP_NULL;
-	zp_handle* foundMethod = ZP_NULL;
-	zpString methodStr( methodName );
+    zp_handle method = ZP_NULL;
+    zp_handle* foundMethod = ZP_NULL;
+    zpString methodStr( methodName );
 
-	if( m_cachedMethods.find( methodStr, &foundMethod ) )
-	{
-		method = *foundMethod;
-	}
-	//else
-	//{
-	//	asIObjectType* objectType = (asIObjectType*)m_resource;
-	//	method = objectType->GetMethodByName( methodName );
-	//	m_cachedMethods[ methodStr ] = method;
-	//}
+    if( m_cachedMethods.find( methodStr, &foundMethod ) )
+    {
+        method = *foundMethod;
+    }
+    //else
+    //{
+    //    asIObjectType* objectType = (asIObjectType*)m_resource;
+    //    method = objectType->GetMethodByName( methodName );
+    //    m_cachedMethods[ methodStr ] = method;
+    //}
 
-	return method;
+    return method;
 }
 zp_bool zpScriptResource::load( const zp_char* filename )
 {
-	m_filename = filename;
+    m_filename = filename;
 
-	asIScriptEngine* engine = (asIScriptEngine*)zpAngelScript::getInstance()->getEngine();
+    asIScriptEngine* engine = (asIScriptEngine*)zpAngelScript::getInstance()->getEngine();
 
-	asIScriptModule* module = engine->GetModule( filename, asGM_CREATE_IF_NOT_EXISTS );
-	if( module == ZP_NULL ) return false;
-	
-	zpStringBuffer code;
-	zpFile codeFile( filename );
-	if( codeFile.open( ZP_FILE_MODE_ASCII_READ ) )
-	{
-		codeFile.readFile( code );
-		codeFile.close();
-	}
-	else
-	{
-		return false;
-	}
+    asIScriptModule* module = engine->GetModule( filename, asGM_CREATE_IF_NOT_EXISTS );
+    if( module == ZP_NULL ) return false;
+    
+    zpStringBuffer code;
+    zpFile codeFile( filename );
+    if( codeFile.open( ZP_FILE_MODE_ASCII_READ ) )
+    {
+        codeFile.readFile( code );
+        codeFile.close();
+    }
+    else
+    {
+        return false;
+    }
 
-	zp_int r;
-	r = module->AddScriptSection( filename, code.str(), code.length() );
-	if( r < asSUCCESS ) return false;
+    zp_int r;
+    r = module->AddScriptSection( filename, code.str(), code.length() );
+    if( r < asSUCCESS ) return false;
 
-	r = module->Build();
-	if( r < asSUCCESS ) return false;
+    r = module->Build();
+    if( r < asSUCCESS ) return false;
 
-	zp_int b = m_filename.lastIndexOf( zpFile::sep ) + 1;
-	zp_int e = m_filename.lastIndexOf( '.' );
+    zp_int b = m_filename.lastIndexOf( zpFile::sep ) + 1;
+    zp_int e = m_filename.lastIndexOf( '.' );
 
-	zpString className( m_filename.substring( b, e ) );
+    zpString className( m_filename.substring( b, e ) );
 
-	asIObjectType* objectType = module->GetObjectTypeByName( className.str() );
-	if( objectType == ZP_NULL ) return false;
+    asIObjectType* objectType = module->GetObjectTypeByName( className.str() );
+    if( objectType == ZP_NULL ) return false;
 
-	objectType->AddRef();
-	m_resource = objectType;
+    objectType->AddRef();
+    m_resource = objectType;
 
-	asIScriptFunction* method;
-	zp_uint count = objectType->GetMethodCount();
-	m_cachedMethods.reserve( count );
-	for( zp_uint i = 0; i < count; ++i )
-	{
-		method = objectType->GetMethodByIndex( i );
-		method->AddRef();
-		m_cachedMethods.put( zpString( method->GetName() ), method );
-	}
+    asIScriptFunction* method;
+    zp_uint count = objectType->GetMethodCount();
+    m_cachedMethods.reserve( count );
+    for( zp_uint i = 0; i < count; ++i )
+    {
+        method = objectType->GetMethodByIndex( i );
+        method->AddRef();
+        m_cachedMethods.put( zpString( method->GetName() ), method );
+    }
 
-	return true;
+    return true;
 }
 void zpScriptResource::unload()
 {
-	m_cachedMethods.foreach( []( const zpString& key, zp_handle value )
-	{
-		( (asIScriptFunction*)value )->Release();
-	} );
-	m_cachedMethods.clear();
+    m_cachedMethods.foreach( []( const zpString& key, zp_handle value )
+    {
+        ( (asIScriptFunction*)value )->Release();
+    } );
+    m_cachedMethods.clear();
 
-	if( m_resource )
-	{
-		( (asIObjectType*)m_resource )->Release();
-		m_resource = ZP_NULL;
-	}
+    if( m_resource )
+    {
+        ( (asIObjectType*)m_resource )->Release();
+        m_resource = ZP_NULL;
+    }
 
-	asIScriptEngine* engine = (asIScriptEngine*)zpAngelScript::getInstance()->getEngine();
-	engine->DiscardModule( m_filename.str() );
+    asIScriptEngine* engine = (asIScriptEngine*)zpAngelScript::getInstance()->getEngine();
+    engine->DiscardModule( m_filename.str() );
 
-	m_filename.clear();
+    m_filename.clear();
 }
 
 zpScriptResourceInstance::zpScriptResourceInstance()
-	: m_scriptObject( ZP_NULL )
+    : m_scriptObject( ZP_NULL )
 {}
 zpScriptResourceInstance::~zpScriptResourceInstance()
 {
-	destroyed();
+    destroyed();
 }
 void zpScriptResourceInstance::callMethod( const zp_char* methodName )
 {
-	if( isVaild() )
-	{
-		zp_handle method = getResource()->getMethod( methodName );
-		zpAngelScript::getInstance()->callObjectMethod( m_scriptObject, method );
-	}
+    if( isVaild() )
+    {
+        zp_handle method = getResource()->getMethod( methodName );
+        zpAngelScript::getInstance()->callObjectMethod( m_scriptObject, method );
+    }
 }
 void zpScriptResourceInstance::callMethodImmidiate( const zp_char* methodName )
 {
-	if( isVaild() )
-	{
-		zp_handle method = getResource()->getMethod( methodName );
-		zpAngelScript::getInstance()->callObjectMethodImmidiate( m_scriptObject, method );
-	}
+    if( isVaild() )
+    {
+        zp_handle method = getResource()->getMethod( methodName );
+        zpAngelScript::getInstance()->callObjectMethodImmidiate( m_scriptObject, method );
+    }
 }
 void zpScriptResourceInstance::destroyed()
 {
-	if( isVaild() && m_scriptObject != ZP_NULL )
-	{
-		zp_handle objectType = *getResource()->getData();
-		zpAngelScript::getInstance()->destroyScriptObject( m_scriptObject, objectType );
-		m_scriptObject = ZP_NULL;
-	}
+    if( isVaild() && m_scriptObject != ZP_NULL )
+    {
+        zp_handle objectType = *getResource()->getData();
+        zpAngelScript::getInstance()->destroyScriptObject( m_scriptObject, objectType );
+        m_scriptObject = ZP_NULL;
+    }
 }
 
 zpScriptContentManager::zpScriptContentManager()
@@ -133,19 +133,19 @@ zpScriptContentManager::~zpScriptContentManager()
 
 zp_bool zpScriptContentManager::createResource( zpScriptResource* res, const zp_char* filename )
 {
-	return res->load( filename );
+    return res->load( filename );
 }
 void zpScriptContentManager::destroyResource( zpScriptResource* res )
 {
-	res->unload();
+    res->unload();
 }
 void zpScriptContentManager::initializeInstance( zpScriptResourceInstance& instance )
 {
-	if( instance.m_scriptObject != ZP_NULL )
-	{
-		instance.destroyed();
-	}
+    if( instance.m_scriptObject != ZP_NULL )
+    {
+        instance.destroyed();
+    }
 
-	zp_handle objectType = *instance.getResource()->getData();
-	instance.m_scriptObject = zpAngelScript::getInstance()->createScriptObject( objectType );
+    zp_handle objectType = *instance.getResource()->getData();
+    instance.m_scriptObject = zpAngelScript::getInstance()->createScriptObject( objectType );
 }

@@ -4,104 +4,104 @@
 
 enum zpWindowStyle : zp_uint
 {
-	ZP_WINDOW_STYLE_MINIMIZE =		0x0001,
-	ZP_WINDOW_STYLE_MAXIMIZE =		0x0002,
+    ZP_WINDOW_STYLE_MINIMIZE =        0x0001,
+    ZP_WINDOW_STYLE_MAXIMIZE =        0x0002,
 
-	ZP_WINDOW_STYLE_NO_RESIZE =		0x0010,
-	ZP_WINDOW_STYLE_RESIZE =		0x0020,
+    ZP_WINDOW_STYLE_NO_RESIZE =        0x0010,
+    ZP_WINDOW_STYLE_RESIZE =        0x0020,
 
-	ZP_WINDOW_STYLE_BORDERLESS =	0x0200,
+    ZP_WINDOW_STYLE_BORDERLESS =    0x0200,
 
-	ZP_WINDOW_STYLE_DEFAULT =		0,
+    ZP_WINDOW_STYLE_DEFAULT =        0,
 };
 
 ZP_PURE_INTERFACE zpWindowFocusListener
 {
 public:
-	virtual void onFocusGained() = 0;
-	virtual void onFocusLost() = 0;
+    virtual void onFocusGained() = 0;
+    virtual void onFocusLost() = 0;
 };
 
 ZP_PURE_INTERFACE zpWindowProcListener
 {
 public:
-	virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) = 0;
+    virtual void onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam ) = 0;
 };
 
 ZP_PURE_INTERFACE zpWindowDragDropListener
 {
 public:
-	virtual void onDragDrop( const zp_char* filename, zp_int x, zp_int y ) = 0;
+    virtual void onDragDrop( const zp_char* filename, zp_int x, zp_int y ) = 0;
 };
 
 
 class zpWindow
 {
 public:
-	zpWindow();
-	~zpWindow();
+    zpWindow();
+    ~zpWindow();
 
-	void setTitle( const zpString& title );
-	void setTitle( const zp_char* title );
-	const zpString& getTitle() const;
+    void setTitle( const zpString& title );
+    void setTitle( const zp_char* title );
+    const zpString& getTitle() const;
 
-	void setPosition( const zpVector2i& position );
-	const zpVector2i& getPosition() const;
+    void setPosition( const zpVector2i& position );
+    const zpVector2i& getPosition() const;
 
-	void setScreenSize( const zpVector2i& size );
-	const zpVector2i& getScreenSize() const;
+    void setScreenSize( const zpVector2i& size );
+    const zpVector2i& getScreenSize() const;
 
-	const zpVector2i& getWindowSize() const;
+    const zpVector2i& getWindowSize() const;
 
-	void setStyle( zp_uint style );
-	zp_uint getStyle() const;
+    void setStyle( zp_uint style );
+    zp_uint getStyle() const;
 
-	zp_handle getWindowHandle() const;
-	zp_handle getInstanceHandle() const;
+    zp_handle getWindowHandle() const;
+    zp_handle getInstanceHandle() const;
 
-	void create();
-	void destroy();
+    void create();
+    void destroy();
 
-	zp_bool isCreated() const;
+    zp_bool isCreated() const;
 
-	zp_bool processMessages();
+    zp_bool processMessages();
 
-	void windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam );
+    void windowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lParam );
 
-	void addFocusListener( zpWindowFocusListener* listener );
-	void removeFocusListener( zpWindowFocusListener* listener );
-	void removeAllFocusListeners();
+    void addFocusListener( zpWindowFocusListener* listener );
+    void removeFocusListener( zpWindowFocusListener* listener );
+    void removeAllFocusListeners();
 
-	void addProcListener( zpWindowProcListener* listener );
-	void removeProcListener( zpWindowProcListener* listener );
-	void removeAllProcListeners();
+    void addProcListener( zpWindowProcListener* listener );
+    void removeProcListener( zpWindowProcListener* listener );
+    void removeAllProcListeners();
 
-	void addDragDropListener( zpWindowDragDropListener* listener );
-	void removeDragDropListener( zpWindowDragDropListener* listener );
-	void removeAllDragDropListeners();
+    void addDragDropListener( zpWindowDragDropListener* listener );
+    void removeDragDropListener( zpWindowDragDropListener* listener );
+    void removeAllDragDropListeners();
 
 private:
-	typedef zpArrayList<zpWindowFocusListener*> zpWindowFocusListenerList;
-	typedef zpArrayList<zpWindowProcListener*> zpWindowProcListenerList;
-	typedef zpArrayList<zpWindowDragDropListener*> zpWindowDragDropListenerList;
+    typedef zpArrayList<zpWindowFocusListener*> zpWindowFocusListenerList;
+    typedef zpArrayList<zpWindowProcListener*> zpWindowProcListenerList;
+    typedef zpArrayList<zpWindowDragDropListener*> zpWindowDragDropListenerList;
 
-	void moveResize();
-	void resizeWindow();
-	
-	zpVector2i m_position;
-	zpVector2i m_screenSize;
-	zpVector2i m_windowSize;
+    void moveResize();
+    void resizeWindow();
+    
+    zpVector2i m_position;
+    zpVector2i m_screenSize;
+    zpVector2i m_windowSize;
 
-	zp_uint m_style;
+    zp_uint m_style;
 
-	zp_handle m_hWnd;
-	zp_handle m_hInstance;
+    zp_handle m_hWnd;
+    zp_handle m_hInstance;
 
-	zpString m_title;
+    zpString m_title;
 
-	zpWindowFocusListenerList m_focusListeners;
-	zpWindowProcListenerList m_procListeners;
-	zpWindowDragDropListenerList m_dragDropListeners;
+    zpWindowFocusListenerList m_focusListeners;
+    zpWindowProcListenerList m_procListeners;
+    zpWindowDragDropListenerList m_dragDropListeners;
 };
 
 #endif

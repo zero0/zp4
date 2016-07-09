@@ -5,18 +5,18 @@
 class zpTags
 {
 public:
-	zpTags();
-	~zpTags();
+    zpTags();
+    ~zpTags();
 
-	void clear();
+    void clear();
 
-	zp_int getTag( const zpString& tag );
-	zp_int getTag( const zp_char* tag );
+    zp_int getTag( const zpString& tag );
+    zp_int getTag( const zp_char* tag );
 
-	const zpString& getTagName( zp_int tagIndex ) const;
+    const zpString& getTagName( zp_int tagIndex ) const;
 
 private:
-	zpFixedArrayList< zpString, 64 > m_tags;
+    zpFixedArrayList< zpString, 64 > m_tags;
 };
 
 #endif

@@ -6,30 +6,30 @@ class zpSkeletonContentManager;
 
 struct zpSkeletonBone
 {
-	zp_int parent;
-	zp_int indexStart;
-	zp_int indexCount;
-	zp_int weightStart;
-	zp_int weightCount;
-	zpMatrix4f bindPose;
+    zp_int parent;
+    zp_int indexStart;
+    zp_int indexCount;
+    zp_int weightStart;
+    zp_int weightCount;
+    zpMatrix4f bindPose;
 };
 
 struct zpSkeleton
 {
-	zp_int rootBoneIndex;
-	zpArrayList< zp_int > indecies;
-	zpArrayList< zp_float > weights;
-	zpArrayList< zpString > boneNames;
-	zpArrayList< zpSkeletonBone > bones;
+    zp_int rootBoneIndex;
+    zpArrayList< zp_int > indecies;
+    zpArrayList< zp_float > weights;
+    zpArrayList< zpString > boneNames;
+    zpArrayList< zpSkeletonBone > bones;
 };
 
 class zpSkeletonResource : public zpResource< zpSkeleton >
 {
 private:
-	zp_bool load( const zp_char* filename );
-	void unload();
+    zp_bool load( const zp_char* filename );
+    void unload();
 
-	friend class zpSkeletonContentManager;
+    friend class zpSkeletonContentManager;
 };
 
 class zpSkeletonResourceInstance : public zpResourceInstance< zpSkeletonResource >
@@ -39,12 +39,12 @@ class zpSkeletonResourceInstance : public zpResourceInstance< zpSkeletonResource
 class zpSkeletonContentManager : public zpContentManager< zpSkeletonResource, zpSkeletonResourceInstance, zpSkeletonContentManager, 8 >
 {
 private:
-	zp_bool createResource( zpSkeletonResource* res, const zp_char* filename );
-	void destroyResource( zpSkeletonResource* res );
-	void initializeInstance( zpSkeletonResourceInstance& instance ) {}
+    zp_bool createResource( zpSkeletonResource* res, const zp_char* filename );
+    void destroyResource( zpSkeletonResource* res );
+    void initializeInstance( zpSkeletonResourceInstance& instance ) {}
 
-	template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
-	friend class zpContentManager;
+    template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
+    friend class zpContentManager;
 };
 
 #endif

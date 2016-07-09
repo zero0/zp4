@@ -10,22 +10,22 @@ struct ID3D11ComputeShader;
 class zpShaderImpl
 {
 public:
-	zpShaderImpl();
-	~zpShaderImpl();
+    zpShaderImpl();
+    ~zpShaderImpl();
 
-	zp_bool load( zpRenderingEngineImpl* engine, const zpBison::Value& shaderFile );
-	void unload();
+    zp_bool load( zpRenderingEngineImpl* engine, const zpBison::Value& shaderFile );
+    void unload();
 
 private:
-	ID3D11VertexShader* m_vertexShader;
-	ID3D11PixelShader* m_pixelShader;
-	ID3D11GeometryShader* m_geometryShader;
-	ID3D11ComputeShader* m_computeShader;
+    ID3D11VertexShader* m_vertexShader;
+    ID3D11PixelShader* m_pixelShader;
+    ID3D11GeometryShader* m_geometryShader;
+    ID3D11ComputeShader* m_computeShader;
 
-	zp_hash m_vertexLayout;
+    zp_hash m_vertexLayout;
 
-	friend class zpRenderingEngineImpl;
-	friend class zpRenderingContextImpl;
+    friend class zpRenderingEngineImpl;
+    friend class zpRenderingContextImpl;
 };
 
 #endif

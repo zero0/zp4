@@ -6,71 +6,71 @@ typedef zp_size_t zpEvent;
 ZP_PURE_INTERFACE zpEventListener;
 class zpEventManager;
 
-#define ZP_EVENT_NULL	( (zpEvent)-1 )
+#define ZP_EVENT_NULL    ( (zpEvent)-1 )
 
 class zpEventHandler
 {
 public:
-	zpEventHandler();
-	~zpEventHandler();
+    zpEventHandler();
+    ~zpEventHandler();
 
-	zp_bool isHandlerForEvent( const zpEvent& e ) const;
+    zp_bool isHandlerForEvent( const zpEvent& e ) const;
 
 private:
-	zpEvent m_handlesEvent;
+    zpEvent m_handlesEvent;
 
-	friend class zpEventManager;
+    friend class zpEventManager;
 };
 
 struct zpQueuedEvent
 {
-	zpString eventName;
-	zpObject* sender;
+    zpString eventName;
+    zpObject* sender;
 };
 
 ZP_PURE_INTERFACE zpEventListener
 {
 public:
-	virtual void handleEvent( const zpEvent& e, zpObject* sender ) = 0;
+    virtual void handleEvent( const zpEvent& e, zpObject* sender ) = 0;
 };
 
 class zpEventManager
 {
-	ZP_NON_COPYABLE( zpEventManager );
+    ZP_NON_COPYABLE( zpEventManager );
 public:
-	zpEventManager();
-	~zpEventManager();
+    zpEventManager();
+    ~zpEventManager();
 
-	void setup();
-	void update();
-	void teardown();
+    void setup();
+    void update();
+    void teardown();
 
-	void addEventListener( const zp_char* eventName, zpEventListener* listener, zpEventHandler& handler );
-	void addEventListener( const zpString& eventName, zpEventListener* listener, zpEventHandler& handler );
+    void addEventListener( const zp_char* eventName, zpEventListener* listener, zpEventHandler& handler );
+    void addEventListener( const zpString& eventName, zpEventListener* listener, zpEventHandler& handler );
 
-	void removeEventListener( const zp_char* eventName, zpEventListener* listener, zpEventHandler& handler );
-	void removeEventListener( const zpString& eventName, zpEventListener* listener, zpEventHandler& handler );
+    void removeEventListener( const zp_char* eventName, zpEventListener* listener, zpEventHandler& handler );
+    void removeEventListener( const zpString& eventName, zpEventListener* listener, zpEventHandler& handler );
 
-	void removeAllEventListeners( const zp_char* eventName );
-	void removeAllEventListeners( const zpString& eventName );
+    void removeAllEventListeners( const zp_char* eventName );
+    void removeAllEventListeners( const zpString& eventName );
 
-	void sendEvent( const zp_char* eventName, zpObject* sender );
-	void sendEvent( const zpString& eventName, zpObject* sender );
+    void sendEvent( const zp_char* eventName, zpObject* sender );
+    void sendEvent( const zpString& eventName, zpObject* sender );
 
-	void queueEvent( const zp_char* eventName, zpObject* sender );
-	void queueEvent( const zpString& eventName, zpObject* sender );
+    void queueEvent( const zp_char* eventName, zpObject* sender );
+    void queueEvent( const zpString& eventName, zpObject* sender );
 
 private:
-	zp_bool findEvent( const zp_char* eventName, zp_size_t& index );
-	zp_bool findEvent( const zpString& eventName, zp_size_t& index );
+    zp_bool findEvent( const zp_char* eventName, zp_size_t& index );
+    zp_bool findEvent( const zpString& eventName, zp_size_t& index );
 
-	zp_size_t findEventAndCreate( const zp_char* eventName );
-	zp_size_t findEventAndCreate( const zpString& eventName );
+    zp_size_t findEventAndCreate( const zp_char* eventName );
+    zp_size_t findEventAndCreate( const zpString& eventName );
 
-	zpArrayList< zpString > m_eventNames;
-	zpArrayList< zpArrayList< zpEventListener* > > m_eventListeners;
+    zpArrayList< zpString > m_eventNames;
+    zpArrayList< zpArrayList< zpEventListener* > > m_eventListeners;
 
-	zpArrayList< zpQueuedEvent > m_eventQueue;
+    zpArrayList< zpQueuedEvent > m_eventQueue;
 };
 
 #endif

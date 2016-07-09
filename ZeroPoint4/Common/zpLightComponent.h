@@ -4,36 +4,36 @@
 class zpLightComponent : public zpComponent
 {
 public:
-	zpLightComponent( zpObject* obj, const zpBison::Value& def );
-	virtual ~zpLightComponent();
+    zpLightComponent( zpObject* obj, const zpBison::Value& def );
+    virtual ~zpLightComponent();
 
-	const zpLightBufferData* getLight() const { return m_light; }
-	zpLightBufferData* getLight() { return m_light; }
+    const zpLightBufferData* getLight() const { return m_light; }
+    zpLightBufferData* getLight() { return m_light; }
 
 protected:
-	void onCreate();
-	void onInitialize();
-	void onDestroy();
+    void onCreate();
+    void onInitialize();
+    void onDestroy();
 
-	void onUpdate( zp_float deltaTime, zp_float realTime );
-	void onSimulate();
+    void onUpdate( zp_float deltaTime, zp_float realTime );
+    void onSimulate();
 
-	void onEnabled();
-	void onDisabled();
+    void onEnabled();
+    void onDisabled();
 
 private:
-	zpLightBufferData* m_light;
+    zpLightBufferData* m_light;
 };
 
 
 class zpLightComponentPool : public zpContentPool< zpLightComponent, 8 >
 {
 public:
-	zpLightComponentPool();
-	virtual ~zpLightComponentPool();
+    zpLightComponentPool();
+    virtual ~zpLightComponentPool();
 
-	void update( zp_float deltaTime, zp_float realTime );
-	void simulate();
+    void update( zp_float deltaTime, zp_float realTime );
+    void simulate();
 };
 
 #endif

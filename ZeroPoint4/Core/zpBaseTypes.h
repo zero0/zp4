@@ -3,13 +3,13 @@
 #define ZP_BASE_TYPES_H
 
 #if __cplusplus
-#define ZP_NULL	nullptr
+#define ZP_NULL    nullptr
 #else
-#define ZP_NULL	0
+#define ZP_NULL    0
 #endif
 
 #if ZP_WIN_32
-#define ZP_W64	__w64
+#define ZP_W64    __w64
 #else
 #define ZP_W64
 #endif

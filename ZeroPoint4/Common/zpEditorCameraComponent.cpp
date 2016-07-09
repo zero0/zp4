@@ -2,8 +2,8 @@
 
 #if 1
 zpEditorCameraComponent::zpEditorCameraComponent( zpObject* obj, const zpBison::Value& def )
-	: zpComponent( obj )
-	, m_isActive( false )
+    : zpComponent( obj )
+    , m_isActive( false )
 {}
 zpEditorCameraComponent::~zpEditorCameraComponent() {}
 
@@ -26,10 +26,10 @@ void zpEditorCameraComponent::onMouseChange( const zpVector2i& delta ) {}
 
 void zpEditorCameraComponent::onCreate()
 {
-	zp_printfln( "create editor camera component" );
+    zp_printfln( "create editor camera component" );
 }
 void zpEditorCameraComponent::onDestroy() {
-	zp_printfln( "destroy editor camera component" );
+    zp_printfln( "destroy editor camera component" );
 }
 
 void zpEditorCameraComponent::onUpdate( zp_float deltaTime, zp_float realTime )
@@ -45,17 +45,17 @@ zpEditorCameraComponentPool::~zpEditorCameraComponentPool() {}
 
 void zpEditorCameraComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
-	m_used.foreach( [ &deltaTime, &realTime ]( zpEditorCameraComponent* o )
-	{
-		o->update( deltaTime, realTime );
-	} );
+    m_used.foreach( [ &deltaTime, &realTime ]( zpEditorCameraComponent* o )
+    {
+        o->update( deltaTime, realTime );
+    } );
 }
 void zpEditorCameraComponentPool::simulate()
 {
-	m_used.foreach( []( zpEditorCameraComponent* o )
-	{
-		o->simulate();
-	} );
+    m_used.foreach( []( zpEditorCameraComponent* o )
+    {
+        o->simulate();
+    } );
 }
 
 #endif
