@@ -92,29 +92,13 @@ public:
     void setOptionsFilename( const zp_char* filename );
     const zpString& getOptionsFilename() const;
 
-    void addPhase( zpApplicationPhase* phase );
-    void addState( zpApplicationState* state );
-
-    void popCurrentPhase();
-    void updatePhase( zp_float deltaTime, zp_float realTime );
-    void pushNextPhase();
-
-    void swapState( const zp_char* stateName );
-    void pushState( const zp_char* stateName );
-    void popState();
-    void updateState( zp_float deltaTime, zp_float realTime );
-    zpApplicationState* getCurrentState() const;
-
     void processCommandLine( const zpArrayList< zpString >& args );
-    
+
     void initialize();
     void setup();
     void run();
     void teardown();
     zp_int shutdown();
-
-    void update();
-    void simulate();
 
     void garbageCollect();
     void reloadAllResources();
@@ -131,13 +115,10 @@ public:
 
     zp_bool loadFile( const zp_char* filename );
     zp_bool handleDragAndDrop( const zp_char* filename, zp_int x, zp_int y );
-    void handleInput();
 
     void loadWorld( const zp_char* worldFilename );
     void loadWorldAdditive( const zp_char* worldFilename );
     zp_float getLoadingWorldProgress() const;
-
-    void processFrame();
 
     zpWindow* getWindow() { return &m_window; }
     zpRenderingPipeline* getRenderPipeline() { return &m_renderingPipeline; }
@@ -164,21 +145,47 @@ public:
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )            zp##cmp##ComponentPool* get##cmp##ComponentPool() { return &m_componentPool##cmp; }
-    #include "zpAllComponents.inl"
+#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
-    zp_uint getFrameCount() const { return m_frameCount; }
-    
+    zp_uint getFrameCount() const;
+
     const zpTime& getTime() const { return m_timer; }
     zpTime& getTime() { return m_timer; }
 
-    zp_bool isApplicationPaused() const { return m_isApplicationPaused; }
-    void setApplicationPaused( zp_bool applicationPaused ) { m_isApplicationPaused = applicationPaused; }
+    zp_bool isApplicationPaused() const;
+    void setApplicationPaused( zp_bool applicationPaused );
+
+protected:
+    virtual void onInitialize() {}
+    virtual void onSetup() {}
+    virtual void onTeardown() {}
+    virtual void onShutdown() {}
+
+    virtual void onUpdate() {}
+    virtual void onSimulate() {}
+
+    virtual void onHandleInput() {}
+
+    virtual void onGarbageCollect() {}
+    virtual void onReloadAllResources() {}
+
+#if ZP_USE_HOT_RELOAD
+    virtual void onReloadChangedResources() {}
+#endif
+
+    virtual void onApplicationPaused( zp_bool applicationPaused ) {};
 
 private:
+    void update();
+    void simulate();
+
+    void processFrame();
 
     void runGarbageCollect();
     void runReloadAllResources();
+
+    void handleInput();
 
 #if ZP_USE_HOT_RELOAD
     void runReloadChangedResources();
@@ -193,7 +200,6 @@ private:
     zp_bool m_isApplicationPaused;
     zp_bool m_isApplicationStepped;
 
-    zp_int m_currentPhase;
     zp_int m_exitCode;
 
     zpString m_optionsFilename;
@@ -201,24 +207,19 @@ private:
     zpString m_loadingWorldFilename;
     zpString m_initialWorldFilename;
     zpString m_nextWorldFilename;
-    zpString m_editorStateName;
 
-    zpProfiler m_profiler;
     zpConsole* m_console;
-    zpTime m_timer;
     zpMemorySystem* m_memory;
 
     zpWorld* m_currentWorld;
     zpWorld* m_nextWorld;
 
+    zpProfiler m_profiler;
+    zpTime m_timer;
+
     zp_long m_lastTime;
     zp_long m_simulateHz;
     zp_float m_totalFrameTimeMs;
-
-    zpArrayList< zpApplicationPhase* > m_phases;
-
-    zpArrayList< zpApplicationState* > m_allStates;
-    zpArrayList< zpApplicationState* > m_stateStack;
 
     zpWindow m_window;
 
@@ -233,7 +234,7 @@ private:
 
     zpInputManager m_inputManager;
     zpRenderingPipeline m_renderingPipeline;
-    
+
     zpPrefabContentManager m_prefabContent;
     zpObjectContentManager m_objectContent;
     zpWorldContentManager m_worldContent;
@@ -250,7 +251,7 @@ private:
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )            zp##cmp##ComponentPool m_componentPool##cmp;
-    #include "zpAllComponents.inl"
+#include "zpAllComponents.inl"
 #undef ZP_COMPONENT_DEF
 
     enum zpApplicationStats : zp_uint

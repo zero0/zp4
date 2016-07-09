@@ -77,7 +77,6 @@ public:
     {
         if( app->getInputManager()->getKeyboard()->isKeyPressed( ZP_KEY_CODE_P ) )
         {
-            app->popCurrentPhase();
         }
         return ZP_APPLICATION_PHASE_NORMAL;
     }
@@ -375,14 +374,6 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
         // set config files
         application->setConfigFilename( BLACKJACK_CONFIG );
         application->setOptionsFilename( BLACKJACK_OPTIONS );
-
-        // add phases
-        application->addPhase( &protoDBPhase );
-        application->addPhase( &loadWorld );
-        application->addPhase( &playPhase );
-
-        // add states
-        application->addState( &editorState );
 
         // process command line
         application->processCommandLine( args );

@@ -4,7 +4,7 @@
 #define ZP_MEMORY_SYSTEM_START_CANARY    0xCAFEBABE
 #define ZP_MEMORY_SYSTEM_END_CANARY        0xDEADBEEF
 
-#define ZP_MEMORY_INCREMENT_SHIFT    4
+#define ZP_MEMORY_INCREMENT_SHIFT    6
 #define ZP_MEMORY_INCREMENT_SIZE    ( 1 << ZP_MEMORY_INCREMENT_SHIFT )    // 64bit alignment
 #define ZP_MEMORY_INCREMENT_MASK    ( ZP_MEMORY_INCREMENT_SIZE - 1 )
 #define ZP_MEMORY_ALIGN_SIZE( s )    ( ( (s) + ZP_MEMORY_INCREMENT_SIZE ) & ( ~ZP_MEMORY_INCREMENT_MASK ) )
@@ -409,7 +409,10 @@ void zpMemorySystem::addBlock( zpMemoryBlock** table, zpMemoryBlock* block )
         // if the block is larger than the top, insert front
         if( block->alignedSize > tableHead->alignedSize )
         {
-            _insertBefore( tableHead, block );
+            if( tableHead->prev )
+            {
+                _insertBefore( tableHead, block );
+            }
 
             table[ index ] = block;
         }
@@ -418,7 +421,7 @@ void zpMemorySystem::addBlock( zpMemoryBlock** table, zpMemoryBlock* block )
         {
             zpMemoryBlock* h = tableHead;
             zpMemoryBlock* n = tableHead->next;
-            while( n != tableHead )
+            while( n && n != tableHead )
             {
                 if( block->alignedSize > n->alignedSize )
                 {

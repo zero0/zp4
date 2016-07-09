@@ -10,7 +10,9 @@ enum zpProfilerSteps
     ZP_PROFILER_STEP_PROCESS_FRAME,
     ZP_PROFILER_STEP_FRAME,
     ZP_PROFILER_STEP_UPDATE,
+    ZP_PROFILER_STEP_SUB_UPDATE,
     ZP_PROFILER_STEP_SIMULATE,
+    ZP_PROFILER_STEP_HANDLE_INPUT,
     ZP_PROFILER_STEP_RENDER_PARTICLES,
     ZP_PROFILER_STEP_RENDER_MESHES,
     ZP_PROFILER_STEP_RENDER_ANIMATED_MESHES,
@@ -63,7 +65,6 @@ zpApplication::zpApplication()
     , m_shouldReloadAllResources( false )
     , m_isApplicationPaused( false )
     , m_isApplicationStepped( false )
-    , m_currentPhase( 0 )
     , m_exitCode( 0 )
     , m_optionsFilename( ZP_APPLICATION_DEFAULT_OPTIONS_FILE )
     , m_configFilename( ZP_APPLICATION_DEFAULT_CONFIG_FILE )
@@ -97,106 +98,6 @@ void zpApplication::setConfigFilename( const zp_char* filename )
 const zpString& zpApplication::getConfigFilename() const
 {
     return m_configFilename;
-}
-
-void zpApplication::popCurrentPhase()
-{
-    ZP_ASSERT( m_currentPhase >= 0, "Trying to pop an empty phase stack" );
-
-    m_phases[ m_currentPhase ]->onLeavePhase( this );
-    m_currentPhase--;
-}
-void zpApplication::updatePhase( zp_float deltaTime, zp_float realTime )
-{
-    zpApplicationPhaseResult r = m_phases[ m_currentPhase ]->onUpdatePhase( this, deltaTime, realTime );
-    switch( r )
-    {
-    case ZP_APPLICATION_PHASE_NORMAL:
-        break;
-
-    case ZP_APPLICATION_PHASE_COMPLETE:
-        pushNextPhase();
-        break;
-
-    case ZP_APPLICATION_PHASE_FAILURE:
-        popCurrentPhase();
-        break;
-    }
-}
-void zpApplication::pushNextPhase()
-{
-    ++m_currentPhase;
-    m_phases[ m_currentPhase ]->onEnterPhase( this );
-}
-
-void zpApplication::swapState( const zp_char* stateName )
-{
-    if( !m_stateStack.isEmpty() )
-    {
-        m_stateStack.back()->onLeaveState( this );
-        m_stateStack.popBack();
-    }
-
-    zpApplicationState** state;
-    if( m_allStates.findIf( [ stateName ]( zpApplicationState* s ) { return zp_strcmp( s->getStateName(), stateName ) == 0; }, &state ) )
-    {
-        zpApplicationState* s = *state;
-        ZP_ASSERT( m_stateStack.indexOf( s ) < 0, "State '%s' already in stack", stateName );
-
-        s->onEnterState( this );
-
-        m_stateStack.pushBack( s );
-    }
-    else
-    {
-        ZP_ASSERT( false, "State '%s' not found", stateName );
-    }
-}
-void zpApplication::pushState( const zp_char* stateName )
-{
-    if( !m_stateStack.isEmpty() )
-    {
-        m_stateStack.back()->onLeaveState( this );
-    }
-
-    zpApplicationState** state;
-    if( m_allStates.findIf( [ stateName ]( zpApplicationState* s ) { return zp_strcmp( s->getStateName(), stateName ) == 0; }, &state ) )
-    {
-        zpApplicationState* s = *state;
-        ZP_ASSERT( m_stateStack.indexOf( s ) == zpArrayList< zpApplicationState* >::npos, "State '%s' already in stack", stateName );
-
-        s->onEnterState( this );
-
-        m_stateStack.pushBack( s );
-    }
-    else
-    {
-        ZP_ASSERT( false, "State '%s' not found", stateName );
-    }
-}
-void zpApplication::popState()
-{
-    if( !m_stateStack.isEmpty() )
-    {
-        m_stateStack.back()->onLeaveState( this );
-        m_stateStack.popBack();
-    }
-
-    if( !m_stateStack.isEmpty() )
-    {
-        m_stateStack.back()->onEnterState( this );
-    }
-}
-void zpApplication::updateState( zp_float deltaTime, zp_float realTime )
-{
-    if( !m_stateStack.isEmpty() )
-    {
-        m_stateStack.back()->onUpdateState( this, deltaTime, realTime );
-    }
-}
-zpApplicationState* zpApplication::getCurrentState() const
-{
-    return m_stateStack.isEmpty() ? ZP_NULL : m_stateStack.back();
 }
 
 void zpApplication::processCommandLine( const zpArrayList< zpString >& args )
@@ -282,6 +183,8 @@ void zpApplication::initialize()
     // register input with window
     m_window.addFocusListener( &m_inputManager );
     m_window.addProcListener( &m_inputManager );
+
+    onInitialize();
 }
 void zpApplication::setup()
 {
@@ -316,13 +219,11 @@ void zpApplication::setup()
         m_loadingWorldFilename = loadingWorld.asCString();
     }
 
-    m_currentPhase = -1;
-
     m_protoDBManager.setProtoDBFile( appOptions[ "ProtoDB" ].asCString() );
 
     m_renderingPipeline.getMaterialContentManager()->getResource( appOptions[ "DefaultMaterial" ].asCString(), m_defaultMaterial );
 
-    m_editorStateName = appOptions[ "EditorStateName" ].asCString();
+    onSetup();
 
     m_lastTime = m_timer.getTime();
 }
@@ -337,9 +238,6 @@ void zpApplication::run()
 
         // setup app
         setup();
-
-        // push next phase, starting the phase update
-        pushNextPhase();
 
         // loop while app is running and window is processing messages
         while( m_isRunning && m_window.processMessages() )
@@ -356,6 +254,8 @@ void zpApplication::run()
 
 void zpApplication::teardown()
 {
+    onTeardown();
+
     m_appOptions.release();
     m_appConfig.release();
 
@@ -367,19 +267,6 @@ void zpApplication::teardown()
 
     m_worldContent.destroyAllWorlds();
     m_worldContent.update();
-
-    // pop all phases
-    while( m_currentPhase >= 0 )
-    {
-        popCurrentPhase();
-    }
-
-    // leave all states
-    while ( !m_stateStack.isEmpty() )
-    {
-        m_stateStack.back()->onLeaveState( this );
-        m_stateStack.popBack();
-    }
 
     m_renderingPipeline.teardown();
     m_gui.teardown();
@@ -396,10 +283,7 @@ void zpApplication::teardown()
 }
 zp_int zpApplication::shutdown()
 {
-    m_phases.clear();
-
-    m_stateStack.clear();
-    m_allStates.clear();
+    onShutdown();
 
     runGarbageCollect();
 
@@ -479,16 +363,6 @@ void zpApplication::update()
     m_eventManager.update();
     ZP_PROFILE_END( EVENT_UPDATE );
 
-    // update phases
-    ZP_PROFILE_START( UPDATE_PHASE );
-    updatePhase( deltaTime, realTime );
-    ZP_PROFILE_END( UPDATE_PHASE );
-
-    // update state
-    ZP_PROFILE_START( UPDATE_STATE );
-    updateState( deltaTime, realTime );
-    ZP_PROFILE_END( UPDATE_STATE );
-
     // update world, delete, create objects, etc.
     ZP_PROFILE_START( WORLD_UPDATE );
     m_worldContent.update();
@@ -523,24 +397,18 @@ void zpApplication::update()
     m_audioEngine.update();
     ZP_PROFILE_END( AUDIO_UPDATE );
 
-    handleInput();
-
-    ZP_PROFILE_START( DRAW_GUI );
-    if( !m_displayStats.isZero() )
-    {
-        onGUI();
-    }
-    ZP_PROFILE_END( DRAW_GUI );
+    ZP_PROFILE_START( SUB_UPDATE );
+    onUpdate();
+    ZP_PROFILE_END( SUB_UPDATE );
 }
 void zpApplication::simulate()
 {
-    if( !m_isApplicationPaused )
-    {
-        //m_componentPoolEditorCamera.simulate();
-        m_physicsEngine.simulate();
+    //m_componentPoolEditorCamera.simulate();
+    m_physicsEngine.simulate();
 
-        m_componentPoolRigidBody.simulate();
-    }
+    m_componentPoolRigidBody.simulate();
+
+    onSimulate();
 }
 
 void zpApplication::garbageCollect()
@@ -630,19 +498,6 @@ void zpApplication::handleInput()
     if( keyboard->isKeyPressed( ZP_KEY_CODE_ESC ) )
     {
         exit( 0 );
-    }
-    else if( keyboard->isKeyPressed( ZP_KEY_CODE_TAB ) )
-    {
-        zpApplicationState* currentState = getCurrentState();
-        zp_bool inEditorState = currentState != ZP_NULL && currentState->getStateName() == m_editorStateName;
-        if( inEditorState )
-        {
-            popState();
-        }
-        else
-        {
-            pushState( m_editorStateName.str() );
-        }
     }
     else if( keyboard->isKeyPressed( ZP_KEY_CODE_RIGHT ) )
     {
@@ -780,6 +635,8 @@ void zpApplication::handleInput()
 
         context->endDrawImmediate();
     }
+
+    onHandleInput();
 }
 
 void zpApplication::loadWorld( const zp_char* worldFilename )
@@ -828,6 +685,11 @@ void zpApplication::processFrame()
     ZP_PROFILE_END( HOT_RELOAD );
 #endif
 
+    // handle input
+    ZP_PROFILE_START( HANDLE_INPUT );
+    handleInput();
+    ZP_PROFILE_END( HANDLE_INPUT );
+
     // update
     ZP_PROFILE_START( UPDATE );
     update();
@@ -851,6 +713,13 @@ void zpApplication::processFrame()
     }
 
     m_timer.setInterpolation( (zp_float)( startTime - m_lastTime ) / (zp_float)m_simulateHz );
+
+    ZP_PROFILE_START( DRAW_GUI );
+    if( !m_displayStats.isZero() )
+    {
+        onGUI();
+    }
+    ZP_PROFILE_END( DRAW_GUI );
 
     ZP_PROFILE_START( RENDER_FRAME );
     {
@@ -931,17 +800,6 @@ void zpApplication::processFrame()
     ZP_PROFILE_FINALIZE();
 }
 
-void zpApplication::addPhase( zpApplicationPhase* phase )
-{
-    ZP_ASSERT( !m_isRunning, "Trying to add Phases to a running application" );
-    m_phases.pushBack( phase );
-}
-void zpApplication::addState( zpApplicationState* state )
-{
-    ZP_ASSERT( !m_isRunning, "Trying to add States to a running application" );
-    m_allStates.pushBack( state );
-}
-
 void zpApplication::runGarbageCollect()
 {
     m_textContent.garbageCollect();
@@ -956,6 +814,8 @@ void zpApplication::runGarbageCollect()
     m_renderingPipeline.getMaterialContentManager()->garbageCollect();
     m_renderingPipeline.getShaderContentManager()->garbageCollect();
     m_renderingPipeline.getTextureContentManager()->garbageCollect();
+
+    onGarbageCollect();
 }
 void zpApplication::runReloadAllResources()
 {
@@ -972,7 +832,7 @@ void zpApplication::runReloadAllResources()
     m_renderingPipeline.getShaderContentManager()->reloadAllResources();
     m_renderingPipeline.getTextureContentManager()->reloadAllResources();
 
-    //m_protoDBManager.reloadProtoDB();
+    onReloadAllResources();
 }
 
 #if ZP_USE_HOT_RELOAD
@@ -990,7 +850,7 @@ void zpApplication::runReloadChangedResources()
     m_renderingPipeline.getShaderContentManager()->reloadChangedResources();
     m_renderingPipeline.getTextureContentManager()->reloadChangedResources();
 
-    //m_protoDBManager.reloadChangedProtoDB();
+    onReloadChangedResources();
 }
 #endif
 
@@ -1190,4 +1050,20 @@ void zpApplication::onGUI()
     }
 
     m_gui.endGUI();
+}
+
+zp_uint zpApplication::getFrameCount() const
+{
+    return m_frameCount;
+}
+
+zp_bool zpApplication::isApplicationPaused() const
+{
+    return m_isApplicationPaused;
+}
+void zpApplication::setApplicationPaused( zp_bool applicationPaused )
+{
+    m_isApplicationPaused = applicationPaused;
+
+    onApplicationPaused( applicationPaused );
 }
