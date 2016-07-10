@@ -10,8 +10,9 @@ enum zpProfilerSteps
     ZP_PROFILER_STEP_PROCESS_FRAME,
     ZP_PROFILER_STEP_FRAME,
     ZP_PROFILER_STEP_UPDATE,
-    ZP_PROFILER_STEP_SUB_UPDATE,
-    ZP_PROFILER_STEP_SIMULATE,
+    ZP_PROFILER_STEP_APP_UPDATE,
+    ZP_PROFILER_STEP_APP_LATE_UPDATE,
+    ZP_PROFILER_STEP_FIXED_UPDATE,
     ZP_PROFILER_STEP_HANDLE_INPUT,
     ZP_PROFILER_STEP_RENDER_PARTICLES,
     ZP_PROFILER_STEP_RENDER_MESHES,
@@ -102,7 +103,7 @@ const zpString& zpApplication::getConfigFilename() const
 
 void zpApplication::processCommandLine( const zpArrayList< zpString >& args )
 {
-
+    onProcessCommandLine( args );
 }
 
 void zpApplication::initialize()
@@ -358,6 +359,10 @@ void zpApplication::update()
         garbageCollect();
     }
 
+    ZP_PROFILE_START( APP_UPDATE );
+    onUpdate( deltaTime, realTime );
+    ZP_PROFILE_END( APP_UPDATE );
+
     // pump queued events
     ZP_PROFILE_START( EVENT_UPDATE );
     m_eventManager.update();
@@ -397,18 +402,18 @@ void zpApplication::update()
     m_audioEngine.update();
     ZP_PROFILE_END( AUDIO_UPDATE );
 
-    ZP_PROFILE_START( SUB_UPDATE );
-    onUpdate();
-    ZP_PROFILE_END( SUB_UPDATE );
+    ZP_PROFILE_START( APP_LATE_UPDATE );
+    onLateUpdate( deltaTime, realTime );
+    ZP_PROFILE_END( APP_LATE_UPDATE );
 }
-void zpApplication::simulate()
+void zpApplication::fixedUpdate()
 {
     //m_componentPoolEditorCamera.simulate();
     m_physicsEngine.simulate();
 
     m_componentPoolRigidBody.simulate();
 
-    onSimulate();
+    onFixedUpdate();
 }
 
 void zpApplication::garbageCollect()
@@ -442,15 +447,17 @@ void zpApplication::onWindowProc( zp_uint uMessage, zp_uint wParam, zp_ulong lPa
 }
 void zpApplication::onFocusGained()
 {
-    zp_printfcln( ZP_CC_LIGHT_BLUE, "focused" );
     m_inputManager.onFocusGained();
     m_renderingPipeline.onFocusGained();
+
+    onFocusChanged( true );
 }
 void zpApplication::onFocusLost()
 {
-    zp_printfcln( ZP_CC_LIGHT_RED, "unfocused" );
     m_inputManager.onFocusLost();
     m_renderingPipeline.onFocusLost();
+
+    onFocusChanged( false );
 }
 void zpApplication::onDragDrop( const zp_char* filename, zp_int x, zp_int y )
 {
@@ -695,16 +702,16 @@ void zpApplication::processFrame()
     update();
     ZP_PROFILE_END( UPDATE );
 
-    // simulate
-    ZP_PROFILE_START( SIMULATE );
+    // fixed update
+    ZP_PROFILE_START( FIXED_UPDATE );
     zp_int numUpdates = 0;
     while( ( startTime - m_lastTime ) > m_simulateHz && numUpdates < 5 )
     {
-        simulate();
+        fixedUpdate();
         m_lastTime += m_simulateHz;
         ++numUpdates;
     }
-    ZP_PROFILE_END( SIMULATE );
+    ZP_PROFILE_END( FIXED_UPDATE );
 
     // adjust timer
     if( ( startTime - m_lastTime ) > m_simulateHz )
@@ -735,6 +742,7 @@ void zpApplication::processFrame()
         m_componentPoolMeshRenderer.render( i );
         ZP_PROFILE_END( RENDER_MESHES );
 
+        // animated mesh render
         ZP_PROFILE_START( RENDER_ANIMATED_MESHES );
         m_componentPoolAnimatedMeshRenderer.render( i );
         ZP_PROFILE_END( RENDER_ANIMATED_MESHES );
@@ -959,7 +967,7 @@ void zpApplication::onGUI()
     if( m_displayStats.isMarked( ZP_APPLICATION_STATS_UPDATE ) )
     {
         zp_float updateMs =             m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_UPDATE            , secondsPerTick );
-        zp_float simulateMs =         m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SIMULATE        , secondsPerTick );
+        zp_float simulateMs =         m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_FIXED_UPDATE        , secondsPerTick );
         zp_float sleepMs =             m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_SLEEP            , secondsPerTick );
         zp_float objectUpdateMs =     m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_OBJECT_UPDATE    , secondsPerTick );
         zp_float worldUpdateMs =     m_profiler.getPreviousTimeSeconds( ZP_PROFILER_STEP_WORLD_UPDATE    , secondsPerTick );

@@ -157,18 +157,23 @@ public:
     void setApplicationPaused( zp_bool applicationPaused );
 
 protected:
+    virtual void onProcessCommandLine( const zpArrayList< zpString >& args ) {}
+
     virtual void onInitialize() {}
     virtual void onSetup() {}
     virtual void onTeardown() {}
     virtual void onShutdown() {}
 
-    virtual void onUpdate() {}
-    virtual void onSimulate() {}
+    virtual void onUpdate( float deltaTime, float realTime ) {}
+    virtual void onLateUpdate( float deltaTime, float realTime ) {}
+    virtual void onFixedUpdate() {}
 
     virtual void onHandleInput() {}
 
     virtual void onGarbageCollect() {}
     virtual void onReloadAllResources() {}
+
+    virtual void onFocusChanged( zp_bool gained ) {}
 
 #if ZP_USE_HOT_RELOAD
     virtual void onReloadChangedResources() {}
@@ -178,7 +183,7 @@ protected:
 
 private:
     void update();
-    void simulate();
+    void fixedUpdate();
 
     void processFrame();
 
