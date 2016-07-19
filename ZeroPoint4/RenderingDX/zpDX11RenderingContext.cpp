@@ -73,10 +73,10 @@ void zpRenderingContextImpl::setViewport( const zpViewport& viewport )
 void zpRenderingContextImpl::setScissorRect( const zpRecti& rect )
 {
     D3D11_RECT r;
-    r.left   = rect.getPosition().getX();
-    r.top    = rect.getPosition().getY();
-    r.right  = rect.getSize().getX();
-    r.bottom = rect.getSize().getY();
+    r.left   = rect.getLeft();
+    r.top    = rect.getTop();
+    r.right  = rect.getRight();
+    r.bottom = rect.getBottom();
 
     m_context->RSSetScissorRects( 1, &r );
 }
@@ -175,7 +175,7 @@ void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, cons
         }
         break;
 
-    case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE:
+    case ZP_RENDERING_COMMNAD_DRAW_IMMEDIATE: 
     case ZP_RENDERING_COMMNAD_DRAW_BUFFERED:
         if( command->material != ZP_NULL )
         {
@@ -209,7 +209,6 @@ void zpRenderingContextImpl::processCommand( zpRenderingEngineImpl* engine, cons
 }
 void zpRenderingContextImpl::processCommands( zpRenderingEngineImpl* engine, const zpArrayList< zpRenderingCommand* >& renderCommands )
 {
-    const zp_uint count = renderCommands.size();
     zpRenderingCommand* const* cmd = renderCommands.begin();
     zpRenderingCommand* const* end = renderCommands.end();
 
@@ -240,25 +239,29 @@ void zpRenderingContextImpl::bindMaterial( const zpMaterial* material )
 
     if( shader->m_vertexShader )
     {
-        m_context->VSSetShader( shader->m_vertexShader, 0, 0 );
+        m_context->VSSetShader( shader->m_vertexShader, ZP_NULL, 0 );
         m_context->VSSetConstantBuffers( ZP_CONSTANT_BUFFER_SLOT_GLOBAL, 1, globalBuffer );
     }
 
     if( shader->m_geometryShader )
     {
-        m_context->GSSetShader( shader->m_geometryShader, 0, 0 );
+        m_context->GSSetShader( shader->m_geometryShader, ZP_NULL, 0 );
         m_context->GSSetConstantBuffers( ZP_CONSTANT_BUFFER_SLOT_GLOBAL, 1, globalBuffer );
     }
 
     if( shader->m_pixelShader )
     {
-        m_context->PSSetShader( shader->m_pixelShader, 0, 0 );
+        m_context->PSSetShader( shader->m_pixelShader, ZP_NULL, 0 );
         m_context->PSSetConstantBuffers( ZP_CONSTANT_BUFFER_SLOT_GLOBAL, 1, globalBuffer );
         
-        material->materialTextures.foreach( [ this ]( const zpMaterialTexture& t ) {
-            m_context->PSSetSamplers( t.slot, 1, &t.sampler.getSamplerStateImpl()->m_sampler );
-            m_context->PSSetShaderResources( t.slot, 1, &t.texture.getResource()->getData()->getTextureImpl()->m_textureResourceView );
-        } );
+        const zpMaterialTexture* b = material->materialTextures.begin();
+        const zpMaterialTexture* e = material->materialTextures.end();
+
+        for( ; b != e; ++b )
+        {
+            m_context->PSSetSamplers( b->slot, 1, &b->sampler.getSamplerStateImpl()->m_sampler );
+            m_context->PSSetShaderResources( b->slot, 1, &b->texture.getResource()->getData()->getTextureImpl()->m_textureResourceView );
+        }
     }
 
 #if 0

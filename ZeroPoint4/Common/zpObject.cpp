@@ -11,6 +11,7 @@ zp_bool zpObjectResource::load( const zp_char* filename )
 void zpObjectResource::unload()
 {
     m_filename.clear();
+    m_resource.clear();
 }
 
 zpObjectContentManager::zpObjectContentManager()
@@ -65,9 +66,12 @@ void zpObjectContentManager::initializeAllObjectsInWorld( zpWorld* world )
 
 void zpObjectContentManager::destroyAllObjects()
 {
-    m_used.foreach( []( zpObject* o ) {
-        o->destroy();
-    } );
+    zpObject** b = m_used.begin();
+    zpObject** e = m_used.end();
+    for( ; b != e; ++b )
+    {
+        (*b)->destroy();
+    }
 }
 void zpObjectContentManager::destroyAllObjectsInWorld( zpWorld* world )
 {
@@ -111,6 +115,73 @@ void zpObjectContentManager::getAllObjectsWithTag( zp_int tag, zpArrayList< zpOb
         {
             objects.pushBack( o );
         }
+    }
+}
+
+void zpObjectContentManager::registerComponent( const zp_char* componentType, zpComponentFactoryCreate factoryCreate, zpComponentFactoryDestroy factoryDestroy )
+{
+    zp_hash componentHash = zp_fnv1_32_string( componentType, 0 );
+
+    zp_size_t index;
+    if( m_componentFactoryHashes.findIndexIf( [ componentHash ]( zp_hash a ) { return a == componentHash; }, index ) )
+    {
+        zpComponentFactoryFunctions& funcs = m_componentFactoryFunctions[ index ];
+        funcs.createFunc = factoryCreate;
+        funcs.destroyFunc = factoryDestroy;
+    }
+    else
+    {
+        m_componentFactoryHashes.pushBack( componentHash );
+        zpComponentFactoryFunctions& funcs = m_componentFactoryFunctions.pushBackEmpty();
+        funcs.createFunc = factoryCreate;
+        funcs.destroyFunc = factoryDestroy;
+    }
+}
+void zpObjectContentManager::unregisterComponent( const zp_char* componentType )
+{
+    zp_hash componentHash = zp_fnv1_32_string( componentType, 0 );
+
+    zp_size_t index;
+    zp_bool found = m_componentFactoryHashes.findIndexIf( [ componentHash ]( zp_hash a ) { return a == componentHash; }, index );
+    ZP_ASSERT( found, "Trying to unregister an unknown component %s", componentType );
+    if( found )
+    {
+        m_componentFactoryHashes.erase( index );
+        m_componentFactoryFunctions.erase( index );
+    }
+}
+void zpObjectContentManager::unregisterAllComponents()
+{
+    m_componentFactoryFunctions.clear();
+    m_componentFactoryHashes.clear();
+}
+
+void zpObjectContentManager::addComponent( zpObject* obj, const zp_char* componentType, const zpBison::Value& data )
+{
+    zp_hash componentHash = zp_fnv1_32_string( componentType, 0 );
+
+    zp_size_t index;
+    zp_bool found = m_componentFactoryHashes.findIndexIf( [ componentHash ]( zp_hash a ) { return a == componentHash; }, index );
+    ZP_ASSERT( found, "Trying to add unknown component %s", componentType );
+    if( found )
+    {
+        zpComponentFactoryFunctions& funcs = m_componentFactoryFunctions[ index ];
+        zpComponent* cmp = funcs.createFunc( obj, data );
+    }
+}
+void zpObjectContentManager::removeComponent( zpObject* obj, const zp_char* componentType )
+{
+    zp_hash componentHash = zp_fnv1_32_string( componentType, 0 );
+
+    zp_size_t index;
+    zp_bool found = m_componentFactoryHashes.findIndexIf( [ componentHash ]( zp_hash a ) { return a == componentHash; }, index );
+    ZP_ASSERT( found, "Trying to remove unknown component %s", componentType );
+    if( found )
+    {
+        zpComponent* cmp;
+
+        zpComponentFactoryFunctions& funcs = m_componentFactoryFunctions[ index ];
+        funcs.destroyFunc( cmp );
     }
 }
 
@@ -416,7 +487,7 @@ void zpObject::load( zp_bool isInitialLoad, const zpBison::Value& root )
     }
 
     // setup components with app and object
-    m_components.setup( m_application, this );
+    m_components.setup( this );
 
     // add and create components
     const zpBison::Value& components = root[ "Components" ];
@@ -430,9 +501,12 @@ void zpObject::load( zp_bool isInitialLoad, const zpBison::Value& root )
 
 void zpObject::unload()
 {
-    m_flags.unmark( ZP_OBJECT_FLAG_CREATED );
-    m_flags.unmark( ZP_OBJECT_FLAG_INITIALIZED );
+    if( m_flags.isMarked( ZP_OBJECT_FLAG_CREATED ) )
+    {
+        m_flags.unmark( ZP_OBJECT_FLAG_CREATED );
+        m_flags.unmark( ZP_OBJECT_FLAG_INITIALIZED );
 
-    m_components.unload();
-    clearTags();
+        m_components.unload();
+        clearTags();
+    }
 }

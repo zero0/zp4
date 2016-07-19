@@ -6,6 +6,15 @@ class zpObject;
 class zpObjectContentManager;
 class zpObjectResource;
 
+typedef zpComponent* (*zpComponentFactoryCreate)( zpObject* obj, const zpBison::Value& data );
+typedef void (*zpComponentFactoryDestroy)( zpComponent* cmp );
+
+struct zpComponentFactoryFunctions
+{
+    zpComponentFactoryCreate createFunc;
+    zpComponentFactoryDestroy destroyFunc;
+};
+
 enum zpObjectFlag : zp_uint
 {
     ZP_OBJECT_FLAG_ENABLED,
@@ -97,10 +106,11 @@ private:
     zp_long m_lastLoadTime;
     zp_uint m_prefabId;
     zp_uint m_instanceId;
-    zpAllComponents m_components;
 
     zpApplication* m_application;
     zpWorld* m_world;
+
+    zpAllComponents m_components;
 
     zpObjectResourceInstance m_object;
 };
@@ -123,6 +133,13 @@ public:
     void getAllObjectsInLayer( zp_uint layer, zpArrayList< zpObject* >& objects ) const;
     void getAllObjectsWithTag( zp_int tag, zpArrayList< zpObject* >& objects ) const;
 
+    void registerComponent( const zp_char* componentType, zpComponentFactoryCreate factoryCreate, zpComponentFactoryDestroy factoryDestroy );
+    void unregisterComponent( const zp_char* componentType );
+    void unregisterAllComponents();
+
+    void addComponent( zpObject* obj, const zp_char* componentType, const zpBison::Value& data );
+    void removeComponent( zpObject* obj, const zp_char* componentType );
+
     void update();
     void simulate();
 
@@ -132,6 +149,9 @@ private:
     void initializeInstance( zpObjectResourceInstance& instance ) {}
 
     zp_uint m_numObjects;
+
+    zpArrayList< zpComponentFactoryFunctions > m_componentFactoryFunctions;
+    zpArrayList< zp_hash > m_componentFactoryHashes;
 
     template<typename Resource, typename ResourceInstance, typename ImplManager, zp_uint ResourceCount>
     friend class zpContentManager;

@@ -32,10 +32,9 @@ public:
 
     void setEnabled( zp_bool enabled );
 
-    void setup( zpApplication* app, zpObject* obj );
+    void setup( zpObject* obj );
 
 private:
-    zpApplication* m_app;
     zpObject* m_object;
 
 #undef ZP_COMPONENT_DEF
