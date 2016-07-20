@@ -11,9 +11,9 @@ public:
     void setMasterVolume( zp_float volume );
     void getMasterVolume( zp_float& volume );
 
-    void setListenerPosition( const zpVector4f& pos );
-    void setListenerVelocity( const zpVector4f& vel );
-    void setListenerOrientation( const zpVector4f& forward, const zpVector4f& up );
+    void setListenerPosition( zpVector4fParamF pos );
+    void setListenerVelocity( zpVector4fParamF vel );
+    void setListenerOrientation( zpVector4fParamF forward, zpVector4fParamF up );
     void setListenerRolloff( zp_float rolloff );
     void setListenerDistance( zp_float dist );
     void setListenerDoppler( zp_float dopper );
@@ -26,16 +26,16 @@ public:
     void getListenerDoppler( zp_float& doppler );
 
 
-    zp_bool createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_uint bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels );
+    zp_bool createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_size_t bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels );
     void cloneSoundBuffer( const zpAudioBuffer& buffer, zpAudioBuffer& copyBuffer );
     void destroySoundBuffer( zpAudioBuffer& buffer );
 
-    void fillSoundBuffer( const zpAudioBuffer& buffer, const void* data, zp_uint size );
+    void fillSoundBuffer( const zpAudioBuffer& buffer, const void* data, zp_size_t size );
 
     void setSoundBufferVolume( const zpAudioBuffer& buffer, zp_float volume );
     void setSoundBufferPan( const zpAudioBuffer& buffer, zp_float pan );
-    void setSoundBufferPosition( const zpAudioBuffer& buffer, const zpVector4f& pos );
-    void setSoundBufferVelocity( const zpAudioBuffer& buffer, const zpVector4f& vel );
+    void setSoundBufferPosition( const zpAudioBuffer& buffer, zpVector4fParamF pos );
+    void setSoundBufferVelocity( const zpAudioBuffer& buffer, zpVector4fParamF vel );
     void setSoundBufferDistances( const zpAudioBuffer& buffer, zp_float minDistance, zp_float maxDistance );
 
     void getSoundBufferVolume( const zpAudioBuffer& buffer, zp_float& volume );
@@ -48,7 +48,7 @@ public:
     void stopSoundBuffer( const zpAudioBuffer& buffer );
     zp_bool isSoundBufferPlaying( const zpAudioBuffer& buffer );
 
-    void getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_uint& writePosition );
+    void getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_size_t& writePosition );
 
     void update();
 

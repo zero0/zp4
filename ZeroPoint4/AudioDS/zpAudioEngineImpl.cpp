@@ -109,7 +109,7 @@ void zpAudioEngineImpl::getMasterVolume( zp_float& volume )
     volume = __zpUnNormalizeVolume( vol );
 }
 
-void zpAudioEngineImpl::setListenerPosition( const zpVector4f& pos )
+void zpAudioEngineImpl::setListenerPosition( zpVector4fParamF pos )
 {
     zp_float p[4];
     zpMath::Vector4Store4( pos, p );
@@ -119,7 +119,7 @@ void zpAudioEngineImpl::setListenerPosition( const zpVector4f& pos )
     
     m_isDirty = true;
 }
-void zpAudioEngineImpl::setListenerVelocity( const zpVector4f& vel )
+void zpAudioEngineImpl::setListenerVelocity( zpVector4fParamF vel )
 {
     zp_float v[4];
     zpMath::Vector4Store4( vel, v );
@@ -129,7 +129,7 @@ void zpAudioEngineImpl::setListenerVelocity( const zpVector4f& vel )
     
     m_isDirty = true;
 }
-void zpAudioEngineImpl::setListenerOrientation( const zpVector4f& forward, const zpVector4f& up )
+void zpAudioEngineImpl::setListenerOrientation( zpVector4fParamF forward, zpVector4fParamF up )
 {
     zp_float f[4], u[4];
     zpMath::Vector4Store4( forward, f );
@@ -206,7 +206,7 @@ void zpAudioEngineImpl::getListenerDoppler( zp_float& doppler )
     listener->GetDopplerFactor( &doppler );
 }
 
-zp_bool zpAudioEngineImpl::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_uint bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels )
+zp_bool zpAudioEngineImpl::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_size_t bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels )
 {
     LPDIRECTSOUND dsound = (LPDIRECTSOUND)m_dsound;
     
@@ -225,7 +225,7 @@ zp_bool zpAudioEngineImpl::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType
     zp_zero_memory( &desc );
     desc.dwSize = sizeof( DSBUFFERDESC );
     desc.dwFlags = DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME;
-    desc.dwBufferBytes = zp_clamp< DWORD >( bufferSize, DSBSIZE_MIN, DSBSIZE_MAX );
+    desc.dwBufferBytes = zp_clamp< DWORD >( (DWORD)bufferSize, DSBSIZE_MIN, DSBSIZE_MAX );
     desc.dwReserved = 0;
     desc.lpwfxFormat = &format;
     desc.guid3DAlgorithm = GUID_NULL;
@@ -293,7 +293,7 @@ void zpAudioEngineImpl::destroySoundBuffer( zpAudioBuffer& buffer )
     buffer.soundBuffer3D = ZP_NULL;
 }
 
-void zpAudioEngineImpl::fillSoundBuffer( const zpAudioBuffer& buffer, const void* data, zp_uint size )
+void zpAudioEngineImpl::fillSoundBuffer( const zpAudioBuffer& buffer, const void* data, zp_size_t size )
 {
     LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)buffer.soundBuffer;
     
@@ -301,7 +301,7 @@ void zpAudioEngineImpl::fillSoundBuffer( const zpAudioBuffer& buffer, const void
     DWORD audioSize1 = 0, audioSize2 = 0;
     HRESULT h;
     
-    h = soundBuffer->Lock( 0, size, &audioPtr1, &audioSize1, &audioPtr2, &audioSize2, 0 );
+    h = soundBuffer->Lock( 0, (DWORD)size, &audioPtr1, &audioSize1, &audioPtr2, &audioSize2, 0 );
     ZP_ASSERT( SUCCEEDED( h ), "" );
 
     if( audioPtr2 == ZP_NULL )
@@ -329,7 +329,7 @@ void zpAudioEngineImpl::setSoundBufferPan( const zpAudioBuffer& buffer, zp_float
     LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)buffer.soundBuffer;
     soundBuffer->SetPan( __zpNormalizePan( pan ) );
 }
-void zpAudioEngineImpl::setSoundBufferPosition( const zpAudioBuffer& buffer, const zpVector4f& pos )
+void zpAudioEngineImpl::setSoundBufferPosition( const zpAudioBuffer& buffer, zpVector4fParamF pos )
 {
     zp_float p[4];
     zpMath::Vector4Store4( pos, p );
@@ -339,7 +339,7 @@ void zpAudioEngineImpl::setSoundBufferPosition( const zpAudioBuffer& buffer, con
 
     m_isDirty = true;
 }
-void zpAudioEngineImpl::setSoundBufferVelocity( const zpAudioBuffer& buffer, const zpVector4f& vel )
+void zpAudioEngineImpl::setSoundBufferVelocity( const zpAudioBuffer& buffer, zpVector4fParamF vel )
 {
     zp_float v[4];
     zpMath::Vector4Store4( vel, v );
@@ -416,7 +416,7 @@ zp_bool zpAudioEngineImpl::isSoundBufferPlaying( const zpAudioBuffer& buffer )
     return ( status & DSBSTATUS_PLAYING ) == DSBSTATUS_PLAYING;
 }
 
-void zpAudioEngineImpl::getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_uint& writePosition )
+void zpAudioEngineImpl::getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_size_t& writePosition )
 {
     LPDIRECTSOUNDBUFFER soundBuffer = (LPDIRECTSOUNDBUFFER)buffer.soundBuffer;
     DWORD cp, cw;

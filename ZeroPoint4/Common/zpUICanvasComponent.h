@@ -153,7 +153,7 @@ public:
     const zpString& getWidgetName( zp_int w ) const;
     void setWidgetName( zp_int w, const zp_char* name );
 
-    const zpVector4f& getWidgetLocalPosition( zp_int w ) const;
+    zpVector4f getWidgetLocalPosition( zp_int w ) const;
     void setWidgetLocalPosition( zp_int w, zpVector4fParamF position );
 
     zpVector2i getWidgetSize( zp_int w ) const;

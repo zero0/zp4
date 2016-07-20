@@ -27,15 +27,15 @@ void zpAudioEngine::getMasterVolume( zp_float& volume )
     m_engine->getMasterVolume( volume );
 }
 
-void zpAudioEngine::setListenerPosition( const zpVector4f& pos )
+void zpAudioEngine::setListenerPosition( zpVector4fParamF pos )
 {
     m_engine->setListenerPosition( pos );
 }
-void zpAudioEngine::setListenerVelocity( const zpVector4f& vel )
+void zpAudioEngine::setListenerVelocity( zpVector4fParamF vel )
 {
     m_engine->setListenerVelocity( vel );
 }
-void zpAudioEngine::setListenerOrientation( const zpVector4f& forward, const zpVector4f& up )
+void zpAudioEngine::setListenerOrientation( zpVector4fParamF forward, zpVector4fParamF up )
 {
     m_engine->setListenerOrientation( forward, up );
 }
@@ -77,7 +77,7 @@ void zpAudioEngine::getListenerDoppler( zp_float& doppler )
     m_engine->getListenerDoppler( doppler );
 }
 
-zp_bool zpAudioEngine::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_uint bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels )
+zp_bool zpAudioEngine::createSoundBuffer( zpAudioBuffer& buffer, zpAudioType type, zp_size_t bufferSize, zp_uint samplesPerSec, zp_uint bitsBerSample, zp_uint channels )
 {
     return m_engine->createSoundBuffer( buffer, type, bufferSize, samplesPerSec, bitsBerSample, channels );
 }
@@ -90,7 +90,7 @@ void zpAudioEngine::destroySoundBuffer( zpAudioBuffer& buffer )
     m_engine->destroySoundBuffer( buffer );
 }
 
-void zpAudioEngine::fillSoundBuffer( const zpAudioBuffer& buffer, const void* data, zp_uint size )
+void zpAudioEngine::fillSoundBuffer( const zpAudioBuffer& buffer, const void* data, zp_size_t size )
 {
     m_engine->fillSoundBuffer( buffer, data, size );
 }
@@ -103,11 +103,11 @@ void zpAudioEngine::setPan( const zpAudioBuffer& buffer, zp_float pan )
 {
     m_engine->setSoundBufferPan( buffer, pan );
 }
-void zpAudioEngine::setPosition( const zpAudioBuffer& buffer, const zpVector4f& pos )
+void zpAudioEngine::setPosition( const zpAudioBuffer& buffer, zpVector4fParamF pos )
 {
     m_engine->setSoundBufferPosition( buffer, pos );
 }
-void zpAudioEngine::setVelocity( const zpAudioBuffer& buffer, const zpVector4f& vel )
+void zpAudioEngine::setVelocity( const zpAudioBuffer& buffer, zpVector4fParamF vel )
 {
     m_engine->setSoundBufferVelocity( buffer, vel );
 }
@@ -150,7 +150,7 @@ zp_bool zpAudioEngine::isPlaying( const zpAudioBuffer& buffer )
     return m_engine->isSoundBufferPlaying( buffer );
 }
 
-void zpAudioEngine::getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_uint& writePosition )
+void zpAudioEngine::getCurrentPlayWritePosition( const zpAudioBuffer& buffer, zp_uint& playPosition, zp_size_t& writePosition )
 {
     m_engine->getCurrentPlayWritePosition( buffer, playPosition, writePosition );
 }

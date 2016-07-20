@@ -259,7 +259,7 @@ void zpTweenComponent::onUpdate( zp_float deltaTime, zp_float realTime )
     }
 
     // remove tweens that should be destroyed
-    for( zp_int i = 0, imax = m_usedTweens.size(); i < imax; ++i )
+    for( zp_size_t i = 0, imax = m_usedTweens.size(); i < imax; ++i )
     {
         zpTweenAction* a = m_usedTweens[ i ];
         zp_bool shouldDestroy = a->flags.isMarked( ZP_TWEEN_FLAGS_SHOULD_DESTROY );

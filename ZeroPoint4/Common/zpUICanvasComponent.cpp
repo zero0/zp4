@@ -383,7 +383,7 @@ void zpUICanvasComponent::render( zpRenderingContext* context )
     {
         context->beginDrawImmediate( 1 << 4, ZP_RENDERING_QUEUE_UI, ZP_TOPOLOGY_TRIANGLE_LIST, ZP_VERTEX_FORMAT_VERTEX_COLOR_UV, &b->material );
 
-        for( zp_uint i = 0, imax = b->pos.size(); i < imax; i += 4 )
+        for( zp_size_t i = 0, imax = b->pos.size(); i < imax; i += 4 )
         {
             context->addQuad(
                 b->pos[ i + 0 ], b->uvs[ i + 0 ], b->cols[ i + 0 ],
@@ -456,8 +456,8 @@ void zpUICanvasComponent::removeWidgetChild( zp_int parent, zp_int child )
     zpUIWidget* parentWidget = getWidget( parent );
     zpUIWidget* childWidget = getWidget( child );
 
-    zp_int index = parentWidget->children.indexOf( child );
-    if( index >= 0 )
+    zp_size_t index = parentWidget->children.indexOf( child );
+    if( index != zpArrayList< zp_int >::npos )
     {
         childWidget->parent = 0;
         parentWidget->children.erase( index );
@@ -475,7 +475,7 @@ void zpUICanvasComponent::setWidgetName( zp_int w, const zp_char* name )
     widget->name = name;
 }
 
-const zpVector4f& zpUICanvasComponent::getWidgetLocalPosition( zp_int w ) const
+zpVector4f zpUICanvasComponent::getWidgetLocalPosition( zp_int w ) const
 {
     const zpUIWidget* widget = getWidget( w );
     return widget->transform.m_m4;
@@ -937,8 +937,8 @@ void zpUICanvasComponent::sortWidget( zp_uint w )
     zpUIWidget* widget = getWidget( w );
 
     widget->children.sort( [ this ]( zp_int a, zp_int b ) -> zp_bool {
-        zp_int da = getWidget( a )->depth;
-        zp_int db = getWidget( b )->depth;
+        zp_size_t da = getWidget( a )->depth;
+        zp_size_t db = getWidget( b )->depth;
         return da < db;
     } );
 

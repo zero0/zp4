@@ -24,7 +24,7 @@ zp_int zpTags::getTag( const zpString& tag )
         m_tags.pushBack( tag );
     }
 
-    return index;
+    return (zp_int)index;
 }
 zp_int zpTags::getTag( const zp_char* tag )
 {
@@ -37,10 +37,10 @@ zp_int zpTags::getTag( const zp_char* tag )
         m_tags.pushBackEmpty() = tag;
     }
 
-    return index;
+    return (zp_int)index;
 }
 
 const zpString& zpTags::getTagName( zp_int tag ) const
 {
-    return m_tags[ tag ];
+    return m_tags[ (zp_size_t)tag ];
 }

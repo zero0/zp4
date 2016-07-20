@@ -156,9 +156,10 @@ void zpObjectContentManager::unregisterAllComponents()
     m_componentFactoryHashes.clear();
 }
 
-void zpObjectContentManager::addComponent( zpObject* obj, const zp_char* componentType, const zpBison::Value& data )
+zpComponent* zpObjectContentManager::createComponent( zpObject* obj, const zp_char* componentType, const zpBison::Value& data )
 {
     zp_hash componentHash = zp_fnv1_32_string( componentType, 0 );
+    zpComponent* cmp = ZP_NULL;
 
     zp_size_t index;
     zp_bool found = m_componentFactoryHashes.findIndexIf( [ componentHash ]( zp_hash a ) { return a == componentHash; }, index );
@@ -166,10 +167,12 @@ void zpObjectContentManager::addComponent( zpObject* obj, const zp_char* compone
     if( found )
     {
         zpComponentFactoryFunctions& funcs = m_componentFactoryFunctions[ index ];
-        zpComponent* cmp = funcs.createFunc( obj, data );
+        cmp = funcs.createFunc( obj, data );
     }
+
+    return cmp;
 }
-void zpObjectContentManager::removeComponent( zpObject* obj, const zp_char* componentType )
+void zpObjectContentManager::destroyComponent( const zp_char* componentType, zpComponent* component )
 {
     zp_hash componentHash = zp_fnv1_32_string( componentType, 0 );
 
@@ -178,10 +181,8 @@ void zpObjectContentManager::removeComponent( zpObject* obj, const zp_char* comp
     ZP_ASSERT( found, "Trying to remove unknown component %s", componentType );
     if( found )
     {
-        zpComponent* cmp;
-
         zpComponentFactoryFunctions& funcs = m_componentFactoryFunctions[ index ];
-        funcs.destroyFunc( cmp );
+        funcs.destroyFunc( component );
     }
 }
 
@@ -203,19 +204,6 @@ void zpObjectContentManager::update()
         if( o->isFlagSet( ZP_OBJECT_FLAG_SHOULD_DESTROY ) )
         {
             destroy( o );
-        }
-    }
-}
-void zpObjectContentManager::simulate()
-{
-    zpObject** b = m_used.begin();
-    zpObject** e = m_used.end();
-    for( ; b != e; ++b )
-    {
-        zpObject* o = *b;
-        if( o->isFlagSet( ZP_OBJECT_FLAG_CAN_UPDATE ) )
-        {
-
         }
     }
 }

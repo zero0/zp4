@@ -137,11 +137,10 @@ public:
     void unregisterComponent( const zp_char* componentType );
     void unregisterAllComponents();
 
-    void addComponent( zpObject* obj, const zp_char* componentType, const zpBison::Value& data );
-    void removeComponent( zpObject* obj, const zp_char* componentType );
+    zpComponent* createComponent( zpObject* obj, const zp_char* componentType, const zpBison::Value& data );
+    void destroyComponent( const zp_char* componentType, zpComponent* component );
 
     void update();
-    void simulate();
 
 private:
     zp_bool createResource( zpObjectResource* res, const zp_char* filename );

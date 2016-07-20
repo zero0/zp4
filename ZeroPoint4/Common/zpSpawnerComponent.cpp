@@ -102,7 +102,7 @@ void zpSpawnerComponent::spawnFromGroup( zp_int group )
             numToSpawn = rnd->randomInt( spawnGroup.minNumToSpawn, spawnGroup.maxNumToSpawn );
         }
 
-        zp_int objectCount = spawnGroup.objectsToSpawn.size();
+        zp_int objectCount = (zp_int)spawnGroup.objectsToSpawn.size();
         zpTransformComponent* t = getParentObject()->getComponents()->getTransformComponent();
 
         for( zp_int i = 0; i < numToSpawn; ++i )
