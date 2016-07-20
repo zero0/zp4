@@ -243,10 +243,13 @@ void zpTransformComponent::onInitialize()
 }
 void zpTransformComponent::onDestroy()
 {
-    m_children.foreach( []( zpTransformComponent* o )
+    zpTransformComponent** b = m_children.begin();
+    zpTransformComponent** e = m_children.end();
+    for( ; b != e; ++b )
     {
-        o->getParentObject()->destroy();
-    } );
+        (*b)->getParentObject()->destroy();
+    }
+
     m_children.clear();
 }
 
@@ -274,17 +277,21 @@ void zpTransformComponent::onSimulate()
 
 void zpTransformComponent::onEnabled()
 {
-    m_children.foreach( []( zpTransformComponent* o )
+    zpTransformComponent** b = m_children.begin();
+    zpTransformComponent** e = m_children.end();
+    for( ; b != e; ++b )
     {
-        o->getParentObject()->setEnabled( true );
-    } );
+        (*b)->setEnabled( true );
+    }
 }
 void zpTransformComponent::onDisabled()
 {
-    m_children.foreach( []( zpTransformComponent* o )
+    zpTransformComponent** b = m_children.begin();
+    zpTransformComponent** e = m_children.end();
+    for( ; b != e; ++b )
     {
-        o->getParentObject()->setEnabled( false );
-    } );
+        (*b)->setEnabled( false );
+    }
 }
 
 zp_size_t zpTransformComponent::findChildDirect( zpTransformComponent* child )
@@ -494,7 +501,7 @@ void zpTransformOctreeNode::subdivide()
 
     zpTransformOctreeNode** b = m_children.begin();
     zpTransformOctreeNode** e = m_children.end();
-    for( zp_int i = 0; b != e; ++b, ++i )
+    for( zp_size_t i = 0; b != e; ++b, ++i )
     {
         c = zpMath::Vector4Mul( offsets[ i ], quartSize );
         c = zpMath::Vector4Add( c, center );
@@ -598,10 +605,12 @@ zpTransformComponentPool::~zpTransformComponentPool()
 void zpTransformComponentPool::update( zp_float deltaTime, zp_float realTime )
 {
     // update transforms
-    m_used.foreach( [ &deltaTime, &realTime ]( zpTransformComponent* o )
+    zpTransformComponent** b = m_used.begin();
+    zpTransformComponent** e = m_used.end();
+    for( ; b != e; ++b )
     {
-        o->update( deltaTime, realTime );
-    } );
+        (*b)->update( deltaTime, realTime );
+    }
 
     // update octree
     m_octree.update();
