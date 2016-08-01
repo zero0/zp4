@@ -336,7 +336,7 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
     zp_int exitCode = 0;
 
     zpMemorySystem* mem = zpMemorySystem::getInstance();
-    mem->initialize( ZP_MEMORY_MB( 10 ) );
+    mem->initialize( ZP_MEMORY_MB( 4 ) );
 
 #if 0
     zpRandom *d = zpRandom::getInstance();

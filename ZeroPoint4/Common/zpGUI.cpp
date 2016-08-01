@@ -156,6 +156,7 @@ void zpGUI::endGUI()
     for( ; b != e; ++b )
     {
         zpGUIWidget* w = *b;
+        w->text.clear();
         w->children.clear();
         m_freeWidgets.pushBack( w );
     }

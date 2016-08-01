@@ -35,18 +35,12 @@ public:
 
 private:
     zpMemorySystem();
-
-    void addBlock( zpMemoryBlock** table, zpMemoryBlock* block );
-    void removeBlock( zpMemoryBlock** table, zpMemoryBlock* block );
-
+    
     zp_size_t m_totalMemory;
     zp_size_t m_totalAlignedMemory;
     zp_size_t m_allocatedMemorySize;
 
     zp_size_t m_numAllocs;
-    zp_size_t m_numDeallocs;
-    zp_size_t m_memAllocated;
-    zp_size_t m_memDeallocated;
     zp_size_t m_memUsed;
 #if ZP_MEMORY_TRACK_POINTERS
     zpFixedArrayList< void*,        ZP_MEMORY_SYSTEM_TRACKED_POINTERS > m_allocedPointers;
@@ -55,8 +49,10 @@ private:
     zp_byte* m_allMemory;
     zp_byte* m_alignedMemory;
 
-    zpMemoryBlock* m_blockTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
-    zpMemoryBlock* m_freeTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
+    //zpMemoryBlock* m_blockTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
+    //zpMemoryBlock* m_freeTable[ ZP_MEMORY_BLOCK_TABLE_SIZE ];
+
+    zpMemoryBlock* m_memoryBlockHead;
 
     static zpMemorySystem s_memory;
 };
