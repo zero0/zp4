@@ -3,96 +3,91 @@
 zpProfiler::zpProfiler()
     : m_currentFrame( 0 )
     , m_previousFrame( 0 )
-    , m_numSteps( 0 )
     , m_time( ZP_NULL )
     , m_mem( ZP_NULL )
 {
 }
 zpProfiler::~zpProfiler()
 {
+    m_time = ZP_NULL;
+    m_mem = ZP_NULL;
 }
 
-void zpProfiler::setup( zp_size_t numSteps, zpTime* time, zpMemorySystem* mem )
+void zpProfiler::setup( zpTime* time, zpMemorySystem* mem )
 {
-    m_numSteps = numSteps;
     m_time = time;
     m_mem = mem;
+    
+    m_frames.resize( ZP_PROFILER_MAX_FRAMES );
 
-    m_profiles.resize( numSteps );
-    m_frames.resize( numSteps );
-
-    reset();
+    clear();
 }
 void zpProfiler::teardown()
 {
-    reset();
+    clear();
 
     m_time = ZP_NULL;
     m_mem = ZP_NULL;
 }
 
-void zpProfiler::start( zp_size_t step )
+zp_size_t zpProfiler::start( const zp_char* fileName, const zp_char* functionName, zp_long lineNumber )
 {
     zp_long time = m_time->getTime();
     zp_long mem = m_mem->getMemoryUsed();
+    
+    zp_size_t index = m_frames[ m_currentFrame ].frames.size();
 
-    zpProfilerPart& part = m_profiles[ step ];
-    part.currentStartTime = time;
-    part.currentStartMemory = mem;
-
-    zpProfilerFrame& frame = m_frames[ step ].frames[ m_currentFrame ];
+    zpProfilerFrame& frame =  m_frames[ m_currentFrame ].frames.pushBackEmpty();
+    frame.fileName = fileName;
+    frame.functionName = functionName;
+    frame.eventName = "";
+    frame.lineNumber = lineNumber;
     frame.startTime = time;
     frame.startMemory = mem;
+
+    return index;
 }
-void zpProfiler::end( zp_size_t step )
+zp_size_t zpProfiler::start( const zp_char* fileName, const zp_char* functionName, const zp_char* eventName, zp_long lineNumber )
 {
     zp_long time = m_time->getTime();
     zp_long mem = m_mem->getMemoryUsed();
 
-    zpProfilerFrame& frame = m_frames[ step ].frames[ m_currentFrame ];
+    zp_size_t index = m_frames[ m_currentFrame ].frames.size();
+
+    zpProfilerFrame& frame =  m_frames[ m_currentFrame ].frames.pushBackEmpty();
+    frame.fileName = fileName;
+    frame.functionName = functionName;
+    frame.eventName = eventName;
+    frame.lineNumber = lineNumber;
+    frame.startTime = time;
+    frame.startMemory = mem;
+
+    return index;
+}
+void zpProfiler::end( zp_size_t index )
+{
+    zp_long time = m_time->getTime();
+    zp_long mem = m_mem->getMemoryUsed();
+
+    zpProfilerFrame& frame = m_frames[ m_currentFrame ].frames[ index ];
     frame.endTime = time;
     frame.endMemory = mem;
-
-    zpProfilerPart& part = m_profiles[ step ];
-    part.currentEndTime = time;
-    part.currentEndMemory = mem;
-    part.samples++;
-
-    part.prevStartTime = part.currentStartTime;
-    part.prevEndTime = part.currentEndTime;
-
-    part.prevStartMemory = part.currentStartMemory;
-    part.prevEndMemory = part.currentEndMemory;
-
-    zp_long t = part.currentEndTime - part.currentStartTime;
-    part.maxTime = ZP_MAX( t, part.maxTime );
-    part.minTime = ZP_MIN( t, part.minTime );
-    part.averageTime = ( part.averageTime + t ) / part.samples;
-
-    part.currentStartTime = 0;
-    part.currentEndTime = 0;
 }
 
-void zpProfiler::reset()
+void zpProfiler::clear()
 {
-    for( zp_uint i = 0; i < m_numSteps; ++i )
+    for( zp_size_t i = 0, imax = m_frames.size(); i < imax; ++i )
     {
-        zpProfilerPart& part = m_profiles[ i ];
-        zp_zero_memory( &part );
-
-        part.maxTime = zp_limit_min<zp_long>();
-        part.minTime = zp_limit_max<zp_long>();
-
-        zpProfilerTimeline& timeline = m_frames[ i ];
-        zp_zero_memory_array( timeline.frames );
+        m_frames[ i ].frames.clear();
     }
 }
 void zpProfiler::finalize()
 {
     m_previousFrame = m_currentFrame;
     m_currentFrame = ( m_currentFrame + 1 ) % ZP_PROFILER_MAX_FRAMES;
+    m_frames[ m_currentFrame ].frames.reset();
 }
-
+#if 0
 zp_long zpProfiler::getPreviousTime( zp_size_t step ) const
 {
     const zpProfilerPart& part = m_profiles[ step ];
@@ -126,8 +121,9 @@ void zpProfiler::printProfile( zp_size_t step, zp_float secondsPerTick ) const
     zp_float t = (zp_float)( part.prevEndTime - part.prevStartTime ) * secondsPerTick;
     zp_printfln( "   sec duration min_time max_time avg_time\n%1.4f %8d %8d %8d %8d", t, ( part.prevEndTime - part.prevStartTime ), part.minTime, part.maxTime, part.averageTime );
 }
+#endif
 
-const zpProfilerTimeline& zpProfiler::getTimeline( zp_size_t step ) const
+const zpProfilerTimeline& zpProfiler::getPreviousFrameTimeline() const
 {
-    return m_frames[ step ];
+    return m_frames[ m_previousFrame ];
 }

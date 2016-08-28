@@ -5,58 +5,14 @@
 #define ZP_APPLICATION_DEFAULT_WINDOW_WIDTH        640
 #define ZP_APPLICATION_DEFAULT_WINDOW_HEIGHT    480
 
-enum zpProfilerSteps
-{
-    ZP_PROFILER_STEP_PROCESS_FRAME,
-    ZP_PROFILER_STEP_FRAME,
-    ZP_PROFILER_STEP_UPDATE,
-    ZP_PROFILER_STEP_APP_UPDATE,
-    ZP_PROFILER_STEP_APP_LATE_UPDATE,
-    ZP_PROFILER_STEP_FIXED_UPDATE,
-    ZP_PROFILER_STEP_HANDLE_INPUT,
-    ZP_PROFILER_STEP_RENDER_PARTICLES,
-    ZP_PROFILER_STEP_RENDER_MESHES,
-    ZP_PROFILER_STEP_RENDER_ANIMATED_MESHES,
-    ZP_PROFILER_STEP_RENDER_SKYBOX,
-    ZP_PROFILER_STEP_RENDER_UI,
-    ZP_PROFILER_STEP_RENDER_FRAME,
-    ZP_PROFILER_STEP_RENDER_BEGIN,
-    ZP_PROFILER_STEP_RENDER,
-    ZP_PROFILER_STEP_DEBUG_RENDER,
-    ZP_PROFILER_STEP_RENDER_PRESENT,
-    ZP_PROFILER_STEP_OBJECT_UPDATE,
-    ZP_PROFILER_STEP_WORLD_UPDATE,
-    ZP_PROFILER_STEP_PHYSICS_UPDATE,
-    ZP_PROFILER_STEP_SCRIPT_UPDATE,
-    ZP_PROFILER_STEP_SCRIPT_PROC_THREADS,
-    ZP_PROFILER_STEP_EVENT_UPDATE,
-
-    ZP_PROFILER_STEP_DRAW_GUI,
-
-    ZP_PROFILER_STEP_UPDATE_PHASE,
-    ZP_PROFILER_STEP_UPDATE_STATE,
-
-    ZP_PROFILER_STEP_INPUT_UPDATE,
-    ZP_PROFILER_STEP_AUDIO_UPDATE,
-    ZP_PROFILER_STEP_RENDERING_UPDATE,
-
-    ZP_PROFILER_STEP_GARBAGE_COLLECT,
-    ZP_PROFILER_STEP_RELOAD_ALL,
-    ZP_PROFILER_STEP_HOT_RELOAD,
-
-    ZP_PROFILER_STEP_SLEEP,
-
-    zpProfilerSteps_Count,
-};
-
 #if ZP_USE_PROFILER
-#define ZP_PROFILE_START( step )    m_profiler.start( (zp_size_t)(ZP_PROFILER_STEP_##step) )
-#define ZP_PROFILE_END( step )        m_profiler.end( (zp_size_t)(ZP_PROFILER_STEP_##step) )
-#define ZP_PROFILE_FINALIZE()        m_profiler.finalize()
+#define ZP_PROFILE_START( eventName )   zp_size_t __index_##eventName = m_profiler.start( __FILE__, __FUNCTION__, #eventName, __LINE__ );
+#define ZP_PROFILE_END( eventName )     m_profiler.end( __index_##eventName )
+#define ZP_PROFILE_FINALIZE()           m_profiler.finalize()
 #else
-#define ZP_PROFILE_START( step )    (void)0
-#define ZP_PROFILE_END( step )        (void)0
-#define ZP_PROFILE_FINALIZE()        (void)0
+#define ZP_PROFILE_SCOPE( profiler )    (void)0
+#define ZP_PROFILE_END( eventName )     (void)0
+#define ZP_PROFILE_FINALIZE()           (void)0
 #endif
 
 zpApplication::zpApplication()
@@ -189,7 +145,7 @@ void zpApplication::initialize()
 }
 void zpApplication::setup()
 {
-    m_profiler.setup( zpProfilerSteps_Count, &m_timer, m_memory );
+    m_profiler.setup( &m_timer, m_memory );
 
 #undef ZP_COMPONENT_DEF
 #define ZP_COMPONENT_DEF( cmp )            m_componentPool##cmp.setup( m_memory );
@@ -321,6 +277,8 @@ void zpApplication::update()
     zp_float deltaTime = m_isApplicationPaused && !m_isApplicationStepped ? 0.f : m_timer.getDeltaSeconds();
     zp_float realTime = m_timer.getWallClockDeltaSeconds();
     
+    ZP_PROFILE_SCOPE( &m_profiler );
+
     // clear application step
     m_isApplicationStepped = false;
 
@@ -531,7 +489,7 @@ void zpApplication::handleInput()
         zp_bool marked = m_displayStats.toggle( ZP_APPLICATION_STATS_FPS );
         if( marked )
         {
-            m_profiler.printProfile( ZP_PROFILER_STEP_PHYSICS_UPDATE, m_timer.getSecondsPerTick() );
+            //m_profiler.printProfile( ZP_PROFILER_STEP_PHYSICS_UPDATE, m_timer.getSecondsPerTick() );
         }
     }
     else if( keyboard->isKeyPressed( ZP_KEY_CODE_F2 ) )
@@ -870,6 +828,28 @@ void zpApplication::onGUI()
 
     zp_float secondsPerTick = m_timer.getSecondsPerTick();
 
+    if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
+    {
+        const zpProfilerTimeline& timeline = m_profiler.getPreviousFrameTimeline();
+
+        zpRectf rect( 5, 5, 320, 230 );
+        m_gui.beginWindow( "Profiler", rect, rect );
+        zp_char buf[ 256 ];
+
+        for( zp_size_t i = 0, imax = timeline.frames.size(); i < imax; ++i )
+        {
+            const zpProfilerFrame& frame = timeline.frames[ i ];
+
+            zp_snprintf( buf, 256, 256, "%-16s %-32s %-16s %4d %8dt %8db", frame.fileName, frame.functionName, frame.eventName, frame.lineNumber, ( frame.endTime - frame.startTime ), ( frame.endMemory - frame.startMemory ) );
+            //buff << frame.fileName << "@" << frame.functionName << ":" << frame.lineNumber << "    " << ( frame.endTime - frame.startTime ) << "t " << ( frame.endMemory - frame.startMemory ) << "b";
+            m_gui.label( 18, buf, zpColor4f( 0, 0, 0, 1 ) );
+            //buff.clear();
+        }
+
+        m_gui.endWindow();
+    }
+
+#if 0
     // draw FPS
     if( m_displayStats.isMarked( ZP_APPLICATION_STATS_FPS ) )
     {
@@ -1027,6 +1007,7 @@ void zpApplication::onGUI()
 
         m_gui.endWindow();
     }
+#endif
 
     if( m_displayStats.isMarked( ZP_APPLICATION_STATS_RENDERING_CMDS ) )
     {
